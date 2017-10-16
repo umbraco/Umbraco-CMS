@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 
 namespace Umbraco.Core.Models
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Core.Models
             if (Config != null)
             {
                 attributes = Config.ToObject<JObject>().Properties()
-                    .Select(p => new KeyValuePair<string, string>(p.Name, p.Value.ToString())).ToList();
+                    .Select(p => new KeyValuePair<string, string>(p.Name, HttpUtility.HtmlAttributeEncode(p.Value.ToString()))).ToList();
             }
 
             if (Styles != null)
@@ -31,8 +32,11 @@ namespace Umbraco.Core.Models
                 var jObject = Styles.ToObject<JObject>();
                 if (jObject.Properties().Any() == false) return attributes;
 
-                var cssValues = string.Join(";", jObject.Properties().Select(p => string.Format("{0}:{1}", p.Name, p.Value.ToString())));
-                attributes.Add(new KeyValuePair<string, string>("style", cssValues));
+                var cssValues = jObject.Properties()
+                    .Where(p => string.IsNullOrWhiteSpace(p.Value.ToString()) == false)
+                    .Select(p => string.Format("{0}:{1}", p.Name, p.Value.ToString()));
+
+                attributes.Add(new KeyValuePair<string, string>("style", HttpUtility.HtmlAttributeEncode(string.Join(";", cssValues))));
             }
 
             return attributes;
