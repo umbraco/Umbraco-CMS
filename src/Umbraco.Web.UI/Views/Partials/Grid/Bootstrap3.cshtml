@@ -60,21 +60,29 @@
         JObject cfg = contentItem.config;
 
         if(cfg != null)
-            foreach (JProperty property in cfg.Properties()) {
-                attrs.Add(property.Name + "='" + property.Value.ToString() + "'");
+            foreach (JProperty property in cfg.Properties())
+            {
+                var propertyValue = HttpUtility.HtmlAttributeEncode(property.Value.ToString());
+                attrs.Add(property.Name + "=\"" + propertyValue + "\"");
             }
-                
+
         JObject style = contentItem.styles;
 
-        if (style != null) { 
-        var cssVals = new List<string>();
-        foreach (JProperty property in style.Properties())
-            cssVals.Add(property.Name + ":" + property.Value.ToString() + ";");
+        if (style != null) {
+            var cssVals = new List<string>();
+            foreach (JProperty property in style.Properties())
+            {
+                var propertyValue = property.Value.ToString();
+                if (string.IsNullOrWhiteSpace(propertyValue) == false)
+                {
+                    cssVals.Add(property.Name + ":" + propertyValue + ";");
+                }
+            }
 
-        if (cssVals.Any())
-            attrs.Add("style='" + string.Join(" ", cssVals) + "'");
+            if (cssVals.Any())
+                attrs.Add("style=\"" + HttpUtility.HtmlAttributeEncode(string.Join(" ", cssVals)) + "\"");
         }
-            
+
         return new MvcHtmlString(string.Join(" ", attrs));
     }
 }
