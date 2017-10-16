@@ -1260,6 +1260,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="chooseDefault">Vælg standard</key>
     <key alias="areAdded">er tilføjet</key>
 
+    <key alias="maxItems">Maksimalt emner</key>
+    <key alias="maxItemsDescription">Efterlad blank eller sat til 0 ubegrænset for</key>
+
   </area>
   <area alias="contentTypeEditor">
 
