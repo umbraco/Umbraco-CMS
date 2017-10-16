@@ -31,7 +31,7 @@ namespace Umbraco.Web.Scheduling
 
         private ILogger Logger { get { return _appContext.ProfilingLogger.Logger; } }
 
-        public override async Task<bool> PerformRunAsync(CancellationToken token)
+        public override bool PerformRun()
         {
             if (_appContext == null) return true; // repeat...
 
@@ -55,16 +55,18 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            UmbracoContext tempContext = null;
             try
             {
                 // DO not run publishing if content is re-loading
                 if (content.Instance.isInitializing == false)
                 {
                     //TODO: We should remove this in v8, this is a backwards compat hack
+                    // see notes in CacheRefresherEventHandler
                     // because notifications will not be sent if there is no UmbracoContext
                     // see NotificationServiceExtensions
                     var httpContext = new HttpContextWrapper(new HttpContext(new SimpleWorkerRequest("temp.aspx", "", new StringWriter())));
-                    UmbracoContext.EnsureContext(
+                    tempContext = UmbracoContext.EnsureContext(
                         httpContext,
                         _appContext,
                         new WebSecurity(httpContext, _appContext),
@@ -81,13 +83,18 @@ namespace Umbraco.Web.Scheduling
             {
                 Logger.Error<ScheduledPublishing>("Failed (see exception).", e);
             }
+            finally
+            {
+                if (tempContext != null)
+                    tempContext.Dispose(); // nulls the ThreadStatic context
+            }
 
             return true; // repeat
         }
 
         public override bool IsAsync
         {
-            get { return true; }
+            get { return false; }
         }
     }
 }
