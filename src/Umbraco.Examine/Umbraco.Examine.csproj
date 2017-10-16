@@ -47,7 +47,6 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="Examine" Version="2.0.0-beta2" />
-    <PackageReference Include="SharpZipLib" Version="0.86.0" />
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

@@ -7,7 +7,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
-using ICSharpCode.SharpZipLib.Zip;
+using System.IO.Compression;
 
 namespace Umbraco.Core.IO
 {
@@ -23,47 +23,11 @@ namespace Umbraco.Core.IO
         internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
         {
             // Unzip
-            string tempDir = unPackDirectory;
+            var tempDir = unPackDirectory;
             Directory.CreateDirectory(tempDir);
-
-            //TODO: Get rid of SharpZipLib library
-            using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
-            {
-                ZipEntry theEntry;
-                while ((theEntry = s.GetNextEntry()) != null)
-                {
-                    string directoryName = Path.GetDirectoryName(theEntry.Name);
-                    string fileName = Path.GetFileName(theEntry.Name);
-
-                    if (fileName != String.Empty)
-                    {
-                        FileStream streamWriter = File.Create(tempDir + Path.DirectorySeparatorChar + fileName);
-
-                        int size = 2048;
-                        byte[] data = new byte[2048];
-                        while (true)
-                        {
-                            size = s.Read(data, 0, data.Length);
-                            if (size > 0)
-                            {
-                                streamWriter.Write(data, 0, size);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        streamWriter.Close();
-
-                    }
-                }
-
-                // Clean up
-                s.Close();
-                if (deleteZipFile)
-                    File.Delete(zipFilePath);
-            }
+            ZipFile.ExtractToDirectory(zipFilePath, unPackDirectory);
+            if (deleteZipFile)
+                File.Delete(zipFilePath);
         }
 
         //helper to try and match the old path to a new virtual one
@@ -83,7 +47,7 @@ namespace Umbraco.Core.IO
         //Replaces tildes with the root dir
         public static string ResolveUrl(string virtualPath)
         {
-             if (virtualPath.StartsWith("~"))
+            if (virtualPath.StartsWith("~"))
                 return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
             else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
