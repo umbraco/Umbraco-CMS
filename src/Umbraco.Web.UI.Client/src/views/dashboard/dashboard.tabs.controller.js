@@ -18,14 +18,19 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController(dashboardResource, assetsService, tourService) {
+function startUpDynamicContentController($timeout, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
+    var evts = [];
+
     vm.loading = true;
     vm.showDefault = false;
     
     vm.startTour = startTour;
 
-    vm.tours = tourService.getGroupedTours();
+    function onInit() {
+        // load tours
+        vm.tours = tourService.getGroupedTours();
+    }
 
     function startTour(tour) {
         tourService.startTour(tour);
@@ -75,6 +80,17 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
         ]
     };
 
+    evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
+        $timeout(function(){
+            angular.forEach(vm.tours, function (tourGroup) {
+                angular.forEach(tourGroup, function (tour) {
+                    if(tour.alias === completedTour.alias) {
+                        tour.completed = true;
+                    }
+                });
+            });
+        });
+    }));
     
     //proxy remote css through the local server
     assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
@@ -98,6 +114,10 @@ function startUpDynamicContentController(dashboardResource, assetsService, tourS
             vm.loading = false;
             vm.showDefault = true;
         });
+
+    
+    onInit();
+
 }
 
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);

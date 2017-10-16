@@ -1,7 +1,9 @@
 (function () {
     'use strict';
 
-    function tourService(eventsService) {
+    function tourService(eventsService, localStorageService) {
+
+        var localStorageKey = "umbTours";
 
         var tours = [
             {
@@ -284,24 +286,78 @@
         ];
 
         function startTour(tour) {
-            eventsService.emit("appState.startTour", tour);
+            eventsService.emit("appState.tour.start", tour);
         }
 
         function endTour() {
-            eventsService.emit("appState.endTour");
+            eventsService.emit("appState.tour.end");
         }
 
-        function completeTour() {
-            eventsService.emit("appState.endTour");
+        function completeTour(tour) {
+            saveInLocalStorage(tour);
+            eventsService.emit("appState.tour.complete", tour);
         }
-
+        
         function getAllTours() {
+            setCompletedTours();
             return tours;
         }
 
         function getGroupedTours() {
+            setCompletedTours();
             var groupedTours = _.groupBy(tours, "group");
             return groupedTours;
+        }
+
+        ///////////
+
+        function setCompletedTours() {
+
+            var storedTours = [];
+
+            if (localStorageService.get(localStorageKey)) {
+                storedTours = localStorageService.get(localStorageKey);
+            }
+
+            angular.forEach(storedTours, function (storedTour) {
+                if (storedTour.completed === true) {
+                    angular.forEach(tours, function (tour) {
+                        if (storedTour.alias === tour.alias) {
+                            tour.completed = true;
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function saveInLocalStorage(tour) {
+            var storedTours = [];
+            var tourFound = false;
+
+            if (localStorageService.get(localStorageKey)) {
+                storedTours = localStorageService.get(localStorageKey);
+            }
+
+            if (storedTours.length > 0) {
+                angular.forEach(storedTours, function (storedTour) {
+                    if (storedTour.alias === tour.alias) {
+                        storedTour.completed = true;
+                        tourFound = true;
+                    }
+                });
+            }
+
+            if (!tourFound) {
+                var storageObject = {
+                    "alias": tour.alias,
+                    "completed": true
+                };
+                storedTours.push(storageObject);
+            }
+
+            localStorageService.set(localStorageKey, storedTours);
+
         }
 
         var service = {

@@ -23,8 +23,8 @@
             };
 
             scope.completeTour = function() {
-                unbindEvent();                
-                tourService.completeTour();
+                unbindEvent();
+                tourService.completeTour(scope.tour);
                 backdropService.close();
             };
 
