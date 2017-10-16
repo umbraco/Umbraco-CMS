@@ -511,6 +511,13 @@ function Package-NuGet
     -Properties BuildTmp="$tmp" `
     -Version $version.Semver.ToString() `
     -Verbosity quiet -outputDirectory $out
+    
+    $hook = "$($uenv.SolutionRoot)\build\hooks\Post-Package-NuGet.ps1"
+    if (Test-Path -Path $hook)
+    {
+      . "$hook"
+      Post-Package-NuGet $uenv $version
+    }
 }
 
 #
@@ -577,15 +584,15 @@ function Build-Umbraco
   {
     Prepare-NuGet $uenv
   }
-  elseif ($target -eq "restore-nuget")
+  elseif ($target -eq "Restore-NuGet" -or $target -eq "restore-nuget")
   {
     Restore-NuGet $uenv
   }
-  elseif ($target -eq "pkg-zip")
+  elseif ($target -eq "Package-Zip" -eq $target -eq "pkg-zip")
   {
     Package-Zip $uenv
   }
-  elseif ($target -eq "pkg-nuget")
+  elseif ($target -eq "Package-NuGet" -eq $target -eq "pkg-nuget")
   {
     Package-NuGet $uenv $version
   }
