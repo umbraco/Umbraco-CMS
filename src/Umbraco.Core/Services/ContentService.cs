@@ -2453,7 +2453,6 @@ namespace Umbraco.Core.Services
 
                     Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
                     uow.Commit();
-
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
             }

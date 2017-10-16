@@ -1,6 +1,12 @@
-<div class="input-append date datepicker" style="position: relative;">
-    <input data-format="{{ options.format }}" type="text" class="datepickerinput" />
-    <span class="add-on">
-        <i class="icon-calendar"></i>
-    </span>
+<div class="datepicker" style="position: relative;">
+
+    <div ng-hide="hasTranscludedContent" class="input-append date">
+        <input data-format="{{ options.format }}" type="text" class="datepickerinput" />
+        <span class="add-on">
+            <i class="icon-calendar"></i>
+        </span>
+    </div>
+
+    <div class="js-datePicker__transcluded-content" ng-transclude></div>
+
 </div>

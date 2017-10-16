@@ -22,10 +22,21 @@
             <umb-tabs-content view="true" class="form-horizontal">
                <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-                  <umb-property property="property" ng-repeat="property in tab.properties">
-                     <umb-editor model="property"></umb-editor>
-                  </umb-property>
-
+                    <!-- Other tabs than info -->
+                    <div ng-if="tab.id !== -1 && tab.alias !== '_umb_infoTab'">
+                        <umb-property ng-repeat="property in tab.properties" property="property">
+                            <umb-editor model="property"></umb-editor>
+                        </umb-property>
+                    </div>
+                    
+                    <!-- Info tab -->
+                    <div ng-if="tab.id === -1 && tab.alias === '_umb_infoTab'">
+                        <umb-media-node-info
+                            ng-if="content"
+                            node="content">
+                        </umb-media-node-info>
+                    </div>
+                
                </umb-tab>
             </umb-tabs-content>
 
