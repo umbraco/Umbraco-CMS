@@ -30,14 +30,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (!IsNested(publishedProperty))
                 return false;
 
-            // fixme - the facade should provide this
-            var preValueCollection = NestedContentHelper.GetPreValuesCollectionByDataTypeId(publishedProperty.DataTypeId);
-            var preValueDictionary = preValueCollection.PreValuesAsDictionary;
-
-            return preValueDictionary.TryGetValue("minItems", out var minItems)
-                   && preValueDictionary.TryGetValue("maxItems", out var maxItems)
-                   && int.TryParse(minItems.Value, out var minItemsValue) && minItemsValue == 1
-                   && int.TryParse(maxItems.Value, out var maxItemsValue) && maxItemsValue == 1;
+            var config = publishedProperty.DataType.GetConfiguration<NestedContentPropertyEditor.DataTypeConfiguration>();
+            return config.MinItems == 1 && config.MaxItems == 1;
         }
 
         public static bool IsNestedMany(PublishedPropertyType publishedProperty)

@@ -130,11 +130,6 @@ namespace Umbraco.Tests.PublishedContent
                     currSort = rootChildren[i].SortOrder;
                 }
             }
-
-
-
-
-
         }
 
 
@@ -438,7 +433,6 @@ namespace Umbraco.Tests.PublishedContent
                 new[] { mSubChild1.Id, mChild1.Id, mRoot.Id }));
         }
 
-
         [Test]
         public void Convert_From_Standard_Xml()
         {
@@ -490,6 +484,4 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNull(converted);
         }
     }
-
-
 }

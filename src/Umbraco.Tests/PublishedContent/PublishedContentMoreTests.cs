@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.ObjectModel;
 using System.Web.Routing;
 using Moq;
@@ -11,6 +12,7 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
 using LightInject;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
@@ -189,17 +191,18 @@ namespace Umbraco.Tests.PublishedContent
 
         private static SolidFacade CreateFacade()
         {
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
             var caches = new SolidFacade();
             var cache = caches.InnerContentCache;
 
             var props = new[]
             {
-                new PublishedPropertyType("prop1", 1, "?"),
+                factory.CreatePropertyType("prop1", 1, "?"),
             };
 
-            var contentType1 = new PublishedContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
-            var contentType2 = new PublishedContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2Sub = new PublishedContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
+            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
+            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
 
             cache.Add(new SolidPublishedContent(contentType1)
                 {

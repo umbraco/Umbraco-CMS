@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 using Moq;
@@ -6,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -16,13 +18,14 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture, RequiresSTA]
     public abstract class BaseWebTest : TestWithDatabaseBase
     {
-        public override void SetUp()
+        protected override void Initialize()
         {
-            base.SetUp();
+            base.Initialize();
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
-            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] {});
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { }, factory);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 

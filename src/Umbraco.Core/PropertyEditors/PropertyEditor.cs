@@ -190,5 +190,30 @@ namespace Umbraco.Core.PropertyEditors
         {
             return $"Name: {Name}, Alias: {Alias}, IsParameterEditor: {IsParameterEditor}";
         }
+
+        /// <summary>
+        /// Maps a preValues collection to a strongly typed object.
+        /// </summary>
+        /// <param name="preValues">The preValues collection.</param>
+        /// <returns>A strongly typed object.</returns>
+        /// <remarks>
+        /// <para>Each property editor can declare a DataTypeConfiguration inner class that represents
+        /// its preValues in a nice strongly typed way, and override this method to convert the preValues
+        /// collection.</para>
+        /// <para>Otherwise, by default, this method will convert to a Dictionary{string, string}.</para>
+        /// <para>fixme - is this temp?</para>
+        /// </remarks>
+        public virtual object MapDataTypeConfiguration(PreValueCollection preValues)
+        {
+            var asDictionary = preValues.IsDictionaryBased
+                ? preValues.PreValuesAsDictionary
+                : preValues.FormatAsDictionary();
+
+            var configuration = new Dictionary<string, string>();
+            foreach (var kvp in asDictionary)
+                configuration[kvp.Key] = kvp.Value.Value;
+
+            return configuration;
+        }
     }
 }

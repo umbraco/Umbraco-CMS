@@ -11,6 +11,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
@@ -69,11 +71,14 @@ namespace Umbraco.Tests.Scoping
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
+            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+
             return new FacadeService(
                 options,
                 null,
                 runtimeStateMock.Object,
                 ServiceContext,
+                contentTypeFactory,
                 UowProvider,
                 facadeAccessor,
                 Logger,

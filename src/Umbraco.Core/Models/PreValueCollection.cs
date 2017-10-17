@@ -5,7 +5,7 @@ using System.Linq;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents the pre-value data for a DataType
+    /// Represents the preValues for a data type.
     /// </summary>
     /// <remarks>
     /// Due to the legacy nature of the data that can be stored for pre-values, we have this class which encapsulates the 2 different
@@ -17,84 +17,72 @@ namespace Umbraco.Core.Models
     public class PreValueCollection : IDeepCloneable
     {
         private IDictionary<string, PreValue> _preValuesAsDictionary;
-        private IEnumerable<PreValue> _preValuesAsArray;
+        private PreValue[] _preValuesAsArray;
+
+        /// <summary>
+        /// Gets the collection as an array.
+        /// </summary>
         public IEnumerable<PreValue> PreValuesAsArray
         {
-            get
-            {
-                if (_preValuesAsArray == null)
-                {
-                    throw new InvalidOperationException("The current pre-value collection is dictionary based, use the PreValuesAsDictionary property instead");
-                }
-                return _preValuesAsArray;
-            }
-            set { _preValuesAsArray = value; }
-        }
-
-        public IDictionary<string, PreValue> PreValuesAsDictionary
-        {
-            get
-            {
-                if (_preValuesAsDictionary == null)
-                {
-                    throw new InvalidOperationException("The current pre-value collection is array based, use the PreValuesAsArray property instead");
-                }
-                return _preValuesAsDictionary;
-            }
-            set { _preValuesAsDictionary = value; }
+            get => _preValuesAsArray
+                ?? throw new InvalidOperationException("The current preValue collection is dictionary based, use the PreValuesAsDictionary property instead.");
+            set => _preValuesAsArray = value.ToArray();
         }
 
         /// <summary>
-        /// Check if it is a dictionary based collection
+        /// Gets the collection as a dictionary.
         /// </summary>
-        public bool IsDictionaryBased
+        public IDictionary<string, PreValue> PreValuesAsDictionary
         {
-            get { return _preValuesAsDictionary != null; }
+            get => _preValuesAsDictionary
+                ?? throw new InvalidOperationException("The current preValue collection is array based, use the PreValuesAsArray property instead.");
+            set => _preValuesAsDictionary = value;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the collection is dictionary-based.
+        /// </summary>
+        public bool IsDictionaryBased => _preValuesAsDictionary != null;
+
+        /// <summary>
+        /// Initializes a new array-based instance of the <seealso cref="PreValueCollection"/> class.
+        /// </summary>
         public PreValueCollection(IEnumerable<PreValue> preVals)
         {
-            _preValuesAsArray = preVals;
+            _preValuesAsArray = preVals.ToArray();
         }
 
+        /// <summary>
+        /// Initializes a new dictionary-based instance of the <seealso cref="PreValueCollection"/> class.
+        /// </summary>
         public PreValueCollection(IDictionary<string, PreValue> preVals)
         {
             _preValuesAsDictionary = preVals;
         }
 
         /// <summary>
-        /// Regardless of how the pre-values are stored this will return as a dictionary, it will convert an array based to a dictionary
+        /// Gets the collection as a dictionary, even if it is array-based.
         /// </summary>
-        /// <returns></returns>
         public IDictionary<string, PreValue> FormatAsDictionary()
         {
             if (IsDictionaryBased)
-            {
                 return PreValuesAsDictionary;
-            }
 
-            //it's an array so need to format it, the alias will just be an iteration
-            var result = new Dictionary<string, PreValue>();
-            var asArray = PreValuesAsArray.ToArray();
-            for (var i = 0; i < asArray.Length; i++)
-            {
-                result.Add(i.ToInvariantString(), asArray[i]);
-            }
-            return result;
+            var dictionary = new Dictionary<string, PreValue>();
+            for (var i = 0; i < _preValuesAsArray.Length; i++)
+                dictionary[i.ToInvariantString()] = _preValuesAsArray[i];
+            return dictionary;
         }
 
         public object DeepClone()
         {
             var clone = (PreValueCollection) MemberwiseClone();
-            if (_preValuesAsArray != null)
-            {
-                clone._preValuesAsArray = _preValuesAsArray.Select(x => (PreValue)x.DeepClone()).ToArray();
-            }
-            if (_preValuesAsDictionary != null)
-            {
-                clone._preValuesAsDictionary = _preValuesAsDictionary.ToDictionary(x => x.Key, x => (PreValue)x.Value.DeepClone());
-            }
 
+            if (_preValuesAsArray != null)
+                clone._preValuesAsArray = _preValuesAsArray.Select(x => (PreValue) x.DeepClone()).ToArray();
+
+            if (_preValuesAsDictionary != null)
+                clone._preValuesAsDictionary = _preValuesAsDictionary.ToDictionary(x => x.Key, x => (PreValue) x.Value.DeepClone());
 
             return clone;
         }

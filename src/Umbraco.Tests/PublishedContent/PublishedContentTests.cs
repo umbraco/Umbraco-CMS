@@ -9,7 +9,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
-using Current = Umbraco.Core.Composing.Current;
 using LightInject;
 using Umbraco.Tests.Testing;
 
@@ -22,14 +21,19 @@ namespace Umbraco.Tests.PublishedContent
     [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
     public class PublishedContentTests : PublishedContentTestBase
     {
-        private TypeLoader _typeLoader;
-
-        public override void SetUp()
+        protected override void Compose()
         {
-            // required so we can access property.Value
-            //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+            base.Compose();
 
-            base.SetUp();
+            Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -37,24 +41,17 @@ namespace Umbraco.Tests.PublishedContent
             // explicitely want to be here...
 
             var propertyTypes = new[]
-                {
-                    // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias),
-                    new PublishedPropertyType("selectedNodes", 0, "?"),
-                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"),
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
-                    new PublishedPropertyType("testRecursive", 0, "?"),
-                };
-            var compositionAliases = new[] {"MyCompositionAlias"};
-            var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
+            {
+                // AutoPublishedContentType will auto-generate other properties
+                factory.CreatePropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias),
+                factory.CreatePropertyType("selectedNodes", 0, "?"),
+                factory.CreatePropertyType("umbracoUrlAlias", 0, "?"),
+                factory.CreatePropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
+                factory.CreatePropertyType("testRecursive", 0, "?"),
+            };
+            var compositionAliases = new[] { "MyCompositionAlias" };
+            var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes, factory);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
-        }
-
-        protected override void Compose()
-        {
-            base.Compose();
-
-            Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
         protected override TypeLoader CreatePluginManager(IServiceFactory f)
@@ -554,8 +551,10 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void FragmentProperty()
         {
-            var pt = new PublishedPropertyType("detached", Constants.PropertyEditors.IntegerAlias);
-            var ct = new PublishedContentType(0, "alias", new[] { pt });
+            var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+
+            var pt = factory.CreatePropertyType("detached", 0, Constants.PropertyEditors.IntegerAlias);
+            var ct = factory.CreateContentType(0, "alias", new[] { pt });
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.Value);
             Assert.AreEqual(5548, prop.Value);
@@ -571,16 +570,18 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Fragment2()
         {
-            var pt1 = new PublishedPropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
-            var pt2 = new PublishedPropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
-            var pt3 = new PublishedPropertyType("size", 0, Constants.PropertyEditors.IntegerAlias);
+            var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
+
+            var pt1 = factory.CreatePropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
+            var pt2 = factory.CreatePropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
+            var pt3 = factory.CreatePropertyType("size", 0, Constants.PropertyEditors.IntegerAlias);
             const string val1 = "boom bam";
             const int val2 = 0;
             const int val3 = 666;
 
             var guid = Guid.NewGuid();
 
-            var ct = new PublishedContentType(0, "alias", new[] { pt1, pt2, pt3 });
+            var ct = factory.CreateContentType(0, "alias", new[] { pt1, pt2, pt3 });
 
             var c = new ImageWithLegendModel(ct, guid, new Dictionary<string, object>
             {

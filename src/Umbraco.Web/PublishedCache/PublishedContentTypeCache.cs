@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -10,8 +9,10 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PublishedCache
 {
-    // caches content, media and member types
-
+    /// <summary>
+    /// Represents a content type cache.
+    /// </summary>
+    /// <remarks>This cache is not snapshotted, so it refreshes any time things change.</remarks>
     public class PublishedContentTypeCache
     {
         private readonly Dictionary<string, PublishedContentType> _typesByAlias = new Dictionary<string, PublishedContentType>();
@@ -19,51 +20,87 @@ namespace Umbraco.Web.PublishedCache
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
-        public readonly ILogger _logger;
+        private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
+        private readonly ILogger _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        internal PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, ILogger logger)
+        // default ctor
+        internal PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
             _logger = logger;
+            _publishedContentTypeFactory = publishedContentTypeFactory;
         }
 
         // for unit tests ONLY
-        internal PublishedContentTypeCache(ILogger logger)
+        internal PublishedContentTypeCache(ILogger logger, IPublishedContentTypeFactory publishedContentTypeFactory)
         {
             _logger = logger;
+            _publishedContentTypeFactory = publishedContentTypeFactory;
         }
 
+        /// <summary>
+        /// Clears all cached content types.
+        /// </summary>
         public void ClearAll()
         {
             _logger.Debug<PublishedContentTypeCache>("Clear all.");
 
-            using (new WriteLock(_lock))
+            try
             {
+                _lock.EnterWriteLock();
+
                 _typesByAlias.Clear();
                 _typesById.Clear();
             }
+            finally
+            {
+                if (_lock.IsWriteLockHeld)
+                    _lock.ExitWriteLock();
+            }
         }
 
+        /// <summary>
+        /// Clears a cached content type.
+        /// </summary>
+        /// <param name="id">An identifier.</param>
         public void ClearContentType(int id)
         {
             _logger.Debug<PublishedContentTypeCache>("Clear content type w/id {0}.", () => id);
 
-            using (var l = new UpgradeableReadLock(_lock))
+            try
             {
-                PublishedContentType type;
-                if (_typesById.TryGetValue(id, out type) == false)
+                _lock.EnterUpgradeableReadLock();
+
+                if (_typesById.TryGetValue(id, out var type) == false)
                     return;
 
-                l.UpgradeToWriteLock();
+                try
+                {
+                    _lock.EnterWriteLock();
 
-                _typesByAlias.Remove(GetAliasKey(type));
-                _typesById.Remove(id);
+                    _typesByAlias.Remove(GetAliasKey(type));
+                    _typesById.Remove(id);
+                }
+                finally
+                {
+                    if (_lock.IsWriteLockHeld)
+                        _lock.ExitWriteLock();
+                }
+            }
+            finally
+            {
+                if (_lock.IsUpgradeableReadLockHeld)
+                    _lock.ExitUpgradeableReadLock();
             }
         }
 
+        /// <summary>
+        /// Clears all cached content types referencing a data type.
+        /// </summary>
+        /// <param name="id">A data type identifier.</param>
         public void ClearDataType(int id)
         {
             _logger.Debug<PublishedContentTypeCache>("Clear data type w/id {0}.", () => id);
@@ -73,8 +110,10 @@ namespace Umbraco.Web.PublishedCache
             // IContentTypeComposition) and so every PublishedContentType having a property based upon
             // the cleared data type, be it local or inherited, will be cleared.
 
-            using (new WriteLock(_lock))
+            try
             {
+                _lock.EnterWriteLock();
+
                 var toRemove = _typesById.Values.Where(x => x.PropertyTypes.Any(xx => xx.DataTypeId == id)).ToArray();
                 foreach (var type in toRemove)
                 {
@@ -82,32 +121,84 @@ namespace Umbraco.Web.PublishedCache
                     _typesById.Remove(type.Id);
                 }
             }
-        }
-
-        public PublishedContentType Get(PublishedItemType itemType, string alias)
-        {
-            var aliasKey = GetAliasKey(itemType, alias);
-            using (var l = new UpgradeableReadLock(_lock))
+            finally
             {
-                PublishedContentType type;
-                if (_typesByAlias.TryGetValue(aliasKey, out type))
-                    return type;
-                type = CreatePublishedContentType(itemType, alias);
-                l.UpgradeToWriteLock();
-                return _typesByAlias[aliasKey] = _typesById[type.Id] = type;
+                if (_lock.IsWriteLockHeld)
+                    _lock.ExitWriteLock();
             }
         }
 
+        /// <summary>
+        /// Gets a published content type.
+        /// </summary>
+        /// <param name="itemType">An item type.</param>
+        /// <param name="alias">An alias.</param>
+        /// <returns>The published content type corresponding to the item type and alias.</returns>
+        public PublishedContentType Get(PublishedItemType itemType, string alias)
+        {
+            var aliasKey = GetAliasKey(itemType, alias);
+
+            try
+            {
+                _lock.EnterUpgradeableReadLock();
+
+                if (_typesByAlias.TryGetValue(aliasKey, out var type))
+                    return type;
+
+                type = CreatePublishedContentType(itemType, alias);
+
+                try
+                {
+                    _lock.EnterWriteLock();
+
+                    return _typesByAlias[aliasKey] = _typesById[type.Id] = type;
+                }
+                finally
+                {
+                    if (_lock.IsWriteLockHeld)
+                        _lock.ExitWriteLock();
+                }
+            }
+            finally
+            {
+                if (_lock.IsUpgradeableReadLockHeld)
+                    _lock.ExitUpgradeableReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Gets a published content type.
+        /// </summary>
+        /// <param name="itemType">An item type.</param>
+        /// <param name="id">An identifier.</param>
+        /// <returns>The published content type corresponding to the item type and identifier.</returns>
         public PublishedContentType Get(PublishedItemType itemType, int id)
         {
-            using (var l = new UpgradeableReadLock(_lock))
+            try
             {
-                PublishedContentType type;
-                if (_typesById.TryGetValue(id, out type))
+                _lock.EnterUpgradeableReadLock();
+
+                if (_typesById.TryGetValue(id, out var type))
                     return type;
+
                 type = CreatePublishedContentType(itemType, id);
-                l.UpgradeToWriteLock();
-                return _typesByAlias[GetAliasKey(type)] = _typesById[type.Id] = type;
+
+                try
+                {
+                    _lock.EnterWriteLock();
+
+                    return _typesByAlias[GetAliasKey(type)] = _typesById[type.Id] = type;
+                }
+                finally
+                {
+                    if (_lock.IsWriteLockHeld)
+                        _lock.ExitWriteLock();
+                }
+            }
+            finally
+            {
+                if (_lock.IsUpgradeableReadLockHeld)
+                    _lock.ExitUpgradeableReadLock();
             }
         }
 
@@ -135,7 +226,7 @@ namespace Umbraco.Web.PublishedCache
             if (contentType == null)
                 throw new Exception($"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with alias \"{alias}\".");
 
-            return new PublishedContentType(itemType, contentType);
+            return _publishedContentTypeFactory.CreateContentType(itemType, contentType);
         }
 
         private PublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
@@ -162,21 +253,28 @@ namespace Umbraco.Web.PublishedCache
             if (contentType == null)
                 throw new Exception($"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with id {id}.");
 
-            return new PublishedContentType(itemType, contentType);
+            return _publishedContentTypeFactory.CreateContentType(itemType, contentType);
         }
 
         // for unit tests - changing the callback must reset the cache obviously
         private Func<string, PublishedContentType> _getPublishedContentTypeByAlias;
         internal Func<string, PublishedContentType> GetPublishedContentTypeByAlias
         {
-            get { return _getPublishedContentTypeByAlias; }
+            get => _getPublishedContentTypeByAlias;
             set
             {
-                using (new WriteLock(_lock))
+                try
                 {
+                    _lock.EnterWriteLock();
+
                     _typesByAlias.Clear();
                     _typesById.Clear();
                     _getPublishedContentTypeByAlias = value;
+                }
+                finally
+                {
+                    if (_lock.IsWriteLockHeld)
+                        _lock.ExitWriteLock();
                 }
             }
         }
@@ -185,14 +283,21 @@ namespace Umbraco.Web.PublishedCache
         private Func<int, PublishedContentType> _getPublishedContentTypeById;
         internal Func<int, PublishedContentType> GetPublishedContentTypeById
         {
-            get { return _getPublishedContentTypeById; }
+            get => _getPublishedContentTypeById;
             set
             {
-                using (new WriteLock(_lock))
+                try
                 {
+                    _lock.EnterWriteLock();
+
                     _typesByAlias.Clear();
                     _typesById.Clear();
                     _getPublishedContentTypeById = value;
+                }
+                finally
+                {
+                    if (_lock.IsWriteLockHeld)
+                        _lock.ExitWriteLock();
                 }
             }
         }
@@ -201,13 +306,20 @@ namespace Umbraco.Web.PublishedCache
         {
             string k;
 
-            if (itemType == PublishedItemType.Content)
-                k = "c";
-            else if (itemType == PublishedItemType.Media)
-                k = "m";
-            else if (itemType == PublishedItemType.Member)
-                k = "m";
-            else throw new ArgumentOutOfRangeException(nameof(itemType));
+            switch (itemType)
+            {
+                case PublishedItemType.Content:
+                    k = "c";
+                    break;
+                case PublishedItemType.Media:
+                    k = "m";
+                    break;
+                case PublishedItemType.Member:
+                    k = "m";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(itemType));
+            }
 
             return k + ":" + alias;
         }

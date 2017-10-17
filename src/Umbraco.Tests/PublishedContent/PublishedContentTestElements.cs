@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
@@ -313,14 +314,17 @@ namespace Umbraco.Tests.PublishedContent
 
     class AutoPublishedContentType : PublishedContentType
     {
-        private static readonly PublishedPropertyType Default = new PublishedPropertyType("*", 0, "?");
+        private static readonly PublishedContentTypeFactory Factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
-            : base(id, alias, Enumerable.Empty<string>(), propertyTypes)
+        private static readonly PublishedPropertyType Default
+            = Factory.CreatePropertyType("*", 0, "?");
+
+        public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory publishedContentTypeFactory)
+            : base(id, alias, Enumerable.Empty<string>(), propertyTypes, publishedContentTypeFactory)
         { }
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
-            : base(id, alias, compositionAliases, propertyTypes)
+        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory publishedContentTypeFactory)
+            : base(id, alias, compositionAliases, propertyTypes, publishedContentTypeFactory)
         { }
 
         public override PublishedPropertyType GetPropertyType(string alias)

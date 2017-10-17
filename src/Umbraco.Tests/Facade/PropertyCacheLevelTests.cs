@@ -27,9 +27,10 @@ namespace Umbraco.Tests.Facade
                 converter,
             });
 
-            var setType1 = new PublishedContentType(1000, "set1", new[]
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
             {
-                new PublishedPropertyType("prop1", "editor1", converters),
+                publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
             // PublishedElementPropertyBase.GetCacheLevels:
@@ -101,9 +102,10 @@ namespace Umbraco.Tests.Facade
                 converter,
             });
 
-            var setType1 = new PublishedContentType(1000, "set1", new[]
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
             {
-                new PublishedPropertyType("prop1", "editor1", converters),
+                publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
             var snapshotCache = new DictionaryCacheProvider();
@@ -171,9 +173,10 @@ namespace Umbraco.Tests.Facade
                 converter,
             });
 
-            var setType1 = new PublishedContentType(1000, "set1", new[]
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
             {
-                new PublishedPropertyType("prop1", "editor1", converters),
+                publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
             Assert.Throws<Exception>(() =>

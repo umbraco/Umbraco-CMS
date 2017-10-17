@@ -48,6 +48,14 @@ namespace Umbraco.Web.PropertyEditors
         // has to be lazy else circular dep in ctor
         private PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
+        private static IContentType GetElementType(JObject item)
+        {
+            var contentTypeAlias = item[ContentTypeAliasPropertyKey]?.ToObject<string>();
+            return string.IsNullOrEmpty(contentTypeAlias)
+                ? null
+                : Current.Services.ContentTypeService.Get(contentTypeAlias);
+        }
+
         #region Pre Value Editor
 
         protected override PreValueEditor CreatePreValueEditor()
@@ -76,6 +84,34 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
             public string HideLabel { get; set; }
+        }
+
+        #endregion
+
+        #region DataType Configuration
+
+        public class DataTypeConfiguration
+        {
+            public string[] ContentTypes { get; set; }
+            public int? MinItems { get; set; }
+            public int? MaxItems { get; set; }
+            public bool ConfirmDeletes { get; set; }
+            public bool ShowIcons { get; set; }
+            public bool HideLabel { get; set; }
+        }
+
+        public override object MapDataTypeConfiguration(PreValueCollection preValues)
+        {
+            var d = preValues.PreValuesAsDictionary;
+            return new DataTypeConfiguration
+            {
+                ContentTypes = d.TryGetValue("contentTypes", out var preValue) ? preValue.Value.Split(',') : Array.Empty<string>(),
+                MinItems = d.TryGetValue("minItems", out preValue) && int.TryParse(preValue.Value, out var minItems) ? (int?) minItems : null,
+                MaxItems = d.TryGetValue("maxItems", out preValue) && int.TryParse(preValue.Value, out var maxItems) ? (int?) maxItems : null,
+                ConfirmDeletes = d.TryGetValue("confirmDeletes", out preValue) && preValue.Value == "1",
+                ShowIcons = d.TryGetValue("showIcons", out preValue) && preValue.Value == "1",
+                HideLabel = d.TryGetValue("hideLabel", out preValue) && preValue.Value == "1"
+            };
         }
 
         #endregion
@@ -134,7 +170,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = ((JObject)o);
 
-                    var contentType = NestedContentHelper.GetElementType(propValues);
+                    var contentType = GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;
@@ -206,7 +242,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = ((JObject)o);
 
-                    var contentType = NestedContentHelper.GetElementType(propValues);
+                    var contentType = GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;
@@ -284,7 +320,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = ((JObject)o);
 
-                    var contentType = NestedContentHelper.GetElementType(propValues);
+                    var contentType = GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;
@@ -354,7 +390,7 @@ namespace Umbraco.Web.PropertyEditors
                     var o = value[i];
                     var propValues = (JObject) o;
 
-                    var contentType = NestedContentHelper.GetElementType(propValues);
+                    var contentType = GetElementType(propValues);
                     if (contentType == null)
                     {
                         continue;

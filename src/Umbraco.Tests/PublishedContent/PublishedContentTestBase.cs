@@ -4,8 +4,8 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
 using LightInject;
+using Moq;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -14,23 +14,6 @@ namespace Umbraco.Tests.PublishedContent
     /// </summary>
     public abstract class PublishedContentTestBase : BaseWebTest
     {
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            // need to specify a custom callback for unit tests
-            var propertyTypes = new[]
-                {
-                    // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
-                };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
-            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
-
-            var umbracoContext = GetUmbracoContext("/test");
-            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
-        }
-
         protected override void Compose()
         {
             base.Compose();
@@ -45,6 +28,26 @@ namespace Umbraco.Tests.PublishedContent
                 .Append<DatePickerValueConverter>()
                 .Append<TinyMceValueConverter>()
                 .Append<YesNoValueConverter>();
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            var converters = Container.GetInstance<PropertyValueConverterCollection>();
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+
+            // need to specify a custom callback for unit tests
+            var propertyTypes = new[]
+            {
+                // AutoPublishedContentType will auto-generate other properties
+                publishedContentTypeFactory.CreatePropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
+            };
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes, publishedContentTypeFactory);
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
+
+            var umbracoContext = GetUmbracoContext("/test");
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
         }
     }
 }

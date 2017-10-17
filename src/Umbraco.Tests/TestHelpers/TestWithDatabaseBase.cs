@@ -29,6 +29,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using LightInject;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -249,6 +250,7 @@ namespace Umbraco.Tests.TestHelpers
                 Current.Services.ContentTypeService,
                 Current.Services.MediaTypeService,
                 Current.Services.MemberTypeService,
+                Container.GetInstance<IPublishedContentTypeFactory>(),
                 Current.Logger);
 
             // testing=true so XmlStore will not use the file nor the database
@@ -256,6 +258,7 @@ namespace Umbraco.Tests.TestHelpers
             var facadeAccessor = new UmbracoContextFacadeAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var service = new FacadeService(
                 Current.Services,
+                Container.GetInstance<IPublishedContentTypeFactory>(),
                 (ScopeProvider) Current.ScopeProvider,
                 UowProvider,
                 cache, facadeAccessor, Current.Logger, ContentTypesCache, null, true, Options.FacadeServiceRepositoryEvents);

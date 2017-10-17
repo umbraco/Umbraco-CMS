@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -17,65 +18,80 @@ namespace Umbraco.Core.Models.PublishedContent
         // fixme - benchmark this!
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
 
-        // internal so it can be used by PublishedNoCache which does _not_ want to cache anything and so will never
-        // use the static cache getter PublishedContentType.GetPublishedContentType(alias) below - anything else
-        // should use it.
-        // fixme - not true anymore internal and all?!
+        // fixme used in legacy page.cs that should die
         internal PublishedContentType(IContentType contentType)
-            : this(PublishedItemType.Content, contentType)
+            : this(PublishedItemType.Content, contentType, new CurrentPublishedContentTypeFactory())
         { }
 
-        internal PublishedContentType(IMediaType mediaType)
-            : this(PublishedItemType.Media, mediaType)
-        { }
-
-        internal PublishedContentType(IMemberType memberType)
-            : this(PublishedItemType.Member, memberType)
-        { }
-
-        internal PublishedContentType(PublishedItemType itemType, IContentTypeComposition contentType)
+        // fixme above and should die
+        private class CurrentPublishedContentTypeFactory : IPublishedContentTypeFactory
         {
-            Id = contentType.Id;
-            Alias = contentType.Alias;
-            ItemType = itemType;
-            CompositionAliases = new HashSet<string>(contentType.CompositionAliases(), StringComparer.InvariantCultureIgnoreCase);
+            public PublishedContentType CreateContentType(PublishedItemType itemType, IContentTypeComposition contentType)
+            {
+                return new PublishedContentType(itemType, contentType, this);
+            }
+
+            public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, PropertyType propertyType)
+            {
+                return new PublishedPropertyType(contentType, propertyType, Current.PublishedModelFactory, Current.PropertyValueConverters, this);
+            }
+
+            public PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, string editorAlias, bool umbraco = false)
+            {
+                return new PublishedPropertyType(propertyTypeAlias, dataTypeId, editorAlias, umbraco, Current.PublishedModelFactory, Current.PropertyValueConverters, this);
+            }
+
+            public PublishedDataType CreateDataType(int id, string editorAlias)
+            {
+                return new PublishedDataType(id, editorAlias, new DataTypeConfigurationSource(Current.Services.DataTypeService, Current.PropertyEditors));
+            }
+        }
+
+        // this is the main and only true ctor
+        internal PublishedContentType(PublishedItemType itemType, IContentTypeComposition contentType, IPublishedContentTypeFactory factory)
+            : this(contentType.Id, contentType.Alias, itemType, contentType.CompositionAliases())
+        {
             var propertyTypes = contentType.CompositionPropertyTypes
-                .Select(x => new PublishedPropertyType(this, x));
+                .Select(x => factory.CreatePropertyType(this, x));
+
             if (itemType == PublishedItemType.Member)
-                propertyTypes = WithMemberProperties(propertyTypes, this);
+                propertyTypes = WithMemberProperties(this, propertyTypes, factory);
             _propertyTypes = propertyTypes.ToArray();
+
             InitializeIndexes();
         }
 
-        // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
-            : this(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes)
-        { }
-
-        // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
-            : this(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes)
-        { }
-
-        // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+        private PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases)
         {
             Id = id;
             Alias = alias;
             ItemType = itemType;
             CompositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
-            if (itemType == PublishedItemType.Member)
-                propertyTypes = WithMemberProperties(propertyTypes);
-            _propertyTypes = propertyTypes.ToArray();
-            foreach (var propertyType in _propertyTypes)
-                propertyType.ContentType = this;
-            InitializeIndexes();
         }
 
-        // create floating content type - ie does not match anything in the DB
-        internal PublishedContentType(string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
-            : this(0, alias, compositionAliases, propertyTypes)
+        // internal so it can be used for unit tests
+        internal PublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
+            : this(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, factory)
         { }
+
+        // internal so it can be used for unit tests
+        internal PublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
+            : this(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, factory)
+        { }
+
+        private PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
+            : this (id, alias, itemType, compositionAliases)
+        {
+            var propertyTypesA = propertyTypes.ToArray();
+            foreach (var propertyType in propertyTypesA)
+                propertyType.ContentType = this;
+
+            if (itemType == PublishedItemType.Member)
+                propertyTypesA = WithMemberProperties(this, propertyTypesA, factory).ToArray();
+            _propertyTypes = propertyTypesA;
+
+            InitializeIndexes();
+        }
 
         private void InitializeIndexes()
         {
@@ -105,8 +121,7 @@ namespace Umbraco.Core.Models.PublishedContent
             { "LastPasswordChangeDate", Tuple.Create(Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
         };
 
-        private static IEnumerable<PublishedPropertyType> WithMemberProperties(IEnumerable<PublishedPropertyType> propertyTypes,
-            PublishedContentType contentType = null)
+        private static IEnumerable<PublishedPropertyType> WithMemberProperties(PublishedContentType contentType, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
         {
             var aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var propertyType in propertyTypes)
@@ -117,8 +132,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
             foreach (var propertyType in BuiltinMemberProperties
                 .Where(kvp => aliases.Contains(kvp.Key) == false)
-                .Select(kvp => new PublishedPropertyType(kvp.Key, kvp.Value.Item1, kvp.Value.Item2, umbraco: true)))
+                .Select(kvp => factory.CreatePropertyType(kvp.Key, kvp.Value.Item1, kvp.Value.Item2, umbraco: true)))
             {
+                // fixme why would it be null?
                 if (contentType != null) propertyType.ContentType = contentType;
                 yield return propertyType;
             }
@@ -144,8 +160,7 @@ namespace Umbraco.Core.Models.PublishedContent
         // this is the ONLY place where we compare ALIASES!
         public int GetPropertyIndex(string alias)
         {
-            int index;
-            if (_indexes.TryGetValue(alias, out index)) return index; // fastest
+            if (_indexes.TryGetValue(alias, out var index)) return index; // fastest
             if (_indexes.TryGetValue(alias.ToLowerInvariant(), out index)) return index; // slower
             return -1;
         }

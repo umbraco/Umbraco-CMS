@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
@@ -33,6 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     class FacadeService : FacadeServiceBase
     {
         private readonly ServiceContext _serviceContext;
+        private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IScopeProvider _scopeProvider;
         private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly Database _dataSource;
@@ -73,13 +75,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public FacadeService(Options options, MainDom mainDom, IRuntimeState runtime, ServiceContext serviceContext, IScopeUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger, IScopeProvider scopeProvider)
+        public FacadeService(Options options, MainDom mainDom, IRuntimeState runtime,
+            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
+            IScopeUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger, IScopeProvider scopeProvider)
             : base(facadeAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
             //    throw new Exception("Singleton must be instancianted only once!");
 
             _serviceContext = serviceContext;
+            _publishedContentTypeFactory = publishedContentTypeFactory;
             _uowProvider = uowProvider;
             _dataSource = new Database();
             _logger = logger;
@@ -270,7 +275,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // content (and types) are read-locked
 
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => new PublishedContentType(PublishedItemType.Content, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Content, x));
             _contentStore.UpdateContentTypes(null, contentTypes, null);
 
             _localContentDb?.Clear();
@@ -286,7 +291,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void LoadContentFromLocalDbLocked(IScopeUnitOfWork uow)
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => new PublishedContentType(PublishedItemType.Content, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Content, x));
             _contentStore.UpdateContentTypes(null, contentTypes, null);
 
             _logger.Debug<FacadeService>("Loading content from local db...");
@@ -338,7 +343,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // locks & notes: see content
 
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
-                .Select(x => new PublishedContentType(PublishedItemType.Media, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Media, x));
             _mediaStore.UpdateContentTypes(null, mediaTypes, null);
 
             _localMediaDb?.Clear();
@@ -354,7 +359,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void LoadMediaFromLocalDbLocked(IScopeUnitOfWork uow)
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
-                .Select(x => new PublishedContentType(PublishedItemType.Media, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Media, x));
             _mediaStore.UpdateContentTypes(null, mediaTypes, null);
 
             _logger.Debug<FacadeService>("Loading media from local db...");
@@ -815,8 +820,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content Types
 
-        private IEnumerable<PublishedContentType> CreateContentTypes(PublishedItemType itemType, params int[] ids)
+        private IEnumerable<PublishedContentType> CreateContentTypes(PublishedItemType itemType, int[] ids)
         {
+            // XxxTypeService.GetAll(empty) returns everything!
+            if (ids.Length == 0)
+                return Enumerable.Empty<PublishedContentType>();
+
             IEnumerable<IContentTypeComposition> contentTypes;
             switch (itemType)
             {
@@ -835,7 +844,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // some may be missing - not checking here
 
-            return contentTypes.Select(x => new PublishedContentType(itemType, x));
+            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(itemType, x));
         }
 
         private PublishedContentType CreateContentType(PublishedItemType itemType, int id)
@@ -856,7 +865,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }
 
-            return contentType == null ? null : new PublishedContentType(itemType, contentType);
+            return contentType == null ? null : _publishedContentTypeFactory.CreateContentType(itemType, contentType);
         }
 
         private void RefreshContentTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)
@@ -981,7 +990,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var facadeCache = new StaticCacheProvider();
 
-            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _logger);
+            var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
             var domainCache = new DomainCache(domainSnap);
 

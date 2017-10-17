@@ -33,11 +33,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            var preValueCollection = NestedContentHelper.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
-            var contentTypes = preValueCollection.PreValuesAsDictionary["contentTypes"].Value;
-            return contentTypes.Contains(",")
+            var contentTypes = propertyType.DataType.GetConfiguration<NestedContentPropertyEditor.DataTypeConfiguration>().ContentTypes;
+            return contentTypes.Length > 1
                 ? typeof(IPublishedElement)
-                : ModelType.For(contentTypes);
+                : ModelType.For(contentTypes[0]);
         }
 
         /// <inheritdoc />

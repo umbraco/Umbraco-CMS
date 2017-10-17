@@ -243,7 +243,6 @@
     <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentController.cs" />
-    <Compile Include="PropertyEditors\NestedContentHelper.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
     <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />

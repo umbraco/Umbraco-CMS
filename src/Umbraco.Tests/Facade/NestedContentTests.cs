@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -15,6 +15,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Models;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
@@ -34,14 +35,7 @@ namespace Umbraco.Tests.Facade
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
 
-            // fixme - temp needed by NestedContentHelper to cache preValues
-            container.RegisterSingleton(f => CacheHelper.NoCache);
-
             var dataTypeService = new Mock<IDataTypeService>();
-
-            // fixme - temp both needed by NestedContentHelper to read preValues
-            container.RegisterSingleton<ServiceContext>();
-            container.RegisterSingleton(f => dataTypeService.Object);
 
             // mocked dataservice returns nested content preValues
             dataTypeService
@@ -67,9 +61,6 @@ namespace Umbraco.Tests.Facade
 
             var publishedModelFactory = new Mock<IPublishedModelFactory>();
 
-            // fixme - temp needed by PublishedPropertyType
-            container.RegisterSingleton(f => publishedModelFactory.Object);
-
             // mocked model factory returns model type
             var modelTypes = new Dictionary<string, Type>
             {
@@ -87,6 +78,16 @@ namespace Umbraco.Tests.Facade
                     if (element.ContentType.Alias.InvariantEquals("contentN1"))
                         return new TestElementModel(element);
                     return element;
+                });
+
+            // mocked model factory creates model lists
+            publishedModelFactory
+                .Setup(x => x.CreateModelList(It.IsAny<string>()))
+                .Returns((string alias) =>
+                {
+                    return alias == "contentN1"
+                        ? (IList) new List<TestElementModel>()
+                        : (IList) new List<IPublishedElement>();
                 });
 
             var contentCache = new Mock<IPublishedContentCache>();
@@ -111,13 +112,22 @@ namespace Umbraco.Tests.Facade
                 new NestedContentManyValueConverter(facadeAccessor.Object, publishedModelFactory.Object, proflog),
             });
 
-            var propertyType1 = new PublishedPropertyType("property1", 1, Constants.PropertyEditors.NestedContentAlias, converters);
-            var propertyType2 = new PublishedPropertyType("property2", 2, Constants.PropertyEditors.NestedContentAlias, converters);
-            var propertyTypeN1 = new PublishedPropertyType("propertyN1", Constants.PropertyEditors.TextboxAlias, converters);
+            PropertyEditorCollection editors = null;
+            editors = new PropertyEditorCollection(new PropertyEditor[]
+            {
+                new NestedContentPropertyEditor(Mock.Of<ILogger>(), new Lazy<PropertyEditorCollection>(() => editors)) 
+            });
 
-            var contentType1 = new PublishedContentType(1, "content1", new[] { propertyType1 });
-            var contentType2 = new PublishedContentType(2, "content2", new[] { propertyType2 });
-            var contentTypeN1 = new PublishedContentType(2, "contentN1", new[] { propertyTypeN1 });
+            var source = new DataTypeConfigurationSource(dataTypeService.Object, editors);
+            var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, source);
+
+            var propertyType1 = factory.CreatePropertyType("property1", 1, Constants.PropertyEditors.NestedContentAlias);
+            var propertyType2 = factory.CreatePropertyType("property2", 2, Constants.PropertyEditors.NestedContentAlias);
+            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 0, Constants.PropertyEditors.TextboxAlias);
+
+            var contentType1 = factory.CreateContentType(1, "content1", new[] { propertyType1 });
+            var contentType2 = factory.CreateContentType(2, "content2", new[] { propertyType2 });
+            var contentTypeN1 = factory.CreateContentType(2, "contentN1", new[] { propertyTypeN1 });
 
             // mocked content cache returns content types
             contentCache

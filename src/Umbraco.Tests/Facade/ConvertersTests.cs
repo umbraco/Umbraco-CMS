@@ -25,10 +25,11 @@ namespace Umbraco.Tests.Facade
             {
                 new SimpleConverter1(),
             });
+            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
 
-            var elementType1 = new PublishedContentType(1000, "element1", new[]
+            var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", new[]
             {
-                new PublishedPropertyType("prop1", "editor1", converters),
+                contentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
@@ -77,15 +78,16 @@ namespace Umbraco.Tests.Facade
             {
                 new SimpleConverter2(facadeAccessor),
             });
+            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
 
-            var elementType1 = new PublishedContentType(1000, "element1", new[]
+            var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", new[]
             {
-                new PublishedPropertyType("prop1", "editor2", converters),
+                contentTypeFactory.CreatePropertyType("prop1", 0, "editor2"),
             });
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
-            var cntType1 = new PublishedContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
+            var cntType1 = contentTypeFactory.CreateContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
             var cnt1 = new FacadeTestObjects.TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
             cacheContent[cnt1.Id] = cnt1;
 
@@ -157,24 +159,27 @@ namespace Umbraco.Tests.Facade
             facadeAccessorMock.Setup(x => x.Facade).Returns(facadeMock.Object);
             Current.Container.Register(f => facadeAccessorMock.Object);
 
-            var elementType1 = new PublishedContentType(1000, "element1", new[]
+            var converters = Current.Container.GetInstance<PropertyValueConverterCollection>();
+            var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, Mock.Of<IDataTypeConfigurationSource>());
+
+            var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", new[]
             {
-                new PublishedPropertyType("prop1", "editor1"),
+                contentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
-            var elementType2 = new PublishedContentType(1001, "element2", new[]
+            var elementType2 = contentTypeFactory.CreateContentType(1001, "element2", new[]
             {
-                new PublishedPropertyType("prop2", "editor2"),
+                contentTypeFactory.CreatePropertyType("prop2", 0, "editor2"),
             });
 
-            var contentType1 = new PublishedContentType(1002, "content1", new[]
+            var contentType1 = contentTypeFactory.CreateContentType(1002, "content1", new[]
             {
-                new PublishedPropertyType("prop1", "editor1"),
+                contentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
-            var contentType2 = new PublishedContentType(1003, "content2", new[]
+            var contentType2 = contentTypeFactory.CreateContentType(1003, "content2", new[]
             {
-                new PublishedPropertyType("prop2", "editor2"),
+                contentTypeFactory.CreatePropertyType("prop2", 0, "editor2"),
             });
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);

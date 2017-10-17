@@ -57,7 +57,6 @@ namespace Umbraco.Web.Cache
                     dataTypeCache.Result.ClearCacheByKeySearch(CacheKeys.DataTypePreValuesCacheKey + "_" + payload.Id);
 
                 _idkMap.ClearCache(payload.Id);
-                NestedContentHelper.ClearCache(payload.Id); // fixme refactor nested content
             }
 
             // fixme - not sure I like these?

@@ -34,11 +34,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            var preValueCollection = NestedContentHelper.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
-            var contentTypes = preValueCollection.PreValuesAsDictionary["contentTypes"].Value;
-            return contentTypes.Contains(",")
+            var contentTypes = propertyType.DataType.GetConfiguration<NestedContentPropertyEditor.DataTypeConfiguration>().ContentTypes;
+            return contentTypes.Length > 1
                 ? typeof (IEnumerable<IPublishedElement>)
-                : typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes));
+                : typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0]));
         }
 
         /// <inheritdoc />
@@ -63,12 +62,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if (objects.Count == 0)
                     return Enumerable.Empty<IPublishedElement>();
 
-                // fixme do NOT do it here! + use the facade cache
-                var preValueCollection = NestedContentHelper.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
-                var contentTypes = preValueCollection.PreValuesAsDictionary["contentTypes"].Value;
-                var elements = contentTypes.Contains(",")
+                var contentTypes = propertyType.DataType.GetConfiguration<NestedContentPropertyEditor.DataTypeConfiguration>().ContentTypes;
+                var elements = contentTypes.Length > 1
                     ? new List<IPublishedElement>()
-                    : PublishedModelFactory.CreateModelList(contentTypes);
+                    : PublishedModelFactory.CreateModelList(contentTypes[0]);
 
                 foreach (var sourceObject in objects)
                 {

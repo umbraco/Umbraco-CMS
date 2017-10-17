@@ -5,6 +5,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using LightInject;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -20,6 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 factory.GetInstance<MainDom>(),
                 factory.GetInstance<IRuntimeState>(),
                 factory.GetInstance<ServiceContext>(),
+                factory.GetInstance<IPublishedContentTypeFactory>(),
                 factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<IFacadeAccessor>(),
                 factory.GetInstance<ILogger>(),
