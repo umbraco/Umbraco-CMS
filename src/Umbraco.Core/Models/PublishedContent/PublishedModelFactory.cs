@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -10,15 +11,15 @@ namespace Umbraco.Core.Models.PublishedContent
     public class PublishedModelFactory : IPublishedModelFactory
     {
         private readonly Dictionary<string, ModelInfo> _modelInfos;
+        private readonly Dictionary<string, Type> _modelTypeMap;
 
         private class ModelInfo
         {
             public Type ParameterType { get; set; }
             public Func<object, object> Ctor { get; set; }
             public Type ModelType { get; set; }
+            public Func<IList> ListCtor { get; set; }
         }
-
-        public Dictionary<string, Type> ModelTypeMap { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedModelFactory"/> class with types.
@@ -37,7 +38,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public PublishedModelFactory(IEnumerable<Type> types)
         {
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
-            ModelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
+            var modelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var type in types)
             {
@@ -72,19 +73,21 @@ namespace Umbraco.Core.Models.PublishedContent
                 // have to use an unsafe ctor because we don't know the types, really
                 var modelCtor = ReflectionUtilities.EmitCtorUnsafe<Func<object, object>>(constructor);
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, ModelType = type, Ctor = modelCtor };
-                ModelTypeMap[typeName] = type;
+                modelTypeMap[typeName] = type;
             }
 
             _modelInfos = modelInfos.Count > 0 ? modelInfos : null;
+            _modelTypeMap = modelTypeMap;
         }
 
+        /// <inheritdoc />
         public IPublishedElement CreateModel(IPublishedElement element)
         {
             // fail fast
             if (_modelInfos == null)
                 return element;
 
-            if (_modelInfos.TryGetValue(element.ContentType.Alias, out var modelInfo) == false)
+            if (!_modelInfos.TryGetValue(element.ContentType.Alias, out var modelInfo))
                 return element;
 
             // ReSharper disable once UseMethodIsInstanceOfType
@@ -94,5 +97,27 @@ namespace Umbraco.Core.Models.PublishedContent
             // can cast, because we checked when creating the ctor
             return (IPublishedElement) modelInfo.Ctor(element);
         }
+
+        /// <inheritdoc />
+        public IList CreateModelList(string alias)
+        {
+            // fail fast
+            if (_modelInfos == null)
+                return new List<IPublishedElement>();
+
+            if (!_modelInfos.TryGetValue(alias, out var modelInfo))
+                return new List<IPublishedElement>();
+
+            var ctor = modelInfo.ListCtor;
+            if (ctor != null) return ctor();
+
+            var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
+            ctor = modelInfo.ListCtor = ReflectionUtilities.EmitCtor<Func<IList>>(declaring: listType);
+            return ctor();
+        }
+
+        /// <inheritdoc />
+        public Type MapModelType(Type type)
+            => ModelType.Map(type, _modelTypeMap);
     }
 }

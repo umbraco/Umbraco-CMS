@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -11,6 +12,9 @@ namespace Umbraco.Core.Models.PublishedContent
         public IPublishedElement CreateModel(IPublishedElement element) => element;
 
         /// <inheritdoc />
-        public Dictionary<string, Type> ModelTypeMap { get; } = new Dictionary<string, Type>();
+        public IList CreateModelList(string alias) => new List<IPublishedElement>();
+
+        /// <inheritdoc />
+        public Type MapModelType(Type type) => typeof(IPublishedElement);
     }
 }

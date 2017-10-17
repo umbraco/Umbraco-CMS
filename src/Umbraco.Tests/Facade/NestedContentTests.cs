@@ -71,12 +71,13 @@ namespace Umbraco.Tests.Facade
             container.RegisterSingleton(f => publishedModelFactory.Object);
 
             // mocked model factory returns model type
+            var modelTypes = new Dictionary<string, Type>
+            {
+                { "contentN1", typeof(TestElementModel) }
+            };
             publishedModelFactory
-                .Setup(x => x.ModelTypeMap)
-                .Returns(new Dictionary<string, Type>
-                {
-                    { "contentN1", typeof (TestElementModel) }
-                });
+                .Setup(x => x.MapModelType(It.IsAny<Type>()))
+                .Returns((Type type) => ModelType.Map(type, modelTypes));
 
             // mocked model factory creates models
             publishedModelFactory

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -19,7 +16,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// </summary>
     public class NestedContentManyValueConverter : NestedContentValueConverterBase
     {
-        private readonly ConcurrentDictionary<Type, Func<IList>> _listCtors = new ConcurrentDictionary<Type, Func<IList>>();
         private readonly ProfilingLogger _proflog;
 
         /// <summary>
@@ -70,26 +66,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 // fixme do NOT do it here! + use the facade cache
                 var preValueCollection = NestedContentHelper.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
                 var contentTypes = preValueCollection.PreValuesAsDictionary["contentTypes"].Value;
-                IList elements;
-                if (contentTypes.Contains(","))
-                {
-                    elements = new List<IPublishedElement>();
-                }
-                else if (PublishedModelFactory.ModelTypeMap.TryGetValue(contentTypes, out var type))
-                {
-                    var ctor = _listCtors.GetOrAdd(type, t =>
-                    {
-                        var listType = typeof(List<>).MakeGenericType(t);
-                        return ReflectionUtilities.EmitCtor<Func<IList>>(declaring: listType);
-                    });
-
-                    elements = ctor();
-                }
-                else
-                {
-                    // should we throw instead?
-                    elements = new List<IPublishedElement>();
-                }
+                var elements = contentTypes.Contains(",")
+                    ? new List<IPublishedElement>()
+                    : PublishedModelFactory.CreateModelList(contentTypes);
 
                 foreach (var sourceObject in objects)
                 {

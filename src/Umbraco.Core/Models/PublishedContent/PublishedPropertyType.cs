@@ -280,7 +280,7 @@ namespace Umbraco.Core.Models.PublishedContent
             get
             {
                 if (!_initialized) Initialize();
-                return _clrType ?? (_clrType = ModelType.Map(_modelClrType, Current.PublishedModelFactory.ModelTypeMap));
+                return _clrType ?? (_clrType = Current.PublishedModelFactory.MapModelType(_modelClrType));
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -17,9 +17,18 @@ namespace Umbraco.Core.Models.PublishedContent
         IPublishedElement CreateModel(IPublishedElement element);
 
         /// <summary>
-        /// Gets the model type map.
+        /// Creates a List{T} of a strongly-typed model for a model type alias.
         /// </summary>
-        /// <remarks>The model type map maps element type aliases to actual Clr types.</remarks>
-        Dictionary<string, Type> ModelTypeMap { get; }
+        /// <param name="alias">The model type alias.</param>
+        /// <returns>A List{T} of the strongly-typed model, exposed as an IList.</returns>
+        IList CreateModelList(string alias);
+
+        /// <summary>
+        /// Maps a Clr type that may contain model types, to an actual Clr type.
+        /// </summary>
+        /// <param name="type">The Clr type.</param>
+        /// <returns>The actual Clr type.</returns>
+        /// <remarks>See <seealso cref="ModelType"/> for more details.</remarks>
+        Type MapModelType(Type type);
     }
 }
