@@ -524,13 +524,8 @@ namespace Umbraco.Core
             }
             catch (ReflectionTypeLoadException rex) // GetTypes throws ReflectionTypeLoadException
             {
-                var sb = new StringBuilder();
-                AppendCouldNotLoad(sb, a, getAll);
-                foreach (var loaderException in rex.LoaderExceptions.WhereNotNull())
-                    AppendLoaderException(sb, loaderException);
-
-                // rethrow with new message
-                throw new ReflectionTypeLoadException(rex.Types, rex.LoaderExceptions, sb.ToString());
+                // return all types that don't cause an issue
+                return rex.Types.Where(t => t != null);
             }
         }
 
