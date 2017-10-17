@@ -46,7 +46,9 @@ namespace Umbraco.Web
         /// <param name="app"></param>
         protected virtual void ConfigureMiddleware(IAppBuilder app)
         {
-            // Configure OWIN for authentication. 
+            // Configure OWIN for authentication.
+            ConfigureUmbracoAuthentication(app);
+
             app
                 .UseSignalR()
                 .FinalizeMiddlewareConfiguration();
