@@ -44,7 +44,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         function(id) {
                             var found = _.find(medias,
                                 function(m) {
-                                    return m.udi === id || m.id === id;
+                                    // We could use coercion (two ='s) here .. but not sure if this works equally well in all browsers and
+                                    // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
+                                    // compares and be completely sure it works.
+                                    return m.udi.toString() === id.toString() || m.id.toString() === id.toString();
                                 });
                             if (found) {
                                 return found;
