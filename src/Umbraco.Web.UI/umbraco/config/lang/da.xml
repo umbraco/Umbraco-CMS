@@ -784,6 +784,15 @@ Mange hilsner fra Umbraco robotten
   <area alias="colorpicker">
     <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
   </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Du har valgt et dokument som er slettet eller lagt i papirkurven</key>
+    <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
+    <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="deletedItem">Slettet medie</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
     <key alias="chooseInternal">vælg en intern side</key>
