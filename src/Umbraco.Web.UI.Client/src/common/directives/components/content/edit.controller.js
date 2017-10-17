@@ -208,9 +208,9 @@
       if (!$scope.busy) {
 
         // Chromes popup blocker will kick in if a window is opened 
-        // outwith the initial scoped request. This trick will fix that.
+        // without the initial scoped request. This trick will fix that.
         //  
-        var previewWindow = $window.open('preview/?id=' + content.id, 'umbpreview');
+        var previewWindow = $window.open('preview/?init=true&id=' + content.id, 'umbpreview');
 
         // Build the correct path so both /#/ and #/ work.
         var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + content.id;
