@@ -1,7 +1,9 @@
 (function () {
     'use strict';
 
-    function tourService(eventsService) {
+    function tourService(eventsService, localStorageService) {
+
+        var localStorageKey = "umbTours";
 
         var tours = [
             {
@@ -20,7 +22,7 @@
                         title: "Create document type",
                         content: "<p>Hover the document types tree and click the <b>three small dots</b> to open the context menu</p>",
                         event: "click",
-                        clickElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
+                        eventElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
                     },
                     {
                         element: "#dialog [data-element='action-documentType']",
@@ -31,7 +33,8 @@
                     {
                         element: "[data-element='editor-name-field']",
                         title: "Enter a name",
-                        content: "<p>Our document type needs a name. Enter <b>Home</b> in the field and click <i>Next</i></p>"
+                        content: "<p>Our document type needs a name. Enter <b>Home</b> in the field and click <i>Next</i></p>",
+                        view: "doctypename"
                     },
                     {
                         element: "[data-element='editor-description']",
@@ -58,7 +61,8 @@
                     {
                         element: "[data-element~='overlay-property-settings'] [data-element='property-name']",
                         title: "Enter a name",
-                        content: "Enter <b>Welcome Text</b> as name for the property"
+                        content: "Enter <b>Welcome Text</b> as name for the property",
+                        view: "propertyname"
                     },
                     {
                         element: "[data-element~='overlay-property-settings'] [data-element='property-description']",
@@ -117,7 +121,7 @@
                         title: "Open context menu",
                         content: "<p>Open the context menu by hovering the root of the content section.</p><p>Now click the <b>three small dots</b> to the right</p>",
                         event: "click",
-                        clickElement: "[data-element='tree-root'] [data-element='tree-item-options']"
+                        eventElement: "[data-element='tree-root'] [data-element='tree-item-options']"
                     },
                     {
                         element: "[data-element='action-create-home']",
@@ -128,7 +132,8 @@
                     {
                         element: "[data-element='editor-content'] [data-element='editor-name-field']",
                         title: "Give your new page a name",
-                        content: "<p>Our new page needs a name. Enter <b>Home</b> in the field and click <b>Next</b></p>"
+                        content: "<p>Our new page needs a name. Enter <b>Home</b> in the field and click <i>Next</i></p>",
+                        view: "nodename"
                     },
                     {
                         element: "[data-element='editor-content'] [data-element='property-welcomeText']",
@@ -159,7 +164,8 @@
                         title: "Expand the Templates node",
                         content: "<p>To see all our templates click the <b>small triangle</b> to the left of the templates node</p>",
                         event: "click",
-                        clickElement: "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']"
+                        eventElement: "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']",
+                        view: "templatetree"
                     },
                     {
                         element: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home']",
@@ -202,7 +208,7 @@
                         title: "Open page",
                         content: "<p>Click the <b>Link</b> to view your page.</p><p>Tip: Click the preview button in the bottom right corner to preview changes without publishing them</p>",
                         event: "click",
-                        clickElement: "[data-element='editor-content'] [data-element='property-_umb_urls'] a[target='_blank']"
+                        eventElement: "[data-element='editor-content'] [data-element='property-_umb_urls'] a[target='_blank']"
                     }
                 ]
             },
@@ -222,7 +228,7 @@
                         title: "Create a new folder",
                         content: "<p>Hover the media root and click the <b>three small dots</b> on the right side of the item</p>",
                         event: "click",
-                        clickElement: "#tree [data-element='tree-root'] [data-element='tree-item-options']"
+                        eventElement: "#tree [data-element='tree-root'] [data-element='tree-item-options']"
                     },
                     {
                         element: "#dialog [data-element='action-Folder']",
@@ -244,14 +250,15 @@
                     {
                         element: "[data-element='editor-media'] [data-element='dropzone']",
                         title: "Upload images",
-                        content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select some images on your computer and upload them.</p>"
+                        content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select some images on your computer and upload them.</p>",
+                        view: "uploadimages"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='media-grid-item-0']",
                         title: "View media item details",
                         content: "Hover the media item and <b>Click the purple bar</b> to view details about the media item",
                         event: "click",
-                        clickElement: "[data-element='editor-media'] [data-element='media-grid-item-0'] [data-element='media-grid-item-edit']"
+                        eventElement: "[data-element='editor-media'] [data-element='media-grid-item-0'] [data-element='media-grid-item-edit']"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='property-umbracoFile']",
@@ -284,24 +291,78 @@
         ];
 
         function startTour(tour) {
-            eventsService.emit("appState.startTour", tour);
+            eventsService.emit("appState.tour.start", tour);
         }
 
         function endTour() {
-            eventsService.emit("appState.endTour");
+            eventsService.emit("appState.tour.end");
         }
 
-        function completeTour() {
-            eventsService.emit("appState.endTour");
+        function completeTour(tour) {
+            saveInLocalStorage(tour);
+            eventsService.emit("appState.tour.complete", tour);
         }
-
+        
         function getAllTours() {
+            setCompletedTours();
             return tours;
         }
 
         function getGroupedTours() {
+            setCompletedTours();
             var groupedTours = _.groupBy(tours, "group");
             return groupedTours;
+        }
+
+        ///////////
+
+        function setCompletedTours() {
+
+            var storedTours = [];
+
+            if (localStorageService.get(localStorageKey)) {
+                storedTours = localStorageService.get(localStorageKey);
+            }
+
+            angular.forEach(storedTours, function (storedTour) {
+                if (storedTour.completed === true) {
+                    angular.forEach(tours, function (tour) {
+                        if (storedTour.alias === tour.alias) {
+                            tour.completed = true;
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function saveInLocalStorage(tour) {
+            var storedTours = [];
+            var tourFound = false;
+
+            if (localStorageService.get(localStorageKey)) {
+                storedTours = localStorageService.get(localStorageKey);
+            }
+
+            if (storedTours.length > 0) {
+                angular.forEach(storedTours, function (storedTour) {
+                    if (storedTour.alias === tour.alias) {
+                        storedTour.completed = true;
+                        tourFound = true;
+                    }
+                });
+            }
+
+            if (!tourFound) {
+                var storageObject = {
+                    "alias": tour.alias,
+                    "completed": true
+                };
+                storedTours.push(storageObject);
+            }
+
+            localStorageService.set(localStorageKey, storedTours);
+
         }
 
         var service = {

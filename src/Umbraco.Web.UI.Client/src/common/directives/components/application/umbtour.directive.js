@@ -23,8 +23,8 @@
             };
 
             scope.completeTour = function() {
-                unbindEvent();                
-                tourService.completeTour();
+                unbindEvent();
+                tourService.completeTour(scope.tour);
                 backdropService.close();
             };
 
@@ -126,12 +126,12 @@
 
                 function _position() {
 
-                    var element = $(scope.currentStep.element);
-                    var offset = element.offset();
-                    var width = element.outerWidth(true);
-                    var height = element.outerHeight(true);
-
                     $timeout(function () {
+
+                        var element = $(scope.currentStep.element);
+                        var offset = element.offset();
+                        var width = element.outerWidth(true);
+                        var height = element.outerHeight(true);
 
                         var popoverWidth = popover.outerWidth(true);
                         var popoverHeight = popover.outerHeight(true);
@@ -140,65 +140,49 @@
                         var documentHeight = $(document).height();
                         var position;
                         var css = {};
+                        
+                        // messure available space on each side of the target element
+                        var space = {
+                            "top": offset.top,
+                            "right": documentWidth - (offset.left + width),
+                            "bottom": documentHeight - (offset.top + height),
+                            "left": offset.left
+                        };
 
                         console.log("SPACE", space);
                         console.log("document width", documentWidth);
                         console.log("document height", documentHeight);
-                        
 
-
-                        // If no specific position is set - find the position with most available space
-                        if(scope.currentStep.placement) {
-                            
-                            position = scope.currentStep.placement;
-
-                        } else {
-
-                            var space = {
-                                "top": offset.top,
-                                "right": documentWidth - (offset.left + width),
-                                "bottom": documentHeight - (offset.top + height),
-                                "left": offset.left
-                            };
-
-                            position = findMax(space);
-                        }
+                        // get the posistion with most available space
+                        position = findMax(space);
 
                         if(position === "top") {
-
                             if (offset.left < documentWidth/2) {
-                                css = {top: offset.top - popoverHeight, left: offset.left};        
-                         
+                                css = {top: offset.top - popoverHeight, left: offset.left};
                             } else {
                                 css = {top: offset.top - popoverHeight, left: offset.left - popoverWidth + width};
                             }
                         }
 
                         if(position === "right") {
-
                             if (offset.top < documentHeight/2) {
-                                css = {top: offset.top, left: offset.left + width};        
-                         
+                                css = {top: offset.top, left: offset.left + width};
                             } else {
                                 css = {top: offset.top + height - popoverHeight, left: offset.left + width};
                             }
                         }
 
                         if(position === "bottom") {
-
                             if (offset.left < documentWidth/2) {
-                                css = {top: offset.top + height, left: offset.left};        
-                         
+                                css = {top: offset.top + height, left: offset.left};
                             } else {
                                 css = {top: offset.top + height, left: offset.left - popoverWidth + width};
                             }
                         }
 
                         if(position === "left") {
-
                             if (offset.top < documentHeight/2) {
                                 css = {top: offset.top, left: offset.left - popoverWidth};        
-                         
                             } else {
                                 css = {top: offset.top + height - popoverHeight, left: offset.left - popoverWidth};
                             }
@@ -228,8 +212,8 @@
 
             function bindEvent() {
                 var eventName = scope.currentStep.event + ".step-" + scope.currentStepIndex;
-                if(scope.currentStep.clickElement) {
-                    $(scope.currentStep.clickElement).on(eventName, handleEvent);
+                if(scope.currentStep.eventElement) {
+                    $(scope.currentStep.eventElement).on(eventName, handleEvent);
                     console.log("bind", eventName);                    
                 } else {
                     $(scope.currentStep.element).on(eventName, handleEvent);
@@ -239,17 +223,17 @@
 
             function unbindEvent() {
                 var eventName = scope.currentStep.event + ".step-" + scope.currentStepIndex;                
-                if(scope.currentStep.clickElement) {
-                    $(scope.currentStep.clickElement).off(eventName);
+                if(scope.currentStep.eventElement) {
+                    $(scope.currentStep.eventElement).off(eventName);
                     console.log("unbind", eventName);                    
                 } else {
                     $(scope.currentStep.element).off(eventName);
-                    console.log("unbind", eventName);                    
+                    console.log("unbind", eventName);
                 }
             }
 
             function handleEvent() {
-                alert("event happened");
+                //alert("event happened");
                 unbindEvent();
                 nextStep();
             }
