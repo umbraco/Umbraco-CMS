@@ -906,8 +906,8 @@ namespace Umbraco.Web
 
         public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using DescendantsOrSelf(), that's expensive
-            return other.AncestorsOrSelf().Any(x => x.Id == content.Id);
+            // avoid using DescendantsOrSelf() or AncestorsOrSelf(), they're expensive
+            return other.Path.InvariantStartsWith(content.Path);
         }
 
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
