@@ -117,19 +117,27 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
             });
             unsubscribe.push(locationEvent);
 
-            var savedUnloadHandler = $window.onbeforeunload;
-            $window.onbeforeunload = function () {
+            // try to do it in the most cross-browser way
+            // some browsers will display their own custom message
+            // and some will just ignore this completely
+            function onBeforeUnload(e) {
                 if (formCtrl.$dirty) {
-                    return "You have unsaved changes."; // most browsers won't display it anyways
+                    var message = "You have unsaved changes.";
+                    e.returnValue = message;
+                    return message;
+                } else {
+                    return null;
                 }
             }
+
+            $window.addEventListener("beforeunload", onBeforeUnload);
 
             //Ensure to remove the event handler when this instance is destroyted
             scope.$on('$destroy', function() {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }
-                $window.onbeforeunload = savedUnloadHandler;
+                $window.removeEventListener("beforeunload", onBeforeUnload);
             });
 
             $timeout(function(){
