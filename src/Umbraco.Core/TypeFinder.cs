@@ -5,9 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -19,8 +17,6 @@ namespace Umbraco.Core
     /// </summary>
     public static class TypeFinder
     {
-        public static bool IAmUnitTestingSoNeverUseHttpContextEver = false;
-
         private static volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private static readonly object LocalFilteredAssemblyCacheLocker = new object();
 
@@ -47,7 +43,7 @@ namespace Umbraco.Core
             HashSet<Assembly> assemblies = null;
             try
             {
-                var isHosted = (HttpContext.Current != null || HostingEnvironment.IsHosted) && IAmUnitTestingSoNeverUseHttpContextEver == false;
+                var isHosted = IOHelper.IsHosted;
 
                 try
                 {
