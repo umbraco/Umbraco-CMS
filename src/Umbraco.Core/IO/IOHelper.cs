@@ -13,7 +13,9 @@ using Umbraco.Core.Configuration;
 namespace Umbraco.Core.IO
 {
 	public static class IOHelper
-    {
+	{
+	    public static bool IAmUnitTestingSoNeverUseHttpContextEver = false;
+
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
@@ -98,6 +100,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
+            useHttpContext = useHttpContext && IAmUnitTestingSoNeverUseHttpContextEver == false;
 
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
