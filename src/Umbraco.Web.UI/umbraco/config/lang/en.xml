@@ -1749,6 +1749,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="enterCustomValidation">...or enter a custom validation</key>
     <key alias="fieldIsMandatory">Field is mandatory</key>
     <key alias="validationRegExp">Enter a regular expression</key>
+	<key alias="customErrorMessage">Enter a custom error message</key>
     <key alias="minCount">You need to add at least</key>
     <key alias="maxCount">You can only have</key>
     <key alias="items">items</key>
