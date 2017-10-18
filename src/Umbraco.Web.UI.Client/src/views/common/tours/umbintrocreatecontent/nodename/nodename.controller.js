@@ -4,7 +4,7 @@
     function NodeNameController($scope) {
         
         var vm = this;
-        var element = angular.element($scope.model.currentStep.element);
+        var element = angular.element($scope.currentStep.element);
 
         vm.error = false;
         
@@ -12,7 +12,7 @@
 
         function initNextStep() {
             if(element.val() === 'Home') {
-                $scope.model.nextStep();
+                $scope.nextStep();
             } else {
                 vm.error = true;
             }
