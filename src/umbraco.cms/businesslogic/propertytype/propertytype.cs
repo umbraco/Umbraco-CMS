@@ -38,6 +38,7 @@ namespace umbraco.cms.businesslogic.propertytype
         private int _tabId;
         private int _propertyTypeGroup;
         private string _validationRegExp = "";
+        private string _validationCustomErrorMessage = "";
 
         #endregion
 
@@ -56,7 +57,7 @@ namespace umbraco.cms.businesslogic.propertytype
         {
             var found = ApplicationContext.Current.DatabaseContext.Database
                 .SingleOrDefault<dynamic>(
-                    "Select mandatory as mandatory, dataTypeId as dataTypeId, propertyTypeGroupId as propertyTypeGroupId, contentTypeId as contentTypeId, sortOrder as sortOrder, alias as alias, name as name, validationRegExp as validationRegExp, description as description from cmsPropertyType where id=@id",
+                    "Select mandatory as mandatory, dataTypeId as dataTypeId, propertyTypeGroupId as propertyTypeGroupId, contentTypeId as contentTypeId, sortOrder as sortOrder, alias as alias, name as name, validationRegExp as validationRegExp, validationCustomErrorMessage as validationCustomErrorMessage, description as description from cmsPropertyType where id=@id",
                     new {id = id});
 
             if (found == null)
@@ -76,6 +77,7 @@ namespace umbraco.cms.businesslogic.propertytype
             _alias = found.alias;
             _name = found.name;
             _validationRegExp = found.validationRegExp;
+            _validationCustomErrorMessage = found.validationCustomErrorMessage;
             _DataTypeId = found.dataTypeId;
             _contenttypeid = found.contentTypeId;
             _description = found.description;
@@ -164,6 +166,17 @@ namespace umbraco.cms.businesslogic.propertytype
             }
         }
 
+        public string ValidationCustomErrorMessage
+        {
+            get { return _validationCustomErrorMessage; }
+            set
+            {
+                _validationCustomErrorMessage = value;
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set validationCustomErrorMessage = @validationCustomErrorMessage where id = @id",
+                        sqlHelper.CreateParameter("@validationCustomErrorMessage", value), sqlHelper.CreateParameter("@id", Id));
+            }
+        }
         public string Description
         {
             get
