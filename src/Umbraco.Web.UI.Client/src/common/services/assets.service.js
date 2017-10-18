@@ -2,12 +2,12 @@
  * @ngdoc service
  * @name umbraco.services.assetsService
  *
- * @requires $q 
+ * @requires $q
  * @requires angularHelper
- *  
+ *
  * @description
  * Promise-based utillity service to lazy-load client-side dependencies inside angular controllers.
- * 
+ *
  * ##usage
  * To use, simply inject the assetsService into any controller that needs it, and make
  * sure the umbraco.services module is accesible - which it should be by default.
@@ -18,7 +18,7 @@
  *                 //this code executes when the dependencies are done loading
  *          });
  *      });
- * </pre> 
+ * </pre>
  *
  * You can also load individual files, which gives you greater control over what attibutes are passed to the file, as well as timeout
  *
@@ -38,7 +38,7 @@
  *                 //loadcss cannot determine when the css is done loading, so this will trigger instantly
  *          });
  *      });
- * </pre>  
+ * </pre>
  */
 angular.module('umbraco.services')
 .factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
@@ -79,7 +79,7 @@ angular.module('umbraco.services')
             }
         },
 
-        /** 
+        /**
             Internal method. This is called when the application is loading and the user is already authenticated, or once the user is authenticated.
             There's a few assets the need to be loaded for the application to function but these assets require authentication to load.
         */
@@ -110,10 +110,10 @@ angular.module('umbraco.services')
          *
          * @description
          * Injects a file as a stylesheet into the document head
-         * 
+         *
          * @param {String} path path to the css file to load
          * @param {Scope} scope optional scope to pass into the loader
-         * @param {Object} keyvalue collection of attributes to pass to the stylesheet element  
+         * @param {Object} keyvalue collection of attributes to pass to the stylesheet element
          * @param {Number} timeout in milliseconds
          * @returns {Promise} Promise object which resolves when the file has loaded
          */
@@ -151,10 +151,10 @@ angular.module('umbraco.services')
          *
          * @description
          * Injects a file as a javascript into the document
-         * 
+         *
          * @param {String} path path to the js file to load
          * @param {Scope} scope optional scope to pass into the loader
-         * @param {Object} keyvalue collection of attributes to pass to the script element  
+         * @param {Object} keyvalue collection of attributes to pass to the script element
          * @param {Number} timeout in milliseconds
          * @returns {Promise} Promise object which resolves when the file has loaded
          */
@@ -195,7 +195,7 @@ angular.module('umbraco.services')
          *
          * @description
          * Injects a collection of css and js files
-         * 
+         *
          *
          * @param {Array} pathArray string array of paths to the files to load
          * @param {Scope} scope optional scope to pass into the loader
@@ -212,6 +212,7 @@ angular.module('umbraco.services')
             var nonEmpty = _.reject(pathArray, function (item) {
                 return item === undefined || item === "";
             });
+
             if (nonEmpty.length === 0) {
                 var deferred = $q.defer();
                 promise = deferred.promise;
@@ -233,8 +234,8 @@ angular.module('umbraco.services')
                         assets.push(asset);
                     }
 
-                    //we need to always push to the promises collection to monitor correct 
-                    //execution                        
+                    //we need to always push to the promises collection to monitor correct
+                    //execution
                     promises.push(asset.deferred.promise);
                 }
             });
@@ -252,43 +253,28 @@ angular.module('umbraco.services')
                     return asset.path.match(/(\.js$|\.js\?)/ig);
                 });
 
+            function assetLoaded(asset) {
+                asset.state = "loaded";
+                if (!scope) {
+                    asset.deferred.resolve(true);
+                    return;
+                }
+                angularHelper.safeApply(scope,
+                    function () {
+                        asset.deferred.resolve(true);
+                    });
+            }
+
             if (cssAssets.length > 0) {
                 var cssPaths = _.map(cssAssets, function (asset) { return appendRnd(asset.path) });
-                LazyLoad.css(cssPaths,
-                    function () {
-                        _.each(cssAssets,
-                            function (asset) {
-                                asset.state = "loaded";
-                                if (!scope) {
-                                    asset.deferred.resolve(true);
-                                    return;
-                                }
-                                angularHelper.safeApply(scope,
-                                    function () {
-                                        asset.deferred.resolve(true);
-                                    });
-                            });
-                    });
+                LazyLoad.css(cssPaths, function() { _.each(cssAssets, assetLoaded); });
             }
 
             if (jsAssets.length > 0) {
                 var jsPaths = _.map(jsAssets, function (asset) { return appendRnd(asset.path) });
-                LazyLoad.js(jsPaths,
-                    function () {
-                        _.each(jsAssets,
-                            function (asset) {
-                                asset.state = "loaded";
-                                if (!scope) {
-                                    asset.deferred.resolve(true);
-                                    return;
-                                }
-                                angularHelper.safeApply(scope,
-                                    function () {
-                                        asset.deferred.resolve(true);
-                                    });
-                            });
-                    });
+                LazyLoad.js(jsPaths, function () { _.each(jsAssets, assetLoaded); });
             }
+
             return promise;
         }
     };
