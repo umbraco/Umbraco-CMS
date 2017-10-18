@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, $location) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -638,6 +638,14 @@
           activate();
         }
       });
+
+      scope.goToType = function (contentTypeId) {
+          $location.path('/settings/' + scope.contentType + 's/edit/' + contentTypeId);
+      }
+
+      scope.goToTypeFromPropertyGroup = function (propertyGroup, parentTabIndex) {
+          scope.goToType(propertyGroup.parentTabContentTypes[parentTabIndex]);
+      }
 
       // clean up
       scope.$on('$destroy', function(){

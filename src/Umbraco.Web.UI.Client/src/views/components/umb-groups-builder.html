@@ -98,7 +98,7 @@
                         <localize key="contentTypeEditor_inheritedFrom"></localize> {{ tab.inheritedFromName }}
 
                         <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
-                            {{ contentTypeName }}
+                            <a ng-click="goToTypeFromPropertyGroup(tab, $index)">{{ contentTypeName }}</a>
                             <span ng-if="!$last">, </span>
                         </span>
                     </div>
@@ -224,7 +224,7 @@
                                     <div class="umb-group-builder__property-tag" ng-if="property.inherited">
                                         <i class="icon icon-merge"></i>
                                         <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
-                                        {{property.contentTypeName}}
+                                        <a href="" ng-click="goToType(property.contentTypeId)">{{property.contentTypeName}}</a>
                                     </div>
 
                                     <div class="umb-group-builder__property-tag" ng-if="property.locked">
