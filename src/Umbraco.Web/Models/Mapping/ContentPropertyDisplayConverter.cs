@@ -39,6 +39,7 @@ namespace Umbraco.Web.Models.Mapping
             //add the validation information
             display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
             display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
+            display.Validation.CustomErrorMessage = originalProp.PropertyType.ValidationCustomErrorMessage;
             
             if (display.PropertyEditor == null)
             {

@@ -13,5 +13,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "pattern")]
         public string Pattern { get; set; }
+
+        [DataMember(Name = "customErrorMessage")]
+        public string CustomErrorMessage { get; set; }
     }
 }

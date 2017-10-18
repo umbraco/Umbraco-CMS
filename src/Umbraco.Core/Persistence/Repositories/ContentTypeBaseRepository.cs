@@ -503,6 +503,7 @@ AND umbracoNode.id <> @id",
                 propType.Mandatory = dto.Mandatory;
                 propType.SortOrder = dto.SortOrder;
                 propType.ValidationRegExp = dto.ValidationRegExp;
+                propType.ValidationCustomErrorMessage = dto.ValidationCustomErrorMessage;
                 propType.CreateDate = createDate;
                 propType.UpdateDate = updateDate;
                 list.Add(propType);
@@ -1077,14 +1078,14 @@ AND umbracoNode.id <> @id",
                 // NOTE: MySQL requires a SELECT * FROM the inner union in order to be able to sort . lame.
 
                 var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,
-                            PT.ptUniqueId as ptUniqueID, PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp,
+                            PT.ptUniqueId as ptUniqueID, PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, PT.ptValidationCustomErrorMessage,
                             PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
                             PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyTypeGroup as PG
                         LEFT JOIN
                         (
                             SELECT PT.uniqueID as ptUniqueId, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc,
-                                    PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
+                                    PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp, PT.validationCustomErrorMessage as ptValidationCustomErrorMessage,
                                     PT.propertyTypeGroupId as ptGroupId,
                                     DT.dbType as dtDbType, DT.nodeId as dtId, DT.propertyEditorAlias as dtPropEdAlias
                             FROM cmsPropertyType as PT
@@ -1098,7 +1099,7 @@ AND umbracoNode.id <> @id",
 
                         SELECT  PT.contentTypeId as contentTypeId,
                                 PT.uniqueID as ptUniqueID, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc,
-                                PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
+                                PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp, PT.validationCustomErrorMessage as ptValidationCustomErrorMessage,
                                 DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
                                 PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyType as PT
@@ -1151,7 +1152,8 @@ AND umbracoNode.id <> @id",
                                     Name = row.ptName,
                                     PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
                                     SortOrder = row.ptSortOrder,
-                                    ValidationRegExp = row.ptRegExp
+                                    ValidationRegExp = row.ptRegExp,
+                                    ValidationCustomErrorMessage = row.ptValidationCustomErrorMessage
                                 })))
                         {
                             //fill in the rest of the group properties
@@ -1180,7 +1182,8 @@ AND umbracoNode.id <> @id",
                             Name = row.ptName,
                             PropertyGroupId = null,
                             SortOrder = row.ptSortOrder,
-                            ValidationRegExp = row.ptRegExp
+                            ValidationRegExp = row.ptRegExp,
+                            ValidationCustomErrorMessage = row.ptValidationCustomErrorMessage
                         }).ToArray());
 
                     allPropertyTypeCollection[currId] = propertyTypeCollection;

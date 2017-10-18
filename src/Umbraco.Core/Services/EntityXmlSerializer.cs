@@ -403,6 +403,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                    propertyType.ValidationCustomErrorMessage != null ? new XElement("ValidationCustomErrorMessage", propertyType.ValidationCustomErrorMessage) : null,
                                                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
                 
                 genericProperties.Add(genericProperty);

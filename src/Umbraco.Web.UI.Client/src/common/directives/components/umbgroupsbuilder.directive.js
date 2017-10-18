@@ -545,6 +545,7 @@
             property.dataTypeName = oldModel.property.dataTypeName;
             property.validation.mandatory = oldModel.property.validation.mandatory;
             property.validation.pattern = oldModel.property.validation.pattern;
+            property.validation.customErrorMessage = oldModel.property.validation.customErrorMessage;
             property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
             property.memberCanEdit = oldModel.property.memberCanEdit;
 
@@ -592,7 +593,8 @@
           propertyState: "init",
           validation: {
             mandatory: false,
-            pattern: null
+            pattern: null,
+            customErrorMessage: null
           }
         };
 

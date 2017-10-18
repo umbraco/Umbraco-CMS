@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models
         private string _helpText;
         private int _sortOrder;
         private string _validationRegExp;
+        private string _validationCustomErrorMessage;
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
@@ -101,6 +102,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
             public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+            public readonly PropertyInfo ValidationCustomErrorMessageSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationCustomErrorMessage);
             public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
         }
 
@@ -237,6 +239,16 @@ namespace Umbraco.Core.Models
         {
             get { return _validationRegExp; }
             set { SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector); }
+        }
+
+        /// <summary>
+        /// Gets or Sets the custom error message for validation
+        /// </summary>
+        [DataMember]
+        public string ValidationCustomErrorMessage
+        {
+            get { return _validationCustomErrorMessage; }
+            set { SetPropertyValueAndDetectChanges(value, ref _validationCustomErrorMessage, Ps.Value.ValidationCustomErrorMessageSelector); }
         }
 
         private string GetAlias(string value)

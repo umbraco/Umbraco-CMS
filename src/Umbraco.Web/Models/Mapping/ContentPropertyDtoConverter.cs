@@ -25,6 +25,7 @@ namespace Umbraco.Web.Models.Mapping
 
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
+            propertyDto.ValidationCustomErrorMessage = originalProperty.PropertyType.ValidationCustomErrorMessage;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
             

@@ -810,6 +810,7 @@ namespace Umbraco.Core.Services
                     Description = (string)property.Element("Description"),
                     Mandatory = property.Element("Mandatory") != null ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true") : false,
                     ValidationRegExp = (string)property.Element("Validation"),
+                    ValidationCustomErrorMessage = (string)property.Element("ValidationCustomErrorMessage"),
                     SortOrder = sortOrder
                 };
 

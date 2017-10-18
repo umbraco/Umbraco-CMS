@@ -46,6 +46,10 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public string ValidationRegExp { get; set; }
 
+        [Column("validationCustomErrorMessage")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string ValidationCustomErrorMessage { get; set; }
+
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(2000)]

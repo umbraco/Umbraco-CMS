@@ -35,6 +35,9 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("validationRegExp")]
         public string ValidationRegExp { get; set; }
 
+        [Column("validationCustomErrorMessage")]
+        public string ValidationCustomErrorMessage { get; set; }
+
         [Column("Description")]
         public string Description { get; set; }
 

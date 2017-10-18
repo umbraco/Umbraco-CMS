@@ -6,9 +6,11 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -166,7 +168,15 @@ namespace Umbraco.Web.WebApi.Filters
                         //It's required
                         || (p.IsRequired))
                     {
-                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
+                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(
+                            postedValue,
+                            new JObject()
+                            {
+                                new JProperty("pattern", p.ValidationRegExp),
+                                new JProperty("customErrorMessage", p.ValidationCustomErrorMessage),
+                            }.ToString(),
+                            preValues,
+                            editor))
                         {
                             actionContext.ModelState.AddPropertyError(result, p.Alias);
                         }

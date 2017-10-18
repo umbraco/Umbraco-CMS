@@ -40,6 +40,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
                 .IgnoreEntityCommonProperties()
                 .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
+                .ForMember(type => type.ValidationCustomErrorMessage, expression => expression.ResolveUsing(basic => basic.Validation.CustomErrorMessage))
                 .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
                 .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
                 .ForMember(type => type.DataTypeDefinitionId, expression => expression.ResolveUsing(basic => basic.DataTypeId))

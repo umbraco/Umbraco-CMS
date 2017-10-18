@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
@@ -33,16 +35,33 @@ namespace Umbraco.Core.PropertyEditors
 
         public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
         {
+            string pattern = null;
+            string customErrorMessage = null;
+
+			//TODO: This would ideally be a JObject or plain object
+            if (config.IsNullOrWhiteSpace() == false)
+            {
+                var json = JsonConvert.DeserializeObject<JObject>(config);
+                if (json["pattern"] != null)
+                {
+                    pattern = json["pattern"].ToString();
+                }
+                if (json["customErrorMessage"] != null)
+                {
+                    customErrorMessage = json["customErrorMessage"].ToString();
+                }
+            }
+
             //TODO: localize these!
-            if (config.IsNullOrWhiteSpace() == false && value != null)
+            if (pattern.IsNullOrWhiteSpace() == false && value != null)
             {
                 var asString = value.ToString();
 
-                var regex = new Regex(config);
+                var regex = new Regex(pattern);
 
                 if (regex.IsMatch(asString) == false)
                 {
-                    yield return new ValidationResult("Value is invalid, it does not match the correct pattern", new[] { "value" });
+                    yield return new ValidationResult(customErrorMessage ?? "Value is invalid, it does not match the correct pattern", new[] { "value" });
                 }                
             }
             

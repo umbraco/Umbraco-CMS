@@ -128,6 +128,7 @@ namespace Umbraco.Core.Persistence.Factories
                         Mandatory = typeDto.Mandatory,
                         SortOrder = typeDto.SortOrder,
                         ValidationRegExp = typeDto.ValidationRegExp,
+                        ValidationCustomErrorMessage = typeDto.ValidationCustomErrorMessage,
                         PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id.Value),
                         CreateDate = memberType.CreateDate,
                         UpdateDate = memberType.UpdateDate,
