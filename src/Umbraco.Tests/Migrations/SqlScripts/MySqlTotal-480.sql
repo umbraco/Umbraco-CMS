@@ -280,7 +280,8 @@ Name nvarchar (255) NULL,
 helpText nvarchar (1000) NULL, 
 sortOrder int NOT NULL DEFAULT 0, 
 mandatory bit NOT NULL DEFAULT 0, 
-validationRegExp nvarchar (255) NULL, 
+validationRegExp nvarchar (255) NULL,
+validationCustomErrorMessage nvarchar (255) NULL, 
 Description nvarchar (2000) NULL 
 ) 
  

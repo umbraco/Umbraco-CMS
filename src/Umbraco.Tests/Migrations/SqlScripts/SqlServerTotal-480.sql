@@ -315,7 +315,8 @@ CREATE TABLE [cmsPropertyType]
 [helpText] [nvarchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
 [sortOrder] [int] NOT NULL CONSTRAINT [DF__cmsProper__sortO__1EA48E88] DEFAULT (0), 
 [mandatory] [bit] NOT NULL CONSTRAINT [DF__cmsProper__manda__2180FB33] DEFAULT (0), 
-[validationRegExp] [nvarchar] (255) COLLATE Danish_Norwegian_CI_AS NULL, 
+[validationRegExp] [nvarchar] (255) COLLATE Danish_Norwegian_CI_AS NULL,
+[validationCustomErrorMessage] [nvarchar] (255) COLLATE Danish_Norwegian_CI_AS NULL, 
 [Description] [nvarchar] (2000) COLLATE Danish_Norwegian_CI_AS NULL 
 ) 
  
