@@ -1,20 +1,13 @@
 <div class="umb-tour">
 
-    <div class="umb-tour__popover shadow-depth-2" ng-class="{
-        'umb-tour__popover--center': position === 'center',
-        'umb-tour__popover--top': position === 'top',
-        'umb-tour__popover--right': position ===  'right',
-        'umb-tour__popover--bottom': position ===  'bottom',
-        'umb-tour__popover--left': position ===  'left'}">
+    <div class="umb-loader umb-tour__loader" ng-if="loadingStep"></div>
+
+    <div class="umb-tour__popover shadow-depth-2" ng-class="{'umb-tour__popover--l': model.currentStep.type === 'intro' || model.currentStepIndex === model.steps.length}">
         
-        <div ng-if="loadingStep">
-            <umb-load-indicator></umb-load-indicator>
-        </div>
-        
-        <div ng-if="!configuredView && !loadingStep && !elementNotFound">
+        <div ng-if="!configuredView && !elementNotFound">
 
             <!-- Regular steps -->
-            <umb-tour-step ng-if="model.currentStepIndex < model.steps.length && model.currentStep.type !== 'intro'">
+            <umb-tour-step ng-if="model.currentStepIndex < model.steps.length">
                     
                 <umb-tour-step-header
                     title="model.currentStep.title">
@@ -25,44 +18,28 @@
                 </umb-tour-step-content>
     
                 <umb-tour-step-footer class="flex justify-between items-center">
+                    
                     <umb-tour-step-counter
                         current-step="model.currentStepIndex + 1"
                         total-steps="model.steps.length">
                     </umb-tour-step-counter>
-                    <div>
+                    
+                    <div ng-if="model.currentStep.type !== 'intro'">
                         <umb-button size="xs" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>
                         <umb-button size="xs" ng-if="!model.currentStep.event" button-style="success" type="button" action="model.nextStep()" label="Next"></umb-button>
                     </div>
+
+                    <div ng-if="model.currentStep.type === 'intro'">
+                        <umb-button size="m" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>                            
+                        <umb-button size="m" button-style="success" type="button" action="model.nextStep()" label="Start tour"></umb-button>
+                    </div>
+
                 </umb-tour-step-footer>
         
             </umb-tour-step>
 
-            <!-- Intro step type -->
-            <umb-tour-step size="l" ng-if="model.currentStepIndex === 0 && model.currentStep.type === 'intro'">
-
-                <umb-tour-step-header
-                    title="model.currentStep.title">
-                </umb-tour-step-header>
-
-                <umb-tour-step-content
-                    content="model.currentStep.content">
-                </umb-tour-step-content>
-
-                <umb-tour-step-footer class="flex justify-between items-center">
-                    <umb-tour-step-counter
-                        current-step="model.currentStepIndex + 1"
-                        total-steps="model.steps.length">
-                    </umb-tour-step-counter>
-                    <div>
-                        <umb-button size="m" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>                            
-                        <umb-button size="m" button-style="success" type="button" action="model.nextStep()" label="Start tour"></umb-button>
-                    </div>
-                </umb-tour-step-footer>
-
-            </umb-tour-step>
-
-            <!-- Outro step type -->
-            <umb-tour-step size="l" ng-if="model.currentStepIndex === model.steps.length" class="tc">
+            <!-- Outro step -->
+            <umb-tour-step ng-if="model.currentStepIndex === model.steps.length" class="tc">
 
                 <umb-tour-step-content>
                     <div class="flex items-center justify-center">

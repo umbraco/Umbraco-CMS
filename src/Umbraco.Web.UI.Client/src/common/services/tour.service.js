@@ -284,7 +284,8 @@
                         element: "#tree [data-element='tree-item-Home']",
                         title: "Open the Home page",
                         content: "<p>Click the <b>Home</b> page to open it</p>",
-                        event: "click"
+                        event: "click",
+                        eventElement: "#tree [data-element='tree-item-Home'] a.umb-tree-item__label"
                     },
                     {
                         element: "[data-element='editor-content'] [data-element='tab-Generic properties']",

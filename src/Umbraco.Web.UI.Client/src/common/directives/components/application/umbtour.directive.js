@@ -28,6 +28,7 @@
 
             function onInit() {
                 popover = el.find(".umb-tour__popover");
+                popover.hide();                
                 scope.model.currentStepIndex = 0;
                 backdropService.open({disableEventsOnClick: true});
                 startStep();
@@ -51,6 +52,7 @@
             }
 
             function nextStep() {
+                popover.hide();                
                 scope.model.currentStepIndex++;
                 // make sure we don't go too far
                 if(scope.model.currentStepIndex !== scope.model.steps.length) {
@@ -72,7 +74,6 @@
             }
 
             function startStep() {
-
                 scope.loadingStep = true;
                 backdropService.setHighlight(null);
 
@@ -143,9 +144,10 @@
             function setPopoverPosition(element) {
 
                 $timeout(function () {
-
+                    
                     var position = "center";
-                    var css = {top: "50%", left: "50%", marginLeft: "inherit", marginTop: "inherit" };
+                    var margin = 20;
+                    var css = {};
 
                     var popoverWidth = popover.outerWidth();
                     var popoverHeight = popover.outerHeight();
@@ -176,57 +178,54 @@
 
                         if (position === "top") {
                             if (offset.left < documentWidth / 2) {
-                                css.top = offset.top - popoverHeight;
+                                css.top = offset.top - popoverHeight - margin;
                                 css.left = offset.left;
                             } else {
-                                css.top = offset.top - popoverHeight;
+                                css.top = offset.top - popoverHeight - margin;
                                 css.left = offset.left - popoverWidth + width;
                             }
                         }
 
                         if (position === "right") {
                             if (offset.top < documentHeight / 2) {
-                                css.top = offset.top; 
-                                css.left = offset.left + width;
+                                css.top = offset.top;
+                                css.left = offset.left + width + margin;
                             } else {
                                 css.top = offset.top + height - popoverHeight;
-                                css.left = offset.left + width;
+                                css.left = offset.left + width + margin;
                             }
                         }
 
                         if (position === "bottom") {
                             if (offset.left < documentWidth / 2) {
-                                css.top = offset.top + height;
+                                css.top = offset.top + height + margin;
                                 css.left = offset.left;
                             } else {
-                                css.top = offset.top + height;
+                                css.top = offset.top + height + margin;
                                 css.left = offset.left - popoverWidth + width;
                             }
                         }
 
                         if (position === "left") {
                             if (offset.top < documentHeight / 2) {
-                                css.top = offset.top; 
-                                css.left = offset.left - popoverWidth;
+                                css.top = offset.top;
+                                css.left = offset.left - popoverWidth - margin;
                             } else {
                                 css.top = offset.top + height - popoverHeight;
-                                css.left = offset.left - popoverWidth;
+                                css.left = offset.left - popoverWidth - margin;
                             }
                         }
 
                     } else {
-
                         // if there is no dom element center the popover
-                        css.marginLeft = - (popoverWidth / 2);
-                        css.marginTop = - (popoverHeight / 2);
-
+                        css.top = "calc(50% - " + popoverHeight/2 + "px)";
+                        css.left = "calc(50% - " + popoverWidth/2 + "px)";                        
                     }
 
-                    popover.css(css);
-
-                    scope.position = position;
-
+                    popover.css(css).fadeIn("fast");
+                    
                 });
+
 
             }
 
@@ -235,9 +234,10 @@
                 var timer = window.setInterval(function(){
                     // check for pending requests both in angular and on the document
                     if($http.pendingRequests.length === 0 && document.readyState === "complete") {
-                        deferred.resolve();
-                        clearInterval(timer);
-                        scope.$apply();
+                        $timeout(function(){
+                            deferred.resolve();
+                            clearInterval(timer);
+                        });
                     }
                 }, 50);
                 return deferred.promise;
