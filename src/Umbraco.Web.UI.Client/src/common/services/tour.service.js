@@ -408,6 +408,17 @@
             return groupedTours;
         }
 
+        function getTourByAlias(tourAlias) {
+            var tour = _.findWhere(tours, {alias: tourAlias});
+            return tour;
+        }
+
+        function getCompletedTours() {
+            var completedTours = localStorageService.get(localStorageKey);
+            var aliases = _.pluck(completedTours, "alias");
+            return aliases;
+        }
+
         ///////////
 
         function setCompletedTours() {
@@ -464,7 +475,9 @@
             endTour: endTour,
             completeTour: completeTour,
             getAllTours: getAllTours,
-            getGroupedTours: getGroupedTours
+            getGroupedTours: getGroupedTours,
+            getTourByAlias: getTourByAlias,
+            getCompletedTours: getCompletedTours
         };
 
         return service;
