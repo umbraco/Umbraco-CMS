@@ -86,9 +86,11 @@
         <!-- Dom element not found error -->
         <div ng-if="elementNotFound && !loadingStep">
             <umb-tour-step class="tc">
-                <umb-tour-step-header class="bold color-red">Test test test</umb-tour-step-header>
+                <umb-tour-step-header>
+                    <h4 class="bold color-red">Oh, we got lost!</h4>
+                </umb-tour-step-header>
                 <umb-tour-step-content>
-                    <p>Oh, we lost the next step <b>{{ currentStep.title }}</b> and don't know where to go.</p>
+                    <p>We lost the next step <b>{{ model.currentStep.title }}</b> and don't know where to go.</p>
                     <p>Please go back and start the tour again.</p>
                 </umb-tour-step-content>
                 <umb-tour-step-footer>
