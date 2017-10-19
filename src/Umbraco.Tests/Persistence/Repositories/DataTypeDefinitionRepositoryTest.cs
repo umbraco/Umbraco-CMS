@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
         }
 
-        private DataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private DataTypeDefinitionRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(
                 unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
@@ -41,26 +41,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             return dataTypeDefinitionRepository;
         }
 
-        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
         {
             return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Constants.ObjectTypes.DataTypeContainerGuid);
-        }
-
-        [TestCase("UmbracoPreVal87-21,3,48", 3, true)]
-        [TestCase("UmbracoPreVal87-21,33,48", 3, false)]
-        [TestCase("UmbracoPreVal87-21,33,48", 33, true)]
-        [TestCase("UmbracoPreVal87-21,3,48", 33, false)]
-        [TestCase("UmbracoPreVal87-21,3,48", 21, true)]
-        [TestCase("UmbracoPreVal87-21,3,48", 48, true)]
-        [TestCase("UmbracoPreVal87-22,33,48", 2, false)]
-        [TestCase("UmbracoPreVal87-22,33,48", 22, true)]
-        [TestCase("UmbracoPreVal87-22,33,44", 4, false)]
-        [TestCase("UmbracoPreVal87-22,33,44", 44, true)]
-        [TestCase("UmbracoPreVal87-22,333,44", 33, false)]
-        [TestCase("UmbracoPreVal87-22,333,44", 333, true)]
-        public void Pre_Value_Cache_Key_Tests(string cacheKey, int preValueId, bool outcome)
-        {
-            Assert.AreEqual(outcome, Regex.IsMatch(cacheKey, DataTypeDefinitionRepository.GetCacheKeyRegex(preValueId)));
         }
 
         [Test]
@@ -441,7 +424,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var exists = repository.Exists(1034); //Content picker
+                var exists = repository.Exists(1046); //Content picker
                 var doesntExist = repository.Exists(-80);
 
                 // Assert
@@ -537,7 +520,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             var cached = cache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>().Result
-                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_" + dtd.Id);
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());
@@ -581,7 +564,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             var cached = cache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>().Result
-                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_" + dtd.Id);
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());

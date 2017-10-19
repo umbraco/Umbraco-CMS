@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using umbraco.BusinessLogic;
+using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.media
 {
     [Obsolete("This interface is no longer used and will be removed from the codebase in future versions")]
-    public interface IMediaFactory
+    public interface IMediaFactory : IDiscoverable
     {
         List<string> Extensions { get; }
         int Priority { get; }

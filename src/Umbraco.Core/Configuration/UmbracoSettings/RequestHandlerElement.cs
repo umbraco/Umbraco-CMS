@@ -5,30 +5,18 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class RequestHandlerElement : ConfigurationElement, IRequestHandlerSection
+    internal class RequestHandlerElement : UmbracoConfigurationElement, IRequestHandlerSection
     {
         [ConfigurationProperty("useDomainPrefixes")]
         public InnerTextConfigurationElement<bool> UseDomainPrefixes
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["useDomainPrefixes"],
-                    //set the default
-                    false);  
-            }
+            get { return GetOptionalTextElement("useDomainPrefixes", false); }
         }
 
         [ConfigurationProperty("addTrailingSlash")]
         public InnerTextConfigurationElement<bool> AddTrailingSlash
         {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<bool>(
-                    (InnerTextConfigurationElement<bool>)this["addTrailingSlash"],
-                    //set the default
-                    true);  
-            }
+            get { return GetOptionalTextElement("addTrailingSlash", true); }
         }
 
         private UrlReplacingElement _defaultUrlReplacing;
@@ -123,7 +111,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool IRequestHandlerSection.ConvertUrlsToAscii
         {
-            get { return UrlReplacing.ConvertUrlsToAscii; }
+            get { return UrlReplacing.ConvertUrlsToAscii.InvariantEquals("true"); }
+        }
+
+        bool IRequestHandlerSection.TryConvertUrlsToAscii
+        {
+            get { return UrlReplacing.ConvertUrlsToAscii.InvariantEquals("try"); }
         }
 
         IEnumerable<IChar> IRequestHandlerSection.CharCollection

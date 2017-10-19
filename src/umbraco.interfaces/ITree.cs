@@ -6,8 +6,8 @@ namespace umbraco.interfaces
 	/// <summary>
 	/// Interface for created application trees in the umbraco backoffice
 	/// </summary>
-	public interface ITree
-	{
+	public interface ITree : IDiscoverable
+    {
         /// <summary>
         /// Sets the tree id.
         /// </summary>

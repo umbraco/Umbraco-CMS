@@ -33,10 +33,8 @@
     <key alias="sendtopublish">Send til publisering</key>
     <key alias="sendToTranslate">Send til oversetting</key>
     <key alias="sort">Sorter</key>
-    <key alias="toPublish">Send til publisering</key>
     <key alias="translate">Oversett</key>
     <key alias="update">Oppdater</key>
-    <key alias="defaultValue">Standard verdi</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Ingen tilgang.</key>
@@ -468,7 +466,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>Standardbrukeren har blitt deaktivert eller har ingen tilgang til Umbraco!</strong></p><p>Ingen videre handling er nødvendig. Klikk <b>neste</b> for å fortsette.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Passordet til standardbrukeren har blitt forandret etter installasjonen!</strong></p><p>Ingen videre handling er nødvendig. Klikk <strong>Neste</strong> for å fortsette.]]></key>
     <key alias="defaultUserPasswordChanged">Passordet er blitt endret!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco skaper en standard bruker med login <strong> ( "admin") </ strong> og passord <strong> ( "default") </ strong>. Det er <strong> viktig </ strong> at passordet er endret til noe unikt. </ p> <p> Dette trinnet vil sjekke standard brukerens passord og foreslår hvis det må skiftes </ p>]]></key>
     <key alias="greatStart">Få en god start med våre introduksjonsvideoer</key>
     <key alias="licenseText">Ved å klikke på Neste-knappen (eller endre UmbracoConfigurationStatus i Web.config), godtar du lisensen for denne programvaren som angitt i boksen nedenfor. Legg merke til at denne Umbraco distribusjon består av to ulike lisenser, åpen kilde MIT lisens for rammen og Umbraco frivareverktøy lisens som dekker brukergrensesnittet.</key>
     <key alias="None">Ikke installert.</key>
@@ -633,7 +630,7 @@ Vennlig hilsen Umbraco roboten
   <area alias="publicAccess">
     <key alias="paAdvanced">Avansert: Beskytt ved å velge hvilke brukergrupper som har tilgang til siden</key>
     <key alias="paAdvancedHelp"><![CDATA[Om du ønsker å kontrollere tilgang til siden ved å bruke rolle-basert autentisering,<br /> ved å bruke Umbraco's medlems-grupper]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du må opprette en medlemsgruppe før du kan bruke <br /> rollebasert autentikasjon.]]></key>
+    <key alias="paAdvancedNoGroups">Du må opprette en medlemsgruppe før du kan bruke rollebasert autentikasjon.</key>
     <key alias="paErrorPage">Feilside</key>
     <key alias="paErrorPageHelp">Brukt når personer logger på, men ikke har tilgang</key>
     <key alias="paHowWould">Hvordan vil du beskytte siden din?</key>
@@ -884,8 +881,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="postContent">Sett inn etter felt</key>
     <key alias="preContent">Sett inn før felt</key>
     <key alias="recursive">Rekursivt</key>
-    <key alias="removeParagraph">Fjern paragraftagger</key>
-    <key alias="removeParagraphHelp">Fjerner eventuelle &lt;P&gt; rundt teksten</key>
     <key alias="standardFields">Standardfelter</key>
     <key alias="uppercase">Store bokstaver</key>
     <key alias="urlEncode">URL koding</key>
@@ -1005,8 +1000,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="startnode">Startnode</key>
     <key alias="username">Navn</key>
     <key alias="userPermissions">Brukertillatelser</key>
-    <key alias="usertype">Brukertype</key>
-    <key alias="userTypes">Brukertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversetter</key>
     <key alias="change">Endre</key>

@@ -5,7 +5,7 @@
 
     How it works:
         - Confirm the macro parameter has been passed in with a value
-        - Loop through all the media Id's passed in (might be a single item, might be many)
+        - Loop through all the media Ids passed in (might be a single item, might be many)
         - Display any individual images, as well as any folders of images
 
     Macro Parameters To Create, for this macro to work:
@@ -15,17 +15,17 @@
 @{ var mediaId = Model.MacroParameters["mediaId"]; }
 @if (mediaId != null)
 {
-    @* Get all the media item associated with the id passed in *@
-    var media = Umbraco.Media(mediaId);
-    var selection = media.Children("Image");
+    @* Get the media item associated with the id passed in *@
+    var media = Umbraco.TypedMedia(mediaId);
+    var selection = media.Children<Image>().ToArray();
 
-    if (selection.Any())
+    if (selection.Length > 0)
     {
         <ul>
             @foreach (var item in selection)
             {
                 <li>
-                    <img src="@item.umbracoFile" alt="@item.Name" />
+                    <img src="@item.Url" alt="@item.Name" />
                 </li>
             }
         </ul>

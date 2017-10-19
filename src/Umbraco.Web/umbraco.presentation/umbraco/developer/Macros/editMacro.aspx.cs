@@ -88,6 +88,7 @@ namespace umbraco.cms.presentation.developer
 		{
 			macroName.Text = macro.Name;
 			macroAlias.Text = macro.Alias;
+		    macroKey.Text = macro.Key.ToString();
 			macroXslt.Text = macro.XsltPath;
 			macroPython.Text = macro.ScriptPath;
 		    cachePeriod.Text = macro.CacheDuration.ToInvariantString();
@@ -210,7 +211,8 @@ namespace umbraco.cms.presentation.developer
 
         protected IEnumerable<IParameterEditor> GetMacroParameterEditors()
         {
-            return ParameterEditorResolver.Current.ParameterEditors;
+            // we need to show the depracated ones for backwards compatibility
+            return ParameterEditorResolver.Current.GetParameterEditors(true);
         }
 
 		public void macroPropertyCreate(object sender, EventArgs e)
@@ -233,7 +235,7 @@ namespace umbraco.cms.presentation.developer
 			var macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
 			var macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
 			var macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
-			
+
 			if (macroPropertyAliasNew.Text != ui.Text("general", "new", UmbracoUser) + " " + ui.Text("general", "alias", UmbracoUser))
 			{
                 if (_macro.Properties.ContainsKey(macroPropertyAliasNew.Text.Trim()))
@@ -287,7 +289,7 @@ namespace umbraco.cms.presentation.developer
 		}
 
 		protected override void OnInit(EventArgs e)
-		{			
+		{
 			base.OnInit(e);
             EnsureChildControls();
 		}
@@ -332,7 +334,9 @@ namespace umbraco.cms.presentation.developer
 
             SetMacroValuesFromPostBack(_macro, Convert.ToInt32(tempCachePeriod), tempMacroAssembly, tempMacroType);
 
-            // Save elements
+            // save elements
+            // this is oh so completely broken
+            var aliases = new Dictionary<string, string>();
             foreach (RepeaterItem item in macroProperties.Items)
             {
                 var macroPropertyId = (HtmlInputHidden)item.FindControl("macroPropertyID");
@@ -345,14 +349,26 @@ namespace umbraco.cms.presentation.developer
                 var sortOrder = 0;
                 int.TryParse(macroElementSortOrder.Text, out sortOrder);
 
+                var alias = macroElementAlias.Text.Trim();
+                if (prop.Alias != alias) // changing the alias
+                {
+                    // use a temp alias to avoid collision if eg swapping aliases
+                    var tempAlias = Guid.NewGuid().ToString("N").Substring(0, 8);
+                    aliases[tempAlias] = alias;
+                    alias = tempAlias;
+                }
+
                 _macro.Properties.UpdateProperty(
                     prop.Alias,
                     macroElementName.Text.Trim(),
                     sortOrder,
-                    macroElementType.SelectedValue,                    
-                    macroElementAlias.Text.Trim());
-
+                    macroElementType.SelectedValue,
+                    alias);
             }
+
+            // now apply the real aliases, should not collide
+            foreach (var kvp in aliases)
+                _macro.Properties.UpdateProperty(kvp.Key, newAlias: kvp.Value);
 
             Services.MacroService.Save(_macro);
 
@@ -418,14 +434,23 @@ namespace umbraco.cms.presentation.developer
 		/// </remarks>
 		protected global::System.Web.UI.WebControls.TextBox macroAlias;
 
-		/// <summary>
-		/// Pane1_2 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::umbraco.uicontrols.Pane Pane1_2;
+	    /// <summary>
+	    /// macroAlias control.
+	    /// </summary>
+	    /// <remarks>
+	    /// Auto-generated field.
+	    /// To modify move field declaration from designer file to code-behind file.
+	    /// </remarks>
+	    protected global::System.Web.UI.WebControls.Label macroKey;
+
+        /// <summary>
+        /// Pane1_2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane1_2;
 
 		/// <summary>
 		/// macroXslt control.

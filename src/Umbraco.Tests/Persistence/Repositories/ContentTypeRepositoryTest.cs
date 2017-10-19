@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
@@ -49,20 +49,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             return repository;
         }
 
-        private ContentTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private ContentTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
             return contentTypeRepository;
         }
 
-        private MediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork unitOfWork)
+        private MediaTypeRepository CreateMediaTypeRepository(IScopeUnitOfWork unitOfWork)
         {
             var contentTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             return contentTypeRepository;
         }
 
-        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork, Guid containerEntityType)
+        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork, Guid containerEntityType)
         {
             return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, containerEntityType);
         }
@@ -169,6 +169,38 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
+            }
+        }
+
+        [Test]
+        public void Can_Get_All_Containers()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container1, container2, container3;
+            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            {
+                container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container1" };
+                containerRepository.AddOrUpdate(container1);
+                container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container2" };
+                containerRepository.AddOrUpdate(container2);
+                container3 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "container3" };
+                containerRepository.AddOrUpdate(container3);
+                unitOfWork.Commit();
+                Assert.That(container1.Id, Is.GreaterThan(0));
+                Assert.That(container2.Id, Is.GreaterThan(0));
+                Assert.That(container3.Id, Is.GreaterThan(0));
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            {
+                var found1 = containerRepository.Get(container1.Id);
+                Assert.IsNotNull(found1);
+                var found2 = containerRepository.Get(container2.Id);
+                Assert.IsNotNull(found2);
+                var found3 = containerRepository.Get(container3.Id);
+                Assert.IsNotNull(found3);
+                var allContainers = containerRepository.GetAll();
+                Assert.AreEqual(3, allContainers.Count());
             }
         }
 
@@ -539,7 +571,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
-                var child1 = MockedContentTypes.CreateSimpleContentType("aabc", "aabc", contentType, randomizeAliases: true);
+                var child1 = MockedContentTypes.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true);
                 repository.AddOrUpdate(child1);
                 var child3 = MockedContentTypes.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true);
                 repository.AddOrUpdate(child3);
@@ -553,7 +585,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentTypes.Count(), Is.EqualTo(3));
                 Assert.AreEqual("a123", contentTypes.ElementAt(0).Name);
-                Assert.AreEqual("aabc", contentTypes.ElementAt(1).Name);
+                Assert.AreEqual("abc", contentTypes.ElementAt(1).Name);
                 Assert.AreEqual("zyx", contentTypes.ElementAt(2).Name);
             }
 

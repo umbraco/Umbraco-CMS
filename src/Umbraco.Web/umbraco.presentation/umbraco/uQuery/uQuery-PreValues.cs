@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.NodeFactory;
@@ -24,20 +25,23 @@ namespace umbraco
 		/// </returns>
 		public static PreValue MakeNewPreValue(int dataTypeDefinitionId, string value, string alias = "", int sortOrder = 0)
 		{
-			var result =
-				SqlHelper.ExecuteNonQuery(
-					"INSERT INTO cmsDataTypePreValues (datatypeNodeId, value, alias, sortorder) VALUES (@dtdefid, @value, @alias, @sortorder)",
-					SqlHelper.CreateParameter("@dtdefid", dataTypeDefinitionId),
-					SqlHelper.CreateParameter("@value", value),
-					SqlHelper.CreateParameter("@alias", alias),
-					SqlHelper.CreateParameter("@sortorder", sortOrder));
+		    using (var sqlHelper = Application.SqlHelper)
+		    {
+		        var result =
+		            sqlHelper.ExecuteNonQuery(
+		                "INSERT INTO cmsDataTypePreValues (datatypeNodeId, value, alias, sortorder) VALUES (@dtdefid, @value, @alias, @sortorder)",
+		                sqlHelper.CreateParameter("@dtdefid", dataTypeDefinitionId),
+		                sqlHelper.CreateParameter("@value", value),
+		                sqlHelper.CreateParameter("@alias", alias),
+		                sqlHelper.CreateParameter("@sortorder", sortOrder));
 
-			if (result > -1)
-			{
-				return uQuery.GetPreValues(dataTypeDefinitionId).Single(x => x.Value.Equals(value) && x.GetAlias().Equals(alias) && x.SortOrder == sortOrder);
-			}
+		        if (result > -1)
+		        {
+		            return uQuery.GetPreValues(dataTypeDefinitionId).Single(x => x.Value.Equals(value) && x.GetAlias().Equals(alias) && x.SortOrder == sortOrder);
+		        }
 
-			return null;
+		        return null;
+		    }
 		}
 
 		/// <summary>
@@ -94,17 +98,18 @@ namespace umbraco
 		/// <returns></returns>
 		public static bool ReorderPreValue(int preValueId, int sortOrder)
 		{
-			var result =
-				SqlHelper.ExecuteNonQuery(
-					"UPDATE cmsDataTypePreValues SET sortorder = @sortorder WHERE id = @prevalueid",
-					SqlHelper.CreateParameter("@prevalueid", preValueId),
-					SqlHelper.CreateParameter("@sortorder", sortOrder));
+            using (var sqlHelper = Application.SqlHelper) { 
+                var result =
+				    sqlHelper.ExecuteNonQuery(
+					    "UPDATE cmsDataTypePreValues SET sortorder = @sortorder WHERE id = @prevalueid",
+					    sqlHelper.CreateParameter("@prevalueid", preValueId),
+					    sqlHelper.CreateParameter("@sortorder", sortOrder));
 
-			if (result > 0)
-			{
-				return true;
-			}
-
+			    if (result > 0)
+			    {
+				    return true;
+			    }
+            }
 			return false;
 		}
 	}

@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 2, Constants.System.UmbracoMigrationName)]
     public class DropControlIdColumn : MigrationBase
     {
         public DropControlIdColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

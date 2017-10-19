@@ -30,7 +30,6 @@
     <key alias="sendtopublish">Invia per la pubblicazione</key>
     <key alias="sendToTranslate">Invia per la traduzione</key>
     <key alias="sort">Ordina</key>
-    <key alias="toPublish">Invia la pubblicazione</key>
     <key alias="translate">Traduci</key>
     <key alias="unpublish">Annulla pubblicazione</key>
     <key alias="update">Aggiorna</key>
@@ -162,6 +161,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Titolo del Link</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Nome</key>
     <key alias="assignDomain">Gestione alias Hostnames</key>
     <key alias="closeThisWindow">Chiudi questa finestra</key>
@@ -390,7 +391,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>L'utente di default è stato disabilitato o non ha accesso ad Umbraco!</strong></p><p>Non è necessario eseguire altre operazioni. Clicca il tasto <strong>Avanti</strong> per continuare.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>La password è stata modificata con successo</strong></p><p>Non è necessario eseguire altre operazioni. Clicca il tasto <strong>Avanti</strong> per continuare.]]></key>
     <key alias="defaultUserPasswordChanged"><![CDATA[La password è stata modificata!]]></key>
-    <key alias="defaultUserText"><![CDATA[<p>Umbraco crea un utente <strong>('admin')</strong>predefinito e password <strong>('default')</strong>. E' <strong>importante</strong> modificare la password con una personale.</p><p>Questo passaggio controlla la password predefinita e ricorda, se necessario, di modificarla.</p>]]></key>
     <key alias="greatStart"><![CDATA[Parti alla grande, guarda i nostri video introduttivi]]></key>
     <key alias="licenseText"><![CDATA[Cliccando il pulsante Avanti (o modificando la voce UmbracoConfigurationStatus nel file web.config), accettti le condizioni di licenza specificate nel box sottostante. Nota che questa distribuzione di Umbraco è composta da due differenti licenze, la MIT open source per il framework e la Umbraco freeware per la UI.]]></key>
     <key alias="None"><![CDATA[Ancora non installato.]]></key>
@@ -572,7 +572,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
   <area alias="publicAccess">
     <key alias="paAdvanced"><![CDATA[Protezione basata su ruoli]]></key>
     <key alias="paAdvancedHelp"><![CDATA[Se vuoi controllare gli accessi alla pagina tramite l'autenticazione basata sui ruoli,<br /> usando i gruppi di membri di Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Devi creare un gruppo di membri prima di utilizzare <br />l'autenticazione basata sui ruoli.]]></key>
+    <key alias="paAdvancedNoGroups">Devi creare un gruppo di membri prima di utilizzare l'autenticazione basata sui ruoli</key>
     <key alias="paErrorPage"><![CDATA[Pagina di Errore]]></key>
     <key alias="paErrorPageHelp"><![CDATA[Usato quando qualcuno è connesso, ma non ha accesso]]></key>
     <key alias="paHowWould"><![CDATA[Vuoi restringere l'accesso a questa pagina?]]></key>
@@ -789,8 +789,6 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="postContent"><![CDATA[Inserisci dopo il campo]]></key>
     <key alias="preContent"><![CDATA[Inserisci prima il campo]]></key>
     <key alias="recursive">Ricorsivo</key>
-    <key alias="removeParagraph"><![CDATA[Rimuovi i tag paragrafo]]></key>
-    <key alias="removeParagraphHelp"><![CDATA[Rimuoverà &lt;P&gt; all'inizio e alla fine del testo]]></key>
     <key alias="standardFields">Campi Standard</key>
     <key alias="uppercase">Maiuscolo</key>
     <key alias="urlEncode"><![CDATA[Codifica URL]]></key>
@@ -917,8 +915,6 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="startnode"><![CDATA[Nodo di inizio della sezione Contenuto]]></key>
     <key alias="username">Username</key>
     <key alias="userPermissions"><![CDATA[Permessi Utente]]></key>
-    <key alias="usertype"><![CDATA[Tipo di utente]]></key>
-    <key alias="userTypes"><![CDATA[Tipi Utente]]></key>
     <key alias="writer">Writer</key>
   </area>
 </language>

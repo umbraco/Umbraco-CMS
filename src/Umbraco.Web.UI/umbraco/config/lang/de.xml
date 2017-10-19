@@ -33,10 +33,8 @@
     <key alias="sendtopublish">Zur Veröffentlichung einreichen</key>
     <key alias="sendToTranslate">Zur Übersetzung senden</key>
     <key alias="sort">Sortieren</key>
-    <key alias="toPublish">Zur Veröffentlichung einreichen</key>
     <key alias="translate">Übersetzen</key>
     <key alias="update">Aktualisieren</key>
-    <key alias="defaultValue">Standardwert</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Erlaubnis verweigert.</key>
@@ -221,6 +219,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Name des Link</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Name</key>
     <key alias="assignDomain">Hostnamen verwalten</key>
     <key alias="closeThisWindow">Fenster schließen</key>
@@ -278,6 +278,7 @@
     <key alias="search">Durchsuchen ...</key>
     <key alias="filter">Filtern ...</key>
     <key alias="enterTags">Tippen, um Tags hinzuzufügen (nach jedem Tag die Eingabetaste drücken) ...</key>
+    <key alias="usernameHint">Der Benutzername ist normalerweise Ihre E-Mail-Adresse</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Auf oberster Ebene erlauben</key>
@@ -479,13 +480,6 @@
     <key alias="defaultUserDisabled">&lt;strong&gt;Der Standard-Benutzer wurde deaktiviert oder hat keinen Zugriff auf Umbraco.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPassChanged">&lt;strong&gt;Das Kennwort des Standard-Benutzers wurde seit der Installation verändert.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPasswordChanged">Das Kennwort wurde geändert!</key>
-    <key alias="defaultUserText">&lt;p&gt;
-	  Bei der Installation von Umbraco wurde ein Standard-Benutzer mit dem Login-Namen &lt;strong&gt;'admin'&lt;/strong&gt; und dem Kennwort &lt;strong&gt;'default'&lt;/strong&gt; erstellt.
-	  &lt;strong&gt;WICHTIG:&lt;/strong&gt; Das Kennwort sollte auf ein sicheres, eigenes Kennwort geändert werden.
-	&lt;/p&gt;
-	&lt;p&gt;
-	  Das Kennwort des Standard-Benutzers wird jetzt geprüft und im Anschluss werden eventuell notwendige Änderungen vorschlagen.
-	&lt;/p&gt;</key>
     <key alias="greatStart">Schauen Sie sich die Einführungsvideos für einen schnellen und einfachen Start an.</key>
     <key alias="licenseText">Mit der Installation stimmen Sie der angezeigten Lizenz für diese Software zu. Bitte beachten Sie, dass diese Umbraco-Distribution aus zwei Lizenzen besteht. Einer freien Open-Source MIT-Lizenz für das Framework und der Umbraco-Freeware-Lizenz für die Verwaltungsoberfläche.</key>
     <key alias="None">Noch nicht installiert.</key>
@@ -858,7 +852,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   <area alias="grid">
     <key alias="insertControl">Element hinzufügen</key>
     <key alias="addRows">Zeilenlayout auswählen</key>
-    <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
+    <key alias="addElement">Element mit &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; hinzufügen</key>
     <key alias="dropElement">Drop content</key>
     <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
     <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
@@ -902,8 +896,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="postContent">An den Feldinhalt anhängen</key>
     <key alias="preContent">Dem Feldinhalt voranstellen</key>
     <key alias="recursive">Rekursiv</key>
-    <key alias="removeParagraph">Textabsatz entfernen</key>
-    <key alias="removeParagraphHelp">Alle &lt;p&gt; am Anfang und am Ende des Feldinhalts werden entfernt</key>
     <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>
@@ -1023,8 +1015,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="startnode">Startelement in den Inhalten</key>
     <key alias="username">Benutzername</key>
     <key alias="userPermissions">Berechtigungen</key>
-    <key alias="usertype">Rolle</key>
-    <key alias="userTypes">Rollen</key>
     <key alias="writer">Autor</key>
     <key alias="translator">Übersetzer</key>
     <key alias="yourProfile" version="7.0">Ihr Profil</key>

@@ -165,12 +165,20 @@ namespace Umbraco.Web.Models.Mapping
             var listViewTab = new Tab<ContentPropertyDisplay>();
             listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
             listViewTab.Label = localizedTextService.Localize("content/childItems");
-            listViewTab.Id = 25;
+            listViewTab.Id = display.Tabs.Count() + 1;
             listViewTab.IsActive = true;
 
             var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
+
+            //Override Tab Label if tabName is provided
+            if (listViewConfig.ContainsKey("tabName"))
+            {
+                var configTabName = listViewConfig["tabName"];
+                if (configTabName != null && string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
+                    listViewTab.Label = configTabName.ToString();
+            }
 
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
@@ -229,7 +237,7 @@ namespace Umbraco.Web.Models.Mapping
             var groupsGroupsByName = content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
             foreach (var groupsByName in groupsGroupsByName)
             {
-                var properties = new List<ContentPropertyDisplay>();
+                var properties = new List<Property>();
                 
                 // merge properties for groups with the same name
                 foreach (var group in groupsByName)
@@ -237,13 +245,16 @@ namespace Umbraco.Web.Models.Mapping
                     var groupProperties = content.GetPropertiesForGroup(group)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
 
-                    properties.AddRange(Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(groupProperties));
+                    properties.AddRange(groupProperties);
                 }
 
                 if (properties.Count == 0)
                     continue;
 
-                TranslateProperties(properties);
+                // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
+                var mappedProperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(properties.OrderBy(prop => prop.PropertyType.SortOrder));
+
+                TranslateProperties(mappedProperties);
 
                 // add the tab
                 // we need to pick an identifier... there is no "right" way...
@@ -256,7 +267,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = groupId,
                     Alias = groupName,
                     Label = _localizedTextService.UmbracoDictionaryTranslate(groupName),
-                    Properties = properties,
+                    Properties = mappedProperties,
                     IsActive = false
                 });
             }

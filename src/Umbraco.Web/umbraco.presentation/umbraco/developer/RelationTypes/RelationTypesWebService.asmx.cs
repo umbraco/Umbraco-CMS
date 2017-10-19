@@ -1,10 +1,11 @@
 ﻿using System.Web.Services;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
-	/// <summary>
+    /// <summary>
 	/// Webservice to delete relation types, this allows deletion via a javacscript call hooked into the tree UI
 	/// </summary>
 	[WebService(Namespace = "http://tempuri.org/")]
@@ -22,7 +23,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		{
 		    var user = UmbracoContext.Current.Security.CurrentUser;
             
-			if (user.UserType.Name == "Administrators")
+			if (user.IsAdmin())
 			{
                 var relationService = ApplicationContext.Current.Services.RelationService;
 			    var relationType = relationService.GetRelationTypeById(relationTypeId);

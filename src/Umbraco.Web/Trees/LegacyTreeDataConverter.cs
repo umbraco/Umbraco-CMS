@@ -215,11 +215,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/sort.aspx?id=" + nodeId + "&nodeType=" + nodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sort")));
-                case "UmbClientMgr.appActions().actionRights()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/cruds.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "rights")));
+                
                 case "UmbClientMgr.appActions().actionProtect()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -254,7 +250,7 @@ namespace Umbraco.Web.Trees
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/republish.aspx?rnd=" + DateTime.UtcNow.Ticks,
-                            "Republishing entire site"));
+                            ui.GetText("actions", "republish")));
                 case "UmbClientMgr.appActions().actionAssignDomain()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -265,11 +261,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/sendToTranslation.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "sendToTranslate")));
-                case "UmbClientMgr.appActions().actionEmptyTranscan()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/emptyTrashcan.aspx?type=" + currentSection,
-                            ui.GetText("actions", "emptyTrashcan")));
+                
                 case "UmbClientMgr.appActions().actionImport()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -285,16 +277,7 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/viewAuditTrail.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "auditTrail")));
-                case "UmbClientMgr.appActions().actionMove()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=cut&id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "move")));
-                case "UmbClientMgr.appActions().actionCopy()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/moveOrCopy.aspx?app=" + currentSection + "&mode=copy&id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ui.GetText("actions", "copy")));
+              
             }
             return Attempt<LegacyUrlAction>.Fail();
         }

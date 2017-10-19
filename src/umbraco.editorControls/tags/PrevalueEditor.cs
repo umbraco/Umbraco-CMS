@@ -15,12 +15,13 @@ namespace umbraco.editorControls.tags
     {
         private TextBox _group;
 
-        public static ISqlHelper SqlHelper
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        public ISqlHelper SqlHelper
         {
-            get
-            {
-                return Application.SqlHelper;
-            }
+            get { return Application.SqlHelper; }
         }
 
         // referenced datatype
@@ -44,16 +45,18 @@ namespace umbraco.editorControls.tags
         public void Save()
         {
             //clear all datatype data first...
-            SqlHelper.ExecuteNonQuery("delete from cmsDataTypePrevalues where datatypeNodeId = " + _datatype.DataTypeDefinitionId);
-            
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePrevalues where datatypeNodeId = " + _datatype.DataTypeDefinitionId);
+
             //Save datatype
             _datatype.DBType = datatype.DBTypes.Ntext;
-            
+
             // Save path and control type..
-            SqlHelper.ExecuteNonQuery("insert into cmsDataTypePrevalues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,@alias)",
-                SqlHelper.CreateParameter("@value", _group.Text),
-                SqlHelper.CreateParameter("@alias", "group"),
-                SqlHelper.CreateParameter("@dtdefid", _datatype.DataTypeDefinitionId));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("insert into cmsDataTypePrevalues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,@alias)",
+                    sqlHelper.CreateParameter("@value", _group.Text),
+                    sqlHelper.CreateParameter("@alias", "group"),
+                    sqlHelper.CreateParameter("@dtdefid", _datatype.DataTypeDefinitionId));
         }
 
         private void setupChildControls()
@@ -92,19 +95,20 @@ namespace umbraco.editorControls.tags
             get
             {
                 SortedList retval = new SortedList();
-                IRecordsReader dr = SqlHelper.ExecuteReader(
-                    "Select alias, [value] from cmsDataTypeprevalues where DataTypeNodeId = " + _datatype.DataTypeDefinitionId + " order by sortorder");
-
-                while (dr.Read())
+                using (var sqlHelper = Application.SqlHelper)
+                using (var dr = sqlHelper.ExecuteReader(
+                    "Select alias, [value] from cmsDataTypeprevalues where DataTypeNodeId = " + _datatype.DataTypeDefinitionId + " order by sortorder"))
                 {
-                    if (!retval.ContainsKey(dr.GetString("alias")))
+                    while (dr.Read())
                     {
-                        retval.Add(dr.GetString("alias"), dr.GetString("value"));
+                        if (!retval.ContainsKey(dr.GetString("alias")))
+                        {
+                            retval.Add(dr.GetString("alias"), dr.GetString("value"));
+                        }
                     }
-                }
 
-                dr.Close();
-                return retval;
+                    return retval;
+                }
             }
         }
     }

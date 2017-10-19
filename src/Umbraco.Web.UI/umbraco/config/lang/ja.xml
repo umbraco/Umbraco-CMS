@@ -33,10 +33,8 @@
     <key alias="sendtopublish">公開に送る</key>
     <key alias="sendToTranslate">翻訳に送る</key>
     <key alias="sort">並べ替え</key>
-    <key alias="toPublish">公開する</key>
     <key alias="translate">翻訳</key>
     <key alias="update">更新</key>
-    <key alias="defaultValue">初期値</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">アクセスが拒否されました</key>
@@ -275,19 +273,12 @@
     <key alias="thumbnailimageclickfororiginal">クリックすると画像がフルサイズで表示されます</key>
     <key alias="treepicker">項目の選択</key>
     <key alias="viewCacheItem">キャッシュされている項目の表示</key>
-	<key alias="createFolder">フォルダーの作成...</key>
-
+    <key alias="createFolder">フォルダーの作成...</key>
     <key alias="relateToOriginalLabel">オリジナルに関連付ける</key>
     <key alias="theFriendliestCommunity">フレンドリーなコミュニティ</key>
-
     <key alias="linkToPage">ページへリンク</key>
-
     <key alias="openInNewWindow">リンク ドキュメントを新しいウィンドウまたはタブで開く</key>
-    <key alias="openInFullBody">リンク ドキュメントをウィンドウ全文表示で開く</key>
-    <key alias="openInParentFrame">親フレームでリンク ドキュメントを開く</key>
-
     <key alias="linkToMedia">メディアへリンク</key>
-
     <key alias="selectMedia">メディアの選択</key>
     <key alias="selectIcon">アイコンの選択</key>
     <key alias="selectItem">アイテムの選択</key>
@@ -296,19 +287,14 @@
     <key alias="selectContent">コンテンツの選択</key>
     <key alias="selectMember">メンバーの選択</key>
     <key alias="selectMemberGroup">メンバー グループの選択</key>
-
     <key alias="noMacroParams">このマクロのパラメーターはありません</key>
-
     <key alias="externalLoginProviders">外部ログイン プロバイダー</key>
     <key alias="exceptionDetail">例外の詳細</key>
     <key alias="stacktrace">スタックトレース</key>
     <key alias="innerException">Inner Exception</key>
-
     <key alias="linkYour">次をリンク:</key>
     <key alias="unLinkYour">次をリンク解除:</key>
-
     <key alias="account">アカウント</key>
-
     <key alias="selectEditor">エディターの選択</key>
   </area>
   <area alias="dictionaryItem">
@@ -581,15 +567,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<b>次へ</b>をクリックして続行してください。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          Umbracoはデフォルトユーザーとしてユーザー名 <strong>('admin')</strong> 、パスワード <strong>('default')</strong>を作成します。このパスワードを独自のものに変更する事は<strong>重要</strong>
-          なことです。
-        </p>
-        <p>
-          ここではデフォルトのユーザーのパスワードを確認し、必要ならば変更しておく事をお勧めします。
-        </p>
-      ]]></key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
     <key alias="licenseText">次へボタンをクリック(またはweb.configのumbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
     <key alias="None">まだインストールは完了していません。</key>
@@ -1120,8 +1097,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="postContent">フィールド値の後ろ追加</key>
     <key alias="preContent">フィールド値の前に追加</key>
     <key alias="recursive">再帰的</key>
-    <key alias="removeParagraph">段落タグの消去</key>
-    <key alias="removeParagraphHelp">段落タグ &amp;lt;P&amp;gt; を消去します</key>
     <key alias="standardFields">標準フィールド</key>
     <key alias="uppercase">大文字変換</key>
     <key alias="urlEncode">URLエンコード</key>
@@ -1249,8 +1224,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="startnode">コンテンツの開始ノード</key>
     <key alias="username">ユーザー名</key>
     <key alias="userPermissions">ユーザーの権限</key>
-    <key alias="usertype">ユーザーの種類</key>
-    <key alias="userTypes">ユーザーの種類</key>
     <key alias="writer">投稿者</key>
     <key alias="translator">翻訳者</key>
 	<key alias="change">変更</key>

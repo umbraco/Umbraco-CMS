@@ -1,25 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Media;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
@@ -52,7 +41,7 @@ namespace Umbraco.Core.Models
         /// * The item exists and is published
         /// * A call to ContentService.Save is made
         /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
-        /// 
+        ///
         /// In this case, there is no reason to make any database changes at all
         /// </remarks>
         internal static bool RequiresSaving(this IContent entity)
@@ -72,7 +61,7 @@ namespace Umbraco.Core.Models
         /// * The item exists and is published
         /// * A call to ContentService.Save is made
         /// * The item has not been modified whatsoever apart from changing it's published status from published to saved
-        /// 
+        ///
         /// In this case, there is no reason to make any database changes at all
         /// </remarks>
         internal static bool RequiresSaving(this IContent entity, PublishedState publishedState)
@@ -80,7 +69,7 @@ namespace Umbraco.Core.Models
             var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
             //check if any user prop has changed
             var propertyValueChanged = entity.IsAnyUserPropertyDirty();
-            
+
             //We need to know if any other property apart from Published was changed here
             //don't create a new version if the published state has changed to 'Save' but no data has actually been changed
             if (publishedChanged && entity.Published == false && propertyValueChanged == false)
@@ -312,9 +301,9 @@ namespace Umbraco.Core.Models
             return content.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                           .Contains(recycleBinId.ToInvariantString());
         }
-        
+
         /// <summary>
-        /// Removes characters that are not valide XML characters from all entity properties 
+        /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018
         /// </summary>
         /// <returns></returns>
@@ -329,7 +318,7 @@ namespace Umbraco.Core.Models
             {
                 if (property.Value is string)
                 {
-                    var value = (string)property.Value;
+                    var value = (string) property.Value;
                     property.Value = value.ToValidXmlString();
                 }
             }
@@ -404,14 +393,13 @@ namespace Umbraco.Core.Models
             return content.Properties
                           .Where(property => propertyGroup.PropertyTypes
                                                           .Select(propertyType => propertyType.Id)
-                                                          .Contains(property.PropertyTypeId))
-                          .OrderBy(x => x.PropertyType.SortOrder);
+                                                          .Contains(property.PropertyTypeId));
         }
 
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
-        public static void PropertyValues(this IContent content, object value)
+        public static void PropertyValues(this IContentBase content, object value)
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");
@@ -444,160 +432,122 @@ namespace Umbraco.Core.Models
             }
         }
 
+        public static IContentTypeComposition GetContentType(this IContentBase contentBase)
+        {
+            if (contentBase == null) throw new ArgumentNullException("contentBase");
+
+            var content = contentBase as IContent;
+            if (content != null) return content.ContentType;
+            var media = contentBase as IMedia;
+            if (media != null) return media.ContentType;
+            var member = contentBase as IMember;
+            if (member != null) return member.ContentType;
+            throw new NotSupportedException("Unsupported IContentBase implementation: " + contentBase.GetType().FullName + ".");
+        }
+
         #region SetValue for setting file contents
 
         /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileBase object as the property value
+        /// Stores and sets an uploaded HttpPostedFileBase as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="value">The uploaded <see cref="HttpPostedFileBase"/>.</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
-            // Ensure we get the filename without the path in IE in intranet mode 
+            // ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
-            var fileName = value.FileName;
-            if (fileName.LastIndexOf(@"\") > 0)
-                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+            var filename = value.FileName;
+            var pos = filename.LastIndexOf(@"\", StringComparison.InvariantCulture);
+            if (pos > 0)
+                filename = filename.Substring(pos + 1);
 
-            var name =
-                IOHelper.SafeFileName(
-                    fileName.Substring(fileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                       fileName.Length - fileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                            .ToLower());
+            // strip any directory info
+            pos = filename.LastIndexOf(IOHelper.DirSepChar);
+            if (pos > 0)
+                filename = filename.Substring(pos + 1);
 
-            if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
+            // get a safe & clean filename
+            filename = IOHelper.SafeFileName(filename);
+            if (string.IsNullOrWhiteSpace(filename)) return;
+            filename = filename.ToLower();
+
+            FileSystemProviderManager.Current.MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream);
         }
 
         /// <summary>
-        /// Sets and uploads the file from a HttpPostedFile object as the property value
+        /// Stores and sets an uploaded HttpPostedFile as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="value">The uploaded <see cref="HttpPostedFile"/>.</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
-            SetValue(content, propertyTypeAlias, (HttpPostedFileBase)new HttpPostedFileWrapper(value));
+            SetValue(content, propertyTypeAlias, (HttpPostedFileBase) new HttpPostedFileWrapper(value));
         }
 
         /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileWrapper object as the property value
+        /// Stores and sets an uploaded HttpPostedFileWrapper as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="value">The uploaded <see cref="HttpPostedFileWrapper"/>.</param>
         [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
-            SetValue(content, propertyTypeAlias, (HttpPostedFileBase)value);
+            SetValue(content, propertyTypeAlias, (HttpPostedFileBase) value);
         }
 
         /// <summary>
-        /// Sets and uploads the file from a <see cref="Stream"/> as the property value
+        /// Stores and sets a file as a property value.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="fileName">Name of the file</param>
-        /// <param name="fileStream"><see cref="Stream"/> to save to disk</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName, Stream fileStream)
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="filename">The name of the file.</param>
+        /// <param name="filestream">A stream containing the file data.</param>
+        /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
+        /// you need to store the file by yourself using Store and then figure out
+        /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream)
         {
-            var name = IOHelper.SafeFileName(fileName);
+            if (filename == null || filestream == null) return;
 
-            if (string.IsNullOrEmpty(name) == false && fileStream != null)
-                SetFileOnContent(content, propertyTypeAlias, name, fileStream);
+            // get a safe & clean filename
+            filename = IOHelper.SafeFileName(filename);
+            if (string.IsNullOrWhiteSpace(filename)) return;
+            filename = filename.ToLower();
+
+            FileSystemProviderManager.Current.MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream);
         }
 
-        private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string filename, Stream fileStream)
+        /// <summary>
+        /// Stores a file.
+        /// </summary>
+        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="filename">The name of the file.</param>
+        /// <param name="filestream">A stream containing the file data.</param>
+        /// <param name="filepath">The original file path, if any.</param>
+        /// <returns>The path to the file, relative to the media filesystem.</returns>
+        /// <remarks>
+        /// <para>Does NOT set the property value, so one should probably store the file and then do
+        /// something alike: property.Value = MediaHelper.FileSystem.GetUrl(filepath).</para>
+        /// <para>The original file path is used, in the old media file path scheme, to try and reuse
+        /// the "folder number" that was assigned to the previous file referenced by the property,
+        /// if any.</para>
+        /// </remarks>
+        public static string StoreFile(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
-            var property = content.Properties.FirstOrDefault(x => x.Alias == propertyTypeAlias);
-            if (property == null)
-                return;
-
-            //TODO: ALl of this naming logic needs to be put into the ImageHelper and then we need to change FileUploadPropertyValueEditor to do the same!
-
-            var numberedFolder = MediaSubfolderCounter.Current.Increment();
-            var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
-                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), filename)
-                                              : numberedFolder + "-" + filename;
-
-            var extension = Path.GetExtension(filename).Substring(1).ToLowerInvariant();
-
-            //the file size is the length of the stream in bytes
-            var fileSize = fileStream.Length;
-
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            fs.AddFile(fileName, fileStream);
-
-            //Check if file supports resizing and create thumbnails
-            var supportsResizing = UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(extension);
-
-            //the config section used to auto-fill properties
-            IImagingAutoFillUploadField uploadFieldConfigNode = null;
-
-            //Check for auto fill of additional properties
-            if (UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties != null)
-            {
-                uploadFieldConfigNode = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
-                                    .FirstOrDefault(x => x.Alias == propertyTypeAlias);
-
-            }
-
-            if (supportsResizing)
-            {
-                //get the original image from the original stream
-                if (fileStream.CanSeek) fileStream.Seek(0, 0);
-                using (var originalImage = Image.FromStream(fileStream))
-                {
-                    var additionalSizes = new List<int>();
-
-                    //Look up Prevalues for this upload datatype - if it is an upload datatype - get additional configured sizes
-                    if (property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
-                    {
-                        //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                        var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
-                        var thumbnailSizes = values.FirstOrDefault();
-                        //Additional thumbnails configured as prevalues on the DataType
-                        if (thumbnailSizes != null)
-                        {
-							foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
-                            {
-                                int thumbSize;
-                                if (thumb != "" && int.TryParse(thumb, out thumbSize))
-                                {
-                                    additionalSizes.Add(thumbSize);
-                                }
-                            }
-                        }
-                    }
-
-                    ImageHelper.GenerateMediaThumbnails(fs, fileName, extension, originalImage, additionalSizes);
-
-                    //while the image is still open, we'll check if we need to auto-populate the image properties
-                    if (uploadFieldConfigNode != null)
-                    {
-                        content.SetValue(uploadFieldConfigNode.WidthFieldAlias, originalImage.Width.ToString(CultureInfo.InvariantCulture));
-                        content.SetValue(uploadFieldConfigNode.HeightFieldAlias, originalImage.Height.ToString(CultureInfo.InvariantCulture));
-                    }
-
-                }
-            }
-
-            //if auto-fill is true, then fill the remaining, non-image properties
-            if (uploadFieldConfigNode != null)
-            {
-                content.SetValue(uploadFieldConfigNode.LengthFieldAlias, fileSize.ToString(CultureInfo.InvariantCulture));
-                content.SetValue(uploadFieldConfigNode.ExtensionFieldAlias, extension);
-            }
-
-            //Set the value of the property to that of the uploaded file's url
-            property.Value = fs.GetUrl(fileName);
+            var propertyType = content.GetContentType()
+                .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
+            return FileSystemProviderManager.Current.MediaFileSystem.StoreFile(content, propertyType, filename, filestream, filepath);
         }
 
         #endregion
 
         #region User/Profile methods
-        
+
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
@@ -672,7 +622,7 @@ namespace Umbraco.Core.Models
         ///// <param name="tagGroup"></param>
         ///// <returns></returns>
         ///// <remarks>
-        ///// The tags returned are only relavent for published content & saved media or members 
+        ///// The tags returned are only relavent for published content & saved media or members
         ///// </remarks>
         //public static IEnumerable<ITag> GetTags(this IContentBase content, string propertyTypeAlias, string tagGroup = "default")
         //{

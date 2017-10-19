@@ -2,11 +2,26 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Services
 {
     public interface IEntityService
     {
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        bool Exists(Guid key);
+
+        /// <summary>
+        /// Returns true if the entity exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
+
         /// <summary>
         /// Returns the integer id for a given GUID
         /// </summary>
@@ -14,6 +29,13 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType"></param>
         /// <returns></returns>
         Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Returns the integer id for a given Udi
+        /// </summary>
+        /// <param name="udi"></param>
+        /// <returns></returns>
+        Attempt<int> GetIdForUdi(Udi udi);
 
         /// <summary>
         /// Returns the GUID for a given integer id
@@ -124,6 +146,57 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetChildren(int parentId, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
+        /// Returns a paged collection of children
+        /// </summary>
+        /// <param name="parentId">The parent id to return children for</param>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedChildren(int parentId, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(int id, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants
+        /// </summary>
+        IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        /// <summary>
+        /// Returns a paged collection of descendants from the root
+        /// </summary>
+        /// <param name="umbracoObjectType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="orderDirection"></param>
+        /// <param name="filter"></param>
+        /// <param name="includeTrashed">true/false to include trashed objects</param>
+        /// <returns></returns>
+        IEnumerable<IUmbracoEntity> GetPagedDescendantsFromRoot(UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "", bool includeTrashed = true);
+
+        /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>
         /// <param name="id">Id of entity to retrieve descendents for</param>
@@ -177,6 +250,16 @@ namespace Umbraco.Core.Services
         IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
 
         /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+
+        /// <summary>
+        /// Gets paths for entities.
+        /// </summary>
+        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
+
+        /// <summary>
         /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.
         /// </summary>
         /// <param name="id">Id of the entity</param>
@@ -203,5 +286,13 @@ namespace Umbraco.Core.Services
         /// <param name="umbracoObjectType"><see cref="UmbracoObjectTypes"/></param>
         /// <returns>Type of the entity</returns>
         Type GetEntityType(UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Reserves an identifier for a key.
+        /// </summary>
+        /// <param name="key">They key.</param>
+        /// <returns>The identifier.</returns>
+        /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
+        int ReserveId(Guid key);
     }
 }

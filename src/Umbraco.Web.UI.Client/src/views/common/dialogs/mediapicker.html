@@ -75,7 +75,8 @@
 	                <input type="text"
 	                       ng-model="searchTerm"
 	                       class="umb-search-field search-query"
-	                       placeholder="Filter...">
+                          localize="placeholder"
+	                       placeholder="@placeholders_filter">
                 </div>
 
                 <div class="upload-button">
@@ -116,8 +117,10 @@
   
 
         <div class="umb-panel-body with-footer">
-            
+                       
             <umb-file-dropzone 
+                ng-if="acceptedMediatypes.length > 0"
+                accepted-mediatypes="acceptedMediatypes"
                 hide-dropzone="{{!activeDrag && images.length > 0}}" 
                 parent-id="{{currentFolder.id}}"
                 files-uploaded="onUploadComplete"
@@ -156,4 +159,4 @@
 
     </div>
 
-</div>
+</form>

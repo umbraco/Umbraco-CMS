@@ -14,16 +14,18 @@ using Umbraco.Core.Packaging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using System.Diagnostics;
-using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.interfaces;
+using Umbraco.Core.Events;
+using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.businesslogic.packager
 {
     /// <summary>
     /// The packager is a component which enables sharing of both data and functionality components between different umbraco installations.
     /// 
-    /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macroes/documenttypes (etc.)
+    /// The output is a .umb (a zip compressed file) which contains the exported documents/medias/macros/documenttypes (etc.)
     /// in a Xml document, along with the physical files used (images/usercontrols/xsl documents etc.)
     /// 
     /// Partly implemented, import of packages is done, the export is *under construction*.
@@ -379,48 +381,13 @@ namespace umbraco.cms.businesslogic.packager
 
                     //Perhaps it would have been a good idea to put the following into methods eh?!?
 
-                    #region DataTypes
-                    var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-                    if (dataTypeElement != null)
+                    #region Stylesheets
+                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
                     {
-                        var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
-                        foreach (var dataTypeDefinition in dataTypeDefinitions)
-                        {
-                            insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
-                        }
-                    }
-                    #endregion
+                        StyleSheet s = StyleSheet.Import(n, currentUser);
 
-                    #region Languages
-                    var languageItemsElement = rootElement.Descendants("Languages").FirstOrDefault();
-                    if (languageItemsElement != null)
-                    {
-                        var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
-                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
-                    }
-
-                    #endregion
-
-                    #region Dictionary items
-                    var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
-                    if (dictionaryItemsElement != null)
-                    {
-                        var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
-                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
-                    }
-                    #endregion
-
-                    #region Macros
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
-                    {
-                        //TODO: Fix this, this should not use the legacy API
-                        Macro m = Macro.Import(n);
-
-                        if (m != null)
-                        {
-                            insPack.Data.Macros.Add(m.Id.ToString(CultureInfo.InvariantCulture));
-                            //saveNeeded = true;
-                        }
+                        insPack.Data.Stylesheets.Add(s.Id.ToString(CultureInfo.InvariantCulture));
+                        //saveNeeded = true;
                     }
 
                     //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
@@ -435,6 +402,46 @@ namespace umbraco.cms.businesslogic.packager
                         {
                             insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
                         }
+                    }
+                    #endregion
+
+                    #region Languages
+                    var languageItemsElement = rootElement.Descendants("Languages").FirstOrDefault();
+                    if (languageItemsElement != null)
+                    {
+                        var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
+                        insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString(CultureInfo.InvariantCulture)));
+                    }
+
+                    #endregion
+
+                    #region Dictionary items
+                    var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
+                    if (dictionaryItemsElement != null)
+                    {
+                        var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
+                        insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString(CultureInfo.InvariantCulture)));
+                    }
+                    #endregion
+
+                    #region DataTypes
+                    var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
+                    if (dataTypeElement != null)
+                    {
+                        var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
+                        foreach (var dataTypeDefinition in dataTypeDefinitions)
+                        {
+                            insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+                    #endregion
+
+                    #region Macros
+                    var macroItemsElement = rootElement.Descendants("Macros").FirstOrDefault();
+                    if (macroItemsElement != null)
+                    {
+                        var insertedMacros = packagingService.ImportMacros(macroItemsElement);
+                        insPack.Data.Macros.AddRange(insertedMacros.Select(m => m.Id.ToString(CultureInfo.InvariantCulture)));
                     }
                     #endregion
 
@@ -454,18 +461,6 @@ namespace umbraco.cms.businesslogic.packager
                             //saveNeeded = true;
                         }
                     }
-                    #endregion
-
-                    #region Stylesheets
-                    foreach (XmlNode n in Config.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
-                    {
-                        StyleSheet s = StyleSheet.Import(n, currentUser);
-
-                        insPack.Data.Stylesheets.Add(s.Id.ToString());
-                        //saveNeeded = true;
-                    }
-
-                    //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                     #endregion
 
                     #region Documents
@@ -514,6 +509,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
 
                 OnPackageBusinessLogicInstalled(insPack);
+                OnPackageInstalled(insPack);
             }
         }
 
@@ -524,6 +520,7 @@ namespace umbraco.cms.businesslogic.packager
         /// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
+            
             if (Directory.Exists(tempDir))
             {
                 Directory.Delete(tempDir, true);
@@ -820,6 +817,22 @@ namespace umbraco.cms.businesslogic.packager
         {
             EventHandler<InstalledPackage> handler = PackageBusinessLogicInstalled;
             if (handler != null) handler(null, e);
+        }
+
+        private void OnPackageInstalled(InstalledPackage insPack)
+        {
+            // getting an InstallationSummary for sending to the PackagingService.ImportedPackage event
+            var fileService = ApplicationContext.Current.Services.FileService;
+            var macroService = ApplicationContext.Current.Services.MacroService;
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            var localizationService = ApplicationContext.Current.Services.LocalizationService;
+
+            var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
+            installationSummary.PackageInstalled = true;
+
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, false);
+            PackagingService.OnImportedPackage(args);
         }
     }
 }

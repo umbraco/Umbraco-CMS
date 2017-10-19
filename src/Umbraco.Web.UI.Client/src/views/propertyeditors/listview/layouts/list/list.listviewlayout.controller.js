@@ -1,75 +1,96 @@
 (function () {
-   "use strict";
+    "use strict";
 
-   function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper) {
+    function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper, mediaTypeHelper) {
 
-      var vm = this;
+        var vm = this;
+        var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
 
-      vm.nodeId = $scope.contentId;
-        //we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
-        vm.acceptedFileTypes = !mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.disallowedUploadFiles);
-      vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
-      vm.activeDrag = false;
-      vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+        vm.nodeId = $scope.contentId;
 
-      vm.selectItem = selectItem;
-      vm.clickItem = clickItem;
-      vm.selectAll = selectAll;
-      vm.isSelectedAll = isSelectedAll;
-      vm.isSortDirection = isSortDirection;
-      vm.sort = sort;
-      vm.dragEnter = dragEnter;
-      vm.dragLeave = dragLeave;
-      vm.onFilesQueue = onFilesQueue;
-      vm.onUploadComplete = onUploadComplete;
+        // Use whitelist of allowed file types if provided
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
+        if (vm.acceptedFileTypes === '') {
+            // If not provided, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+            vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
+        }
 
-      function selectAll($event) {
-         listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
-         }
+        vm.maxFileSize = umbracoSettings.maxFileSize + "KB";
+        vm.activeDrag = false;
+        vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+        vm.acceptedMediatypes = [];
 
-      function isSelectedAll() {
-         return listViewHelper.isSelectedAll($scope.items, $scope.selection);
-         }
+        vm.selectItem = selectItem;
+        vm.clickItem = clickItem;
+        vm.selectAll = selectAll;
+        vm.isSelectedAll = isSelectedAll;
+        vm.isSortDirection = isSortDirection;
+        vm.sort = sort;
+        vm.dragEnter = dragEnter;
+        vm.dragLeave = dragLeave;
+        vm.onFilesQueue = onFilesQueue;
+        vm.onUploadComplete = onUploadComplete;
 
-      function selectItem(selectedItem, $index, $event) {
-         listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
-         }
+        function activate() {
 
-      function clickItem(item) {
-         $location.path($scope.entityType + '/' +$scope.entityType + '/edit/' +item.id);
-         }
+            if ($scope.entityType === 'media') {
+                mediaTypeHelper.getAllowedImagetypes(vm.nodeId).then(function (types) {
+                    vm.acceptedMediatypes = types;
+                });
+            }
 
-      function isSortDirection(col, direction) {
-         return listViewHelper.setSortingDirection(col, direction, $scope.options);
-         }
+        }
 
-      function sort(field, allow, isSystem) {
-         if (allow) {
-            $scope.options.orderBySystemField = isSystem;
-            listViewHelper.setSorting(field, allow, $scope.options);
+        function selectAll($event) {
+            listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
+        }
+
+        function isSelectedAll() {
+            return listViewHelper.isSelectedAll($scope.items, $scope.selection);
+        }
+
+        function selectItem(selectedItem, $index, $event) {
+            listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
+        }
+
+        function clickItem(item) {
+            // if item.id is 2147483647 (int.MaxValue) use item.key
+            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
+        }
+
+        function isSortDirection(col, direction) {
+            return listViewHelper.setSortingDirection(col, direction, $scope.options);
+        }
+
+        function sort(field, allow, isSystem) {
+            if (allow) {
+                $scope.options.orderBySystemField = isSystem;
+                listViewHelper.setSorting(field, allow, $scope.options);
+                $scope.getContent($scope.contentId);
+            }
+        }
+
+        // Dropzone upload functions
+        function dragEnter(el, event) {
+            vm.activeDrag = true;
+        }
+
+        function dragLeave(el, event) {
+            vm.activeDrag = false;
+        }
+
+        function onFilesQueue() {
+            vm.activeDrag = false;
+        }
+
+        function onUploadComplete() {
             $scope.getContent($scope.contentId);
-            }
-            }
+        }
 
-               // Dropzone upload functions
-      function dragEnter(el, event) {
-         vm.activeDrag = true;
-   }
+        activate();
 
-      function dragLeave(el, event) {
-         vm.activeDrag = false;
-      }
+    }
 
-      function onFilesQueue() {
-         vm.activeDrag = false;
-         }
+    angular.module("umbraco").controller("Umbraco.PropertyEditors.ListView.ListLayoutController", ListViewListLayoutController);
 
-      function onUploadComplete() { 
-         $scope.getContent($scope.contentId);
-   }
-
-   }
-
-angular.module("umbraco").controller("Umbraco.PropertyEditors.ListView.ListLayoutController", ListViewListLayoutController);
-
-}) ();
+})();

@@ -5,17 +5,17 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class ContentTypeServiceBase : RepositoryService
+    public class ContentTypeServiceBase : ScopeRepositoryService
     {
         public ContentTypeServiceBase(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
-        {
-        }
-        
+        { }
+
         /// <summary>
         /// This is called after an content type is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Services
                 //      - a content type changes it's alias OR
                 //      - if a content type has it's property removed OR
                 //      - if a content type has a property whose alias has changed
-                //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+                //here we need to check if the alias of the content type changed or if one of the properties was removed.
                 var dirty = contentType as IRememberBeingDirty;
                 if (dirty == null) continue;
 
@@ -50,25 +50,45 @@ namespace Umbraco.Core.Services
                     && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved") || hasAnyPropertiesChangedAlias))
                 {
                     //If the alias was changed then we only need to update the xml structures for content of the current content type.
-                    //If a property was deleted or a property alias was changed then we need to update the xml structures for any 
+                    //If a property was deleted or a property alias was changed then we need to update the xml structures for any
                     // content of the current content type and any of the content type's child content types.
                     if (dirty.WasPropertyDirty("Alias")
                         && dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved") == false && hasAnyPropertiesChangedAlias == false)
                     {
-                        //if only the alias changed then only update the current content type                        
+                        //if only the alias changed then only update the current content type
                         toUpdate.Add(contentType);
                     }
                     else
                     {
                         //if a property was deleted or alias changed, then update all content of the current content type
-                        // and all of it's desscendant doc types.     
-                        toUpdate.AddRange(contentType.DescendantsAndSelf());
+                        // and all of it's desscendant doc types.
+                        toUpdate.Add(contentType);
+                        toUpdate.AddRange(GetDescendants(contentType));
                     }
                 }
             }
 
             return toUpdate;
+        }
 
+        public virtual IEnumerable<IContentTypeBase> GetDescendants(IContentTypeBase contentType)
+        {
+            return Enumerable.Empty<IContentTypeBase>();
+        }
+
+        /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        public bool HasContainerInPath(string contentPath)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                // can use same repo for both content and media
+                var repository = RepositoryFactory.CreateContentTypeRepository(uow);
+                return repository.HasContainerInPath(contentPath);
+            }
         }
     }
 }

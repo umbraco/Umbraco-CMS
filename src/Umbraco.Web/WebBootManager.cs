@@ -42,13 +42,16 @@ using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Profiling;
+using Umbraco.Web.Search;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -86,17 +89,15 @@ namespace Umbraco.Web
         /// Creates and returns the service context for the app
         /// </summary>
         /// <param name="dbContext"></param>
-        /// <param name="dbFactory"></param>
+        /// <param name="scopeProvider"></param>
         /// <returns></returns>
-        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
+        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IScopeProvider scopeProvider)
         {
             //use a request based messaging factory
-            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonHttpContextAccessor());
+            var evtMsgs = new ScopeLifespanMessagesFactory(new SingletonHttpContextAccessor(), scopeProvider);
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
-                new PetaPocoUnitOfWorkProvider(dbFactory),
-                new FileUnitOfWorkProvider(),
-                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
+                new PetaPocoUnitOfWorkProvider(scopeProvider),
                 ApplicationCache,
                 ProfilingLogger.Logger,
                 evtMsgs);
@@ -227,9 +228,11 @@ namespace Umbraco.Web
 
             //Now ensure webapi is initialized after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
-
+            
             return this;
         }
+
+        
 
         internal static void ConfigureGlobalFilters()
         {
@@ -373,6 +376,8 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
+
+            SearchableTreeResolver.Current = new SearchableTreeResolver(ServiceProvider, LoggerResolver.Current.Logger, ApplicationContext.Services.ApplicationTreeService, () => PluginManager.ResolveSearchableTrees());
 
             XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveXsltExtensions());
 
@@ -533,17 +538,19 @@ namespace Umbraco.Web
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.ResolveThumbnailProviders());
+                () => PluginManager.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.ResolveImageUrlProviders());
+                () => PluginManager.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
 
             HealthCheckResolver.Current = new HealthCheckResolver(LoggerResolver.Current.Logger,
                 () => PluginManager.ResolveTypes<HealthCheck.HealthCheck>());
+            HealthCheckNotificationMethodResolver.Current = new HealthCheckNotificationMethodResolver(LoggerResolver.Current.Logger,
+                () => PluginManager.ResolveTypes<HealthCheck.NotificationMethods.IHealthCheckNotificatationMethod>());
         }
 
         /// <summary>
@@ -579,6 +586,15 @@ namespace Umbraco.Web
             // is complete and cancel this current event so the rebuild process doesn't start right now.
             args.Cancel = true;
             IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
+
+            //check if the index is rebuilding due to an error and log it
+            if (args.IsHealthy == false)
+            {
+                var baseIndex = args.Indexer as BaseIndexProvider;
+                var name = baseIndex != null ? baseIndex.Name : "[UKNOWN]";
+
+                ProfilingLogger.Logger.Error<WebBootManager>(string.Format("The index {0} is rebuilding due to being unreadable/corrupt", name), args.UnhealthyException);
+            }
         }
     }
 }

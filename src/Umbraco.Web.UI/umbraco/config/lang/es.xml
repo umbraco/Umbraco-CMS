@@ -32,10 +32,8 @@
     <key alias="sendtopublish">Enviar a Publicar</key>
     <key alias="sendToTranslate">Enviar a Traducir</key>
     <key alias="sort">Ordernar</key>
-    <key alias="toPublish">Enviar a publicación</key>
     <key alias="translate">Traducir</key>
     <key alias="update">Actualizar</key>
-    <key alias="defaultValue">Valor por defecto</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permiso denegado.</key>
@@ -220,6 +218,8 @@
     <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Título del vínculo</key>
+    <key alias="urlLinkPicker">Vínculo</key>
     <key alias="anchorInsert">Nombre</key>
     <key alias="assignDomain">Administrar dominios</key>
     <key alias="closeThisWindow">Cerrar esta ventana</key>
@@ -277,6 +277,7 @@
     <key alias="entername">Escribe un nombre...</key>
     <key alias="search">Escribe tu búsqueda...</key>
     <key alias="filter">Escribe para filtrar resultados...</key>
+    <key alias="usernameHint">Tu nombre de usuario normalmente es tu e-mail</key>
   </area>
   <area alias="editcontenttype">
   <key alias="allowAtRoot" version="7.2">Permitir en nodo raíz</key>
@@ -471,7 +472,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido desabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pinche en <b>Próximo</b> para continuar.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>¡La contraseña del usuario por defecto ha sido cambiada desde que se instaló!</strong></p><p>No hay que realizar ninguna tarea más. Pulsa <strong>Siguiente</strong> para proseguir.]]></key>
     <key alias="defaultUserPasswordChanged">¡La constraseña se ha cambiado!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco crea un usuario por defecto con un nombre de usuario  <strong>('admin')</strong> y constraseña <strong>('default')</strong>. Es <strong>importante</strong> que la contraseña se cambie a algo único. </p> <p> Este paso comprobará la contraseña del usuario por defecto y sugerirá si debe cambiarse. </p> ]]></key>
     <key alias="greatStart">Ten un buen comienzo, visita nuestros videos de introducción</key>
     <key alias="licenseText">Pulsando el botón de Siguiente (o modificando el UmbracoConfigurationStatus en el web.config), aceptar la licencia de este software tal y como se especifica en el cuadro de debajo. Ten en cuenta que esta distribución de Umbraco consta de dos licencias diferentes, la licencia open source MIT para el framework y la licencia Umbraco freeware que cubre la IU.</key>
     <key alias="None">No ha sido instalado.</key>
@@ -596,7 +596,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteccion basada en roles</key>
     <key alias="paAdvancedHelp"><![CDATA[Si desea controlar el acceso a la página usando autenticación basada en roles,<br /> usando los grupos de miembros de Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Necesita crear un grupo de miembros antes de poder usar <br /> autenticación basada en roles.]]></key>
+    <key alias="paAdvancedNoGroups">Necesita crear un grupo de miembros antes de poder usar autenticación basada en roles</key>
     <key alias="paErrorPage">Página de error</key>
     <key alias="paErrorPageHelp">Usada cuando alguien hace login, pero no tiene acceso</key>
     <key alias="paHowWould">Elija cómo restringir el acceso a esta página</key>
@@ -789,6 +789,9 @@
 
     <key alias="allowAllEditors">Permitir todos los controles de edición</key>
     <key alias="allowAllRowConfigurations">Permitir todas las configuraciones de fila</key>
+    <key alias="maxItems">Artículos máximos</key>
+    <key alias="maxItemsDescription">Laat dit leeg of is ingesteld op -1 voor onbeperkt</key>
+    <key alias="maxItemsDescription">Dejar en blanco o se establece en 0 para ilimitada</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Campo opcional</key>
@@ -808,8 +811,6 @@
     <key alias="postContent">Insertar después del campo</key>
     <key alias="preContent">Insertar antes del campo</key>
     <key alias="recursive">Recursivo</key>
-    <key alias="removeParagraph">Borrar los tags del párrafo</key>
-    <key alias="removeParagraphHelp">Borrará cualquier &amp;lt;P&amp;gt; al principio y al final del texto</key>
     <key alias="uppercase">Mayúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Formateará los caracteres especiales de las URLs</key>
@@ -926,8 +927,6 @@
     <key alias="startnode">Nodo de comienzo en contenido</key>
     <key alias="username">Nombre de usuario</key>
     <key alias="userPermissions">Permisos de usuarios</key>
-    <key alias="usertype">Tipo de usuario</key>
-    <key alias="userTypes">Tipos de usuarios</key>
     <key alias="writer">Redactor</key>
     <key alias="yourProfile" version="7.0">Tu perfil</key>
     <key alias="yourHistory" version="7.0">Tu historial reciente</key>

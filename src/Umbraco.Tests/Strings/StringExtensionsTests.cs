@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Strings
         {
             ShortStringHelperResolver.Reset();
         }
-
+        
         [TestCase("hello", "world", false)]
         [TestCase("hello", "hello", true)]
         [TestCase("hellohellohellohellohellohellohello", "hellohellohellohellohellohellohelloo", false)]

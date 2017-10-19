@@ -38,6 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             
             config.CreateMap<PropertyTypeBasic, PropertyType>()
                 .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
+                .IgnoreEntityCommonProperties()
                 .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
                 .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
                 .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
@@ -45,9 +46,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.PropertyEditorAlias, expression => expression.Ignore())
                 .ForMember(type => type.HelpText, expression => expression.Ignore())
-                .ForMember(type => type.Key, expression => expression.Ignore())
-                .ForMember(type => type.CreateDate, expression => expression.Ignore())
-                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
+                .ForMember(type => type.Key, expression => expression.Ignore())                                
+                .ForMember(type => type.DeletedDate, expression => expression.Ignore())                                
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
             config.CreateMap<DocumentTypeSave, IContentType>()
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<MediaTypeSave, IMediaType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<MediaTypeSave, PropertyTypeBasic, IMediaType>(applicationContext)
-                .ConstructUsing((source) => new MediaType(source.ParentId))                
+                .ConstructUsing((source) => new MediaType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);
@@ -161,9 +161,15 @@ namespace Umbraco.Web.Models.Mapping
 
                 });
 
-            config.CreateMap<IMemberType, ContentTypeBasic>();
-            config.CreateMap<IMediaType, ContentTypeBasic>();
-            config.CreateMap<IContentType, ContentTypeBasic>();
+            config.CreateMap<IMemberType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MemberType, content.Key)))
+                .ForMember(x => x.Blueprints, expression => expression.Ignore());
+            config.CreateMap<IMediaType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.MediaType, content.Key)))
+                .ForMember(x => x.Blueprints, expression => expression.Ignore());
+            config.CreateMap<IContentType, ContentTypeBasic>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DocumentType, content.Key)))
+                .ForMember(x => x.Blueprints, expression => expression.Ignore());
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
 

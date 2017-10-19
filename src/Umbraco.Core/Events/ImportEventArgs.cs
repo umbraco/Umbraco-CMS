@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace Umbraco.Core.Events
 {
-    public class ImportEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+    public class ImportEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>, IEquatable<ImportEventArgs<TEntity>>
     {
         /// <summary>
         /// Constructor accepting an XElement with the xml being imported
@@ -46,5 +47,38 @@ namespace Umbraco.Core.Events
         /// Returns the xml relating to the import event
         /// </summary>
         public XElement Xml { get; private set; }
+
+        public bool Equals(ImportEventArgs<TEntity> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return base.Equals(other) && Equals(Xml, other.Xml);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ImportEventArgs<TEntity>) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (base.GetHashCode() * 397) ^ (Xml != null ? Xml.GetHashCode() : 0);
+            }
+        }
+
+        public static bool operator ==(ImportEventArgs<TEntity> left, ImportEventArgs<TEntity> right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(ImportEventArgs<TEntity> left, ImportEventArgs<TEntity> right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

@@ -15,8 +15,6 @@
     <key alias="disable">비활성</key>
     <key alias="emptyTrashcan">휴지통 비우기</key>
     <key alias="exportDocumentType">추출 문서 유형</key>
-    <key alias="exportDocumentTypeAsCode">.NET으로 추출</key>
-    <key alias="exportDocumentTypeAsCode-Full">.NET으로 추출</key>
     <key alias="importDocumentType">등록 문서 유형</key>
     <key alias="importPackage">패키지 등록</key>
     <key alias="liveEdit">캔버스 내용 편집</key>
@@ -32,7 +30,6 @@
     <key alias="sendtopublish">발행 항목으로 전달</key>
     <key alias="sendToTranslate">번역 항목으로 전달</key>
     <key alias="sort">정렬</key>
-    <key alias="toPublish">발행 항목으로 전달</key>
     <key alias="translate">번역</key>
     <key alias="update">업데이트</key>
   </area>
@@ -393,14 +390,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <b>다음</b>을 눌러주세요.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>설치후 기본사용자의 암호가 성공적으로 변경되었습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
     <key alias="defaultUserPasswordChanged">비밀번호가 변경되었습니다!</key>
-    <key alias="defaultUserText"><![CDATA[
-      <p>
-        Umbraco 는 로긴을 위한 기본 <strong>('admin')</strong> 사용자를 만들고 암호를 <strong>('default')</strong>로 설정합니다. 암호를 <strong>꼭</strong>변경하셔야 합니다.
-      </p>
-      <p>
-        이 과정은 기본 사용자의 암호를 체크하고 변경이 필요한 부분을 제안합니다.
-      </p>
-    ]]></key>
     <key alias="greatStart">편리한 시작을 위해, 소개 Video를 시청하세요</key>
     <key alias="licenseText">다음버튼을 누르시면 (또는Web.config에 UmbracoConfigurationStatus를 수정하시면), 여러분은 아래에 명시된 소프트웨어 라이센스를 수락합니다. Umbraco 배포는 2가지 다른 라이센스로 구성되어 있습니다. 프레임워크에는 오픈소스 MIT라이센스가 UI에는 Umbraco 프리웨어 라이센스가 적용됩니다.</key>
     <key alias="None">아직 설치되지 않았습니다.</key>
@@ -794,8 +783,6 @@
     <key alias="postContent">필드뒤에 삽입</key>
     <key alias="preContent">필드앞에 삽입</key>
     <key alias="recursive">Recursive</key>
-    <key alias="removeParagraph">단락 태그삭제</key>
-    <key alias="removeParagraphHelp">문서 시작과 끝의 &amp;amp;lt;P&amp;amp;gt; 를 삭제하시겠습니까</key>
     <key alias="uppercase">대문자</key>
     <key alias="urlEncode">URL 인코딩</key>
     <key alias="urlEncodeHelp">URL의 특수문자를 포맷하겠습니까</key>
@@ -917,8 +904,6 @@
     <key alias="startnode">컨텐츠의 시작노드</key>
     <key alias="username">사용자명</key>
     <key alias="userPermissions">사용자권한</key>
-    <key alias="usertype">사용자 타입</key>
-    <key alias="userTypes">사용자 타입</key>
     <key alias="writer">작성자</key>
   </area>
 </language>

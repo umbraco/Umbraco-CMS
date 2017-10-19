@@ -112,16 +112,14 @@ angular.module("umbraco")
 
         /* ---------- UPDATE PASSWORD ---------- */
 
-        //create the initial model for change password property editor
+        //create the initial model for change password
         $scope.changePasswordModel = {
-           alias: "_umb_password",
-           view: "changepassword",
            config: {},
            value: {}
         };
 
         //go get the config for the membership provider and add it to the model
-        currentUserResource.getMembershipProviderConfig().then(function(data) {
+        authResource.getMembershipProviderConfig().then(function(data) {
            $scope.changePasswordModel.config = data;
            //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
            //this will ensure the oldPassword is shown so they can change it
@@ -138,6 +136,9 @@ angular.module("umbraco")
                 $scope.changePasswordButtonState = "busy";
 
                 currentUserResource.changePassword($scope.changePasswordModel.value).then(function(data) {
+
+                    //reset old data 
+                    clearPasswordFields();
 
                     //if the password has been reset, then update our model
                     if (data.value) {
@@ -168,9 +169,10 @@ angular.module("umbraco")
            $scope.showPasswordFields = !$scope.showPasswordFields;
         }
 
-        function clearPasswordFields() {
+        function clearPasswordFields() { 
+           $scope.changePasswordModel.value.oldPassword = "";
            $scope.changePasswordModel.value.newPassword = "";
-           $scope.changePasswordModel.confirm = "";
+           $scope.changePasswordModel.value.confirm = "";
         }
-
+         
     });

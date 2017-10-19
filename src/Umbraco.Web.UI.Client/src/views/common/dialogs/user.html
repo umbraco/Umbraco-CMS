@@ -24,7 +24,7 @@
 
                <h5><localize key="user_yourProfile" /></h5>
 
-               <a href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}"
+               <a href="#/users/users/user/{{user.id}}"
                   class="btn btn-primary"
                   ng-click="close()"
                   ng-if="canEditProfile">
@@ -42,7 +42,7 @@
 
             <div class="umb-pane external-logins" ng-if="externalLoginProviders.length > 0 && !showPasswordFields">
 
-                <h5>External login providers</h5>
+                <h5><localize key="defaultdialogs_externalLoginProviders">External login providers</localize></h5>
 
                 <div ng-repeat="login in externalLoginProviders">
 
@@ -55,7 +55,7 @@
 								onclick="document.forms.oauthloginform.submit();">
 
 							<i class="fa" ng-class="login.properties.SocialIcon"></i>
-							Link your {{login.caption}} account
+							<localize key="defaultdialogs_linkYour">Link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
 						</button>
 					</form>
 
@@ -67,7 +67,7 @@
                             name="provider"
                             value="{{login.authType}}">
                         <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                        Un-link your {{login.caption}} account
+                        <localize key="defaultdialogs_unLinkYour">Un-link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
                     </button>
                 </div>
 

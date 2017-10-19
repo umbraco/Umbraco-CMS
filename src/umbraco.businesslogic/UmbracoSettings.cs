@@ -273,6 +273,14 @@ namespace umbraco
         }
 
         /// <summary>
+        /// File types that will be allowed to be uploaded via the content/media upload control
+        /// </summary>
+        public static IEnumerable<string> AllowedUploadFiles
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.AllowedUploadFiles; }
+        }
+
+        /// <summary>
         /// Gets the allowed image file types.
         /// </summary>
         /// <value>The allowed image file types.</value>
@@ -439,7 +447,7 @@ namespace umbraco
 
         /// <summary>
         /// Gets HelpPage configurations.
-        /// A help page configuration specify language, user type, application, application url and 
+        /// A help page configuration specify language, user groups, application, application url and 
         /// the target help page url.
         /// </summary>
         public static XmlNode HelpPages

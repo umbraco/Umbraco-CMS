@@ -44,19 +44,27 @@
       <div ng-if="currentCell" style="padding-bottom: 50px;">
 
           <umb-control-group label="@general_width">
-             <div class="grid-size-scaler" >
-                  <div class="grid-size-scaler">
-                      <a href ng-click="scaleDown(currentCell)">
-                          <i class="icon icon-remove"></i>
-                      </a>
-                      {{currentCell.grid}}
-                      <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
-                          <i class="icon icon-add"></i>
-                      </a>
-                  </div>
-             </div>
+              <div class="grid-size-scaler">
+                  <a href ng-click="scaleDown(currentCell)">
+                      <i class="icon icon-remove"></i>
+                  </a>
+                  {{currentCell.grid}}
+                  <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
+                      <i class="icon icon-add"></i>
+                  </a>
+              </div>
+          </umb-control-group>
+          
+          <umb-control-group label="@grid_maxItems" description="@grid_maxItemsDescription">
+              <input type="number" ng-model="currentCell.maxItems" class="umb-editor-tiny" placeholder="Max" min="0" />
           </umb-control-group>
 
+          <umb-control-group hide-label="true">
+	  		  <i class="icon-delete red"></i>
+	  		  <a class="btn btn-small btn-link" href="" ng-click="deleteArea(currentCell, currentRow)">
+	  			  <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
+	  		  </a>
+	  	  </umb-control-group>
 
           <umb-control-group hide-label="true">
              <ul class="unstyled">

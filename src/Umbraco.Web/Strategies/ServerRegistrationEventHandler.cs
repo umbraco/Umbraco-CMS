@@ -35,7 +35,7 @@ namespace Umbraco.Web.Strategies
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             _registrar = ServerRegistrarResolver.Current.Registrar as DatabaseServerRegistrar;
-            
+
             // only for the DatabaseServerRegistrar
             if (_registrar == null) return;
 
@@ -65,10 +65,10 @@ namespace Umbraco.Web.Strategies
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
                     RegisterBackgroundTasks(e);
-                    break;                
+                    break;
             }
         }
-        
+
         private void RegisterBackgroundTasks(UmbracoRequestEventArgs e)
         {
             //remove handler, we're done
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Strategies
                     15000, //delay before first execution
                     _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
                     svc, _registrar, serverAddress);
-                
+
                 //Perform the rest async, we don't want to block the startup sequence
                 // this will just reoccur on a background thread
                 _backgroundTaskRunner.TryAdd(task);
@@ -124,11 +124,6 @@ namespace Umbraco.Web.Strategies
                 get { return false; }
             }
 
-            public override bool RunsOnShutdown
-            {
-                get { return false; }
-            }
-
             /// <summary>
             /// Runs the background task.
             /// </summary>
@@ -137,6 +132,8 @@ namespace Umbraco.Web.Strategies
             {
                 try
                 {
+                    // TouchServer uses a proper unit of work etc underneath so even in a
+                    // background task it is safe to call it without dealing with any scope
                     _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
 
                     return true; // repeat
@@ -147,11 +144,6 @@ namespace Umbraco.Web.Strategies
 
                     return false; // probably stop if we have an error
                 }
-            }
-
-            public override Task<bool> PerformRunAsync(CancellationToken token)
-            {
-                throw new NotImplementedException();
             }
         }
     }

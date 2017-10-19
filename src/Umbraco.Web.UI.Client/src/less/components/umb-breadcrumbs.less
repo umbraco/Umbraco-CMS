@@ -12,8 +12,8 @@
 
 .umb-breadcrumbs__ancestor-link,
 .umb-breadcrumbs__ancestor-text {
-    font-size: 11px;
-    color: #555;
+    font-size: 13px;
+    color: @gray-3;
     max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
@@ -25,7 +25,7 @@
 }
 
 .umb-breadcrumbs__ancestor-link:hover {
-   color: #000;
+   color: @black;
 }
 
 .umb-breadcrumbs__seperator {
@@ -33,5 +33,12 @@
    top: 1px;
    margin-left: 5px;
    margin-right: 5px;
-   color: #ccc;
+   color: @gray-7;
+}
+
+input.umb-breadcrumbs__add-ancestor {
+    height: 25px;
+    margin-top: -2px;
+    margin-left: 3px;
+    width: 100px;
 }

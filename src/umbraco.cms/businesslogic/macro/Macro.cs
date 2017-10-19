@@ -1,11 +1,8 @@
 using System;
-using System.Data;
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Runtime.CompilerServices;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -34,7 +31,11 @@ namespace umbraco.cms.businesslogic.macro
 	{
         //initialize empty model
 	    internal IMacro MacroEntity = new Umbraco.Core.Models.Macro();
-
+        
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -47,6 +48,14 @@ namespace umbraco.cms.businesslogic.macro
 		{
 			get { return MacroEntity.Id; }
 		}
+
+        /// <summary>
+        /// key
+        /// </summary>
+	    public Guid Key
+	    {
+	        get { return MacroEntity.Key; }
+	    }
 		
 		/// <summary>
 		/// If set to true, the macro can be inserted on documents using the richtexteditor.
@@ -177,6 +186,7 @@ namespace umbraco.cms.businesslogic.macro
 	        {
 	            return MacroEntity.Properties.Select(x => new MacroProperty
 	                {
+                        Key = x.Key,
 	                    Alias = x.Alias,
 	                    Name = x.Name,
                         SortOrder = x.SortOrder,
@@ -185,23 +195,26 @@ namespace umbraco.cms.businesslogic.macro
 	                }).ToArray();
 	        }
 	    }
-        
-		/// <summary>
-		/// Macro initializer
-		/// </summary>
-		public Macro()
+
+        /// <summary>
+        /// Macro initializer
+        /// </summary>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
+        public Macro()
 		{
 		}
 
-		/// <summary>
-		/// Macro initializer
-		/// </summary>
-		/// <param name="Id">The id of the macro</param>
-		public Macro(int Id)
+        /// <summary>
+        /// Macro initializer
+        /// </summary>
+        /// <param name="Id">The id of the macro</param>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
+        public Macro(int Id)
 		{
             Setup(Id);
 		}
 
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
         internal Macro(IMacro macro)
         {
             MacroEntity = macro;
@@ -211,15 +224,17 @@ namespace umbraco.cms.businesslogic.macro
         /// Initializes a new instance of the <see cref="Macro"/> class.
         /// </summary>
         /// <param name="alias">The alias.</param>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
         public Macro(string alias)
         {
             Setup(alias);
         }
 
-	    /// <summary>
-	    /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-	    /// </summary>
-	    public virtual void Save()
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        [Obsolete("This should no longer be used, use the IMacroService and related models instead")]
+        public virtual void Save()
 	    {
 	        //event
 	        var e = new SaveEventArgs();
@@ -250,8 +265,7 @@ namespace umbraco.cms.businesslogic.macro
 		    }
 		}
 
-        //TODO: Fix this, this should wrap a new API!
-
+        [Obsolete("This is no longer used, use the IMacroService and related models instead")]
         public static Macro Import(XmlNode n)
         {
             var alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));

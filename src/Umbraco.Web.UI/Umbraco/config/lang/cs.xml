@@ -32,10 +32,8 @@
     <key alias="sendtopublish">Odeslat k publikování</key>
     <key alias="sendToTranslate">Odeslat k překladu</key>
     <key alias="sort">Seřadit</key>
-    <key alias="toPublish">Odeslat k publikování</key>
     <key alias="translate">Přeložit</key>
     <key alias="update">Aktualizovat</key>
-    <key alias="defaultValue">Výchozí hodnota</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Přístup zakázán.</key>
@@ -469,14 +467,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>Výchozí uživatel byl deaktivován, nebo nemá přístup k umbracu!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          umbraco vytváří výchozího uživatele s uživatelským jménem <strong>('admin')</strong> a heslem <strong>('default')</strong>. Je <strong>důležité</strong> změnit toto heslo na jiné.
-        </p>
-        <p>
-          Tento krok zkontroluje heslo výchozího uživatele a doporučí, má-li být změněno.
-        </p>
-      ]]></key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
     <key alias="licenseText">Kliknutím na tlačítko následující (nebo modifikováním umbracoConfigurationStatus v souboru web.config) přijímáte licenci tohoto software tak, jak je uvedena v poli níže. Upozorňujeme, že tato distribuce umbraca se skládá ze dvou různých licencí, open source MIT licence pro framework a umbraco freeware licence, která pokrývá UI.</key>
     <key alias="None">Není nainstalováno.</key>
@@ -676,7 +666,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Ochrana prostřednictvím rolí</key>
     <key alias="paAdvancedHelp"><![CDATA[Pokud si přejete řídit přístup ke stránce za použití autentizace prostřednictvím rolí,<br /> použijte členské skupiny umbraca.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Musíte vytvořit členskou skupinu před tím, než můžete použít <br />autentizaci prostřednictvím rolí]]></key>
+    <key alias="paAdvancedNoGroups">Musíte vytvořit členskou skupinu před tím, než můžete použít autentizaci prostřednictvím rolí</key>
     <key alias="paErrorPage">Chybová stránka</key>
     <key alias="paErrorPageHelp">Použita, když jsou lidé přihlášení, ale nemají přístup</key>
     <key alias="paHowWould">Vyberte, jak omezit přístup k této stránce</key>
@@ -911,8 +901,6 @@
     <key alias="postContent">Vložit za polem</key>
     <key alias="preContent">Vložit před polem</key>
     <key alias="recursive">Rekurzivní</key>
-    <key alias="removeParagraph">Odstranit tagy odstavce</key>
-    <key alias="removeParagraphHelp">Odstraní jakékoliv &amp;lt;P&amp;gt; na začátku a na konci textu</key>
     <key alias="standardFields">Standardní pole</key>
     <key alias="uppercase">Velká písmena</key>
     <key alias="urlEncode">Kódování URL</key>
@@ -1039,8 +1027,6 @@
     <key alias="startnode">Úvodní uzel v obsahu</key>
     <key alias="username">Uživatelské jméno</key>
     <key alias="userPermissions">Oprávnění uživatele</key>
-    <key alias="usertype">Typ uživatele</key>
-    <key alias="userTypes">Typy uživatelů</key>
     <key alias="writer">Spisovatel</key>
     <key alias="yourProfile" version="7.0">Váš profil</key>
     <key alias="yourHistory" version="7.0">Vaše nedávná historie</key>

@@ -18,23 +18,21 @@ namespace umbraco
 	/// </summary>
 	public static partial class uQuery
 	{
-		/// <summary>
-		/// Gets the SqlHelper used by Umbraco
-		/// </summary>
-		public static ISqlHelper SqlHelper
-		{
-			get
-			{
-				return Application.SqlHelper;
-			}
-		}
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        public static ISqlHelper SqlHelper
+        {
+            get { return Application.SqlHelper; }
+        }
 
-		/// <summary>
-		/// Constructs the XML source from the cmsContentXml table used for Media and Members.
-		/// </summary>
-		/// <param name="umbracoObjectType">an UmbracoObjectType value</param>
-		/// <returns>XML built from the cmsContentXml table</returns>
-		public static XmlDocument GetPublishedXml(UmbracoObjectType umbracoObjectType)
+        /// <summary>
+        /// Constructs the XML source from the cmsContentXml table used for Media and Members.
+        /// </summary>
+        /// <param name="umbracoObjectType">an UmbracoObjectType value</param>
+        /// <returns>XML built from the cmsContentXml table</returns>
+        public static XmlDocument GetPublishedXml(UmbracoObjectType umbracoObjectType)
 		{
 			try
 			{
@@ -43,7 +41,8 @@ namespace umbraco
 				var xmlDoc = new XmlDocument();
 				var sql = "SELECT umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml FROM umbracoNode INNER JOIN cmsContentXml ON cmsContentXml.nodeId = umbracoNode.id AND umbracoNode.nodeObjectType = @nodeObjectType ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-				using (var dr = uQuery.SqlHelper.ExecuteReader(sql, uQuery.SqlHelper.CreateParameter("@nodeObjectType", umbracoObjectType.GetGuid())))
+                using (var sqlHelper = Application.SqlHelper)
+                using (var dr = sqlHelper.ExecuteReader(sql, sqlHelper.CreateParameter("@nodeObjectType", umbracoObjectType.GetGuid())))
 				{
 					while (dr.Read())
 					{

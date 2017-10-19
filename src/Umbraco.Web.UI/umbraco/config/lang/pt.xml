@@ -15,8 +15,6 @@
     <key alias="disable">Desabilitar</key>
     <key alias="emptyTrashcan">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
-    <key alias="exportDocumentTypeAsCode">Exportar para .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Exportar para .NET</key>
     <key alias="importDocumentType">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>
     <key alias="liveEdit">Editar na Tela</key>
@@ -32,7 +30,6 @@
     <key alias="sendtopublish">Enviar para Publicação</key>
     <key alias="sendToTranslate">Enviar para Tradução</key>
     <key alias="sort">Classificar</key>
-    <key alias="toPublish">Enviar para publicação</key>
     <key alias="translate">Traduzir</key>
     <key alias="update">Atualizar</key>
   </area>
@@ -392,15 +389,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>O usuário padrão foi desabilitado ou não tem acesso à Umbraco!</strong></p><p>Nenhuma ação posterior precisa ser tomada. Clique <b>Próximo</b> para prosseguir.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>A senha do usuário padrão foi alterada com sucesso desde a instalação!</strong></p><p>Nenhuma ação posterior é necessária. Clique <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="defaultUserPasswordChanged">Senha foi alterada!</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          Umbraco cria um usuário padrão com o login <strong>('admin')</strong> e senha <strong>('default')</strong>. É <strong>importante</strong> que a senha seja alterada para algo único.
-        </p>
-        <p>
-          Este passo irá checar a senha do usuário padrão e sugerir uma alteração se necessário.
-        </p>
-      
-    ]]></key>
     <key alias="greatStart">Comece com o pé direito, assista nossos vídeos introdutórios</key>
     <key alias="licenseText">Ao clicar no próximo botão (ou modificando o UmbracoConfigurationStatus no web.config), você aceita a licença deste software cmo especificado na caixa abaixo. Note que esta distribuição de Umbraco consiste em duas licenças diferentes, a licença aberta MIT para a framework e a licença de software livre (freeware) Umbraco que cobre o UI.</key>
     <key alias="None">Nenhum instalado ainda.</key>
@@ -576,7 +564,7 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteção baseada em função</key>
     <key alias="paAdvancedHelp"><![CDATA[Se você deseja controlar o acesso à página usando autenticação baseada em funções, <br /> usando grupos de membros do Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Você precisa criar um grupo de membros antes que possa usar <br /> autenticação baseada em função.]]></key>
+    <key alias="paAdvancedNoGroups">Você precisa criar um grupo de membros antes que possa usar autenticação baseada em função.</key>
     <key alias="paErrorPage">Página de Erro</key>
     <key alias="paErrorPageHelp">Usado quando as pessoas estão logadas, mas não para ter acesso</key>
     <key alias="paHowWould">Escolha como restringir o acesso à esta página</key>
@@ -783,8 +771,6 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="postContent">Inserir após campo</key>
     <key alias="preContent">Inserir antes do campo</key>
     <key alias="recursive">Recursivo</key>
-    <key alias="removeParagraph">Remover etiquetas de parágrafo</key>
-    <key alias="removeParagraphHelp">Removerá quaisquer &amp;lt;P&amp;gt; do começo ao fim do texto</key>
     <key alias="uppercase">Maiúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Vai formatar caracteres especiais em URLs</key>
@@ -901,8 +887,6 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="startnode">Nó Inicial do Conteúdo</key>
     <key alias="username">Nome de Usuário</key>
     <key alias="userPermissions">Permissões de usuário</key>
-    <key alias="usertype">Tipo de usuário</key>
-    <key alias="userTypes">Tipos de usuários</key>
     <key alias="writer">Escrevente</key>
   </area>
 </language>

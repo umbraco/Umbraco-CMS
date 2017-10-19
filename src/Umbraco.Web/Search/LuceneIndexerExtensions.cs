@@ -5,6 +5,8 @@ using Examine.LuceneEngine.Providers;
 using Examine.Providers;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Lucene.Net.Store;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Search
 {
@@ -13,6 +15,28 @@ namespace Umbraco.Web.Search
     /// </summary>
     internal static class ExamineExtensions
     {
+        /// <summary>
+        /// Checks if the index can be read/opened
+        /// </summary>
+        /// <param name="indexer"></param>
+        /// <param name="ex">The exception returned if there was an error</param>
+        /// <returns></returns>
+        public static bool IsHealthy(this LuceneIndexer indexer, out Exception ex)
+        {
+            try
+            {
+                using (indexer.GetIndexWriter().GetReader())
+                {
+                    ex = null;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                ex = e;
+                return false;
+            }
+        }
 
         /// <summary>
         /// Return the number of indexed documents in Lucene
@@ -21,9 +45,17 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexDocumentCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            try
             {
-                return reader.NumDocs();
+                using (var reader = indexer.GetIndexWriter().GetReader())
+                {
+                    return reader.NumDocs();
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get GetIndexDocumentCount, the writer is already closed");
+                return 0;
             }
         }
 
@@ -34,9 +66,19 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexFieldCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            //TODO: check for closing! and AlreadyClosedException
+
+            try
             {
-                return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
+                using (var reader = indexer.GetIndexWriter().GetReader())
+                {
+                    return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get GetIndexFieldCount, the writer is already closed");
+                return 0;
             }
         }
 
@@ -47,9 +89,17 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static bool IsIndexOptimized(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            try
             {
-                return reader.IsOptimized();
+                using (var reader = indexer.GetIndexWriter().GetReader())
+                {
+                    return reader.IsOptimized();
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get IsIndexOptimized, the writer is already closed");
+                return false;
             }
         }
 
@@ -74,9 +124,17 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetDeletedDocumentsCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
+            try
             {
-                return reader.NumDeletedDocs();
+                using (var reader = indexer.GetIndexWriter().GetReader())
+                {
+                    return reader.NumDeletedDocs();
+                }
+            }
+            catch (AlreadyClosedException)
+            {
+                LogHelper.Warn(typeof(ExamineExtensions), "Cannot get GetDeletedDocumentsCount, the writer is already closed");
+                return 0;
             }
         }
     }

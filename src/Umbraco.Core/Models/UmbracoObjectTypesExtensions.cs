@@ -12,6 +12,7 @@ namespace Umbraco.Core.Models
     {
         //MUST be concurrent to avoid thread collisions!
         private static readonly ConcurrentDictionary<UmbracoObjectTypes, Guid> UmbracoObjectTypeCache = new ConcurrentDictionary<UmbracoObjectTypes, Guid>();
+        private static readonly ConcurrentDictionary<UmbracoObjectTypes, string> UmbracoObjectTypeUdiCache = new ConcurrentDictionary<UmbracoObjectTypes, string>();
 
         /// <summary>
         /// Get an UmbracoObjectTypes value from it's name
@@ -43,6 +44,21 @@ namespace Umbraco.Core.Models
             return umbracoObjectType;
         }
 
+        public static string GetUdiType(Guid guid)
+        {
+            var umbracoObjectType = Constants.UdiEntityType.Unknown;
+
+            foreach (var name in Enum.GetNames(typeof(UmbracoObjectTypes)))
+            {
+                var objType = GetUmbracoObjectType(name);
+                if (objType.GetGuid() == guid)
+                {
+                    umbracoObjectType = GetUdiType(objType);
+                }
+            }
+            return umbracoObjectType;
+        }
+
         /// <summary>
         /// Extension method for the UmbracoObjectTypes enum to return the enum GUID
         /// </summary>
@@ -52,20 +68,39 @@ namespace Umbraco.Core.Models
         {
             return UmbracoObjectTypeCache.GetOrAdd(umbracoObjectType, types =>
                 {
-                    var type = typeof(UmbracoObjectTypes);
-                    var memInfo = type.GetMember(umbracoObjectType.ToString());
-                    var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
-                        false);
+                    var type = typeof (UmbracoObjectTypes);
+                    var memberInfo = type.GetMember(umbracoObjectType.ToString());
+                    var attributes = memberInfo[0].GetCustomAttributes(typeof (UmbracoObjectTypeAttribute), false);
 
                     if (attributes.Length == 0)
                         return Guid.Empty;
 
-                    var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
+                    var attribute = (UmbracoObjectTypeAttribute) attributes[0];
                     if (attribute == null)
                         return Guid.Empty;
 
                     return attribute.ObjectId;
                 });
+        }
+
+        public static string GetUdiType(this UmbracoObjectTypes umbracoObjectType)
+        {
+            return UmbracoObjectTypeUdiCache.GetOrAdd(umbracoObjectType, types =>
+            {
+                var type = typeof(UmbracoObjectTypes);
+                var memInfo = type.GetMember(umbracoObjectType.ToString());
+                var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoUdiTypeAttribute),
+                    false);
+
+                if (attributes.Length == 0)
+                    return Constants.UdiEntityType.Unknown;
+
+                var attribute = ((UmbracoUdiTypeAttribute)attributes[0]);
+                if (attribute == null)
+                    return Constants.UdiEntityType.Unknown;
+
+                return attribute.UdiType;
+            });
         }
 
         /// <summary>

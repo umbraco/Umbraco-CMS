@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
+using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.businesslogic.packager {
     public class InstalledPackage
@@ -123,6 +126,71 @@ namespace umbraco.cms.businesslogic.packager {
         protected virtual void FireAfterDelete(EventArgs e) {
             if (AfterDelete != null)
                 AfterDelete(this, e);
+        }
+
+        /// <summary>
+        /// Used internally for creating an InstallationSummary (used in new PackagingService) representation of this InstalledPackage object.
+        /// </summary>
+        /// <param name="contentTypeService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="fileService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="macroService"></param>
+        /// <returns></returns>
+        internal InstallationSummary GetInstallationSummary(IContentTypeService contentTypeService, IDataTypeService dataTypeService, IFileService fileService, ILocalizationService localizationService, IMacroService macroService)
+        {
+            var macros = TryGetIntegerIds(Data.Macros).Select(macroService.GetById).ToList();
+            var templates = TryGetIntegerIds(Data.Templates).Select(fileService.GetTemplate).ToList();
+            var contentTypes = TryGetIntegerIds(Data.Documenttypes).Select(contentTypeService.GetContentType).ToList();
+            var dataTypes = TryGetIntegerIds(Data.DataTypes).Select(dataTypeService.GetDataTypeDefinitionById).ToList();
+            var dictionaryItems = TryGetIntegerIds(Data.DictionaryItems).Select(localizationService.GetDictionaryItemById).ToList();
+            var languages = TryGetIntegerIds(Data.Languages).Select(localizationService.GetLanguageById).ToList();
+            
+            for (var i = 0; i < Data.Files.Count; i++)
+            {
+                var filePath = Data.Files[i];
+                Data.Files[i] = filePath.GetRelativePath();
+            }
+
+            return new InstallationSummary
+            {
+                ContentTypesInstalled = contentTypes,
+                DataTypesInstalled = dataTypes,
+                DictionaryItemsInstalled = dictionaryItems,
+                FilesInstalled = Data.Files,
+                LanguagesInstalled = languages,
+                MacrosInstalled = macros,
+                MetaData = GetMetaData(),
+                TemplatesInstalled = templates,
+            };
+        }
+
+        internal MetaData GetMetaData()
+        {
+            return new MetaData()
+            {
+                AuthorName = Data.Author,
+                AuthorUrl = Data.AuthorUrl,
+                Control = Data.LoadControl,
+                License = Data.License,
+                LicenseUrl = Data.LicenseUrl,
+                Name = Data.Name,
+                Readme = Data.Readme,
+                Url = Data.Url,
+                Version = Data.Version
+            };
+        }
+
+        private static IEnumerable<int> TryGetIntegerIds(IEnumerable<string> ids)
+        {
+            var intIds = new List<int>();
+            foreach (var id in ids)
+            {
+                int parsed;
+                if (int.TryParse(id, out parsed))
+                    intIds.Add(parsed);
+            }
+            return intIds;
         }
     }
 }
