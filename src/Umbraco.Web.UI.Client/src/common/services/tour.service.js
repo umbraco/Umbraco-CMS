@@ -81,7 +81,7 @@
                         content: "<p>In the editor picker dialog we can pick one of the many build in editor.</p>"
                     },
                     {
-                        element: "[data-element~='overlay-editor-picker'] [data-element='editor-Umbraco.TextboxMultiple']",
+                        element: "[data-element~='overlay-editor-picker'] [data-element='editor-Textarea']",
                         title: "Select editor",
                         content: "Select the <b>Textarea</b> editor which allows the content editor to enter long texts",
                         event: "click"
