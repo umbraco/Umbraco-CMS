@@ -17,6 +17,8 @@ namespace umbraco.cms.businesslogic.utilities
                 Directory.CreateDirectory(UnPackDirectory);
             }
 
+            ZipFile.ExtractToDirectory(ZipFilePath, UnPackDirectory);
+
             if (DeleteZipFile)
                 File.Delete(ZipFilePath);
         }
