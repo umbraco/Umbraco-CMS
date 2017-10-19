@@ -1,6 +1,7 @@
 <div class="umb-tour">
 
     <div class="umb-tour__popover shadow-depth-2" ng-class="{
+        'umb-tour__popover--center': position === 'center',
         'umb-tour__popover--top': position === 'top',
         'umb-tour__popover--right': position ===  'right',
         'umb-tour__popover--bottom': position ===  'bottom',
@@ -10,44 +11,91 @@
             <umb-load-indicator></umb-load-indicator>
         </div>
         
-        <div ng-if="!configuredView && !loadingStep">
+        <div ng-if="!configuredView && !loadingStep && !elementNotFound">
 
             <!-- Regular steps -->
-            <umb-tour-step ng-if="currentStepIndex < tour.steps.length">
+            <umb-tour-step ng-if="model.currentStepIndex < model.steps.length && model.currentStep.type !== 'intro'">
                     
                 <umb-tour-step-header
-                    title="currentStep.title">
+                    title="model.currentStep.title">
                 </umb-tour-step-header>
     
                 <umb-tour-step-content
-                    content="currentStep.content">
+                    content="model.currentStep.content">
                 </umb-tour-step-content>
     
                 <umb-tour-step-footer class="flex justify-between items-center">
                     <umb-tour-step-counter
-                        current-step="currentStepIndex + 1"
-                        total-steps="tour.steps.length">
+                        current-step="model.currentStepIndex + 1"
+                        total-steps="model.steps.length">
                     </umb-tour-step-counter>
                     <div>
-                        <umb-button size="xs" button-style="link" type="button" action="endTour()" label="End tour"></umb-button>
-                        <umb-button size="xs" ng-if="!currentStep.event" button-style="success" type="button" action="nextStep()" label="Next"></umb-button>
+                        <umb-button size="xs" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>
+                        <umb-button size="xs" ng-if="!model.currentStep.event" button-style="success" type="button" action="model.nextStep()" label="Next"></umb-button>
                     </div>
                 </umb-tour-step-footer>
         
             </umb-tour-step>
 
-            <!-- Outro step -->
-            <div ng-if="currentStepIndex === tour.steps.length && !loadingStep">
-                <div class="umb-tour__title">WOOOHOOO!</div>
-                <div class="umb-tour__content">Your completed the tour. That is amazing!</div>
-                <div class="umb-tour__button-container-center">
-                    <umb-button type="button" button-style="success" size="xs" action="completeTour()" label="Complete"></umb-button>
-                </div>
-            </div>
+            <!-- Intro step type -->
+            <umb-tour-step size="l" ng-if="model.currentStepIndex === 0 && model.currentStep.type === 'intro'">
+
+                <umb-tour-step-header
+                    title="model.currentStep.title">
+                </umb-tour-step-header>
+
+                <umb-tour-step-content
+                    content="model.currentStep.content">
+                </umb-tour-step-content>
+
+                <umb-tour-step-footer class="flex justify-between items-center">
+                    <umb-tour-step-counter
+                        current-step="model.currentStepIndex + 1"
+                        total-steps="model.steps.length">
+                    </umb-tour-step-counter>
+                    <div>
+                        <umb-button size="m" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>                            
+                        <umb-button size="m" button-style="success" type="button" action="model.nextStep()" label="Start tour"></umb-button>
+                    </div>
+                </umb-tour-step-footer>
+
+            </umb-tour-step>
+
+            <!-- Outro step type -->
+            <umb-tour-step size="l" ng-if="model.currentStepIndex === model.steps.length" class="tc">
+
+                <umb-tour-step-content>
+                    <div class="flex items-center justify-center">
+                        <umb-checkmark size="xl" checked="true"></umb-checkmark>
+                    </div>
+                    <h3 class="bold">Congratulations!</h3>
+                    <p>You have reached the end of the <b>{{model.name}}</b> tour - way to go!</p>
+                </umb-tour-step-content>
+
+                <umb-tour-step-footer>
+                    <umb-button type="button" button-style="success" size="m" action="model.completeTour()" label="Complete"></umb-button>
+                </umb-tour-step-footer>
+
+            </umb-tour-step>
 
         </div>
 
-        <div ng-if="configuredView && !loadingStep" ng-include="configuredView"></div>
+        <!-- Custom step view -->
+        <div ng-if="configuredView && !loadingStep && !elementNotFound" ng-include="configuredView"></div>
+        
+        <!-- Dom element not found error -->
+        <div ng-if="elementNotFound && !loadingStep">
+            <umb-tour-step class="tc">
+                <umb-tour-step-header class="bold color-red">Test test test</umb-tour-step-header>
+                <umb-tour-step-content>
+                    <p>Oh, we lost the next step <b>{{ currentStep.title }}</b> and don't know where to go.</p>
+                    <p>Please go back and start the tour again.</p>
+                </umb-tour-step-content>
+                <umb-tour-step-footer>
+                    <umb-button size="s" button-style="success" type="button" action="model.endTour()" label="End tour"></umb-button>
+                </umb-tour-step-footer>
+            </umb-tour-step>
+        </div>
 
     </div>
 

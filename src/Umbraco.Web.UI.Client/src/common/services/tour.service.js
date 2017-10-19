@@ -7,10 +7,84 @@
 
         var tours = [
             {
+                "name": "Introduction",
+                "alias": "umbIntroIntroduction",
+                "group": "Getting Started",
+                "steps": [
+                    {
+                        title: "Welcome to Umbraco - The Friendly CMS",
+                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p>",
+                        type: "intro"
+                    },
+                    {
+                        element: "#applications",
+                        title: "Sections",
+                        content: "These are the <b>Sections</b> and allows you to navigate the different areas of Umbraco"
+                    },
+                    {
+                        element: "#tree",
+                        title: "The Tree",
+                        content: "This is the <b>Tree</b> and contains all the pages of your website"
+                    },
+                    {
+                        element: "[data-element='global-search-field']",
+                        title: "Search",
+                        content: "The search allows you to quickly find content across sections within Umbraco"
+                    },
+                    {
+                        element: "#applications [data-element='section-user']",
+                        title: "User profile",
+                        content: "Click here to open the user profile dialog",
+                        event: "click"
+                    },
+                    {
+                        element: "[data-element~='overlay-user']",
+                        title: "User profile",
+                        content: "This is where you can see details about your user, change your password and log out of Umbraco"
+                    },
+                    {
+                        element: "[data-element~='overlay-user'] [data-element='button-testy']",
+                        title: "User profile",
+                        content: "This is where you can see details about your user, change your password and log out of Umbraco",
+                        event: "click"
+                    },
+                    /*
+                    {
+                        element: "[data-element~='overlay-user'] [data-element~='button-change-password']",
+                        title: "User profile",
+                        content: "This is where you can see details about your user, change your password and log out of Umbraco",
+                        event: "click"
+                    },
+                    */
+                    {
+                        element: "[data-element~='overlay-user'] [data-element='overlay-close']",
+                        title: "User profile",
+                        content: "Let's close the user profile again",
+                        event: "click"
+                    },
+                    {
+                        element: "#applications [data-element='section-help']",
+                        title: "Help",
+                        content: "If you ever find yourself in trouble click here to open the help drawer",
+                        event: "click"
+                    },
+                    {
+                        element: "[data-element='drawer']",
+                        title: "Help",
+                        content: "<p>In the help drawer you can find articles and videos related to the section you are using.</p><p>You will also find more tours like this which will help you get started with Umbraco.</p>"
+                    }
+                ]
+            },
+            {
                 "name": "Create document type",
                 "alias": "umbIntroCreateDocType",
                 "group": "Getting Started",
                 "steps": [
+                    {
+                        title: "Create your first Document Type",
+                        content: "<p>Step 1 of any site is to create a <strong>Document Type</strong>. A Document Type is a data container where you can add data fields. The editor can then input data and Umbraco can use it to output it in the relevant parts of a <strong>template</strong>.</p><p>In this tour you will learn how to set up a basic Document Type with a data field to enter some text.</p>",
+                        type: "intro"
+                    },
                     {
                         element: "#applications [data-element='section-settings']",
                         title: "Navigate to the settings sections",
@@ -117,6 +191,11 @@
                 "group": "Getting Started",
                 "steps": [
                     {
+                        title: "Creating your first content node",
+                        content: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in euismod velit. Aliquam sit amet turpis in velit convallis bibendum. Suspendisse venenatis porttitor ipsum eu eleifend.</p>",
+                        type: "intro"
+                    },
+                    {
                         element: "[data-element='tree-root']",
                         title: "Open context menu",
                         content: "<p>Open the context menu by hovering the root of the content section.</p><p>Now click the <b>three small dots</b> to the right</p>",
@@ -153,6 +232,11 @@
                 "alias": "umbIntroRenderInTemplate",
                 "group": "Getting Started",
                 "steps": [
+                    {
+                        title: "Render your content in a template",
+                        content: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in euismod velit. Aliquam sit amet turpis in velit convallis bibendum. Suspendisse venenatis porttitor ipsum eu eleifend.</p>",
+                        type: "intro"
+                    },
                     {
                         element: "#applications [data-element='section-settings']",
                         title: "Navigate to the settings section",
@@ -192,6 +276,11 @@
                 "group": "Getting Started",
                 "steps": [
                     {
+                        title: "View your Umbraco site",
+                        content: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in euismod velit. Aliquam sit amet turpis in velit convallis bibendum. Suspendisse venenatis porttitor ipsum eu eleifend.</p>",
+                        type: "intro"
+                    },
+                    {
                         element: "#tree [data-element='tree-item-Home']",
                         title: "Open the Home page",
                         content: "<p>Click the <b>Home</b> page to open it</p>",
@@ -217,6 +306,11 @@
                 "alias": "umbIntroMediaSection",
                 "group": "Getting Started",
                 "steps": [
+                    {
+                        title: "How to use the media library",
+                        content: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in euismod velit. Aliquam sit amet turpis in velit convallis bibendum. Suspendisse venenatis porttitor ipsum eu eleifend.</p>",
+                        type: "intro"
+                    },
                     {
                         element: "#applications [data-element='section-media']",
                         title: "Navigate to the media section",

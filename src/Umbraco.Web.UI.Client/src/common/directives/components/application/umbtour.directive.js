@@ -1,48 +1,45 @@
 (function () {
     'use strict';
 
-    function TourDirective($timeout, $http, tourService, backdropService) {
+    function TourDirective($timeout, $http, $q, tourService, backdropService) {
 
         function link(scope, el, attr, ctrl) {
 
             var popover;
 
-            scope.totalSteps;
-            scope.currentStepIndex;
-            scope.currentStep;
             scope.loadingStep = false;
+            scope.elementNotFound = false;
 
-            scope.nextStep = function() {
+            scope.model.nextStep = function() {
                 nextStep();
             };
 
-            scope.endTour = function() {
+            scope.model.endTour = function() {
                 unbindEvent();
                 tourService.endTour();
                 backdropService.close();
             };
 
-            scope.completeTour = function() {
+            scope.model.completeTour = function() {
                 unbindEvent();
-                tourService.completeTour(scope.tour);
+                tourService.completeTour(scope.model);
                 backdropService.close();
             };
 
             function onInit() {
                 popover = el.find(".umb-tour__popover");
-                scope.totalSteps = scope.tour.steps.length;
-                scope.currentStepIndex = 0;
+                scope.model.currentStepIndex = 0;
                 backdropService.open({disableEventsOnClick: true});
                 startStep();
             }
 
             function setView() {
-                if (scope.currentStep.view && scope.tour.alias) {
+                if (scope.model.currentStep.view && scope.model.alias) {
                     //we do this to avoid a hidden dialog to start loading unconfigured views before the first activation
-                    var configuredView = scope.currentStep.view;
-                    if (scope.currentStep.view.indexOf(".html") === -1) {
-                        var viewAlias = scope.currentStep.view.toLowerCase();
-                        var tourAlias = scope.tour.alias.toLowerCase();
+                    var configuredView = scope.model.currentStep.view;
+                    if (scope.model.currentStep.view.indexOf(".html") === -1) {
+                        var viewAlias = scope.model.currentStep.view.toLowerCase();
+                        var tourAlias = scope.model.alias.toLowerCase();
                         configuredView = "views/common/tours/" + tourAlias + "/" + viewAlias + "/" + viewAlias + ".html";
                     }
                     if (configuredView !== scope.configuredView) {
@@ -54,54 +51,71 @@
             }
 
             function nextStep() {
-                scope.currentStepIndex++;
-                if(scope.currentStepIndex !== scope.tour.steps.length) {
+                scope.model.currentStepIndex++;
+                // make sure we don't go too far
+                if(scope.model.currentStepIndex !== scope.model.steps.length) {
                     startStep();
+                // tour completed - final step
+                } else {
+                    scope.loadingStep = true;
+
+                    waitForPendingRerequests().then(function(){
+                        scope.loadingStep = false;
+                        // clear current step
+                        scope.model.currentStep = {};
+                        // set popover position to center
+                        setPopoverPosition(null);
+                        // remove backdrop hightlight
+                        backdropService.setHighlight(null);
+                    });
                 }
             }
 
             function startStep() {
 
-                // we need to make sure that all requests are done
-                var timer = window.setInterval(function(){
+                scope.loadingStep = true;
+                backdropService.setHighlight(null);
 
-                    console.log("pending", $http.pendingRequests.length);
-                    console.log("document ready", document.readyState);
+                waitForPendingRerequests().then(function() {
+
+                    scope.model.currentStep = scope.model.steps[scope.model.currentStepIndex];
+
+                    setView();
                     
-                    scope.loadingStep = true;
+                    // if highlight element is set - find it
+                    findHighlightElement();
 
-                    backdropService.setHighlight(null);
-
-                    // check for pending requests both in angular and on the document
-                    if($http.pendingRequests.length === 0 && document.readyState === "complete") {
-                        console.log("Everything is DONE JOHN");
-
-                        scope.currentStep = scope.tour.steps[scope.currentStepIndex];
-
-                        clearInterval(timer);
-
-                        setView();
-                        
-                        positionPopover();
-
-                        // if a custom event needs to be bound we do it now
-                        if(scope.currentStep.event) {
-                            bindEvent();
-                        }
-
-                        scope.loadingStep = false;
-
+                    // if a custom event needs to be bound we do it now
+                    if(scope.model.currentStep.event) {
+                        bindEvent();
                     }
-                    
-                }, 50);
 
+                    scope.loadingStep = false;
+
+                });
             }
 
-            function positionPopover() {
+            function findHighlightElement() {
+
+                scope.elementNotFound = false;                
 
                 $timeout(function () {
 
-                    var element = $(scope.currentStep.element);
+                    // if an element isn't set - show the popover in the center
+                    if(!scope.model.currentStep.element) {
+                        setPopoverPosition(null);
+                        return;
+                    }
+
+                    var element = angular.element(scope.model.currentStep.element);
+
+                    // we couldn't find the element in the dom - abort and show error
+                    if(element.length === 0) {
+                        scope.elementNotFound = true;
+                        setPopoverPosition(null);
+                        return;
+                    }
+
                     var scrollParent = element.scrollParent();
 
                     console.log("scrollParent", scrollParent);
@@ -114,33 +128,37 @@
                         }, function () {
                             // Animation complete.
                             console.log("ANIMATION COMPLETE");
-                            _position();
-                            backdropService.setHighlight(scope.currentStep.element);
+                            setPopoverPosition(element);
+                            backdropService.setHighlight(scope.model.currentStep.element);
                         });
                     } else {
-                        _position();
-                        backdropService.setHighlight(scope.currentStep.element);
+                        setPopoverPosition(element);
+                        backdropService.setHighlight(scope.model.currentStep.element);
                     }
 
                 });
 
-                function _position() {
+            }
 
-                    $timeout(function () {
+            function setPopoverPosition(element) {
 
-                        var element = $(scope.currentStep.element);
+                $timeout(function () {
+
+                    var position = "center";
+                    var css = {top: "50%", left: "50%", marginLeft: "inherit", marginTop: "inherit" };
+
+                    var popoverWidth = popover.outerWidth();
+                    var popoverHeight = popover.outerHeight();
+                    var popoverOffset = popover.offset();
+                    var documentWidth = $(document).width();
+                    var documentHeight = $(document).height();
+
+                    if(element) {
+
                         var offset = element.offset();
-                        var width = element.outerWidth(true);
-                        var height = element.outerHeight(true);
+                        var width = element.outerWidth();
+                        var height = element.outerHeight();
 
-                        var popoverWidth = popover.outerWidth(true);
-                        var popoverHeight = popover.outerHeight(true);
-                        var popoverOffset = popover.offset();
-                        var documentWidth = $(document).width();
-                        var documentHeight = $(document).height();
-                        var position;
-                        var css = {};
-                        
                         // messure available space on each side of the target element
                         var space = {
                             "top": offset.top,
@@ -156,46 +174,73 @@
                         // get the posistion with most available space
                         position = findMax(space);
 
-                        if(position === "top") {
-                            if (offset.left < documentWidth/2) {
-                                css = {top: offset.top - popoverHeight, left: offset.left};
+                        if (position === "top") {
+                            if (offset.left < documentWidth / 2) {
+                                css.top = offset.top - popoverHeight;
+                                css.left = offset.left;
                             } else {
-                                css = {top: offset.top - popoverHeight, left: offset.left - popoverWidth + width};
+                                css.top = offset.top - popoverHeight;
+                                css.left = offset.left - popoverWidth + width;
                             }
                         }
 
-                        if(position === "right") {
-                            if (offset.top < documentHeight/2) {
-                                css = {top: offset.top, left: offset.left + width};
+                        if (position === "right") {
+                            if (offset.top < documentHeight / 2) {
+                                css.top = offset.top; 
+                                css.left = offset.left + width;
                             } else {
-                                css = {top: offset.top + height - popoverHeight, left: offset.left + width};
+                                css.top = offset.top + height - popoverHeight;
+                                css.left = offset.left + width;
                             }
                         }
 
-                        if(position === "bottom") {
-                            if (offset.left < documentWidth/2) {
-                                css = {top: offset.top + height, left: offset.left};
+                        if (position === "bottom") {
+                            if (offset.left < documentWidth / 2) {
+                                css.top = offset.top + height;
+                                css.left = offset.left;
                             } else {
-                                css = {top: offset.top + height, left: offset.left - popoverWidth + width};
+                                css.top = offset.top + height;
+                                css.left = offset.left - popoverWidth + width;
                             }
                         }
 
-                        if(position === "left") {
-                            if (offset.top < documentHeight/2) {
-                                css = {top: offset.top, left: offset.left - popoverWidth};        
+                        if (position === "left") {
+                            if (offset.top < documentHeight / 2) {
+                                css.top = offset.top; 
+                                css.left = offset.left - popoverWidth;
                             } else {
-                                css = {top: offset.top + height - popoverHeight, left: offset.left - popoverWidth};
+                                css.top = offset.top + height - popoverHeight;
+                                css.left = offset.left - popoverWidth;
                             }
                         }
 
-                        popover.css(css);
+                    } else {
 
-                        scope.position = position;
+                        // if there is no dom element center the popover
+                        css.marginLeft = - (popoverWidth / 2);
+                        css.marginTop = - (popoverHeight / 2);
 
-                    });
+                    }
 
-                }
+                    popover.css(css);
 
+                    scope.position = position;
+
+                });
+
+            }
+
+            function waitForPendingRerequests() {
+                var deferred = $q.defer();
+                var timer = window.setInterval(function(){
+                    // check for pending requests both in angular and on the document
+                    if($http.pendingRequests.length === 0 && document.readyState === "complete") {
+                        deferred.resolve();
+                        clearInterval(timer);
+                        scope.$apply();
+                    }
+                }, 50);
+                return deferred.promise;
             }
 
             function findMax(obj) {
@@ -211,23 +256,23 @@
             }
 
             function bindEvent() {
-                var eventName = scope.currentStep.event + ".step-" + scope.currentStepIndex;
-                if(scope.currentStep.eventElement) {
-                    $(scope.currentStep.eventElement).on(eventName, handleEvent);
-                    console.log("bind", eventName);                    
+                var eventName = scope.model.currentStep.event + ".step-" + scope.model.currentStepIndex;
+                if(scope.model.currentStep.eventElement) {
+                    $(scope.model.currentStep.eventElement).on(eventName, handleEvent);
+                    console.log("bind", eventName);
                 } else {
-                    $(scope.currentStep.element).on(eventName, handleEvent);
-                    console.log("bind", eventName);                    
+                    $(scope.model.currentStep.element).on(eventName, handleEvent);
+                    console.log("bind", eventName);
                 }
             }
 
             function unbindEvent() {
-                var eventName = scope.currentStep.event + ".step-" + scope.currentStepIndex;                
-                if(scope.currentStep.eventElement) {
-                    $(scope.currentStep.eventElement).off(eventName);
-                    console.log("unbind", eventName);                    
+                var eventName = scope.model.currentStep.event + ".step-" + scope.model.currentStepIndex;                
+                if(scope.model.currentStep.eventElement) {
+                    $(scope.model.currentStep.eventElement).off(eventName);
+                    console.log("unbind", eventName);
                 } else {
-                    $(scope.currentStep.element).off(eventName);
+                    $(scope.model.currentStep.element).off(eventName);
                     console.log("unbind", eventName);
                 }
             }
@@ -239,7 +284,7 @@
             }
 
             function resize() {
-                positionPopover();
+                findHighlightElement();
             }
 
             onInit();
@@ -259,7 +304,7 @@
             templateUrl: 'views/components/application/umb-tour.html',
             link: link,
             scope: {
-                tour: "="
+                model: "="
             }
         };
 

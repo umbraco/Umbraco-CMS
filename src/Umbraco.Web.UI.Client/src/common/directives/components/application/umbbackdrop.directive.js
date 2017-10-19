@@ -29,11 +29,11 @@
                     // The element to highlight
                     var highlightElement = angular.element(scope.element);
 
-                    if(highlightElement) {
+                    if(highlightElement && highlightElement.length > 0) {
 
                         var offset = highlightElement.offset();
-                        var width = highlightElement.outerWidth(true);
-                        var height = highlightElement.outerHeight(true);
+                        var width = highlightElement.outerWidth();
+                        var height = highlightElement.outerHeight();
 
                         // Rounding numbers
                         var topDistance = offset.top.toFixed();

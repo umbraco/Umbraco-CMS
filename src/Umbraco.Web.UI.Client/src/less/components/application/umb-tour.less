@@ -4,9 +4,6 @@
     left: 50%;
     background: @white;
     border-radius: @baseBorderRadius;
-    padding: 15px;
-    max-width: 250px;
-    min-width: 150px;
     z-index: 10000;
 }
 
@@ -17,34 +14,66 @@
 
 .umb-tour__popover--right {
     margin-left: 20px;
-    transform: none;
+    transform: none;    
 }
 
 .umb-tour__popover--bottom {
     margin-top: 20px;
-    transform: none;
+    transform: none;    
 }
 
 .umb-tour__popover--left {
     margin-right: 20px;
-    transform: none;
+    transform: none;    
 }
 
-.umb-tour__step-counter {
+.umb-tour-step {
+    max-width: 250px;
+    min-width: 150px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.umb-tour-step__counter {
     font-size: 13px;
     color: @gray-5;
 }
 
-.umb-tour__title {
+.umb-tour-step__header {
+    margin-top: 5px;
     margin-bottom: 10px;
+}
+
+.umb-tour-step__title {
     font-weight: bold;
     color: @black;
     font-size: 15px;
-    margin-top: 5px;
 }
 
-.umb-tour__content {
+.umb-tour-step__content {
     margin-bottom: 15px;
     font-size: 15px;
     line-height: 1.6em;
+}
+
+/* Sizes */
+
+.umb-tour-step--l {
+    padding: 30px;
+    max-width: 600px;
+
+    .umb-tour-step__header {
+        margin-bottom: 30px;
+        margin-top: 10px;
+    }
+
+    .umb-tour-step__title {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .umb-tour-step__content {
+        margin-bottom: 25px;
+    }
+
 }

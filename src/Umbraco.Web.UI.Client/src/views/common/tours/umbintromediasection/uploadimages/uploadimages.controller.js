@@ -4,7 +4,7 @@
     function UploadImagesController($scope, editorState, mediaResource) {
         
         var vm = this;
-        var element = angular.element($scope.currentStep.element);
+        var element = angular.element($scope.model.currentStep.element);
 
         vm.error = false;
         
@@ -24,7 +24,7 @@
                     var children = data;
 
                     if(children.items && children.items.length > 0) {
-                        $scope.nextStep();
+                        $scope.model.nextStep();
                     } else {
                         vm.error = true;
                     }
