@@ -11,6 +11,7 @@
        </p>
 
         <umb-button
+            data-element="button-edit-user"
             type="link"
             href="#/users/users/user/{{user.id}}"
             action="model.close()"
@@ -21,6 +22,7 @@
        </umb-button>
 
         <umb-button
+            data-element="button-change-password"
             type="button"
             action="togglePasswordFields()"
             label="Change password"
@@ -29,6 +31,7 @@
        </umb-button>
 
         <umb-button
+            data-element="button-log-out"
             type="button"
             action="logout()"
             shortcut="ctrl+shift+l"
