@@ -12,11 +12,6 @@ namespace umbraco.cms.businesslogic.utilities
     {
         public static void UnPack(string ZipFilePath, string UnPackDirectory, bool DeleteZipFile)
         {
-            if (Directory.Exists(UnPackDirectory) != true)
-            {
-                Directory.CreateDirectory(UnPackDirectory);
-            }
-
             ZipFile.ExtractToDirectory(ZipFilePath, UnPackDirectory);
 
             if (DeleteZipFile)
