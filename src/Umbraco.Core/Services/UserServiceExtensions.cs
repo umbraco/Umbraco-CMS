@@ -4,27 +4,56 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services
 {
-    internal static class UserServiceExtensions
+    public static class UserServiceExtensions
     {
         /// <summary>
-        /// Remove all permissions for this user for all nodes specified
+        /// Get explicitly assigned permissions for a group and optional node Ids
         /// </summary>
-        /// <param name="userService"></param>
-        /// <param name="userId"></param>
-        /// <param name="entityIds"></param>
-        public static void RemoveUserPermissions(this IUserService userService, int userId, params int[] entityIds)
+        /// <param name="service"></param>
+        /// <param name="group"></param>
+        /// <param name="fallbackToDefaultPermissions">
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        /// </param>
+        /// <param name="nodeIds">Specifiying nothing will return all permissions for all nodes</param>
+        /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
+        public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
-            userService.ReplaceUserPermissions(userId, new char[] {}, entityIds);
+            return service.GetPermissions(new[] {group}, fallbackToDefaultPermissions, nodeIds);
         }
 
         /// <summary>
-        /// Remove all permissions for this user for all nodes
+        /// Gets the permissions for the provided group and path
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="group"></param>
+        /// <param name="path">Path to check permissions for</param>
+        /// <param name="fallbackToDefaultPermissions">
+        ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit permissions set
+        /// </param>
+        public static EntityPermissionSet GetPermissionsForPath(this IUserService service, IUserGroup group, string path, bool fallbackToDefaultPermissions = false)
+        {
+            return service.GetPermissionsForPath(new[] { group }, path, fallbackToDefaultPermissions);
+        }
+
+        /// <summary>
+        /// Remove all permissions for this user group for all nodes specified
         /// </summary>
         /// <param name="userService"></param>
-        /// <param name="userId"></param>
-        public static void RemoveUserPermissions(this IUserService userService, int userId)
+        /// <param name="groupId"></param>
+        /// <param name="entityIds"></param>
+        public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds)
         {
-            userService.ReplaceUserPermissions(userId, new char[] { });
+            userService.ReplaceUserGroupPermissions(groupId, new char[] {}, entityIds);
+        }
+
+        /// <summary>
+        /// Remove all permissions for this user group for all nodes
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="groupId"></param>
+        public static void RemoveUserGroupPermissions(this IUserService userService, int groupId)
+        {
+            userService.ReplaceUserGroupPermissions(groupId, new char[] { });
         }
 
         /// <summary>
@@ -36,7 +65,7 @@ namespace Umbraco.Core.Services
         /// To maintain compatibility we have to check the login name if the provider key lookup fails but otherwise
         /// we'll store the provider user key in the login column.
         /// </remarks>
-        public static IUser CreateUserMappingForCustomProvider(this IUserService userService, MembershipUser member)
+        internal static IUser CreateUserMappingForCustomProvider(this IUserService userService, MembershipUser member)
         {
             if (member == null) throw new ArgumentNullException("member");
 
@@ -51,18 +80,11 @@ namespace Umbraco.Core.Services
 
             if (found == null)
             {
-                var writer = userService.GetUserTypeByAlias("writer");
-                if (writer == null)
-                {
-                    throw new InvalidOperationException("Could not map the custom user to an Umbraco user, no 'writer' user type could be found");
-                }
                 var user = new User(
                     member.UserName,
                     member.Email ?? Guid.NewGuid().ToString("N") + "@example.com", //email cannot be empty
                     member.ProviderUserKey == null ? member.UserName : member.ProviderUserKey.ToString(),
-                    Guid.NewGuid().ToString("N"), //pass cannot be empty
-                    writer);
-                user.AddAllowedSection(Constants.Applications.Content);
+                    Guid.NewGuid().ToString("N")); //pass cannot be empty
                 userService.Save(user);
                 return user;
             }

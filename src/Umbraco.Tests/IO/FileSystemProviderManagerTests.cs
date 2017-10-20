@@ -26,14 +26,14 @@ namespace Umbraco.Tests.IO
 
             // start clean
             // because some tests will create corrupt or weird filesystems
-            FileSystemProviderManager.Current.Reset();
+            FileSystemProviderManager.ResetCurrent();
         }
 
         [TearDown]
         public void TearDown()
         {
             // stay clean (see note in SetUp)
-            FileSystemProviderManager.Current.Reset();
+            FileSystemProviderManager.ResetCurrent();
         }
 
         [Test]

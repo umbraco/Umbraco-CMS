@@ -16,10 +16,26 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("hideDisabledUsersInBackoffice", false); }
         }
 
+        /// <summary>
+        /// Used to enable/disable the forgot password functionality on the back office login screen
+        /// </summary>
         [ConfigurationProperty("allowPasswordReset")]
         internal InnerTextConfigurationElement<bool> AllowPasswordReset
         {
             get { return GetOptionalTextElement("allowPasswordReset", true); }
+        }
+
+        /// <summary>
+        /// A boolean indicating that by default the email address will be the username
+        /// </summary>
+        /// <remarks>
+        /// Even if this is true and the username is different from the email in the database, the username field will still be shown.
+        /// When this is false, the username and email fields will be shown in the user section.
+        /// </remarks>
+        [ConfigurationProperty("usernameIsEmail")]
+        internal InnerTextConfigurationElement<bool> UsernameIsEmail
+        {
+            get { return GetOptionalTextElement("usernameIsEmail", true); }
         }
 
         [ConfigurationProperty("authCookieName")]
@@ -44,9 +60,24 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return HideDisabledUsersInBackoffice; }
         }
 
+        /// <summary>
+        /// Used to enable/disable the forgot password functionality on the back office login screen
+        /// </summary>
         bool ISecuritySection.AllowPasswordReset
         {
             get { return AllowPasswordReset; }
+        }
+
+        /// <summary>
+        /// A boolean indicating that by default the email address will be the username
+        /// </summary>
+        /// <remarks>
+        /// Even if this is true and the username is different from the email in the database, the username field will still be shown.
+        /// When this is false, the username and email fields will be shown in the user section.
+        /// </remarks>
+        bool ISecuritySection.UsernameIsEmail
+        {
+            get { return UsernameIsEmail; }
         }
 
         string ISecuritySection.AuthCookieName

@@ -15,6 +15,7 @@ using System.Linq;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 using Umbraco.Web.Trees;
+using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -106,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                .ForMember(member => member.Owner, expression => expression.UseValue(new UserBasic {Name = "Admin", UserId = 0}))
+                .ForMember(member => member.Owner, expression => expression.UseValue(new UserProfile {Name = "Admin", UserId = 0}))
                 .ForMember(member => member.Icon, expression => expression.UseValue("icon-user"))
                 .ForMember(member => member.Name, expression => expression.MapFrom(user => user.UserName))
                 .ForMember(member => member.Email, expression => expression.MapFrom(content => content.Email))

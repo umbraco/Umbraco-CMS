@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -23,7 +20,7 @@ namespace Umbraco.Core.Models
         private DateTime? _expireDate;
         private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
-        private bool _permissionsChanged;
+
         /// <summary>
         /// Constructor for creating a Content object
         /// </summary>
@@ -32,7 +29,7 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         public Content(string name, IContent parent, IContentType contentType)
 			: this(name, parent, contentType, new PropertyCollection())
-		{			
+		{
 		}
 
         /// <summary>
@@ -68,7 +65,7 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties) 
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
 			: base(name, parentId, contentType, properties)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
@@ -87,7 +84,6 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
             public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
-            public readonly PropertyInfo PermissionsChangedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.PermissionsChanged);
         }
 
         /// <summary>
@@ -95,7 +91,7 @@ namespace Umbraco.Core.Models
         /// This is used to override the default one from the ContentType.
         /// </summary>
         /// <remarks>
-        /// If no template is explicitly set on the Content object, 
+        /// If no template is explicitly set on the Content object,
         /// the Default template from the ContentType will be returned.
         /// </remarks>
         [DataMember]
@@ -197,15 +193,6 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
         }
 
-        /// <summary>
-        /// Used internally to track if permissions have been changed during the saving process for this entity
-        /// </summary>
-        [IgnoreDataMember]
-        internal bool PermissionsChanged
-        {
-            get { return _permissionsChanged; }
-            set { SetPropertyValueAndDetectChanges(value, ref _permissionsChanged, Ps.Value.PermissionsChangedSelector); }
-        }
 
         /// <summary>
         /// Gets the ContentType used by this content object
@@ -277,6 +264,9 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         internal DateTime PublishedDate { get; set; }
 
+        [DataMember]
+        public bool IsBlueprint { get; internal set; }
+
         /// <summary>
         /// Changes the Trashed state of the content object
         /// </summary>
@@ -293,7 +283,7 @@ namespace Umbraco.Core.Models
                 ChangePublishedState(PublishedState.Unpublished);
             }
         }
-        
+
         /// <summary>
         /// Method to call when Entity is being updated
         /// </summary>

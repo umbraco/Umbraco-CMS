@@ -1,4 +1,5 @@
-﻿@inherits Umbraco.Web.Macros.PartialViewMacroPage
+﻿@using Umbraco.Web
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
 @*
     This snippet makes a breadcrumb of parents using an unordered HTML list.
 
@@ -7,13 +8,13 @@
     - Finally it outputs the name of the current page (without a link)
 *@
 
-@{ var selection = Model.Content.Ancestors(); }
+@{ var selection = Model.Content.Ancestors().ToArray(); }
 
-@if (selection.Any())
+@if (selection.Length > 0)
 {
     <ul class="breadcrumb">
         @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@
-        @foreach (var item in selection.OrderBy("Level"))
+        @foreach (var item in selection.OrderBy(x => x.Level))
         {
             <li><a href="@item.Url">@item.Name</a> <span class="divider">/</span></li>
         }

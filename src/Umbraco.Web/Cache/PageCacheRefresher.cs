@@ -50,8 +50,9 @@ namespace Umbraco.Web.Cache
         /// </summary>
         public override void RefreshAll()
         {
-            content.Instance.RefreshContentFromDatabase();
-            XmlPublishedContent.ClearRequest();
+            if (Suspendable.PageCacheRefresher.CanRefreshDocumentCacheFromDatabase)
+                content.Instance.RefreshContentFromDatabase();
+            ClearCaches();
             base.RefreshAll();
         }
 
@@ -61,11 +62,9 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.UpdateDocumentCache(id);
-            XmlPublishedContent.ClearRequest();
-            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
+            if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+                content.Instance.UpdateDocumentCache(id);
+            ClearCaches();
             base.Refresh(id);
         }
 
@@ -75,35 +74,35 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.ClearDocumentCache(id, false);
-            XmlPublishedContent.ClearRequest();
-            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
+            if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+                content.Instance.ClearDocumentCache(id, false);
+            ClearCaches();
             base.Remove(id);
         }
 
         public override void Refresh(IContent instance)
         {
-            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.UpdateDocumentCache(new Document(instance));
-            XmlPublishedContent.ClearRequest();
-            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
+            if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+                content.Instance.UpdateDocumentCache(new Document(instance));
+            ClearCaches();
             base.Refresh(instance);
         }
 
         public override void Remove(IContent instance)
         {
+            if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+                content.Instance.ClearDocumentCache(new Document(instance), false);
+            ClearCaches();
+            base.Remove(instance);
+        }
+
+        private void ClearCaches()
+        {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
-            content.Instance.ClearDocumentCache(new Document(instance), false);
             XmlPublishedContent.ClearRequest();
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
-            base.Remove(instance);
         }
     }
 }

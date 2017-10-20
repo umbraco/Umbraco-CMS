@@ -2,10 +2,6 @@
 @using Umbraco.Web.Templates
 @using Newtonsoft.Json.Linq
 
-@* 
-    Razor helpers located at the bottom of this file
-*@
-
 @if (Model != null && Model.sections != null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;

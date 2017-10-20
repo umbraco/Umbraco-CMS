@@ -9,19 +9,44 @@ namespace Umbraco.Web.HealthCheck
     /// </summary>
     public class HealthCheckContext
     {
+        private readonly HttpContextBase _httpContext;
+
+        private readonly UmbracoContext _umbracoContext;
+
         public HealthCheckContext(HttpContextBase httpContext, UmbracoContext umbracoContext)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            HttpContext = httpContext;
-            UmbracoContext = umbracoContext;
-            ApplicationContext = UmbracoContext.Application;
+            _httpContext = httpContext;
+            _umbracoContext = umbracoContext;
+            ApplicationContext = _umbracoContext.Application;
         }
 
-        public HttpContextBase HttpContext { get; private set; }
-        public UmbracoContext UmbracoContext { get; private set; }
+        public HealthCheckContext(ApplicationContext applicationContext)
+        {
+            ApplicationContext = applicationContext;
+        }
+
         public ApplicationContext ApplicationContext { get; private set; }
 
-        //TODO: Do we need any more info/service exposed here?
+        public string SiteUrl
+        {
+            get
+            {
+                return _httpContext != null
+                    ? _httpContext.Request.Url.GetLeftPart(UriPartial.Authority)
+                    : ApplicationContext.UmbracoApplicationUrl.Replace("/umbraco", string.Empty);
+            }
+        }
+
+        public string ApplicationPath
+        {
+            get
+            {
+                return _httpContext != null
+                    ? _httpContext.Request.ApplicationPath
+                    : "/";
+            }
+        }
     }
 }

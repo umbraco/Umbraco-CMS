@@ -16,13 +16,14 @@ using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 
 namespace umbraco.BasePages
 {
     /// <summary>
     /// umbraco.BasePages.BasePage is the default page type for the umbraco backend.
-    /// The basepage keeps track of the current user and the page context. But does not 
+    /// The basepage keeps track of the current user and the page context. But does not
     /// Restrict access to the page itself.
     /// The keep the page secure, the umbracoEnsuredPage class should be used instead
     /// </summary>
@@ -32,7 +33,7 @@ namespace umbraco.BasePages
         private User _user;
         private bool _userisValidated = false;
         private ClientTools _clientTools;
-        
+
         /// <summary>
         /// The path to the umbraco root folder
         /// </summary>
@@ -55,7 +56,7 @@ namespace umbraco.BasePages
         protected static ISqlHelper SqlHelper
         {
             get { return BusinessLogic.Application.SqlHelper; }
-        }        
+        }
 
         /// <summary>
         /// Returns the current ApplicationContext
@@ -82,7 +83,7 @@ namespace umbraco.BasePages
         }
 
         /// <summary>
-        /// Returns the current BasePage for the current request. 
+        /// Returns the current BasePage for the current request.
         /// This assumes that the current page is a BasePage, otherwise, returns null;
         /// </summary>
         [Obsolete("Should use the Umbraco.Web.UmbracoContext.Current singleton instead to access common methods and properties")]
@@ -92,9 +93,9 @@ namespace umbraco.BasePages
             {
                 var page = HttpContext.Current.CurrentHandler as BasePage;
                 if (page != null) return page;
-                //the current handler is not BasePage but people might be expecting this to be the case if they 
+                //the current handler is not BasePage but people might be expecting this to be the case if they
                 // are using this singleton accesor... which is legacy code now and shouldn't be used. When people
-                // start using Umbraco.Web.UI.Pages.BasePage then this will not be the case! So, we'll just return a 
+                // start using Umbraco.Web.UI.Pages.BasePage then this will not be the case! So, we'll just return a
                 // new instance of BasePage as a hack to make it work.
                 if (HttpContext.Current.Items["umbraco.BasePages.BasePage"] == null)
                 {
@@ -185,7 +186,7 @@ namespace umbraco.BasePages
             var identity = HttpContext.Current.GetCurrentIdentity(
                 //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                 // Without this check, anything that is using this legacy API, like ui.Text will
-                // automatically log the back office user in even if it is a front-end request (if there is 
+                // automatically log the back office user in even if it is a front-end request (if there is
                 // a back office user logged in. This can cause problems becaues the identity is changing mid
                 // request. For example: http://issues.umbraco.org/issue/U4-4010
                 HttpContext.Current.CurrentHandler is Page);
@@ -216,7 +217,7 @@ namespace umbraco.BasePages
             var identity = HttpContext.Current.GetCurrentIdentity(
                 //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                 // Without this check, anything that is using this legacy API, like ui.Text will
-                // automatically log the back office user in even if it is a front-end request (if there is 
+                // automatically log the back office user in even if it is a front-end request (if there is
                 // a back office user logged in. This can cause problems becaues the identity is changing mid
                 // request. For example: http://issues.umbraco.org/issue/U4-4010
                 HttpContext.Current.CurrentHandler is Page);
@@ -233,7 +234,7 @@ namespace umbraco.BasePages
         {
             var ticket = HttpContext.Current.GetUmbracoAuthTicket();
             if (ticket.Expired) return 0;
-            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;         
+            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;
             return ticks;
         }
 
@@ -250,7 +251,7 @@ namespace umbraco.BasePages
                 var identity = HttpContext.Current.GetCurrentIdentity(
                     //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
                     // Without this check, anything that is using this legacy API, like ui.Text will
-                    // automatically log the back office user in even if it is a front-end request (if there is 
+                    // automatically log the back office user in even if it is a front-end request (if there is
                     // a back office user logged in. This can cause problems becaues the identity is changing mid
                     // request. For example: http://issues.umbraco.org/issue/U4-4010
                     HttpContext.Current.CurrentHandler is Page);
@@ -278,7 +279,7 @@ namespace umbraco.BasePages
 
         public static void RenewLoginTimeout()
         {
-            HttpContext.Current.RenewUmbracoAuthTicket();           
+            HttpContext.Current.RenewUmbracoAuthTicket();
         }
 
         /// <summary>
@@ -292,10 +293,9 @@ namespace umbraco.BasePages
                 Id = u.Id,
                 AllowedApplications = u.GetApplications().Select(x => x.alias).ToArray(),
                 RealName = u.Name,
-                //currently we only have one user type!
-                Roles = new[] { u.UserType.Alias },
-                StartContentNode = u.StartNodeId,
-                StartMediaNode = u.StartMediaId,
+                Roles = u.GetGroups(),
+                StartContentNodes = u.UserEntity.CalculateContentStartNodeIds(ApplicationContext.Current.Services.EntityService),
+                StartMediaNodes = u.UserEntity.CalculateMediaStartNodeIds(ApplicationContext.Current.Services.EntityService),
                 Username = u.LoginName,
                 Culture = ui.Culture(u)
 
@@ -342,7 +342,7 @@ namespace umbraco.BasePages
         }
 
         //[Obsolete("Use ClientTools instead")]
-        //public void reloadParentNode() 
+        //public void reloadParentNode()
         //{
         //    ClientTools.ReloadParentNode(true);
         //}
@@ -379,7 +379,7 @@ namespace umbraco.BasePages
         {
             base.OnInit(e);
 
-            //This must be set on each page to mitigate CSRF attacks which ensures that this unique token 
+            //This must be set on each page to mitigate CSRF attacks which ensures that this unique token
             // is added to the viewstate of each request
             if (umbracoUserContextID.IsNullOrWhiteSpace() == false)
             {

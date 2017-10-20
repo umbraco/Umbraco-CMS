@@ -29,23 +29,19 @@
     <key alias="republish">Opublikuj ponownie całą stronę</key>
     <key alias="restore" version="7.3.0">Przywróć</key>
     <key alias="SetPermissionsForThePage">Ustaw  uprawnienia dla strony %0%</key>
-    <key alias="chooseWhereToMove">Wybierz miejsce docelowe</key>
-    <key alias="toInTheTreeStructureBelow">do w poniższej strukturze drzewa</key>
     <key alias="rights">Uprawnienia</key>
     <key alias="rollback">Cofnij</key>
     <key alias="sendtopublish">Wyślij do publikacji</key>
     <key alias="sendToTranslate">Wyślij do tłumaczenia</key>
     <key alias="sort">Sortuj</key>
-    <key alias="toPublish">Zapisz do opublikowania</key>
     <key alias="translate">Przetłumacz</key>
     <key alias="update">Aktualizuj</key>
-    <key alias="defaultValue">Domyślna wartość</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Brak odpowiednich uprawnień</key>
     <key alias="addNew">Dodaj nową domenę</key>
     <key alias="remove">Usuń domenę</key>
-    <key alias="invalidNode">Niepoprawny węzeł.</key>
+    <key alias="invalidNode">Niepoprawny węzeł</key>
     <key alias="invalidDomain">Niepoprawny format domeny.</key>
     <key alias="duplicateDomain">Domena została już przydzielona.</key>
     <key alias="language">Język</key>
@@ -635,15 +631,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="defaultUserDisabled"><![CDATA[<strong>Konto domyślnego użytkownika zostało wyłączone lub nie ma on dostępu do Umbraco!</strong></p><p>Żadne dodatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Hasło domyślnego użytkownika zostało zmienione od czasu instalacji!</strong></p><p>Żadne dodatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
     <key alias="defaultUserPasswordChanged">Hasło zostało zmienione!</key>
-    <key alias="defaultUserText"><![CDATA[
-                <p> 
-                  Umbraco tworzy domyślne konto użytkownika o loginie <strong>('admin')</strong> i haśle <strong>('default')</strong>. Jest <strong>ważne</strong>, 
-                  aby zmienić hasło na inne. 
-                </p> 
-                <p> 
-                  Ten krok sprawdzi, czy hasło domyślnego użytkownika powinno być zmienione. 
-                </p>
-                ]]></key>
     <key alias="greatStart">Aby szybko wejść w świat Umbraco, obejrzyj nasze filmy wprowadzające</key>
     <key alias="licenseText">Klikając przycisk dalej (lub modyfikując klucz UmbracoConfigurationStatus w pliku web.config), akceptujesz licencję na niniejsze oprogramowanie zgodnie ze specyfikacją w poniższym polu. Zauważ, że ta dystrybucja Umbraco składa się z dwoch licencji - licencja MIT typu open source dla kodu oraz licencja "Umbraco freeware", która dotyczy interfejsu użytkownika.</key>
     <key alias="None">Nie zainstalowane.</key>
@@ -1480,8 +1467,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="startnode">Węzeł początkowy w zawartości</key>
     <key alias="username">Nazwa użytkownika</key>
     <key alias="userPermissions">Prawa dostępu użytkownika</key>
-    <key alias="usertype">Typ</key>
-    <key alias="userTypes">Typy użytkowników</key>
     <key alias="writer">Pisarz</key>
     <key alias="translator">Tłumacz</key>
     <key alias="change">Zmień</key>

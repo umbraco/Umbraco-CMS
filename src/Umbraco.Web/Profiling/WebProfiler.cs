@@ -99,13 +99,17 @@ namespace Umbraco.Web.Profiling
             if (request.Success == false || request.Result.Url.IsClientSideRequest())
                 return false;
 
-            if (string.IsNullOrEmpty(request.Result.QueryString["umbDebug"]))
-                return false;
+            //if there is an umbDebug query string than profile it
+            bool umbDebug;
+            if (string.IsNullOrEmpty(request.Result.QueryString["umbDebug"]) == false && bool.TryParse(request.Result.QueryString["umbDebug"], out umbDebug))
+                return true;
 
-            if (request.Result.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
-                return false;
+            //if there is an umbDebug header than profile it
+            if (string.IsNullOrEmpty(request.Result.Headers["X-UMB-DEBUG"]) == false && bool.TryParse(request.Result.Headers["X-UMB-DEBUG"], out umbDebug))
+                return true;
 
-            return true;
+            //everything else is ok to profile
+            return false;
         }
 
         /// <summary>

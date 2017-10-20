@@ -187,6 +187,7 @@
                                     <i class="icon icon-navigation" ng-if="!property.inherited"></i>
                                     <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
                                     <span class="umb-group-builder__property-meta-alias">({{ property.alias }})</span>
+                                    <span ng-show="sortingMode"><input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-editor-tiny" ng-model="property.sortOrder" ng-disabled="property.inherited" /></span>
                                 </div>
 
                             </div>

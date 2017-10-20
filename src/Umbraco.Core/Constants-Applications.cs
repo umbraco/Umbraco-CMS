@@ -59,6 +59,11 @@
             public const string Content = "content";
 
             /// <summary>
+            /// alias for the content blueprint tree.
+            /// </summary>
+            public const string ContentBlueprints = "contentBlueprints";
+
+            /// <summary>
             /// alias for the member tree.
             /// </summary>
             public const string Members = "member";
@@ -122,6 +127,8 @@
             public const string PartialViewMacros = "partialViewMacros";
 
             public const string Scripts = "scripts";
+
+            public const string Users = "users";
 
             //TODO: Fill in the rest!
         }

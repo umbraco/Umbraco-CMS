@@ -27,7 +27,7 @@
 			<div ng-hide="miniListView">
 				<umb-tree
 					section="media"
-					hideheader="false"
+				    hideheader="{{treeModel.hideHeader}}"
 					hideoptions="true"
 					isdialog="true"
 					eventhandler="dialogTreeEventHandler"

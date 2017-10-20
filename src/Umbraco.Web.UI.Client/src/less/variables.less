@@ -152,7 +152,7 @@
 // -------------------------
 @tableBackground:                   transparent; // overall background-color
 @tableBackgroundAccent:             @gray-10; // for striping
-@tableBackgroundHover:              @gray-9; // for hover
+@tableBackgroundHover:              @gray-10; // for hover
 @tableBorder:                       @gray-8; // table and cell border
 
 // Buttons
@@ -230,6 +230,12 @@
 @zindexModalBackdrop:     1040;
 @zindexModal:             1050;
 
+@zindexUmbOverlay:        7500;
+@zindexOverlayBackdrop:   2000;
+
+// Sticky bar has a z-index of "500", which is set from javascript in directive
+// so set z-index of cropper should be lower to be behind sticky bar.
+@zindexCropperOverlay:    499;
 
 // Sprite icons path
 // -------------------------

@@ -87,6 +87,23 @@ namespace Umbraco.Core.Services
         int CountDescendants(int parentId, string contentTypeAlias = null);
 
         IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
+        IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IMedia without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new media objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parentId">Id of Parent for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>

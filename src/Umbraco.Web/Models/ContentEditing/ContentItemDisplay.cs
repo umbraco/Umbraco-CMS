@@ -1,15 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Formatting;
 using System.Runtime.Serialization;
-using System.Web.Http;
-using System.Web.Http.ModelBinding;
-using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -56,7 +48,9 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Each char represents a button which we can then map on the front-end to the correct actions
         /// </remarks>
         [DataMember(Name = "allowedActions")]
-        public IEnumerable<char> AllowedActions { get; set; }
+        public IEnumerable<string> AllowedActions { get; set; }
 
+        [DataMember(Name = "isBlueprint")]
+        public bool IsBlueprint { get; set; }
     }
 }

@@ -57,11 +57,7 @@
                     vm.createFolderError = err;
 
                     //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
+                    formHelper.showNotifications(err.data);    
                 });
             }
         }

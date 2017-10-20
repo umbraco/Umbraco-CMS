@@ -388,12 +388,11 @@ namespace Umbraco.Tests.TestHelpers
             return ctx;
         }
 
-        protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
+        protected virtual FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
         {
             var factory = routeData != null
                             ? new FakeHttpContextFactory(url, routeData)
                             : new FakeHttpContextFactory(url);
-
 
             //set the state helper
             StateHelper.HttpContext = factory.HttpContext;

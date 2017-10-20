@@ -32,7 +32,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IDomain>(domain, evtMsgs)))
+                var deleteEventArgs = new DeleteEventArgs<IDomain>(domain, evtMsgs);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -42,8 +43,8 @@ namespace Umbraco.Core.Services
                 repository.Delete(domain);
                 uow.Commit();
 
-                var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
-                uow.Events.Dispatch(Deleted, this, args);
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
                 return OperationStatus.Success(evtMsgs);
             }
 
@@ -92,7 +93,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDomain>(domainEntity, evtMsgs)))
+                var saveEventArgs = new SaveEventArgs<IDomain>(domainEntity, evtMsgs);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -101,7 +103,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateDomainRepository(uow);
                 repository.AddOrUpdate(domainEntity);
                 uow.Commit();
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
                 return OperationStatus.Success(evtMsgs);
             }
 

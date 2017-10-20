@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:valFormManager
 * @restrict A
 * @require formController
-* @description Used to broadcast an event to all elements inside this one to notify that form validation has 
+* @description Used to broadcast an event to all elements inside this one to notify that form validation has
 * changed. If we don't use this that means you have to put a watch for each directive on a form's validation
 * changing which would result in much higher processing. We need to actually watch the whole $error collection of a form
 * because just watching $valid or $invalid doesn't acurrately trigger form validation changing.
@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams) {
+function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams, $window) {
     return {
         require: "form",
         restrict: "A",
@@ -43,7 +43,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 return formCtrl.$error;
             }, function (e) {
                 scope.$broadcast("valStatusChanged", { form: formCtrl });
-                
+
                 //find all invalid elements' .control-group's and apply the error class
                 var inError = element.find(".control-group .ng-invalid").closest(".control-group");
                 inError.addClass("error");
@@ -53,12 +53,12 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 noInError.removeClass("error");
 
             }, true);
-            
+
             var className = attr.valShowValidation ? attr.valShowValidation : "show-validation";
             var savingEventName = attr.savingEvent ? attr.savingEvent : "formSubmitting";
             var savedEvent = attr.savedEvent ? attr.savingEvent : "formSubmitted";
 
-            //This tracks if the user is currently saving a new item, we use this to determine 
+            //This tracks if the user is currently saving a new item, we use this to determine
             // if we should display the warning dialog that they are leaving the page - if a new item
             // is being saved we never want to display that dialog, this will also cause problems when there
             // are server side validation issues.
@@ -85,7 +85,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 element.removeClass(className);
 
                 //clear form state as at this point we retrieve new data from the server
-                //and all validation will have cleared at this point    
+                //and all validation will have cleared at this point
                 formCtrl.$setPristine();
             }));
 
@@ -117,11 +117,27 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
             });
             unsubscribe.push(locationEvent);
 
+            // try to do it in the most cross-browser way
+            // some browsers will display their own custom message
+            // and some will just ignore this completely
+            function onBeforeUnload(e) {
+                if (formCtrl.$dirty) {
+                    var message = "You have unsaved changes.";
+                    e.returnValue = message;
+                    return message;
+                } else {
+                    return null;
+                }
+            }
+
+            $window.addEventListener("beforeunload", onBeforeUnload);
+
             //Ensure to remove the event handler when this instance is destroyted
             scope.$on('$destroy', function() {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }
+                $window.removeEventListener("beforeunload", onBeforeUnload);
             });
 
             $timeout(function(){

@@ -74,7 +74,7 @@ namespace Umbraco.Web.Security.Providers
                 _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
                 if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                 {
-                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                    throw new ProviderException("No default member type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
                 _hasDefaultMember = true;
             }
@@ -87,6 +87,13 @@ namespace Umbraco.Web.Security.Providers
                     _providerKeyAsGuid = true;
                 }
             }
+        }
+
+        protected override Attempt<string> GetRawPassword(string username)
+        {
+            var found = MemberService.GetByUsername(username);
+            if (found == null) return Attempt<string>.Fail();
+            return Attempt.Succeed(found.RawPasswordValue);
         }
 
         public override string DefaultMemberTypeAlias
@@ -102,7 +109,7 @@ namespace Umbraco.Web.Security.Providers
                             _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
-                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                                throw new ProviderException("No default member type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                             }
                             _hasDefaultMember = true;
                         }

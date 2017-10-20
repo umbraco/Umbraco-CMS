@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<UmbracoEntity, EntityBasic>()
                 .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key))) 
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
-                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(dto => dto.Trashed, expression => expression.MapFrom(x => x.Trashed))
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .AfterMap((entity, basic) =>
                 {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         basic.Icon = "icon-user";
                     }
-                });
+                });            
 
             config.CreateMap<PropertyType, EntityBasic>()
                 .ForMember(x => x.Udi, expression => expression.Ignore())
@@ -64,20 +64,7 @@ namespace Umbraco.Web.Models.Mapping
                .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
-
-            //config.CreateMap<EntityBasic, ITemplate>()
-            //    .ConstructUsing(basic => new Template(basic.Name, basic.Alias)
-            //    {
-            //        Id = Convert.ToInt32(basic.Id),
-            //        Key = basic.Key
-            //    })
-            //   .ForMember(t => t.Path, expression => expression.Ignore())
-            //   .ForMember(t => t.Id, expression => expression.MapFrom(template => Convert.ToInt32(template.Id)))
-            //   .ForMember(x => x.VirtualPath, expression => expression.Ignore())
-            //   .ForMember(x => x.CreateDate, expression => expression.Ignore())
-            //   .ForMember(x => x.UpdateDate, expression => expression.Ignore())
-            //   .ForMember(x => x.Content, expression => expression.Ignore());
-
+            
             config.CreateMap<EntityBasic, ContentTypeSort>()
                 .ForMember(x => x.Id, expression => expression.MapFrom(entity => new Lazy<int>(() => Convert.ToInt32(entity.Id))))
                 .ForMember(x => x.SortOrder, expression => expression.Ignore());
@@ -89,8 +76,32 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
-            config.CreateMap<SearchResult, EntityBasic>()
+            config.CreateMap<UmbracoEntity, SearchResultItem>()
+                .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key)))
+                .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.Score, expression => expression.Ignore())
+                .AfterMap((entity, basic) =>
+                {
+                    if (basic.Icon.IsNullOrWhiteSpace())
+                    {
+                        if (entity.NodeObjectTypeId == Constants.ObjectTypes.MemberGuid)
+                            basic.Icon = "icon-user";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DataTypeGuid) 
+                            basic.Icon = "icon-autofill";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DocumentTypeGuid)
+                            basic.Icon = "icon-item-arrangement";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.MediaTypeGuid)
+                            basic.Icon = "icon-thumbnails";
+                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.TemplateTypeGuid)
+                            basic.Icon = "icon-newspaper-alt";
+                    }
+                });
+
+            config.CreateMap<SearchResult, SearchResultItem>()
                 //default to document icon
+                  .ForMember(x => x.Score, expression => expression.MapFrom(result => result.Score))
                   .ForMember(x => x.Udi, expression => expression.Ignore())
                   .ForMember(x => x.Icon, expression => expression.Ignore())
                   .ForMember(x => x.Id, expression => expression.MapFrom(result => result.Id))
@@ -156,11 +167,11 @@ namespace Umbraco.Web.Models.Mapping
                           }
                       });
 
-            config.CreateMap<ISearchResults, IEnumerable<EntityBasic>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+            config.CreateMap<ISearchResults, IEnumerable<SearchResultItem>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
 
-            config.CreateMap<IEnumerable<SearchResult>, IEnumerable<EntityBasic>>()
-                  .ConvertUsing(results => results.Select(Mapper.Map<EntityBasic>).ToList());
+            config.CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()
+                  .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
         }
     }
 }

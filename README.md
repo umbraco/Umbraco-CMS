@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/ikpgqxiw9v8opltv/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-hs8dx/branch/dev-v7)
+[![Build status](https://ci.appveyor.com/api/projects/status/6by6harxtxt0ocdx/branch/dev-v7?svg=true)](https://ci.appveyor.com/project/Umbraco/umbraco-cms-b2cri/branch/dev-v7)
 
 Umbraco CMS
 ===========
@@ -12,9 +12,7 @@ Umbraco is a free open source Content Management System built on the ASP.NET pla
 
 ## Building Umbraco from source ##
 
-The easiest way to get started is to run `build/build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `grunt vs` in `src\Umbraco.Web.UI.Client`.
- 
-If you're interested in making changes to Belle without running Visual Studio make sure to read the [Belle ReadMe file](src/Umbraco.Web.UI.Client/README.md). 
+The easiest way to get started is to run `build/build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`.
 
 Note that you can always [download a nightly build](http://nightly.umbraco.org/?container=umbraco-750) so you don't have to build the code yourself.
 

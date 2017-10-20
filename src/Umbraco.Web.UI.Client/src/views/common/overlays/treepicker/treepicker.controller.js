@@ -9,7 +9,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.section = dialogOptions.section;
         $scope.treeAlias = dialogOptions.treeAlias;
         $scope.multiPicker = dialogOptions.multiPicker;
-        $scope.hideHeader = true;
+        $scope.hideHeader = (typeof dialogOptions.hideHeader) === "boolean" ? dialogOptions.hideHeader : true;
         // if you need to load a not initialized tree set this value to false - default is true
         $scope.onlyInitialized = dialogOptions.onlyInitialized;
         $scope.searchInfo = {
@@ -28,7 +28,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
 
 
-        //TODO: I don't think this is used or called anywhere!!
+        //This is called from ng-init
+        //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init. 
+        //this is probably an anti pattern IMO and shouldn't be used
         $scope.init = function (contentType) {
 
             if (contentType === "content") {
@@ -207,26 +209,23 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         function select(text, id, entity) {
             //if we get the root, we just return a constructed entity, no need for server data
             if (id < 0) {
-                if ($scope.multiPicker) {
 
+                var rootNode = {
+                    alias: null,
+                    icon: "icon-folder",
+                    id: id,
+                    name: text
+                };
+
+                if ($scope.multiPicker) {
                     if (entity) {
                         multiSelectItem(entity);
                     } else {
-                        //otherwise we have to get it from the server
-                        entityResource.getById(id, $scope.entityType).then(function (ent) {
-                            multiSelectItem(ent);
-                        });
+                        multiSelectItem(rootNode);
                     }
-
                 }
                 else {
-                    var node = {
-                        alias: null,
-                        icon: "icon-folder",
-                        id: id,
-                        name: text
-                    };
-                    $scope.model.selection.push(node);
+                    $scope.model.selection.push(rootNode);
                     $scope.model.submit($scope.model);
                 }
             }
