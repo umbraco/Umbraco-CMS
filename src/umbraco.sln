@@ -1,12 +1,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\build.md = ..\build\build.md
+		..\build\build.ps1 = ..\build\build.ps1
 		..\build\BuildDocs.ps1 = ..\build\BuildDocs.ps1
 		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
@@ -147,5 +148,8 @@ Global
 		{86DEB346-089F-4106-89C8-D852B9CF2A33} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{460C4687-9209-4100-AAB0-82867B592FDC} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 		{F80CA2F0-168E-4364-AB75-A27DDD58643D} = {460C4687-9209-4100-AAB0-82867B592FDC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}
 	EndGlobalSection
 EndGlobal

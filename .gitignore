@@ -148,5 +148,5 @@ src/PrecompiledWeb/*
 # build
 build.out/
 build.tmp/
-build/Modules/*/temp/
 build/hooks/
+build/temp/
