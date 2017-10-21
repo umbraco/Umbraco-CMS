@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
@@ -75,6 +76,11 @@ namespace Umbraco.Tests.TokenReplacers
                                 }
                         }
                 };
+        }
+
+        protected static string GetTestPropertyValue(ContentItemDisplay model)
+        {
+            return model.Properties.Single(x => x.Alias == "testProperty").Value.ToString();
         }
     }
 }

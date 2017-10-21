@@ -15,7 +15,7 @@ namespace Umbraco.Tests.TokenReplacers
 
             tokenReplacer.ReplaceTokens(model);
 
-            Assert.AreEqual("Hello World!", model.Properties.Single(x => x.Alias == "testProperty").Value.ToString());
+            Assert.AreEqual("Hello World!", GetTestPropertyValue(model));
         }
     }
 }

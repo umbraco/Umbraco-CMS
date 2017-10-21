@@ -15,7 +15,7 @@ namespace Umbraco.Tests.TokenReplacers
 
             tokenReplacer.ReplaceTokens(model);
 
-            Assert.AreEqual("Created from parent with id: 1000", model.Properties.Single(x => x.Alias == "testProperty").Value.ToString());
+            Assert.AreEqual("Created from parent with id: 1000", GetTestPropertyValue(model));
         }
     }
 }

@@ -16,8 +16,7 @@ namespace Umbraco.Tests.TokenReplacers
             var testDate = DateTime.Now;
             tokenReplacer.ReplaceTokens(model);
 
-            Assert.AreEqual(string.Format("Page created on {0}.", testDate.ToString("d-MMM-yyyy")),
-                model.Properties.Single(x => x.Alias == "testProperty").Value.ToString());
+            Assert.AreEqual(string.Format("Page created on {0}.", testDate.ToString("d-MMM-yyyy")), GetTestPropertyValue(model));
         }
 
         [Test]
@@ -28,8 +27,7 @@ namespace Umbraco.Tests.TokenReplacers
             var testDate = DateTime.Now;
             tokenReplacer.ReplaceTokens(model);
 
-            Assert.AreEqual(string.Format("Page created on {0}.", testDate),
-                model.Properties.Single(x => x.Alias == "testProperty").Value.ToString());
+            Assert.AreEqual(string.Format("Page created on {0}.", testDate), GetTestPropertyValue(model));
         }
     }
 }

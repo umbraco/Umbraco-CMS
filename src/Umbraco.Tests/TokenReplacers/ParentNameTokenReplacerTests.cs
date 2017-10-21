@@ -1,11 +1,12 @@
-﻿using System.Linq;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Web.TokenReplacers.Replacers;
 
 namespace Umbraco.Tests.TokenReplacers
 {
+    using Umbraco.Web.Models.ContentEditing;
+
     [TestFixture]
     public class ParentNameTokenReplacerTests : TokenReplacerTests
     {
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.TokenReplacers
 
             tokenReplacer.ReplaceTokens(model);
 
-            Assert.AreEqual("Created from parent with name: Parent", model.Properties.Single(x => x.Alias == "testProperty").Value.ToString());
+            Assert.AreEqual("Created from parent with name: Parent", GetTestPropertyValue(model));
         }
     }
 }
