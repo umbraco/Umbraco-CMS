@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Web.TokenReplacers.Replacers;
 
 namespace Umbraco.Tests.TokenReplacers

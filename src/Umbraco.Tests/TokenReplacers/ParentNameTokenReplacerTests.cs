@@ -5,8 +5,6 @@ using Umbraco.Web.TokenReplacers.Replacers;
 
 namespace Umbraco.Tests.TokenReplacers
 {
-    using Umbraco.Web.Models.ContentEditing;
-
     [TestFixture]
     public class ParentNameTokenReplacerTests : TokenReplacerTests
     {
