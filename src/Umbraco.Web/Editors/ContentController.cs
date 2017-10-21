@@ -20,6 +20,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.TokenReplacers;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
@@ -328,10 +329,19 @@ namespace Umbraco.Web.Editors
 
             var mapped = Mapper.Map<ContentItemDisplay>(blueprint);
 
-            // TODO: apply tokens
+            ApplyTokens(mapped);
 
             RemoveContainerTab(mapped);
             return mapped;
+        }
+
+        private void ApplyTokens(ContentItemDisplay mapped)
+        {
+            var tokenReplacers = TokenReplacerResolver.Current.TokenReplacers;
+            foreach (var tokenReplacer in tokenReplacers)
+            {
+                tokenReplacer.ReplaceTokens(mapped);
+            }
         }
 
         private static void RemoveContainerTab(ContentItemDisplay mapped)

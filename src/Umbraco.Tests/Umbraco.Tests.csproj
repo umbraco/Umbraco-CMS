@@ -198,6 +198,11 @@
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
+    <Compile Include="TokenReplacers\DateTimeTokenReplacerTests.cs" />
+    <Compile Include="TokenReplacers\ParentNameTokenReplacerTests.cs" />
+    <Compile Include="TokenReplacers\ParentIdTokenReplacerTests.cs" />
+    <Compile Include="TokenReplacers\TokenReplacerTests.cs" />
+    <Compile Include="TokenReplacers\NameTokenReplacerTests.cs" />
     <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />

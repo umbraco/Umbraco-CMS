@@ -491,6 +491,15 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
+    <Compile Include="TokenReplacers\Replacers\BaseTokenReplacer.cs" />
+    <Compile Include="TokenReplacers\Replacers\DateTimeTokenReplacer.cs" />
+    <Compile Include="TokenReplacers\Replacers\ParentNameTokenReplacer.cs" />
+    <Compile Include="TokenReplacers\Replacers\ParentIdTokenReplacer.cs" />
+    <Compile Include="TokenReplacers\Replacers\NameTokenReplacer.cs" />
+    <Compile Include="TokenReplacers\TokenReplacerContext.cs" />
+    <Compile Include="TokenReplacers\TokenReplacerResolver.cs" />
+    <Compile Include="TokenReplacers\ITokenReplacer.cs" />
+    <Compile Include="TokenReplacers\ITokenReplacerResolver.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
