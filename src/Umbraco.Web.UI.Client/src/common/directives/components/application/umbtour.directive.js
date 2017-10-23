@@ -119,16 +119,12 @@
 
                     var scrollParent = element.scrollParent();
 
-                    console.log("scrollParent", scrollParent);
-
                     // Detect if scroll is needed
                     if (element[0].offsetTop > scrollParent[0].clientHeight) {
-                        console.log("SCROOOOOOOL");
                         scrollParent.animate({
                             scrollTop: element[0].offsetTop
                         }, function () {
                             // Animation complete.
-                            console.log("ANIMATION COMPLETE");
                             setPopoverPosition(element);
                             backdropService.setHighlight(scope.model.currentStep.element);
                         });
@@ -168,10 +164,6 @@
                             "bottom": documentHeight - (offset.top + height),
                             "left": offset.left
                         };
-
-                        console.log("SPACE", space);
-                        console.log("document width", documentWidth);
-                        console.log("document height", documentHeight);
 
                         // get the posistion with most available space
                         position = findMax(space);
@@ -294,11 +286,9 @@
                 if(scope.model.currentStep.eventElement) {
                     angular.element(scope.model.currentStep.eventElement).off(eventName);
                     angular.element(scope.model.currentStep.eventElement).off(removeEventName);
-                    //console.log("unbind", eventName);
                 } else {
                     angular.element(scope.model.currentStep.element).off(eventName);
                     angular.element(scope.model.currentStep.element).off(removeEventName);
-                    //console.log("unbind", eventName);
                 }
             }
 
