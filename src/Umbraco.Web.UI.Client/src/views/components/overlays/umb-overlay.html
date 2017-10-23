@@ -35,7 +35,7 @@
 
                 <div class="umb-overlay-drawer__align-right">
                     <umb-button
-                        data-element="overlay-cancel-submit"
+                        alias="overlayCancelSubmit"
                         action="cancelConfirmSubmit()"
                         button-style="link"
                         label="Cancel"
@@ -55,7 +55,7 @@
 
             <div class="umb-overlay-drawer__align-right" ng-if="!model.confirmSubmit.show">
                 <umb-button
-                    data-element="overlay-close"
+                    alias="overlayClose"
                     action="closeOverLay()"
                     button-style="link"
                     label-key="{{model.closeButtonLabelKey}}"
@@ -64,7 +64,7 @@
                 </umb-button>
 
                 <umb-button
-                    data-element="overlay-submit"
+                    alias="overlaySubmit"
                     button-style="success"
                     label-key="{{model.submitButtonLabelKey}}"
                     label="{{model.submitButtonLabel}}"

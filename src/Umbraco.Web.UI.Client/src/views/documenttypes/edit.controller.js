@@ -121,6 +121,7 @@
             if (result) {
                 //Models builder mode:
                 vm.page.defaultButton = {
+                    alias: "save",
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
                     labelKey: "buttons_save",
@@ -129,6 +130,7 @@
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
+                    alias: "saveAndGenerateModels",
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
                     labelKey: "buttons_saveAndGenerateModels",

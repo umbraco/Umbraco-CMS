@@ -2,7 +2,7 @@
     
    <umb-button
       ng-if="defaultButton"
-      data-element="button-group-primary"
+      alias="{{defaultButton.alias ? defaultButton.alias : 'groupPrimary' }}"
       type="button"
       action="defaultButton.handler()"
       button-style="success"
@@ -18,8 +18,8 @@
    </a>
 
    <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" ng-if="subButtons.length > 0" role="menu" ng-class="{'-align-right': float === 'right'}">
-      <li data-element="button-group-secondary-{{$index}}" ng-repeat="subButton in subButtons">
-         <a href="#" ng-click="subButton.handler()" hotkey="{{subButton.hotKey}}" hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}" prevent-default>
+      <li ng-repeat="subButton in subButtons">
+         <a data-element="{{subButton.alias ? 'button-' + subButton.alias : 'button-group-secondary-' + $index }}" href="#" ng-click="subButton.handler()" hotkey="{{subButton.hotKey}}" hotkey-when-hidden="{{subButton.hotKeyWhenHidden}}" prevent-default>
             <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
          </a>
       </li>

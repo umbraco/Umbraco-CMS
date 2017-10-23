@@ -50,7 +50,7 @@
             <umb-editor-footer-content-right>
 
                <umb-button
-                  data-element="button-return-to-list-view"
+                  alias="returnToListView"
                   ng-if="page.listViewPath"
                   type="link"
                   href="#{{page.listViewPath}}"
@@ -59,7 +59,7 @@
                </umb-button>
 
                <umb-button
-                  data-element="button-preview"
+                  alias="preview"
                   ng-if="!page.isNew && content.allowPreview"
                   type="button"
                   button-style="info"
