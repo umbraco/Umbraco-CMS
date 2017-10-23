@@ -1,6 +1,9 @@
 ﻿(function () {
     'use strict';
 
+    // comes from https://codepen.io/jakob-e/pen/eNBQaP
+    // works fine with Angular 1.6.5 - alas not with 1.1.5 - binding issue
+
     function PasswordToggleDirective($compile) {
 
         var directive = {
