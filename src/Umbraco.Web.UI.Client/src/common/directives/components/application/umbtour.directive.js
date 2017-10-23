@@ -152,8 +152,8 @@
                     var popoverWidth = popover.outerWidth();
                     var popoverHeight = popover.outerHeight();
                     var popoverOffset = popover.offset();
-                    var documentWidth = $(document).width();
-                    var documentHeight = $(document).height();
+                    var documentWidth = angular.element(document).width();
+                    var documentHeight = angular.element(document).height();
 
                     if(element) {
 
@@ -256,31 +256,50 @@
             }
 
             function bindEvent() {
+
+                var bindToElement = scope.model.currentStep.element;
                 var eventName = scope.model.currentStep.event + ".step-" + scope.model.currentStepIndex;
+                var removeEventName = "remove.step-" + scope.model.currentStepIndex;
+                var handled = false;  
+
                 if(scope.model.currentStep.eventElement) {
-                    $(scope.model.currentStep.eventElement).on(eventName, handleEvent);
-                    console.log("bind", eventName);
-                } else {
-                    $(scope.model.currentStep.element).on(eventName, handleEvent);
-                    console.log("bind", eventName);
+                    bindToElement = scope.model.currentStep.eventElement;
                 }
+
+                $(bindToElement).on(eventName, function(){
+                    if(!handled) {
+                        unbindEvent();
+                        nextStep();
+                        handled = true;
+                    }
+                });
+
+                // Hack: we do this to handle cases where ng-if is used and removes the element we need to click.
+                // for some reason it seems the elements gets removed before the event is raised. This is a temp solution which assumes:
+                // "if you ask me to click on an element, and it suddenly gets removed from the dom, let's go on to the next step".
+                $(bindToElement).on(removeEventName, function () {
+                    if(!handled) {
+                        unbindEvent();
+                        nextStep();
+                        handled = true;
+                    }
+                });
+
             }
 
             function unbindEvent() {
-                var eventName = scope.model.currentStep.event + ".step-" + scope.model.currentStepIndex;                
+                var eventName = scope.model.currentStep.event + ".step-" + scope.model.currentStepIndex;
+                var removeEventName = "remove.step-" + scope.model.currentStepIndex;
+                
                 if(scope.model.currentStep.eventElement) {
-                    $(scope.model.currentStep.eventElement).off(eventName);
-                    console.log("unbind", eventName);
+                    angular.element(scope.model.currentStep.eventElement).off(eventName);
+                    angular.element(scope.model.currentStep.eventElement).off(removeEventName);
+                    //console.log("unbind", eventName);
                 } else {
-                    $(scope.model.currentStep.element).off(eventName);
-                    console.log("unbind", eventName);
+                    angular.element(scope.model.currentStep.element).off(eventName);
+                    angular.element(scope.model.currentStep.element).off(removeEventName);
+                    //console.log("unbind", eventName);
                 }
-            }
-
-            function handleEvent() {
-                //alert("event happened");
-                unbindEvent();
-                nextStep();
             }
 
             function resize() {
@@ -293,6 +312,7 @@
 
             scope.$on('$destroy', function () {
                 $(window).off('resize.umbTour');
+                unbindEvent();
             });
 
         }

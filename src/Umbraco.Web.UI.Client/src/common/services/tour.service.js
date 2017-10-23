@@ -43,20 +43,6 @@
                         content: "This is where you can see details about your user, change your password and log out of Umbraco"
                     },
                     {
-                        element: "[data-element~='overlay-user'] [data-element='button-testy']",
-                        title: "User profile",
-                        content: "This is where you can see details about your user, change your password and log out of Umbraco",
-                        event: "click"
-                    },
-                    /*
-                    {
-                        element: "[data-element~='overlay-user'] [data-element~='button-change-password']",
-                        title: "User profile",
-                        content: "This is where you can see details about your user, change your password and log out of Umbraco",
-                        event: "click"
-                    },
-                    */
-                    {
                         element: "[data-element~='overlay-user'] [data-element='overlay-close']",
                         title: "User profile",
                         content: "Let's close the user profile again",
@@ -255,6 +241,7 @@
                         element: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home']",
                         title: "Open Home template",
                         content: "<p>Click the <b>Home</b> template to open and edit it</p>",
+                        eventElement: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home'] a.umb-tree-item__label",
                         event: "click"
                     },
                     {
