@@ -18,9 +18,7 @@
       uploaded: false
     }
     $scope.togglePassword = function () {
-        console.log('toggle');
         var elem = $("form[name='loginForm'] input[name='password']");
-        console.log(elem);
         elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
     }
 
