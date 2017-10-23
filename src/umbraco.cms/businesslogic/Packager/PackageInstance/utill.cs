@@ -59,7 +59,7 @@ namespace umbraco.cms.businesslogic.packager
             requirements.AppendChild(CreateNode("minor", pack.UmbracoVersion == null ? "0" : pack.UmbracoVersion.Minor.ToInvariantString(), doc));
             requirements.AppendChild(CreateNode("patch", pack.UmbracoVersion == null ? "0" : pack.UmbracoVersion.Build.ToInvariantString(), doc));
             if (pack.UmbracoVersion != null)
-            {                
+            {
                 requirements.Attributes.Append(CreateAttribute("type", "strict", doc));
             }
             package.AppendChild(requirements);
@@ -294,8 +294,14 @@ namespace umbraco.cms.businesslogic.packager
                         }
                     }
                 }
+
+                using (var fileStream = new FileStream(savePath, FileMode.Create))
+                {
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    memoryStream.CopyTo(fileStream);
+                }
             }
-            
+
         }
 
         private static ArrayList GenerateFileList(string Dir)
