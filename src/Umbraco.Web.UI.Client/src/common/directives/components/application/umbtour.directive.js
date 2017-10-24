@@ -67,14 +67,16 @@
                         scope.model.currentStep = {};
                         // set popover position to center
                         setPopoverPosition(null);
-                        // remove backdrop hightlight
+                        // remove backdrop hightlight and custom opacity
                         backdropService.setHighlight(null);
+                        backdropService.setOpacity(null);
                     });
                 }
             }
 
             function startStep() {
                 scope.loadingStep = true;
+                backdropService.setOpacity(scope.model.steps[scope.model.currentStepIndex].backdropOpacity);
                 backdropService.setHighlight(null);
 
                 waitForPendingRerequests().then(function() {

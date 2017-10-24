@@ -19,7 +19,8 @@
                     {
                         element: "#applications",
                         title: "Sections",
-                        content: "These are the <b>Sections</b> and allows you to navigate the different areas of Umbraco."
+                        content: "These are the <b>Sections</b> and allows you to navigate the different areas of Umbraco.",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "#tree",
@@ -34,8 +35,9 @@
                     {
                         element: "#applications [data-element='section-user']",
                         title: "User profile",
-                        content: "Click here to open the user profile dialog.",
-                        event: "click"
+                        content: "Click on the <b>user photo</b> to open the user profile dialog.",
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "[data-element~='overlay-user']",
@@ -52,12 +54,14 @@
                         element: "#applications [data-element='section-help']",
                         title: "Help",
                         content: "If you ever find yourself in trouble click here to open the help drawer.",
-                        event: "click"
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "[data-element='drawer']",
                         title: "Help",
-                        content: "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>"
+                        content: "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
+                        backdropOpacity: 0.6
                     }
                 ]
             },
@@ -75,7 +79,8 @@
                         element: "#applications [data-element='section-settings']",
                         title: "Navigate to the settings sections",
                         content: "In the <b>Settings section</b> we will find the document types.",
-                        event: "click"
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "#tree [data-element='tree-item-documentTypes']",
@@ -227,7 +232,8 @@
                         element: "#applications [data-element='section-settings']",
                         title: "Navigate to the Settings section",
                         content: "<p>In the <b>Settings</b> section you will find all the templates</p><p>It is of course also possible to edit all your code files in your favorite code editor.</p>",
-                        event: "click"
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "#tree [data-element='tree-item-templates']",
@@ -303,7 +309,8 @@
                         element: "#applications [data-element='section-media']",
                         title: "Navigate to the media section",
                         content: "The <b>media</b> section is where you will manage all your media items.",
-                        event: "click"
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "#tree [data-element='tree-root']",

@@ -16,7 +16,7 @@
 
             function onInit() {
 
-                if (scope.element) {
+                if (scope.highlightElement) {
                     setHighlight();
                 }
 
@@ -27,7 +27,7 @@
                 $timeout(function () {
 
                     // The element to highlight
-                    var highlightElement = angular.element(scope.element);
+                    var highlightElement = angular.element(scope.highlightElement);
 
                     if(highlightElement && highlightElement.length > 0) {
 
@@ -63,7 +63,7 @@
                 setHighlight();
             }
 
-            events.push(scope.$watch("element", function (newValue, oldValue) {
+            events.push(scope.$watch("highlightElement", function (newValue, oldValue) {
                 if(!newValue) {return;}
                 if(newValue === oldValue) {return;}
                 setHighlight();
@@ -90,8 +90,9 @@
             templateUrl: "views/components/application/umb-backdrop.html",
             link: link,
             scope: {
-                element: "=",
-                disableEventsOnClick: "="
+                backdropOpacity: "=?",
+                highlightElement: "=?",
+                disableEventsOnClick: "=?",
             }
         };
 

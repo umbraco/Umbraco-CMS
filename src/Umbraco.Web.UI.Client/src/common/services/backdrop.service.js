@@ -4,6 +4,7 @@
     function backdropService(eventsService) {
 
         var args = {
+            opacity: null,
             element: null,
             disableEventsOnClick: false,
             show: false
@@ -25,10 +26,13 @@
         }
 
         function close() {
-
             args.element = null;
             args.show = false;
+            eventsService.emit("appState.backdrop", args);
+        }
 
+        function setOpacity(opacity) {
+            args.opacity = opacity;
             eventsService.emit("appState.backdrop", args);
         }
 
@@ -40,6 +44,7 @@
         var service = {
             open: open,
             close: close,
+            setOpacity: setOpacity,
             setHighlight: setHighlight
         };
 

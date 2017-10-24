@@ -1,15 +1,15 @@
 <div ng-click="clickBackdrop($event)">
     <!-- Backdrop with highlight -->
-    <svg ng-if="element" class="umb-backdrop" xmlns="http://www.w3.org/2000/svg" version="1.1">
-        <rect class="umb-backdrop__rect umb-backdrop__rect--left" height="100%"/>
-        <rect class="umb-backdrop__rect umb-backdrop__rect--top" width="100%"/>
-        <rect class="umb-backdrop__rect umb-backdrop__rect--bottom" width="100%"/>
-        <rect class="umb-backdrop__rect umb-backdrop__rect--right" height="100%" width="100%"/>
+    <svg ng-if="highlightElement" class="umb-backdrop" xmlns="http://www.w3.org/2000/svg" version="1.1" ng-style="{'fill-opacity': backdropOpacity }">
+        <rect class="umb-backdrop__rect umb-backdrop__rect--left" height="100%" />
+        <rect class="umb-backdrop__rect umb-backdrop__rect--top" width="100% "/>
+        <rect class="umb-backdrop__rect umb-backdrop__rect--bottom" width="100%" />
+        <rect class="umb-backdrop__rect umb-backdrop__rect--right" height="100%" width="100%" />
     </svg>
 
     <!-- Full screen backdrop -->
-    <svg ng-if="!element" class="umb-backdrop" xmlns="http://www.w3.org/2000/svg" version="1.1">
-        <rect  class="umb-backdrop__rect" height="100%" width="100%"/>
+    <svg ng-if="!highlightElement" class="umb-backdrop" xmlns="http://www.w3.org/2000/svg" version="1.1" ng-style="{'fill-opacity': backdropOpacity }">
+        <rect  class="umb-backdrop__rect" height="100%" width="100%" />
     </svg>
 
 </div>
