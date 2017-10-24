@@ -128,11 +128,11 @@
                         }, function () {
                             // Animation complete.
                             setPopoverPosition(element);
-                            backdropService.setHighlight(scope.model.currentStep.element);
+                            backdropService.setHighlight(scope.model.currentStep.element, scope.model.currentStep.elementPreventClick);
                         });
                     } else {
                         setPopoverPosition(element);
-                        backdropService.setHighlight(scope.model.currentStep.element);
+                        backdropService.setHighlight(scope.model.currentStep.element, scope.model.currentStep.elementPreventClick);
                     }
 
                 });

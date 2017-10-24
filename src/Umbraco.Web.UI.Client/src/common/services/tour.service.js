@@ -18,12 +18,14 @@
                     },
                     {
                         element: "#applications",
+                        elementPreventClick: true,
                         title: "Sections",
                         content: "These are the <b>Sections</b> and allows you to navigate the different areas of Umbraco.",
                         backdropOpacity: 0.6
                     },
                     {
                         element: "#tree",
+                        elementPreventClick: true,
                         title: "The Tree",
                         content: "This is the <b>Tree</b> and will contain all the content of your website."
                     },
@@ -41,6 +43,7 @@
                     },
                     {
                         element: "[data-element~='overlay-user']",
+                        elementPreventClick: true,
                         title: "User profile",
                         content: "<p>This is where you can see details about your user, change your password and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advaned user management.</p>"
                     },
@@ -59,6 +62,7 @@
                     },
                     {
                         element: "[data-element='drawer']",
+                        elementPreventClick: true,
                         title: "Help",
                         content: "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
                         backdropOpacity: 0.6
@@ -142,6 +146,7 @@
                     },
                     {
                         element: "[data-element~='overlay-editor-picker']",
+                        elementPreventClick: true,
                         title: "Editor picker",
                         content: "<p>In the editor picker dialog we can pick one of the many build in editor.</p>"
                     },
@@ -153,6 +158,7 @@
                     },
                     {
                         element: "[data-element~='overlay-editor-settings']",
+                        elementPreventClick: true,
                         title: "Editor settings",
                         content: "Each property editor can have individual settings. We don't want to change any of these now."
                     },

@@ -6,6 +6,7 @@
         var args = {
             opacity: null,
             element: null,
+            elementPreventClick: false,
             disableEventsOnClick: false,
             show: false
         };
@@ -36,8 +37,9 @@
             eventsService.emit("appState.backdrop", args);
         }
 
-        function setHighlight(element) {
+        function setHighlight(element, preventClick) {
             args.element = element;
+            args.elementPreventClick = preventClick;
             eventsService.emit("appState.backdrop", args);
         }
 

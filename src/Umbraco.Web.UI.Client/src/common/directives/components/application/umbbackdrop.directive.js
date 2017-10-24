@@ -53,6 +53,12 @@
                         rectBottom.css({ "height": "100%", "y": topAndHeight, "x": leftDistance });                    
                         rectLeft.css({ "width": leftDistance });
 
+                        // Prevent interaction in the highlighted area
+                        if(scope.highlightPreventClick) {
+                            var preventClickElement = el.find(".umb-backdrop__highlight-prevent-click");
+                            preventClickElement.css({ "width": width, "height": height, "left": offset.left, "top": offset.top });
+                        }
+
                     }
 
                 });
@@ -92,6 +98,7 @@
             scope: {
                 backdropOpacity: "=?",
                 highlightElement: "=?",
+                highlightPreventClick: "=?",
                 disableEventsOnClick: "=?",
             }
         };
