@@ -295,7 +295,7 @@
                     {
                         element: "[data-element='editor-content'] [data-element='property-_umb_urls']",
                         title: "Open page",
-                        content: "<p>Click the <b>Link</b> to view your page.</p><p>Tip: Click the preview button in the bottom right corner to preview changes without publishing them.</p>",
+                        content: "<p>Click the <b>Link to document</b> <i class='icon-out'></i> to view your page.</p><p>Tip: Click the preview button in the bottom right corner to preview changes without publishing them.</p>",
                         event: "click",
                         eventElement: "[data-element='editor-content'] [data-element='property-_umb_urls'] a[target='_blank']"
                     }
