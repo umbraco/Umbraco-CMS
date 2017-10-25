@@ -1041,15 +1041,15 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <!-- Only runs if the Belle build folder doesn't yet exist -->
     <Message Text="Skipping BelleBuild because UmbracoBuild is '$(UmbracoBuild)', " Importance="High" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Running BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib does not exist" Importance="High" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib')" />
-    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
-    <Message Text="Skipping BelleBuild because $(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib exists or UmbracoBuild is not set" Importance="High" Condition="Exists('$(ProjectDir)\..\Umbraco.Web.UI\Umbraco\lib') and '$(UmbracoBuild)' == ''" />
+    <Message Text="Skipping BelleBuild because $(ProjectDir)Umbraco\lib exists." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib')" />
+    <Message Text="Running BelleBuild." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
+    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
   </Target>
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
   </Target>
   <Target Name="BelleBuild" BeforeTargets="Rebuild" Condition=" '$(UmbracoBuild)' == '' ">
-    <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = $pwd\build\build.ps1 -get ; $ubuild.CompileBelle() }&quot;" />
+    <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = &amp;&quot;$pwd\build\build.ps1&quot; -get ; $ubuild.CompileBelle() }&quot;" />
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.5\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.5\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
