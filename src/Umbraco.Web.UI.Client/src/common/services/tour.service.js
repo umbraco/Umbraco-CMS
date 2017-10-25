@@ -314,12 +314,6 @@
             return groupedTours;
         }
 
-        function getCompletedTours() {
-            var completedTours = localStorageService.get(localStorageKey);
-            var aliases = _.pluck(completedTours, "alias");
-            return aliases;
-        }
-
         ///////////
 
         function setCompletedTours() {
@@ -376,8 +370,7 @@
             endTour: endTour,
             completeTour: completeTour,
             getAllTours: getAllTours,
-            getGroupedTours: getGroupedTours,
-            getCompletedTours: getCompletedTours
+            getGroupedTours: getGroupedTours
         };
 
         return service;

@@ -1,6 +1,21 @@
 <div class="umb-dashboard-grid" ng-controller="Umbraco.Dashboard.StartUpDynamicContentController as vm">
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+    
+    <!-- Tours -->
+    <div>
+        <div ng-repeat="(key,value) in vm.tours">
+            <h5>
+                <span ng-if="key !== 'undefined'">{{key}}</span>                    
+                <span ng-if="key === 'undefined'">Other</span>
+            </h5>
+            <div ng-repeat="tour in value">
+                {{ tour.name }}
+                <div ng-if="tour.completed">Completed</div>
+                <button ng-click="vm.startTour(tour)">Start</button>
+            </div>
+        </div>
+    </div>
 
     <div class="row clearfix" ng-if="vm.dashboard">
         <!-- Sections -->

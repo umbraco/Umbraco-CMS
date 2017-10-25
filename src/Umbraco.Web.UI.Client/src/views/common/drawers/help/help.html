@@ -4,19 +4,8 @@
         title="{{ vm.title }}"
         description="{{ vm.subtitle }}">
     </umb-drawer-header>
-
+    
     <umb-drawer-content>
-
-        <!-- Tours -->
-        <umb-dropdown-block ng-repeat="(key,value) in vm.tours" title="key" circle="true" percentage="60">
-            <umb-dropdown-block-item
-                on-start="vm.startTour(tour)"
-                tick="true"
-                name="{{ tour.name }}"
-                completed="{{ tour.completed }}"
-                ng-repeat="tour in value">
-            </umb-dropdown-block-item>
-        </umb-dropdown-block>
 
         <!-- Show in custom help dashboard -->
         <div style="margin-bottom: 20px;" ng-if="vm.customDashboard.length > 0">
