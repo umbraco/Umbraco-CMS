@@ -207,7 +207,7 @@ namespace Umbraco.Core
                     return _currentAssembliesHash;
 
                 _currentAssembliesHash = GetFileHash(new List<Tuple<FileSystemInfo, bool>>
-					{
+                    {
 						// the bin folder and everything in it
 						new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)), false),
 						// the app code folder and everything in it
@@ -216,7 +216,7 @@ namespace Umbraco.Core
 						new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
                         // trees.config - use the contents to create the hash since this gets resaved on every app startup!
                         new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
-					}, _logger);
+                    }, _logger);
 
                 return _currentAssembliesHash;
             }
@@ -601,7 +601,7 @@ namespace Umbraco.Core
             if (cache == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
                 return ResolveTypesInternal(
-                    typeof (T), null,
+                    typeof(T), null,
                     () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
                     cache);
             }
@@ -610,14 +610,14 @@ namespace Umbraco.Core
             // filter the cached discovered types (and cache the result)
 
             var discovered = ResolveTypesInternal(
-                typeof (IDiscoverable), null,
+                typeof(IDiscoverable), null,
                 () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
                 true);
 
             return ResolveTypesInternal(
-                typeof (T), null,
+                typeof(T), null,
                 () => discovered
-                    .Where(x => typeof (T).IsAssignableFrom(x)),
+                    .Where(x => typeof(T).IsAssignableFrom(x)),
                 true);
         }
 
@@ -640,7 +640,7 @@ namespace Umbraco.Core
             if (cache == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
                 return ResolveTypesInternal(
-                    typeof (T), typeof (TAttribute),
+                    typeof(T), typeof(TAttribute),
                     () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(specificAssemblies ?? AssembliesToScan),
                     cache);
             }
@@ -649,12 +649,12 @@ namespace Umbraco.Core
             // filter the cached discovered types (and cache the result)
 
             var discovered = ResolveTypesInternal(
-                typeof (IDiscoverable), null,
+                typeof(IDiscoverable), null,
                 () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
                 true);
 
             return ResolveTypesInternal(
-                typeof (T), typeof (TAttribute),
+                typeof(T), typeof(TAttribute),
                 () => discovered
                     .Where(x => typeof(T).IsAssignableFrom(x))
                     .Where(x => x.GetCustomAttributes<TAttribute>(false).Any()),
@@ -676,7 +676,7 @@ namespace Umbraco.Core
             cache &= specificAssemblies == null;
 
             return ResolveTypesInternal(
-                typeof (object), typeof (TAttribute),
+                typeof(object), typeof(TAttribute),
                 () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 cache);
         }
@@ -694,13 +694,13 @@ namespace Umbraco.Core
             var name = ResolvedName(baseType, attributeType);
 
             lock (_typesLock)
-            using (_logger.TraceDuration<PluginManager>(
-                "Resolving " + name,
-                "Resolved " + name)) // cannot contain typesFound.Count as it's evaluated before the find
-            {
-                // resolve within a lock & timer
-                return ResolveTypesInternalLocked(baseType, attributeType, finder, cache);
-            }
+                using (_logger.TraceDuration<PluginManager>(
+                    "Resolving " + name,
+                    "Resolved " + name)) // cannot contain typesFound.Count as it's evaluated before the find
+                {
+                    // resolve within a lock & timer
+                    return ResolveTypesInternalLocked(baseType, attributeType, finder, cache);
+                }
         }
 
         private static string ResolvedName(Type baseType, Type attributeType)
@@ -836,7 +836,7 @@ namespace Umbraco.Core
 
             public TypeListKey(Type baseType, Type attributeType)
             {
-                BaseType = baseType ?? typeof (object);
+                BaseType = baseType ?? typeof(object);
                 AttributeType = attributeType;
             }
 
@@ -854,7 +854,7 @@ namespace Umbraco.Core
 
                 var hash = 5381;
                 hash = ((hash << 5) + hash) ^ BaseType.GetHashCode();
-                hash = ((hash << 5) + hash) ^ (AttributeType ?? typeof (TypeListKey)).GetHashCode();
+                hash = ((hash << 5) + hash) ^ (AttributeType ?? typeof(TypeListKey)).GetHashCode();
                 return hash;
             }
         }
@@ -917,7 +917,7 @@ namespace Umbraco.Core
         {
             // look for IParameterEditor (fast, IDiscoverable) then filter
 
-            var propertyEditor = typeof (PropertyEditor);
+            var propertyEditor = typeof(PropertyEditor);
 
             return mgr.ResolveTypes<IParameterEditor>()
                 .Where(x => propertyEditor.IsAssignableFrom(x) && x != propertyEditor);
@@ -932,8 +932,8 @@ namespace Umbraco.Core
         /// </remarks>
         public static IEnumerable<Type> ResolveParameterEditors(this PluginManager mgr)
         {
-            var propertyEditor = typeof (PropertyEditor);
-            var parameterEditor = typeof (ParameterEditor);
+            var propertyEditor = typeof(PropertyEditor);
+            var parameterEditor = typeof(ParameterEditor);
 
             return mgr.ResolveTypes<IParameterEditor>()
                 .Where(x => x != propertyEditor && x != parameterEditor);

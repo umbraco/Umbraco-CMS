@@ -124,7 +124,7 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual void ResetPluginManager()
         {
             PluginManager.Current = null;
-        }        
+        }
 
         protected virtual CacheHelper CreateCacheHelper()
         {
