@@ -1,0 +1,20 @@
+<div>
+    <div>
+        <details class="umb-tour__dropdown-contaiener">
+            <summary>
+                <span class="umb-tour__dropdown-title">{{ title }}</span>
+                <div class="umb-tour__progress-circle-container" ng-if="circle == true">
+                    <umb-progress-circle
+                        percentage="{{ percentage }}"
+                        size="50"
+                        font-size=""
+                        stroke-color="">
+                    </umb-progress-circle>
+                </div>
+            </summary>
+            <div class="umb-tour__dropdown-list" ng-transclude>
+
+            </div>
+        </details>
+    </div>
+</div>
