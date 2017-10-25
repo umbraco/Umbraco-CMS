@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState) {
+    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter) {
 
         var vm = this;
         var evts = [];
@@ -14,6 +14,21 @@
         vm.customDashboard = null;
 
         vm.closeDrawer = closeDrawer;
+
+        vm.startTour = startTour;
+        
+        vm.tours = tourService.getGroupedTours();
+    
+        function startTour(tour) {
+            tourService.startTour(tour);
+        }
+
+
+        // Finding out, how many tours are completed for the progress circle
+        var completedLength = tourService.getCompletedTours().length;
+        var tourLength = tourService.getAllTours().length;
+
+        $scope.tourPercentage = (completedLength/tourLength)*100 
 
         function oninit() {
 
