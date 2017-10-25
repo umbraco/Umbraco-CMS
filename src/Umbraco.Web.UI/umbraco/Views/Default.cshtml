@@ -56,7 +56,7 @@
     <div ng-hide="!authenticated" ng-cloak>
     
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
-        <umb-drawer ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
         
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
@@ -68,7 +68,7 @@
 
             <umb-tour
                 ng-if="tour.show"
-                tour="tour">
+                model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>
@@ -79,7 +79,9 @@
 
     <umb-backdrop
         ng-if="backdrop.show"
-        element="backdrop.element"
+        backdrop-opacity="backdrop.opacity"
+        highlight-element="backdrop.element"
+        highlight-prevent-click="backdrop.elementPreventClick"
         disable-events-on-click="backdrop.disableEventsOnClick">
     </umb-backdrop>
 

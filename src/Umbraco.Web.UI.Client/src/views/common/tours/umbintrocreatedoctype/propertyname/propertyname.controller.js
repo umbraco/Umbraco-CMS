@@ -4,7 +4,7 @@
     function PropertyNameController($scope) {
         
         var vm = this;
-        var element = angular.element($scope.currentStep.element);
+        var element = angular.element($scope.model.currentStep.element);
 
         vm.error = false;
         
@@ -12,7 +12,7 @@
 
         function initNextStep() {
             if(element.val() === 'Welcome Text') {
-                $scope.nextStep();
+                $scope.model.nextStep();
             } else {
                 vm.error = true;
             }

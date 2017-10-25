@@ -7,7 +7,10 @@
             restrict: 'E',
             replace: true,
             transclude: true,
-            templateUrl: 'views/components/application/umbtour/umb-tour-step.html'
+            templateUrl: 'views/components/application/umbtour/umb-tour-step.html',
+            scope: {
+                size: "@?"
+            }
         };
 
         return directive;

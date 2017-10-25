@@ -1,26 +1,30 @@
-<umb-tour-step ng-controller="Umbraco.Tours.UmbIntroCreateDocType.PropertyNameController as vm">
+<div ng-controller="Umbraco.Tours.UmbIntroCreateDocType.PropertyNameController as vm">
+
+    <umb-tour-step>
+            
+        <umb-tour-step-header
+            title="model.currentStep.title">
+        </umb-tour-step-header>
         
-    <umb-tour-step-header
-        title="currentStep.title">
-    </umb-tour-step-header>
-    
-    <umb-tour-step-content
-        content="currentStep.content">
-        <div ng-if="vm.error" class="color-red" style="margin-top: 5px;">Please enter <b>Welcome Text</b> in the field</div>
-    </umb-tour-step-content>
+        <umb-tour-step-content
+            content="model.currentStep.content">
+            <div ng-if="vm.error" class="color-red" style="margin-top: 5px;">Please enter <b>Welcome Text</b> in the field</div>
+        </umb-tour-step-content>
 
-    <umb-tour-step-footer class="flex justify-between items-center">
+        <umb-tour-step-footer class="flex justify-between items-center">
 
-        <umb-tour-step-counter
-            current-step="currentStepIndex + 1"
-            total-steps="tour.steps.length">
-        </umb-tour-step-counter>
+            <umb-tour-step-counter
+                current-step="model.currentStepIndex + 1"
+                total-steps="model.steps.length">
+            </umb-tour-step-counter>
 
-        <div>
-            <umb-button size="xs" button-style="link" type="button" action="endTour()" label="End tour"></umb-button>
-            <umb-button size="xs" button-style="success" type="button" action="vm.initNextStep()" label="Next"></umb-button>
-        </div>
+            <div>
+                <umb-button size="xs" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>
+                <umb-button size="xs" button-style="success" type="button" action="vm.initNextStep()" label="Next"></umb-button>
+            </div>
 
-    </umb-tour-step-footer>
+        </umb-tour-step-footer>
 
-</umb-tour-step>
+    </umb-tour-step>
+
+</div>

@@ -30,7 +30,7 @@
                         <div ng-class="{'btn-group umb-era-button-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
                             
                             <button
-                                data-element="button-master-template"
+                                data-element="button-masterTemplate"
                                 type="button"
                                 class="umb-era-button umb-button--s"
                                 ng-click="vm.openMasterTemplateOverlay()">
@@ -75,7 +75,7 @@
                         </div>
 
                         <button
-                            data-element="button-query-builder"
+                            data-element="button-queryBuilder"
                             type="button"
                             style="margin-right: 10px;"
                             class="umb-era-button umb-button--s"
@@ -118,7 +118,7 @@
             <umb-editor-footer-content-right>
 
                <umb-button
-                  data-element="button-save"
+                  alias="save"
                   type="submit"
                   button-style="success"
                   state="vm.page.saveButtonState"

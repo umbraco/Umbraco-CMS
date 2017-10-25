@@ -4,12 +4,12 @@
     function TemplatesTreeController($scope) {
         
         var vm = this;
-        var eventElement = angular.element($scope.currentStep.eventElement);
+        var eventElement = angular.element($scope.model.currentStep.eventElement);
         
         function onInit() {
             // check if tree is already open - if it is - go to next step
             if(eventElement.hasClass("icon-navigation-down")) {
-                $scope.nextStep();
+                $scope.model.nextStep();
             }
         }
 

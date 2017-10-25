@@ -28,8 +28,21 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     vm.startTour = startTour;
 
     function onInit() {
+        
         // load tours
         vm.tours = tourService.getGroupedTours();
+        
+        // get list of completed tours
+        var completedTours = tourService.getCompletedTours();
+
+        // get intro tour
+        var introTour = tourService.getTourByAlias("umbIntroIntroduction");
+        
+        // start tour if it hasn't been completed
+        if(completedTours.indexOf(introTour.alias) === -1) {
+            tourService.startTour(introTour);
+        }
+        
     }
 
     function startTour(tour) {
