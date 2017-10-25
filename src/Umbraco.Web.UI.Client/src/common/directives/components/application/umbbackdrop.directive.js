@@ -16,7 +16,7 @@
 
             function onInit() {
 
-                if (scope.element) {
+                if (scope.highlightElement) {
                     setHighlight();
                 }
 
@@ -27,13 +27,13 @@
                 $timeout(function () {
 
                     // The element to highlight
-                    var highlightElement = angular.element(scope.element);
+                    var highlightElement = angular.element(scope.highlightElement);
 
-                    if(highlightElement) {
+                    if(highlightElement && highlightElement.length > 0) {
 
                         var offset = highlightElement.offset();
-                        var width = highlightElement.outerWidth(true);
-                        var height = highlightElement.outerHeight(true);
+                        var width = highlightElement.outerWidth();
+                        var height = highlightElement.outerHeight();
 
                         // Rounding numbers
                         var topDistance = offset.top.toFixed();
@@ -53,6 +53,12 @@
                         rectBottom.css({ "height": "100%", "y": topAndHeight, "x": leftDistance });                    
                         rectLeft.css({ "width": leftDistance });
 
+                        // Prevent interaction in the highlighted area
+                        if(scope.highlightPreventClick) {
+                            var preventClickElement = el.find(".umb-backdrop__highlight-prevent-click");
+                            preventClickElement.css({ "width": width, "height": height, "left": offset.left, "top": offset.top });
+                        }
+
                     }
 
                 });
@@ -63,7 +69,7 @@
                 setHighlight();
             }
 
-            events.push(scope.$watch("element", function (newValue, oldValue) {
+            events.push(scope.$watch("highlightElement", function (newValue, oldValue) {
                 if(!newValue) {return;}
                 if(newValue === oldValue) {return;}
                 setHighlight();
@@ -90,8 +96,10 @@
             templateUrl: "views/components/application/umb-backdrop.html",
             link: link,
             scope: {
-                element: "=",
-                disableEventsOnClick: "="
+                backdropOpacity: "=?",
+                highlightElement: "=?",
+                highlightPreventClick: "=?",
+                disableEventsOnClick: "=?",
             }
         };
 
