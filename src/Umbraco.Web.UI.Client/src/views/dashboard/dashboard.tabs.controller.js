@@ -28,19 +28,21 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     vm.startTour = startTour;
 
     function onInit() {
+
+        var introTourAlias = "umbIntroIntroduction";
         
         // load tours
         vm.tours = tourService.getGroupedTours();
         
         // get list of completed tours
         var completedTours = tourService.getCompletedTours();
-
-        // get intro tour
-        var introTour = tourService.getTourByAlias("umbIntroIntroduction");
         
         // start tour if it hasn't been completed
-        if(completedTours.indexOf(introTour.alias) === -1) {
-            tourService.startTour(introTour);
+        if(completedTours.indexOf(introTourAlias) === -1) {
+            var introTour = tourService.getTourByAlias(introTourAlias);
+            if(introTour) {
+                tourService.startTour(introTour);
+            }
         }
         
     }
@@ -94,14 +96,20 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     };
 
     evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
-        $timeout(function(){
+        $timeout(function () {
             angular.forEach(vm.tours, function (tourGroup) {
                 angular.forEach(tourGroup, function (tour) {
-                    if(tour.alias === completedTour.alias) {
+                    if (tour.alias === completedTour.alias) {
                         tour.completed = true;
                     }
                 });
             });
+        });
+    }));
+
+    evts.push(eventsService.on("appState.tour.updatedTours", function (name, tours) {
+        $timeout(function(){
+            vm.tours = tourService.getGroupedTours();
         });
     }));
     
