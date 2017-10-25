@@ -48,14 +48,14 @@
                <span class="umb-breadcrumbs__seperator">&#47;</span>
             </li>
 
-            <li class="umb-breadcrumbs__ancestor" ng-if="!lockedFolder">
+            <li class="umb-breadcrumbs__ancestor" ng-show="!lockedFolder">
                <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
                   <i class="icon icon-add small"></i>
                </a>
 
                <input
                   type="text"
-                  class="input-foldername input-mini inline"
+                  class="umb-breadcrumbs__add-ancestor"
                   ng-show="showFolderInput"
                   ng-model="newFolderName"
                   ng-keydown="enterSubmitFolder($event)"

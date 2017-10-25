@@ -1087,6 +1087,15 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="colorpicker">
     <key alias="noColors">You have not configured any approved colors</key>
   </area>
+  <area alias="contentPicker">
+      <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
+      <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
+  </area>
+  <area alias="mediaPicker">
+      <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
+      <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
+      <key alias="deletedItem">Deleted item</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
     <key alias="chooseInternal">choose internal page</key>
@@ -1405,6 +1414,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+    <key alias="maxItems">Maximum items</key>
+    <key alias="maxItemsDescription">Leave blank or set to 0 for unlimited</key>
     <key alias="setAsDefault">Set as default</key>
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>

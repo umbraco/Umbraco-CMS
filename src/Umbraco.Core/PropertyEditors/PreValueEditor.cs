@@ -178,29 +178,25 @@ namespace Umbraco.Core.PropertyEditors
             return result;
         }
 
-        private void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
+        protected void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
         {
-            //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
-            // so they can be consumed as real json in angular!
+            // convert values that are Json to true Json objects that can be consumed by Angular
 
             var keys = result.Keys.ToArray();
             for (var i = 0; i < keys.Length; i++)
             {
-                if (result[keys[i]] is string)
+                if ((result[keys[i]] is string) == false) continue;
+
+                var asString = result[keys[i]].ToString();
+                if (asString.DetectIsJson() == false) continue;
+
+                try
                 {
-                    var asString = result[keys[i]].ToString();
-                    if (asString.DetectIsJson())
-                    {
-                        try
-                        {
-                            var json = JsonConvert.DeserializeObject(asString);
-                            result[keys[i]] = json;
-                        }
-                        catch
-                        {
-                            //swallow this exception, we thought it was json but it really isn't so continue returning a string
-                        }
-                    }
+                    result[keys[i]] = JsonConvert.DeserializeObject(asString);
+                }
+                catch
+                {
+                    // swallow this exception, we thought it was Json but it really isn't so continue returning a string
                 }
             }
         }

@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Urls,
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
-                            ? new[] {"Cannot generate urls without a current Umbraco Context"}
+                            ? new[] { "Cannot generate urls without a current Umbraco Context" }
                             : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.AllowPreview, expression => expression.Ignore())
@@ -85,8 +85,8 @@ namespace Umbraco.Web.Models.Mapping
 
         private static DateTime? GetPublishedDate(IContent content)
         {
-            var date = ((Content) content).PublishedDate;
-            return date == default (DateTime) ? (DateTime?) null : date;
+            var date = ((Content)content).PublishedDate;
+            return date == default(DateTime) ? (DateTime?)null : date;
         }
 
         /// <summary>
@@ -111,11 +111,17 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-            
+
+            //set default template if template isn't set
+            if (string.IsNullOrEmpty(display.TemplateAlias))
+                display.TemplateAlias = content.ContentType.DefaultTemplate == null
+                    ? string.Empty
+                    : content.ContentType.DefaultTemplate.Alias;
+
             if (content.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
-            }            
+            }
 
             TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText);
         }

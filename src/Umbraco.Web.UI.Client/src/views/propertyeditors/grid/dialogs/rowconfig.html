@@ -48,14 +48,18 @@
                   <a href ng-click="scaleDown(currentCell)">
                       <i class="icon icon-remove"></i>
                   </a>
-                      {{currentCell.grid}}
+                  {{currentCell.grid}}
                   <a href ng-click="scaleUp(currentCell, availableRowSpace, true)">
                       <i class="icon icon-add"></i>
                   </a>
               </div>
           </umb-control-group>
+          
+          <umb-control-group label="@grid_maxItems" description="@grid_maxItemsDescription">
+              <input type="number" ng-model="currentCell.maxItems" class="umb-editor-tiny" placeholder="Max" min="0" />
+          </umb-control-group>
 
-	  	  <umb-control-group hide-label="true">
+          <umb-control-group hide-label="true">
 	  		  <i class="icon-delete red"></i>
 	  		  <a class="btn btn-small btn-link" href="" ng-click="deleteArea(currentCell, currentRow)">
 	  			  <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
