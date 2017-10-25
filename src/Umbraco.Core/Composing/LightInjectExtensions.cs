@@ -10,14 +10,14 @@ namespace Umbraco.Core.Composing
     /// <summary>
     /// Provides extensions to LightInject.
     /// </summary>
-    internal static class LightInjectExtensions
+    public static class LightInjectExtensions
     {
         /// <summary>
         /// Configure the container for Umbraco Core usage and assign to Current.
         /// </summary>
         /// <param name="container">The container.</param>
         /// <remarks>The container is now the unique application container and is now accessible via Current.Container.</remarks>
-        public static void ConfigureUmbracoCore(this ServiceContainer container)
+        internal static void ConfigureUmbracoCore(this ServiceContainer container)
         {
             // supports annotated constructor injections
             // eg to specify the service name on some services

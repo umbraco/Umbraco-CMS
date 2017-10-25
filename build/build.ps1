@@ -1,11 +1,11 @@
 
   param (
-    # load but don't execute
+    # get, don't execute
     [Parameter(Mandatory=$false)]
-    [Alias("n")]
-    [switch] $nop = $false,
+    [Alias("g")]
+    [switch] $get = $false,
 
-    # run local - don't download, assume everything is ready
+    # run local, don't download, assume everything is ready
     [Parameter(Mandatory=$false)]
     [Alias("l")]
     [Alias("loc")]
@@ -13,74 +13,31 @@
 
     # keep the build directories, don't clear them
     [Parameter(Mandatory=$false)]
-    [Alias("k")]
-    [Alias("keep")]
-    [switch] $keepBuildDirs = $false
+    [Alias("c")]
+    [Alias("cont")]
+    [switch] $continue = $false
   )
-
-  Write-Host "Umbraco.Cms Build"
 
   # ################################################################
   # BOOTSTRAP
   # ################################################################
 
-  # ensure we have temp folder for downloads
-  $scriptRoot = "$PSScriptRoot"
-  $scriptTemp = "$scriptRoot\temp"
-  if (-not (test-path $scriptTemp)) { mkdir $scriptTemp > $null }
-
-  # get NuGet
-  $cache = 4
-  $nuget = "$scriptTemp\nuget.exe"
-  if (-not $local)
-  {
-    $source = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-    if ((test-path $nuget) -and ((ls $nuget).CreationTime -lt [DateTime]::Now.AddDays(-$cache)))
-    {
-      Remove-Item $nuget -force -errorAction SilentlyContinue > $null
-    }
-    if (-not (test-path $nuget))
-    {
-      Write-Host "Download NuGet..."
-      Invoke-WebRequest $source -OutFile $nuget
-      if (-not $?) { throw "Failed to download NuGet." }
-    }
-  }
-  elseif (-not (test-path $nuget))
-  {
-    throw "Failed to locate NuGet.exe."
-  }
-
-  # get the build system
-  if (-not $local)
-  {
-    $solutionRoot = "$scriptRoot\.."
-    $nugetConfig = @{$true="$solutionRoot\src\NuGet.config.user";$false="$solutionRoot\src\NuGet.config"}[(test-path "$solutionRoot\src\NuGet.config.user")]
-    &$nuget install Umbraco.Build -OutputDirectory $scriptTemp -Verbosity quiet -PreRelease -ConfigFile $nugetConfig
-    if (-not $?) { throw "Failed to download Umbraco.Build." }
-  }
-
-  # ensure we have the build system
-  $ubuildPath = ls "$scriptTemp\Umbraco.Build.*" | sort -property CreationTime -descending | select -first 1
-  if (-not $ubuildPath)
-  {
-    throw "Failed to locate the build system."
-  }
-
-  # boot the build system
-  # this creates $global:ubuild
-  &"$ubuildPath\ps\Boot.ps1"
-  $ubuild.Boot($ubuildPath.FullName, [System.IO.Path]::GetFullPath("$scriptRoot\.."),
+  # create and boot the buildsystem
+  $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
+  if (-not $?) { return }
+  $ubuild.Boot($PSScriptRoot, 
     @{ Local = $local; },
-    @{ KeepBuildDirs = $keepBuildDirs })
-  if (-not $?) { throw "Failed to boot the build system." }
+    @{ Continue = $continue })
+  if ($ubuild.OnError()) { return }
+
+  Write-Host "Zbu.ModelsBuilder Build"
   Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
   # ################################################################
   # TASKS
   # ################################################################
   
-  $ubuild | Add-Member -MemberType ScriptMethod SetMoreUmbracoVersion -value `
+  $ubuild.DefineMethod("SetMoreUmbracoVersion",
   {
     param ( $semver )
 
@@ -98,9 +55,9 @@
     $updater = New-Object "Umbraco.Build.ExpressPortUpdater"
     $csproj = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
     $updater.Update($csproj, $release)
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod SandboxNode -value `
+  $ubuild.DefineMethod("SandboxNode",
   {
     $global:node_path = $env:path
     $nodePath = $this.BuildEnv.NodePath
@@ -111,18 +68,18 @@
     $global:node_nodepath = $this.ClearEnvVar("NODEPATH")
     $global:node_npmcache = $this.ClearEnvVar("NPM_CONFIG_CACHE")
     $global:node_npmprefix = $this.ClearEnvVar("NPM_CONFIG_PREFIX")
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod RestoreNode -value `
+  $ubuild.DefineMethod("RestoreNode",
   {
     $env:path = $node_path
     
     $this.SetEnvVar("NODEPATH", $node_nodepath)
     $this.SetEnvVar("NPM_CONFIG_CACHE", $node_npmcache)
     $this.SetEnvVar("NPM_CONFIG_PREFIX", $node_npmprefix)
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod CompileBelle -value `
+  $ubuild.DefineMethod("CompileBelle",
   {
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\belle.log"
@@ -133,24 +90,45 @@
     # get a temp clean node env (will restore)
     $this.SandboxNode()
 
-    Push-Location "$($uenv.SolutionRoot)\src\Umbraco.Web.UI.Client"
+    # stupid PS is going to gather all "warnings" in $error
+    # so we have to take care of it else they'll bubble and kill the build
+    if ($error.Count -gt 0) { return }
+
+    Push-Location "$($this.SolutionRoot)\src\Umbraco.Web.UI.Client"
     Write-Output "" > $log
-    Write-Output "node version is:" > $log
+    
+    Write-Output "### node version is:" > $log
     &node -v >> $log 2>&1
-    Write-Output "npm version is:" >> $log 2>&1
+    if (-not $?) { throw "Failed to report node version." }
+
+    Write-Output "### npm version is:" >> $log 2>&1
     &npm -v >> $log 2>&1
-    Write-Output "clean npm cache" >> $log 2>&1
+    if (-not $?) { throw "Failed to report npm version." }
+
+    Write-Output "### clean npm cache" >> $log 2>&1
     &npm cache clean >> $log 2>&1
-    Write-Output "npm install" >> $log 2>&1
+    $error.Clear() # that one can fail 'cos security bug - ignore
+
+    Write-Output "### npm install" >> $log 2>&1
     &npm install >> $log 2>&1
-    Write-Output "install bower" >> $log 2>&1
+    Write-Output ">> $? $($error.Count)" >> $log 2>&1
+
+    Write-Output "### install bower" >> $log 2>&1
     &npm install -g bower >> $log 2>&1
-    Write-Output "install gulp" >> $log 2>&1
+    $error.Clear() # that one fails 'cos bower is deprecated - ignore
+    
+    Write-Output "### install gulp" >> $log 2>&1
     &npm install -g gulp >> $log 2>&1
-    Write-Output "install gulp-cli" >> $log 2>&1
+    $error.Clear() # that one fails 'cos deprecated stuff - ignore
+
+    Write-Output "### nstall gulp-cli" >> $log 2>&1
     &npm install -g gulp-cli --quiet >> $log 2>&1
-    Write-Output "gulp build for version $($this.Version.Release)" >> $log 2>&1
+    if (-not $?) { throw "Failed to install gulp-cli" } # that one is expected to work
+
+    Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
     &gulp build --buildversion=$this.Version.Release >> $log 2>&1
+    if (-not $?) { throw "Failed to build" } # that one is expected to work
+
     Pop-Location
     
     # fixme - should we filter the log to find errors?
@@ -167,9 +145,9 @@
     Write-Host "Set hidden attribute on node_modules"
     $dir = Get-Item -force "$src\Umbraco.Web.UI.Client\node_modules"
     $dir.Attributes = $dir.Attributes -bor ([System.IO.FileAttributes]::Hidden)
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod CompileUmbraco -value `
+  $ubuild.DefineMethod("CompileUmbraco",
   {
     $buildConfiguration = "Release"
 
@@ -222,9 +200,9 @@
     if (-not $?) { throw "Failed to compile Umbraco.Compat7." }
   
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod PrepareTests -value `
+  $ubuild.DefineMethod("PrepareTests",
   {
     Write-Host "Prepare Tests"
   
@@ -248,9 +226,9 @@
       Write-Host "Create bin directory"
       mkdir "$($this.BuildTemp)\tests\bin" > $null
     }
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod CompileTests -value `
+  $ubuild.DefineMethod("CompileTests",
   {
     $buildConfiguration = "Release"
     $log = "$($this.BuildTemp)\msbuild.tests.log"
@@ -282,9 +260,9 @@
     if (-not $?) { throw "Failed to compile tests." }
 
     # /p:UmbracoBuild tells the csproj that we are building from PS
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod PreparePackages -value `
+  $ubuild.DefineMethod("PreparePackages",
   {
     Write-Host "Prepare Packages" 
     
@@ -359,9 +337,9 @@
     mkdir "$tmp\WebPi\umbraco" > $null
     $this.CopyFiles("$tmp\WebApp", "*", "$tmp\WebPi\umbraco")
     $this.CopyFiles("$src\WebPi", "*",  "$tmp\WebPi")
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod PackageZip -value `
+  $ubuild.DefineMethod("PackageZip",
   {
     Write-Host "Create Zip packages" 
 
@@ -394,9 +372,9 @@
     Write-Host "Hash WebPI"
     $hash = $this.GetFileHash("$out\UmbracoCms.WebPI.$($this.Version.Semver).zip")
     Write-Output $hash | out-file "$out\webpihash.txt" -encoding ascii  
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod PrepareBuild -value `
+  $ubuild.DefineMethod("PrepareBuild",
   {
     Write-Host "Clear folders and files"    
     $this.RemoveDirectory("$($this.SolutionRoot)\src\Umbraco.Web.UI.Client\bower_components")
@@ -404,9 +382,9 @@
     $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
     Write-Host "Create clean web.config"
     $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod PrepareNuGet -value `
+  $ubuild.DefineMethod("PrepareNuGet",
   {
     Write-Host "Prepare NuGet"
 
@@ -416,17 +394,17 @@
 
     # fixme - that one does not exist in .bat build either?
     #mv "$($this.BuildTemp)\WebApp\Xslt\Web.config" "$($this.BuildTemp)\WebApp\Xslt\Web.config.transform"
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod RestoreNuGet -value `
+  $ubuild.DefineMethod("RestoreNuGet",
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
     &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" -ConfigFile $this.BuildEnv.NuGetConfig > "$($this.BuildTemp)\nuget.restore.log"
     if (-not $?) { throw "Failed to restore NuGet packages." }   
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod PackageNuGet -value `
+  $ubuild.DefineMethod("PackageNuGet",
   {
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
 
@@ -440,19 +418,19 @@
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
-        -Symbols -Verbosity quiet -outputDirectory "$($this.BuildOutput)"
+        -Symbols -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version $this.Version.Semver.ToString() `
-        -Verbosity quiet -outputDirectory "$($this.BuildOutput)"
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Compat7.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version $this.Version.Semver.ToString() `
-        -Verbosity quiet -outputDirectory "$($this.BuildOutput)"
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.compat7.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Compat7." }
 
     # run hook
@@ -462,25 +440,42 @@
       $this.PostPackageNuGet();
       if (-not $?) { throw "Failed to run hook." }
     }
-  }
+  })
 
-  $ubuild | Add-Member -MemberType ScriptMethod Build -value `
+  $ubuild.DefineMethod("VerifyNuGet",
+  {
+    $this.VerifyNuGetConsistency(
+      ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Compat7"),
+      ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine", "Umbraco.Compat7"))
+    if ($this.OnError()) { return }
+  })
+
+  $ubuild.DefineMethod("Build",
   {
     $this.PrepareBuild()
+    if ($this.OnError()) { return }
     $this.RestoreNuGet()
+    if ($this.OnError()) { return }
     $this.CompileBelle()
+    if ($this.OnError()) { return }
     $this.CompileUmbraco()
+    if ($this.OnError()) { return }
     $this.PrepareTests()
+    if ($this.OnError()) { return }
     $this.CompileTests()
+    if ($this.OnError()) { return }
     # not running tests
     $this.PreparePackages()
+    if ($this.OnError()) { return }
     $this.PackageZip()
-    $this.VerifyNuGet(
-        ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Compat7"),
-        ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine", "Umbraco.Compat7"))
+    if ($this.OnError()) { return }
+    $this.VerifyNuGet()
+    if ($this.OnError()) { return }
     $this.PrepareNuGet()
+    if ($this.OnError()) { return }
     $this.PackageNuGet()
-  }
+    if ($this.OnError()) { return }
+  })
 
   # ################################################################
   # RUN
@@ -490,6 +485,10 @@
   $ubuild.ReleaseBranches = @( "master" )
 
   # run
-  if (-not $nop) { $ubuild.Build() }
+  if (-not $get) 
+  {
+    $ubuild.Build() 
+    if ($ubuild.OnError()) { return }
+  }
   Write-Host "Done"
-  if ($nop) { return $ubuild }
+  if ($get) { return $ubuild }

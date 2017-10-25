@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -19,6 +20,7 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         private ModelType(string contentTypeAlias)
         {
+            if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
             ContentTypeAlias = contentTypeAlias;
             Name = "{" + ContentTypeAlias + "}";
         }
@@ -227,10 +229,12 @@ namespace Umbraco.Core.Models.PublishedContent
         public override Guid GUID { get; } = Guid.NewGuid();
 
         /// <inheritdoc />
-        public override Module Module => throw new NotSupportedException();
+        //public override Module Module => throw new NotSupportedException();
+        public override Module Module => GetType().Module;
 
         /// <inheritdoc />
-        public override Assembly Assembly => throw new NotSupportedException();
+        //public override Assembly Assembly => throw new NotSupportedException();
+        public override Assembly Assembly => GetType().Assembly;
 
         /// <inheritdoc />
         public override string FullName => Name;

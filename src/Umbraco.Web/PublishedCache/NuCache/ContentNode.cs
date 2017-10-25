@@ -132,6 +132,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public readonly int CreatorId;
 
         // draft and published version (either can be null, but not both)
+        // are models not direct PublishedContent instances
         public IPublishedContent Draft;
         public IPublishedContent Published;
 
@@ -142,13 +143,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public ContentNodeKit ToKit()
         {
+            var draft = Draft is PublishedContentModel draftModel
+                ? (PublishedContent) draftModel.Unwrap()
+                : (PublishedContent) Draft;
+
+            var published = Published is PublishedContentModel publishedModel
+                ? (PublishedContent) publishedModel.Unwrap()
+                : (PublishedContent) Published;
+
             return new ContentNodeKit
             {
                 Node = this,
                 ContentTypeId = ContentType.Id,
 
-                DraftData = ((PublishedContent) Draft)?._contentData,
-                PublishedData = ((PublishedContent) Published)?._contentData
+                DraftData = draft?._contentData,
+                PublishedData = published?._contentData
             };
         }
     }

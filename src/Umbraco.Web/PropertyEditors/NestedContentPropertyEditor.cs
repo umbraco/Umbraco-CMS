@@ -92,12 +92,22 @@ namespace Umbraco.Web.PropertyEditors
 
         public class DataTypeConfiguration
         {
-            public string[] ContentTypes { get; set; }
+            public NestedContentType[] ContentTypes { get; set; }
             public int? MinItems { get; set; }
             public int? MaxItems { get; set; }
             public bool ConfirmDeletes { get; set; }
             public bool ShowIcons { get; set; }
             public bool HideLabel { get; set; }
+
+            public class NestedContentType
+            {
+                [JsonProperty("ncAlias")]
+                public string Alias { get; set; }
+                [JsonProperty("ncTabAlias")]
+                public string Tab { get; set; }
+                [JsonProperty("nameTemplate")]
+                public string Template { get; set; }
+            }
         }
 
         public override object MapDataTypeConfiguration(PreValueCollection preValues)
@@ -105,7 +115,9 @@ namespace Umbraco.Web.PropertyEditors
             var d = preValues.PreValuesAsDictionary;
             return new DataTypeConfiguration
             {
-                ContentTypes = d.TryGetValue("contentTypes", out var preValue) ? preValue.Value.Split(',') : Array.Empty<string>(),
+                ContentTypes = d.TryGetValue("contentTypes", out var preValue)
+                    ? JsonConvert.DeserializeObject<DataTypeConfiguration.NestedContentType[]>(preValue.Value)
+                    : Array.Empty<DataTypeConfiguration.NestedContentType>(),
                 MinItems = d.TryGetValue("minItems", out preValue) && int.TryParse(preValue.Value, out var minItems) ? (int?) minItems : null,
                 MaxItems = d.TryGetValue("maxItems", out preValue) && int.TryParse(preValue.Value, out var maxItems) ? (int?) maxItems : null,
                 ConfirmDeletes = d.TryGetValue("confirmDeletes", out preValue) && preValue.Value == "1",

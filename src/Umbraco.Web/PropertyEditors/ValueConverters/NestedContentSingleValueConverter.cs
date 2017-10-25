@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var contentTypes = propertyType.DataType.GetConfiguration<NestedContentPropertyEditor.DataTypeConfiguration>().ContentTypes;
             return contentTypes.Length > 1
                 ? typeof(IPublishedElement)
-                : ModelType.For(contentTypes[0]);
+                : ModelType.For(contentTypes[0].Alias);
         }
 
         /// <inheritdoc />
