@@ -32,7 +32,8 @@
                                 <div style="margin-right: 6px;" ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs">{{ $index + 1 }}</div>
                                 <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" style="margin-right: 6px;"></umb-checkmark>
                                 <span ng-class="{'strike': tour.completed}">{{ tour.name }}</span>
-                                <umb-button ng-if="tour.completed || vm.showTourButton($index, value)" size="xxs" type="button" label="start" style="margin-left: auto;" action="vm.startTour(tour)"></umb-button>
+                                <umb-button ng-if="!tour.completed && vm.showTourButton($index, value)" button-style="primary" size="xxs" type="button" label="Start" style="margin-left: auto;" action="vm.startTour(tour)"></umb-button>                                
+                                <umb-button ng-if="tour.completed" size="xxs" type="button" label="Rerun" style="margin-left: auto;" action="vm.startTour(tour)"></umb-button>
                             </div>
                         </div>
                     </div>
