@@ -4,6 +4,7 @@
     function tourService(eventsService, localStorageService) {
 
         var localStorageKey = "umbTours";
+        var currentTour = null;
 
         var tours = [
             {
@@ -401,15 +402,23 @@
 
         function startTour(tour) {
             eventsService.emit("appState.tour.start", tour);
+            currentTour = tour;
         }
 
         function endTour() {
+            currentTour = null;
             eventsService.emit("appState.tour.end");
+            currentTour = null;
         }
 
         function completeTour(tour) {
             saveInLocalStorage(tour);
             eventsService.emit("appState.tour.complete", tour);
+            currentTour = null;
+        }
+
+        function getCurrentTour() {
+            return currentTour;
         }
         
         function getAllTours() {
@@ -489,6 +498,7 @@
             startTour: startTour,
             endTour: endTour,
             completeTour: completeTour,
+            getCurrentTour: getCurrentTour,
             getAllTours: getAllTours,
             getGroupedTours: getGroupedTours,
             getTourByAlias: getTourByAlias,
