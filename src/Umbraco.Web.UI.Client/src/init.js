@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService',
-  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService) {
+app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
+  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -23,7 +23,11 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 //send the ready event with the included returnToPath,returnToSearch data
                 eventsService.emit("app.ready", data);
                 returnToPath = null, returnToSearch = null;
+
+                loadGettingStartedTours();
+                
             });
+
         });
 
         /** execute code on each successful route */
@@ -478,7 +482,16 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 ]
             }
         ];
-
-        tourService.registerTours(gettingStartedTours);
+        
+        function loadGettingStartedTours() {
+            // Register Get started tours if the Get Started dashboard is installed
+            dashboardResource.getDashboard("content").then(function (dashboards) {
+                angular.forEach(dashboards, function(dashboard) {
+                    if(dashboard.alias === "GetStarted" ) {
+                        tourService.registerTours(gettingStartedTours);
+                    }
+                });
+            });
+        }
 
     }]);
