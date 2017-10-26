@@ -136,16 +136,20 @@
                 });
                 group.completedPercentage = Math.round((completedTours/group.length)*100);
             });
-
         }
 
-        oninit();
+        evts.push(eventsService.on("appState.tour.complete", function () {
+            vm.tours = tourService.getGroupedTours();
+            getTourGroupCompletedPercentage();
+        }));
            
         $scope.$on('$destroy', function () {
             for (var e in evts) {
                 eventsService.unsubscribe(evts[e]);
             }
         });
+
+        oninit();
 
     }
 
