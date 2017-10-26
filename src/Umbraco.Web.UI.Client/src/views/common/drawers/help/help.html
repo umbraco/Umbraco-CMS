@@ -8,15 +8,39 @@
     <umb-drawer-content>
 
         <!-- Tours -->
-        <umb-dropdown-block ng-repeat="(key,value) in vm.tours" title="key" circle="true" percentage="{{ tourPercentage }}">
-            <umb-dropdown-block-item
-                on-start="vm.startTour(tour)"
-                tick="true"
-                name="{{ tour.name }}"
-                completed="{{ tour.completed }}"
-                ng-repeat="tour in value">
-            </umb-dropdown-block-item>
-        </umb-dropdown-block>
+
+        <div style="margin-bottom: 20px;">
+            <h5 style="margin-bottom: 10px; margin-top: 0;">Tours</h5>
+            
+            <div ng-repeat="(key,value) in vm.tours" style="margin-bottom: 5px;">
+
+                <div class="umb-help-list">
+
+                    <a href="" class="umb-help-list-item flex items-center justify-between" style="padding: 5px 20px;" ng-click="value.open = !value.open">
+                        <h5><i style="margin-right: 2px;" ng-class="{'icon-navigation-right': !value.open, 'icon-navigation-down': value.open}"></i>{{key}}</h5>
+                        <umb-progress-circle
+                            percentage="{{value.completedPercentage}}"
+                            size="40"
+                            font-size="xs"
+                            stroke-color="">
+                        </umb-progress-circle>
+                    </a>
+
+                    <div ng-if="value.open">
+                        <div class="umb-help-list-item" ng-repeat="tour in value">
+                            <div class="umb-help-list-item__content">
+                                <div style="margin-right: 6px;" ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs">{{ $index + 1 }}</div>
+                                <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" style="margin-right: 6px;"></umb-checkmark>
+                                <span ng-class="{'strike': tour.completed}">{{ tour.name }}</span>
+                                <umb-button ng-if="tour.completed || vm.showTourButton($index, value)" size="xxs" type="button" label="start" style="margin-left: auto;" action="vm.startTour(tour)"></umb-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
 
         <!-- Show in custom help dashboard -->
         <div style="margin-bottom: 20px;" ng-if="vm.customDashboard.length > 0">
@@ -49,7 +73,7 @@
         </div>
 
         <!--  Umbraco tv content -->
-        <div>
+        <div style="margin-bottom: 20px;">
             <h5 style="margin-bottom: 10px; margin-top: 0;" ng-if="vm.videos.length > 0">Videos</h5>
             <ul class="umb-help-list">
                 <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
@@ -62,25 +86,28 @@
             </ul>
         </div>
 
+        <!--  Links -->
+        <div>
+            <a class="umb-help-badge" style="margin-bottom: 5px;" target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                <i class="umb-help-badge__icon icon-tv-old"></i>
+                <div class="umb-help-badge__title">Visit umbraco.tv</div>
+                <small>
+                    <localize key="help_theBestUmbracoVideoTutorials">The best Umbraco video tutorials</localize>
+                </small>
+            </a>
+
+            <a class="umb-help-badge" style="margin-bottom: 5px;" target="_blank" href="http://our.umbraco.org?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
+                <i class="umb-help-badge__icon icon-favorite"></i>
+                <div class="umb-help-badge__title">Visit our.umbraco.org</div>
+                <small>
+                    <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
+                </small>
+            </a>
+        </div>
+
     </umb-drawer-content>
 
     <umb-drawer-footer>
-
-        <a class="umb-help-badge" style="margin-bottom: 5px;" target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
-            <i class="umb-help-badge__icon icon-tv-old"></i>
-            <div class="umb-help-badge__title">Visit umbraco.tv</div>
-            <small>
-                <localize key="help_theBestUmbracoVideoTutorials">The best Umbraco video tutorials</localize>
-            </small>
-        </a>
-
-        <a class="umb-help-badge" style="margin-bottom: 5px;" target="_blank" href="http://our.umbraco.org?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
-            <i class="umb-help-badge__icon icon-favorite"></i>
-            <div class="umb-help-badge__title">Visit our.umbraco.org</div>
-            <small>
-                <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
-            </small>
-        </a>
 
         <div class="flex justify-end">
             <umb-button

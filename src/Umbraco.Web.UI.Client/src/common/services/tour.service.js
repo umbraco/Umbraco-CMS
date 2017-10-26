@@ -193,6 +193,13 @@
                         type: "intro"
                     },
                     {
+                        element: "#applications [data-element='section-content']",
+                        title: "Navigate to the content sections",
+                        content: "In the <b>Content section</b> we will find the content of our website.",
+                        event: "click",
+                        backdropOpacity: 0.6
+                    },
+                    {
                         element: "[data-element='tree-root']",
                         title: "Open context menu",
                         content: "<p>Open the context menu by hovering the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
@@ -278,6 +285,13 @@
                         title: "View your Umbraco site",
                         content: "<p>Our three main components to a page is done: <b>Document type, Template, and Content</b> - it is now time to see the result.</p><p>In this tour we will learn how to see our published website.</p>",
                         type: "intro"
+                    },
+                    {
+                        element: "#applications [data-element='section-content']",
+                        title: "Navigate to the content sections",
+                        content: "In the <b>Content section</b> we will find the content of our website.",
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "#tree [data-element='tree-item-Home']",

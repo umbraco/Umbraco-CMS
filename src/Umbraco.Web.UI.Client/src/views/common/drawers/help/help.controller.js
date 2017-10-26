@@ -12,25 +12,21 @@
         vm.tree = $routeParams.tree;
         vm.sectionName = "";
         vm.customDashboard = null;
+        vm.tours = [];
 
         vm.closeDrawer = closeDrawer;
-
         vm.startTour = startTour;
-        
-        vm.tours = tourService.getGroupedTours();
-    
+        vm.getTourGroupCompletedPercentage = getTourGroupCompletedPercentage;
+        vm.showTourButton = showTourButton;
+            
         function startTour(tour) {
             tourService.startTour(tour);
+            closeDrawer();
         }
 
-
-        // Finding out, how many tours are completed for the progress circle
-        var completedLength = tourService.getCompletedTours().length;
-        var tourLength = tourService.getAllTours().length;
-
-        $scope.tourPercentage = (completedLength/tourLength)*100 
-
         function oninit() {
+
+            vm.tours = tourService.getGroupedTours();
 
             // load custom help dashboard
             dashboardResource.getDashboard("user-help").then(function (dashboard) {
@@ -55,6 +51,8 @@
                 findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
 
             });
+
+            getTourGroupCompletedPercentage();
 
         }
 
@@ -114,6 +112,31 @@
             localizationService.localize(languageKey).then(function (value) {
                 vm.sectionName = value;
             });
+        }
+
+        function showTourButton(index, tourGroup) {
+            if(index !== 0) {
+                var prevTour = tourGroup[index - 1];
+                if(prevTour.completed) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+
+        function getTourGroupCompletedPercentage() {
+            // Finding out, how many tours are completed for the progress circle
+            angular.forEach(vm.tours, function(group){
+                var completedTours = 0;
+                angular.forEach(group, function(tour){
+                    if(tour.completed) {
+                        completedTours++;
+                    }
+                });
+                group.completedPercentage = Math.round((completedTours/group.length)*100);
+            });
+
         }
 
         oninit();
