@@ -53,6 +53,13 @@
             });
 
             getTourGroupCompletedPercentage();
+            
+            // check if a tour is running - if it is open the matching group
+            var currentTour = tourService.getCurrentTour();
+
+            if (currentTour) {
+                openTourGroup(currentTour.alias);
+            }
 
         }
 
@@ -125,6 +132,16 @@
             }
         }
 
+        function openTourGroup(tourAlias) {
+            angular.forEach(vm.tours, function (group) {
+                angular.forEach(group, function (tour) {
+                    if (tour.alias === tourAlias) {
+                        group.open = true;
+                    }
+                });
+            });
+        }
+
         function getTourGroupCompletedPercentage() {
             // Finding out, how many tours are completed for the progress circle
             angular.forEach(vm.tours, function(group){
@@ -138,8 +155,9 @@
             });
         }
 
-        evts.push(eventsService.on("appState.tour.complete", function () {
+        evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
             vm.tours = tourService.getGroupedTours();
+            openTourGroup(tour.alias);
             getTourGroupCompletedPercentage();
         }));
            
