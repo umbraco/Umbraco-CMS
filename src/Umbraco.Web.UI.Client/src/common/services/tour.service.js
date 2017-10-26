@@ -130,9 +130,10 @@
                         event: "click"
                     },
                     {
-                        element: "[data-element='group-name']",
+                        element: "[data-element='group-name-field']",
                         title: "Enter a name",
-                        content: "Enter <code>Content</code> in the tab name."
+                        content: "Enter <code>Content</code> in the tab name.",
+                        view: "tabName"
                     },
                     {
                         element: "[data-element='property-add']",
