@@ -24,11 +24,18 @@
                         content: "These are the <b>Sections</b> and allows you to navigate the different areas of Umbraco.",
                         backdropOpacity: 0.6
                     },
+                    
                     {
                         element: "#tree",
                         elementPreventClick: true,
                         title: "The Tree",
                         content: "This is the <b>Tree</b> and will contain all the content of your website."
+                    },
+                    {
+                        element: "[data-element='editor-content']",
+                        elementPreventClick: true,
+                        title: "Dashboards",
+                        content: "A dashboard is the main view you are presented with when entering a section within the backoffice, and can be used to show valuable information to the users of the system."
                     },
                     {
                         element: "[data-element='global-search-field']",
@@ -67,6 +74,11 @@
                         title: "Help",
                         content: "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
                         backdropOpacity: 0.6
+                    },
+                    {
+                        element: "[data-element='drawer'] [data-element='help-tours']",
+                        title: "Tours",
+                        content: "To continue your journey on getting started with Umbraco, you can find more tours right here."
                     }
                 ]
             },
