@@ -42,7 +42,7 @@ Use this directive to render a circular progressbar.
 
 
                 // centering text for all sizes
-                var text = element.find(".umb-tour__values");
+                var text = element.find(".umb-progress-circle__percentage");
                 
                 text.css({ "line-height": scope.size + "px" });
                 console.log("this is the size:", scope.size);
@@ -58,7 +58,7 @@ Use this directive to render a circular progressbar.
                 }
 
                 // calculating the circle's highlight
-                var circle = element.find(".umb-tour__progress-circle");
+                var circle = element.find(".umb-progress-circle__highlight");
                 var r = circle.attr('r');
                 var strokeDashArray = (r*Math.PI)*2;
 

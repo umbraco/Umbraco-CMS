@@ -1,9 +1,9 @@
 <div>
-    <div class="umb-tour__progress-container" ng-style="{'width': size, 'height': size }">                    
-        <svg class="umb-tour__progress" viewBox="0 0 100 100">
-            <circle class="umb-tour__progress-circle-bg" cx="50" cy="50" r="47" fill="none" stroke-width="6"/>
-            <circle class="umb-tour__progress-circle umb-tour__progress-circle--{{ strokeColor }}" cx="50" cy="50" r="47" fill="none" stroke-width="6" stroke-dasharray="{{ strokeDashArray }}" stroke-dashoffset="{{ strokeDashOffset }}" />
+    <div class="umb-progress-circle__container" ng-style="{'width': size, 'height': size }">                    
+        <svg class="umb-progress-circle__view-box" viewBox="0 0 100 100">
+            <circle class="umb-progress-circle__bg" cx="50" cy="50" r="47" fill="none" stroke-width="6"/>
+            <circle class="umb-progress-circle__highlight umb-progress-circle__highlight--{{ strokeColor }}" cx="50" cy="50" r="47" fill="none" stroke-width="6" stroke-dasharray="{{ strokeDashArray }}" stroke-dashoffset="{{ strokeDashOffset }}" />
         </svg>
-        <div class="umb-tour__values umb-tour__values--{{ fontSize }}"> {{ percentage }}%</div>
+        <div class="umb-progress-circle__percentage umb-progress-circle__percentage--{{ fontSize }}"> {{ percentage }}%</div>
     </div>
 </div>
