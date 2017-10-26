@@ -16,7 +16,7 @@
 
                 <div class="umb-help-list">
 
-                    <a href="" class="umb-help-list-item flex items-center justify-between" style="padding: 5px 20px;text-decoration: none;" ng-click="value.open = !value.open">
+                    <a href="" class="umb-help-list-item__content flex items-center justify-between" style="text-decoration: none;" ng-click="value.open = !value.open">
                         <h5 class="umb-help-list-item__group-title"><i style="margin-right: 2px;text-decoration: none;" ng-class="{'icon-navigation-right': !value.open, 'icon-navigation-down': value.open}"></i>{{key}}</h5>
                         <umb-progress-circle
                             percentage="{{value.completedPercentage}}"
@@ -26,12 +26,16 @@
 
                     <div ng-if="value.open">
                         <div data-element="tour-{{tour.alias}}" class="umb-help-list-item" ng-repeat="tour in value">
-                            <div class="umb-help-list-item__content">
-                                <div style="margin-right: 6px;" ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs">{{ $index + 1 }}</div>
-                                <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" style="margin-right: 6px;"></umb-checkmark>
-                                <span ng-class="{'strike': tour.completed}">{{ tour.name }}</span>
-                                <umb-button ng-if="!tour.completed && vm.showTourButton($index, value)" button-style="primary" size="xxs" type="button" label="Start" style="margin-left: auto;" action="vm.startTour(tour)"></umb-button>                                
-                                <umb-button ng-if="tour.completed" size="xxs" type="button" label="Rerun" style="margin-left: auto;" action="vm.startTour(tour)"></umb-button>
+                            <div class="umb-help-list-item__content justify-between">
+                                <div class="flex items-center">
+                                    <div ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs umb-help-list-item__icon">{{ $index + 1 }}</div>
+                                    <umb-checkmark ng-if="tour.completed" size="xs" checked="tour.completed" class="umb-help-list-item__icon"></umb-checkmark>
+                                    <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
+                                </div>
+                                <div>
+                                    <umb-button ng-if="!tour.completed && vm.showTourButton($index, value)" button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>                                
+                                    <umb-button ng-if="tour.completed" size="xxs" type="button" label="Rerun" action="vm.startTour(tour)"></umb-button>
+                                </div>
                             </div>
                         </div>
                     </div>
