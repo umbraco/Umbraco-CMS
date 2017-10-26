@@ -9,27 +9,21 @@ Use this directive to render a circular progressbar.
 
 <h3>Markup example</h3>
 <pre>
-	<div ng-controller="My.Controller as vm">
-
+    <div>
+    
         <umb-progress-circle
             percentage="80"
             size="60"
-            font-size="m"
-            stroke-color="green">
+            color="secondary">
         </umb-progress-circle>
 
 	</div>
 </pre>
 
-
 @param {string} size (<code>attribute</code>): This parameter defines the width and the height of the circle in pixels.
 @param {string} percentage (<code>attribute</code>): Takes a number between 0 and 100 and applies it to the circle's highlight length.
-@param {string} strokeColor (<code>attribute</code>): the color of the highlight (green, purple, red, yellow). Green by default. 
-@param {string} fontSize (<code>attribute</code>): Defines the size of the number in the center (xs, s, m, l, xl)
+@param {string} color (<code>attribute</code>): the color of the highlight (primary, secondary, success, warning, danger). Success by default. 
 **/
-
-
-
 
 (function (){
     'use strict';
@@ -44,10 +38,10 @@ Use this directive to render a circular progressbar.
                 var percent = scope.percentage;
 
                 if (percent > 100) {
-                    percent = 100
+                    percent = 100;
                 }
                 else if (percent < 0) {
-                    percent = 0
+                    percent = 0;
                 }
 
                 // calculating the circle's highlight
@@ -63,7 +57,9 @@ Use this directive to render a circular progressbar.
 
                 // Distance for the highlight dash's offset
                 scope.strokeDashOffset = strokeDashOffset;
-                var coloring = circle.attr('stroke');
+
+                // set font size
+                scope.percentageSize = (scope.size * 0.3) + "px";
 
             }
 
@@ -78,8 +74,7 @@ Use this directive to render a circular progressbar.
             scope: {
                 size: "@?",
                 percentage: "@",
-                strokeColor: "@",
-                fontSize: "@"
+                color: "@"
             },
             link: link
 
