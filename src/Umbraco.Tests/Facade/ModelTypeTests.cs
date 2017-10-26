@@ -34,6 +34,39 @@ namespace Umbraco.Tests.Facade
         }
 
         [Test]
+        public void TypeToStringTests()
+        {
+            var type = typeof(int);
+            Assert.AreEqual("System.Int32", type.ToString());
+            Assert.AreEqual("System.Int32[]", type.MakeArrayType().ToString());
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[System.Int32[]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).ToString());
+        }
+
+        [Test]
+        public void ModelTypeFullNameTests()
+        {
+            Assert.AreEqual("{alias1}", ModelType.For("alias1").FullName);
+
+            Type type = ModelType.For("alias1");
+            Assert.AreEqual("{alias1}", type.FullName);
+
+            // there's an "*" there because the arrays are not true SZArray - but that changes when we map
+            Assert.AreEqual("{alias1}[*]", ModelType.For("alias1").MakeArrayType().FullName);
+            // note the inner assembly qualified name
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[{alias1}[*], Umbraco.Core, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null]]", typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()).FullName);
+        }
+
+        [Test]
+        public void TypeFullNameTests()
+        {
+            var type = typeof(int);
+            Assert.AreEqual("System.Int32", type.FullName);
+            Assert.AreEqual("System.Int32[]", type.MakeArrayType().FullName);
+            // note the inner assembly qualified name
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[[System.Int32[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).FullName);
+        }
+
+        [Test]
         public void ModelTypeMapTests()
         {
             var map = new Dictionary<string, Type>

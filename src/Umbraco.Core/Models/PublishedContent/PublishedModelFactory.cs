@@ -64,7 +64,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 if (constructor == null)
                     throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPublishedElement.");
 
-                var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
+                var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))

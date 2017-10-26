@@ -259,7 +259,7 @@ namespace Umbraco.Tests.PublishedContent
         public object XPathValue { get; set; }
     }
 
-    [PublishedContentModel("ContentType2")]
+    [PublishedModel("ContentType2")]
     internal class ContentType2 : PublishedContentModel
     {
         #region Plumbing
@@ -273,7 +273,7 @@ namespace Umbraco.Tests.PublishedContent
         public int Prop1 => this.Value<int>("prop1");
     }
 
-    [PublishedContentModel("ContentType2Sub")]
+    [PublishedModel("ContentType2Sub")]
     internal class ContentType2Sub : ContentType2
     {
         #region Plumbing

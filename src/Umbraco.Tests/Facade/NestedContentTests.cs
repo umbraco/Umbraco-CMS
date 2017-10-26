@@ -32,9 +32,6 @@ namespace Umbraco.Tests.Facade
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
-
             var dataTypeService = new Mock<IDataTypeService>();
 
             // mocked dataservice returns nested content preValues
@@ -47,14 +44,14 @@ namespace Umbraco.Tests.Facade
                         {
                             { "minItems", new PreValue("1") },
                             { "maxItems", new PreValue("1") },
-                            { "contentTypes", new PreValue("contentN1") }
+                            { "contentTypes", new PreValue("[{\"ncAlias\":\"contentN1\",\"ncTabAlias\":\"\",\"nameTemplate\":\"\"}]") }
                         });
                     if (id == 2)
                         return new PreValueCollection(new Dictionary<string, PreValue>
                         {
                             { "minItems", new PreValue("1") },
                             { "maxItems", new PreValue("99") },
-                            { "contentTypes", new PreValue("contentN1") }
+                            { "contentTypes", new PreValue("[{\"ncAlias\":\"contentN1\",\"ncTabAlias\":\"\",\"nameTemplate\":\"\"}]") }
                         });
                     return null;
                 });
@@ -115,7 +112,7 @@ namespace Umbraco.Tests.Facade
             PropertyEditorCollection editors = null;
             editors = new PropertyEditorCollection(new PropertyEditor[]
             {
-                new NestedContentPropertyEditor(Mock.Of<ILogger>(), new Lazy<PropertyEditorCollection>(() => editors)) 
+                new NestedContentPropertyEditor(Mock.Of<ILogger>(), new Lazy<PropertyEditorCollection>(() => editors))
             });
 
             var source = new DataTypeConfigurationSource(dataTypeService.Object, editors);

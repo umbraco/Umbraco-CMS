@@ -190,7 +190,7 @@ namespace Umbraco.Tests.PublishedContent
             }
         }
 
-        [PublishedContentModel("Home")]
+        [PublishedModel("Home")]
         internal class Home : PublishedContentModel
         {
             public Home(IPublishedContent content)

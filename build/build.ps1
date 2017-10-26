@@ -175,7 +175,7 @@
       /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
       /p:Verbosity=minimal `
       /t:Clean`;Rebuild `
-      /tv:"$($ubuild.BuildEnv.VisualStudio.ToolsVersion)" `
+      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
       > $log
 
@@ -193,7 +193,7 @@
       /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
       /p:Verbosity=minimal `
       /t:Rebuild `
-      /tv:"$($ubuild.BuildEnv.VisualStudio.ToolsVersion)" `
+      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
       > $log7
 
@@ -252,7 +252,7 @@
       /p:OutDir="$($this.BuildTemp)\tests\\" `
       /p:Verbosity=minimal `
       /t:Build `
-      /tv:"$($ubuild.BuildEnv.VisualStudio.ToolsVersion)" `
+      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
       /p:NugetPackages="$($this.SolutionRoot)\src\packages" `
       > $log

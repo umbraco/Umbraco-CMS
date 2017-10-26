@@ -75,6 +75,39 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <summary>
+        /// Gets the actual Clr type name by replacing model types, if any.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="map">The model types map.</param>
+        /// <returns>The actual Clr type name.</returns>
+        public static string MapToName(Type type, Dictionary<string, string> map)
+        {
+            if (type is ModelType modelType)
+            {
+                if (map.TryGetValue(modelType.ContentTypeAlias, out var actualTypeName))
+                    return actualTypeName;
+                throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
+            }
+
+            if (type is ModelTypeArrayType arrayType)
+            {
+                if (map.TryGetValue(arrayType.ContentTypeAlias, out var actualTypeName))
+                    return actualTypeName + "[]";
+                throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
+            }
+
+            if (type.IsGenericType == false)
+                return type.FullName;
+            var def = type.GetGenericTypeDefinition();
+            if (def == null)
+                throw new InvalidOperationException("panic");
+
+            var args = type.GetGenericArguments().Select(x => MapToName(x, map)).ToArray();
+            var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));
+            return defFullName + "<" + string.Join(", ", args) + ">";
+        }
+
+        /// <summary>
         /// Gets a value indicating whether two <see cref="Type"/> instances are equal.
         /// </summary>
         /// <param name="t1">The first instance.</param>
@@ -229,12 +262,10 @@ namespace Umbraco.Core.Models.PublishedContent
         public override Guid GUID { get; } = Guid.NewGuid();
 
         /// <inheritdoc />
-        //public override Module Module => throw new NotSupportedException();
-        public override Module Module => GetType().Module;
+        public override Module Module => GetType().Module; // hackish but FullName requires something
 
         /// <inheritdoc />
-        //public override Assembly Assembly => throw new NotSupportedException();
-        public override Assembly Assembly => GetType().Assembly;
+        public override Assembly Assembly => GetType().Assembly; // hackish but FullName requires something
 
         /// <inheritdoc />
         public override string FullName => Name;
@@ -354,8 +385,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public override string Name { get; }
         public override Guid GUID { get; } = Guid.NewGuid();
-        public override Module Module => throw new NotSupportedException();
-        public override Assembly Assembly => throw new NotSupportedException();
+        public override Module Module =>GetType().Module; // hackish but FullName requires something
+        public override Assembly Assembly => GetType().Assembly; // hackish but FullName requires something
         public override string FullName => Name;
         public override string Namespace => string.Empty;
         public override string AssemblyQualifiedName => Name;

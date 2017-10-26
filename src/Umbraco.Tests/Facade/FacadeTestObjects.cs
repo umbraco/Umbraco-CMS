@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Facade
     {
         #region Published models
 
-        [PublishedContentModel("element1")]
+        [PublishedModel("element1")]
         public class TestElementModel1 : PublishedElementModel
         {
             public TestElementModel1(IPublishedElement content)
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Facade
             public string Prop1 => this.Value<string>("prop1");
         }
 
-        [PublishedContentModel("element2")]
+        [PublishedModel("element2")]
         public class TestElementModel2 : PublishedElementModel
         {
             public TestElementModel2(IPublishedElement content)
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Facade
             public IEnumerable<TestContentModel1> Prop2 => this.Value<IEnumerable<TestContentModel1>>("prop2");
         }
 
-        [PublishedContentModel("content1")]
+        [PublishedModel("content1")]
         public class TestContentModel1 : PublishedContentModel
         {
             public TestContentModel1(IPublishedContent content)
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Facade
             public string Prop1 => this.Value<string>("prop1");
         }
 
-        [PublishedContentModel("content2")]
+        [PublishedModel("content2")]
         public class TestContentModel2 : PublishedContentModel
         {
             public TestContentModel2(IPublishedContent content)
