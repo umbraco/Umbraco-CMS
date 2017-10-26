@@ -39,13 +39,6 @@ Use this directive to render a circular progressbar.
         function link(scope, element, $filter) {
             
             function onInit() {
-
-
-                // centering text for all sizes
-                var text = element.find(".umb-progress-circle__percentage");
-                
-                text.css({ "line-height": scope.size + "px" });
-                console.log("this is the size:", scope.size);
                             
                 // making sure we get the right numbers
                 var percent = scope.percentage;
