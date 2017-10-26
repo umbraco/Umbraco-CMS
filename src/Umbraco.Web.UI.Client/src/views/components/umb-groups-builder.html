@@ -66,7 +66,8 @@
                     <ng-form name="groupNameForm" data-element="group-name">
                         <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
                             <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
-                            <input class="umb-group-builder__group-title-input"
+                            <input data-element="group-name-field"
+                                   class="umb-group-builder__group-title-input"
                                    type="text"
                                    localize="placeholder"
                                    placeholder="@placeholders_entername"

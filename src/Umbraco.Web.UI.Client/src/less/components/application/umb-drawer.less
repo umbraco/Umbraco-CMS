@@ -149,7 +149,8 @@
     border-bottom: 1px solid @gray-9;
 }
 
-.umb-help-list-item > a {
+.umb-help-list-item > a,
+.umb-help-list-item__content {
     display: flex;
     align-items: center;
     padding: 10px 20px;
@@ -186,4 +187,8 @@
     font-size: 14px;
     color: @gray-6;
     margin-left: auto;
+}
+
+.umb-help-list-item:hover .umb-help-list-item__group-title {
+    text-decoration: underline;
 }

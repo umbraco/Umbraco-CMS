@@ -1,0 +1,49 @@
+.umb-progress-circle {
+    position: relative;
+}
+
+.umb-progress-circle__view-box {
+    position: absolute;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+
+// circle highlight on progressbar
+.umb-progress-circle__highlight {
+    stroke: @green;
+}
+
+.umb-progress-circle__highlight--primary {
+    stroke: @turquoise;
+}
+
+.umb-progress-circle__highlight--secondary {
+    stroke: @purple;
+}
+
+.umb-progress-circle__highlight--success {
+    stroke: @green;
+}
+
+.umb-progress-circle__highlight--warning {
+    stroke: @yellow;
+}
+
+.umb-progress-circle__highlight--danger {
+    stroke: @red;
+}
+
+// circle progressbar bg
+.umb-progress-circle__bg {
+    stroke: @gray-8;
+}
+
+// the text in the center
+.umb-progress-circle__percentage {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
