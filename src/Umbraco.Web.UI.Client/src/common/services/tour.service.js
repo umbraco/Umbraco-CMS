@@ -14,7 +14,7 @@
                 "steps": [
                     {
                         title: "Welcome to Umbraco - The Friendly CMS",
-                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p>",
+                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p>If you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.</p>",
                         type: "intro"
                     },
                     {
