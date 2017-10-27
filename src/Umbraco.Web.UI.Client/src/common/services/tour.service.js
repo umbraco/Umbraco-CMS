@@ -42,7 +42,7 @@
                         element: "[data-element='editor-content']",
                         elementPreventClick: true,
                         title: "Dashboards",
-                        content: "A dashboard is the main view you are presented with when entering a section within the backoffice, and can be used to show valuable information to the users of the system."
+                        content: "<p>A dashboard is the main view you are presented with when entering a section within the backoffice, and can be used to show valuable information to the users of the system.</p><p>Notice that some sections have multiple dashboards.</p>"
                     },
                     {
                         element: "[data-element='global-search-field']",
