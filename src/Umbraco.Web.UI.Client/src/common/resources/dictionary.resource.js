@@ -66,9 +66,40 @@ function dictionaryResource($q, $http, umbRequestHelper) {
       "Failed to create item ");
   }
 
+    /**
+         * @ngdoc method
+         * @name umbraco.resources.dictionaryResource#deleteById
+         * @methodOf umbraco.resources.dictionaryResource
+         *
+         * @description
+         * Gets a dictionary item with a given id
+         *
+         * ##usage
+         * <pre>
+         * dictionaryResource.getById(1234)
+         *    .then(function() {
+         *        alert('Found it!');
+         *    });
+         * </pre>
+         *
+         * @param {Int} id id of dictionary item to get
+         * @returns {Promise} resourcePromise object.
+         *
+  **/
+    function getById(id) {
+        return umbRequestHelper.resourcePromise(
+            $http.post(
+                umbRequestHelper.getApiUrl(
+                    "dictionaryApiBaseUrl",
+                    "GetById",
+                    [{ id: id }])),
+            "Failed to get item " + id);
+    }
+
   var resource = {
     deleteById: deleteById,
-    create : create
+    create: create,
+    getById: getById
   };
 
   return resource;
