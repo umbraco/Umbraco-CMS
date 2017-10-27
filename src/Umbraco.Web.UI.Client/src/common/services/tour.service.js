@@ -60,7 +60,7 @@
                         element: "[data-element~='overlay-user']",
                         elementPreventClick: true,
                         title: "User profile",
-                        content: "<p>This is where you can see details about your user, change your password and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advaned user management.</p>"
+                        content: "<p>Here you can see details about your user, what Umbraco version the site is running, change your password and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advaned user management.</p>"
                     },
                     {
                         element: "[data-element~='overlay-user'] [data-element='button-overlayClose']",
