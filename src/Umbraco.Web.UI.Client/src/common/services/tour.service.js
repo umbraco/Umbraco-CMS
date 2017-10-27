@@ -126,6 +126,15 @@
             currentTour = null;            
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.tourService#getCurrentTour
+         * @methodOf umbraco.services.tourService
+         *
+         * @description
+         * Returns the current tour
+         * @returns {Array} Returns the current tour
+		 */
         function getCurrentTour() {
             return currentTour;
         }
