@@ -374,6 +374,7 @@
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
@@ -1505,18 +1506,18 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx.cs">
       <DependentUpon>exportDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>    
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx.cs">
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>    
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
-    </Compile>    
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1530,14 +1531,14 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.designer.cs">
       <DependentUpon>sendToTranslation.aspx</DependentUpon>
-    </Compile>    
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-    </Compile>    
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1565,7 +1566,7 @@
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProvider.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\GzipCompressor.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\GzipModule.cs" />
-    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\IModule.cs" />    
+    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\IModule.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSON.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSONReader.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JSONWriter.cs" />
@@ -1709,7 +1710,7 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\XmlTree.cs">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />    
+    <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx.cs">
       <DependentUpon>CacheRefresher.asmx</DependentUpon>
@@ -1743,7 +1744,7 @@
       <DependentUpon>publication.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\RegexComWebservice.cs" />    
+    <Compile Include="umbraco.presentation\umbraco\webservices\RegexComWebservice.cs" />
     <Compile Include="umbraco.presentation\umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1840,7 +1841,7 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />  
+    <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
     <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1877,7 +1878,7 @@
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
-    <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />   
+    <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
     <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
       <SubType>ASPXCodeBehind</SubType>
