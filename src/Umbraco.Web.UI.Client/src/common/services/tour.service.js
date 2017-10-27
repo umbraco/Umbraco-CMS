@@ -52,7 +52,7 @@
                     {
                         element: "#applications [data-element='section-user']",
                         title: "User profile",
-                        content: "Click on the <b>user photo</b> to open the user profile dialog.",
+                        content: "Click on your <b>user avatar</b> to open the user profile dialog.",
                         event: "click",
                         backdropOpacity: 0.6
                     },
