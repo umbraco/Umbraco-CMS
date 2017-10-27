@@ -14,14 +14,21 @@
                 "steps": [
                     {
                         title: "Welcome to Umbraco - The Friendly CMS",
-                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p>If you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.</p>",
+                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>n this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p><em>IIf you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.<em></p>",
                         type: "intro"
                     },
                     {
                         element: "#applications",
                         elementPreventClick: true,
+                        title: "Main Menu",
+                        content: "This is the main menu in Umbraco backoffice. Here you can navigate betweeen the different sections, see your user profile and open the help drawer",
+                        backdropOpacity: 0.6
+                    },
+                    {
+                        element: "[data-element='section-content']",
+                        elementPreventClick: true,
                         title: "Sections",
-                        content: "These are the <b>Sections</b> and allows you to navigate the different areas of Umbraco.",
+                        content: "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the main menu and you'll be there in no time.",
                         backdropOpacity: 0.6
                     },
                     
