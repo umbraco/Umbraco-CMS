@@ -47,7 +47,7 @@
                     {
                         element: "[data-element='global-search-field']",
                         title: "Search",
-                        content: "The search allows you to quickly find content across sections within Umbraco."
+                        content: "The search allows you to quickly find whatever you're looking for across sections within Umbraco."
                     },
                     {
                         element: "#applications [data-element='section-user']",
