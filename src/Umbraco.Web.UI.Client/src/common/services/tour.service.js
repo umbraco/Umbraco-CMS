@@ -36,7 +36,7 @@
                         element: "#tree",
                         elementPreventClick: true,
                         title: "The Tree",
-                        content: "<p>This is the <b>Tree</b> and is the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b> and here you can navigate the content of the website.</p>"
+                        content: "<p>This is the <b>Tree</b> and is the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b> and here you can navigate the content of your website.</p>"
                     },
                     {
                         element: "[data-element='editor-content']",
