@@ -362,7 +362,8 @@
                     {
                         element: "[data-element='editor-media'] [data-element='editor-name-field']",
                         title: "Enter a name",
-                        content: "<p>Enter <code>My folder</code> in the field.</p>"
+                        content: "<p>Enter <code>My folder</code> in the field.</p>",
+                        view: "foldername"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='button-save']",
