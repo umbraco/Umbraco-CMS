@@ -128,6 +128,12 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                         content: "This is the <b>Tree</b> and will contain all the content of your website."
                     },
                     {
+                        element: "[data-element='editor-content']",
+                        elementPreventClick: true,
+                        title: "Dashboards",
+                        content: "A dashboard is the main view you are presented with when entering a section within the backoffice, and can be used to show valuable information to the users of the system."
+                    },
+                    {
                         element: "[data-element='global-search-field']",
                         title: "Search",
                         content: "The search allows you to quickly find content across sections within Umbraco."
@@ -164,6 +170,11 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                         title: "Help",
                         content: "<p>In the help drawer you will find articles and videos related to the section you are using.</p><p>This is also where you will find the next tour on how to get started with Umbraco.</p>",
                         backdropOpacity: 0.6
+                    },
+                    {
+                        element: "[data-element='drawer'] [data-element='help-tours']",
+                        title: "Tours",
+                        content: "To continue your journey on getting started with Umbraco, you can find more tours right here."
                     }
                 ]
             },
@@ -215,9 +226,10 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                         event: "click"
                     },
                     {
-                        element: "[data-element='group-name']",
+                        element: "[data-element='group-name-field']",
                         title: "Enter a name",
-                        content: "Enter <code>Content</code> in the tab name."
+                        content: "Enter <code>Content</code> in the tab name.",
+                        view: "tabName"
                     },
                     {
                         element: "[data-element='property-add']",
@@ -289,6 +301,13 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                         title: "Creating your first content node",
                         content: "<p>The <b>Content section</b> contains the content of the website. Content is displayed as <b>nodes</b> in the content tree.</p><p>In this tour we will learn how to create our <b>Home</b> page for our website.</p>",
                         type: "intro"
+                    },
+                    {
+                        element: "#applications [data-element='section-content']",
+                        title: "Navigate to the content sections",
+                        content: "In the <b>Content section</b> we will find the content of our website.",
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "[data-element='tree-root']",
@@ -376,6 +395,13 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                         title: "View your Umbraco site",
                         content: "<p>Our three main components to a page is done: <b>Document type, Template, and Content</b> - it is now time to see the result.</p><p>In this tour we will learn how to see our published website.</p>",
                         type: "intro"
+                    },
+                    {
+                        element: "#applications [data-element='section-content']",
+                        title: "Navigate to the content sections",
+                        content: "In the <b>Content section</b> we will find the content of our website.",
+                        event: "click",
+                        backdropOpacity: 0.6
                     },
                     {
                         element: "#tree [data-element='tree-item-Home']",
