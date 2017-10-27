@@ -133,7 +133,7 @@
          *
          * @description
          * Returns the current tour
-         * @returns {Array} Returns the current tour
+         * @returns {Object} Returns the current tour
 		 */
         function getCurrentTour() {
             return currentTour;
