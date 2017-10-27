@@ -14,6 +14,10 @@ namespace Umbraco.Web.Editors
     using System.Net.Http;
     using System.Web.Http;
 
+    using AutoMapper;
+
+    using Umbraco.Core.Models;
+    using Umbraco.Web.Models.ContentEditing;
     using Umbraco.Web.WebApi;
 
     /// <summary>
@@ -65,7 +69,8 @@ namespace Umbraco.Web.Editors
         {
             if (string.IsNullOrEmpty(key))
             {
-                return this.Request.CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
+                return this.Request
+                    .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
             }
 
             if (this.Services.LocalizationService.DictionaryItemExists(key))
@@ -94,7 +99,31 @@ namespace Umbraco.Web.Editors
             {
                 this.Logger.Error(this.GetType(), "Error creating dictionary", exception);
                 return this.Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
-            }            
+            }
+        }
+
+        /// <summary>
+        /// Gets a dictionary item by id
+        /// </summary>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        ///  Returrns a not found response when dictionary item does not exist
+        /// </exception>
+        public DictionaryDisplay GetById(int id)
+        {
+            var dictionary = this.Services.LocalizationService.GetDictionaryItemById(id);
+
+            if (dictionary == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
         }
     }
 }
