@@ -14,7 +14,7 @@
                 "steps": [
                     {
                         title: "Welcome to Umbraco - The Friendly CMS",
-                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>n this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p><em>IIf you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.<em></p>",
+                        content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p><em>IIf you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.<em></p>",
                         type: "intro"
                     },
                     {
@@ -28,7 +28,7 @@
                         element: "[data-element='section-content']",
                         elementPreventClick: true,
                         title: "Sections",
-                        content: "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the main menu and you'll be there in no time.",
+                        content: "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the appropriate icon in the main menu and you'll be there in no time.",
                         backdropOpacity: 0.6
                     },
                     
@@ -36,7 +36,7 @@
                         element: "#tree",
                         elementPreventClick: true,
                         title: "The Tree",
-                        content: "This is the <b>Tree</b> and will contain all the content of your website."
+                        content: "<p>This is the <b>Tree</b> and is the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b> and here you can navigate the content of the website.</p>"
                     },
                     {
                         element: "[data-element='editor-content']",
