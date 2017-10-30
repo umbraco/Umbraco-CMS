@@ -128,6 +128,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsDocument WHERE nodeId = @Id",
                                "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
                                "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
+                               "DELETE FROM cmsMedia WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
@@ -380,7 +381,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sortOrder = maxSortOrder + 1;
 
             //Create the (base) node data - umbracoNode
-            var nodeDto = dto.ContentDto.NodeDto;
+            var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
@@ -415,15 +416,21 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Level = level;
 
             //Create the Content specific data - cmsContent
-            var contentDto = dto.ContentDto;
+            var contentDto = dto.ContentVersionDto.ContentDto;
             contentDto.NodeId = nodeDto.NodeId;
             Database.Insert(contentDto);
 
             //Create the first version - cmsContentVersion
             //Assumes a new Version guid and Version date (modified date) has been set
+            var contentVersionDto = dto.ContentVersionDto;
+            contentVersionDto.NodeId = nodeDto.NodeId;
+            Database.Insert(contentVersionDto);
+
+            //Create the Media specific data for this version - cmsMedia
+            //Assumes a new Version guid has been generated
             dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
-
+            
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
@@ -473,12 +480,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
-            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            var contentDto = Database.First<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);
             var dto = factory.BuildDto(entity);
 
             //Updates the (base) node data - umbracoNode
-            var nodeDto = dto.ContentDto.NodeDto;
+            var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             nodeDto.ValidatePathWithException();
             var o = Database.Update(nodeDto);
 
@@ -486,15 +493,18 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentDto.ContentTypeId != entity.ContentTypeId)
             {
                 //Create the Content specific data - cmsContent
-                var newContentDto = dto.ContentDto;
+                var newContentDto = dto.ContentVersionDto.ContentDto;
                 Database.Update(newContentDto);
             }
 
             //In order to update the ContentVersion we need to retrieve its primary key id
-            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
-            dto.Id = contentVerDto.Id;
+            var contentVerDto = Database.First<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+            dto.ContentVersionDto.Id = contentVerDto.Id;
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
+            Database.Update(dto.ContentVersionDto);
+
+            //now update the media entry
             Database.Update(dto);
 
             //Create the PropertyData for this version - cmsPropertyData

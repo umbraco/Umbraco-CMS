@@ -64,15 +64,23 @@ namespace Umbraco.Core.Persistence.Factories
             return BuildEntity(dto, _contentType);
         }
 
-        public ContentVersionDto BuildDto(IMedia entity)
+        public MediaDto BuildDto(IMedia entity)
         {
-            var dto = new ContentVersionDto
-                                        {
-                                            NodeId = entity.Id,
-                                            VersionDate = entity.UpdateDate,
-                                            VersionId = entity.Version,
-                                            ContentDto = BuildContentDto(entity)
-                                        };
+            var versionDto = new ContentVersionDto
+            {
+                NodeId = entity.Id,
+                VersionDate = entity.UpdateDate,
+                VersionId = entity.Version,
+                ContentDto = BuildContentDto(entity)
+            };
+            var dto = new MediaDto()
+            {
+                NodeId = entity.Id,
+                ContentVersionDto = versionDto,
+                //TODO: Get the media path!
+                MediaPath = "",
+                VersionId = entity.Version
+            };
             return dto;
         }
 
