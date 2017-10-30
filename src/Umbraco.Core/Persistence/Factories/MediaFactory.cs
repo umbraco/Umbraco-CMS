@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// <param name="text"></param>
         /// <param name="mediaPath"></param>
         /// <returns></returns>
-        private bool TryMatch(string text, out string mediaPath)
+        internal static bool TryMatch(string text, out string mediaPath)
         {
             mediaPath = null;
 
