@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
@@ -87,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of PetaPocoRepositoryBase<int,IMedia>
 
-        protected override Sql GetBaseQuery(BaseQueryType queryType)
+        private Sql GetBaseQuery(BaseQueryType queryType, bool includeFilePaths)
         {
             var sql = new Sql();
             sql.Select(queryType == BaseQueryType.Count ? "COUNT(*)" : (queryType == BaseQueryType.Ids ? "cmsContentVersion.contentId" : "*"))
@@ -95,12 +96,24 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId, SqlSyntax)
-                //TODO: IF we want to enable querying on content type information this will need to be joined
-                //.InnerJoin<ContentTypeDto>(SqlSyntax)
-                //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+
+            if (includeFilePaths)
+            {
+                sql.InnerJoin<MediaDto>(SqlSyntax)
+                    .On<MediaDto, ContentVersionDto>(SqlSyntax, left => left.VersionId, right => right.VersionId);
+            }
+            
+            //TODO: IF we want to enable querying on content type information this will need to be joined
+            //.InnerJoin<ContentTypeDto>(SqlSyntax)
+            //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId, SqlSyntax);
             return sql;
+        }
+
+        protected override Sql GetBaseQuery(BaseQueryType queryType)
+        {
+            return GetBaseQuery(queryType, false);
         }
 
         protected override Sql GetBaseQuery(bool isCount)
@@ -368,7 +381,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Ensure that strings don't contain characters that are invalid in XML
             entity.SanitizeEntityPropertiesForXmlStorage();
 
-            var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
+            var factory = new MediaFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
@@ -478,7 +491,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
+            var factory = new MediaFactory(NodeObjectTypeId);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.First<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);
@@ -650,6 +663,38 @@ namespace Umbraco.Core.Persistence.Repositories
             #endregion
         }
         #endregion
+
+        /// <summary>
+        /// Gets an <see cref="IMedia"/> object from the path stored in the for the media item.
+        /// </summary>
+        /// <param name="mediaPath">Path of the media item to retrieve (for example: /media/1024/koala_403x328.jpg)</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IMedia GetMediaByPath(string mediaPath)
+        {
+            var umbracoFileValue = mediaPath;
+
+            const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
+            var isResized = Regex.IsMatch(mediaPath, pattern);
+
+            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
+            if (isResized)
+            {
+                var underscoreIndex = mediaPath.LastIndexOf('_');
+                var dotIndex = mediaPath.LastIndexOf('.');
+                umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
+            }
+
+            var sql = GetBaseQuery(BaseQueryType.FullSingle, true);
+            sql.Where<MediaDto>(mediaDto => mediaDto.MediaPath == umbracoFileValue, SqlSyntax);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            if (dto == null)
+                return null;
+
+            var content = CreateMediaFromDto(dto, sql);
+
+            return content;
+        }
 
         /// <summary>
         /// Gets paged media results

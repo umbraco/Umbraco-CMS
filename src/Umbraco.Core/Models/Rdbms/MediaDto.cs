@@ -23,6 +23,7 @@ namespace Umbraco.Core.Models.Rdbms
         public ContentVersionDto ContentVersionDto { get; set; }
 
         [Column("mediaPath")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string MediaPath { get; set; }
     }
 }
