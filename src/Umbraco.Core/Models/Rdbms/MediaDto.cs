@@ -19,11 +19,11 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn(AutoIncrement = false)]
         public Guid VersionId { get; set; }
         
-        [ResultColumn]
-        public ContentVersionDto ContentVersionDto { get; set; }
-
         [Column("mediaPath")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string MediaPath { get; set; }
+
+        [ResultColumn]
+        public ContentVersionDto ContentVersionDto { get; set; }
     }
 }
