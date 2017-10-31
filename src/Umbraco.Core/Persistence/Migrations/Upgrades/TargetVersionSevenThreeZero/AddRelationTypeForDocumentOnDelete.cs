@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
 
         // need to capture the DTO as it is modified in later migrations
 
-        [TableName("umbracoRelationType")]
+        [TableName(Constants.DatabaseSchema.Tables.RelationType)]
         [PrimaryKey("id")]
         [ExplicitColumns]
         internal class RelationTypeDtoCapture

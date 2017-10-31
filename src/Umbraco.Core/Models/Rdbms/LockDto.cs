@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoLock")]
+    [TableName(Constants.DatabaseSchema.Tables.Lock)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class LockDto

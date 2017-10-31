@@ -60,17 +60,17 @@ namespace Umbraco.Web.Strategies.Migrations
                 {
                     //Turn on identity insert if db provider is not mysql
                     if (syntax.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", syntax.GetQuotedTableName("cmsDataType"))));
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", syntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
 
-                    e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = -26, DataTypeId = Constants.DataTypes.DefaultContentListView, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
-                    e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = -27, DataTypeId = Constants.DataTypes.DefaultMediaListView, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
-                    e.MigrationContext.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = -28, DataTypeId = Constants.DataTypes.DefaultMembersListView, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                    e.MigrationContext.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -26, DataTypeId = Constants.DataTypes.DefaultContentListView, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                    e.MigrationContext.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -27, DataTypeId = Constants.DataTypes.DefaultMediaListView, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                    e.MigrationContext.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -28, DataTypeId = Constants.DataTypes.DefaultMembersListView, PropertyEditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
                 }
                 finally
                 {
                     //Turn off identity insert if db provider is not mysql
                     if (syntax.SupportsIdentityInsert())
-                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", syntax.GetQuotedTableName("cmsDataType"))));
+                        e.MigrationContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", syntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
                 }
 
 

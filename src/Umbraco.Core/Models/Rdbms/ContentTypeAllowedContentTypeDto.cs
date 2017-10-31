@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsContentTypeAllowedContentType")]
+    [TableName(Constants.DatabaseSchema.Tables.ContentChildType)]
     [PrimaryKey("Id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentTypeAllowedContentTypeDto

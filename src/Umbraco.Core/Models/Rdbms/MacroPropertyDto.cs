@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsMacroProperty")]
+    [TableName(Constants.DatabaseSchema.Tables.MacroProperty)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class MacroPropertyDto

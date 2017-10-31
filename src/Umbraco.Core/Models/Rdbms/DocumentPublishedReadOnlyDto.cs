@@ -3,7 +3,7 @@ using NPoco;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsDocument")]
+    [TableName(Constants.DatabaseSchema.Tables.Document)]
     [PrimaryKey("versionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentPublishedReadOnlyDto

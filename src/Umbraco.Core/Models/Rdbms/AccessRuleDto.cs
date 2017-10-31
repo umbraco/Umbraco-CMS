@@ -1,12 +1,11 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoAccessRule")]
+    [TableName(Constants.DatabaseSchema.Tables.AccessRule)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class AccessRuleDto

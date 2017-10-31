@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsTags")]
+    [TableName(Constants.DatabaseSchema.Tables.Tag)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class TagDto

@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsMember")]
+    [TableName(Constants.DatabaseSchema.Tables.Member)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class MemberDto

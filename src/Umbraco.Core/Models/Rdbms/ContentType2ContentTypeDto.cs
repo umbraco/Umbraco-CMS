@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsContentType2ContentType")]
+    [TableName(Constants.DatabaseSchema.Tables.ElementTypeTree)]
     [ExplicitColumns]
     internal class ContentType2ContentTypeDto
     {

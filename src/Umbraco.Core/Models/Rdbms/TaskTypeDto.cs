@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsTaskType")]
+    [TableName(Constants.DatabaseSchema.Tables.TaskType)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class TaskTypeDto

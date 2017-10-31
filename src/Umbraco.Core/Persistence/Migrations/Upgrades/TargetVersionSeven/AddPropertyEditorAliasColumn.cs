@@ -15,12 +15,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Up()
         {
-            Alter.Table("cmsDataType").AddColumn("propertyEditorAlias").AsString(255).NotNullable().WithDefaultValue("");
+            Alter.Table(Constants.DatabaseSchema.Tables.DataType).AddColumn("propertyEditorAlias").AsString(255).NotNullable().WithDefaultValue("");
         }
 
         public override void Down()
         {
-            Delete.Column("propertyEditorAlias").FromTable("cmsDataType");
+            Delete.Column("propertyEditorAlias").FromTable(Constants.DatabaseSchema.Tables.DataType);
         }
     }
 }

@@ -728,7 +728,6 @@
     <Compile Include="Models\Rdbms\UserGroup2NodePermissionDto.cs" />
     <Compile Include="Models\Rdbms\UserGroupDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
-    <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
@@ -772,6 +771,7 @@
     <Compile Include="Packaging\PackageExtraction.cs" />
     <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\BulkDataReader.cs" />
+    <Compile Include="Persistence\Constants-DatabaseSchema.cs" />
     <Compile Include="Persistence\Constants-DbProviderNames.cs" />
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />

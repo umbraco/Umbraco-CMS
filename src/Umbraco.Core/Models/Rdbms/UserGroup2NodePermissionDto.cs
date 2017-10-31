@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoUserGroup2NodePermission")]
+    [TableName(Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
     [ExplicitColumns]
     internal class UserGroup2NodePermissionDto
     {

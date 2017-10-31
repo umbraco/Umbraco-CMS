@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsDataTypePreValues")]
+    [TableName(Constants.DatabaseSchema.Tables.DataTypePreValue)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class DataTypePreValueDto

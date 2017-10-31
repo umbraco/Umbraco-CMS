@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsPreviewXml")]
+    [TableName(Constants.DatabaseSchema.Tables.NodePreviewXml)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class PreviewXmlDto

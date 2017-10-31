@@ -40,11 +40,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         // * developers can change the property editor for the data type at a later time when there's a compatible one
                         // * editors cannot edit the value with an invalid editor
 
-                        Update.Table("cmsDataType").Set(new { propertyEditorAlias = Constants.PropertyEditors.NoEditAlias }).Where(new { item.pk });
+                        Update.Table(Constants.DatabaseSchema.Tables.DataType).Set(new { propertyEditorAlias = Constants.PropertyEditors.NoEditAlias }).Where(new { item.pk });
                     }
                     else
                     {
-                        Update.Table("cmsDataType").Set(new { propertyEditorAlias = alias }).Where(new { item.pk });
+                        Update.Table(Constants.DatabaseSchema.Tables.DataType).Set(new { propertyEditorAlias = alias }).Where(new { item.pk });
                     }
                 }
                 else
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     // * developers can change the property editor for the data type at a later time when there's a compatible one
                     // * editors cannot edit the value with an invalid editor
 
-                    Update.Table("cmsDataType").Set(new { propertyEditorAlias = Constants.PropertyEditors.NoEditAlias }).Where(new { item.pk });
+                    Update.Table(Constants.DatabaseSchema.Tables.DataType).Set(new { propertyEditorAlias = Constants.PropertyEditors.NoEditAlias }).Where(new { item.pk });
                 }
             }
         }

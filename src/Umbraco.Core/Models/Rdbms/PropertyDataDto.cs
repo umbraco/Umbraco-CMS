@@ -1,11 +1,10 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsPropertyData")]
+    [TableName(Constants.DatabaseSchema.Tables.PropertyData)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyDataDto

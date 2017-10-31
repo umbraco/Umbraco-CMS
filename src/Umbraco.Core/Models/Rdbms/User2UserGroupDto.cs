@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoUser2UserGroup")]
+    [TableName(Constants.DatabaseSchema.Tables.User2UserGroup)]
     [ExplicitColumns]
     internal class User2UserGroupDto
     {
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int UserGroupId { get; set; }
     }
 
-    [TableName("umbracoUser2UserGroup")]
+    [TableName(Constants.DatabaseSchema.Tables.User2UserGroup)]
     [ExplicitColumns]
     internal class User2UserGroupReadOnlyDto
     {

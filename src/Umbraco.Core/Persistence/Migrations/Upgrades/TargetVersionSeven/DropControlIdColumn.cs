@@ -14,9 +14,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Up()
         {
-            Delete.Column("controlId").FromTable("cmsDataType");
+            Delete.Column("controlId").FromTable(Constants.DatabaseSchema.Tables.DataType);
             //drop the default contstraint on the new column too
-            Delete.DefaultConstraint().OnTable("cmsDataType").OnColumn("propertyEditorAlias");
+            Delete.DefaultConstraint().OnTable(Constants.DatabaseSchema.Tables.DataType).OnColumn("propertyEditorAlias");
         }
 
         public override void Down()

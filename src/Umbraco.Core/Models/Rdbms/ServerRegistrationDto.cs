@@ -1,12 +1,11 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoServer")]
+    [TableName(Constants.DatabaseSchema.Tables.Server)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class ServerRegistrationDto

@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoLanguage")]
+    [TableName(Constants.DatabaseSchema.Tables.Language)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class LanguageDto

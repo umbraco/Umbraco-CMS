@@ -92,12 +92,12 @@ namespace Umbraco.Web.Install.InstallSteps
             var sql = new Sql();
             sql
                 .Select(
-                    sqlSyntax.GetQuotedColumn("cmsDataType", "controlId"),
+                    sqlSyntax.GetQuotedColumn(Constants.DatabaseSchema.Tables.DataType, "controlId"),
                     sqlSyntax.GetQuotedColumn("umbracoNode", "text"))
-                .From(sqlSyntax.GetQuotedTableName("cmsDataType"))
+                .From(sqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))
                 .InnerJoin(sqlSyntax.GetQuotedTableName("umbracoNode"))
                 .On(
-                    sqlSyntax.GetQuotedColumn("cmsDataType", "nodeId") + " = " +
+                    sqlSyntax.GetQuotedColumn(Constants.DatabaseSchema.Tables.DataType, "nodeId") + " = " +
                     sqlSyntax.GetQuotedColumn("umbracoNode", "id"));
 
             List<dynamic> list;

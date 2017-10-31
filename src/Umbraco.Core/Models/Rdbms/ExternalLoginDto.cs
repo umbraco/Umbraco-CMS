@@ -1,12 +1,11 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoExternalLogin")]
+    [TableName(Constants.DatabaseSchema.Tables.ExternalLogin)]
     [ExplicitColumns]
     [PrimaryKey("Id")]
     internal class ExternalLoginDto
@@ -31,7 +30,5 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime CreateDate { get; set; }
-
-
     }
 }

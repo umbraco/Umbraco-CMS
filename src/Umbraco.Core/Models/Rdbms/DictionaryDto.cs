@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsDictionary")]
+    [TableName(Constants.DatabaseSchema.Tables.DictionaryEntry)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class DictionaryDto

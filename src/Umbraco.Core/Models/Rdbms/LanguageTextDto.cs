@@ -1,11 +1,10 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsLanguageText")]
+    [TableName(Constants.DatabaseSchema.Tables.DictionaryValue)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class LanguageTextDto

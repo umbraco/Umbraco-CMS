@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsTemplate")]
+    [TableName(Constants.DatabaseSchema.Tables.Template)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class TemplateDto

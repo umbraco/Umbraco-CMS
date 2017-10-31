@@ -1,11 +1,10 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoCacheInstruction")]
+    [TableName(Constants.DatabaseSchema.Tables.CacheInstruction)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class CacheInstructionDto

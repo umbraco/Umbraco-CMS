@@ -147,9 +147,9 @@ namespace Umbraco.Tests.Persistence.Querying
                 scope.Database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 99999, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,99999", SortOrder = 0, UniqueId = new Guid("129241F0-D24E-4FC3-92D1-BC2D48B7C431"), Text = "Test Content Type", NodeObjectType = Constants.ObjectTypes.DocumentType, CreateDate = DateTime.Now });
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("umbracoNode"))));
 
-                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("cmsDataType"))));
-                scope.Database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 44444, DataTypeId = 55555, PropertyEditorAlias = Constants.PropertyEditors.TextboxAlias, DbType = "Nvarchar" });
-                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("cmsDataType"))));
+                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
+                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 44444, DataTypeId = 55555, PropertyEditorAlias = Constants.PropertyEditors.TextboxAlias, DbType = "Nvarchar" });
+                scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
 
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("cmsContentType"))));
                 scope.Database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 88888, NodeId = 99999, Alias = "TestContentType", Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });

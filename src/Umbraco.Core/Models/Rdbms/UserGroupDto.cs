@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoUserGroup")]
+    [TableName(Constants.DatabaseSchema.Tables.UserGroup)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class UserGroupDto

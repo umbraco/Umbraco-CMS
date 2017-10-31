@@ -1,10 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoDomains")]
+    [TableName(Constants.DatabaseSchema.Tables.Domain)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class DomainDto

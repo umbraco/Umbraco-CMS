@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("cmsContentNu")]
+    [TableName(Constants.DatabaseSchema.Tables.NodeData)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentNuDto

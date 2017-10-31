@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Security.AccessControl;
 using NPoco;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName("umbracoAccess")]
+    [TableName(Constants.DatabaseSchema.Tables.Access)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class AccessDto
