@@ -178,7 +178,7 @@ namespace Umbraco.Web
 
 		public static bool HasScheme(string uri)
 		{
-			return uri.IndexOf("://") > 0;
+			return uri.IndexOf(Uri.SchemeDelimiter) > 0;
 		}
 
 		public static string StartWithScheme(string uri)
@@ -188,7 +188,7 @@ namespace Umbraco.Web
 
 		public static string StartWithScheme(string uri, string scheme)
 		{
-			return HasScheme(uri) ? uri : String.Format("{0}://{1}", scheme ?? Uri.UriSchemeHttp, uri);
+			return HasScheme(uri) ? uri : String.Format("{0}{1}{2}", scheme ?? Uri.UriSchemeHttp, Uri.SchemeDelimiter, uri);
 		}
 
 		public static string EndPathWithSlash(string uri)

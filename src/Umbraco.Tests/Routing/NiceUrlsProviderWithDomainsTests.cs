@@ -201,15 +201,15 @@ namespace Umbraco.Tests.Routing
         // different current tests
         [TestCase(1001, "http://domain2.com", false, "http://domain1.com/foo/")]
         [TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1/")]
-        [TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo/")]
-        [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
+        [TestCase(1001, "https://domain1.com", false, "https://domain1.com/foo/")]
+        [TestCase(10011, "https://domain1.com", false, "https://domain1.com/foo/1001-1/")]
         public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings);
+            var routingContext = GetRoutingContext("/test", 1111, umbracoSettings: settings, isSecureRequest: currentUrl.StartsWith(Uri.UriSchemeHttps));
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains

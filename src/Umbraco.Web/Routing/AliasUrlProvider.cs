@@ -65,12 +65,12 @@ namespace Umbraco.Web.Routing
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
 
             var n = node;
-            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            var domainUris = domainHelper.DomainsForNode(n.Id, current, umbracoContext.HttpContext.Request, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
+                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, umbracoContext.HttpContext.Request, false);
             }
 
             var path = "/" + umbracoUrlName;
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Routing
             }
 
             return domainUris
-                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
+                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPartWithScheme(UriPartial.Path, umbracoContext.HttpContext.Request.GetScheme()), path)))
                 .Select(uri => UriUtility.UriFromUmbraco(uri).ToString());
         }
 

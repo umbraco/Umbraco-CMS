@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -11,6 +13,38 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HttpRequestExtensions
 	{
+	    /// <summary>
+	    /// Returns either https or http depending on the information in the request
+	    /// </summary>
+	    /// <param name="request"></param>
+	    /// <returns></returns>
+	    public static string GetScheme(this HttpRequestBase request)
+	    {
+	        return GetScheme(request, DefaultUrlProvider.KnownForwardedHttpsHeaders);
+	    }
+
+        /// <summary>
+        /// Returns either https or http depending on the information in the request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="knownForwardedHttpsHeaders"></param>
+        /// <returns></returns>
+        public static string GetScheme(this HttpRequestBase request, string[] knownForwardedHttpsHeaders)
+	    {
+	        var httpsForwardHeaderExists = false;
+	        if (request.Headers != null)
+	        {
+	            foreach (var header in knownForwardedHttpsHeaders)
+	            {
+	                httpsForwardHeaderExists = request.Headers.ContainsKey(header);
+	                if (httpsForwardHeaderExists) break;
+	            }
+            }
+
+	        return httpsForwardHeaderExists || request.IsSecureConnection ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
+	    }
+
+
         /// <summary>
         /// Extracts the value from the query string and cleans it to prevent xss attacks.
         /// </summary>

@@ -8,12 +8,12 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	public sealed class SiteDomainHelperResolver : SingleObjectResolverBase<SiteDomainHelperResolver, ISiteDomainHelper>
 	{
-		
-		/// <summary>
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SiteDomainHelperResolver"/> class with an <see cref="ISiteDomainHelper"/> implementation.
-		/// </summary>
-        /// <param name="helper">The <see cref="ISiteDomainHelper"/> implementation.</param>
-        internal SiteDomainHelperResolver(ISiteDomainHelper helper)
+        /// </summary>
+        /// <param name="helper">The <see cref="ISiteDomainHelper2"/> implementation.</param>
+        internal SiteDomainHelperResolver(ISiteDomainHelper2 helper)
 			: base(helper)
 		{ }
 

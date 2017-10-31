@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -73,10 +73,10 @@ namespace Umbraco.Web.Routing
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
+                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, umbracoContext.HttpContext.Request);
 
             // assemble the url from domainUri (maybe null) and path
-            return AssembleUrl(domainUri, path, current, mode).ToString();
+            return AssembleUrl(domainUri, path, current, mode, umbracoContext.HttpContext.Request).ToString();
         }
 
         #endregion
@@ -113,21 +113,23 @@ namespace Umbraco.Web.Routing
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
-            var domainUris = pos == 0 ? null : domainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
+            var domainUris = pos == 0 ? null : domainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current, umbracoContext.HttpContext.Request);
 
             // assemble the alternate urls from domainUris (maybe empty) and path
-            return AssembleUrls(domainUris, path).Select(uri => uri.ToString());
+            return AssembleUrls(domainUris, path, umbracoContext.HttpContext.Request).Select(uri => uri.ToString());
         }
 
         #endregion
 
         #region Utilities
 
-        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlProviderMode mode)
+        private Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlProviderMode mode, HttpRequestBase httpRequest)
         {
             Uri uri;
 
             // ignore vdir at that point, UriFromUmbraco will do it
+
+            var scheme = httpRequest.GetScheme();
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
@@ -144,7 +146,8 @@ namespace Umbraco.Web.Routing
                 switch (mode)
                 {
                     case UrlProviderMode.Absolute:
-                        uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
+                        // ReSharper disable once PossibleNullReferenceException - if current was null it will not be Absolute
+                        uri = new Uri(scheme + Uri.SchemeDelimiter + current.Authority + path.EnsureStartsWith('/'));
                         break;
                     case UrlProviderMode.Relative:
                     case UrlProviderMode.Auto:
@@ -158,7 +161,7 @@ namespace Umbraco.Web.Routing
             {
                 if (mode == UrlProviderMode.Auto)
                 {
-                    if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
+                    if (current != null && scheme == domainUri.Uri.Scheme && domainUri.Uri.CompareLeftPart(current, UriPartial.Authority, ignoreScheme:true))
                         mode = UrlProviderMode.Relative;
                     else
                         mode = UrlProviderMode.Absolute;
@@ -167,7 +170,7 @@ namespace Umbraco.Web.Routing
                 switch (mode)
                 {
                     case UrlProviderMode.Absolute:
-                        uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPartWithScheme(UriPartial.Path, httpRequest.GetScheme()), path));
                         break;
                     case UrlProviderMode.Relative:
                         uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative);
@@ -189,7 +192,7 @@ namespace Umbraco.Web.Routing
         }
 
         // always build absolute urls unless we really cannot
-        IEnumerable<Uri> AssembleUrls(IEnumerable<DomainAndUri> domainUris, string path)
+        private IEnumerable<Uri> AssembleUrls(IEnumerable<DomainAndUri> domainUris, string path, HttpRequestBase httpRequest)
         {
             // no domain == no "other" url
             if (domainUris == null)
@@ -197,13 +200,20 @@ namespace Umbraco.Web.Routing
 
             // if no domain was found and then we have no "other" url
             // else return absolute urls, ignoring vdir at that point
-            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)));
+            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPartWithScheme(UriPartial.Path, httpRequest.GetScheme()), path)));
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
             return uris.Select(UriUtility.UriFromUmbraco);
         }
 
+
         #endregion
+
+        /// <summary>
+        /// Get/set the https headers to check against
+        /// </summary>
+        //TODO: Make this configurable via IWebRoutingSection?
+        public static string[] KnownForwardedHttpsHeaders = new[] { "HTTP_X_FORWARDED_PROTO" };
     }
 }

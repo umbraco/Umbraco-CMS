@@ -10,6 +10,7 @@ using Umbraco.Core.Profiling;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation;
+using Umbraco.Web;
 
 namespace umbraco
 {
@@ -211,7 +212,8 @@ namespace umbraco
         [Obsolete("Use umbraco.presentation.UmbracContext.Current.GetBaseUrl()")]
         public static string GetBaseUrl(HttpContext Context)
         {
-            return Context.Request.Url.GetLeftPart(UriPartial.Authority);
+            var httpRequest = new HttpRequestWrapper(Context.Request);
+            return httpRequest.Url.GetLeftPartWithScheme(UriPartial.Authority, httpRequest.GetScheme());
         }
     }
 }

@@ -357,7 +357,8 @@ namespace Umbraco.Web
 
             if (urlHelper.RequestContext.HttpContext.Request.Url != null)
             {
-                var requestUrl = urlHelper.RequestContext.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority);
+                var requestUrl = urlHelper.RequestContext.HttpContext.Request.Url
+                    .GetLeftPartWithScheme(UriPartial.Authority, urlHelper.RequestContext.HttpContext.Request.GetScheme());
                 return string.Format("{0}{1}", requestUrl, mediaItem.Url);
             }
             return null;

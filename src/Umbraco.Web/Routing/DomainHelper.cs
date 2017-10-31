@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -27,15 +28,16 @@ namespace Umbraco.Web.Routing
 
         #region Domain for Node
 
-        /// <summary>
-        /// Finds the domain for the specified node, if any, that best matches a specified uri.
-        /// </summary>
-        /// <param name="nodeId">The node identifier.</param>
-        /// <param name="current">The uri, or null.</param>
-        /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
-        /// <remarks>If at least a domain is set on the node then the method returns the domain that
-        /// best matches the specified uri, else it returns null.</remarks>
-        internal DomainAndUri DomainForNode(int nodeId, Uri current)
+	    /// <summary>
+	    /// Finds the domain for the specified node, if any, that best matches a specified uri.
+	    /// </summary>
+	    /// <param name="nodeId">The node identifier.</param>
+	    /// <param name="current">The uri, or null.</param>
+	    /// <param name="httpRequest"></param>
+	    /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
+	    /// <remarks>If at least a domain is set on the node then the method returns the domain that
+	    /// best matches the specified uri, else it returns null.</remarks>
+	    internal DomainAndUri DomainForNode(int nodeId, Uri current, HttpRequestBase httpRequest)
         {
             // be safe
             if (nodeId <= 0)
@@ -50,7 +52,11 @@ namespace Umbraco.Web.Routing
 
             // else filter
             var helper = SiteDomainHelperResolver.Current.Helper;
-            var domainAndUri = DomainForUri(domains, current, domainAndUris => helper.MapDomain(current, domainAndUris));
+
+            var helperV2 = helper as ISiteDomainHelper2;
+            var domainAndUri = helperV2 != null
+                ? DomainForUri(domains, current, domainAndUris => helperV2.MapDomain(current, httpRequest, domainAndUris))
+                : DomainForUri(domains, current, domainAndUris => helper.MapDomain(current, domainAndUris));
 
             if (domainAndUri == null)
                 throw new Exception("DomainForUri returned null.");
@@ -68,16 +74,17 @@ namespace Umbraco.Web.Routing
             return nodeId > 0 && _domainService.GetAssignedDomains(nodeId, false).Any();
         }
 
-        /// <summary>
-        /// Find the domains for the specified node, if any, that match a specified uri.
-        /// </summary>
-        /// <param name="nodeId">The node identifier.</param>
-        /// <param name="current">The uri, or null.</param>
-        /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
-        /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
-        /// <remarks>If at least a domain is set on the node then the method returns the domains that
-        /// best match the specified uri, else it returns null.</remarks>
-        internal IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current, bool excludeDefault = true)
+	    /// <summary>
+	    /// Find the domains for the specified node, if any, that match a specified uri.
+	    /// </summary>
+	    /// <param name="nodeId">The node identifier.</param>
+	    /// <param name="current">The uri, or null.</param>
+	    /// <param name="httpRequest"></param>
+	    /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
+	    /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
+	    /// <remarks>If at least a domain is set on the node then the method returns the domains that
+	    /// best match the specified uri, else it returns null.</remarks>
+	    internal IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current, HttpRequestBase httpRequest, bool excludeDefault = true)
         {
             // be safe
             if (nodeId <= 0)
@@ -95,7 +102,11 @@ namespace Umbraco.Web.Routing
 
             // filter
             var helper = SiteDomainHelperResolver.Current.Helper;
-            return helper.MapDomains(current, domainAndUris, excludeDefault).ToArray();
+
+            var helperV2 = helper as ISiteDomainHelper2;
+            return helperV2 != null
+                ? helperV2.MapDomains(current, httpRequest, domainAndUris, excludeDefault).ToArray()
+                : helper.MapDomains(current, domainAndUris, excludeDefault).ToArray();
         }
 
         #endregion
@@ -200,7 +211,8 @@ namespace Umbraco.Web.Routing
             if (context != null && domain.DomainName.StartsWith("/"))
             {
                 // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-                var authority = context.Request.Url.GetLeftPart(UriPartial.Authority);
+                var httpRequest = new HttpRequestWrapper(context.Request);
+                var authority = context.Request.Url.GetLeftPartWithScheme(UriPartial.Authority, httpRequest.GetScheme());
                 domain.DomainName = authority + domain.DomainName;
             }
             return domain;

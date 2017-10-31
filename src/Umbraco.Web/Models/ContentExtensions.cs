@@ -67,7 +67,7 @@ namespace Umbraco.Web.Models
                     hasDomain = content != null && domainHelper.NodeHasDomains(content.Id);
                 }
 
-                domain = hasDomain ? domainHelper.DomainForNode(content.Id, current).UmbracoDomain : null;
+                domain = hasDomain ? domainHelper.DomainForNode(content.Id, current, umbracoContext.HttpContext.Request).UmbracoDomain : null;
             }
             else
             {
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Models
                 var pos = route.IndexOf('/');
                 domain = pos == 0
                     ? null
-                    : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current).UmbracoDomain;
+                    : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, umbracoContext.HttpContext.Request).UmbracoDomain;
             }
 
             var rootContentId = domain == null ? -1 : domain.RootContentId;

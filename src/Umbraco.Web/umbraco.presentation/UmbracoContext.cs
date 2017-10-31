@@ -9,6 +9,7 @@ using umbraco.presentation.preview;
 using Examine.Providers;
 using Examine;
 using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.presentation
 {
@@ -149,7 +150,7 @@ namespace umbraco.presentation
             {
                 if (_request == null)
                 {
-                    _request = new UmbracoRequest(this._httpContext.Request);
+                    _request = new UmbracoRequest(_httpContext.Request);
                 }
                 return _request;
             }
@@ -159,9 +160,10 @@ namespace umbraco.presentation
         /// Gets the base URL for the website
         /// </summary>
         /// <returns></returns>
+        //TODO: This doesn't seem to be used for anything....
         public virtual string GetBaseUrl()
         {
-            return this.Request.Url.GetLeftPart(UriPartial.Authority);
+            return Request.Url.GetLeftPartWithScheme(UriPartial.Authority, Request.GetScheme());
         }
 
         public virtual UmbracoServerUtility Server

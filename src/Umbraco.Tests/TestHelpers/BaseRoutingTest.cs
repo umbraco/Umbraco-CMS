@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Web.Routing;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
@@ -23,12 +24,21 @@ namespace Umbraco.Tests.TestHelpers
 	    ///  <param name="routeData"></param>
 	    /// <param name="setUmbracoContextCurrent">set to true to also set the singleton UmbracoContext.Current to the context created with this method</param>
 	    /// <param name="umbracoSettings"></param>
+	    /// <param name="isSecureRequest">
+	    /// If true will set the IsSecureRequest of the HttpRequestBase object to true
+	    /// </param>
 	    /// <returns></returns>
-	    protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null, bool setUmbracoContextCurrent = false, IUmbracoSettingsSection umbracoSettings = null)
+	    protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null, bool setUmbracoContextCurrent = false, IUmbracoSettingsSection umbracoSettings = null, bool isSecureRequest = false)
 	    {
 	        if (umbracoSettings == null) umbracoSettings = SettingsForTests.GetDefault();
 
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
+
+	        if (isSecureRequest)
+	        {
+	            Mock.Get(umbracoContext.HttpContext.Request).Setup(x => x.IsSecureConnection).Returns(true);
+	        }
+
             var urlProvider = new UrlProvider(umbracoContext, umbracoSettings.WebRouting, new IUrlProvider[]
             {
                 new DefaultUrlProvider(umbracoSettings.RequestHandler)

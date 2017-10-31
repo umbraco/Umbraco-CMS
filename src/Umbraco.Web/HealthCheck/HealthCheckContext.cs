@@ -33,6 +33,7 @@ namespace Umbraco.Web.HealthCheck
         {
             get
             {
+                //TODO: For health checks should this use GetLeftPartWithScheme? But if that is the case we need an HttpRequestBase and we won't have it when running on a background thread
                 return _httpContext != null
                     ? _httpContext.Request.Url.GetLeftPart(UriPartial.Authority)
                     : ApplicationContext.UmbracoApplicationUrl.Replace("/umbraco", string.Empty);

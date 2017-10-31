@@ -333,7 +333,11 @@ namespace umbraco
         internal static string NiceUrlWithDomain(int nodeID, bool ignoreUmbracoHostNames)
         {
             if (ignoreUmbracoHostNames)
-                return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + NiceUrl(nodeID);
+            {
+                var httpRequestBase = new HttpRequestWrapper(HttpContext.Current.Request);
+                return httpRequestBase.Url.GetLeftPartWithScheme(UriPartial.Authority, httpRequestBase.GetScheme()) + NiceUrl(nodeID);
+            }
+                
 
             return NiceUrlWithDomain(nodeID);
         }
