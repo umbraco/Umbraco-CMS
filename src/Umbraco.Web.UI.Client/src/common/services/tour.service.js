@@ -133,7 +133,7 @@
                     {
                         element: "[data-element='group-add']",
                         title: "Add tab",
-                        content: "Tabs help are used organize properties on content in the Content section. Click <b>Add new tab</b> to add a tab.",
+                        content: "Tabs are used organize properties on content in the Content section. Click <b>Add new tab</b> to add a tab.",
                         event: "click"
                     },
                     {
@@ -150,8 +150,8 @@
                     },
                     {
                         element: "[data-element~='overlay-property-settings'] [data-element='property-name']",
-                        title: "Enter a name",
-                        content: "Enter <code>Welcome Text</code> as name for the property.",
+                        title: "Name the property",
+                        content: "Enter <code>Welcome Text</code> as the name for the property.",
                         view: "propertyname"
                     },
                     {
@@ -162,26 +162,26 @@
                     {
                         element: "[data-element~='overlay-property-settings'] [data-element='editor-add']",
                         title: "Add editor",
-                        content: "The editor defines what data type the property is. Click <b>Add editor</b> to open the editor picker dialog.",
+                        content: "When you add an editor you choose the what the input method for this property will be. Click <b>Add editor</b> to open the editor picker dialog.",
                         event: "click"
                     },
                     {
                         element: "[data-element~='overlay-editor-picker']",
                         elementPreventClick: true,
                         title: "Editor picker",
-                        content: "<p>In the editor picker dialog we can pick one of the many build in editor.</p>"
+                        content: "<p>In the editor picker dialog we can pick one of the many build in editor.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em></p>"
                     },
                     {
                         element: "[data-element~='overlay-editor-picker'] [data-element='editor-Textarea']",
                         title: "Select editor",
-                        content: "Select the <b>Textarea</b> editor which allows us to enter long texts.",
+                        content: "Select the <b>Textarea</b> editor. This will add a textarea to the Welcome Text property.",
                         event: "click"
                     },
                     {
                         element: "[data-element~='overlay-editor-settings']",
                         elementPreventClick: true,
                         title: "Editor settings",
-                        content: "Each property editor can have individual settings. We don't want to change any of these now."
+                        content: "Each property editor can have individual settings. For the textarea editor you can set a charachter limit but in this case it is not needed"
                     },
                     {
                         element: "[data-element~='overlay-editor-settings'] [data-element='button-overlaySubmit']",

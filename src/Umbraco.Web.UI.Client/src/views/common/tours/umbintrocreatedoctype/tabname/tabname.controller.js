@@ -11,7 +11,7 @@
         vm.initNextStep = initNextStep;
 
         function initNextStep() {
-            if(element.val() === 'Content') {
+            if(element.val() === 'Home') {
                 $scope.model.nextStep();
             } else {
                 vm.error = true;
