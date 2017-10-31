@@ -16,7 +16,7 @@
 
             scope.model.endTour = function() {
                 unbindEvent();
-                tourService.endTour();
+                tourService.endTour(scope.model);
                 backdropService.close();
             };
 
@@ -25,6 +25,12 @@
                 tourService.completeTour(scope.model);
                 backdropService.close();
             };
+
+            scope.model.disableTour = function() {
+                unbindEvent();
+                tourService.disableTour(scope.model);
+                backdropService.close();
+            }
 
             function onInit() {
                 popover = el.find(".umb-tour__popover");

@@ -32,14 +32,15 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
         // load tours
         vm.tours = tourService.getGroupedTours();
         
-        // get list of completed tours
+        // get list of completed tours and disabled tours
         var completedTours = tourService.getCompletedTours();
+        var disabledTours = tourService.getDisabledTours();
 
         // get intro tour
         var introTour = tourService.getTourByAlias("umbIntroIntroduction");
         
-        // start tour if it hasn't been completed
-        if(completedTours.indexOf(introTour.alias) === -1) {
+        // start intro tour if it hasn't been completed or disabled
+        if(completedTours.indexOf(introTour.alias) === -1 && disabledTours.indexOf(introTour.alias) === -1) {
             tourService.startTour(introTour);
         }
         
