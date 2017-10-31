@@ -145,7 +145,7 @@
                     {
                         element: "[data-element='property-add']",
                         title: "Add a property",
-                        content: "<p>Properties are the different types of data on our content page.</p><p>On our Home page we wan't to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
+                        content: "<p>Properties are the different input fields on a content page.</p><p>On our Home Page we wan't to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
                         event: "click"
                     },
                     {
