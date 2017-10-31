@@ -109,7 +109,7 @@
                     {
                         element: "#tree [data-element='tree-item-documentTypes']",
                         title: "Create document type",
-                        content: "<p>Hover the document types tree and click the <b>three small dots</b> to open the <b>context menu</b>.</p>",
+                        content: "<p>Hover the Document Type tree and click the <b>three small dots</b> to open the <b>context menu</b>.</p>",
                         event: "click",
                         eventElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
                     },
