@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Tours.UmbIntroRenderInTemplate.TemplatesTreeController as vm">
-    <umb-tour-step>
+    <umb-tour-step on-close="model.endTour()">
             
         <umb-tour-step-header
             title="model.currentStep.title">
@@ -15,10 +15,6 @@
                 current-step="model.currentStepIndex + 1"
                 total-steps="model.steps.length">
             </umb-tour-step-counter>
-
-            <div>
-                <umb-button size="xs" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>
-            </div>
 
         </umb-tour-step-footer>
 

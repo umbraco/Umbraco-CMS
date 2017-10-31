@@ -7,7 +7,7 @@
         <div ng-if="!configuredView && !elementNotFound">
 
             <!-- Regular steps -->
-            <umb-tour-step ng-if="model.currentStepIndex < model.steps.length">
+            <umb-tour-step ng-if="model.currentStepIndex < model.steps.length" on-close="model.endTour()" hide-close="model.currentStep.type === 'intro'">
                     
                 <umb-tour-step-header
                     title="model.currentStep.title">
@@ -25,12 +25,11 @@
                     </umb-tour-step-counter>
                     
                     <div ng-if="model.currentStep.type !== 'intro'">
-                        <umb-button size="xs" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>
                         <umb-button size="xs" ng-if="!model.currentStep.event" button-style="success" type="button" action="model.nextStep()" label="Next"></umb-button>
                     </div>
 
                     <div ng-if="model.currentStep.type === 'intro'">
-                        <umb-button size="m" button-style="link" type="button" action="model.endTour()" label="End tour"></umb-button>                            
+                        <umb-button size="m" button-style="link" type="button" action="model.endTour()" label="Do it later"></umb-button>
                         <umb-button size="m" button-style="success" type="button" action="model.nextStep()" label="Start tour"></umb-button>
                     </div>
 
@@ -39,7 +38,7 @@
             </umb-tour-step>
 
             <!-- Outro step -->
-            <umb-tour-step ng-if="model.currentStepIndex === model.steps.length" class="tc">
+            <umb-tour-step ng-if="model.currentStepIndex === model.steps.length" class="tc" hide-close="model.currentStepIndex === model.steps.length">
 
                 <umb-tour-step-content>
                     <div class="flex items-center justify-center">

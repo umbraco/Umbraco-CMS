@@ -36,6 +36,7 @@
 
     .umb-tour-step__content {
         margin-bottom: 25px;
+        font-size: 15px;
     }
 }
 
@@ -44,19 +45,36 @@
     color: @gray-5;
 }
 
+.umb-tour-step__close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 19px;
+    color: @gray-7;
+    cursor: pointer;
+}
+
+.umb-tour-step__close:hover,
+.umb-tour-step__close:active {
+    color: @gray-4;
+    text-decoration: none;
+}
+
 .umb-tour-step__header {
-    margin-top: 5px;
     margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .umb-tour-step__title {
     font-weight: bold;
     color: @black;
     font-size: 15px;
+    line-height: 1.3em;
+    width: calc(~"100% - 35px");
 }
 
 .umb-tour-step__content {
     margin-bottom: 15px;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6em;
 }

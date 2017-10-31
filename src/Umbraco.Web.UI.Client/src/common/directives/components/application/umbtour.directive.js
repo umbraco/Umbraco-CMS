@@ -105,7 +105,7 @@
                 $timeout(function () {
 
                     // if an element isn't set - show the popover in the center
-                    if(!scope.model.currentStep.element) {
+                    if(scope.model.currentStep && !scope.model.currentStep.element) {
                         setPopoverPosition(null);
                         return;
                     }
