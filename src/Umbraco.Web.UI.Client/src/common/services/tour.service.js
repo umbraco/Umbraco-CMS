@@ -101,8 +101,8 @@
                     },
                     {
                         element: "#applications [data-element='section-settings']",
-                        title: "Navigate to the settings sections",
-                        content: "In the <b>Settings section</b> we will find the document types.",
+                        title: "Navigate to the Settings sections",
+                        content: "In the <b>Settings section</b> you can create and manage Document types.",
                         event: "click",
                         backdropOpacity: 0.6
                     },
