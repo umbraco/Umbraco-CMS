@@ -243,7 +243,7 @@
                     return item.alias === "_umb_membergroup";
                 });
                 saveModel.email = propEmail.value;
-                saveModel.username = propLogin.value;
+                saveModel.username = propLogin.value.trim();
                 
                 saveModel.password = this.formatChangePasswordModel(propPass.value);
 
