@@ -88,18 +88,19 @@ namespace Umbraco.Web
             //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
             foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
             {
-                WriteInstructions(instructionsBatch);
+                WriteInstructions(instructionsBatch.ToArray());
             }
             
         }
 
-        private void WriteInstructions(IEnumerable<RefreshInstruction> instructions)
+        private void WriteInstructions(RefreshInstruction[] instructions)
         {
             var dto = new CacheInstructionDto
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Length
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);
@@ -145,7 +146,7 @@ namespace Umbraco.Web
                 //only write the json blob with a maximum count of the MaxProcessingInstructionCount
                 foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
                 {
-                    WriteInstructions(maxBatch);
+                    WriteInstructions(maxBatch.ToArray());
                 }
             }
             else
