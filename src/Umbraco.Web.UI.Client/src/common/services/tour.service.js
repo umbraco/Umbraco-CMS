@@ -122,13 +122,13 @@
                     {
                         element: "[data-element='editor-name-field']",
                         title: "Enter a name",
-                        content: "<p>Our document type needs a name. Enter <code>Home</code> in the field and click <b>Next</b>.",
+                        content: "<p>Your Document Type needs a name. Enter <code>Home Page</code> in the field and click <b>Next</b>.",
                         view: "doctypename"
                     },
                     {
                         element: "[data-element='editor-description']",
                         title: "Enter a description",
-                        content: "<p>A description helps to pick the right document type when creating content.</p><p>Write a description to our Home page. It could be: <br/><pre>The home to our website</pre></p>"
+                        content: "<p>A description helps to pick the right document type when creating content.</p><p>Write a description to our Home page. It could be: <br/><pre>The home page of the website</pre></p>"
                     },
                     {
                         element: "[data-element='group-add']",
