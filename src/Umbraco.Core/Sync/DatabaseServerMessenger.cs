@@ -205,7 +205,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Synchronize the server (throttled).
         /// </summary>
-        protected void Sync()
+        protected internal void Sync()
         {
             lock (_locko)
             {
