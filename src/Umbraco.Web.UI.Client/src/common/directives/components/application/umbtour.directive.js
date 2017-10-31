@@ -247,7 +247,7 @@
                         pulseElement.css({ "width": width, "height": height, "left": offset.left, "top": offset.top });
                         pulseElement.fadeIn();
 
-                    }, 5000);
+                    }, 2000);
                 }
             }
 
