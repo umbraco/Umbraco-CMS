@@ -2,106 +2,6 @@
 app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
   function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
 
-        //This sets the default jquery ajax headers to include our csrf token, we
-        // need to user the beforeSend method because our token changes per user/login so
-        // it cannot be static
-        $.ajaxSetup({
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
-              if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
-                xhr.setRequestHeader("X-UMB-DEBUG", "true");
-              }
-            }
-        });
-
-        /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
-        eventsService.on("app.authenticated", function(evt, data) {
-            
-            assetsService._loadInitAssets().then(function() {
-                appState.setGlobalState("isReady", true);
-
-                //send the ready event with the included returnToPath,returnToSearch data
-                eventsService.emit("app.ready", data);
-                returnToPath = null, returnToSearch = null;
-
-                loadGettingStartedTours();
-                
-            });
-
-        });
-
-        /** execute code on each successful route */
-        $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
-
-            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
-            var deployEnv, deployEnvTitle;
-            if (deployConfig) {
-                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
-                deployEnvTitle = "(" + deployEnv + ") ";
-            }
-
-            if(current.params.section) {
-
-                //Uppercase the current section, content, media, settings, developer, forms
-                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
-
-                var baseTitle = currentSection + " - " + $location.$$host;
-
-                //Check deploy for Global Umbraco.Sys obj workspace
-                if(deployEnv){
-                    $rootScope.locationTitle = deployEnvTitle + baseTitle;
-                }
-                else {
-                    $rootScope.locationTitle = baseTitle;
-                }
-                
-            }
-            else {
-
-                if(deployEnv) {
-                     $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
-                }
-
-                $rootScope.locationTitle = "Umbraco - " + $location.$$host;
-            }
-
-            //reset the editorState on each successful route chage
-            editorState.reset();
-
-            //reset the file manager on each route change, the file collection is only relavent
-            // when working in an editor and submitting data to the server.
-            //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
-            fileManager.clearFiles();
-        });
-
-        /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
-            wiring up it's controller, etc... and then redirect to the rejected URL.   */
-        $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
-            event.preventDefault();
-
-            var returnPath = null;
-            if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
-                //Set the current path before redirecting so we know where to redirect back to
-                returnPath = encodeURIComponent($location.url());
-            }
-
-            $location.path(rejection.path)
-            if (returnPath) {
-                $location.search("returnPath", returnPath);
-            }
-
-        });
-
-
-        /* this will initialize the navigation service once the application has started */
-        navigationService.init();
-
-        //check for touch device, add to global appState
-        //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
-        var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
-        appState.setGlobalState("touchDevice", touchDevice);
-
-
         // load in getting started tour
         var gettingStartedTours = [
             {
@@ -508,16 +408,116 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 ]
             }
         ];
-        
-        function loadGettingStartedTours() {
-            // Register Get started tours if the Get Started dashboard is installed
-            dashboardResource.getDashboard("content").then(function (dashboards) {
-                angular.forEach(dashboards, function(dashboard) {
-                    if(dashboard.alias === "GetStarted" ) {
-                        tourService.registerTours(gettingStartedTours);
-                    }
+
+        //This sets the default jquery ajax headers to include our csrf token, we
+        // need to user the beforeSend method because our token changes per user/login so
+        // it cannot be static
+        $.ajaxSetup({
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
+              if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
+                xhr.setRequestHeader("X-UMB-DEBUG", "true");
+              }
+            }
+        });
+
+        /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
+        eventsService.on("app.authenticated", function(evt, data) {
+            
+            assetsService._loadInitAssets().then(function() {
+                
+                // Register Get started tours if the Get Started dashboard is installed
+                dashboardResource.getDashboard("content").then(function (dashboards) {
+                    angular.forEach(dashboards, function(dashboard) {
+                        if(dashboard.alias === "GetStarted" ) {
+                            tourService.registerTours(gettingStartedTours);
+                        }
+                    });
+                    appReady(data);
+                }, function(){
+                    appReady(data);
                 });
+
             });
+
+        });
+
+        function appReady(data) {
+            appState.setGlobalState("isReady", true);
+            //send the ready event with the included returnToPath,returnToSearch data
+            eventsService.emit("app.ready", data);
+            returnToPath = null, returnToSearch = null;
         }
+
+        /** execute code on each successful route */
+        $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
+
+            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
+            var deployEnv, deployEnvTitle;
+            if (deployConfig) {
+                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
+                deployEnvTitle = "(" + deployEnv + ") ";
+            }
+
+            if(current.params.section) {
+
+                //Uppercase the current section, content, media, settings, developer, forms
+                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
+
+                var baseTitle = currentSection + " - " + $location.$$host;
+
+                //Check deploy for Global Umbraco.Sys obj workspace
+                if(deployEnv){
+                    $rootScope.locationTitle = deployEnvTitle + baseTitle;
+                }
+                else {
+                    $rootScope.locationTitle = baseTitle;
+                }
+                
+            }
+            else {
+
+                if(deployEnv) {
+                     $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
+                }
+
+                $rootScope.locationTitle = "Umbraco - " + $location.$$host;
+            }
+
+            //reset the editorState on each successful route chage
+            editorState.reset();
+
+            //reset the file manager on each route change, the file collection is only relavent
+            // when working in an editor and submitting data to the server.
+            //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
+            fileManager.clearFiles();
+        });
+
+        /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
+            wiring up it's controller, etc... and then redirect to the rejected URL.   */
+        $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
+            event.preventDefault();
+
+            var returnPath = null;
+            if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                //Set the current path before redirecting so we know where to redirect back to
+                returnPath = encodeURIComponent($location.url());
+            }
+
+            $location.path(rejection.path)
+            if (returnPath) {
+                $location.search("returnPath", returnPath);
+            }
+
+        });
+
+
+        /* this will initialize the navigation service once the application has started */
+        navigationService.init();
+
+        //check for touch device, add to global appState
+        //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
+        var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
+        appState.setGlobalState("touchDevice", touchDevice);
 
     }]);
