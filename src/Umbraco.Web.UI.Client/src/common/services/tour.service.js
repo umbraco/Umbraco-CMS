@@ -133,13 +133,13 @@
                     {
                         element: "[data-element='group-add']",
                         title: "Add tab",
-                        content: "Tabs help us organize the content on a content page. Click <b>Add new tab</b> to add a tab.",
+                        content: "Tabs help are used organize properties on content in the Content section. Click <b>Add new tab</b> to add a tab.",
                         event: "click"
                     },
                     {
                         element: "[data-element='group-name-field']",
-                        title: "Enter a name",
-                        content: "Enter <code>Content</code> in the tab name.",
+                        title: "Name the tab",
+                        content: "<p>Enter <code>Home</code> in the tab name.</p><p><em>You can name a tab anything you want and if you have a lot of properties it can be useful to add multiple tabs.</em></p>",
                         view: "tabName"
                     },
                     {
