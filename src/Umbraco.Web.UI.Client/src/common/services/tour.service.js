@@ -116,7 +116,7 @@
                     {
                         element: "#dialog [data-element='action-documentType']",
                         title: "Create Document Type",
-                        content: "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type</p><p>We will use the template in a later tour when we need to render our content.</p>",
+                        content: "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type</p><p>You will use the template in a later tour render content.</p>",
                         event: "click"
                     },
                     {
