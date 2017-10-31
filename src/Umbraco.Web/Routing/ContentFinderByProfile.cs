@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public override bool TryFindContent(PublishedContentRequest frequest)
+        public override bool TryFindContent(PublishedRequest frequest)
         {
             IPublishedContent node = null;
             var path = frequest.Uri.GetAbsolutePathDecoded();

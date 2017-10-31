@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void Can_Lookup_Content()
         {
             var publishedSnapshot = new Mock<IPublishedShapshot>();
-            publishedSnapshot.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
 
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Web.Mvc
 
             var routeDefinition = new RouteDefinition
             {
-                PublishedContentRequest = frequest
+                PublishedRequest = frequest
             };
 
             var routeData = new RouteData();

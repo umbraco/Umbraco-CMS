@@ -57,13 +57,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region IPublishedSnapshot
 
-        public IPublishedContentCache ContentCache => Elements.ContentCache;
+        public IPublishedContentCache Content => Elements.ContentCache;
 
-        public IPublishedMediaCache MediaCache => Elements.MediaCache;
+        public IPublishedMediaCache Media => Elements.MediaCache;
 
-        public IPublishedMemberCache MemberCache => Elements.MemberCache;
+        public IPublishedMemberCache Members => Elements.MemberCache;
 
-        public IDomainCache DomainCache => Elements.DomainCache;
+        public IDomainCache Domains => Elements.DomainCache;
 
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
         {

@@ -51,17 +51,17 @@ namespace Umbraco.Web.Mvc
 
             var request = PublishedRouter.CreateRequest(umbracoContext);
             request.PublishedContent = found;
-            umbracoContext.PublishedContentRequest = request;
+            umbracoContext.PublishedRequest = request;
 
             //allows inheritors to change the pcr
-            PreparePublishedContentRequest(umbracoContext.PublishedContentRequest);
+            PreparePublishedContentRequest(umbracoContext.PublishedRequest);
 
             //create the render model
-            var renderModel = new ContentModel(umbracoContext.PublishedContentRequest.PublishedContent);
+            var renderModel = new ContentModel(umbracoContext.PublishedRequest.PublishedContent);
 
             //assigns the required tokens to the request
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, renderModel);
-            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, umbracoContext.PublishedContentRequest);
+            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, umbracoContext.PublishedRequest);
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
             //this is used just for a flag that this is an umbraco custom route
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.CustomRouteDataToken, true);
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Mvc
                 {
                     ActionName = requestContext.RouteData.GetRequiredString("action"),
                     ControllerName = requestContext.RouteData.GetRequiredString("controller"),
-                    PublishedContentRequest = umbracoContext.PublishedContentRequest
+                    PublishedRequest = umbracoContext.PublishedRequest
                 };
 
                 //set the special data token to the current route definition
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Mvc
 
         protected abstract IPublishedContent FindContent(RequestContext requestContext, UmbracoContext umbracoContext);
 
-        protected virtual void PreparePublishedContentRequest(PublishedContentRequest request)
+        protected virtual void PreparePublishedContentRequest(PublishedRequest request)
         {
             PublishedRouter.PrepareRequest(request);
         }

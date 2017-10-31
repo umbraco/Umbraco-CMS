@@ -67,7 +67,7 @@ namespace Umbraco.Web.Mvc
             {
                 throw new NullReferenceException("There is not current UmbracoContext, it must be initialized before the RenderRouteHandler executes");
             }
-            var request = UmbracoContext.PublishedContentRequest;
+            var request = UmbracoContext.PublishedRequest;
             if (request == null)
             {
                 throw new NullReferenceException("There is not current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="contentModel"></param>
         /// <param name="requestContext"></param>
         /// <param name="frequest"></param>
-        internal void SetupRouteDataForRequest(ContentModel contentModel, RequestContext requestContext, PublishedContentRequest frequest)
+        internal void SetupRouteDataForRequest(ContentModel contentModel, RequestContext requestContext, PublishedRequest frequest)
         {
             //put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
             requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, contentModel); //required for the RenderModelBinder and view engine
@@ -272,7 +272,7 @@ namespace Umbraco.Web.Mvc
         /// <param name="requestContext"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        internal virtual RouteDefinition GetUmbracoRouteDefinition(RequestContext requestContext, PublishedContentRequest request)
+        internal virtual RouteDefinition GetUmbracoRouteDefinition(RequestContext requestContext, PublishedRequest request)
         {
             if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
             if (request == null) throw new ArgumentNullException(nameof(request));
@@ -284,7 +284,7 @@ namespace Umbraco.Web.Mvc
                 {
                     ControllerName = defaultControllerName,
                     ControllerType = defaultControllerType,
-                    PublishedContentRequest = request,
+                    PublishedRequest = request,
                     ActionName = ((Route)requestContext.RouteData.Route).Defaults["action"].ToString(),
                     HasHijackedRoute = false
                 };
@@ -338,7 +338,7 @@ namespace Umbraco.Web.Mvc
             return def;
         }
 
-        internal IHttpHandler GetHandlerOnMissingTemplate(PublishedContentRequest request)
+        internal IHttpHandler GetHandlerOnMissingTemplate(PublishedRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -370,7 +370,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="requestContext"></param>
         /// <param name="request"></param>
-        internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, PublishedContentRequest request)
+        internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, PublishedRequest request)
         {
             if (requestContext == null) throw new ArgumentNullException(nameof(requestContext));
             if (request == null) throw new ArgumentNullException(nameof(request));

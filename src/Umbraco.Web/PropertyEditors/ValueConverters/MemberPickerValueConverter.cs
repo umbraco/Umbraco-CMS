@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 IPublishedContent member;
                 if (source is int id)
                 {
-                    member = _publishedSnapshotAccessor.PublishedSnapshot.MemberCache.GetById(id);
+                    member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetById(id);
                     if (member != null)
                         return member;
                 }
@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var sourceUdi = source as GuidUdi;
                     if (sourceUdi == null) return null;
-                    member = _publishedSnapshotAccessor.PublishedSnapshot.MemberCache.GetByProviderKey(sourceUdi.Guid);
+                    member = _publishedSnapshotAccessor.PublishedSnapshot.Members.GetByProviderKey(sourceUdi.Guid);
                     if (member != null)
                         return member;
                 }

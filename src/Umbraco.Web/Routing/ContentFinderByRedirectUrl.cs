@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
         /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        public bool TryFindContent(PublishedContentRequest frequest)
+        public bool TryFindContent(PublishedRequest frequest)
         {
             var route = frequest.HasDomain
                 ? frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())

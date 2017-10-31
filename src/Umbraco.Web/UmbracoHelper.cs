@@ -122,7 +122,7 @@ namespace Umbraco.Web
 
             _umbracoContext = umbracoContext;
             if (_umbracoContext.IsFrontEndUmbracoRequest)
-                _currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
+                _currentPage = _umbracoContext.PublishedRequest.PublishedContent;
             _services = services;
             _appCache = appCache;
         }

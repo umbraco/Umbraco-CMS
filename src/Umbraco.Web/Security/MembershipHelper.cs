@@ -94,7 +94,7 @@ namespace Umbraco.Web.Security
             _umbracoContext = umbracoContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-            _memberCache = umbracoContext.PublishedShapshot.MemberCache;
+            _memberCache = umbracoContext.PublishedShapshot.Members;
 
             // helpers are *not* instanciated by the container so we have to
             // get our dependencies injected manually, through properties.
@@ -156,7 +156,7 @@ namespace Umbraco.Web.Security
         /// </remarks>
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
-            return _umbracoContext.PublishedContentRequest == null
+            return _umbracoContext.PublishedRequest == null
                 ? PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser)
                 : PublicAccessService.HasAccess(path, CurrentUserName, Router.GetRolesForLogin);
         }

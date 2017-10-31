@@ -86,12 +86,12 @@ namespace Umbraco.Web
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
 
-            if (_umbracoContext.PublishedContentRequest == null)
+            if (_umbracoContext.PublishedRequest == null)
             {
                 throw new InvalidOperationException("Cannot render a macro when there is no current PublishedContentRequest.");
             }
 
-            return RenderMacro(alias, parameters, _umbracoContext.PublishedContentRequest.UmbracoPage);
+            return RenderMacro(alias, parameters, _umbracoContext.PublishedRequest.UmbracoPage);
         }
 
         /// <summary>
@@ -280,8 +280,8 @@ namespace Umbraco.Web
             //currently assigned node. The PublishedContentRequest will be null if:
             // * we are rendering a partial view or child action
             // * we are rendering a view from a custom route
-            if ((_umbracoContext.PublishedContentRequest == null
-                || _umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+            if ((_umbracoContext.PublishedRequest == null
+                || _umbracoContext.PublishedRequest.PublishedContent.Id != currentPage.Id)
                 && currentPage.Id > 0) // in case we're rendering a detached content (id == 0)
             {
                 item.NodeId = currentPage.Id.ToString(CultureInfo.InvariantCulture);

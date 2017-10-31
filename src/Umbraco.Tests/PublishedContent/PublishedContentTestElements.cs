@@ -16,13 +16,13 @@ namespace Umbraco.Tests.PublishedContent
         public readonly SolidPublishedContentCache InnerContentCache = new SolidPublishedContentCache();
         public readonly SolidPublishedContentCache InnerMediaCache = new SolidPublishedContentCache();
 
-        public IPublishedContentCache ContentCache => InnerContentCache;
+        public IPublishedContentCache Content => InnerContentCache;
 
-        public IPublishedMediaCache MediaCache => InnerMediaCache;
+        public IPublishedMediaCache Media => InnerMediaCache;
 
-        public IPublishedMemberCache MemberCache => null;
+        public IPublishedMemberCache Members => null;
 
-        public IDomainCache DomainCache => null;
+        public IDomainCache Domains => null;
 
         public IDisposable ForcedPreview(bool forcedPreview, Action<bool> callback = null)
         {

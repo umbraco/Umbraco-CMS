@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Published
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
             var publishedSnapshotMock = new Mock<IPublishedShapshot>();
-            publishedSnapshotMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
+            publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
             var publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Published
                 => int.TryParse(source as string, out int i) ? i : -1;
 
             public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById((int) inter);
+                => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById((int) inter);
 
             public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Published
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
             var publishedSnapshotMock = new Mock<IPublishedShapshot>();
-            publishedSnapshotMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
+            publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
             Current.Container.Register(f => publishedSnapshotAccessorMock.Object);
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Published
 
             public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
-                return ((int[]) inter).Select(x => (PublishedSnapshotTestObjects.TestContentModel1) _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(x)).ToArray();
+                return ((int[]) inter).Select(x => (PublishedSnapshotTestObjects.TestContentModel1) _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(x)).ToArray();
             }
         }
 

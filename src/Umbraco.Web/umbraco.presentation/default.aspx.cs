@@ -32,7 +32,7 @@ namespace umbraco
         }
 
         private page _upage;
-        private PublishedContentRequest _frequest;
+        private PublishedRequest _frequest;
 
         /// <summary>
         /// To turn off request validation set this to false before the PageLoad event. This equivalent to the validateRequest page directive
@@ -50,7 +50,7 @@ namespace umbraco
                 Page.Trace.IsEnabled &= GlobalSettings.DebugMode && string.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]) == false;
 
                 // get the document request and the page
-                _frequest = UmbracoContext.Current.PublishedContentRequest;
+                _frequest = UmbracoContext.Current.PublishedRequest;
                 _upage = _frequest.UmbracoPage;
 
                 //we need to check this for backwards compatibility in case people still arent' using master pages

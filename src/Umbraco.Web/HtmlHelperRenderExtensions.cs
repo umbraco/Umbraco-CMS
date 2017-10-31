@@ -919,8 +919,8 @@ namespace Umbraco.Web
             string noPreviewLinks = @"<link href=""{1}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
 
             // Get page value
-            int pageId = umbCtx.PublishedContentRequest.UmbracoPage.PageID;
-            string[] path = umbCtx.PublishedContentRequest.UmbracoPage.SplitPath;
+            int pageId = umbCtx.PublishedRequest.UmbracoPage.PageID;
+            string[] path = umbCtx.PublishedRequest.UmbracoPage.SplitPath;
             string result = string.Empty;
             string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
 

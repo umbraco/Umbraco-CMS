@@ -97,7 +97,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var guidUdi = udi as GuidUdi;
                     if (guidUdi == null) continue;
-                    var item = _publishedSnapshotAccessor.PublishedSnapshot.MediaCache.GetById(guidUdi.Guid);
+                    var item = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(guidUdi.Guid);
                     if (item != null)
                         mediaItems.Add(item);
                 }

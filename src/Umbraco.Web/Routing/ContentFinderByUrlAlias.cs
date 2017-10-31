@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(PublishedContentRequest frequest)
+        public bool TryFindContent(PublishedRequest frequest)
         {
             IPublishedContent node = null;
 

@@ -52,13 +52,13 @@ namespace umbraco
         /// <summary>
         /// Initializes a new instance of the <see cref="page"/> class for a published document request.
         /// </summary>
-        /// <param name="frequest">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
+        /// <param name="frequest">The <see cref="PublishedRequest"/> pointing to the document.</param>
         /// <remarks>
         /// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is
         /// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
         /// with an IPublishedContent item, the template id is asssigned purely based on the default.
         /// </remarks>
-        internal page(PublishedContentRequest frequest)
+        internal page(PublishedRequest frequest)
         {
 
             if (!frequest.HasPublishedContent)

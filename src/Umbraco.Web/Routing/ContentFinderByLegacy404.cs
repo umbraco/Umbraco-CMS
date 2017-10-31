@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(PublishedContentRequest frequest)
+        public bool TryFindContent(PublishedRequest frequest)
         {
             _logger.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
 
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Routing
                 }
                 if (node != null)
                 {
-                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedShapshot.DomainCache.GetAll(true), node.Path, null);
+                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedShapshot.Domains.GetAll(true), node.Path, null);
                     if (d != null)
                         errorCulture = d.Culture;
                 }

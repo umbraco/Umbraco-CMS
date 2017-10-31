@@ -13,22 +13,22 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets the <see cref="IPublishedContentCache"/>.
         /// </summary>
-        IPublishedContentCache ContentCache { get; }
+        IPublishedContentCache Content { get; }
 
         /// <summary>
         /// Gets the <see cref="IPublishedMediaCache"/>.
         /// </summary>
-        IPublishedMediaCache MediaCache { get; }
+        IPublishedMediaCache Media { get; }
 
         /// <summary>
         /// Gets the <see cref="IPublishedMemberCache"/>.
         /// </summary>
-        IPublishedMemberCache MemberCache { get; }
+        IPublishedMemberCache Members { get; }
 
         /// <summary>
         /// Gets the <see cref="IDomainCache"/>.
         /// </summary>
-        IDomainCache DomainCache { get; }
+        IDomainCache Domains { get; }
 
         /// <summary>
         /// Gets the snapshot-level cache.

@@ -62,7 +62,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the public content request.
         /// </summary>
-        internal PublishedContentRequest PublishedContentRequest
+        internal PublishedRequest PublishedRequest
         {
             get
             {
@@ -73,14 +73,14 @@ namespace Umbraco.Web.Mvc
 
                 // try view context
                 if (ViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedContentRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (PublishedRequest) ViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // child action, try parent view context
                 if (ViewContext.IsChildAction && ViewContext.ParentActionViewContext.RouteData.DataTokens.ContainsKey(token))
-                    return (PublishedContentRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
+                    return (PublishedRequest) ViewContext.ParentActionViewContext.RouteData.DataTokens.GetRequiredObject(token);
 
                 // fallback to UmbracoContext
-                return UmbracoContext.PublishedContentRequest;
+                return UmbracoContext.PublishedRequest;
             }
         }
 

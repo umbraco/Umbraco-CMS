@@ -140,7 +140,7 @@ namespace Umbraco.Web.Mvc
                     throw routeDefAttempt.Exception;
 
                 var routeDef = routeDefAttempt.Result;
-                return routeDef.PublishedContentRequest.PublishedContent;
+                return routeDef.PublishedRequest.PublishedContent;
             }
         }
 

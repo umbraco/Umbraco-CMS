@@ -1171,7 +1171,7 @@
     <Compile Include="Routing\ContentFinderByProfile.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
-    <Compile Include="Routing\PublishedContentRequest.cs" />
+    <Compile Include="Routing\PublishedRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

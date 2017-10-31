@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models
                 throw new InvalidOperationException("Cannot construct a RenderModel without specifying a CultureInfo when no UmbracoContext has been initialized");
             }
             Content = content;
-            CurrentCulture = UmbracoContext.Current.PublishedContentRequest.Culture;
+            CurrentCulture = UmbracoContext.Current.PublishedRequest.Culture;
         }
 
         /// <summary>

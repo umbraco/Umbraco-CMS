@@ -29,7 +29,7 @@ namespace Umbraco.Web.Templates
         private readonly UmbracoContext _umbracoContext;
         private object _oldPageId;
         private object _oldPageElements;
-        private PublishedContentRequest _oldPublishedContentRequest;
+        private PublishedRequest _oldPublishedRequest;
         private object _oldAltTemplate;
 
         public TemplateRenderer(UmbracoContext umbracoContext, int pageId, int? altTemplateId)
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Templates
             //in some cases the UmbracoContext will not have a PublishedContentRequest assigned to it if we are not in the
             //execution of a front-end rendered page. In this case set the culture to the default.
             //set the culture to the same as is currently rendering
-            if (_umbracoContext.PublishedContentRequest == null)
+            if (_umbracoContext.PublishedRequest == null)
             {
                 var defaultLanguage = Current.Services.LocalizationService.GetAllLanguages().FirstOrDefault();
                 contentRequest.Culture = defaultLanguage == null
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Templates
             }
             else
             {
-                contentRequest.Culture = _umbracoContext.PublishedContentRequest.Culture;
+                contentRequest.Culture = _umbracoContext.PublishedRequest.Culture;
             }
 
             //set the doc that was found by id
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Templates
 
         }
 
-        private void ExecuteTemplateRendering(TextWriter sw, PublishedContentRequest contentRequest)
+        private void ExecuteTemplateRendering(TextWriter sw, PublishedRequest request)
         {
             //NOTE: Before we used to build up the query strings here but this is not necessary because when we do a
             // Server.Execute in the TemplateRenderer, we pass in a 'true' to 'preserveForm' which automatically preserves all current
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Templates
             //var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
             //    .ToDictionary(key => key, key => context.Request.QueryString[key]);
 
-            switch (contentRequest.RenderingEngine)
+            switch (request.RenderingEngine)
             {
                 case RenderingEngine.Mvc:
                     var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
@@ -146,13 +146,13 @@ namespace Umbraco.Web.Templates
                         Route = RouteTable.Routes["Umbraco_default"]
                     });
                     var routeHandler = new RenderRouteHandler(_umbracoContext, ControllerBuilder.Current.GetControllerFactory());
-                    var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, contentRequest);
-                    var renderModel = new ContentModel(contentRequest.PublishedContent);
+                    var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, request);
+                    var renderModel = new ContentModel(request.PublishedContent);
                     //manually add the action/controller, this is required by mvc
                     requestContext.RouteData.Values.Add("action", routeDef.ActionName);
                     requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
                     //add the rest of the required route data
-                    routeHandler.SetupRouteDataForRequest(renderModel, requestContext, contentRequest);
+                    routeHandler.SetupRouteDataForRequest(renderModel, requestContext, request);
 
                     var stringOutput = RenderUmbracoRequestToString(requestContext);
 
@@ -197,15 +197,15 @@ namespace Umbraco.Web.Templates
             return newWriter.ToString();
         }
 
-        private void SetNewItemsOnContextObjects(PublishedContentRequest contentRequest)
+        private void SetNewItemsOnContextObjects(PublishedRequest request)
         {
             // handlers like default.aspx will want it and most macros currently need it
-            contentRequest.UmbracoPage = new page(contentRequest);
+            request.UmbracoPage = new page(request);
             //now, set the new ones for this page execution
-            _umbracoContext.HttpContext.Items["pageID"] = contentRequest.PublishedContent.Id;
-            _umbracoContext.HttpContext.Items["pageElements"] = contentRequest.UmbracoPage.Elements;
+            _umbracoContext.HttpContext.Items["pageID"] = request.PublishedContent.Id;
+            _umbracoContext.HttpContext.Items["pageElements"] = request.UmbracoPage.Elements;
             _umbracoContext.HttpContext.Items[Core.Constants.Conventions.Url.AltTemplate] = null;
-            _umbracoContext.PublishedContentRequest = contentRequest;
+            _umbracoContext.PublishedRequest = request;
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace Umbraco.Web.Templates
             //save the values in them so that we can re-set them after we render so the rest of the execution works as per normal.
             _oldPageId = _umbracoContext.HttpContext.Items["pageID"];
             _oldPageElements = _umbracoContext.HttpContext.Items["pageElements"];
-            _oldPublishedContentRequest = _umbracoContext.PublishedContentRequest;
+            _oldPublishedRequest = _umbracoContext.PublishedRequest;
             _oldAltTemplate = _umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate];
         }
 
@@ -226,7 +226,7 @@ namespace Umbraco.Web.Templates
         /// </summary>
         private void RestoreItems()
         {
-            _umbracoContext.PublishedContentRequest = _oldPublishedContentRequest;
+            _umbracoContext.PublishedRequest = _oldPublishedRequest;
             _umbracoContext.HttpContext.Items["pageID"] = _oldPageId;
             _umbracoContext.HttpContext.Items["pageElements"] = _oldPageElements;
             _umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate] = _oldAltTemplate;

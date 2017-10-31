@@ -16,7 +16,7 @@ namespace Umbraco.Web.Mvc
     [PreRenderViewActionFilter]
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
-        private PublishedContentRequest _publishedContentRequest;
+        private PublishedRequest _publishedRequest;
 
         public RenderMvcController()
         {
@@ -26,28 +26,28 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public override UmbracoContext UmbracoContext => PublishedContentRequest.UmbracoContext;
+        public override UmbracoContext UmbracoContext => PublishedRequest.UmbracoContext;
 
         /// <summary>
         /// Gets the current content item.
         /// </summary>
-        protected IPublishedContent CurrentPage => PublishedContentRequest.PublishedContent;
+        protected IPublishedContent CurrentPage => PublishedRequest.PublishedContent;
 
         /// <summary>
         /// Gets the current published content request.
         /// </summary>
-        protected internal virtual PublishedContentRequest PublishedContentRequest
+        protected internal virtual PublishedRequest PublishedRequest
         {
             get
             {
-                if (_publishedContentRequest != null)
-                    return _publishedContentRequest;
+                if (_publishedRequest != null)
+                    return _publishedRequest;
                 if (RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken) == false)
                 {
                     throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedContentRequest object");
                 }
-                _publishedContentRequest = (PublishedContentRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
-                return _publishedContentRequest;
+                _publishedRequest = (PublishedRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
+                return _publishedRequest;
             }
         }
 

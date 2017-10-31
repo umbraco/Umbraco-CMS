@@ -21,7 +21,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// The current RenderModel found for the request
         /// </summary>
-        public PublishedContentRequest PublishedContentRequest { get; set; }
+        public PublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Gets/sets whether the current request has a hijacked route/user controller routed for it

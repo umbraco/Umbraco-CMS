@@ -87,13 +87,13 @@ namespace Umbraco.Web.Mvc
             base.OnActionExecuted(filterContext);
 
             //First we need to check if the pcr has been set, if it has we're going to ignore this and not actually do anything
-            if (UmbracoContext.Current.PublishedContentRequest != null)
+            if (UmbracoContext.Current.PublishedRequest != null)
             {
                 return;
             }
 
-            UmbracoContext.Current.PublishedContentRequest = PublishedRouter.CreateRequest(UmbracoContext.Current);
-            ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedContentRequest, filterContext);
+            UmbracoContext.Current.PublishedRequest = PublishedRouter.CreateRequest(UmbracoContext.Current);
+            ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedRequest, filterContext);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="request"></param>
         /// <param name="filterContext"></param>
-        protected virtual void ConfigurePublishedContentRequest(PublishedContentRequest request, ActionExecutedContext filterContext)
+        protected virtual void ConfigurePublishedContentRequest(PublishedRequest request, ActionExecutedContext filterContext)
         {
             if (_contentId.HasValue)
             {

@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (string.IsNullOrEmpty(elementTypeAlias))
                 return null;
 
-            var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetContentType(elementTypeAlias);
+            var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetContentType(elementTypeAlias);
             if (publishedContentType == null)
                 return null;
 

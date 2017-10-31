@@ -367,8 +367,8 @@ namespace Umbraco.Web.Macros
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
-            if (UmbracoContext.Current.PublishedContentRequest == null
-                || UmbracoContext.Current.PublishedContentRequest.HasPublishedContent == false)
+            if (UmbracoContext.Current.PublishedRequest == null
+                || UmbracoContext.Current.PublishedRequest.HasPublishedContent == false)
                 return Attempt.Fail(new MacroContent { Text = "[macro]" });
 
             var textService = Current.Services.TextService;
@@ -443,7 +443,7 @@ namespace Umbraco.Web.Macros
         private static MacroContent ExecutePartialView(MacroModel macro)
         {
             var engine = new PartialViewMacroEngine();
-            var content = UmbracoContext.Current.PublishedContentRequest.PublishedContent;
+            var content = UmbracoContext.Current.PublishedRequest.PublishedContent;
             return engine.Execute(macro, content);
         }
 

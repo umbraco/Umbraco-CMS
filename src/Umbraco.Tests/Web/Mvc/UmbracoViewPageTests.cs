@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Web.Mvc
             var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
             frequest.Culture = CultureInfo.InvariantCulture;
-            umbracoContext.PublishedContentRequest = frequest;
+            umbracoContext.PublishedRequest = frequest;
 
             var context = new ViewContext();
             context.RouteData = new RouteData();

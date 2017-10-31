@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 IPublishedContent content;
                 if (inter is int id)
                 {
-                    content = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(id);
+                    content = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(id);
                     if (content != null)
                         return content;
                 }
@@ -65,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var udi = inter as GuidUdi;
                     if (udi == null)
                         return null;
-                    content = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(udi.Guid);
+                    content = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(udi.Guid);
                     if (content != null)
                         return content;
                 }

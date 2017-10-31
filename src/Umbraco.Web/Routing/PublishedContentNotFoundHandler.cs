@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
 
             response.Clear();
 
-            var frequest = UmbracoContext.Current.PublishedContentRequest;
+            var frequest = UmbracoContext.Current.PublishedRequest;
             var reason = "Cannot render the page at url '{0}'.";
             if (frequest.HasPublishedContent == false)
                 reason = "No umbraco document matches the url '{0}'.";

@@ -153,7 +153,7 @@ namespace Umbraco.Web
             // instanciate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
             var request = PublishedRouter.CreateRequest(umbracoContext);
-            umbracoContext.PublishedContentRequest = request;
+            umbracoContext.PublishedRequest = request;
             PublishedRouter.PrepareRequest(request);
 
             // HandleHttpResponseStatus returns a value indicating that the request should
@@ -336,7 +336,7 @@ namespace Umbraco.Web
         // returns a value indicating whether redirection took place and the request has
         // been completed - because we don't want to Response.End() here to terminate
         // everything properly.
-        internal static bool HandleHttpResponseStatus(HttpContextBase context, PublishedContentRequest pcr, ILogger logger)
+        internal static bool HandleHttpResponseStatus(HttpContextBase context, PublishedRequest pcr, ILogger logger)
         {
             var end = false;
             var response = context.Response;
@@ -422,7 +422,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
-        private static void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
+        private static void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly

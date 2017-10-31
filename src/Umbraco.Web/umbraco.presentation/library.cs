@@ -1147,7 +1147,7 @@ namespace umbraco
             {
                 var publishedSnapshot = Current.PublishedSnapshot
                     ?? Current.PublishedSnapshotService.CreatePublishedSnapshot(null);
-                contentCache = publishedSnapshot.ContentCache as PublishedContentCache;
+                contentCache = publishedSnapshot.Content as PublishedContentCache;
             }
 
             if (contentCache == null)

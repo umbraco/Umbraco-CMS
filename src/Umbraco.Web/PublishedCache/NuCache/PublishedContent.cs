@@ -103,10 +103,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // args are: current published snapshot (may be null), previewing, content id - returns: content
 
         internal static Func<IPublishedShapshot, bool, int, IPublishedContent> GetContentByIdFunc { get; set; }
-            = (publishedShapshot, previewing, id) => publishedShapshot.ContentCache.GetById(previewing, id);
+            = (publishedShapshot, previewing, id) => publishedShapshot.Content.GetById(previewing, id);
 
         internal static Func<IPublishedShapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
-            = (publishedShapshot, previewing, id) => publishedShapshot.MediaCache.GetById(previewing, id);
+            = (publishedShapshot, previewing, id) => publishedShapshot.Media.GetById(previewing, id);
 
         private IPublishedContent GetContentById(bool previewing, int id)
         {

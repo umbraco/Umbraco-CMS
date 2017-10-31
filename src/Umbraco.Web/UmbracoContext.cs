@@ -175,17 +175,17 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        public IPublishedContentCache ContentCache => PublishedShapshot.ContentCache;
+        public IPublishedContentCache ContentCache => PublishedShapshot.Content;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
-        public IPublishedMediaCache MediaCache => PublishedShapshot.MediaCache;
+        public IPublishedMediaCache MediaCache => PublishedShapshot.Media;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
         /// </summary>
-        public bool IsFrontEndUmbracoRequest => PublishedContentRequest != null;
+        public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
         /// <summary>
         /// Gets the url provider.
@@ -195,7 +195,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets/sets the PublishedContentRequest object
         /// </summary>
-        public PublishedContentRequest PublishedContentRequest { get; set; }
+        public PublishedRequest PublishedRequest { get; set; }
 
         /// <summary>
         /// Exposes the HttpContext for the current request

@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Published
 
             // mocked published snapshot returns a content cache
             publishedSnapshot
-                .Setup(x => x.ContentCache)
+                .Setup(x => x.Content)
                 .Returns(contentCache.Object);
 
             var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();

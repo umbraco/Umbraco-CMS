@@ -112,7 +112,7 @@ namespace Umbraco.Tests.TestHelpers
             var httpContext = Mock.Of<HttpContextBase>();
 
             var publishedSnapshotMock = new Mock<IPublishedShapshot>();
-            publishedSnapshotMock.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            publishedSnapshotMock.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshot = publishedSnapshotMock.Object;
             var publishedSnapshotServiceMock = new Mock<IPublishedSnapshotService>();
             publishedSnapshotServiceMock.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);

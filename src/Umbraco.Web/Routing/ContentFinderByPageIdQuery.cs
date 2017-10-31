@@ -9,7 +9,7 @@
     /// </remarks>
     public class ContentFinderByPageIdQuery : IContentFinder
     {
-        public bool TryFindContent(PublishedContentRequest frequest)
+        public bool TryFindContent(PublishedRequest frequest)
         {
             int pageId;
             if (int.TryParse(frequest.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))

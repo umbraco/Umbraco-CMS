@@ -4,7 +4,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestLastChanceFinder : IContentLastChanceFinder
     {
-        public bool TryFindContent(PublishedContentRequest frequest)
+        public bool TryFindContent(PublishedRequest frequest)
         {
             return false;
         }

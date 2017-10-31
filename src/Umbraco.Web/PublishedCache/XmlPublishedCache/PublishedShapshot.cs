@@ -19,23 +19,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             PublishedMemberCache memberCache,
             DomainCache domainCache)
         {
-            ContentCache = contentCache;
-            MediaCache = mediaCache;
-            MemberCache = memberCache;
-            DomainCache = domainCache;
+            Content = contentCache;
+            Media = mediaCache;
+            Members = memberCache;
+            Domains = domainCache;
         }
 
         /// <inheritdoc />
-        public IPublishedContentCache ContentCache { get; }
+        public IPublishedContentCache Content { get; }
 
         /// <inheritdoc />
-        public IPublishedMediaCache MediaCache { get; }
+        public IPublishedMediaCache Media { get; }
 
         /// <inheritdoc />
-        public IPublishedMemberCache MemberCache { get; }
+        public IPublishedMemberCache Members { get; }
 
         /// <inheritdoc />
-        public IDomainCache DomainCache { get; }
+        public IDomainCache Domains { get; }
 
         /// <inheritdoc />
         public ICacheProvider SnapshotCache => null;

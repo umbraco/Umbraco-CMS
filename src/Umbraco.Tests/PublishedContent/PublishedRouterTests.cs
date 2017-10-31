@@ -10,7 +10,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-    public class PublishedContentRequestEngineTests : BaseWebTest
+    public class PublishedRouterTests : BaseWebTest
     {
         [Test]
         public void ConfigureRequest_Returns_False_Without_HasPublishedContent()

@@ -39,7 +39,7 @@ namespace Umbraco.Web.Mvc
 
             //Special case, if it is webforms but we're posting to an MVC surface controller, then we
             // need to return the webforms result instead
-            if (routeDef.PublishedContentRequest.RenderingEngine == RenderingEngine.WebForms)
+            if (routeDef.PublishedRequest.RenderingEngine == RenderingEngine.WebForms)
             {
                 EnsureViewContextForWebForms(context);
                 var webFormsHandler = RenderRouteHandler.GetWebFormsHandler();
