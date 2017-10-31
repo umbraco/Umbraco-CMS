@@ -96,7 +96,7 @@
                 "steps": [
                     {
                         title: "Create your first Document Type",
-                        content: "<p>Step 1 of any site is to create a <strong>Document Type</strong>. A Document Type is a data container where you can add data fields. The editor can then input data and Umbraco can use it to output it in the relevant parts of a <strong>template</strong>.</p><p>In this tour you will learn how to set up a basic Document Type with a data field to enter a short text.</p>",
+                        content: "<p>Step 1 of any site is to create a <strong>Document Type</strong>.<br> A Document Type is a template for content. For each <em>type</em> of content you want to create you'll create a Document Type. This will define were content based on this Document Type can be created, how many properties it holds and what the input method should be for these properties.</p><p>When you have at least one Document type in place you can start creating content and this content can the be used in a template.</p><p>In this tour you will learn how to set up a basic Document Type with a property to enter a short text.</p>",
                         type: "intro"
                     },
                     {
