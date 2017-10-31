@@ -224,10 +224,10 @@
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
-    <Compile Include="Facade\FacadeTestObjects.cs" />
-    <Compile Include="Facade\ModelTypeTests.cs" />
-    <Compile Include="Facade\NestedContentTests.cs" />
-    <Compile Include="Facade\PropertyCacheLevelTests.cs" />
+    <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
+    <Compile Include="Published\ModelTypeTests.cs" />
+    <Compile Include="Published\NestedContentTests.cs" />
+    <Compile Include="Published\PropertyCacheLevelTests.cs" />
     <Compile Include="Misc\DateTimeExtensionsTests.cs" />
     <Compile Include="Misc\HashGeneratorTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
@@ -243,7 +243,7 @@
     <Compile Include="Persistence\Repositories\EntityRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
-    <Compile Include="Facade\ConvertersTests.cs" />
+    <Compile Include="Published\ConvertersTests.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />
@@ -280,7 +280,7 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="Testing\UmbracoTestOptions.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
-    <Compile Include="TestHelpers\Stubs\TestFacadeAccessor.cs" />
+    <Compile Include="TestHelpers\Stubs\TestPublishedSnapshotAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />

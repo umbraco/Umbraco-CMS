@@ -63,7 +63,7 @@ namespace Umbraco.Web.Routing
             if (string.IsNullOrWhiteSpace(umbracoUrlName))
                 return Enumerable.Empty<string>();
 
-            var domainHelper = new DomainHelper(umbracoContext.Facade.DomainCache);
+            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.DomainCache);
 
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, false);

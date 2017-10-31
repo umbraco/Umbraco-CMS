@@ -18,13 +18,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private readonly ServiceContext _services;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MediaPickerValueConverter(ServiceContext services, PropertyEditorCollection propertyEditors, IFacadeAccessor facadeAccessor)
+        public MediaPickerValueConverter(ServiceContext services, PropertyEditorCollection propertyEditors, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
             _propertyEditors = propertyEditors ?? throw new ArgumentException(nameof(propertyEditors));
-            _facadeAccessor = facadeAccessor ?? throw new ArgumentNullException(nameof(facadeAccessor));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 : typeof (IPublishedContent);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Facade;
+            => PropertyCacheLevel.Snapshot;
 
         private bool IsMultipleDataType(int dataTypeId, string propertyEditorAlias)
         {
@@ -97,7 +97,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var guidUdi = udi as GuidUdi;
                     if (guidUdi == null) continue;
-                    var item = _facadeAccessor.Facade.MediaCache.GetById(guidUdi.Guid);
+                    var item = _publishedSnapshotAccessor.PublishedSnapshot.MediaCache.GetById(guidUdi.Guid);
                     if (item != null)
                         mediaItems.Add(item);
                 }

@@ -11,7 +11,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
-    class SolidFacade : IFacade
+    class SolidPublishedShapshot : IPublishedShapshot
     {
         public readonly SolidPublishedContentCache InnerContentCache = new SolidPublishedContentCache();
         public readonly SolidPublishedContentCache InnerMediaCache = new SolidPublishedContentCache();
@@ -32,9 +32,9 @@ namespace Umbraco.Tests.PublishedContent
         public void Resync()
         { }
 
-        public ICacheProvider FacadeCache => null;
-
         public ICacheProvider SnapshotCache => null;
+
+        public ICacheProvider ElementsCache => null;
     }
 
     class SolidPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache

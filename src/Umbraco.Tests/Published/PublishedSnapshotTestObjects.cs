@@ -4,9 +4,9 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Facade
+namespace Umbraco.Tests.Published
 {
-    public class FacadeTestObjects
+    public class PublishedSnapshotTestObjects
     {
         #region Published models
 

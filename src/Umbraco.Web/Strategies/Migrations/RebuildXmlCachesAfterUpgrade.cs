@@ -38,7 +38,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 //var mediaService = (MediaService) ApplicationContext.Current.Services.MediaService;
                 //mediaService.RebuildXmlStructures();
 
-                var svc = Current.FacadeService as FacadeService;
+                var svc = Current.PublishedSnapshotService as PublishedSnapshotService;
                 svc?.RebuildMediaXml();
 
                 // note: not re-indexing medias?
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 //var contentService = (ContentService) ApplicationContext.Current.Services.ContentService;
                 //contentService.RebuildXmlStructures();
 
-                var svc = Current.FacadeService as FacadeService;
+                var svc = Current.PublishedSnapshotService as PublishedSnapshotService;
                 svc?.RebuildContentAndPreviewXml();
             }
         }

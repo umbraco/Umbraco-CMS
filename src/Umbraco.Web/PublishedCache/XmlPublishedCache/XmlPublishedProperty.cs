@@ -45,7 +45,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 if (_objectValueComputed) return _objectValue;
                 var inter = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
                 // initial reference cache level always is .Content
-                _objectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Content, inter, _isPreviewing);
+                _objectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, inter, _isPreviewing);
                 _objectValueComputed = true;
                 return _objectValue;
             }

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -19,7 +18,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Facade
+namespace Umbraco.Tests.Published
 {
     [TestFixture]
     public class NestedContentTests
@@ -88,25 +87,24 @@ namespace Umbraco.Tests.Facade
                 });
 
             var contentCache = new Mock<IPublishedContentCache>();
-            var facade = new Mock<IFacade>();
+            var publishedSnapshot = new Mock<IPublishedShapshot>();
 
-            // mocked facade returns a content cache
-            facade
+            // mocked published snapshot returns a content cache
+            publishedSnapshot
                 .Setup(x => x.ContentCache)
                 .Returns(contentCache.Object);
 
-            var facadeAccessor = new Mock<IFacadeAccessor>();
-            //container.RegisterSingleton(f => facadeAccessor.Object);
+            var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
 
-            // mocked facade accessor returns a facade
-            facadeAccessor
-                .Setup(x => x.Facade)
-                .Returns(facade.Object);
+            // mocked published snapshot accessor returns a facade
+            publishedSnapshotAccessor
+                .Setup(x => x.PublishedSnapshot)
+                .Returns(publishedSnapshot.Object);
 
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
-                new NestedContentSingleValueConverter(facadeAccessor.Object, publishedModelFactory.Object, proflog),
-                new NestedContentManyValueConverter(facadeAccessor.Object, publishedModelFactory.Object, proflog),
+                new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
+                new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
             });
 
             PropertyEditorCollection editors = null;
@@ -145,7 +143,7 @@ namespace Umbraco.Tests.Facade
 
             // nested single converter returns the proper value clr type TestModel, and cache level
             Assert.AreEqual(typeof (TestElementModel), contentType1.GetPropertyType("property1").ClrType);
-            Assert.AreEqual(PropertyCacheLevel.Content, contentType1.GetPropertyType("property1").CacheLevel);
+            Assert.AreEqual(PropertyCacheLevel.Element, contentType1.GetPropertyType("property1").CacheLevel);
 
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
@@ -171,7 +169,7 @@ namespace Umbraco.Tests.Facade
 
             // nested many converter returns the proper value clr type IEnumerable<TestModel>, and cache level
             Assert.AreEqual(typeof (IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
-            Assert.AreEqual(PropertyCacheLevel.Content, contentType2.GetPropertyType("property2").CacheLevel);
+            Assert.AreEqual(PropertyCacheLevel.Element, contentType2.GetPropertyType("property2").CacheLevel);
 
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
@@ -210,7 +208,7 @@ namespace Umbraco.Tests.Facade
             private IPublishedElement _owner;
 
             public TestPublishedProperty(PublishedPropertyType propertyType, object source)
-                : base(propertyType, PropertyCacheLevel.Content) // initial reference cache level always is .Content
+                : base(propertyType, PropertyCacheLevel.Element) // initial reference cache level always is .Content
             {
                 SourceValue = source;
                 HasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));

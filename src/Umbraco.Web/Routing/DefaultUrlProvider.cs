@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.Facade.DomainCache);
+            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.DomainCache);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.Facade.DomainCache);
+            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.DomainCache);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>

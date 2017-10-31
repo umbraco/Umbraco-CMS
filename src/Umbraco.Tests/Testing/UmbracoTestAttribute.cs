@@ -27,8 +27,8 @@ namespace Umbraco.Tests.Testing
         /// <summary>
         /// Gets or sets a value indicating ... FIXME to be completed
         /// </summary>
-        public bool FacadeServiceRepositoryEvents { get => _facadeServiceRepositoryEvents.ValueOrDefault(false); set => _facadeServiceRepositoryEvents.Set(value); }
-        private readonly Settable<bool> _facadeServiceRepositoryEvents = new Settable<bool>();
+        public bool PublishedRepositoryEvents { get => _publishedRepositoryEvents.ValueOrDefault(false); set => _publishedRepositoryEvents.Set(value); }
+        private readonly Settable<bool> _publishedRepositoryEvents = new Settable<bool>();
 
         /// <summary>
         /// Gets or sets a value indicating the required logging support.
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Testing
             base.Merge(other);
 
             _autoMapper.Set(attr._autoMapper);
-            _facadeServiceRepositoryEvents.Set(attr._facadeServiceRepositoryEvents);
+            _publishedRepositoryEvents.Set(attr._publishedRepositoryEvents);
             _logger.Set(attr._logger);
             _database.Set(attr._database);
             _pluginManager.Set(attr._pluginManager);

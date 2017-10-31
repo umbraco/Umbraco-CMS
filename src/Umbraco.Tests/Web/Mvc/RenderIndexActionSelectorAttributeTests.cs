@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),

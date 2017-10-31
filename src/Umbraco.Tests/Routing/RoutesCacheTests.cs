@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Routing
         {
             //var routingContext = GetRoutingContext("/test", 1111);
             var umbracoContext = GetUmbracoContext("/test", 0);
-            var cache = umbracoContext.Facade.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.PublishedShapshot.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
 
             // fixme not sure?

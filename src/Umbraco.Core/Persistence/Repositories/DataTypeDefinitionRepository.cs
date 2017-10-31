@@ -104,7 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 // so... we are modifying content types here. the service will trigger Deleted event,
                 // which will propagate to DataTypeCacheRefresher which will clear almost every cache
-                // there is to clear... and in addition facade caches will clear themselves too, so
+                // there is to clear... and in addition published snapshot caches will clear themselves too, so
                 // this is probably safe alghough it looks... weird.
                 //
                 // what IS weird is that a content type is losing a property and we do NOT raise any

@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // most of the snapshots management code, etc is an exact copy
         // SnapDictionary has unit tests to ensure it all works correctly
 
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<object>> _contentRootNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<PublishedContentType>> _contentTypesById;
@@ -42,9 +42,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Ctor
 
-        public ContentStore(IFacadeAccessor facadeAccessor, ILogger logger, BPlusTree<int, ContentNodeKit> localDb = null)
+        public ContentStore(IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, BPlusTree<int, ContentNodeKit> localDb = null)
         {
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _logger = logger;
             _localDb = localDb;
 
@@ -275,7 +275,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (node == null) continue;
                     var contentTypeId = node.ContentType.Id;
                     if (index.TryGetValue(contentTypeId, out PublishedContentType contentType) == false) continue;
-                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType, _facadeAccessor));
+                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType, _publishedSnapshotAccessor));
                 }
             }
             finally
@@ -389,7 +389,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link);
                         if (link?.Value == null)
                             continue;
-                        var node = new ContentNode(link.Value, contentType, _facadeAccessor);
+                        var node = new ContentNode(link.Value, contentType, _publishedSnapshotAccessor);
                         SetValueLocked(_contentNodes, id, node);
                         if (_localDb != null) RegisterChange(id, node.ToKit());
                     }
@@ -412,7 +412,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return false;
 
             // and use
-            kit.Build(link.Value, _facadeAccessor);
+            kit.Build(link.Value, _publishedSnapshotAccessor);
 
             return true;
         }
@@ -618,7 +618,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var link = GetParentLink(content);
                 var parent = link.Value;
                 if (link.Gen < _liveGen)
-                    parent = parent.CloneParent(_facadeAccessor);
+                    parent = parent.CloneParent(_publishedSnapshotAccessor);
                 parent.ChildContentIds.Remove(content.Id);
                 if (link.Gen < _liveGen)
                     SetValueLocked(_contentNodes, parent.Id, parent);
@@ -648,7 +648,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var link = GetParentLink(content);
                 var parent = link.Value;
                 if (link.Gen < _liveGen)
-                    parent = parent.CloneParent(_facadeAccessor);
+                    parent = parent.CloneParent(_publishedSnapshotAccessor);
                 parent.ChildContentIds.Add(content.Id);
                 if (link.Gen < _liveGen)
                     SetValueLocked(_contentNodes, parent.Id, parent);

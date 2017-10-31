@@ -8,12 +8,12 @@ namespace Umbraco.Web.Cache
 {
     public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresher, DomainCacheRefresher.JsonPayload>
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public DomainCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+        public DomainCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService)
             : base(cacheHelper)
         {
-            _facadeService = facadeService;
+            _publishedSnapshotService = publishedSnapshotService;
         }
 
         #region Define
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Cache
             // the new content...
 
             // notify
-            _facadeService.Notify(payloads);
+            _publishedSnapshotService.Notify(payloads);
             // then trigger event
             base.Refresh(payloads);
         }

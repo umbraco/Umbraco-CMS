@@ -1,55 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
-    /// Creates and manages IFacade.
+    /// Creates and manages <see cref="IPublishedShapshot"/> instances.
     /// </summary>
-    public interface IFacadeService : IDisposable
+    public interface IPublishedSnapshotService : IDisposable
     {
-        #region Facade
+        #region PublishedSnapshot
 
         /* Various places (such as Node) want to access the XML content, today as an XmlDocument
          * but to migrate to a new cache, they're migrating to an XPathNavigator. Still, they need
          * to find out how to get that navigator.
          *
-         * Because a cache such as the DrippingCache is contextual ie it has a "snapshot" nothing
-         * and remains consistent over the snapshot, the navigator should come from the "current"
-         * snapshot.
+         * Because a cache such as NuCache is contextual i.e. it has a "snapshot" thing and remains
+         * consistent over the snapshot, the navigator has to come come from the "current" snapshot.
          *
-         * The service creates those snapshots in IPublishedCaches objects.
-         *
-         * Places such as Node need to be able to find the "current" one so the factory has a
-         * notion of what is "current". In most cases, the IPublishedCaches object is created
-         * and registered against an UmbracoContext, and that context is then used as "current".
-         *
-         * But for tests we need to have a way to specify what's the "current" object & preview.
-         * Which is defined in PublishedCachesServiceBase.
+         * So although everything should be injected... we also need a notion of "the current published
+         * snapshot". This is provided by the IPublishedSnapshotAccessor.
          *
          */
 
         /// <summary>
-        /// Creates a facade.
+        /// Creates a published snapshot.
         /// </summary>
         /// <param name="previewToken">A preview token, or <c>null</c> if not previewing.</param>
-        /// <returns>A facade.</returns>
-        IFacade CreateFacade(string previewToken);
+        /// <returns>A published snapshot.</returns>
+        /// <remarks>If <paramref name="previewToken"/> is null, the snapshot is not previewing, else it
+        /// is previewing, and what is or is not visible in preview depends on the content of the token,
+        /// which is not specified and depends on the actual published snapshot service implementation.</remarks>
+        IPublishedShapshot CreatePublishedSnapshot(string previewToken);
 
         /// <summary>
-        /// Gets the facade accessor.
+        /// Gets the published snapshot accessor.
         /// </summary>
-        IFacadeAccessor FacadeAccessor { get; }
+        IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
 
         /// <summary>
-        /// Ensures that the facade has the proper environment to run.
+        /// Ensures that the published snapshot has the proper environment to run.
         /// </summary>
         /// <param name="errors">The errors, if any.</param>
-        /// <returns>A value indicating whether the facade has the proper environment to run.</returns>
+        /// <returns>A value indicating whether the published snapshot has the proper environment to run.</returns>
         bool EnsureEnvironment(out IEnumerable<string> errors);
 
         #endregion

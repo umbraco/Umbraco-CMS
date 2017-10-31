@@ -16,9 +16,9 @@ using Umbraco.Web.Cache;
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     /// <summary>
-    /// Implements a facade service.
+    /// Implements a published snapshot service.
     /// </summary>
-    internal class FacadeService : FacadeServiceBase
+    internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly XmlStore _xmlStore;
         private readonly RoutesCache _routesCache;
@@ -32,51 +32,51 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         #region Constructors
 
         // used in WebBootManager + tests
-        public FacadeService(ServiceContext serviceContext,
+        public PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
-            IFacadeAccessor facadeAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
             ILogger logger,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
-            : this(serviceContext, publishedContentTypeFactory, scopeProvider, uowProvider, requestCache, segmentProviders, facadeAccessor, logger, null, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, publishedContentTypeFactory, scopeProvider, uowProvider, requestCache, segmentProviders, publishedSnapshotAccessor, logger, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
-        internal FacadeService(ServiceContext serviceContext,
+        internal PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
-            IFacadeAccessor facadeAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
             ILogger logger,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, publishedContentTypeFactory, scopeProvider, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), facadeAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, publishedContentTypeFactory, scopeProvider, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), publishedSnapshotAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
-        private FacadeService(ServiceContext serviceContext,
+        private PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
-            IFacadeAccessor facadeAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
             ILogger logger,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : base(facadeAccessor)
+            : base(publishedSnapshotAccessor)
         {
             _routesCache = new RoutesCache();
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
 
-            _xmlStore = new XmlStore(serviceContext, scopeProvider, uowProvider, _routesCache, _contentTypeCache, segmentProviders, facadeAccessor, mainDom, testing, enableRepositoryEvents);
+            _xmlStore = new XmlStore(serviceContext, scopeProvider, uowProvider, _routesCache, _contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
@@ -117,7 +117,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Caches
 
-        public override IFacade CreateFacade(string previewToken)
+        public override IPublishedShapshot CreatePublishedSnapshot(string previewToken)
         {
             // use _requestCache to store recursive properties lookup, etc. both in content
             // and media cache. Life span should be the current request. Or, ideally
@@ -126,7 +126,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var domainCache = new DomainCache(_domainService);
 
-            return new Facade(
+            return new PublishedShapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _contentTypeCache, _routesCache, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),

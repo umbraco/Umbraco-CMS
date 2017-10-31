@@ -10,11 +10,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     public abstract class NestedContentValueConverterBase : PropertyValueConverterBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        protected NestedContentValueConverterBase(IFacadeAccessor facadeAccessor, IPublishedModelFactory publishedModelFactory)
+        protected NestedContentValueConverterBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory)
         {
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             PublishedModelFactory = publishedModelFactory;
         }
 
@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (string.IsNullOrEmpty(elementTypeAlias))
                 return null;
 
-            var publishedContentType = _facadeAccessor.Facade.ContentCache.GetContentType(elementTypeAlias);
+            var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetContentType(elementTypeAlias);
             if (publishedContentType == null)
                 return null;
 
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 || !Guid.TryParse(keyo.ToString(), out var key))
                 key = Guid.Empty;
 
-            IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _facadeAccessor);
+            IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
             element = PublishedModelFactory.CreateModel(element);
             return element;
         }

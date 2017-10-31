@@ -29,9 +29,9 @@ namespace Umbraco.Web.Install.InstallSteps
             installer.LoadConfig(packageFile);
             installer.InstallCleanUp(manifestId, packageFile);
 
-            // library.RefreshContent is obsolete, would need to RefreshAllFacade,
+            // library.RefreshContent is obsolete, would need to RefreshAll... snapshot,
             // but it should be managed automatically by services and caches!
-            //DistributedCache.Instance.RefreshAllFacade();
+            //DistributedCache.Instance.RefreshAll...();
         }
 
         public override bool RequiresExecution(object model)

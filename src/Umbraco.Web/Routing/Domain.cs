@@ -3,7 +3,7 @@
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Represents a facade domain.
+    /// Represents a published snapshot domain.
     /// </summary>
     public class Domain
     {

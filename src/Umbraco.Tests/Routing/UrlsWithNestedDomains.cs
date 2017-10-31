@@ -50,10 +50,10 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
             // route a rogue url
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
 
-            facadeRouter.FindDomain(frequest);
+            publishedRouter.FindDomain(frequest);
             Assert.IsTrue(frequest.HasDomain);
 
             // check that it's been routed

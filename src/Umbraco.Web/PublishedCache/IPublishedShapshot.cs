@@ -4,9 +4,11 @@ using Umbraco.Core.Cache;
 namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
-    /// The Umbraco facade.
+    /// Specifies a published snapshot.
     /// </summary>
-    public interface IFacade
+    /// <remarks>A published snapshot is a point-in-time capture of the current state of
+    /// everything that is "published".</remarks>
+    public interface IPublishedShapshot
     {
         /// <summary>
         /// Gets the <see cref="IPublishedContentCache"/>.
@@ -29,23 +31,23 @@ namespace Umbraco.Web.PublishedCache
         IDomainCache DomainCache { get; }
 
         /// <summary>
-        /// Gets the facade cache.
-        /// </summary>
-        ICacheProvider FacadeCache { get; }
-
-        /// <summary>
-        /// Gets the snapshot cache.
+        /// Gets the snapshot-level cache.
         /// </summary>
         ICacheProvider SnapshotCache { get; }
 
         /// <summary>
-        /// Forces the facade preview mode.
+        /// Gets the elements-level cache.
+        /// </summary>
+        ICacheProvider ElementsCache { get; }
+
+        /// <summary>
+        /// Forces the preview mode.
         /// </summary>
         /// <param name="preview">The forced preview mode.</param>
         /// <param name="callback">A callback to execute when reverting to previous preview.</param>
         /// <remarks>
-        /// <para>Forcing to false means no preview. Forcing to true means 'full' preview if the facade is not already previewing;
-        /// otherwise the facade keeps previewing according to whatever settings it is using already.</para>
+        /// <para>Forcing to false means no preview. Forcing to true means 'full' preview if the snapshot is not already previewing;
+        /// otherwise the snapshot keeps previewing according to whatever settings it is using already.</para>
         /// <para>Stops forcing preview when disposed.</para></remarks>
         IDisposable ForcedPreview(bool preview, Action<bool> callback = null);
     }

@@ -56,15 +56,15 @@ namespace Umbraco.Tests.PublishedContent
         {
             RouteData routeData = null;
 
-            var facade = CreateFacade();
+            var publishedSnapshot = CreatePublishedSnapshot();
 
-            var facadeService = new Mock<IFacadeService>();
-            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
+            var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
+            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
             var umbracoContext = new UmbracoContext(
                 httpContext,
-                facadeService.Object,
+                publishedSnapshotService.Object,
                 new WebSecurity(httpContext, Current.Services.UserService),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>());
@@ -189,10 +189,10 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(2, result[1].Id);
         }
 
-        private static SolidFacade CreateFacade()
+        private static SolidPublishedShapshot CreatePublishedSnapshot()
         {
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
-            var caches = new SolidFacade();
+            var caches = new SolidPublishedShapshot();
             var cache = caches.InnerContentCache;
 
             var props = new[]

@@ -16,8 +16,8 @@ namespace Umbraco.Tests.Routing
         public void Lookup_By_Page_Id(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByPageIdQuery();
 
             //we need to manually stub the return output of HttpContext.Request["umbPageId"]

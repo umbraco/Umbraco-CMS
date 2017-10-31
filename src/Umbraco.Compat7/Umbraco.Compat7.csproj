@@ -52,7 +52,44 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" Exclude="obj\**\*.cs" />
+    <Compile Include="Compat7Component.cs" />
+    <Compile Include="Core\ActionsResolver.cs" />
+    <Compile Include="Core\ApplicationContext.cs" />
+    <Compile Include="Core\ApplicationEventHandler.cs" />
+    <Compile Include="Core\Cache\CacheRefreshersResolver.cs" />
+    <Compile Include="Core\DatabaseContext.cs" />
+    <Compile Include="Core\Dictionary\CultureDictionaryFactoryResolver.cs" />
+    <Compile Include="Core\IApplicationEventHandler.cs" />
+    <Compile Include="Core\Logging\LoggerResolver.cs" />
+    <Compile Include="Core\Logging\LogHelper.cs" />
+    <Compile Include="Core\Logging\ProfilerResolver.cs" />
+    <Compile Include="Core\Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
+    <Compile Include="Core\ObjectResolution\LazyManyObjectsResolverBase.cs" />
+    <Compile Include="Core\ObjectResolution\ManyObjectsResolverBase.cs" />
+    <Compile Include="Core\ObjectResolution\WeightedObjectsResolverBase.cs" />
+    <Compile Include="Core\Persistence\Migrations\MigrationResolver.cs" />
+    <Compile Include="Core\PropertyEditors\PropertyEditorResolver.cs" />
+    <Compile Include="Core\PropertyEditors\PropertyValueConvertersResolver.cs" />
+    <Compile Include="Core\Strings\ShortStringHelperResolver.cs" />
+    <Compile Include="Core\Strings\UrlSegmentProviderResolver.cs" />
+    <Compile Include="Core\Sync\ServerMessengerResolver.cs" />
+    <Compile Include="Core\Sync\ServerRegistrarResolver.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Web\HealthCheck\HealthCheckResolver.cs" />
+    <Compile Include="Web\Media\ThumbnailProvidersResolver.cs" />
+    <Compile Include="Web\Models\IRenderModel.cs" />
+    <Compile Include="Web\Models\RenderModel.cs" />
+    <Compile Include="Web\Models\RenderModelOfTContent.cs" />
+    <Compile Include="Web\Mvc\DefaultRenderMvcControllerResolver.cs" />
+    <Compile Include="Web\Mvc\FilteredControllerFactoriesResolver.cs" />
+    <Compile Include="Web\Mvc\UmbracoTemplatePage.cs" />
+    <Compile Include="Web\Mvc\UmbracoTemplatePageOfTContent.cs" />
+    <Compile Include="Web\PublishedCache\PublishedSnapshotServiceResolver.cs" />
+    <Compile Include="Web\Routing\ContentFinderResolver.cs" />
+    <Compile Include="Web\Routing\ContentLastChangeFinderResolver.cs" />
+    <Compile Include="Web\Routing\SiteDomainHelperResolver.cs" />
+    <Compile Include="Web\Routing\UrlProviderResolver.cs" />
+    <Compile Include="Web\UmbracoHelperExtensions.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>

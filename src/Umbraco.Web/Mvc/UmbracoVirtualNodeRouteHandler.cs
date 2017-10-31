@@ -11,7 +11,7 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
         // todo - try lazy property injection?
-        private FacadeRouter FacadeRouter => Core.Composing.Current.Container.GetInstance<FacadeRouter>();
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Container.GetInstance<PublishedRouter>();
 
         /// <summary>
         /// Returns the UmbracoContext for this route handler
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Mvc
             var found = FindContent(requestContext, umbracoContext);
             if (found == null) return new NotFoundHandler();
 
-            var request = FacadeRouter.CreateRequest(umbracoContext);
+            var request = PublishedRouter.CreateRequest(umbracoContext);
             request.PublishedContent = found;
             umbracoContext.PublishedContentRequest = request;
 
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Mvc
 
         protected virtual void PreparePublishedContentRequest(PublishedContentRequest request)
         {
-            FacadeRouter.PrepareRequest(request);
+            PublishedRouter.PrepareRequest(request);
         }
     }
 }

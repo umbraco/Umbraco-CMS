@@ -54,7 +54,7 @@ namespace Umbraco.Web.Routing
                 }
                 if (node != null)
                 {
-                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.Facade.DomainCache.GetAll(true), node.Path, null);
+                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedShapshot.DomainCache.GetAll(true), node.Path, null);
                     if (d != null)
                         errorCulture = d.Culture;
                 }

@@ -74,7 +74,7 @@ namespace Umbraco.Web.Mvc
         protected UmbracoContext UmbracoContext => _umbracoContext ?? (_umbracoContext = UmbracoContext.Current);
 
         // todo - try lazy property injection?
-        private FacadeRouter FacadeRouter => Core.Composing.Current.Container.GetInstance<FacadeRouter>();
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Container.GetInstance<PublishedRouter>();
 
         /// <summary>
         /// Exposes an UmbracoHelper
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Mvc
                 return;
             }
 
-            UmbracoContext.Current.PublishedContentRequest = FacadeRouter.CreateRequest(UmbracoContext.Current);
+            UmbracoContext.Current.PublishedContentRequest = PublishedRouter.CreateRequest(UmbracoContext.Current);
             ConfigurePublishedContentRequest(UmbracoContext.Current.PublishedContentRequest, filterContext);
         }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Mvc
                 request.PublishedContent = (IPublishedContent) result;
             }
 
-            FacadeRouter.PrepareRequest(request);
+            PublishedRouter.PrepareRequest(request);
         }
     }
 }

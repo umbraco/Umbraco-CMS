@@ -31,7 +31,7 @@ using Database = Umbraco.Web.PublishedCache.NuCache.DataSource.Database;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    class FacadeService : FacadeServiceBase
+    class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
@@ -60,13 +60,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public static readonly bool FullCacheWhenPreviewing = true;
 
         // define constant - determines whether to cache the published content
-        // objects (in the snapshot cache, or facade cache, depending on preview)
+        // objects (in the elements cache, or snapshot cache, depending on preview)
         // or to refetch them all the time. caching is faster but uses more
         // memory. not sure what we want.
         public static readonly bool CachePublishedContentChildren = true;
 
         // define constant - determines whether to cache the content cache root
-        // objects (in the snapshot cache, or facade cache, depending on preview)
+        // objects (in the elements cache, or snapshot cache, depending on preview)
         // or to refecth them all the time. caching is faster but uses more
         // memory - not sure what we want.
         public static readonly bool CacheContentCacheRoots = true;
@@ -75,10 +75,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         //private static int _singletonCheck;
 
-        public FacadeService(Options options, MainDom mainDom, IRuntimeState runtime,
+        public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
-            IScopeUnitOfWorkProvider uowProvider, IFacadeAccessor facadeAccessor, ILogger logger, IScopeProvider scopeProvider)
-            : base(facadeAccessor)
+            IScopeUnitOfWorkProvider uowProvider, IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IScopeProvider scopeProvider)
+            : base(publishedSnapshotAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
             //    throw new Exception("Singleton must be instancianted only once!");
@@ -100,7 +100,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // content (and content types) from database cannot be consistent (see notes in "Handle
             // Notifications" region), so
             // - notifications will be ignored
-            // - trying to obtain a facade from the service will throw
+            // - trying to obtain a published snapshot from the service will throw
             if (runtime.Level != RuntimeLevel.Run)
                 return;
 
@@ -133,13 +133,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                 // figure out whether it can read the dbs or it should populate them from sql
-                _contentStore = new ContentStore(facadeAccessor, logger, _localContentDb);
-                _mediaStore = new ContentStore(facadeAccessor, logger, _localMediaDb);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, logger, _localContentDb);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, logger, _localMediaDb);
             }
             else
             {
-                _contentStore = new ContentStore(facadeAccessor, logger);
-                _mediaStore = new ContentStore(facadeAccessor, logger);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, logger);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, logger);
             }
 
             _domainStore = new SnapDictionary<int, Domain>();
@@ -170,7 +170,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<FacadeService>("Panic, exception while loading cache data.", e);
+                    _logger.Error<PublishedSnapshotService>("Panic, exception while loading cache data.", e);
                 }
 
                 // finaly, cache is ready!
@@ -224,13 +224,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public class Options
         {
-            // disabled: prevents the facade from updating and exposing changes
-            //           or even creating a new facade to see changes, uses old cache = bad
+            // disabled: prevents the published snapshot from updating and exposing changes
+            //           or even creating a new published snapshot to see changes, uses old cache = bad
             //
-            //// indicates that the facade cache should reuse the application request cache
-            //// otherwise a new cache object would be created for the facade specifically,
+            //// indicates that the snapshot cache should reuse the application request cache
+            //// otherwise a new cache object would be created for the snapshot specifically,
             //// which is the default - web boot manager uses this to optimze facades
-            //public bool FacadeCacheIsApplicationRequestCache;
+            //public bool PublishedSnapshotCacheIsApplicationRequestCache;
 
             public bool IgnoreLocalDb;
         }
@@ -280,12 +280,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _localContentDb?.Clear();
 
-            _logger.Debug<FacadeService>("Loading content from database...");
+            _logger.Debug<PublishedSnapshotService>("Loading content from database...");
             var sw = Stopwatch.StartNew();
             var kits = _dataSource.GetAllContentSources(uow);
             _contentStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<FacadeService>("Loaded content from database (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded content from database (" + sw.ElapsedMilliseconds + "ms).");
         }
 
         private void LoadContentFromLocalDbLocked(IScopeUnitOfWork uow)
@@ -294,12 +294,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Content, x));
             _contentStore.UpdateContentTypes(null, contentTypes, null);
 
-            _logger.Debug<FacadeService>("Loading content from local db...");
+            _logger.Debug<PublishedSnapshotService>("Loading content from local db...");
             var sw = Stopwatch.StartNew();
             var kits = _localContentDb.Select(x => x.Value).OrderBy(x => x.Node.Level);
             _contentStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<FacadeService>("Loaded content from local db (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded content from local db (" + sw.ElapsedMilliseconds + "ms).");
         }
 
         // keep these around - might be useful
@@ -348,12 +348,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _localMediaDb?.Clear();
 
-            _logger.Debug<FacadeService>("Loading media from database...");
+            _logger.Debug<PublishedSnapshotService>("Loading media from database...");
             var sw = Stopwatch.StartNew();
             var kits = _dataSource.GetAllMediaSources(uow);
             _mediaStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<FacadeService>("Loaded media from database (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded media from database (" + sw.ElapsedMilliseconds + "ms).");
         }
 
         private void LoadMediaFromLocalDbLocked(IScopeUnitOfWork uow)
@@ -362,12 +362,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Media, x));
             _mediaStore.UpdateContentTypes(null, mediaTypes, null);
 
-            _logger.Debug<FacadeService>("Loading media from local db...");
+            _logger.Debug<PublishedSnapshotService>("Loading media from local db...");
             var sw = Stopwatch.StartNew();
             var kits = _localMediaDb.Select(x => x.Value);
             _mediaStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<FacadeService>("Loaded media from local db (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded media from local db (" + sw.ElapsedMilliseconds + "ms).");
         }
 
         // keep these around - might be useful
@@ -484,7 +484,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // note: if the service is not ready, ie _isReady is false, then notifications are ignored
 
-        // SetUmbracoVersionStep issues a DistributedCache.Instance.RefreshAllFacade() call which should cause
+        // SetUmbracoVersionStep issues a DistributedCache.Instance.RefreshAll...() call which should cause
         // the entire content, media etc caches to reload from database -- and then the app restarts -- however,
         // at the time SetUmbracoVersionStep runs, Umbraco is not fully initialized and therefore some property
         // value converters, etc are not registered, and rebuilding the NuCache may not work properly.
@@ -518,7 +518,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (draftChanged || publishedChanged)
-                ((Facade)CurrentFacade).Resync();
+                ((PublishedShapshot)CurrentPublishedShapshot).Resync();
         }
 
         private void NotifyLocked(IEnumerable<ContentCacheRefresher.JsonPayload> payloads, out bool draftChanged, out bool publishedChanged)
@@ -537,7 +537,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                _logger.Debug<FacadeService>($"Notified {payload.ChangeTypes} for content {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>($"Notified {payload.ChangeTypes} for content {payload.Id}");
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -615,7 +615,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (anythingChanged)
-                ((Facade)CurrentFacade).Resync();
+                ((PublishedShapshot)CurrentPublishedShapshot).Resync();
         }
 
         private void NotifyLocked(IEnumerable<MediaCacheRefresher.JsonPayload> payloads, out bool anythingChanged)
@@ -630,7 +630,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                _logger.Debug<FacadeService>($"Notified {payload.ChangeTypes} for media {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>($"Notified {payload.ChangeTypes} for media {payload.Id}");
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -704,7 +704,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
-            ((Facade)CurrentFacade).Resync();
+            ((PublishedShapshot)CurrentPublishedShapshot).Resync();
         }
 
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
@@ -749,7 +749,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var idsA = payloads.Select(x => x.Id).ToArray();
 
             foreach (var payload in payloads)
-                _logger.Debug<FacadeService>($"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>($"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}");
 
             using (_contentStore.GetWriter(_scopeProvider))
             using (_mediaStore.GetWriter(_scopeProvider))
@@ -775,7 +775,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }
                 }
 
-            ((Facade) CurrentFacade).Resync();
+            ((PublishedShapshot) CurrentPublishedShapshot).Resync();
         }
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
@@ -918,35 +918,35 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
-        #region Create, Get Facade
+        #region Create, Get Published Snapshot
 
         private long _contentGen, _mediaGen, _domainGen;
-        private ICacheProvider _snapshotCache;
+        private ICacheProvider _elementsCache;
 
-        public override IFacade CreateFacade(string previewToken)
+        public override IPublishedShapshot CreatePublishedSnapshot(string previewToken)
         {
             // no cache, no joy
             if (_isReady == false)
-                throw new InvalidOperationException("The facade service has not properly initialized.");
+                throw new InvalidOperationException("The published snapshot service has not properly initialized.");
 
             var preview = previewToken.IsNullOrWhiteSpace() == false;
-            return new Facade(this, preview);
+            return new PublishedShapshot(this, preview);
         }
 
-        public Facade.FacadeElements GetElements(bool previewDefault)
+        public PublishedShapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
-            // note: using ObjectCacheRuntimeCacheProvider for snapshot and facade caches
+            // note: using ObjectCacheRuntimeCacheProvider for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
             // thing - better use a StaticCacheProvider which "just" creates a concurrent
             // dictionary
 
-            // for facade cache, StaticCacheProvider MAY be OK but it is not thread-safe,
+            // for snapshot cache, StaticCacheProvider MAY be OK but it is not thread-safe,
             // nothing like that...
-            // for snapshot cache, StaticCacheProvider is a No-No, use something better.
+            // for elements cache, StaticCacheProvider is a No-No, use something better.
 
             ContentStore.Snapshot contentSnap, mediaSnap;
             SnapDictionary<int, Domain>.Snapshot domainSnap;
-            ICacheProvider snapshotCache;
+            ICacheProvider elementsCache;
             lock (_storesLock)
             {
                 var scopeContext = _scopeProvider.Context;
@@ -956,14 +956,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     contentSnap = _contentStore.CreateSnapshot();
                     mediaSnap = _mediaStore.CreateSnapshot();
                     domainSnap = _domainStore.CreateSnapshot();
-                    snapshotCache = _snapshotCache;
+                    elementsCache = _elementsCache;
                 }
                 else
                 {
                     contentSnap = _contentStore.LiveSnapshot;
                     mediaSnap = _mediaStore.LiveSnapshot;
                     domainSnap = _domainStore.Test.LiveSnapshot;
-                    snapshotCache = _snapshotCache;
+                    elementsCache = _elementsCache;
 
                     // this is tricky
                     // we are returning elements composed from live snapshots, which we need to replace
@@ -972,36 +972,36 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // elements
                     // just need to make sure nothing gets elements in another enlisted action... so using
                     // a MaxValue to make sure this one runs last, and it should be ok
-                    scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.FacadeService.Resync", () => this, (completed, svc) =>
+                    scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.Resync", () => this, (completed, svc) =>
                     {
-                        ((Facade) svc.CurrentFacade).Resync();
+                        ((PublishedShapshot) svc.CurrentPublishedShapshot).Resync();
                     }, int.MaxValue);
                 }
 
                 // create a new snapshot cache if snapshots are different gens
-                if (contentSnap.Gen != _contentGen || mediaSnap.Gen != _mediaGen || domainSnap.Gen != _domainGen || _snapshotCache == null)
+                if (contentSnap.Gen != _contentGen || mediaSnap.Gen != _mediaGen || domainSnap.Gen != _domainGen || _elementsCache == null)
                 {
                     _contentGen = contentSnap.Gen;
                     _mediaGen = mediaSnap.Gen;
                     _domainGen = domainSnap.Gen;
-                    snapshotCache = _snapshotCache = new DictionaryCacheProvider();
+                    elementsCache = _elementsCache = new DictionaryCacheProvider();
                 }
             }
 
-            var facadeCache = new StaticCacheProvider();
+            var snapshotCache = new StaticCacheProvider();
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
             var domainCache = new DomainCache(domainSnap);
 
-            return new Facade.FacadeElements
+            return new PublishedShapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, facadeCache, snapshotCache, new DomainHelper(domainCache)),
-                MediaCache = new MediaCache(previewDefault, mediaSnap, facadeCache, snapshotCache),
-                MemberCache = new MemberCache(previewDefault, facadeCache, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache, FacadeAccessor),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache)),
+                MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache, PublishedSnapshotAccessor),
                 DomainCache = domainCache,
-                FacadeCache = facadeCache,
-                SnapshotCache = snapshotCache
+                SnapshotCache = snapshotCache,
+                ElementsCache = elementsCache
             };
         }
 
@@ -1029,7 +1029,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Handle Repository Events For Database PreCache
 
         // note: if the service is not ready, ie _isReady is false, then we still handle repository events,
-        // because we can, we do not need a working facade to do it - the only reason why it could cause an
+        // because we can, we do not need a working published snapshot to do it - the only reason why it could cause an
         // issue is if the database table is not ready, but that should be prevented by migrations.
 
         // we need them to be "repository" events ie to trigger from within the repository transaction,

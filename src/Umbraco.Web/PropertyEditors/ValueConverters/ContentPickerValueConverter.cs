@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     internal class ContentPickerValueConverter : PropertyValueConverterBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         private static readonly List<string> PropertiesToExclude = new List<string>
         {
@@ -18,9 +18,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
         };
 
-        public ContentPickerValueConverter(IFacadeAccessor facadeAccessor)
+        public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -31,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => typeof (IPublishedContent);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Snapshot;
+            => PropertyCacheLevel.Elements;
 
         public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 IPublishedContent content;
                 if (inter is int id)
                 {
-                    content = _facadeAccessor.Facade.ContentCache.GetById(id);
+                    content = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(id);
                     if (content != null)
                         return content;
                 }
@@ -65,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var udi = inter as GuidUdi;
                     if (udi == null)
                         return null;
-                    content = _facadeAccessor.Facade.ContentCache.GetById(udi.Guid);
+                    content = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(udi.Guid);
                     if (content != null)
                         return content;
                 }

@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => IsRangeDataType(propertyType.DataTypeId) ? typeof (Range<decimal>) : typeof (decimal);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {

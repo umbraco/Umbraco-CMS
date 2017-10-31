@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => typeof (IHtmlString);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Facade;
+            => PropertyCacheLevel.Snapshot;
 
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it

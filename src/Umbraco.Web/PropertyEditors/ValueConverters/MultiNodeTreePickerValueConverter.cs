@@ -20,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(MustBeStringValueConverter))]
     public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         private static readonly List<string> PropertiesToExclude = new List<string>
         {
@@ -28,9 +28,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
         };
 
-        public MultiNodeTreePickerValueConverter(IFacadeAccessor facadeAccessor)
+        public MultiNodeTreePickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
-            _facadeAccessor = facadeAccessor ?? throw new ArgumentNullException(nameof(facadeAccessor));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Facade;
+            => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<IPublishedContent>);
@@ -89,9 +89,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         foreach (var nodeId in nodeIds)
                         {
                             var multiNodeTreePickerItem =
-                                GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, id => _facadeAccessor.Facade.ContentCache.GetById(id))
-                                ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, id => _facadeAccessor.Facade.MediaCache.GetById(id))
-                                ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, id => _facadeAccessor.Facade.MemberCache.GetById(id));
+                                GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, id => _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(id))
+                                ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, id => _publishedSnapshotAccessor.PublishedSnapshot.MediaCache.GetById(id))
+                                ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, id => _publishedSnapshotAccessor.PublishedSnapshot.MemberCache.GetById(id));
 
                             if (multiNodeTreePickerItem != null)
                             {
@@ -121,9 +121,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             var guidUdi = udi as GuidUdi;
                             if (guidUdi == null) continue;
                             var multiNodeTreePickerItem =
-                                GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => _facadeAccessor.Facade.ContentCache.GetById(guidUdi.Guid))
-                                ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => _facadeAccessor.Facade.MediaCache.GetById(guidUdi.Guid))
-                                ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id => _facadeAccessor.Facade.MemberCache.GetByProviderKey(guidUdi.Guid));
+                                GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(guidUdi.Guid))
+                                ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => _publishedSnapshotAccessor.PublishedSnapshot.MediaCache.GetById(guidUdi.Guid))
+                                ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id => _publishedSnapshotAccessor.PublishedSnapshot.MemberCache.GetByProviderKey(guidUdi.Guid));
                             if (multiNodeTreePickerItem != null)
                             {
                                 multiNodeTreePicker.Add(multiNodeTreePickerItem);

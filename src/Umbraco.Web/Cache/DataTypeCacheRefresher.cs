@@ -12,13 +12,13 @@ namespace Umbraco.Web.Cache
 {
     public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public DataTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService, IdkMap idkMap)
+        public DataTypeCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
             : base(cacheHelper)
         {
-            _facadeService = facadeService;
+            _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
         }
 
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Cache
             MediaPickerValueConverter.ClearCaches();
 
             // notify
-            _facadeService.Notify(payloads);
+            _publishedSnapshotService.Notify(payloads);
 
             base.Refresh(payloads);
         }

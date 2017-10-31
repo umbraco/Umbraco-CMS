@@ -33,10 +33,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             int parentContentId,
             DateTime createDate, int creatorId,
             ContentData draftData, ContentData publishedData,
-            IFacadeAccessor facadeAccessor)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor)
             : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId)
         {
-            SetContentTypeAndData(contentType, draftData, publishedData, facadeAccessor);
+            SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor);
         }
 
         // 2-phases ctor, phase 1
@@ -58,7 +58,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // two-phase ctor, phase 2
-        public void SetContentTypeAndData(PublishedContentType contentType, ContentData draftData, ContentData publishedData, IFacadeAccessor facadeAccessor)
+        public void SetContentTypeAndData(PublishedContentType contentType, ContentData draftData, ContentData publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             ContentType = contentType;
 
@@ -66,9 +66,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 throw new ArgumentException("Both draftData and publishedData cannot be null at the same time.");
 
             if (draftData != null)
-                Draft = new PublishedContent(this, draftData, facadeAccessor).CreateModel();
+                Draft = new PublishedContent(this, draftData, publishedSnapshotAccessor).CreateModel();
             if (publishedData != null)
-                Published = new PublishedContent(this, publishedData, facadeAccessor).CreateModel();
+                Published = new PublishedContent(this, publishedData, publishedSnapshotAccessor).CreateModel();
         }
 
         // clone parent
@@ -97,7 +97,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // clone with new content type
-        public ContentNode(ContentNode origin, PublishedContentType contentType, IFacadeAccessor facadeAccessor)
+        public ContentNode(ContentNode origin, PublishedContentType contentType, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             Id = origin.Id;
             Uid = origin.Uid;
@@ -112,8 +112,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var originDraft = origin.Draft == null ? null : PublishedContent.UnwrapIPublishedContent(origin.Draft);
             var originPublished = origin.Published == null ? null : PublishedContent.UnwrapIPublishedContent(origin.Published);
 
-            Draft = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, facadeAccessor).CreateModel();
-            Published = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, facadeAccessor).CreateModel();
+            Draft = originDraft == null ? null : new PublishedContent(this, originDraft._contentData, publishedSnapshotAccessor).CreateModel();
+            Published = originPublished == null ? null : new PublishedContent(this, originPublished._contentData, publishedSnapshotAccessor).CreateModel();
 
             ChildContentIds = origin.ChildContentIds; // can be the *same* list FIXME oh really?
         }
@@ -136,7 +136,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public IPublishedContent Draft;
         public IPublishedContent Published;
 
-        public ContentNode CloneParent(IFacadeAccessor facadeAccessor)
+        public ContentNode CloneParent(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             return new ContentNode(this);
         }

@@ -10,11 +10,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MemberPickerValueConverter : PropertyValueConverterBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MemberPickerValueConverter(IFacadeAccessor facadeAccessor)
+        public MemberPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
-            _facadeAccessor = facadeAccessor ?? throw new ArgumentNullException(nameof(facadeAccessor));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Facade;
+            => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IPublishedContent);
@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 IPublishedContent member;
                 if (source is int id)
                 {
-                    member = _facadeAccessor.Facade.MemberCache.GetById(id);
+                    member = _publishedSnapshotAccessor.PublishedSnapshot.MemberCache.GetById(id);
                     if (member != null)
                         return member;
                 }
@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var sourceUdi = source as GuidUdi;
                     if (sourceUdi == null) return null;
-                    member = _facadeAccessor.Facade.MemberCache.GetByProviderKey(sourceUdi.Guid);
+                    member = _publishedSnapshotAccessor.PublishedSnapshot.MemberCache.GetByProviderKey(sourceUdi.Guid);
                     if (member != null)
                         return member;
                 }

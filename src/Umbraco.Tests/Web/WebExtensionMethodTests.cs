@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Web
         {
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>());
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Web
         {
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>());
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Web
         {
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>());

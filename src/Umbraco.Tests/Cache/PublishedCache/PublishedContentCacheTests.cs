@@ -61,17 +61,17 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var xmlStore = new XmlStore(() => _xml);
             var cacheProvider = new StaticCacheProvider();
             var domainCache = new DomainCache(ServiceContext.DomainService);
-            var facade = new Umbraco.Web.PublishedCache.XmlPublishedCache.Facade(
+            var publishedShapshot = new Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedShapshot(
                 new PublishedContentCache(xmlStore, domainCache, cacheProvider, ContentTypesCache, null, null),
                 new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, cacheProvider, ContentTypesCache),
                 new PublishedMemberCache(null, cacheProvider, Current.Services.MemberService, ContentTypesCache),
                 domainCache);
-            var facadeService = new Mock<IFacadeService>();
-            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
+            var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
+            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedShapshot);
 
             _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
-                facadeService.Object,
+                publishedSnapshotService.Object,
                 new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService),
                 settings,
                 Enumerable.Empty<IUrlProvider>());

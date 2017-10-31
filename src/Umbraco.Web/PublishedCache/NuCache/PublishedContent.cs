@@ -12,7 +12,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 {
     internal class PublishedContent : PublishedContentBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly ContentNode _contentNode;
         // ReSharper disable once InconsistentNaming
         internal readonly ContentData _contentData; // internal for ContentNode cloning
@@ -21,11 +21,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        public PublishedContent(ContentNode contentNode, ContentData contentData, IFacadeAccessor facadeAccessor)
+        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             _contentNode = contentNode;
             _contentData = contentData;
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
             _urlName = _contentData.Name.ToUrlSegment();
             IsPreviewing = _contentData.Published == false;
@@ -37,15 +37,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     object value;
                     return values.TryGetValue(propertyType.PropertyTypeAlias, out value) && value != null
-                        ? new Property(propertyType, this, value, _facadeAccessor) as IPublishedProperty
-                        : new Property(propertyType, this, _facadeAccessor) as IPublishedProperty;
+                        ? new Property(propertyType, this, value, _publishedSnapshotAccessor) as IPublishedProperty
+                        : new Property(propertyType, this, _publishedSnapshotAccessor) as IPublishedProperty;
                 })
                 .ToArray();
         }
 
         private string GetProfileNameById(int id)
         {
-            var cache = GetCurrentFacadeCache();
+            var cache = GetCurrentSnapshotCache();
             return cache == null
                 ? GetProfileNameByIdNoCache(id)
                 : (string) cache.GetCacheItem(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
@@ -69,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedContent(ContentNode contentNode, PublishedContent origin)
         {
             _contentNode = contentNode;
-            _facadeAccessor = origin._facadeAccessor;
+            _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             _contentData = origin._contentData;
 
             _urlName = origin._urlName;
@@ -84,7 +84,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // clone for previewing as draft a published content that is published and has no draft
         private PublishedContent(PublishedContent origin)
         {
-            _facadeAccessor = origin._facadeAccessor;
+            _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
             _contentNode = origin._contentNode;
             _contentData = origin._contentData;
 
@@ -100,52 +100,52 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #region Get Content/Media for Parent/Children
 
         // this is for tests purposes
-        // args are: current facade (may be null), previewing, content id - returns: content
+        // args are: current published snapshot (may be null), previewing, content id - returns: content
 
-        internal static Func<IFacade, bool, int, IPublishedContent> GetContentByIdFunc { get; set; }
-            = (facade, previewing, id) => facade.ContentCache.GetById(previewing, id);
+        internal static Func<IPublishedShapshot, bool, int, IPublishedContent> GetContentByIdFunc { get; set; }
+            = (publishedShapshot, previewing, id) => publishedShapshot.ContentCache.GetById(previewing, id);
 
-        internal static Func<IFacade, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
-            = (facade, previewing, id) => facade.MediaCache.GetById(previewing, id);
+        internal static Func<IPublishedShapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
+            = (publishedShapshot, previewing, id) => publishedShapshot.MediaCache.GetById(previewing, id);
 
         private IPublishedContent GetContentById(bool previewing, int id)
         {
-            return GetContentByIdFunc(_facadeAccessor.Facade, previewing, id);
+            return GetContentByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
         }
 
         private IEnumerable<IPublishedContent> GetContentByIds(bool previewing, IEnumerable<int> ids)
         {
-            var facade = _facadeAccessor.Facade;
+            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
 
             // beware! the loop below CANNOT be converted to query such as:
-            //return ids.Select(x => _getContentByIdFunc(facade, previewing, x)).Where(x => x != null);
-            // because it would capture the facade and cause all sorts of issues
+            //return ids.Select(x => _getContentByIdFunc(publishedSnapshot, previewing, x)).Where(x => x != null);
+            // because it would capture the published snapshot and cause all sorts of issues
             //
-            // we WANT to get the actual current facade each time we run
+            // we WANT to get the actual current published snapshot each time we run
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var id in ids)
             {
-                var content = GetContentByIdFunc(facade, previewing, id);
+                var content = GetContentByIdFunc(publishedSnapshot, previewing, id);
                 if (content != null) yield return content;
             }
         }
 
         private IPublishedContent GetMediaById(bool previewing, int id)
         {
-            return GetMediaByIdFunc(_facadeAccessor.Facade, previewing, id);
+            return GetMediaByIdFunc(_publishedSnapshotAccessor.PublishedSnapshot, previewing, id);
         }
 
         private IEnumerable<IPublishedContent> GetMediaByIds(bool previewing, IEnumerable<int> ids)
         {
-            var facade = _facadeAccessor.Facade;
+            var publishedShapshot = _publishedSnapshotAccessor.PublishedSnapshot;
 
             // see note above for content
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var id in ids)
             {
-                var content = GetMediaByIdFunc(facade, previewing, id);
+                var content = GetMediaByIdFunc(publishedShapshot, previewing, id);
                 if (content != null) yield return content;
             }
         }
@@ -206,7 +206,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             get
             {
                 var cache = GetAppropriateCache();
-                if (cache == null || FacadeService.CachePublishedContentChildren == false)
+                if (cache == null || PublishedSnapshotService.CachePublishedContentChildren == false)
                     return GetChildren();
 
                 // note: ToArray is important here, we want to cache the result, not the function!
@@ -268,19 +268,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // beware what you use that one for - you don't want to cache its result
         private ICacheProvider GetAppropriateCache()
         {
-            var facade = (Facade) _facadeAccessor.Facade;
-            var cache = facade == null
+            var publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+            var cache = publishedSnapshot == null
                 ? null
-                : ((IsPreviewing == false || FacadeService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
-                    ? facade.SnapshotCache
-                    : facade.FacadeCache);
+                : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
+                    ? publishedSnapshot.ElementsCache
+                    : publishedSnapshot.SnapshotCache);
             return cache;
         }
 
-        private ICacheProvider GetCurrentFacadeCache()
+        private ICacheProvider GetCurrentSnapshotCache()
         {
-            var facade = (Facade) _facadeAccessor.Facade;
-            return facade?.FacadeCache;
+            var publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+            return publishedSnapshot?.SnapshotCache;
         }
 
         #endregion

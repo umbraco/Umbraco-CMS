@@ -15,15 +15,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             base.Compose(composition);
 
-            // register the NuCache facade service
-            composition.SetFacadeService(factory => new FacadeService(
-                new FacadeService.Options(),
+            // register the NuCache published snapshot service
+            composition.SetPublishedSnapshotService(factory => new PublishedSnapshotService(
+                new PublishedSnapshotService.Options(),
                 factory.GetInstance<MainDom>(),
                 factory.GetInstance<IRuntimeState>(),
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IPublishedContentTypeFactory>(),
                 factory.GetInstance<IScopeUnitOfWorkProvider>(),
-                factory.GetInstance<IFacadeAccessor>(),
+                factory.GetInstance<IPublishedSnapshotAccessor>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<IScopeProvider>()));
 
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
         }
 
-        public void Initialize(IFacadeService service)
+        public void Initialize(IPublishedSnapshotService service)
         {
             // nothing - this just ensures that the service is created at boot time
         }

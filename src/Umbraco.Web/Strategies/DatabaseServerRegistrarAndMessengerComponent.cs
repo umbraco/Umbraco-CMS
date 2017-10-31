@@ -72,11 +72,11 @@ namespace Umbraco.Web.Strategies
                             //rebuild the xml cache file if the server is not synced
                             () =>
                             {
-                                // rebuild the facade caches entirely, if the server is not synced
-                                // this is equivalent to DistributedCache RefreshAllFacade but local only
-                                // (we really should have a way to reuse RefreshAllFacade... locally)
+                                // rebuild the published snapshot caches entirely, if the server is not synced
+                                // this is equivalent to DistributedCache RefreshAll... but local only
+                                // (we really should have a way to reuse RefreshAll... locally)
                                 // note: refresh all content & media caches does refresh content types too
-                                var svc = Current.FacadeService;
+                                var svc = Current.PublishedSnapshotService;
                                 bool ignored1, ignored2;
                                 svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
                                 svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);

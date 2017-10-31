@@ -264,11 +264,11 @@ namespace Umbraco.Tests.Routing
             SetDomains1();
 
             var umbracoContext = GetUmbracoContext(inputUrl);
-            var facadeRouter = CreateFacadeRouter(Container);
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(Container);
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // lookup domain
-            facadeRouter.FindDomain(frequest);
+            publishedRouter.FindDomain(frequest);
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
@@ -311,11 +311,11 @@ namespace Umbraco.Tests.Routing
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
             var umbracoContext = GetUmbracoContext(inputUrl);
-            var facadeRouter = CreateFacadeRouter(Container);
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(Container);
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // lookup domain
-            facadeRouter.FindDomain(frequest);
+            publishedRouter.FindDomain(frequest);
 
             // find document
             SettingsForTests.HideTopLevelNodeFromPath = false;
@@ -323,7 +323,7 @@ namespace Umbraco.Tests.Routing
             var result = finder.TryFindContent(frequest);
 
             // apply wildcard domain
-            facadeRouter.HandleWildcardDomains(frequest);
+            publishedRouter.HandleWildcardDomains(frequest);
 
             Assert.IsTrue(result);
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);

@@ -30,7 +30,7 @@ namespace Umbraco.Web.Mvc
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UmbracoContext _umbracoContext;
 
-        // fixme - that one could / should accept a FacadeRouter (engine) to work on the FacadeRequest (published content request)
+        // fixme - that one could / should accept a PublishedRouter (engine) to work on the PublishedRequest (published content request)
         public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory)
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -397,7 +397,7 @@ namespace Umbraco.Web.Mvc
             if (request.HasTemplate == false && routeDef.HasHijackedRoute == false)
             {
                 // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
-                var engine = Core.Composing.Current.Container.GetInstance<FacadeRouter>();
+                var engine = Core.Composing.Current.Container.GetInstance<PublishedRouter>();
                 request.UpdateOnMissingTemplate(); // request will go 404
 
                 // HandleHttpResponseStatus returns a value indicating that the request should

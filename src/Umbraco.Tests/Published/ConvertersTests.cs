@@ -11,7 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Facade
+namespace Umbraco.Tests.Published
 {
     [TestFixture]
     public class ConvertersTests
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Facade
                 => typeof (int);
 
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-                => PropertyCacheLevel.Content;
+                => PropertyCacheLevel.Element;
 
             public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
                 => int.TryParse(source as string, out int i) ? i : 0;
@@ -68,15 +68,15 @@ namespace Umbraco.Tests.Facade
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
-            var facadeMock = new Mock<IFacade>();
-            facadeMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
-            var facadeAccessorMock = new Mock<IFacadeAccessor>();
-            facadeAccessorMock.Setup(x => x.Facade).Returns(facadeMock.Object);
-            var facadeAccessor = facadeAccessorMock.Object;
+            var publishedSnapshotMock = new Mock<IPublishedShapshot>();
+            publishedSnapshotMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
+            var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
+            publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
+            var publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
             var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
             {
-                new SimpleConverter2(facadeAccessor),
+                new SimpleConverter2(publishedSnapshotAccessor),
             });
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
 
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Facade
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             var cntType1 = contentTypeFactory.CreateContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
-            var cnt1 = new FacadeTestObjects.TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var cnt1 = new PublishedSnapshotTestObjects.TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
             cacheContent[cnt1.Id] = cnt1;
 
             Assert.AreSame(cnt1, element1.Value("prop1"));
@@ -96,12 +96,12 @@ namespace Umbraco.Tests.Facade
 
         private class SimpleConverter2 : IPropertyValueConverter
         {
-            private readonly IFacadeAccessor _facadeAccessor;
+            private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
             private readonly PropertyCacheLevel _cacheLevel;
 
-            public SimpleConverter2(IFacadeAccessor facadeAccessor, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
+            public SimpleConverter2(IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
             {
-                _facadeAccessor = facadeAccessor;
+                _publishedSnapshotAccessor = publishedSnapshotAccessor;
                 _cacheLevel = cacheLevel;
             }
 
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Facade
                 => int.TryParse(source as string, out int i) ? i : -1;
 
             public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => _facadeAccessor.Facade.ContentCache.GetById((int) inter);
+                => _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById((int) inter);
 
             public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
@@ -145,19 +145,19 @@ namespace Umbraco.Tests.Facade
 
             IPublishedModelFactory factory = new PublishedModelFactory(new[]
             {
-                typeof (FacadeTestObjects.TestElementModel1), typeof (FacadeTestObjects.TestElementModel2),
-                typeof (FacadeTestObjects.TestContentModel1), typeof (FacadeTestObjects.TestContentModel2),
+                typeof (PublishedSnapshotTestObjects.TestElementModel1), typeof (PublishedSnapshotTestObjects.TestElementModel2),
+                typeof (PublishedSnapshotTestObjects.TestContentModel1), typeof (PublishedSnapshotTestObjects.TestContentModel2),
             });
             Current.Container.Register(f => factory);
 
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
-            var facadeMock = new Mock<IFacade>();
-            facadeMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
-            var facadeAccessorMock = new Mock<IFacadeAccessor>();
-            facadeAccessorMock.Setup(x => x.Facade).Returns(facadeMock.Object);
-            Current.Container.Register(f => facadeAccessorMock.Object);
+            var publishedSnapshotMock = new Mock<IPublishedShapshot>();
+            publishedSnapshotMock.Setup(x => x.ContentCache).Returns(cacheMock.Object);
+            var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
+            publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
+            Current.Container.Register(f => publishedSnapshotAccessorMock.Object);
 
             var converters = Current.Container.GetInstance<PropertyValueConverterCollection>();
             var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, Mock.Of<IDataTypeConfigurationSource>());
@@ -184,8 +184,8 @@ namespace Umbraco.Tests.Facade
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
             var element2 = new PublishedElement(elementType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
-            var cnt1 = new FacadeTestObjects.TestPublishedContent(contentType1, 1003, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
-            var cnt2 = new FacadeTestObjects.TestPublishedContent(contentType2, 1004, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
+            var cnt1 = new PublishedSnapshotTestObjects.TestPublishedContent(contentType1, 1003, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
+            var cnt2 = new PublishedSnapshotTestObjects.TestPublishedContent(contentType2, 1004, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
 
             cacheContent[cnt1.Id] = cnt1.CreateModel();
             cacheContent[cnt2.Id] = cnt2.CreateModel();
@@ -194,25 +194,25 @@ namespace Umbraco.Tests.Facade
             // ie ModelType gets properly mapped by IPublishedContentModelFactory
             // must test ModelClrType with special equals 'cos they are not ref-equals
             Assert.IsTrue(ModelType.Equals(typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1")), contentType2.GetPropertyType("prop2").ModelClrType));
-            Assert.AreEqual(typeof (IEnumerable<FacadeTestObjects.TestContentModel1>), contentType2.GetPropertyType("prop2").ClrType);
+            Assert.AreEqual(typeof (IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>), contentType2.GetPropertyType("prop2").ClrType);
 
             // can create a model for an element
             var model1 = factory.CreateModel(element1);
-            Assert.IsInstanceOf<FacadeTestObjects.TestElementModel1>(model1);
-            Assert.AreEqual("val1", ((FacadeTestObjects.TestElementModel1) model1).Prop1);
+            Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel1>(model1);
+            Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1) model1).Prop1);
 
             // can create a model for a published content
             var model2 = factory.CreateModel(element2);
-            Assert.IsInstanceOf<FacadeTestObjects.TestElementModel2>(model2);
-            var mmodel2 = (FacadeTestObjects.TestElementModel2) model2;
+            Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel2>(model2);
+            var mmodel2 = (PublishedSnapshotTestObjects.TestElementModel2) model2;
 
             // and get direct property
-            Assert.IsInstanceOf<FacadeTestObjects.TestContentModel1[]>(model2.Value("prop2"));
-            Assert.AreEqual(1, ((FacadeTestObjects.TestContentModel1[]) model2.Value("prop2")).Length);
+            Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>(model2.Value("prop2"));
+            Assert.AreEqual(1, ((PublishedSnapshotTestObjects.TestContentModel1[]) model2.Value("prop2")).Length);
 
             // and get model property
-            Assert.IsInstanceOf<IEnumerable<FacadeTestObjects.TestContentModel1>>(mmodel2.Prop2);
-            Assert.IsInstanceOf<FacadeTestObjects.TestContentModel1[]>(mmodel2.Prop2);
+            Assert.IsInstanceOf<IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>>(mmodel2.Prop2);
+            Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>(mmodel2.Prop2);
             var mmodel1 = mmodel2.Prop2.First();
 
             // and we get what we want
@@ -228,16 +228,16 @@ namespace Umbraco.Tests.Facade
                 => typeof (string);
 
             public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-                => PropertyCacheLevel.Content;
+                => PropertyCacheLevel.Element;
         }
 
         public class SimpleConverter3B : PropertyValueConverterBase
         {
-            private readonly IFacadeAccessor _facadeAccessor;
+            private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-            public SimpleConverter3B(IFacadeAccessor facadeAccessor)
+            public SimpleConverter3B(IPublishedSnapshotAccessor publishedSnapshotAccessor)
             {
-                _facadeAccessor = facadeAccessor;
+                _publishedSnapshotAccessor = publishedSnapshotAccessor;
             }
 
             public override bool IsConverter(PublishedPropertyType propertyType)
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Facade
                 => typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1"));
 
             public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-                => PropertyCacheLevel.Snapshot;
+                => PropertyCacheLevel.Elements;
 
             public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
             {
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Facade
 
             public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
-                return ((int[]) inter).Select(x => (FacadeTestObjects.TestContentModel1) _facadeAccessor.Facade.ContentCache.GetById(x)).ToArray();
+                return ((int[]) inter).Select(x => (PublishedSnapshotTestObjects.TestContentModel1) _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(x)).ToArray();
             }
         }
 

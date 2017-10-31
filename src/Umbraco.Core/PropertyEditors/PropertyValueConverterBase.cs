@@ -20,7 +20,7 @@ namespace Umbraco.Core.PropertyEditors
 
         public virtual PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
         {
-            return PropertyCacheLevel.Facade;
+            return PropertyCacheLevel.Snapshot;
         }
 
         public virtual object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)

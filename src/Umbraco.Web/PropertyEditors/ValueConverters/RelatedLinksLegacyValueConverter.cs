@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => typeof (JArray);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {

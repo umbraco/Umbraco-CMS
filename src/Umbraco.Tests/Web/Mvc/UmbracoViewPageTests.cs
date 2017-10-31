@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Web.Mvc
     [UmbracoTest(WithApplication = true)]
     public class UmbracoViewPageTests : UmbracoTestBase
     {
-        private FacadeService _service;
+        private PublishedSnapshotService _service;
 
         [TearDown]
         public override void TearDown()
@@ -395,8 +395,8 @@ namespace Umbraco.Tests.Web.Mvc
                 logger, settings,
                 "/dang", 0);
 
-            var facadeRouter = BaseWebTest.CreateFacadeRouter(TestObjects.GetUmbracoSettings().WebRouting);
-            var frequest = facadeRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
+            var frequest = publishedRouter.CreateRequest(umbracoContext,  new Uri("http://localhost/dang"));
 
             frequest.Culture = CultureInfo.InvariantCulture;
             umbracoContext.PublishedContentRequest = frequest;
@@ -425,7 +425,7 @@ namespace Umbraco.Tests.Web.Mvc
             var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var uowProvider = TestObjects.GetScopeUnitOfWorkProvider(Mock.Of<ILogger>(), scopeProvider: scopeProvider);
             var factory = Mock.Of<IPublishedContentTypeFactory>();
-            _service = new FacadeService(svcCtx, factory, scopeProvider, uowProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
+            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, uowProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 

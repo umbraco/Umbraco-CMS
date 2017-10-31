@@ -15,7 +15,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => typeof (IEnumerable<int>);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {

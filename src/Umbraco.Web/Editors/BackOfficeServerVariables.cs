@@ -263,8 +263,8 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetByPath("", ""))
                         },
                         {
-                            "facadeStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<FacadeStatusController>(
-                                controller => controller.GetFacadeStatusUrl())
+                            "publishedStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
+                                controller => controller.GetPublishedStatusUrl())
                         },
                         {
                             "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(

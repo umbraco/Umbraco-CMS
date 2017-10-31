@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => typeof (JToken);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         public ImageCropperValueConverter()
         {

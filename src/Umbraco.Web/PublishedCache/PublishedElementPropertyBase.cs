@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache
     {
         private readonly object _locko = new object();
         private readonly object _sourceValue;
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         protected readonly IPublishedElement Element;
         protected readonly bool IsPreviewing;
@@ -26,11 +26,11 @@ namespace Umbraco.Web.PublishedCache
         // so making it configureable.
         private const bool FullCacheWhenPreviewing = true;
 
-        public PublishedElementPropertyBase(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IFacadeAccessor facadeAccessor = null)
+        public PublishedElementPropertyBase(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IPublishedSnapshotAccessor publishedSnapshotAccessor = null)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             Element = element;
             IsPreviewing = previewing;
             IsMember = propertyType.ContentType.ItemType == PublishedItemType.Member;
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PublishedCache
 
         public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
         {
-            return "Facade.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
+            return "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
         }
 
         private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
@@ -69,9 +69,9 @@ namespace Umbraco.Web.PublishedCache
             // don't change the reference.
             //
             // examples:
-            // currently (reference) caching at facade, property specifies
-            // snapshot, ok to use content. OTOH, currently caching at snapshot,
-            // property specifies facade, need to use facade.
+            // currently (reference) caching at published snapshot, property specifies
+            // elements, ok to use element. OTOH, currently caching at elements,
+            // property specifies snapshot, need to use snapshot.
             //
             if (PropertyType.CacheLevel > ReferenceCacheLevel || PropertyType.CacheLevel == PropertyCacheLevel.None)
             {
@@ -80,22 +80,22 @@ namespace Umbraco.Web.PublishedCache
             }
             else
             {
-                cacheLevel = PropertyCacheLevel.Content;
+                cacheLevel = PropertyCacheLevel.Element;
                 referenceCacheLevel = ReferenceCacheLevel;
             }
         }
 
         private ICacheProvider GetSnapshotCache()
         {
-            // cache within the snapshot cache, unless previewing, then use the facade or
-            // snapshot cache (if we don't want to pollute the snapshot cache with short-lived
+            // cache within the snapshot cache, unless previewing, then use the snapshot or
+            // elements cache (if we don't want to pollute the elements cache with short-lived
             // data) depending on settings
-            // for members, always cache in the facade cache - never pollute snapshot cache
-            var facade = _facadeAccessor?.Facade;
-            if (facade == null) return null;
+            // for members, always cache in the snapshot cache - never pollute elements cache
+            var publishedSnapshot = _publishedSnapshotAccessor?.PublishedSnapshot;
+            if (publishedSnapshot == null) return null;
             return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
-                ? facade.SnapshotCache
-                : facade.FacadeCache;
+                ? publishedSnapshot.ElementsCache
+                : publishedSnapshot.SnapshotCache;
         }
 
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
@@ -107,18 +107,18 @@ namespace Umbraco.Web.PublishedCache
                     // never cache anything
                     cacheValues = new CacheValues();
                     break;
-                case PropertyCacheLevel.Content:
+                case PropertyCacheLevel.Element:
                     // cache within the property object itself, ie within the content object
                     cacheValues = _cacheValues ?? (_cacheValues = new CacheValues());
                     break;
-                case PropertyCacheLevel.Snapshot:
-                    // cache within the snapshot cache, depending...
+                case PropertyCacheLevel.Elements:
+                    // cache within the elements  cache, depending...
                     var snapshotCache = GetSnapshotCache();
                     cacheValues = (CacheValues) snapshotCache?.GetCacheItem(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
-                case PropertyCacheLevel.Facade:
-                    // cache within the facade cache
-                    var facadeCache = _facadeAccessor?.Facade?.FacadeCache;
+                case PropertyCacheLevel.Snapshot:
+                    // cache within the snapshot cache
+                    var facadeCache = _publishedSnapshotAccessor?.PublishedSnapshot?.SnapshotCache;
                     cacheValues = (CacheValues) facadeCache?.GetCacheItem(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 default:

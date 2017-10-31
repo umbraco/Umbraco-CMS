@@ -4,20 +4,20 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache
 {
-    abstract class FacadeServiceBase : IFacadeService
+    abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
-        protected FacadeServiceBase(IFacadeAccessor facadeAccessor)
+        protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
-            FacadeAccessor = facadeAccessor;
+            PublishedSnapshotAccessor = publishedSnapshotAccessor;
         }
 
-        public IFacadeAccessor FacadeAccessor { get; }
+        public IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
 
-        // note: NOT setting _facadeAccessor.Facade here because it is the
+        // note: NOT setting _publishedSnapshotAccessor.PublishedSnapshot here because it is the
         // responsibility of the caller to manage what the 'current' facade is
-        public abstract IFacade CreateFacade(string previewToken);
+        public abstract IPublishedShapshot CreatePublishedSnapshot(string previewToken);
 
-        protected IFacade CurrentFacade => FacadeAccessor.Facade;
+        protected IPublishedShapshot CurrentPublishedShapshot => PublishedSnapshotAccessor.PublishedSnapshot;
 
         public abstract bool EnsureEnvironment(out IEnumerable<string> errors);
 

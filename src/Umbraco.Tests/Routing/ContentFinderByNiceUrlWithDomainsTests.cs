@@ -126,11 +126,11 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.HideTopLevelNodeFromPath = true;
 
             var umbracoContext = GetUmbracoContext(url);
-            var facadeRouter = CreateFacadeRouter(Container);
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(Container);
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // must lookup domain else lookup by url fails
-            facadeRouter.FindDomain(frequest);
+            publishedRouter.FindDomain(frequest);
 
             var lookup = new ContentFinderByNiceUrl(Logger);
             var result = lookup.TryFindContent(frequest);
@@ -167,11 +167,11 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.HideTopLevelNodeFromPath = true;
 
             var umbracoContext = GetUmbracoContext(url);
-            var facadeRouter = CreateFacadeRouter(Container);
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter(Container);
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
 
             // must lookup domain else lookup by url fails
-            facadeRouter.FindDomain(frequest);
+            publishedRouter.FindDomain(frequest);
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 
             var lookup = new ContentFinderByNiceUrl(Logger);

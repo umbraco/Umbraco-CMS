@@ -41,9 +41,9 @@ namespace Umbraco.Web.Install.InstallSteps
             }
 
             // Some upgrade scripts "may modify the database (cmsContentXml...) tables directly" - not sure
-            // that is still true but the idea is that after an upgrade we want to reset the local facade, on
+            // that is still true but the idea is that after an upgrade we want to reset the local published snapshot, on
             // all LB nodes of course, so we need to use the distributed cache, and refresh everything.
-            Current.DistributedCache.RefreshAllFacade();
+            Current.DistributedCache.RefreshAllPublishedSnapshot();
 
             // Update configurationStatus
             GlobalSettings.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();

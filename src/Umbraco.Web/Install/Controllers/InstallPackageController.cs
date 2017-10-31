@@ -160,9 +160,9 @@ namespace Umbraco.Web.Install.Controllers
             installer.LoadConfig(model.PackageFile);
             installer.InstallCleanUp(model.ManifestId, model.PackageFile);
 
-            // library.RefreshContent is obsolete, would need to RefreshAllFacade,
+            // library.RefreshContent is obsolete, would need to RefreshAll... snapshot,
             // but it should be managed automatically by services and caches!
-            //DistributedCache.Instance.RefreshAllFacade();
+            //DistributedCache.Instance.RefreshAll...();
 
             return Json(new
             {

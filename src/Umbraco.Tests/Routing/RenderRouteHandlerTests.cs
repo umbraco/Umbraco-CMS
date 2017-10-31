@@ -99,8 +99,8 @@ namespace Umbraco.Tests.Routing
             var route = RouteTable.Routes["Umbraco_default"];
             var routeData = new RouteData { Route = route };
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
             frequest.TemplateModel = template;
             frequest.RenderingEngine = RenderingEngine.Mvc;
@@ -135,8 +135,8 @@ namespace Umbraco.Tests.Routing
             var route = RouteTable.Routes["Umbraco_default"];
             var routeData = new RouteData() {Route = route};
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
             frequest.TemplateModel = template;
 

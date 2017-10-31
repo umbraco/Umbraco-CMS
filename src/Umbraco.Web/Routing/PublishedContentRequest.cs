@@ -10,7 +10,7 @@ using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
-    // todo - rename to FacadeRequest as soon as acceptable
+    // todo - rename to PublishedRequest as soon as acceptable
 
     /// <summary>
     /// Represents a request for one specified Umbraco IPublishedContent to be rendered
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class PublishedContentRequest
     {
-        private readonly FacadeRouter _facadeRouter;
+        private readonly PublishedRouter _publishedRouter;
 
         private bool _readonly; // after prepared
         private bool _readonlyUri; // after preparing
@@ -34,13 +34,13 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentRequest"/> class.
         /// </summary>
-        /// <param name="facadeRouter">The facade router.</param>
+        /// <param name="publishedRouter">The published router.</param>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="uri">The request <c>Uri</c>.</param>
-        internal PublishedContentRequest(FacadeRouter facadeRouter, UmbracoContext umbracoContext, Uri uri = null)
+        internal PublishedContentRequest(PublishedRouter publishedRouter, UmbracoContext umbracoContext, Uri uri = null)
         {
             UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            _facadeRouter = facadeRouter ?? throw new ArgumentNullException(nameof(facadeRouter));
+            _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             Uri = uri ?? umbracoContext.CleanedUmbracoUrl;
             RenderingEngine = RenderingEngine.Unknown;
         }
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public void Prepare()
         {
-            _facadeRouter.PrepareRequest(this);
+            _publishedRouter.PrepareRequest(this);
         }
 
         #region Events
@@ -240,7 +240,7 @@ namespace Umbraco.Web.Routing
                 _template = value;
                 RenderingEngine = RenderingEngine.Unknown; // reset
                 if (_template != null)
-                    RenderingEngine = _facadeRouter.FindTemplateRenderingEngine(_template.Alias);
+                    RenderingEngine = _publishedRouter.FindTemplateRenderingEngine(_template.Alias);
             }
         }
 
@@ -271,7 +271,7 @@ namespace Umbraco.Web.Routing
             // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
             alias = alias.Replace(" ", "");
 
-            var model = _facadeRouter.GetTemplate(alias);
+            var model = _publishedRouter.GetTemplate(alias);
             if (model == null)
                 return false;
 
@@ -309,7 +309,7 @@ namespace Umbraco.Web.Routing
         {
             var __readonly = _readonly;
             _readonly = false;
-            _facadeRouter.UpdateRequestOnMissingTemplate(this);
+            _publishedRouter.UpdateRequestOnMissingTemplate(this);
             _readonly = __readonly;
         }
 

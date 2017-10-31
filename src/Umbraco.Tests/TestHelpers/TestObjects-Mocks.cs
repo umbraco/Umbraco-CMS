@@ -111,20 +111,19 @@ namespace Umbraco.Tests.TestHelpers
         {
             var httpContext = Mock.Of<HttpContextBase>();
 
-            //var facadeService = Mock.Of<IFacadeService>();
-            var facadeMock = new Mock<IFacade>();
-            facadeMock.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
-            var facade = facadeMock.Object;
-            var facadeServiceMock = new Mock<IFacadeService>();
-            facadeServiceMock.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade);
-            var facadeService = facadeServiceMock.Object;
+            var publishedSnapshotMock = new Mock<IPublishedShapshot>();
+            publishedSnapshotMock.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var publishedSnapshot = publishedSnapshotMock.Object;
+            var publishedSnapshotServiceMock = new Mock<IPublishedSnapshotService>();
+            publishedSnapshotServiceMock.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
+            var publishedSnapshotService = publishedSnapshotServiceMock.Object;
 
             var webSecurity = new Mock<WebSecurity>(null, null).Object;
             var settings = GetUmbracoSettings();
             var urlProviders = Enumerable.Empty<IUrlProvider>();
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
-            return UmbracoContext.EnsureContext(accessor, httpContext, facadeService, webSecurity, settings, urlProviders, true);
+            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, settings, urlProviders, true);
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()

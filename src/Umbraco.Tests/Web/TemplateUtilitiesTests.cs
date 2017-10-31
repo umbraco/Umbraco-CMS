@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Web
             using (var umbCtx = UmbracoContext.EnsureContext(
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 //setup a quick mock of the WebRouting section
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),

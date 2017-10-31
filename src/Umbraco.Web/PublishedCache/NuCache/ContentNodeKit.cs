@@ -17,9 +17,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public static ContentNodeKit Null { get; } = new ContentNodeKit { ContentTypeId = -1 };
 
-        public void Build(PublishedContentType contentType, IFacadeAccessor facadeAccessor)
+        public void Build(PublishedContentType contentType, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
-            Node.SetContentTypeAndData(contentType, DraftData, PublishedData, facadeAccessor);
+            Node.SetContentTypeAndData(contentType, DraftData, PublishedData, publishedSnapshotAccessor);
         }
     }
 }

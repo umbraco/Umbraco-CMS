@@ -122,10 +122,10 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                 .Returns(() => true);
 
-            var facade = new Mock<IFacade>();
-            facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
-            var facadeService = new Mock<IFacadeService>();
-            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
+            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            publishedSnapshot.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
+            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
 
             //var umbracoContextAccessor = new TestUmbracoContextAccessor();
             //Umbraco.Web.Composing.Current.UmbracoContextAccessor = umbracoContextAccessor;
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             var umbCtx = UmbracoContext.EnsureContext(
                 umbracoContextAccessor,
                 httpContext,
-                facadeService.Object,
+                publishedSnapshotService.Object,
                 webSecurity.Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),

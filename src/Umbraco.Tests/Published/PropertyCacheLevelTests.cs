@@ -9,15 +9,15 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.Facade
+namespace Umbraco.Tests.Published
 {
     [TestFixture]
     public class PropertyCacheLevelTests
     {
         [TestCase(PropertyCacheLevel.None, 2)]
-        [TestCase(PropertyCacheLevel.Content, 1)]
+        [TestCase(PropertyCacheLevel.Element, 1)]
+        [TestCase(PropertyCacheLevel.Elements, 1)]
         [TestCase(PropertyCacheLevel.Snapshot, 1)]
-        [TestCase(PropertyCacheLevel.Facade, 1)]
         public void CacheLevelTest(PropertyCacheLevel cacheLevel, int interConverts)
         {
             var converter = new CacheConverter1(cacheLevel);
@@ -63,37 +63,37 @@ namespace Umbraco.Tests.Facade
         // property is not cached, converted cached at Content, exept
         //  /None = not cached at all
         [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
         [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.None, PropertyCacheLevel.Facade, 1, 0, 0, 0, 0)]
 
-        // property is cached at content level, converted cached at
+        // property is cached at element level, converted cached at
         //  /None = not at all
-        //  /Content = in content
-        //  /Facade = in facade
+        //  /Element = in element
         //  /Snapshot = in snapshot
-        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.Snapshot, 1, 1, 0, 1, 0)]
-        [TestCase(PropertyCacheLevel.Content, PropertyCacheLevel.Facade, 1, 0, 1, 0, 1)]
+        //  /Elements = in elements
+        [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Elements, 1, 1, 0, 1, 0)]
+        [TestCase(PropertyCacheLevel.Element, PropertyCacheLevel.Snapshot, 1, 0, 1, 0, 1)]
 
-        // property is cached at snapshot level, converted cached at Content, exept
+        // property is cached at elements level, converted cached at Element, exept
         //  /None = not cached at all
-        //  /Facade = cached in facade
+        //  /Snapshot = cached in snapshot
+        [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Elements, PropertyCacheLevel.Snapshot, 1, 0, 1, 0, 1)]
+
+        // property is cached at snapshot level, converted cached at Element, exept
+        //  /None = not cached at all
         [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Element, 1, 0, 0, 0, 0)]
+        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Elements, 1, 0, 0, 0, 0)]
         [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Snapshot, PropertyCacheLevel.Facade, 1, 0, 1, 0, 1)]
 
-        // property is cached at facade level, converted cached at Content, exept
-        //  /None = not cached at all
-        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.None, 2, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.Content, 1, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.Snapshot, 1, 0, 0, 0, 0)]
-        [TestCase(PropertyCacheLevel.Facade, PropertyCacheLevel.Facade, 1, 0, 0, 0, 0)]
-
-        public void CacheFacadeTest(PropertyCacheLevel referenceCacheLevel, PropertyCacheLevel converterCacheLevel, int interConverts,
-            int snapshotCount1, int facadeCount1, int snapshotCount2, int facadeCount2)
+        public void CachePublishedSnapshotTest(PropertyCacheLevel referenceCacheLevel, PropertyCacheLevel converterCacheLevel, int interConverts,
+            int elementsCount1, int snapshotCount1, int elementsCount2, int snapshotCount2)
         {
             var converter = new CacheConverter1(converterCacheLevel);
 
@@ -108,47 +108,35 @@ namespace Umbraco.Tests.Facade
                 publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
             });
 
+            var elementsCache = new DictionaryCacheProvider();
             var snapshotCache = new DictionaryCacheProvider();
-            var facadeCache = new DictionaryCacheProvider();
 
-            var facade = new Mock<IFacade>();
-            facade.Setup(x => x.FacadeCache).Returns(facadeCache);
-            facade.Setup(x => x.SnapshotCache).Returns(snapshotCache);
+            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);
+            publishedSnapshot.Setup(x => x.ElementsCache).Returns(elementsCache);
 
-            var facadeAccessor = new Mock<IFacadeAccessor>();
-            facadeAccessor.Setup(x => x.Facade).Returns(facade.Object);
+            var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
+            publishedSnapshotAccessor.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshot.Object);
 
             // pretend we're creating this set as a value for a property
             // referenceCacheLevel is the cache level for this fictious property
             // converterCacheLevel is the cache level specified by the converter
 
-            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, referenceCacheLevel, facadeAccessor.Object);
+            var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false, referenceCacheLevel, publishedSnapshotAccessor.Object);
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(1, converter.InterConverts);
 
+            Assert.AreEqual(elementsCount1, elementsCache.Items.Count);
             Assert.AreEqual(snapshotCount1, snapshotCache.Items.Count);
-            Assert.AreEqual(facadeCount1, facadeCache.Items.Count);
 
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
             Assert.AreEqual(interConverts, converter.InterConverts);
 
+            Assert.AreEqual(elementsCount2, elementsCache.Items.Count);
             Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
-            Assert.AreEqual(facadeCount2, facadeCache.Items.Count);
-
-            var oldFacadeCache = facadeCache;
-            facadeCache.Items.Clear();
-
-            Assert.AreEqual(1234, set1.Value("prop1"));
-            Assert.AreEqual(1, converter.SourceConverts);
-
-            Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
-            Assert.AreEqual(facadeCount2, facadeCache.Items.Count);
-            Assert.AreEqual(facadeCount2, oldFacadeCache.Items.Count);
-
-            Assert.AreEqual((interConverts == 1 ? 1 : 3) + facadeCache.Items.Count, converter.InterConverts);
 
             var oldSnapshotCache = snapshotCache;
             snapshotCache.Items.Clear();
@@ -156,11 +144,23 @@ namespace Umbraco.Tests.Facade
             Assert.AreEqual(1234, set1.Value("prop1"));
             Assert.AreEqual(1, converter.SourceConverts);
 
+            Assert.AreEqual(elementsCount2, elementsCache.Items.Count);
             Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
             Assert.AreEqual(snapshotCount2, oldSnapshotCache.Items.Count);
-            Assert.AreEqual(facadeCount2, facadeCache.Items.Count);
 
-            Assert.AreEqual((interConverts == 1 ? 1 : 4) + facadeCache.Items.Count + snapshotCache.Items.Count, converter.InterConverts);
+            Assert.AreEqual((interConverts == 1 ? 1 : 3) + snapshotCache.Items.Count, converter.InterConverts);
+
+            var oldElementsCache = elementsCache;
+            elementsCache.Items.Clear();
+
+            Assert.AreEqual(1234, set1.Value("prop1"));
+            Assert.AreEqual(1, converter.SourceConverts);
+
+            Assert.AreEqual(elementsCount2, elementsCache.Items.Count);
+            Assert.AreEqual(elementsCount2, oldElementsCache.Items.Count);
+            Assert.AreEqual(snapshotCount2, snapshotCache.Items.Count);
+
+            Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Items.Count + elementsCache.Items.Count, converter.InterConverts);
         }
 
         [Test]
@@ -220,15 +220,6 @@ namespace Umbraco.Tests.Facade
 
             public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
-        }
-
-        // fixme kill
-        private class TestPublishedElementProperty : PublishedElementPropertyBase
-        {
-            public TestPublishedElementProperty(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue,
-                Func<Dictionary<string, object>> getSnapshotCache, Func<Dictionary<string, object>> getFacadeCache)
-                : base(propertyType, element, previewing, referenceCacheLevel, sourceValue)
-            { }
         }
     }
 }

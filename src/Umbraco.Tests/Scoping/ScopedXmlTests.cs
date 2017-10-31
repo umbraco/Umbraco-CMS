@@ -19,7 +19,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ScopedXmlTests : TestWithDatabaseBase
     {
         private CacheRefresherComponent _cacheRefresher;
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Scoping
         //  xmlStore.Xml - the actual main xml document
         //  publishedContentCache.GetXml() - the captured xml
 
-        private static XmlStore XmlStore => (Current.Container.GetInstance<IFacadeService>() as FacadeService).XmlStore;
+        private static XmlStore XmlStore => (Current.Container.GetInstance<IPublishedSnapshotService>() as PublishedSnapshotService).XmlStore;
         private static XmlDocument XmlMaster => XmlStore.Xml;
         private static XmlDocument XmlInContext => ((PublishedContentCache) Umbraco.Web.Composing.Current.UmbracoContext.ContentCache).GetXml(false);
 

@@ -225,9 +225,9 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region Facade
+        #region Published Snapshot
 
-        public static void RefreshAllFacade(this DistributedCache dc)
+        public static void RefreshAllPublishedSnapshot(this DistributedCache dc)
         {
             // note: refresh all content & media caches does refresh content types too
             dc.RefreshAllContentCache();

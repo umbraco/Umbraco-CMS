@@ -19,13 +19,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(RelatedLinksLegacyValueConverter), typeof(JsonValueConverter))]
     public class RelatedLinksValueConverter : PropertyValueConverterBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILogger _logger;
 
-        public RelatedLinksValueConverter(IFacadeAccessor facadeAccessor, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
+        public RelatedLinksValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IUmbracoContextAccessor umbracoContextAccessor, ILogger logger)
         {
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
             _logger = logger;
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             => typeof (JArray);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
@@ -80,7 +80,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     var udiAttempt = strLinkId.TryConvertTo<GuidUdi>();
                     if (udiAttempt.Success)
                     {
-                        var content = _facadeAccessor.Facade.ContentCache.GetById(udiAttempt.Result.Guid);
+                        var content = _publishedSnapshotAccessor.PublishedSnapshot.ContentCache.GetById(udiAttempt.Result.Guid);
                         if (content != null)
                         {
                             relatedLink.Id = content.Id;

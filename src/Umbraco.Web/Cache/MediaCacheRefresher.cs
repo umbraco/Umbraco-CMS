@@ -14,13 +14,13 @@ namespace Umbraco.Web.Cache
 {
     public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public MediaCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService, IdkMap idkMap)
+        public MediaCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
             : base(cacheHelper)
         {
-            _facadeService = facadeService;
+            _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
         }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(JsonPayload[] payloads)
         {
             bool anythingChanged;
-            _facadeService.Notify(payloads, out anythingChanged);
+            _publishedSnapshotService.Notify(payloads, out anythingChanged);
 
             if (anythingChanged)
             {

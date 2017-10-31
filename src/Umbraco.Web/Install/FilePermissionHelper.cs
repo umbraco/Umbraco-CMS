@@ -33,8 +33,8 @@ namespace Umbraco.Web.Install
             if (EnsureFiles(PermissionFiles, out errors) == false)
                 report["File writing failed"] = errors.ToList();
 
-            if (TestFacade(out errors) == false)
-                report["Facade environment check failed"] = errors.ToList();
+            if (TestPublishedSnapshotService(out errors) == false)
+                report["Published snapshot environment check failed"] = errors.ToList();
 
             if (EnsureCanCreateSubDirectory(SystemDirectories.Media, out errors) == false)
                 report["Media folder creation failed"] = errors.ToList();
@@ -114,10 +114,10 @@ namespace Umbraco.Web.Install
             return success;
         }
 
-        public static bool TestFacade(out IEnumerable<string> errors)
+        public static bool TestPublishedSnapshotService(out IEnumerable<string> errors)
         {
-            var facadeService = Current.FacadeService;
-            return facadeService.EnsureEnvironment(out errors);
+            var publishedSnapshotService = Current.PublishedSnapshotService;
+            return publishedSnapshotService.EnsureEnvironment(out errors);
         }
 
         // tries to create a sub-directory

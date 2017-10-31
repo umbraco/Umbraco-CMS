@@ -41,7 +41,7 @@ namespace Umbraco.Web.Templates
         }
 
         // todo - inject!
-        private FacadeRouter FacadeRouter => Core.Composing.Current.Container.GetInstance<FacadeRouter>();
+        private PublishedRouter PublishedRouter => Core.Composing.Current.Container.GetInstance<PublishedRouter>();
 
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Templates
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url, though this isn't going to matter
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
             // fixme - previously that would create an aengine...
-            var contentRequest = FacadeRouter.CreateRequest(_umbracoContext);
+            var contentRequest = PublishedRouter.CreateRequest(_umbracoContext);
 
             var doc = contentRequest.UmbracoContext.ContentCache.GetById(PageId);
 

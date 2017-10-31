@@ -29,8 +29,8 @@ namespace Umbraco.Tests.Routing
             var template1 = CreateTemplate("test");
             var template2 = CreateTemplate("blah");
             var umbracoContext = GetUmbracoContext(urlAsString, template1.Id);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrlAndTemplate(Logger);
 
             SettingsForTests.HideTopLevelNodeFromPath = false;

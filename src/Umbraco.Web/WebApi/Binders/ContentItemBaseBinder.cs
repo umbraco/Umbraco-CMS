@@ -109,15 +109,6 @@ namespace Umbraco.Web.WebApi.Binders
             var httpContext = (HttpContextBase) request.Properties["MS_HttpContext"];
             HttpContext.Current = httpContext.ApplicationInstance.Context;
 
-            // and then we don't need this anymore
-            //UmbracoContext.EnsureContext(
-            //    httpContext, ApplicationContext.Current,
-            //    FacadeServiceResolver.Current.Service,
-            //    new WebSecurity(httpContext, ApplicationContext.Current),
-            //    Core.Configuration.UmbracoConfig.For.UmbracoSettings(),
-            //    UrlProviderResolver.Current.Providers,
-            //    false);
-
             var content = request.Content;
 
             var result = await content.ReadAsMultipartAsync(provider);

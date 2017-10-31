@@ -26,8 +26,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
         {
             // because that version of RTE converter parses {locallink} and executes macros, its value has
-            // to be cached at the facade level, because we have no idea what the macros may depend on actually.
-            return PropertyCacheLevel.Facade;
+            // to be cached at the published snapshot level, because we have no idea what the macros may depend on actually.
+            return PropertyCacheLevel.Snapshot;
         }
 
         public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, ServiceContext services, CacheHelper appCache)

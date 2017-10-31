@@ -32,7 +32,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private readonly XmlNode _xmlNode;
         private readonly bool _isPreviewing;
-        private readonly ICacheProvider _cacheProvider; // at facade/request level (see PublishedContentCache)
+        private readonly ICacheProvider _cacheProvider; // at snapshot/request level (see PublishedContentCache)
         private readonly PublishedContentTypeCache _contentTypeCache;
 
         private bool _nodeInitialized;

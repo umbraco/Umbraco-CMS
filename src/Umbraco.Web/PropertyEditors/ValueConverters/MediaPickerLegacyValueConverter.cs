@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Facade;
+            => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias)

@@ -27,7 +27,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, FacadeServiceRepositoryEvents = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ScopedNuCacheTests : TestWithDatabaseBase
     {
         private CacheRefresherComponent _cacheRefresher;
@@ -64,31 +64,31 @@ namespace Umbraco.Tests.Scoping
 
         private Action _onPublishedAssertAction;
 
-        protected override IFacadeService CreateFacadeService()
+        protected override IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var options = new FacadeService.Options { IgnoreLocalDb = true };
-            var facadeAccessor = new UmbracoContextFacadeAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
+            var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
 
-            return new FacadeService(
+            return new PublishedSnapshotService(
                 options,
                 null,
                 runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
                 UowProvider,
-                facadeAccessor,
+                publishedSnapshotAccessor,
                 Logger,
                 ScopeProvider);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
         {
-            // ensure we have a FacadeService
-            var service = FacadeService as FacadeService;
+            // ensure we have a PublishedSnapshotService
+            var service = PublishedSnapshotService as PublishedSnapshotService;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 

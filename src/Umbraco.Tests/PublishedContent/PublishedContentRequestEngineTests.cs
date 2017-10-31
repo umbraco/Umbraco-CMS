@@ -16,9 +16,9 @@ namespace Umbraco.Tests.PublishedContent
         public void ConfigureRequest_Returns_False_Without_HasPublishedContent()
         {
             var umbracoContext = GetUmbracoContext("/test");
-            var facadeRouter = CreateFacadeRouter();
-            var request = facadeRouter.CreateRequest(umbracoContext);
-            var result = facadeRouter.ConfigureRequest(request);
+            var publishedRouter = CreatePublishedRouter();
+            var request = publishedRouter.CreateRequest(umbracoContext);
+            var result = publishedRouter.ConfigureRequest(request);
 
             Assert.IsFalse(result);
         }
@@ -27,13 +27,13 @@ namespace Umbraco.Tests.PublishedContent
         public void ConfigureRequest_Returns_False_When_IsRedirect()
         {
             var umbracoContext = GetUmbracoContext("/test");
-            var facadeRouter = CreateFacadeRouter();
-            var request = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var request = publishedRouter.CreateRequest(umbracoContext);
             var content = GetPublishedContentMock();
             request.PublishedContent = content.Object;
             request.Culture = new CultureInfo("en-AU");
             request.SetRedirect("/hello");
-            var result = facadeRouter.ConfigureRequest(request);
+            var result = publishedRouter.ConfigureRequest(request);
 
             Assert.IsFalse(result);
         }
@@ -42,12 +42,12 @@ namespace Umbraco.Tests.PublishedContent
         public void ConfigureRequest_Adds_HttpContext_Items_When_Published_Content_Assigned()
         {
             var umbracoContext = GetUmbracoContext("/test");
-            var facadeRouter = CreateFacadeRouter();
-            var request = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var request = publishedRouter.CreateRequest(umbracoContext);
             var content = GetPublishedContentMock();
             request.PublishedContent = content.Object;
             request.Culture = new CultureInfo("en-AU");
-            facadeRouter.ConfigureRequest(request);
+            publishedRouter.ConfigureRequest(request);
 
             Assert.AreEqual(1, umbracoContext.HttpContext.Items["pageID"]);
             Assert.AreEqual(request.UmbracoPage.Elements.Count, ((Hashtable) umbracoContext.HttpContext.Items["pageElements"]).Count);
@@ -57,12 +57,12 @@ namespace Umbraco.Tests.PublishedContent
         public void ConfigureRequest_Sets_UmbracoPage_When_Published_Content_Assigned()
         {
             var umbracoContext = GetUmbracoContext("/test");
-            var facadeRouter = CreateFacadeRouter();
-            var request = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var request = publishedRouter.CreateRequest(umbracoContext);
             var content = GetPublishedContentMock();
             request.Culture = new CultureInfo("en-AU");
             request.PublishedContent = content.Object;
-            facadeRouter.ConfigureRequest(request);
+            publishedRouter.ConfigureRequest(request);
 
             Assert.IsNotNull(request.UmbracoPage);
         }

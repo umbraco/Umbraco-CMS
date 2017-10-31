@@ -26,8 +26,8 @@ namespace Umbraco.Tests.Routing
         public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
         {
             var umbracoContext = GetUmbracoContext(urlString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = true;
 
@@ -59,8 +59,8 @@ namespace Umbraco.Tests.Routing
         public void Match_Document_By_Url(string urlString, int expectedId)
         {
             var umbracoContext = GetUmbracoContext(urlString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
@@ -82,8 +82,8 @@ namespace Umbraco.Tests.Routing
         public void Match_Document_By_Url_With_Special_Characters(string urlString, int expectedId)
         {
             var umbracoContext = GetUmbracoContext(urlString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
@@ -107,8 +107,8 @@ namespace Umbraco.Tests.Routing
         public void Match_Document_By_Url_With_Special_Characters_Using_Hostname(string urlString, int expectedId)
         {
             var umbracoContext = GetUmbracoContext(urlString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/"));
             var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = false;
@@ -134,8 +134,8 @@ namespace Umbraco.Tests.Routing
         public void Match_Document_By_Url_With_Special_Characters_In_Hostname(string urlString, int expectedId)
         {
             var umbracoContext = GetUmbracoContext(urlString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå"));
             var lookup = new ContentFinderByNiceUrl(Logger);
             SettingsForTests.HideTopLevelNodeFromPath = false;

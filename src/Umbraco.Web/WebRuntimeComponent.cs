@@ -74,8 +74,8 @@ namespace Umbraco.Web
             // is per-request so only one wrapper is created per request
             composition.Container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), new PerRequestLifeTime());
 
-            // register the facade accessor - the "current" facade is in the umbraco context
-            composition.Container.RegisterSingleton<IFacadeAccessor, UmbracoContextFacadeAccessor>();
+            // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
+            composition.Container.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             // register a per-request UmbracoContext object
             // no real need to be per request but assuming it is faster
@@ -182,8 +182,8 @@ namespace Umbraco.Web
             // auto-register views
             composition.Container.RegisterAuto(typeof(UmbracoViewPage<>));
 
-            // register facade router
-            composition.Container.Register<FacadeRouter>();
+            // register published router
+            composition.Container.Register<PublishedRouter>();
             composition.Container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
 
             // register preview SignalR hub
@@ -195,7 +195,7 @@ namespace Umbraco.Web
             IUmbracoContextAccessor umbracoContextAccessor,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes,
-            IFacadeService facadeService,
+            IPublishedSnapshotService publishedSnapshotService,
             IUserService userService,
             UrlProviderCollection urlProviders)
         {
@@ -244,7 +244,7 @@ namespace Umbraco.Web
             UmbracoContext.EnsureContext(
                 umbracoContextAccessor,
                 new HttpContextWrapper(HttpContext.Current),
-                facadeService,
+                publishedSnapshotService,
                 new WebSecurity(httpContext, userService),
                 UmbracoConfig.For.UmbracoSettings(),
                 urlProviders);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.Tests.Facade
+namespace Umbraco.Tests.Published
 {
     [TestFixture]
     public class ModelTypeTests
@@ -71,17 +71,17 @@ namespace Umbraco.Tests.Facade
         {
             var map = new Dictionary<string, Type>
             {
-                { "alias1", typeof (FacadeTestObjects.TestElementModel1) },
-                { "alias2", typeof (FacadeTestObjects.TestElementModel2) },
+                { "alias1", typeof (PublishedSnapshotTestObjects.TestElementModel1) },
+                { "alias2", typeof (PublishedSnapshotTestObjects.TestElementModel2) },
             };
 
-            Assert.AreEqual("Umbraco.Tests.Facade.FacadeTestObjects+TestElementModel1",
+            Assert.AreEqual("Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1",
                 ModelType.Map(ModelType.For("alias1"), map).ToString());
-            Assert.AreEqual("Umbraco.Tests.Facade.FacadeTestObjects+TestElementModel1[]",
+            Assert.AreEqual("Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]",
                 ModelType.Map(ModelType.For("alias1").MakeArrayType(), map).ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Facade.FacadeTestObjects+TestElementModel1]",
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1]",
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), map).ToString());
-            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Facade.FacadeTestObjects+TestElementModel1[]]",
+            Assert.AreEqual("System.Collections.Generic.IEnumerable`1[Umbraco.Tests.Published.PublishedSnapshotTestObjects+TestElementModel1[]]",
                 ModelType.Map(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1").MakeArrayType()), map).ToString());
         }
     }

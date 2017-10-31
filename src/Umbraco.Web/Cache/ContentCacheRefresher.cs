@@ -13,12 +13,12 @@ namespace Umbraco.Web.Cache
 {
     public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresher, ContentCacheRefresher.JsonPayload>
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public ContentCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService)
+        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService)
             : base(cacheHelper)
         {
-            _facadeService = facadeService;
+            _publishedSnapshotService = publishedSnapshotService;
         }
 
         #region Define
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Cache
             //if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
             //  ...
 
-            _facadeService.Notify(payloads, out _, out var publishedChanged);
+            _publishedSnapshotService.Notify(payloads, out _, out var publishedChanged);
 
             if (payloads.Any(x => x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll)) || publishedChanged)
             {

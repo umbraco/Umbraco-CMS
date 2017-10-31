@@ -98,8 +98,8 @@ namespace Umbraco.Web.Composing
         public static DistributedCache DistributedCache
             => Container.GetInstance<DistributedCache>();
 
-        public static IFacade Facade
-            => Container.GetInstance<IFacadeAccessor>().Facade;
+        public static IPublishedShapshot PublishedSnapshot
+            => Container.GetInstance<IPublishedSnapshotAccessor>().PublishedSnapshot;
 
         public static EventMessages EventMessages
             => Container.GetInstance<IEventMessagesFactory>().GetOrDefault();
@@ -143,8 +143,8 @@ namespace Umbraco.Web.Composing
         internal static ImageUrlProviderCollection ImageUrlProviders
             => Container.GetInstance<ImageUrlProviderCollection>();
 
-        internal static IFacadeService FacadeService
-            => Container.GetInstance<IFacadeService>();
+        internal static IPublishedSnapshotService PublishedSnapshotService
+            => Container.GetInstance<IPublishedSnapshotService>();
 
         public static ISiteDomainHelper SiteDomainHelper
             => Container.GetInstance<ISiteDomainHelper>();

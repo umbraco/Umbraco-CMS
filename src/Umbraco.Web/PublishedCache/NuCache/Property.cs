@@ -10,7 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
     internal class Property : PublishedPropertyBase
     {
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly object _sourceValue;
         private readonly Guid _contentUid;
         private readonly bool _isPreviewing;
@@ -26,12 +26,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private string _recurseCacheKey;
 
         // initializes a published content property with no value
-        public Property(PublishedPropertyType propertyType, PublishedContent content, IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Content)
-            : this(propertyType, content, null, facadeAccessor, referenceCacheLevel)
+        public Property(PublishedPropertyType propertyType, PublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+            : this(propertyType, content, null, publishedSnapshotAccessor, referenceCacheLevel)
         { }
 
         // initializes a published content property with a value
-        public Property(PublishedPropertyType propertyType, PublishedContent content, object sourceValue, IFacadeAccessor facadeAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Content)
+        public Property(PublishedPropertyType propertyType, PublishedContent content, object sourceValue, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;
@@ -39,7 +39,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _content = content;
             _isPreviewing = content.IsPreviewing;
             _isMember = content.ContentType.ItemType == PublishedItemType.Member;
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
         }
 
         // clone for previewing as draft a published content that is published and has no draft
@@ -51,7 +51,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _content = content;
             _isPreviewing = true;
             _isMember = origin._isMember;
-            _facadeAccessor = origin._facadeAccessor;
+            _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
         }
 
         public override bool HasValue => _sourceValue != null
@@ -76,7 +76,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
         {
             CacheValues cacheValues;
-            Facade facade;
+            PublishedShapshot publishedSnapshot;
             ICacheProvider cache;
             switch (cacheLevel)
             {
@@ -84,27 +84,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // never cache anything
                     cacheValues = new CacheValues();
                     break;
-                case PropertyCacheLevel.Content:
+                case PropertyCacheLevel.Element:
                     // cache within the property object itself, ie within the content object
                     cacheValues = _cacheValues ?? (_cacheValues = new CacheValues());
                     break;
-                case PropertyCacheLevel.Snapshot:
-                    // cache within the snapshot cache, unless previewing, then use the facade or
-                    // snapshot cache (if we don't want to pollute the snapshot cache with short-lived
+                case PropertyCacheLevel.Elements:
+                    // cache within the elements cache, unless previewing, then use the snapshot or
+                    // elements cache (if we don't want to pollute the elements cache with short-lived
                     // data) depending on settings
-                    // for members, always cache in the facade cache - never pollute snapshot cache
-                    facade = (Facade) _facadeAccessor.Facade;
-                    cache = facade == null
+                    // for members, always cache in the snapshot cache - never pollute elements cache
+                    publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    cache = publishedSnapshot == null
                         ? null
-                        : ((_isPreviewing == false || FacadeService.FullCacheWhenPreviewing) && (_isMember == false)
-                            ? facade.SnapshotCache
-                            : facade.FacadeCache);
+                        : ((_isPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (_isMember == false)
+                            ? publishedSnapshot.ElementsCache
+                            : publishedSnapshot.SnapshotCache);
                     cacheValues = GetCacheValues(cache);
                     break;
-                case PropertyCacheLevel.Facade:
-                    // cache within the facade cache
-                    facade = (Facade) _facadeAccessor.Facade;
-                    cache = facade?.FacadeCache;
+                case PropertyCacheLevel.Snapshot:
+                    // cache within the snapshot cache
+                    publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    cache = publishedSnapshot?.SnapshotCache;
                     cacheValues = GetCacheValues(cache);
                     break;
                 default:
@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
 
                     // initial reference cache level always is .Content
-                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Content, GetInterValue(), _isPreviewing);
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
                     cacheValues.ObjectInitialized = true;
                     return cacheValues.ObjectValue;
                 }
@@ -158,7 +158,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
 
                     // initial reference cache level always is .Content
-                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Content, GetInterValue(), _isPreviewing);
+                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
                     cacheValues.XPathInitialized = true;
                     return cacheValues.XPathValue;
                 }

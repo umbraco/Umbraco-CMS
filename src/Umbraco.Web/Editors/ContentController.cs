@@ -40,12 +40,12 @@ namespace Umbraco.Web.Editors
     [ContentControllerConfiguration]
     public class ContentController : ContentControllerBase
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public ContentController(IFacadeService facadeService)
+        public ContentController(IPublishedSnapshotService publishedSnapshotService)
         {
-            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
-            _facadeService = facadeService;
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
+            _publishedSnapshotService = publishedSnapshotService;
         }
 
         /// <summary>
@@ -873,7 +873,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         private void UpdatePreviewContext(int contentId)
         {
-            _facadeService.RefreshPreview(Request.GetPreviewCookieValue(), contentId);
+            _publishedSnapshotService.RefreshPreview(Request.GetPreviewCookieValue(), contentId);
         }
 
         /// <summary>

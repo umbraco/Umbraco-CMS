@@ -13,8 +13,8 @@ namespace Umbraco.Tests.Routing
         public void Lookup_By_Id(string urlAsString, int nodeMatch)
         {
             var umbracoContext = GetUmbracoContext(urlAsString);
-            var facadeRouter = CreateFacadeRouter();
-            var frequest = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
             var lookup = new ContentFinderByIdPath(Logger);
 
 

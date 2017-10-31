@@ -75,7 +75,7 @@ namespace Umbraco.Web.Routing
                 var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
                 if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
                 uri = UriUtility.UriToUmbraco(uri);
-                var r = Core.Composing.Current.Container.GetInstance<FacadeRouter>(); // fixme inject or ?
+                var r = Core.Composing.Current.Container.GetInstance<PublishedRouter>(); // fixme inject or ?
                 var pcr = r.CreateRequest(UmbracoContext.Current, uri);
                 r.TryRouteRequest(pcr);
 

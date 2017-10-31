@@ -2,22 +2,22 @@
 
 namespace Umbraco.Web.PublishedCache
 {
-    public class UmbracoContextFacadeAccessor : IFacadeAccessor
+    public class UmbracoContextPublishedSnapshotAccessor : IPublishedSnapshotAccessor
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public UmbracoContextFacadeAccessor(IUmbracoContextAccessor umbracoContextAccessor)
+        public UmbracoContextPublishedSnapshotAccessor(IUmbracoContextAccessor umbracoContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        public IFacade Facade
+        public IPublishedShapshot PublishedSnapshot
         {
             get
             {
                 var umbracoContext = _umbracoContextAccessor.UmbracoContext;
                 if (umbracoContext == null) throw new Exception("The IUmbracoContextAccessor could not provide an UmbracoContext.");
-                return umbracoContext.Facade;
+                return umbracoContext.PublishedShapshot;
             }
 
             set

@@ -1,6 +1,10 @@
 ﻿NuCache Documentation
 ======================
 
+NOTE - RENAMING
+Facade = PublishedSnapshot
+and everything needs to be renamed accordingly
+
 HOW IT WORKS
 -------------
 

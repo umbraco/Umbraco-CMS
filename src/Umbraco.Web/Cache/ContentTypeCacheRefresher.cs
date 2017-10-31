@@ -10,13 +10,13 @@ namespace Umbraco.Web.Cache
 {
     public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresher, ContentTypeCacheRefresher.JsonPayload>
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
 
-        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IFacadeService facadeService, IdkMap idkMap)
+        public ContentTypeCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
             : base(cacheHelper)
         {
-            _facadeService = facadeService;
+            _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
         }
 
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Cache
                 MemberCacheRefresher.RefreshMemberTypes(CacheHelper);
 
             // notify
-            _facadeService.Notify(payloads);
+            _publishedSnapshotService.Notify(payloads);
 
             // now we can trigger the event
             base.Refresh(payloads);

@@ -22,9 +22,9 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             switch (cacheLevel)
             {
-                case PropertyCacheLevel.Content:
+                case PropertyCacheLevel.Element:
+                case PropertyCacheLevel.Elements:
                 case PropertyCacheLevel.Snapshot:
-                case PropertyCacheLevel.Facade:
                 case PropertyCacheLevel.None:
                     break;
                 case PropertyCacheLevel.Unknown:

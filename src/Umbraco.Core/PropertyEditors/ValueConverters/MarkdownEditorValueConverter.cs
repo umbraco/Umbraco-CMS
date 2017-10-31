@@ -15,7 +15,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {

@@ -4,7 +4,7 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Represents a facade domain with its normalized uri.
+    /// Represents a published snapshot domain with its normalized uri.
     /// </summary>
     /// <remarks>
     /// <para>In Umbraco it is valid to create domains with name such as <c>example.com</c>, <c>https://www.example.com</c>, <c>example.com/foo/</c>.</para>

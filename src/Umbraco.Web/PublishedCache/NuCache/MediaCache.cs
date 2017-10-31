@@ -13,17 +13,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
-        private readonly ICacheProvider _facadeCache;
         private readonly ICacheProvider _snapshotCache;
+        private readonly ICacheProvider _elementsCache;
 
         #region Constructors
 
-        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache)
+        public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache)
             : base(previewDefault)
         {
             _snapshot = snapshot;
-            _facadeCache = facadeCache;
             _snapshotCache = snapshotCache;
+            _elementsCache = elementsCache;
         }
 
         #endregion
@@ -50,12 +50,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
-            if (FacadeService.CacheContentCacheRoots == false)
+            if (PublishedSnapshotService.CacheContentCacheRoots == false)
                 return GetAtRootNoCache(preview);
 
-            var cache = preview == false || FacadeService.FullCacheWhenPreviewing
-                ? _snapshotCache
-                : _facadeCache;
+            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
+                ? _elementsCache
+                : _snapshotCache;
 
             if (cache == null)
                 return GetAtRootNoCache(preview);

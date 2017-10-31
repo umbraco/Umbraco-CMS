@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
@@ -91,15 +91,15 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Can_Lookup_Content()
         {
-            var facade = new Mock<IFacade>();
-            facade.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
-            var facadeService = new Mock<IFacadeService>();
-            facadeService.Setup(x => x.CreateFacade(It.IsAny<string>())).Returns(facade.Object);
+            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            publishedSnapshot.Setup(x => x.MemberCache).Returns(Mock.Of<IPublishedMemberCache>());
+            var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
+            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
 
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
-                facadeService.Object,
+                publishedSnapshotService.Object,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Web.Mvc
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
-                Mock.Of<IFacadeService>(),
+                Mock.Of<IPublishedSnapshotService>(),
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 Enumerable.Empty<IUrlProvider>(),
@@ -143,8 +143,8 @@ namespace Umbraco.Tests.Web.Mvc
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
 
             var contextBase = umbracoContext.HttpContext;
-            var facadeRouter = BaseWebTest.CreateFacadeRouter(TestObjects.GetUmbracoSettings().WebRouting);
-            var frequest = facadeRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
+            var publishedRouter = BaseWebTest.CreatePublishedRouter(TestObjects.GetUmbracoSettings().WebRouting);
+            var frequest = publishedRouter.CreateRequest(umbracoContext, new Uri("http://localhost/test"));
             frequest.PublishedContent = content;
 
             var routeDefinition = new RouteDefinition

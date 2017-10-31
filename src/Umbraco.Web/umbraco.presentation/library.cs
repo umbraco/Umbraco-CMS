@@ -1132,7 +1132,7 @@ namespace umbraco
         }
 
         // legacy would access the raw XML from content.Instance ie a static thing
-        // now that we use a FacadeService, we need to have a "context" to handle a cache.
+        // now that we use a PublishedSnapshotService, we need to have a "context" to handle a cache.
         // UmbracoContext does it for most cases but in some cases we might not have an
         // UmbracoContext. For backward compatibility, try to do something here...
         internal static PublishedContentCache GetSafeContentCache()
@@ -1145,9 +1145,9 @@ namespace umbraco
             }
             else
             {
-                var facade = Current.Facade
-                    ?? Current.FacadeService.CreateFacade(null);
-                contentCache = facade.ContentCache as PublishedContentCache;
+                var publishedSnapshot = Current.PublishedSnapshot
+                    ?? Current.PublishedSnapshotService.CreatePublishedSnapshot(null);
+                contentCache = publishedSnapshot.ContentCache as PublishedContentCache;
             }
 
             if (contentCache == null)

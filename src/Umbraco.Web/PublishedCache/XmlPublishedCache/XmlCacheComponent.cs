@@ -20,14 +20,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             base.Compose(composition);
 
             // register the XML facade service
-            composition.SetFacadeService(factory => new FacadeService(
+            composition.SetPublishedSnapshotService(factory => new PublishedSnapshotService(
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IPublishedContentTypeFactory>(),
                 factory.GetInstance<IScopeProvider>(),
                 factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetInstance<UrlSegmentProviderCollection>(),
-                factory.GetInstance<IFacadeAccessor>(),
+                factory.GetInstance<IPublishedSnapshotAccessor>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<MainDom>()));
 
@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             composition.HealthChecks().Add<XmlDataIntegrityHealthCheck>();
         }
 
-        public void Initialize(IFacadeService service)
+        public void Initialize(IPublishedSnapshotService service)
         {
             // nothing - this just ensures that the service is created at boot time
         }

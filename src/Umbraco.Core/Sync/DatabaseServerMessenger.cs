@@ -115,12 +115,13 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         protected void Boot()
         {
-            // weight:10, must release *before* the facade service, because once released
+            // weight:10, must release *before* the published snapshot service, because once released
             // the service will *not* be able to properly handle our notifications anymore
             const int weight = 10;
 
-            var runtime = _runtime as RuntimeState;
-            if (runtime == null) throw new NotSupportedException($"Unsupported IRuntimeState implementation {_runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
+            if (!(_runtime is RuntimeState runtime))
+                throw new NotSupportedException($"Unsupported IRuntimeState implementation {_runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
+
             var registered = runtime.MainDom.Register(
                 () =>
                 {

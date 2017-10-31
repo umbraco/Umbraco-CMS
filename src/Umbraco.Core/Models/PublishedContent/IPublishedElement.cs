@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.PublishedContent
         #region PublishedElement
 
         /// <summary>
-        /// Gets the unique key of the facade item.
+        /// Gets the unique key of the published snapshot item.
         /// </summary>
         Guid Key { get; }
 

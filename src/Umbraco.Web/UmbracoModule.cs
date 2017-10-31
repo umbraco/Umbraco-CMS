@@ -40,7 +40,7 @@ namespace Umbraco.Web
         public IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
 
         [Inject]
-        public IFacadeService FacadeService { get; set; }
+        public IPublishedSnapshotService PublishedSnapshotService { get; set; }
 
         [Inject]
         public IUserService UserService { get; set; }
@@ -55,7 +55,7 @@ namespace Umbraco.Web
         public ILogger Logger { get; set; }
 
         [Inject]
-        internal FacadeRouter FacadeRouter { get; set; }
+        internal PublishedRouter PublishedRouter { get; set; }
 
         [Inject]
         internal IUmbracoDatabaseFactory DatabaseFactory { get; set; }
@@ -97,7 +97,7 @@ namespace Umbraco.Web
             UmbracoContext.EnsureContext(
                 UmbracoContextAccessor,
                 httpContext,
-                FacadeService,
+                PublishedSnapshotService,
                 new WebSecurity(httpContext, UserService),
                 UmbracoConfig.For.UmbracoSettings(),
                 UrlProviders,
@@ -152,9 +152,9 @@ namespace Umbraco.Web
 
             // instanciate, prepare and process the published content request
             // important to use CleanedUmbracoUrl - lowercase path-only version of the current url
-            var request = FacadeRouter.CreateRequest(umbracoContext);
+            var request = PublishedRouter.CreateRequest(umbracoContext);
             umbracoContext.PublishedContentRequest = request;
-            FacadeRouter.PrepareRequest(request);
+            PublishedRouter.PrepareRequest(request);
 
             // HandleHttpResponseStatus returns a value indicating that the request should
             // not be processed any further, eg because it has been redirect. then, exit.

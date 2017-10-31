@@ -17,14 +17,14 @@ namespace Umbraco.Web.PublishedCache
     internal class PublishedElement : IPublishedElement
     {
         // initializes a new instance of the PublishedElement class
-        // within the context of a facade service (eg a published content property value)
+        // within the context of a published snapshot service (eg a published content property value)
         public PublishedElement(PublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
-            PropertyCacheLevel referenceCacheLevel, IFacadeAccessor facadeAccessor)
+            PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             if (key == Guid.Empty) throw new ArgumentException("Empty guid.");
             if (values == null) throw new ArgumentNullException(nameof(values));
-            if (referenceCacheLevel != PropertyCacheLevel.None && facadeAccessor == null)
-                throw new ArgumentNullException("A facade accessor is required when referenceCacheLevel != None.", nameof(facadeAccessor));
+            if (referenceCacheLevel != PropertyCacheLevel.None && publishedSnapshotAccessor == null)
+                throw new ArgumentNullException("A published snapshot accessor is required when referenceCacheLevel != None.", nameof(publishedSnapshotAccessor));
 
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             Key = key;
@@ -36,13 +36,13 @@ namespace Umbraco.Web.PublishedCache
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.PropertyTypeAlias, out var value);
-                    return (IPublishedProperty) new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, facadeAccessor);
+                    return (IPublishedProperty) new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
                 })
                 .ToArray();
         }
 
         // initializes a new instance of the PublishedElement class
-        // without any context, so it's purely 'standalone' and should NOT interfere with the facade service
+        // without any context, so it's purely 'standalone' and should NOT interfere with the published snapshot service
         // + using an initial reference cache level of .None ensures that everything will be
         // cached at .Content level - and that reference cache level will propagate to all
         // properties

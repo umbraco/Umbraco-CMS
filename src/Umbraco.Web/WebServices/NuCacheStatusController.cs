@@ -10,19 +10,19 @@ namespace Umbraco.Web.WebServices
 {
     public class NuCacheStatusController : UmbracoAuthorizedApiController
     {
-        private readonly IFacadeService _facadeService;
+        private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public NuCacheStatusController(IFacadeService facadeService)
+        public NuCacheStatusController(IPublishedSnapshotService publishedSnapshotService)
         {
-            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
-            _facadeService = facadeService;
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
+            _publishedSnapshotService = publishedSnapshotService;
         }
 
-        private FacadeService FacadeService
+        private PublishedSnapshotService PublishedSnapshotService
         {
             get
             {
-                var svc = _facadeService as FacadeService;
+                var svc = _publishedSnapshotService as PublishedSnapshotService;
                 if (svc == null)
                     throw new NotSupportedException("Not running NuCache.");
                 return svc;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.WebServices
         public string RebuildDbCache()
         {
             // fixme - should wrap in a service scope once we have them
-            var service = FacadeService;
+            var service = PublishedSnapshotService;
             service.RebuildContentDbCache();
             service.RebuildMediaDbCache();
             service.RebuildMemberDbCache();
@@ -43,14 +43,14 @@ namespace Umbraco.Web.WebServices
         [HttpGet]
         public string GetStatus()
         {
-            var service = FacadeService;
+            var service = PublishedSnapshotService;
             return service.GetStatus();
         }
 
         [HttpGet]
         public string Collect()
         {
-            var service = FacadeService;
+            var service = PublishedSnapshotService;
             GC.Collect();
             service.Collect();
             return service.GetStatus();
@@ -59,7 +59,7 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public void ReloadCache()
         {
-            Current.DistributedCache.RefreshAllFacade();
+            Current.DistributedCache.RefreshAllPublishedSnapshot();
         }
     }
 }

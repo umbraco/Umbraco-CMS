@@ -219,9 +219,9 @@ namespace umbraco.presentation.developer.packages
 
 
                     //making sure that publishing actions performed from the cms layer gets pushed to the presentation
-                    // library.RefreshContent is obsolete, would need to RefreshAllFacade,
+                    // library.RefreshContent is obsolete, would need to RefreshAll...,
                     // but it should be managed automatically by services and caches!
-                    //DistributedCache.Instance.RefreshAllFacade();
+                    //DistributedCache.Instance.RefreshAll...();
 
                     if (string.IsNullOrEmpty(_installer.Control) == false)
                     {

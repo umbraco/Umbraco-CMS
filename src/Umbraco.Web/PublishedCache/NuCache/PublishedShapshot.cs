@@ -4,30 +4,30 @@ using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    // implements the facade
-    internal class Facade : IFacade, IDisposable
+    // implements published snapshot
+    internal class PublishedShapshot : IPublishedShapshot, IDisposable
     {
-        private readonly FacadeService _service;
+        private readonly PublishedSnapshotService _service;
         private bool _defaultPreview;
-        private FacadeElements _elements;
+        private PublishedSnapshotElements _elements;
 
         #region Constructors
 
-        public Facade(FacadeService service, bool defaultPreview)
+        public PublishedShapshot(PublishedSnapshotService service, bool defaultPreview)
         {
             _service = service;
             _defaultPreview = defaultPreview;
-            FacadeCache = new ObjectCacheRuntimeCacheProvider();
+            SnapshotCache = new ObjectCacheRuntimeCacheProvider();
         }
 
-        public class FacadeElements : IDisposable
+        public class PublishedSnapshotElements : IDisposable
         {
             public ContentCache ContentCache;
             public MediaCache MediaCache;
             public MemberCache MemberCache;
             public DomainCache DomainCache;
-            public ICacheProvider FacadeCache;
             public ICacheProvider SnapshotCache;
+            public ICacheProvider ElementsCache;
 
             public void Dispose()
             {
@@ -36,11 +36,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private FacadeElements Elements => _elements ?? (_elements = _service.GetElements(_defaultPreview));
+        private PublishedSnapshotElements Elements => _elements ?? (_elements = _service.GetElements(_defaultPreview));
 
         public void Resync()
         {
-            // no lock - facades are single-thread
+            // no lock - published snapshots are single-thread
             _elements?.Dispose();
             _elements = null;
         }
@@ -49,13 +49,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Caches
 
-        public ICacheProvider FacadeCache { get; }
+        public ICacheProvider SnapshotCache { get; }
 
-        public ICacheProvider SnapshotCache => Elements.SnapshotCache;
+        public ICacheProvider ElementsCache => Elements.ElementsCache;
 
         #endregion
 
-        #region IFacade
+        #region IPublishedSnapshot
 
         public IPublishedContentCache ContentCache => Elements.ContentCache;
 
@@ -72,24 +72,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private class ForcedPreviewObject : DisposableObject
         {
-            private readonly Facade _facade;
+            private readonly PublishedShapshot _publishedShapshot;
             private readonly bool _origPreview;
             private readonly Action<bool> _callback;
 
-            public ForcedPreviewObject(Facade facade, bool preview, Action<bool> callback)
+            public ForcedPreviewObject(PublishedShapshot publishedShapshot, bool preview, Action<bool> callback)
             {
-                _facade = facade;
+                _publishedShapshot = publishedShapshot;
                 _callback = callback;
 
                 // save and force
-                _origPreview = facade._defaultPreview;
-                facade._defaultPreview = preview;
+                _origPreview = publishedShapshot._defaultPreview;
+                publishedShapshot._defaultPreview = preview;
             }
 
             protected override void DisposeResources()
             {
                 // restore
-                _facade._defaultPreview = _origPreview;
+                _publishedShapshot._defaultPreview = _origPreview;
                 _callback?.Invoke(_origPreview);
             }
         }

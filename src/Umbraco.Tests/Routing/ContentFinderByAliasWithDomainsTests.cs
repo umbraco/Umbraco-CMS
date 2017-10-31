@@ -22,10 +22,10 @@ namespace Umbraco.Tests.Routing
             //SetDomains1();
 
             var umbracoContext = GetUmbracoContext(inputUrl);
-            var facadeRouter = CreateFacadeRouter();
-            var request = facadeRouter.CreateRequest(umbracoContext);
+            var publishedRouter = CreatePublishedRouter();
+            var request = publishedRouter.CreateRequest(umbracoContext);
             // must lookup domain
-            facadeRouter.FindDomain(request);
+            publishedRouter.FindDomain(request);
 
             if (expectedNode > 0)
                 Assert.AreEqual(expectedCulture, request.Culture.Name);

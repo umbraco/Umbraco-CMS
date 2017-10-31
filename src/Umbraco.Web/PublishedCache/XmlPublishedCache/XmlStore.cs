@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// Represents the Xml storage for the Xml published cache.
     /// </summary>
     /// <remarks>
-    /// <para>One instance of <see cref="XmlStore"/> is instanciated by the <see cref="FacadeService"/> and
+    /// <para>One instance of <see cref="XmlStore"/> is instanciated by the <see cref="PublishedSnapshotService"/> and
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private volatile bool _released;
         private bool _withRepositoryEvents;
 
-        private readonly IFacadeAccessor _facadeAccessor;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly RoutesCache _routesCache;
         private readonly ServiceContext _serviceContext; // fixme WHY
@@ -61,15 +61,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
         public XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom)
-            : this(serviceContext, scopeProvider, uowProvider, routesCache, contentTypeCache, segmentProviders, facadeAccessor, mainDom, false, false)
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom)
+            : this(serviceContext, scopeProvider, uowProvider, routesCache, contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, false, false)
         { }
 
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
         internal XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IFacadeAccessor facadeAccessor, MainDom mainDom,
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
         {
             if (testing == false)
@@ -80,7 +80,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _uowProvider = uowProvider;
             _routesCache = routesCache;
             _contentTypeCache = contentTypeCache;
-            _facadeAccessor = facadeAccessor;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
             InitializeSerializers(segmentProviders);
 
@@ -593,17 +593,17 @@ AND (umbracoNode.id=@id)";
         // should we have async versions that would do: ?
         // var releaser = await _xmlLock.LockAsync();
         //
-        // fixme - not sure about the "resync current facade" thing here, see 7.6...
+        // fixme - not sure about the "resync current published snapshot" thing here, see 7.6...
 
         // gets a locked safe read access to the main xml
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
             return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xml,
-                ResyncCurrentFacade,
+                ResyncCurrentPublishedSnapshot,
                 (xml, registerXmlChange) =>
                 {
                     SetXmlLocked(xml, registerXmlChange);
-                    ResyncCurrentFacade(xml);
+                    ResyncCurrentPublishedSnapshot(xml);
                 }, false);
         }
 
@@ -611,11 +611,11 @@ AND (umbracoNode.id=@id)";
         private SafeXmlReaderWriter GetSafeXmlWriter()
         {
             return SafeXmlReaderWriter.Get(_scopeProvider, _xmlLock, _xml,
-                ResyncCurrentFacade,
+                ResyncCurrentPublishedSnapshot,
                 (xml, registerXmlChange) =>
                 {
                     SetXmlLocked(xml, registerXmlChange);
-                    ResyncCurrentFacade(xml);
+                    ResyncCurrentPublishedSnapshot(xml);
                 }, true);
         }
 
@@ -1241,12 +1241,12 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // ignore media and member types - we're not caching them
         }
 
-        private void ResyncCurrentFacade(XmlDocument xml)
+        private void ResyncCurrentPublishedSnapshot(XmlDocument xml)
         {
-            var facade = (Facade) _facadeAccessor.Facade;
-            if (facade == null) return;
-            ((PublishedContentCache) facade.ContentCache).Resync(xml);
-            ((PublishedMediaCache) facade.MediaCache).Resync();
+            var publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+            if (publishedSnapshot == null) return;
+            ((PublishedContentCache) publishedSnapshot.ContentCache).Resync(xml);
+            ((PublishedMediaCache) publishedSnapshot.MediaCache).Resync();
 
             // not trying to resync members or domains, which are not cached really
         }

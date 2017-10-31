@@ -140,32 +140,32 @@ namespace Umbraco.Core.Components
         }
 
         /// <summary>
-        /// Sets the facade service.
+        /// Sets the published snapshot service.
         /// </summary>
-        /// <typeparam name="T">The type of the facade service.</typeparam>
+        /// <typeparam name="T">The type of the published snapshot service.</typeparam>
         /// <param name="composition">The composition.</param>
-        public static void SetFacadeService<T>(this Composition composition)
-            where T : IFacadeService
+        public static void SetPublishedSnapshotService<T>(this Composition composition)
+            where T : IPublishedSnapshotService
         {
-            composition.Container.RegisterSingleton<IFacadeService, T>();
+            composition.Container.RegisterSingleton<IPublishedSnapshotService, T>();
         }
 
         /// <summary>
-        /// Sets the facade service.
+        /// Sets the published snapshot service.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        /// <param name="factory">A function creating a service facade.</param>
-        public static void SetFacadeService(this Composition composition, Func<IServiceFactory, IFacadeService> factory)
+        /// <param name="factory">A function creating a published snapshot service.</param>
+        public static void SetPublishedSnapshotService(this Composition composition, Func<IServiceFactory, IPublishedSnapshotService> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
 
         /// <summary>
-        /// Sets the facade service.
+        /// Sets the published snapshot service.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        /// <param name="service">A facade service.</param>
-        public static void SetFacadeService(this Composition composition, IFacadeService service)
+        /// <param name="service">A published snapshot service.</param>
+        public static void SetPublishedSnapshotService(this Composition composition, IPublishedSnapshotService service)
         {
             composition.Container.RegisterSingleton(_ => service);
         }

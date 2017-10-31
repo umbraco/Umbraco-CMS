@@ -17,18 +17,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
-        private readonly ICacheProvider _facadeCache;
         private readonly ICacheProvider _snapshotCache;
+        private readonly ICacheProvider _elementsCache;
         private readonly DomainHelper _domainHelper;
 
         #region Constructor
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider facadeCache, ICacheProvider snapshotCache, DomainHelper domainHelper)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper)
             : base(previewDefault)
         {
             _snapshot = snapshot;
-            _facadeCache = facadeCache;
             _snapshotCache = snapshotCache;
+            _elementsCache = elementsCache;
             _domainHelper = domainHelper;
         }
 
@@ -57,7 +57,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
-            var cache = preview == false || FacadeService.FullCacheWhenPreviewing ? _snapshotCache : _facadeCache;
+            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing ? _elementsCache : _snapshotCache;
             var key = CacheKeys.ContentCacheContentByRoute(route, preview);
             return cache.GetCacheItem<IPublishedContent>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode));
         }
@@ -120,7 +120,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public string GetRouteById(bool preview, int contentId)
         {
-            var cache = (preview == false || FacadeService.FullCacheWhenPreviewing) ? _snapshotCache : _facadeCache;
+            var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
             var key = CacheKeys.ContentCacheRouteByContent(contentId, preview);
             return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null));
         }
@@ -232,12 +232,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
-            if (FacadeService.CacheContentCacheRoots == false)
+            if (PublishedSnapshotService.CacheContentCacheRoots == false)
                 return GetAtRootNoCache(preview);
 
-            var cache = preview == false || FacadeService.FullCacheWhenPreviewing
-                ? _snapshotCache
-                : _facadeCache;
+            var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
+                ? _elementsCache
+                : _snapshotCache;
 
             if (cache == null)
                 return GetAtRootNoCache(preview);

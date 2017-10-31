@@ -10,52 +10,52 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class XmlDataIntegrityController : UmbracoAuthorizedApiController
     {
-        private readonly FacadeService _facadeService;
+        private readonly PublishedSnapshotService _publishedSnapshotService;
 
-        public XmlDataIntegrityController(IFacadeService facadeService)
+        public XmlDataIntegrityController(IPublishedSnapshotService publishedSnapshotService)
         {
-            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
-            _facadeService = facadeService as FacadeService;
-            if (_facadeService == null) throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
+            _publishedSnapshotService = publishedSnapshotService as PublishedSnapshotService;
+            if (_publishedSnapshotService == null) throw new NotSupportedException("Unsupported IPublishedSnapshotService, only the Xml one is supported.");
         }
 
         [HttpPost]
         public bool FixContentXmlTable()
         {
-            _facadeService.RebuildContentAndPreviewXml();
-            return _facadeService.VerifyContentAndPreviewXml();
+            _publishedSnapshotService.RebuildContentAndPreviewXml();
+            return _publishedSnapshotService.VerifyContentAndPreviewXml();
         }
 
         [HttpPost]
         public bool FixMediaXmlTable()
         {
-            _facadeService.RebuildMediaXml();
-            return _facadeService.VerifyMediaXml();
+            _publishedSnapshotService.RebuildMediaXml();
+            return _publishedSnapshotService.VerifyMediaXml();
         }
 
         [HttpPost]
         public bool FixMembersXmlTable()
         {
-            _facadeService.RebuildMemberXml();
-            return _facadeService.VerifyMemberXml();
+            _publishedSnapshotService.RebuildMemberXml();
+            return _publishedSnapshotService.VerifyMemberXml();
         }
 
         [HttpGet]
         public bool CheckContentXmlTable()
         {
-            return _facadeService.VerifyContentAndPreviewXml();
+            return _publishedSnapshotService.VerifyContentAndPreviewXml();
         }
 
         [HttpGet]
         public bool CheckMediaXmlTable()
         {
-            return _facadeService.VerifyMediaXml();
+            return _publishedSnapshotService.VerifyMediaXml();
         }
 
         [HttpGet]
         public bool CheckMembersXmlTable()
         {
-            return _facadeService.VerifyMemberXml();
+            return _publishedSnapshotService.VerifyMemberXml();
         }
     }
 }

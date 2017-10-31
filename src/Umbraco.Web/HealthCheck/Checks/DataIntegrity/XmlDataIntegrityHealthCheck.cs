@@ -18,19 +18,19 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
     public class XmlDataIntegrityHealthCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
-        private readonly PublishedCache.XmlPublishedCache.FacadeService _facadeService;
+        private readonly PublishedCache.XmlPublishedCache.PublishedSnapshotService _publishedSnapshotService;
 
         private const string CheckContentXmlTableAction = "checkContentXmlTable";
         private const string CheckMediaXmlTableAction = "checkMediaXmlTable";
         private const string CheckMembersXmlTableAction = "checkMembersXmlTable";
 
-        public XmlDataIntegrityHealthCheck(ILocalizedTextService textService, IFacadeService facadeService)
+        public XmlDataIntegrityHealthCheck(ILocalizedTextService textService, IPublishedSnapshotService publishedSnapshotService)
         {
             _textService = textService;
 
-            _facadeService = facadeService as PublishedCache.XmlPublishedCache.FacadeService;
-            if (_facadeService == null)
-                throw new NotSupportedException("Unsupported IFacadeService, only the Xml one is supported.");
+            _publishedSnapshotService = publishedSnapshotService as PublishedCache.XmlPublishedCache.PublishedSnapshotService;
+            if (_publishedSnapshotService == null)
+                throw new NotSupportedException("Unsupported IPublishedSnapshotService, only the Xml one is supported.");
         }
 
         /// <summary>
@@ -53,13 +53,13 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
             switch (action.Alias)
             {
                 case CheckContentXmlTableAction:
-                    _facadeService.RebuildContentAndPreviewXml();
+                    _publishedSnapshotService.RebuildContentAndPreviewXml();
                     return CheckContent();
                 case CheckMediaXmlTableAction:
-                    _facadeService.RebuildMediaXml();
+                    _publishedSnapshotService.RebuildMediaXml();
                     return CheckMedia();
                 case CheckMembersXmlTableAction:
-                    _facadeService.RebuildMemberXml();
+                    _publishedSnapshotService.RebuildMemberXml();
                     return CheckMembers();
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -68,17 +68,17 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
         private HealthCheckStatus CheckMembers()
         {
-            return Check(_facadeService.VerifyMemberXml(), CheckMembersXmlTableAction, "healthcheck/xmlDataIntegrityCheckMembers");
+            return Check(_publishedSnapshotService.VerifyMemberXml(), CheckMembersXmlTableAction, "healthcheck/xmlDataIntegrityCheckMembers");
         }
 
         private HealthCheckStatus CheckMedia()
         {
-            return Check(_facadeService.VerifyMediaXml(), CheckMediaXmlTableAction, "healthcheck/xmlDataIntegrityCheckMedia");
+            return Check(_publishedSnapshotService.VerifyMediaXml(), CheckMediaXmlTableAction, "healthcheck/xmlDataIntegrityCheckMedia");
         }
 
         private HealthCheckStatus CheckContent()
         {
-            return Check(_facadeService.VerifyContentAndPreviewXml(), CheckContentXmlTableAction, "healthcheck/xmlDataIntegrityCheckContent");
+            return Check(_publishedSnapshotService.VerifyContentAndPreviewXml(), CheckContentXmlTableAction, "healthcheck/xmlDataIntegrityCheckContent");
         }
 
         private HealthCheckStatus Check(bool ok, string action, string text)

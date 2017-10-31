@@ -21,8 +21,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <summary>
         /// Initializes a new instance of the <see cref="NestedContentManyValueConverter"/> class.
         /// </summary>
-        public NestedContentManyValueConverter(IFacadeAccessor facadeAccessor, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
-            : base(facadeAccessor, publishedModelFactory)
+        public NestedContentManyValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory, ProfilingLogger proflog)
+            : base(publishedSnapshotAccessor, publishedModelFactory)
         {
             _proflog = proflog;
         }
@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-            => PropertyCacheLevel.Content;
+            => PropertyCacheLevel.Element;
 
         /// <inheritdoc />
         public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)

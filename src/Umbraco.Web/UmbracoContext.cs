@@ -15,7 +15,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
-        private readonly Lazy<IFacade> _facade;
+        private readonly Lazy<IPublishedShapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
 
@@ -25,7 +25,7 @@ namespace Umbraco.Web
         /// Ensures that there is a "current" UmbracoContext.
         /// </summary>
         /// <param name="httpContext">An http context.</param>
-        /// <param name="facadeService">A facade service.</param>
+        /// <param name="publishedSnapshotService">A published snapshot service.</param>
         /// <param name="webSecurity">A security helper.</param>
         /// <param name="umbracoSettings">The umbraco settings.</param>
         /// <param name="urlProviders">Some url providers.</param>
@@ -48,7 +48,7 @@ namespace Umbraco.Web
         // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
         //   in BeginRequest so *late* ie *after* the HttpApplication has started (+ init? check!)
         // WebRuntimeComponent (and I'm not quite sure why)
-        // -> because an UmbracoContext seems to be required by UrlProvider to get the "current" facade?
+        // -> because an UmbracoContext seems to be required by UrlProvider to get the "current" published snapshot?
         //    note: at startup not sure we have an HttpContext.Current
         //          at startup not sure we have an httpContext.Request => hard to tell "current" url
         //          should we have a post-boot event of some sort for ppl that *need* ?!
@@ -58,7 +58,7 @@ namespace Umbraco.Web
         public static UmbracoContext EnsureContext(
             IUmbracoContextAccessor umbracoContextAccessor,
             HttpContextBase httpContext,
-            IFacadeService facadeService,
+            IPublishedSnapshotService publishedSnapshotService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
@@ -66,7 +66,7 @@ namespace Umbraco.Web
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
@@ -78,7 +78,7 @@ namespace Umbraco.Web
 
             // create & assign to accessor, dispose existing if any
             umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, facadeService, webSecurity, umbracoSettings, urlProviders);
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders);
         }
 
         // initializes a new instance of the UmbracoContext class
@@ -87,13 +87,13 @@ namespace Umbraco.Web
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(
             HttpContextBase httpContext,
-            IFacadeService facadeService,
+            IPublishedSnapshotService publishedSnapshotService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            if (facadeService == null) throw new ArgumentNullException(nameof(facadeService));
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
@@ -114,7 +114,7 @@ namespace Umbraco.Web
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
-            _facade = new Lazy<IFacade>(() => facadeService.CreateFacade(PreviewToken));
+            _publishedSnapshot = new Lazy<IPublishedShapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
             // set the urls...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -165,22 +165,22 @@ namespace Umbraco.Web
         internal Uri CleanedUmbracoUrl { get; }
 
         /// <summary>
-        /// Gets the facade.
+        /// Gets the published snapshot.
         /// </summary>
-        public IFacade Facade => _facade.Value;
+        public IPublishedShapshot PublishedShapshot => _publishedSnapshot.Value;
 
         // for unit tests
-        internal bool HasFacade => _facade.IsValueCreated;
+        internal bool HasPublishedSnapshot => _publishedSnapshot.IsValueCreated;
 
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        public IPublishedContentCache ContentCache => Facade.ContentCache;
+        public IPublishedContentCache ContentCache => PublishedShapshot.ContentCache;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
-        public IPublishedMediaCache MediaCache => Facade.MediaCache;
+        public IPublishedMediaCache MediaCache => PublishedShapshot.MediaCache;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
@@ -280,12 +280,12 @@ namespace Umbraco.Web
         }
 
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
-        // then due to the way it all works at the moment, the 'current' facade need to be in the proper
+        // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.
         internal IDisposable ForcedPreview(bool preview)
         {
             InPreviewMode = preview;
-            return Facade.ForcedPreview(preview, orig => InPreviewMode = orig);
+            return PublishedShapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
         }
 
         private HttpRequestBase GetRequestFromContext()
@@ -313,8 +313,8 @@ namespace Umbraco.Web
             // help caches release resources
             // (but don't create caches just to dispose them)
             // context is not multi-threaded
-            if (_facade.IsValueCreated)
-                _facade.Value.DisposeIfDisposable();
+            if (_publishedSnapshot.IsValueCreated)
+                _publishedSnapshot.Value.DisposeIfDisposable();
         }
     }
 }

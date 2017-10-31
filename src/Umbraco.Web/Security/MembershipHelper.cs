@@ -55,7 +55,7 @@ namespace Umbraco.Web.Security
         private ILogger Logger { get; set; }
 
         [Inject]
-        private FacadeRouter Router { get; set; }
+        private PublishedRouter Router { get; set; }
 
         #region Constructors
 
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Security
             _umbracoContext = umbracoContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-            _memberCache = umbracoContext.Facade.MemberCache;
+            _memberCache = umbracoContext.PublishedShapshot.MemberCache;
 
             // helpers are *not* instanciated by the container so we have to
             // get our dependencies injected manually, through properties.

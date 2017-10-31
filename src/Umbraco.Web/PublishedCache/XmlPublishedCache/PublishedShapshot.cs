@@ -1,21 +1,19 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     /// <summary>
-    /// Implements a facade.
+    /// Implements a published snapshot.
     /// </summary>
-    class Facade : IFacade
+    class PublishedShapshot : IPublishedShapshot
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Facade"/> class with a content cache
+        /// Initializes a new instance of the <see cref="PublishedShapshot"/> class with a content cache
         /// and a media cache.
         /// </summary>
-        public Facade(
+        public PublishedShapshot(
             PublishedContentCache contentCache,
             PublishedMediaCache mediaCache,
             PublishedMemberCache memberCache,
@@ -40,10 +38,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public IDomainCache DomainCache { get; }
 
         /// <inheritdoc />
-        public ICacheProvider FacadeCache => null;
+        public ICacheProvider SnapshotCache => null;
 
         /// <inheritdoc />
-        public ICacheProvider SnapshotCache => null;
+        public ICacheProvider ElementsCache => null;
 
         /// <inheritdoc />
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)

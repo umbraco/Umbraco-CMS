@@ -182,7 +182,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 }
             }
 
-            _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Facade;
+            _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
             _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
         }
 
