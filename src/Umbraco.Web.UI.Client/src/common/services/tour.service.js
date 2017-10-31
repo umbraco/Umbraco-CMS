@@ -108,15 +108,15 @@
                     },
                     {
                         element: "#tree [data-element='tree-item-documentTypes']",
-                        title: "Create document type",
+                        title: "Create Document Type",
                         content: "<p>Hover the Document Type tree and click the <b>three small dots</b> to open the <b>context menu</b>.</p>",
                         event: "click",
                         eventElement: "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
                     },
                     {
                         element: "#dialog [data-element='action-documentType']",
-                        title: "Create document type",
-                        content: "<p>Click <b>Document Type</b> to create a new document type with a template.</p><p>We will use the template in a later tour when we need to render our content.</p>",
+                        title: "Create Document Type",
+                        content: "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type</p><p>We will use the template in a later tour when we need to render our content.</p>",
                         event: "click"
                     },
                     {
