@@ -46,6 +46,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(SegmentLength)]
         public string Segment { get; set; }
 
+        [Column("published")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
+        public bool Published { get; set; }
+
         [Column("intValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? IntegerValue { get; set; }

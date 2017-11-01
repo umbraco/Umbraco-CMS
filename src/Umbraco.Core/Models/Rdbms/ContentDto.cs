@@ -3,21 +3,23 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName(Constants.DatabaseSchema.Tables.Content)]
-    [PrimaryKey("pk")]
+    [TableName(TableName)]
+    [PrimaryKey("id")]
     [ExplicitColumns]
     internal class ContentDto
     {
-        [Column("pk")]
+        private const string TableName = Constants.DatabaseSchema.Tables.Content;
+
+        [Column("id")]
         [PrimaryKeyColumn]
-        public int PrimaryKey { get; set; }
+        public int Id { get; set; }
 
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsContent")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId")]
         public int NodeId { get; set; }
 
-        [Column("contentType")]
+        [Column("contentTypeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
         public int ContentTypeId { get; set; }
 

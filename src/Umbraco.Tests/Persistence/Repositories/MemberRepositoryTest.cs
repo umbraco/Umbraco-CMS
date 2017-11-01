@@ -324,7 +324,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             var sql = provider.SqlContext.Sql();
-            sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
+            sql.Select("umbracoNode.*", "uContent.contentTypeId", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password",
                 Constants.DatabaseSchema.Tables.PropertyData + ".id AS PropertyDataId", Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid",

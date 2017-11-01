@@ -510,7 +510,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (isContent || isMedia)
             {
                 entitySql
-                    .InnerJoin("cmsContent content").On("content.nodeId = umbracoNode.id");
+                    .InnerJoin("uContent content").On("content.nodeId = umbracoNode.id");
             }
 
             if (isContent)

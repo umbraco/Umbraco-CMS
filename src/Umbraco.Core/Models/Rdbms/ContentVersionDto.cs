@@ -5,27 +5,33 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName(Constants.DatabaseSchema.Tables.ContentVersion)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class ContentVersionDto
     {
+        private const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
+
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
-        [Column("ContentId")]
+        [Column("nodeId")]
         [ForeignKey(typeof(ContentDto), Column = "nodeId")]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsContentVersion_ContentId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId")]
         public int NodeId { get; set; }
 
-        [Column("VersionId")]
+        [Column("versionId")]
         [Index(IndexTypes.UniqueNonClustered)]
         public Guid VersionId { get; set; }
 
-        [Column("VersionDate")]
+        [Column("versionDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime VersionDate { get; set; }
+
+        [Column("text")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string Text { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]

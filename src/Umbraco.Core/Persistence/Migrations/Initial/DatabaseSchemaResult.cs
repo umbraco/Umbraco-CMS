@@ -119,9 +119,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 }
             }
 
-            //if the error indicates a problem with the constraint FK_cmsContent_cmsContentType_nodeId then it is not version 7.2
+            //if the error indicates a problem with the constraint FK_cms-OBSOLETE-Content_cmsContentType_nodeId then it is not version 7.2
             // since this gets added in 7.2.0 so it must be the previous version
-            if (Errors.Any(x => x.Item1.Equals("Constraint") && (x.Item2.InvariantEquals("FK_cmsContent_cmsContentType_nodeId"))))
+            if (Errors.Any(x => x.Item1.Equals("Constraint") && (x.Item2.InvariantEquals("FK_cms-OBSOLETE-Content_cmsContentType_nodeId"))))
             {
                 return new Version(7, 0, 0);
             }

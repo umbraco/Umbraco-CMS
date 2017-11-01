@@ -25,9 +25,9 @@ namespace Umbraco.Core
                 public const string DataTypePreValue = /*TableNamePrefix*/ "cms" + "DataTypePreValues"; // fixme dbfixkill merge with uDataType
                 public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 
-                public const string Content = /*TableNamePrefix*/ "cms" + "Content"; // fixme dbfix merge into uDocument
-                public const string ContentVersion = /*TableNamePrefix*/ "cms" + "ContentVersion"; // fixme dbfix rename uDocumentVersion
-                public const string Document = /*TableNamePrefix*/ "cms" + "Document"; // fixme dbfix merge with others + no more version here
+                public const string Content = TableNamePrefix + "Content";
+                public const string ContentVersion = TableNamePrefix + "ContentVersion";
+                public const string Document = TableNamePrefix + "Document";
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";

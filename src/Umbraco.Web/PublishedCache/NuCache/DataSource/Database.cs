@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             var dto = uow.Database.Fetch<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
@@ -26,7 +26,7 @@ nuDraft.data DraftData,
 docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
 LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
 LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
@@ -42,13 +42,13 @@ WHERE n.nodeObjectType=@objType AND n.id=@id
 
             var dto = uow.Database.Fetch<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND n.id=@id
@@ -62,7 +62,7 @@ WHERE n.nodeObjectType=@objType AND n.id=@id
         {
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
@@ -70,7 +70,7 @@ nuDraft.data DraftData,
 docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
 LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
 LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
@@ -86,13 +86,13 @@ ORDER BY n.level, n.sortOrder
 
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType
@@ -104,7 +104,7 @@ ORDER BY n.level, n.sortOrder
         {
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
@@ -113,7 +113,7 @@ docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDa
 nuPub.data PubData
 FROM umbracoNode n
 JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
 LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
 LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
@@ -129,14 +129,14 @@ ORDER BY n.level, n.sortOrder
 
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND x.id=@id
@@ -148,7 +148,7 @@ ORDER BY n.level, n.sortOrder
         {
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
@@ -156,12 +156,12 @@ nuDraft.data DraftData,
 docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
 LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
 LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND cmsContent.contentType IN (@ids)
+WHERE n.nodeObjectType=@objType AND uContent.contentTypeId IN (@ids)
 ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.Document, /*id =*/ ids })).Select(CreateContentNodeKit);
         }
@@ -172,16 +172,16 @@ ORDER BY n.level, n.sortOrder
 
             return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
-cmsContent.contentType ContentTypeId,
+uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
 n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN cmsContent ON (cmsContent.nodeId=n.id)
+JOIN uContent ON (uContent.nodeId=n.id)
 JOIN cmsContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND cmsContent.contentType IN (@ids)
+WHERE n.nodeObjectType=@objType AND uContent.contentTypeId IN (@ids)
 ORDER BY n.level, n.sortOrder
 ", new { objType = Constants.ObjectTypes.Media, /*id =*/ ids })).Select(CreateMediaNodeKit);
         }

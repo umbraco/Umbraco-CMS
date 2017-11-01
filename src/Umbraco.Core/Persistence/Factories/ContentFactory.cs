@@ -156,7 +156,7 @@ namespace Umbraco.Core.Persistence.Factories
 
             if (_primaryKey > 0)
             {
-                contentDto.PrimaryKey = _primaryKey;
+                contentDto.Id = _primaryKey;
             }
 
             return contentDto;

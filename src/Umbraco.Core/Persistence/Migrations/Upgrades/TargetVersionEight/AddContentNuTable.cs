@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight

@@ -862,8 +862,8 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
 JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
-JOIN cmsContent ON (cmsDocument.nodeId=cmsContent.nodeId)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1 AND cmsContent.contentType IN (@ids)
+JOIN uContent ON (cmsDocument.nodeId=uContent.nodeId)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1 AND uContent.contentTypeId IN (@ids)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private const string ReadMoreCmsContentXmlSql = @"SELECT
@@ -1726,15 +1726,15 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN cmsContent ON (cmsContentXml.nodeId=cmsContent.nodeId)
+                //JOIN uContent ON (cmsContentXml.nodeId=uContent.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND cmsContent.contentType IN (@ctypes)",
+                //AND uContent.contentTypeId IN (@ctypes)",
                 db.Execute(@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = contentObjectType, ctypes = contentTypeIdsA });
             }
@@ -1799,15 +1799,15 @@ WHERE cmsPreviewXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsPreviewXml
                 //FROM cmsPreviewXml
                 //JOIN umbracoNode ON (cmsPreviewXml.nodeId=umbracoNode.Id)
-                //JOIN cmsContent ON (cmsPreviewXml.nodeId=cmsContent.nodeId)
+                //JOIN uContent ON (cmsPreviewXml.nodeId=uContent.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND cmsContent.contentType IN (@ctypes)",
+                //AND uContent.contentTypeId IN (@ctypes)",
                 db.Execute(@"DELETE FROM cmsPreviewXml
 WHERE cmsPreviewXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = contentObjectType, ctypes = contentTypeIdsA });
             }
@@ -1876,15 +1876,15 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN cmsContent ON (cmsContentXml.nodeId=cmsContent.nodeId)
+                //JOIN uContent ON (cmsContentXml.nodeId=uContent.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND cmsContent.contentType IN (@ctypes)",
+                //AND uContent.contentTypeId IN (@ctypes)",
                 db.Execute(@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = mediaObjectType, ctypes = contentTypeIdsA });
             }
@@ -1947,15 +1947,15 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN cmsContent ON (cmsContentXml.nodeId=cmsContent.nodeId)
+                //JOIN uContent ON (cmsContentXml.nodeId=uContent.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND cmsContent.contentType IN (@ctypes)",
+                //AND uContent.contentTypeId IN (@ctypes)",
                 db.Execute(@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = memberObjectType, ctypes = contentTypeIdsA });
             }

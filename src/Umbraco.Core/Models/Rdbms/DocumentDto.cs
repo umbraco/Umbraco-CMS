@@ -5,21 +5,24 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName(Constants.DatabaseSchema.Tables.Document)]
+    [TableName(TableName)]
     [PrimaryKey("versionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentDto
     {
+        private const string TableName = Constants.DatabaseSchema.Tables.Document;
+
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto), Column = "nodeId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsDocument", ForColumns = "nodeId, versionId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId, versionId")]
         public int NodeId { get; set; }
 
         [Column("published")]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_published")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
         public bool Published { get; set; }
 
+        // fixme writerUserId
         [Column("documentUser")]
         public int WriterUserId { get; set; }
 
@@ -47,6 +50,7 @@ namespace Umbraco.Core.Models.Rdbms
         [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
         public int? TemplateId { get; set; }
 
+        // fixme kill that one
         [Column("newest")]
         [Constraint(Default = "0")]
         [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_newest")]
@@ -56,6 +60,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
         public ContentVersionDto ContentVersionDto { get; set; }
 
+        // fixme wtf
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
         public DocumentPublishedReadOnlyDto DocumentPublishedReadOnlyDto { get; set; }

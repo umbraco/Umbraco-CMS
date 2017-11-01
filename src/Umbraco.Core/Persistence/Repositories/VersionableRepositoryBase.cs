@@ -710,7 +710,7 @@ WHERE EXISTS(
     INNER JOIN cmsPropertyType
     ON b.datatypeNodeId = cmsPropertyType.dataTypeId
     INNER JOIN
-        (" + string.Format(parsedOriginalSql, "cmsContent.contentType") + @") as docData
+        (" + string.Format(parsedOriginalSql, "uContent.contentTypeId") + @") as docData
     ON cmsPropertyType.contentTypeId = docData.contentType
     WHERE a.id = b.id)", docSql.Arguments);
 
@@ -730,7 +730,7 @@ FROM " + Constants.DatabaseSchema.Tables.PropertyData + "
 INNER JOIN cmsPropertyType
 ON " + Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid = cmsPropertyType.id
 INNER JOIN
-    (" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
+    (" + string.Format(parsedOriginalSql, "uContent.nodeId, cmsContentVersion.VersionId") + @") as docData
 ON " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = docData.VersionId AND " + Constants.DatabaseSchema.Tables.PropertyData + ".nodeId = docData.nodeId
 ORDER BY nodeId, versionId, propertytypeid
 ", docSql.Arguments);

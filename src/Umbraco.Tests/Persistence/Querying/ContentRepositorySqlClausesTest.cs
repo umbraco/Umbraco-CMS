@@ -21,8 +21,8 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Select("*")
                 .From("[cmsDocument]")
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
-                .InnerJoin("[cmsContent]").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
-                .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
+                .InnerJoin("[uContent]").On("[cmsContentVersion].[ContentId] = [uContent].[nodeId]")
+                .InnerJoin("[umbracoNode]").On("[uContent].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"));
 
             var sql = Sql();
@@ -56,8 +56,8 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.SelectAll()
                 .From("[cmsDocument]")
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
-                .InnerJoin("[cmsContent]").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
-                .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
+                .InnerJoin("[uContent]").On("[cmsContentVersion].[ContentId] = [uContent].[nodeId]")
+                .InnerJoin("[umbracoNode]").On("[uContent].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
                 .Where("([umbracoNode].[id] = @0)", 1050);
 
@@ -94,8 +94,8 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Select("*")
                 .From("[cmsDocument]")
                 .InnerJoin("[cmsContentVersion]").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
-                .InnerJoin("[cmsContent]").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
-                .InnerJoin("[umbracoNode]").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
+                .InnerJoin("[uContent]").On("[cmsContentVersion].[ContentId] = [uContent].[nodeId]")
+                .InnerJoin("[umbracoNode]").On("[uContent].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972"))
                 .Where("([umbracoNode].[id] = @0)", 1050)
                 .Where("([cmsContentVersion].[VersionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"))

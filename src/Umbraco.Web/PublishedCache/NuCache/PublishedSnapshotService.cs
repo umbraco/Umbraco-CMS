@@ -1258,9 +1258,9 @@ WHERE cmsContentNu.nodeId IN (
                 db.Execute(@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = contentObjectType, ctypes = contentTypeIdsA });
             }
@@ -1329,9 +1329,9 @@ WHERE cmsContentNu.nodeId IN (
                 db.Execute(@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = mediaObjectType, ctypes = contentTypeIdsA });
             }
@@ -1390,9 +1390,9 @@ WHERE cmsContentNu.nodeId IN (
                 db.Execute(@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN cmsContent ON cmsContent.nodeId=umbracoNode.id
+    JOIN uContent ON uContent.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND cmsContent.contentType IN (@ctypes)
+    AND uContent.contentTypeId IN (@ctypes)
 )",
                     new { objType = memberObjectType, ctypes = contentTypeIdsA });
             }

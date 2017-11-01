@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsDocument WHERE nodeId = @Id",
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
-                               "DELETE FROM cmsContent WHERE nodeId = @Id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @Id",
                                "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
@@ -344,7 +344,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { /*Id =*/ entity.Id });
-            factory.SetPrimaryKey(contentDto.PrimaryKey);
+            factory.SetPrimaryKey(contentDto.Id);
             var dto = factory.BuildDto(entity);
 
             //Updates the (base) node data - umbracoNode

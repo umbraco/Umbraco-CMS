@@ -3,8 +3,6 @@ using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
-using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column;
-using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
@@ -23,11 +21,60 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             Execute.DropKeysAndIndexes();
 
             MigratePropertyData();
+            MigrateContent();
+            MigrateContentVersion();
+            MigrateDocument();
 
             // re-create *all* keys and indexes
             //Create.KeysAndIndexes<PropertyDataDto>();
             foreach (var x in DatabaseSchemaCreation.OrderedTables)
                 Create.KeysAndIndexes(x.Value);
+        }
+
+        private void MigrateContent()
+        {
+            // if the table has already been renamed, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.Content))
+                return;
+
+            // migrate
+            if (ColumnExists(PreTables.Content, "contentType"))
+                ReplaceColumn<PropertyDataDto>(PreTables.Content, "contentType", "contentTypeId");
+            if (ColumnExists(PreTables.Content, "pk"))
+                ReplaceColumn<PropertyDataDto>(PreTables.Content, "pk", "id");
+            Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content);
+        }
+
+        private void MigrateContentVersion()
+        {
+            // if the table has already been renamed, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.ContentVersion))
+                return;
+
+            // migrate
+            if (!ColumnExists(PreTables.ContentVersion, "text"))
+                AddColumn<PropertyDataDto>(PreTables.ContentVersion, "text");
+            if (ColumnExists(PreTables.ContentVersion, "ContentId"))
+                ReplaceColumn<PropertyDataDto>(PreTables.Content, "ContentId", "nodeId");
+            Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion);
+        }
+
+        private void MigrateDocument()
+        {
+            // if the table has already been renamed, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.Document))
+                return;
+
+            // migrate
+            // todo!
+            // - rename nodeId
+            // - rename documentUser
+            // - only keep newest but update other versions with text?
+            // - document text vs node text?
+            // - we need uDocumentVersion FIRST not to lose templateId!
+            // - kill newest
+
+            Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document);
         }
 
         private void MigratePropertyData()
@@ -37,12 +84,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
                 return;
 
             // add column propertyData.languageId
+            // add column propertyData.segment
+            // add column propertyData.published
             if (!ColumnExists(PreTables.PropertyData, "languageId"))
                 AddColumn<PropertyDataDto>(PreTables.PropertyData, "languageId");
-
-            // add column propertyData.segment
             if (!ColumnExists(PreTables.PropertyData, "segment"))
                 AddColumn<PropertyDataDto>(PreTables.PropertyData, "segment");
+            if (!ColumnExists(PreTables.PropertyData, "published"))
+                AddColumn<PropertyDataDto>(PreTables.PropertyData, "published");
 
             // do NOT use Rename.Column as it's borked on SQLCE - use ReplaceColumn instead
 

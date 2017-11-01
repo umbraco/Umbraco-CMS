@@ -1238,8 +1238,8 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         {
             var ids = contentPath.Split(',').Select(int.Parse);
             var sql = new Sql(@"SELECT COUNT(*) FROM cmsContentType
-INNER JOIN cmsContent ON cmsContentType.nodeId=cmsContent.contentType
-WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
+INNER JOIN uContent ON cmsContentType.nodeId=uContent.contentTypeId
+WHERE uContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 

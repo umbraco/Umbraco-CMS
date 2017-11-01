@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_Select_From_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[cmsContent]");
+            expected.SelectAll().From("[uContent]");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>();
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_OrderBy_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[cmsContent]").OrderBy("([cmsContent].[contentType])");
+            expected.SelectAll().From("[uContent]").OrderBy("([uContent].[contentTypeId])");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().OrderBy<ContentDto>(x => x.ContentTypeId);
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_GroupBy_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[cmsContent]").GroupBy("[cmsContent].[contentType]");
+            expected.SelectAll().From("[uContent]").GroupBy("[uContent].[contentTypeId]");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().GroupBy<ContentDto>(x => x.ContentTypeId);
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_Use_Where_Predicate()
         {
             var expected = Sql();
-            expected.SelectAll().From("[cmsContent]").Where("([cmsContent].[nodeId] = @0)", 1045);
+            expected.SelectAll().From("[uContent]").Where("([uContent].[nodeId] = @0)", 1045);
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().Where<ContentDto>(x => x.NodeId == 1045);
@@ -254,9 +254,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             var expected = Sql();
             expected.SelectAll()
-                .From("[cmsContent]")
-                .Where("([cmsContent].[nodeId] = @0)", 1045)
-                .Where("([cmsContent].[contentType] = @0)", 1050);
+                .From("[uContent]")
+                .Where("([uContent].[nodeId] = @0)", 1045)
+                .Where("([uContent].[contentTypeId] = @0)", 1050);
 
             var sql = Sql();
             sql.SelectAll()
