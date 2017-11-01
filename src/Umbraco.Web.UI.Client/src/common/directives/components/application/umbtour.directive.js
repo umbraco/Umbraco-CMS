@@ -6,6 +6,8 @@
         function link(scope, el, attr, ctrl) {
 
             var popover;
+            var pulseElement;
+            var pulseTimer;
 
             scope.loadingStep = false;
             scope.elementNotFound = false;
@@ -34,7 +36,8 @@
 
             function onInit() {
                 popover = el.find(".umb-tour__popover");
-                popover.hide();                
+                pulseElement = el.find(".umb-tour__pulse");
+                popover.hide();
                 scope.model.currentStepIndex = 0;
                 backdropService.open({disableEventsOnClick: true});
                 startStep();
@@ -58,8 +61,12 @@
             }
 
             function nextStep() {
-                popover.hide();                
+                
+                popover.hide();
+                pulseElement.hide();
+                $timeout.cancel(pulseTimer);
                 scope.model.currentStepIndex++;
+
                 // make sure we don't go too far
                 if(scope.model.currentStepIndex !== scope.model.steps.length) {
                     startStep();
@@ -134,10 +141,12 @@
                         }, function () {
                             // Animation complete.
                             setPopoverPosition(element);
+                            setPulsePosition();
                             backdropService.setHighlight(scope.model.currentStep.element, scope.model.currentStep.elementPreventClick);
                         });
                     } else {
                         setPopoverPosition(element);
+                        setPulsePosition();
                         backdropService.setHighlight(scope.model.currentStep.element, scope.model.currentStep.elementPreventClick);
                     }
 
@@ -229,6 +238,25 @@
 
             }
 
+            function setPulsePosition() {
+                if(scope.model.currentStep.event) {
+
+                    pulseTimer = $timeout(function(){
+                        
+                        var clickElementSelector = scope.model.currentStep.eventElement ? scope.model.currentStep.eventElement : scope.model.currentStep.element;
+                        var clickElement = $(clickElementSelector);
+        
+                        var offset = clickElement.offset();
+                        var width = clickElement.outerWidth();
+                        var height = clickElement.outerHeight();
+        
+                        pulseElement.css({ "width": width, "height": height, "left": offset.left, "top": offset.top });
+                        pulseElement.fadeIn();
+
+                    }, 1000);
+                }
+            }
+
             function waitForPendingRerequests() {
                 var deferred = $q.defer();
                 var timer = window.setInterval(function(){
@@ -311,6 +339,7 @@
             scope.$on('$destroy', function () {
                 $(window).off('resize.umbTour');
                 unbindEvent();
+                $timeout.cancel(pulseTimer);
             });
 
         }

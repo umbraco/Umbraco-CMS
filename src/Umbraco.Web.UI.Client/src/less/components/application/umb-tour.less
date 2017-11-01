@@ -5,6 +5,28 @@
     height: 5px;
 }
 
+.umb-tour__pulse {
+    position: fixed;
+    z-index: 10000;
+    display: none;
+    background: transparent;
+    box-shadow: 0 0 0 @green inset;
+    animation: pulse 2s infinite;
+    pointer-events: none;
+}
+  
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 @green inset;
+    }
+    70% {
+        box-shadow: 0 0 0 5px fade(@green, 80%) inset;
+    }
+    100% {
+        box-shadow: 0 0 0 0 @green inset;
+    }
+}
+
 .umb-tour__popover {
     position: fixed;
     background: @white;
