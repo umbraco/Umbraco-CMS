@@ -11,7 +11,7 @@
         vm.initNextStep = initNextStep;
 
         function initNextStep() {
-            if (element.val().lowerCase() === 'welcome text') {
+            if (element.val().toLowerCase() === 'welcome text') {
                 $scope.model.nextStep();
             } else {
                 vm.error = true;
