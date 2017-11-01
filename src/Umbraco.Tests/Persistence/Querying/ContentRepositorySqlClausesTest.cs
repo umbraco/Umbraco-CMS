@@ -133,10 +133,10 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var expected = new Sql();
             expected.Select("*");
-            expected.From("[cmsPropertyData]");
-            expected.InnerJoin("[cmsPropertyType]").On("[cmsPropertyData].[propertytypeid] = [cmsPropertyType].[id]");
-            expected.Where("([cmsPropertyData].[nodeId] = @0)", 1050);
-            expected.Where("([cmsPropertyData].[versionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"));
+            expected.From("[" + Constants.DatabaseSchema.Tables.PropertyData + "]");
+            expected.InnerJoin("[cmsPropertyType]").On("[" + Constants.DatabaseSchema.Tables.PropertyData + "].[propertytypeid] = [cmsPropertyType].[id]");
+            expected.Where("([" + Constants.DatabaseSchema.Tables.PropertyData + "].[nodeId] = @0)", 1050);
+            expected.Where("([" + Constants.DatabaseSchema.Tables.PropertyData + "].[versionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"));
 
             var sql = Sql();
             sql.SelectAll()

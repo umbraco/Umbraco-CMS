@@ -298,7 +298,7 @@ AND umbracoNode.id <> @id",
                             var nodeId = contentDto.NodeId;
                             var propertyTypeId = propertyType.Id;
                             var propertySql = Sql()
-                                .Select("cmsPropertyData.id")
+                                .Select(Constants.DatabaseSchema.Tables.PropertyData + ".id")
                                 .From<PropertyDataDto>()
                                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                                 .Where<PropertyDataDto>(x => x.NodeId == nodeId)
@@ -1246,7 +1246,7 @@ WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             // in theory, services should have ensured that content items of the given content type
-            // have been deleted and therefore cmsPropertyData has been cleared, so cmsPropertyData
+            // have been deleted and therefore PropertyData has been cleared, so PropertyData
             // is included here just to be 100% sure since it has a FK on cmsPropertyType.
 
             var list = new List<string>
@@ -1258,7 +1258,7 @@ WHERE cmsContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", 
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",
                 "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id",
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id",
-                "DELETE FROM cmsPropertyData WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @Id)",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @Id)",
                 "DELETE FROM cmsPropertyType WHERE contentTypeId = @Id",
                 "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id",
             };

@@ -360,7 +360,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     END AS CustomPropVal,
                     cd.{idField} AS CustomPropValContentId
                     FROM {table} cd
-                    INNER JOIN cmsPropertyData cpd ON cpd.nodeId = cd.{idField}{andVersion}
+                    INNER JOIN " + Constants.DatabaseSchema.Tables.PropertyData + @" cpd ON cpd.nodeId = cd.{idField}{andVersion}
                     INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
                     WHERE cpt.Alias = @{sql.Arguments.Length}{andNewest}) AS CustomPropData
                     ON CustomPropData.CustomPropValContentId = umbracoNode.id "; // trailing space is important!
@@ -725,13 +725,13 @@ WHERE EXISTS(
             // id which turns out to be a crazy amount of iterations. Instead we know it's sorted by this value we'll
             // keep an index stored of the rows being read so we never have to re-iterate the entire data set
             // on each document iteration.
-            var propSql = new Sql(@"SELECT cmsPropertyData.*
-FROM cmsPropertyData
+            var propSql = new Sql(@"SELECT " + Constants.DatabaseSchema.Tables.PropertyData + ".*
+FROM " + Constants.DatabaseSchema.Tables.PropertyData + "
 INNER JOIN cmsPropertyType
-ON cmsPropertyData.propertytypeid = cmsPropertyType.id
+ON " + Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid = cmsPropertyType.id
 INNER JOIN
     (" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
-ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.nodeId = docData.nodeId
+ON " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = docData.VersionId AND " + Constants.DatabaseSchema.Tables.PropertyData + ".nodeId = docData.nodeId
 ORDER BY nodeId, versionId, propertytypeid
 ", docSql.Arguments);
 

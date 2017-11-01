@@ -9,9 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
     /// See: http://issues.umbraco.org/issue/U4-9188
     /// </summary>
     [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
-    public class UpdateUniqueIndexOnCmsPropertyData : MigrationBase
+    public class UpdateUniqueIndexOnPropertyData : MigrationBase
     {
-        public UpdateUniqueIndexOnCmsPropertyData(IMigrationContext context)
+        public UpdateUniqueIndexOnPropertyData(IMigrationContext context)
             : base(context)
         { }
 

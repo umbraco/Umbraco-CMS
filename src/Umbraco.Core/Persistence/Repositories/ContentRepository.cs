@@ -194,7 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM umbracoDomains WHERE domainRootStructureID = @Id",
                                "DELETE FROM cmsDocument WHERE nodeId = @Id",
-                               "DELETE FROM cmsPropertyData WHERE nodeId = @Id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
                                "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
@@ -379,7 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories
             dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
-            //Create the PropertyData for this version - cmsPropertyData
+            //Create the PropertyData for this version
             var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             var keyDictionary = new Dictionary<int, int>();
@@ -516,7 +516,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(dto);
             }
 
-            //Create the PropertyData for this version - cmsPropertyData
+            //Create the PropertyData for this version
             var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             var keyDictionary = new Dictionary<int, int>();

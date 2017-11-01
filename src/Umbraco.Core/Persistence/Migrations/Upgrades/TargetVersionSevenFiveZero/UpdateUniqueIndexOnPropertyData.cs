@@ -13,9 +13,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
     /// See: http://issues.umbraco.org/issue/U4-8522
     /// </summary>
     [Migration("7.5.0", 2, Constants.System.UmbracoMigrationName)]
-    public class UpdateUniqueIndexOnCmsPropertyData : MigrationBase
+    public class UpdateUniqueIndexOnPropertyData : MigrationBase
     {
-        public UpdateUniqueIndexOnCmsPropertyData(IMigrationContext context)
+        public UpdateUniqueIndexOnPropertyData(IMigrationContext context)
             : base(context)
         {
         }

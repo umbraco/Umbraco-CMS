@@ -10,7 +10,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -21,93 +20,6 @@ namespace Umbraco.Tests.Migrations
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MigrationIssuesTests : TestWithDatabaseBase
     {
-        [Test]
-        public void Issue8370Test()
-        {
-            // make sure to create some content,
-            // otherwise cannot get it to fail!
-
-            using (var scope = Current.ScopeProvider.CreateScope())
-            {
-                var database = scope.Database;
-
-                var n = new NodeDto
-                {
-                    Text = "text",
-                    CreateDate = DateTime.Now,
-                    Path = "-1",
-                    ParentId = -1,
-                    UniqueId = Guid.NewGuid()
-                };
-                database.Insert(n);
-                var ct = new ContentTypeDto
-                {
-                    Alias = "alias",
-                    NodeId = n.NodeId,
-                    Thumbnail = "thumb"
-                };
-                database.Insert(ct);
-                n = new NodeDto
-                {
-                    Text = "text",
-                    CreateDate = DateTime.Now,
-                    Path = "-1",
-                    ParentId = -1,
-                    UniqueId = Guid.NewGuid()
-                };
-                database.Insert(n);
-                var dt = new DataTypeDto
-                {
-                    PropertyEditorAlias = Constants.PropertyEditors.RelatedLinksAlias,
-                    DbType = "x",
-                    DataTypeId = n.NodeId
-                };
-                database.Insert(dt);
-                var pt = new PropertyTypeDto
-                {
-                    Alias = "alias",
-                    ContentTypeId = ct.NodeId,
-                    DataTypeId = dt.DataTypeId
-                };
-                database.Insert(pt);
-                n = new NodeDto
-                {
-                    Text = "text",
-                    CreateDate = DateTime.Now,
-                    Path = "-1",
-                    ParentId = -1,
-                    UniqueId = Guid.NewGuid()
-                };
-                database.Insert(n);
-                var data = new PropertyDataDto
-                {
-                    NodeId = n.NodeId,
-                    PropertyTypeId = pt.Id,
-                    TextValue = "text",
-                    VersionId = Guid.NewGuid()
-                };
-                database.Insert(data);
-                data = new PropertyDataDto
-                {
-                    NodeId = n.NodeId,
-                    PropertyTypeId = pt.Id,
-                    TextValue = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
-                    VersionId = Guid.NewGuid()
-                };
-                database.Insert(data);
-                var migrationContext = new MigrationContext(database, Logger);
-
-                var migration = new UpdateRelatedLinksData(migrationContext);
-                migration.UpdateRelatedLinksDataDo(migrationContext);
-
-                data = database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
-                Assert.IsNotNull(data);
-                Debug.Print(data.TextValue);
-                Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
-                    data.TextValue);
-            }
-        }
-
         [Test]
         public void Issue8361Test()
         {

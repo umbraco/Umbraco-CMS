@@ -31,7 +31,7 @@ namespace Umbraco.Core
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";
-                public const string PropertyData = /*TableNamePrefix*/ "cms" + "PropertyData";
+                public const string PropertyData = TableNamePrefix + "PropertyData";
 
                 public const string RelationType = /*TableNamePrefix*/ "umbraco" + "RelationType";
                 public const string Relation = /*TableNamePrefix*/ "umbraco" + "Relation";

@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveFive;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZero;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             {
                 // 7.5.0
                 new RemoveStylesheetDataAndTablesAgain(Context),
-                new TargetVersionSevenFiveZero.UpdateUniqueIndexOnCmsPropertyData(Context),
+                new TargetVersionSevenFiveZero.UpdateUniqueIndexOnPropertyData(Context),
 
                 // 7.5.5
                 new UpdateAllowedMediaTypesAtRoot(Context),
@@ -33,8 +34,16 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
                 new AddRelationTypeUniqueIdColumn(Context),
                 new NormalizeTemplateGuids(Context),
                 new ReduceLoginNameColumnsSize(Context),
-                new TargetVersionSevenSixZero.UpdateUniqueIndexOnCmsPropertyData(Context),
+                new TargetVersionSevenSixZero.UpdateUniqueIndexOnPropertyData(Context),
                 new RemoveUmbracoDeployTables(Context),
+
+                // 7.7.0
+                new AddIndexToDictionaryKeyColumn(Context),
+                new AddUserGroupTables(Context),
+                new AddUserStartNodeTable(Context),
+                new EnsureContentTemplatePermissions(Context),
+                new ReduceDictionaryKeyColumnsSize(Context),
+                new UpdateUserTables(Context)
             };
 
             foreach (var migration in migrations)

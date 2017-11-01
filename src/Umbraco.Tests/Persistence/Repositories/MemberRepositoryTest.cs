@@ -326,8 +326,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sql = provider.SqlContext.Sql();
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
-                "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
-                "cmsPropertyData.dateValue", "cmsPropertyData.intValue", "cmsPropertyData.textValue", "cmsPropertyData.varcharValue",
+                "cmsMember.LoginName", "cmsMember.Password",
+                Constants.DatabaseSchema.Tables.PropertyData + ".id AS PropertyDataId", Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid",
+                Constants.DatabaseSchema.Tables.PropertyData + ".dateValue", Constants.DatabaseSchema.Tables.PropertyData + ".intValue",
+                Constants.DatabaseSchema.Tables.PropertyData + ".textValue", Constants.DatabaseSchema.Tables.PropertyData + ".varcharValue",
                 "cmsPropertyType.id", "cmsPropertyType.Alias", "cmsPropertyType.Description",
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
                 "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
@@ -340,7 +342,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
                 .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
+                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = cmsContentVersion.VersionId")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -358,7 +360,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
                 .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
+                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = cmsContentVersion.VersionId")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }

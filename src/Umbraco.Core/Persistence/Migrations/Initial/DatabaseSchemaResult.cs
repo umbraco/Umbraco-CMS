@@ -132,8 +132,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(7, 2, 0);
             }
 
-            //if the error is for cmsPropertyData.dataDecimal it must be the previous version to 7.4 since that is when it is added
-            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsPropertyData,dataDecimal"))))
+            //if the error is for cms-OBSOLETE-PropertyData.dataDecimal it must be the previous version to 7.4 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cms-OBSOLETE-PropertyData,dataDecimal"))))
             {
                 return new Version(7, 3, 0);
             }

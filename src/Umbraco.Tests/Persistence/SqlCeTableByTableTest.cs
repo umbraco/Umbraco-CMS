@@ -353,7 +353,7 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_cmsPropertyData_Table()
+        public void Can_Create_PropertyData_Table()
         {
             using (var scope = ScopeProvider.CreateScope())
             {

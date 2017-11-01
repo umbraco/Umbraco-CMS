@@ -212,7 +212,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // like when we switch a document type, there is property data left over that is linked
             // to the previous document type. So we need to ensure it's removed.
             var sql = Sql()
-                .Select("DISTINCT cmsPropertyData.propertytypeid")
+                .Select("DISTINCT " + Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid")
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
@@ -220,8 +220,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentTypeDto, PropertyTypeDto>(dto => dto.NodeId, dto => dto.ContentTypeId)
                 .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
 
-            //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
-            Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));
+            //Delete all PropertyData where propertytypeid EXISTS in the subquery above
+            Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid", sql));
 
             base.PersistDeletedItem(entity);
         }

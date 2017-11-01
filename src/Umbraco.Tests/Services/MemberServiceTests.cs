@@ -1135,7 +1135,7 @@ namespace Umbraco.Tests.Services
                 result.LastLoginDate.TruncateTo(DateTimeExtensions.DateTruncate.Second));
 
             //now ensure the col is correct
-            var sql = Current.SqlContext.Sql().Select("cmsPropertyData.*")
+            var sql = Current.SqlContext.Sql().Select<PropertyDataDto>()
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)

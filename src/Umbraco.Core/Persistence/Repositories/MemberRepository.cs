@@ -161,7 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
                 .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
+                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = cmsContentVersion.VersionId")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
         }
 
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
-                               "DELETE FROM cmsPropertyData WHERE nodeId = @Id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
                                "DELETE FROM cmsMember2MemberGroup WHERE Member = @Id",
                                "DELETE FROM cmsMember WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
@@ -253,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Insert(dto);
 
-            //Create the PropertyData for this version - cmsPropertyData
+            //Create the PropertyData for this version
             var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
@@ -357,7 +357,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //TODO ContentType for the Member entity
 
-            //Create the PropertyData for this version - cmsPropertyData
+            //Create the PropertyData for this version
             var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
             var keyDictionary = new Dictionary<int, int>();
 

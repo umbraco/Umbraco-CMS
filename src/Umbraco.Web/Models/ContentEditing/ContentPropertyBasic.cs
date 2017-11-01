@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.ContentEditing
     public class ContentPropertyBasic
     {
         /// <summary>
-        /// This is the cmsPropertyData ID
+        /// This is the PropertyData ID
         /// </summary>
         /// <remarks>
         /// This is not really used for anything
