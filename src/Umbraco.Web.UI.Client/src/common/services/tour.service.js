@@ -210,13 +210,13 @@
                 "steps": [
                     {
                         title: "Creating your first content node",
-                        content: "<p>The <b>Content section</b> contains the content of the website. Content is displayed as <b>nodes</b> in the content tree.</p><p>In this tour we will learn how to create our <b>Home</b> page for our website.</p>",
+                        content: "<p>The <b>Content section</b> contains the content of the website. Content is displayed as <b>nodes</b> in the content tree.</p><p>In this tour we will learn how to create our home page for our website. It will use the <b>Home Page</b> Document type you created in the previous tour.</p>",
                         type: "intro"
                     },
                     {
                         element: "#applications [data-element='section-content']",
-                        title: "Navigate to the content sections",
-                        content: "In the <b>Content section</b> we will find the content of our website.",
+                        title: "Navigate to the Content section",
+                        content: "In the <b>Content section</b> you can create and manage the content of the website.",
                         event: "click",
                         backdropOpacity: 0.6
                     },
@@ -230,7 +230,7 @@
                     {
                         element: "[data-element='action-create-home']",
                         title: "Create Home page",
-                        content: "<p>Click on <b>Home</b> to create a new page of type <b>Home</b>.</p>",
+                        content: "<p>The context menu shows you all the actions that are available on a node</p><p>Click on <b>Home Page</b> to create a new page of type <b>Home Page</b>.</p>",
                         event: "click"
                     },
                     {
@@ -246,7 +246,7 @@
                     },
                     {
                         element: "[data-element='editor-content'] [data-element='button-saveAndPublish']",
-                        title: "Save and publish",
+                        title: "Save and Publish",
                         content: "<p>Now click the <b>Save and publish</b> button to save and publish your changes.</p>",
                         event: "click"
                     }
