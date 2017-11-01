@@ -27,7 +27,7 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = ui.Text("update");
-            pane_form.Text = ui.Text("notifications", "editNotifications", node.Text, base.getUser());
+            pane_form.Text = ui.Text("notifications", "editNotifications", Server.HtmlEncode(node.Text), base.getUser());
         }
 
         #region Web Form Designer generated code

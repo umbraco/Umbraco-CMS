@@ -1,12 +1,13 @@
 <div ng-controller="Umbraco.PrevalueEditors.MultiColorPickerController">
     <div class="control-group color-picker-preval">
         <input name="newColor" type="hidden" />
+        <label for="newColor" val-highlight="hasError">#{{newColor}}</label>
+        <input name="newLabel" type="text" ng-model="newLabel" class="umb-editor color-label" placeholder="Label" />
         <button class="btn add" ng-click="add($event)"><localize key="general_add">Add</localize></button>
-        <label for="newColor" val-highlight="hasError">{{newColor}}</label>
     </div>
     <div class="control-group color-picker-preval" ng-repeat="item in model.value">
         <div class="thumbnail span1" hex-bg-color="{{item.value}}" bg-orig="transparent"></div>
-        <pre>{{item.value}}</pre>
+        <div class="color-picker-prediv"><pre>#{{item.value}} - {{item.label}}</pre></div>
         <button class="btn btn-danger" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></button>
     </div>
 </div>

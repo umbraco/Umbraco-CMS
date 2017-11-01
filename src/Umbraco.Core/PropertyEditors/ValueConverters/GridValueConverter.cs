@@ -43,8 +43,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     var gridConfig = UmbracoConfig.For.GridConfig(
                         ApplicationContext.Current.ProfilingLogger.Logger,
                         ApplicationContext.Current.ApplicationCache.RuntimeCache,
-                        new DirectoryInfo(HttpContext.Current.Server.MapPath(SystemDirectories.AppPlugins)),
-                        new DirectoryInfo(HttpContext.Current.Server.MapPath(SystemDirectories.Config)),
+                        new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
+                        new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
                         HttpContext.Current.IsDebuggingEnabled);
                     
                     var sections = GetArray(obj, "sections");
