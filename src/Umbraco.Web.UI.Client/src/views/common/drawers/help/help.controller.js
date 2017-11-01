@@ -28,6 +28,7 @@
 
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
+                getTourGroupCompletedPercentage();
             });
 
             // load custom help dashboard
@@ -53,8 +54,6 @@
                 findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
 
             });
-
-            getTourGroupCompletedPercentage();
             
             // check if a tour is running - if it is open the matching group
             var currentTour = tourService.getCurrentTour();
