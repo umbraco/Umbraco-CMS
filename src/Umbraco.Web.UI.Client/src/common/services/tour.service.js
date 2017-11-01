@@ -210,13 +210,13 @@
                 "steps": [
                     {
                         title: "Creating your first content node",
-                        content: "<p>The <b>Content section</b> contains the content of the website. Content is displayed as <b>nodes</b> in the content tree.</p><p>In this tour we will learn how to create our home page for our website. It will use the <b>Home Page</b> Document type you created in the previous tour.</p>",
+                        content: "<p>In this tour you will learn how to create the home page for your website. It will use the <b>Home Page</b> Document type you created in the previous tour.</p>",
                         type: "intro"
                     },
                     {
                         element: "#applications [data-element='section-content']",
                         title: "Navigate to the Content section",
-                        content: "In the <b>Content section</b> you can create and manage the content of the website.",
+                        content: "<p>In the <b>Content section</b> you can create and manage the content of the website.</p><p>The <b>Content section</b> contains the content of your website. Content is displayed as <b>nodes</b> in the content tree.</p>",
                         event: "click",
                         backdropOpacity: 0.6
                     },
@@ -228,7 +228,7 @@
                         eventElement: "[data-element='tree-root'] [data-element='tree-item-options']"
                     },
                     {
-                        element: "[data-element='action-create-home']",
+                        element: "[data-element='action-create-homePage']",
                         title: "Create Home page",
                         content: "<p>The context menu shows you all the actions that are available on a node</p><p>Click on <b>Home Page</b> to create a new page of type <b>Home Page</b>.</p>",
                         event: "click"
