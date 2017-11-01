@@ -5,9 +5,11 @@ using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -148,6 +150,38 @@ namespace Umbraco.Tests.Migrations
             }
         }
 
+        [Test]
+        public void CreateColumn()
+        {
+            var logger = new DebugDiagnosticsLogger();
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var database = scope.Database;
+
+                var context = new MigrationContext(database, logger);
+
+                var runner = new MigrationRunner(
+                    Mock.Of<IMigrationCollectionBuilder>(),
+                    Mock.Of<IMigrationEntryService>(),
+                    logger,
+                    new SemVersion(0), // 0.0.0
+                    new SemVersion(1), // 1.0.0
+                    "Test",
+
+                    // explicit migrations
+                    new CreateTableOfTDtoMigration(context),
+                    new CreateColumnMigration(context)
+                );
+
+                var upgraded = runner.Execute(context);
+                Assert.IsTrue(upgraded);
+
+                scope.Complete();
+            }
+
+        }
+
         [Migration("1.0.0", 0, "Test")]
         public class CreateTableOfTDtoMigration : MigrationBase
         {
@@ -210,6 +244,27 @@ namespace Umbraco.Tests.Migrations
 
                     Create.KeysAndIndexes(x.Value);
                 }
+            }
+        }
+
+        [Migration("1.0.0", 2, "Test")]
+        public class CreateColumnMigration : MigrationBase
+        {
+            public CreateColumnMigration(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Up()
+            {
+                // cannot delete the column without this, of course
+                Execute.DropKeysAndIndexes();
+
+                Delete.Column("id").FromTable("umbracoNode");
+
+                var table = DefinitionFactory.GetTableDefinition(typeof(NodeDto), SqlSyntax);
+                var column = table.Columns.First(x => x.Name == "id");
+                var create = SqlSyntax.Format(column); // returns [id] INTEGER NOT NULL IDENTITY(1060,1)
+                Execute.Sql($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoNode")} ADD COLUMN " + create);
             }
         }
     }

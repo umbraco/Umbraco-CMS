@@ -43,9 +43,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
             var tableDefinition = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
 
             AddSql(SqlSyntax.FormatPrimaryKey(tableDefinition));
-            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
-                AddSql(sql);
             foreach (var sql in SqlSyntax.Format(tableDefinition.Indexes))
+                AddSql(sql);
+            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
                 AddSql(sql);
         }
 
@@ -54,9 +54,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
             var tableDefinition = DefinitionFactory.GetTableDefinition(typeOfDto, SqlSyntax);
 
             AddSql(SqlSyntax.FormatPrimaryKey(tableDefinition));
-            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
-                AddSql(sql);
             foreach (var sql in SqlSyntax.Format(tableDefinition.Indexes))
+                AddSql(sql);
+            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
                 AddSql(sql);
         }
 

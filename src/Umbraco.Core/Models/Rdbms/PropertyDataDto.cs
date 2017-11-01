@@ -38,7 +38,7 @@ namespace Umbraco.Core.Models.Rdbms
         [ForeignKey(typeof(LanguageDto))]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int LanguageId { get; set; }
+        public int? LanguageId { get; set; }
 
         [Column("segment")]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Segment")]

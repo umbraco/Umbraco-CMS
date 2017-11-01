@@ -19,17 +19,17 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute
         {
             var local = context.GetLocalMigration();
 
-            // drop indexes
-            var indexes = context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(context.Database).ToArray();
-            foreach (var index in indexes.Where(x => x.TableName == tableName))
-                local.Delete.Index(index.IndexName).OnTable(index.TableName);
-
             // drop keys
-            var keys = context.SqlContext.SqlSyntax.GetConstraintsPerTable(context.Database).ToArray();
+            var keys = context.SqlContext.SqlSyntax.GetConstraintsPerTable(context.Database).DistinctBy(x => x.Item2).ToArray();
             foreach (var key in keys.Where(x => x.Item1 == tableName && x.Item2.StartsWith("FK_")))
                 local.Delete.ForeignKey(key.Item2).OnTable(key.Item1);
             foreach (var key in keys.Where(x => x.Item1 == tableName && x.Item2.StartsWith("PK_")))
                 local.Delete.PrimaryKey(key.Item2).FromTable(key.Item1);
+
+            // drop indexes
+            var indexes = context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(context.Database).DistinctBy(x => x.IndexName).ToArray();
+            foreach (var index in indexes.Where(x => x.TableName == tableName))
+                local.Delete.Index(index.IndexName).OnTable(index.TableName);
 
             return local.GetSql();
         }
@@ -38,17 +38,17 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute
         {
             var local = context.GetLocalMigration();
 
-            // drop indexes
-            var indexes = context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(context.Database).ToArray();
-            foreach (var index in indexes)
-                local.Delete.Index(index.IndexName).OnTable(index.TableName);
-
             // drop keys
-            var keys = context.SqlContext.SqlSyntax.GetConstraintsPerTable(context.Database).ToArray();
+            var keys = context.SqlContext.SqlSyntax.GetConstraintsPerTable(context.Database).DistinctBy(x => x.Item2).ToArray();
             foreach (var key in keys.Where(x => x.Item2.StartsWith("FK_")))
                 local.Delete.ForeignKey(key.Item2).OnTable(key.Item1);
             foreach (var key in keys.Where(x => x.Item2.StartsWith("PK_")))
                 local.Delete.PrimaryKey(key.Item2).FromTable(key.Item1);
+
+            // drop indexes
+            var indexes = context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(context.Database).DistinctBy(x => x.IndexName).ToArray();
+            foreach (var index in indexes)
+                local.Delete.Index(index.IndexName).OnTable(index.TableName);
 
             return local.GetSql();
         }

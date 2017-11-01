@@ -1,5 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
+using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column;
+using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
@@ -33,15 +38,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
             // add column propertyData.languageId
             if (!ColumnExists(PreTables.PropertyData, "languageId"))
-                Alter.Table(PreTables.PropertyData).AddColumn("languageId").AsInt32().Nullable();
+                AddColumn<PropertyDataDto>(PreTables.PropertyData, "languageId");
 
             // add column propertyData.segment
             if (!ColumnExists(PreTables.PropertyData, "segment"))
-                Alter.Table(PreTables.PropertyData).AddColumn("segment").AsString(256).Nullable();
+                AddColumn<PropertyDataDto>(PreTables.PropertyData, "segment");
+
+            // do NOT use Rename.Column as it's borked on SQLCE - use ReplaceColumn instead
 
             // rename column propertyData.contentNodeId to nodeId
             if (ColumnExists(PreTables.PropertyData, "contentNodeId"))
-                Rename.Column("contentNodeId").OnTable(PreTables.PropertyData).To("nodeId");
+                ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "contentNodeId", "nodeId");
 
             // rename column propertyData.dataNtext to textValue
             // rename column propertyData.dataNvarchar to varcharValue
@@ -49,15 +56,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             // rename column propertyData.dataInt to intValue
             // rename column propertyData.dataDate to dateValue
             if (ColumnExists(PreTables.PropertyData, "dataNtext"))
-                Rename.Column("dataNtext").OnTable(PreTables.PropertyData).To("textValue");
+                ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "dataNtext", "textValue");
             if (ColumnExists(PreTables.PropertyData, "dataNvarchar"))
-                Rename.Column("dataNtext").OnTable(PreTables.PropertyData).To("varcharValue");
+                ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "dataNvarchar", "varcharValue");
             if (ColumnExists(PreTables.PropertyData, "dataDecimal"))
-                Rename.Column("dataDecimal").OnTable(PreTables.PropertyData).To("decimalValue");
+                ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "dataDecimal", "decimalValue");
             if (ColumnExists(PreTables.PropertyData, "dataInt"))
-                Rename.Column("dataInt").OnTable(PreTables.PropertyData).To("intValue");
+                ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "dataInt", "intValue");
             if (ColumnExists(PreTables.PropertyData, "dataDate"))
-                Rename.Column("dataDate").OnTable(PreTables.PropertyData).To("dateValue");
+                ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "dataDate", "dateValue");
 
             // rename table
             Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData);
@@ -126,6 +133,41 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
             public const string Task = "cmsTask";
             public const string TaskType = "cmsTaskType";
+        }
+
+        private void AddColumn<T>(string tableName, string columnName)
+        {
+            AddColumn<T>(tableName, columnName, out var notNull);
+            if (notNull != null) Execute.Sql(notNull);
+        }
+
+        private void AddColumn<T>(string tableName, string columnName, out string notNull)
+        {
+            if (ColumnExists(tableName, columnName))
+                throw new InvalidOperationException($"Column {tableName}.{columnName} already exists.");
+
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            var column = table.Columns.First(x => x.Name == columnName);
+            var create = SqlSyntax.Format(column);
+            // some db cannot add a NOT NULL column, so change it into NULL
+            if (create.Contains("NOT NULL"))
+            {
+                notNull = string.Format(SqlSyntax.AlterColumn, SqlSyntax.GetQuotedTableName(tableName), create);
+                create = create.Replace("NOT NULL", "NULL");
+            }
+            else
+            {
+                notNull = null;
+            }
+            Execute.Sql($"ALTER TABLE {SqlSyntax.GetQuotedTableName(tableName)} ADD COLUMN " + create);
+        }
+
+        private void ReplaceColumn<T>(string tableName, string currentName, string newName)
+        {
+            AddColumn<T>(tableName, newName, out var notNull);
+            Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}");
+            if (notNull != null) Execute.Sql(notNull);
+            Delete.Column(currentName).FromTable(tableName);
         }
 
         private bool TableExists(string tableName)
