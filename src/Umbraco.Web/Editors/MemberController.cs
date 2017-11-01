@@ -394,8 +394,7 @@ namespace Umbraco.Web.Editors
 
             //map the custom properties - this will already be set for new entities in our member binder
             contentItem.PersistedContent.Email = contentItem.Email;
-            //trim the username as we do not want trailing space - issue U4-10589
-            contentItem.PersistedContent.Username = contentItem.Username.Trim();
+            contentItem.PersistedContent.Username = contentItem.Username;
 
             //use the base method to map the rest of the properties
             base.MapPropertyValues(contentItem);
