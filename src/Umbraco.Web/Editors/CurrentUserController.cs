@@ -40,42 +40,43 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        public UserTours PostSetUserTour(UserTourStatus status)
+        public IEnumerable<UserTourStatus> PostSetUserTour(UserTourStatus status)
         {
             if (status == null) throw new ArgumentNullException("status");
 
+            List<UserTourStatus> userTours;
             if (Security.CurrentUser.TourData.IsNullOrWhiteSpace())
             {
-                var userTours = new UserTours(Security.CurrentUser.Id, new[] {status});
-                Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours.Tours);
+                userTours = new List<UserTourStatus> {status};
+                Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
                 Services.UserService.Save(Security.CurrentUser);
                 return userTours;
             }
 
-            var userTourStatuses = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(Security.CurrentUser.TourData).ToList();
-            var found = userTourStatuses.FirstOrDefault(x => x.Alias == status.Alias);
+            userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(Security.CurrentUser.TourData).ToList();
+            var found = userTours.FirstOrDefault(x => x.Alias == status.Alias);
             if (found != null)
             {
                 //remove it and we'll replace it next
-                userTourStatuses.Remove(found);
+                userTours.Remove(found);
             }
-            userTourStatuses.Add(status);
-            Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTourStatuses);
+            userTours.Add(status);
+            Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
             Services.UserService.Save(Security.CurrentUser);
-            return new UserTours(Security.CurrentUser.Id, userTourStatuses);
+            return userTours;
         }
 
         /// <summary>
         /// Returns the user's tours
         /// </summary>
         /// <returns></returns>
-        public UserTours GetUserTours()
+        public IEnumerable<UserTourStatus> GetUserTours()
         {
             if (Security.CurrentUser.TourData.IsNullOrWhiteSpace())
-                return new UserTours(Security.CurrentUser.Id, Enumerable.Empty<UserTourStatus>());
+                return Enumerable.Empty<UserTourStatus>();
 
             var userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(Security.CurrentUser.TourData);
-            return new UserTours(Security.CurrentUser.Id, userTours);
+            return userTours;
         }
 
         /// <summary>
