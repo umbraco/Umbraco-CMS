@@ -316,17 +316,17 @@
                         eventElement: "#tree [data-element='tree-item-Home'] a.umb-tree-item__label"
                     },
                     {
-                        element: "[data-element='editor-content'] [data-element='tab-Generic properties']",
-                        title: "Properties",
-                        content: "<p>Under the properties tab you will find the default information about a content item.</p>",
+                        element: "[data-element='editor-content'] [data-element='tab-_umb_infoTab']",
+                        title: "Info",
+                        content: "<p>Under the info tab you will find the default information about a content item.</p>",
                         event: "click"
                     },
                     {
-                        element: "[data-element='editor-content'] [data-element='property-_umb_urls']",
+                        element: "[data-element='editor-content'] [data-element='node-info-urls']",
                         title: "Open page",
                         content: "<p>Click the <b>Link to document</b> <i class='icon-out'></i> to view your page.</p><p>Tip: Click the preview button in the bottom right corner to preview changes without publishing them.</p>",
                         event: "click",
-                        eventElement: "[data-element='editor-content'] [data-element='property-_umb_urls'] a[target='_blank']"
+                        eventElement: "[data-element='editor-content'] [data-element='node-info-urls'] a[target='_blank']"
                     }
                 ]
             },
@@ -396,18 +396,18 @@
                         content: "<p>You will also find other details about the image, like the size.</p><p>You can add extra properties to an image by creating or editing the <b>Media types</b></p>"
                     },
                     {
-                        element: "[data-element='editor-media'] [data-element='tab-Generic properties']",
+                        element: "[data-element='editor-media'] [data-element='tab-_umb_infoTab']",
                         title: "Properties",
-                        content: "Like the content section you can also find default properties about the media item. You will find these under the properties tab.",
+                        content: "Like the content section you can also find default info about the media item. You will find this under the info tab.",
                         event: "click"
                     },
                     {
-                        element: "[data-element='editor-media'] [data-element='property-_umb_urls']",
+                        element: "[data-element='editor-media'] [data-element='node-info-urls']",
                         title: "Link to media",
                         content: "The path to the media item..."
                     },
                     {
-                        element: "[data-element='editor-media'] [data-element='property-_umb_updatedate']",
+                        element: "[data-element='editor-media'] [data-element='node-info-update-date']",
                         title: "Last edited",
                         content: "...and information about when the media item has been created and edited."
                     }

@@ -2,7 +2,7 @@
     
     <div class="umb-package-details__main-content">
         
-        <umb-box>
+        <umb-box data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
@@ -16,7 +16,7 @@
             </umb-box-content>
         </umb-box>
 
-        <umb-box>
+        <umb-box data-element="node-info-history">
             <umb-box-header title-key="general_history"></umb-box-header>
             <umb-box-content class="block-form">
                 
@@ -81,7 +81,7 @@
     </div>
 
     <div class="umb-package-details__sidebar">
-        <umb-box>
+        <umb-box data-element="node-info-scheduled-publishing">
             <umb-box-header title-key="general_scheduledPublishing"></umb-box-header>
             <umb-box-content class="block-form">
 
@@ -91,6 +91,7 @@
                         
 
                         <umb-date-time-picker
+                            data-element="node-info-publish"
                             options="datePickerConfig"
                             on-change="datePickerChange(event, 'publish')">
                             
@@ -122,6 +123,7 @@
 
                     <div class="flex items-center flex-column">
                         <umb-date-time-picker
+                            data-element="node-info-unpublish"
                             options="datePickerConfig"
                             on-change="datePickerChange(event, 'unpublish')">
 
@@ -153,15 +155,15 @@
 
             </umb-box-content>
         </umb-box>
-        <umb-box>
+        <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
                 
-                <umb-control-group label="@template_createdDate">
+                <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
                     {{node.createDate | amDateFormat:'MMMM Do YYYY, HH:mm'}} by {{ node.owner.name }}
                 </umb-control-group>
 
-                <umb-control-group label="@content_documentType">
+                <umb-control-group data-element="node-info-document-type" label="@content_documentType">
                     <umb-node-preview
                         style="max-width: 100%; margin-bottom: 0;"
                         icon="documentType.icon"
@@ -171,7 +173,7 @@
                     </umb-node-preview>
                 </umb-control-group>
 
-                <umb-control-group label="@template_template">
+                <umb-control-group data-element="node-info-template" label="@template_template">
                     <select
                         class="input-block-level"
                         ng-model="node.template"
@@ -181,7 +183,7 @@
                     </select>
                 </umb-control-group>
 
-                <umb-control-group label="Id">
+                <umb-control-group data-element="node-info-id" label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>
