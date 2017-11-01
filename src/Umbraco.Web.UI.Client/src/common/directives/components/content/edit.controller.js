@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService) {
+
+    var evts = [];
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -15,21 +17,12 @@
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
     $scope.page.buttonGroupState = "init";
+    $scope.allowOpen = true;
+
 
     function init(content) {
 
-      var buttons = contentEditingHelper.configureContentEditorButtons({
-        create: $scope.page.isNew,
-        content: content,
-        methods: {
-          saveAndPublish: $scope.saveAndPublish,
-          sendToPublish: $scope.sendToPublish,
-          save: $scope.save,
-          unPublish: $scope.unPublish
-        }
-      });
-      $scope.defaultButton = buttons.defaultButton;
-      $scope.subButtons = buttons.subButtons;
+      createButtons(content);
 
       editorState.set($scope.content);
 
@@ -42,6 +35,35 @@
             });
         }
       }
+
+      evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
+        createButtons(args.node);
+      }));
+
+      evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
+        createButtons(args.node);
+      }));
+
+      // We don't get the info tab from the server from version 7.8 so we need to manually add it
+      contentEditingHelper.addInfoTab($scope.content.tabs);
+
+    }
+
+    function createButtons(content) {
+      var buttons = contentEditingHelper.configureContentEditorButtons({
+        create: $scope.page.isNew,
+        content: content,
+        methods: {
+          saveAndPublish: $scope.saveAndPublish,
+          sendToPublish: $scope.sendToPublish,
+          save: $scope.save,
+          unPublish: $scope.unPublish
+        }
+      });
+
+      $scope.defaultButton = buttons.defaultButton;
+      $scope.subButtons = buttons.subButtons;
+
     }
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -208,9 +230,9 @@
       if (!$scope.busy) {
 
         // Chromes popup blocker will kick in if a window is opened 
-        // outwith the initial scoped request. This trick will fix that.
+        // without the initial scoped request. This trick will fix that.
         //  
-        var previewWindow = $window.open('preview/?id=' + content.id, 'umbpreview');
+        var previewWindow = $window.open('preview/?init=true&id=' + content.id, 'umbpreview');
 
         // Build the correct path so both /#/ and #/ work.
         var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + content.id;
@@ -229,6 +251,13 @@
       }
 
     };
+
+    //ensure to unregister from all events!
+    $scope.$on('$destroy', function () {
+      for (var e in evts) {
+        eventsService.unsubscribe(evts[e]);
+      }
+    });
 
   }
 

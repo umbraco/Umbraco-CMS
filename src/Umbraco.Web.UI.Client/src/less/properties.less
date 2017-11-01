@@ -1,0 +1,162 @@
+//----- SCHEDULED PUBLISH ------
+
+.place-holder {
+    height: 60px;
+    width: 60px;
+    margin: 15px auto;
+    background-color: @gray-8;
+}
+
+.date-wrapper {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+}
+
+.date-container {
+    text-align: center;
+}
+
+.date-wrapper__number{
+    font-size: 40px;
+    line-height: 50px;
+    color: @gray-2;
+    font-weight: 900;
+}
+
+.date-container__title {
+    font-size: 16px;
+    font-weight: bold;
+    color: @gray-3;
+    margin-bottom: 5px;
+}
+
+.date-container__date {
+    padding: 0 10px;
+}
+.date-container__date:hover {
+    background-color: @gray-10;
+    cursor: pointer;
+}
+
+.date-wrapper__date{
+    font-size: 13px;
+    color: @gray-6;
+    margin: 0;
+}
+
+.data-wrapper__add{
+    font-size: 18px;
+    line-height: 10px;
+    color: @gray-8;
+    font-weight: 900;
+    margin: 0;
+}
+
+.date-separate {
+    width: 1px;
+    background-color: @gray-8;
+}
+
+//------------------- HISTORY ------------------
+
+
+.history-line {
+    width: 2px;
+    height: 24px;
+    margin: 0 0 0 14px;
+    background-color: @gray-8;
+}
+
+.history-row {
+    display: flex;
+    align-items: center;
+}
+
+.history-item__avatar{
+    min-width: 30px;
+}
+
+.history-item__date {
+    font-size: 13px;
+    color: @gray-5;
+}
+
+.name-date-container {
+    margin: 0 30px 0 7px;
+    height: 30px;
+    min-width: 170px;
+}
+
+.last-history-item .history-line {
+    display: none;
+}
+
+//--------- META DATA --------
+.meta-data-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-data-title {
+    font-size: 15px;
+    color: @black;
+    font-weight: bold;
+    line-height: 20px;
+}
+
+.meta-data-description {
+    font-size: 13px;
+    color: @gray-5;
+}
+
+.meta-data {
+    font-size: 15px;
+    color: @gray-2;
+    line-height: 20px;
+}
+
+/*  RESPONSIVE  */
+
+.history-item__break {
+    display: flex;
+    align-items: center;
+    min-width: 230px;
+}
+@media (max-width: 979px) {
+    
+    .history-row {
+        display: block;
+        padding: 10px 0;
+    }
+
+    .history-item__break {
+        padding: 7px 0;
+    }
+
+    .history-line {
+        display: none;
+    }
+}
+@media (max-width: 1535px) {
+    
+    .history-line {
+        visibility: hidden;
+    }
+}
+
+@media (min-width: 1101px) and (max-width: 1365px) {
+    
+    .history-row {
+        display: block;
+        padding: 10px 0;
+    }
+
+    .history-item__break {
+        padding: 7px 0;
+    }
+
+    .history-line {
+        display: none;
+    }
+}

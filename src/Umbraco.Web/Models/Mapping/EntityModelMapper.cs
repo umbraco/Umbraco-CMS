@@ -6,7 +6,6 @@ using Examine;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
@@ -21,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<UmbracoEntity, EntityBasic>()
                 .ForMember(x => x.Udi, expression => expression.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key))) 
                 .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon))
-                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(dto => dto.Trashed, expression => expression.MapFrom(x => x.Trashed))
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .AfterMap((entity, basic) =>
                 {

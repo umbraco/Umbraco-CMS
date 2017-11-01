@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
+using System.IO.Compression;
 
 namespace Umbraco.Core.Packaging
 {
@@ -14,17 +14,17 @@ namespace Umbraco.Core.Packaging
             bool fileFound = false;
             string foundDir = null;
 
-            ReadZipfileEntries(packageFilePath, (entry, stream) =>
+            ReadZipfileEntries(packageFilePath, entry =>
             {
                 string fileName = Path.GetFileName(entry.Name);
 
-                if (string.IsNullOrEmpty(fileName) == false &&
-                    fileName.Equals(fileToRead, StringComparison.CurrentCultureIgnoreCase))
+                if (string.IsNullOrEmpty(fileName) == false && fileName.Equals(fileToRead, StringComparison.CurrentCultureIgnoreCase))
                 {
 
                     foundDir = entry.Name.Substring(0, entry.Name.Length - fileName.Length);
                     fileFound = true;
-                    using (var reader = new StreamReader(stream))
+                    using (var entryStream = entry.Open())
+                    using (var reader = new StreamReader(entryStream))
                     {
                         retVal = reader.ReadToEnd();
                         return false;
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Packaging
             var d = sourceDestination.ToDictionary(k => k.Key.ToLower(), v => v.Value);
 
 
-            ReadZipfileEntries(packageFilePath, (entry, stream) =>
+            ReadZipfileEntries(packageFilePath, entry =>
             {
                 string fileName = (Path.GetFileName(entry.Name) ?? string.Empty).ToLower();
                 if (fileName == string.Empty) { return true; }
@@ -86,8 +86,9 @@ namespace Umbraco.Core.Packaging
                 if (string.IsNullOrEmpty(fileName) == false && d.TryGetValue(fileName, out destination))
                 {
                     using (var streamWriter = File.Open(destination, FileMode.Create))
+                    using (var entryStream = entry.Open())
                     {
-                        stream.CopyTo(streamWriter);
+                        entryStream.CopyTo(streamWriter);
                     }
 
                     d.Remove(fileName);
@@ -106,7 +107,7 @@ namespace Umbraco.Core.Packaging
         {
             var retVal = expectedFiles.ToList();
 
-            ReadZipfileEntries(packageFilePath, (zipEntry, stream) =>
+            ReadZipfileEntries(packageFilePath, zipEntry =>
             {
                 string fileName = Path.GetFileName(zipEntry.Name);
 
@@ -125,7 +126,7 @@ namespace Umbraco.Core.Packaging
             var dictionary = new Dictionary<string, List<string>>();
 
 
-            ReadZipfileEntries(packageFilePath, (entry, stream) =>
+            ReadZipfileEntries(packageFilePath, entry =>
             {
                 string fileName = (Path.GetFileName(entry.Name) ?? string.Empty).ToLower();
 
@@ -148,53 +149,42 @@ namespace Umbraco.Core.Packaging
         {
             CheckPackageExists(packageFilePath);
 
-            var files = new HashSet<string>(filesToGet.Select(f => f.ToLower()));
+            var files = new HashSet<string>(filesToGet.Select(f => f.ToLowerInvariant()));
 
             using (var fs = File.OpenRead(packageFilePath))
+            using (var zipArchive = new ZipArchive(fs))
             {
-                using (var zipInputStream = new ZipInputStream(fs))
+                foreach (var zipEntry in zipArchive.Entries)
                 {
-                    ZipEntry zipEntry;
-                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
-                    {
-                        
-                        if (zipEntry.IsDirectory) continue;
+                    if (zipEntry.Name.IsNullOrWhiteSpace() && zipEntry.FullName.EndsWith("/")) continue;
 
-                        if (files.Contains(zipEntry.Name))
+                    if (files.Contains(zipEntry.Name.ToLowerInvariant()))
+                    {
+                        using (var memStream = new MemoryStream())
+                        using (var entryStream = zipEntry.Open())
                         {
-                            using (var memStream = new MemoryStream())
-                            {
-                                zipInputStream.CopyTo(memStream);
-                                yield return memStream.ToArray();
-                                memStream.Close();
-                            }
+                            entryStream.CopyTo(memStream);
+                            memStream.Close();
+                            yield return memStream.ToArray();
                         }
                     }
-
-                    zipInputStream.Close();
                 }
-                fs.Close();
             }
         }
 
-        private void ReadZipfileEntries(string packageFilePath, Func<ZipEntry, ZipInputStream, bool> entryFunc, bool skipsDirectories = true)
+        private void ReadZipfileEntries(string packageFilePath, Func<ZipArchiveEntry, bool> entryFunc, bool skipsDirectories = true)
         {
             CheckPackageExists(packageFilePath);
 
             using (var fs = File.OpenRead(packageFilePath))
+            using (var zipArchive = new ZipArchive(fs))
             {
-                using (var zipInputStream = new ZipInputStream(fs))
+                foreach (var zipEntry in zipArchive.Entries)
                 {
-                    ZipEntry zipEntry;
-                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
-                    {
-                        if (zipEntry.IsDirectory && skipsDirectories) continue;
-                        if (entryFunc(zipEntry, zipInputStream) == false) break;
-                    }
-
-                    zipInputStream.Close();
+                    if (zipEntry.Name.IsNullOrWhiteSpace() && zipEntry.FullName.EndsWith("/") && skipsDirectories)
+                        continue;
+                    if (entryFunc(zipEntry) == false) break;
                 }
-                fs.Close();
             }
         }
     }

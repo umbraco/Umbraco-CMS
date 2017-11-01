@@ -636,9 +636,19 @@
     clear: both;
 }
 
-.umb-grid .mce-btn button {
-    padding: 8px 6px;
-    line-height: inherit;
+.umb-grid .mce-btn {
+    button {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 6px;
+        line-height: inherit;
+    }
+
+    &:not(.mce-menubtn) {
+        button {
+            padding-right: 6px;
+        }
+    }
 }
 
 .umb-grid .mce-toolbar {

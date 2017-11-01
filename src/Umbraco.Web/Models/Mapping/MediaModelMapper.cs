@@ -42,6 +42,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.ContentType, expression => expression.ResolveUsing<MediaTypeBasicResolver>())
+                .ForMember(display => display.MediaLink, expression => expression.ResolveUsing(
+                    content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, applicationContext.ProfilingLogger.Logger))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
@@ -64,7 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
-                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());            
         }
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
@@ -87,53 +90,32 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
             }
 
-            var genericProperties = new List<ContentPropertyDisplay>
+            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText);
+        }
+
+        /// <summary>
+        /// Resolves a <see cref="ContentTypeBasic"/> from the <see cref="IContent"/> item and checks if the current user
+        /// has access to see this data
+        /// </summary>
+        private class MediaTypeBasicResolver : ValueResolver<IMedia, ContentTypeBasic>
+        {
+            protected override ContentTypeBasic ResolveCore(IMedia source)
             {
-                new ContentPropertyDisplay
+                //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
+                //If this is a web request and there's a user signed in and the 
+                // user has access to the settings section, we will 
+                if (HttpContext.Current != null && UmbracoContext.Current != null &&
+                    UmbracoContext.Current.Security.CurrentUser != null
+                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants
+                        .Applications.Settings)))
                 {
-                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/mediatype"),
-                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    var contentTypeBasic = Mapper.Map<ContentTypeBasic>(source.ContentType);
+                    return contentTypeBasic;
                 }
-            };
+                //no access
+                return null;
+            }
 
-            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties, properties =>
-            {
-                if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
-                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-                {
-                    var mediaTypeLink = string.Format("#/settings/mediatypes/edit/{0}", media.ContentTypeId);
-
-                    //Replace the doctype property
-                    var docTypeProperty = properties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    docTypeProperty.Value = new List<object>
-                    {
-                        new
-                        {
-                            linkText = media.ContentType.Name,
-                            url = mediaTypeLink,
-                            target = "_self",
-                            icon = "icon-item-arrangement"
-                        }
-                    };
-                    docTypeProperty.View = "urllist";
-                }
-
-                // inject 'Link to media' as the first generic property
-                var links = media.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger);
-                if (links.Any())
-                {
-                    var link = new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("media/urls"),
-                        Value = string.Join(",", links),
-                        View = "urllist"
-                    };
-                    properties.Insert(0, link);
-                }
-            });
         }
     }
 }
