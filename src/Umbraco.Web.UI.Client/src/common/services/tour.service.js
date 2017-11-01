@@ -11,6 +11,7 @@
                 "name": "Introduction",
                 "alias": "umbIntroIntroduction",
                 "group": "Getting Started",
+                "allowDisable": true,
                 "steps": [
                     {
                         title: "Welcome to Umbraco - The Friendly CMS",
@@ -419,13 +420,20 @@
             currentTour = tour;
         }
 
-        function endTour() {
+        function endTour(tour) {
+            eventsService.emit("appState.tour.end", tour);
             currentTour = null;
-            eventsService.emit("appState.tour.end");
+        }
+
+        function disableTour(tour) {
+            tour.disabled = true;
+            saveInLocalStorage(tour);
+            eventsService.emit("appState.tour.end", tour);
             currentTour = null;
         }
 
         function completeTour(tour) {
+            tour.completed = true;
             saveInLocalStorage(tour);
             eventsService.emit("appState.tour.complete", tour);
             currentTour = null;
@@ -452,8 +460,16 @@
         }
 
         function getCompletedTours() {
-            var completedTours = localStorageService.get(localStorageKey);
+            var storedTours = localStorageService.get(localStorageKey);
+            var completedTours = _.where(storedTours, {completed: true});
             var aliases = _.pluck(completedTours, "alias");
+            return aliases;
+        }
+
+        function getDisabledTours() {
+            var storedTours = localStorageService.get(localStorageKey);
+            var disabledTours = _.where(storedTours, {disabled: true});
+            var aliases = _.pluck(disabledTours, "alias");
             return aliases;
         }
 
@@ -483,23 +499,28 @@
             var storedTours = [];
             var tourFound = false;
 
+            // check if something exists in local storage
             if (localStorageService.get(localStorageKey)) {
                 storedTours = localStorageService.get(localStorageKey);
             }
 
+            // update existing tour in localstorage if it's already there
             if (storedTours.length > 0) {
                 angular.forEach(storedTours, function (storedTour) {
                     if (storedTour.alias === tour.alias) {
-                        storedTour.completed = true;
+                        storedTour.completed = storedTour.completed ? storedTour.completed : tour.completed;
+                        storedTour.disabled = storedTour.disabled ? storedTour.disabled : tour.disabled;
                         tourFound = true;
                     }
                 });
             }
 
+            // create new entry in local storage
             if (!tourFound) {
                 var storageObject = {
                     "alias": tour.alias,
-                    "completed": true
+                    "completed": tour.completed,
+                    "disabled": tour.disabled
                 };
                 storedTours.push(storageObject);
             }
@@ -511,12 +532,14 @@
         var service = {
             startTour: startTour,
             endTour: endTour,
+            disableTour: disableTour,
             completeTour: completeTour,
             getCurrentTour: getCurrentTour,
             getAllTours: getAllTours,
             getGroupedTours: getGroupedTours,
             getTourByAlias: getTourByAlias,
-            getCompletedTours: getCompletedTours
+            getCompletedTours: getCompletedTours,
+            getDisabledTours: getDisabledTours,            
         };
 
         return service;
