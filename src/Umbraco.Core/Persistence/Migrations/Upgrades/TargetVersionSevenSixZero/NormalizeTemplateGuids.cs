@@ -16,8 +16,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             Execute.Code(UpdateTemplateGuids);
         }
 
-        private static string UpdateTemplateGuids(IUmbracoDatabase database)
+        private static string UpdateTemplateGuids(IMigrationContext context)
         {
+            var database = context.Database;
+
             // we need this migration because ppl running pre-7.6 on Cloud and Courier have templates in different
             // environments having different GUIDs (Courier does not sync template GUIDs) and we need to normalize
             // these GUIDs so templates with the same alias on different environments have the same GUID.

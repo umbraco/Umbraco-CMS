@@ -16,8 +16,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
 
         public override void Up()
         {
-            Execute.Code(database =>
+            Execute.Code(context =>
             {
+                var database = context.Database;
                 var userGroups = database.Fetch<UserGroupDto>(
                     Context.SqlContext.Sql().Select("*")
                         .From<UserGroupDto>()

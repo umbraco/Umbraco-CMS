@@ -5,6 +5,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute
     public interface IExecuteBuilder : IFluentSyntax
     {
         void Sql(string sqlStatement);
-        void Code(Func<IUmbracoDatabase, string> codeStatement);
+        void Code(Func<IMigrationContext, string> codeStatement);
     }
 }

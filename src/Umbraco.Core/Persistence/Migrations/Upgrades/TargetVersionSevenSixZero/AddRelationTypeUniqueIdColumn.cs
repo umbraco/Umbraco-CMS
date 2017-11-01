@@ -28,8 +28,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             }
         }
 
-        private static string UpdateRelationTypeGuids(IUmbracoDatabase database)
+        private static string UpdateRelationTypeGuids(IMigrationContext context)
         {
+            var database = context.Database;
             var updates = database.Query<dynamic>("SELECT id, alias, name FROM umbracoRelationType")
                 .Select(relationType => Tuple.Create((int) relationType.id, ("relationType____" + (string) relationType.alias + "____" + (string) relationType.name).ToGuid()))
                 .ToList();

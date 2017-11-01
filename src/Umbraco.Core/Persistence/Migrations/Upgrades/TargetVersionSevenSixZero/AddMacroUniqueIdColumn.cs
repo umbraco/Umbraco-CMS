@@ -40,8 +40,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             }
         }
 
-        private static string UpdateMacroGuids(IUmbracoDatabase database)
+        private static string UpdateMacroGuids(IMigrationContext context)
         {
+            var database = context.Database;
+
             var updates = database.Query<dynamic>("SELECT id, macroAlias FROM cmsMacro")
                 .Select(macro => Tuple.Create((int) macro.id, ("macro____" + (string) macro.macroAlias).ToGuid()))
                 .ToList();
@@ -52,8 +54,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             return string.Empty;
         }
 
-        private static string UpdateMacroPropertyGuids(IUmbracoDatabase database)
+        private static string UpdateMacroPropertyGuids(IMigrationContext context)
         {
+            var database = context.Database;
+
             var updates = database.Query<dynamic>(@"SELECT cmsMacroProperty.id id, macroPropertyAlias propertyAlias, cmsMacro.macroAlias macroAlias
 FROM cmsMacroProperty
 JOIN cmsMacro ON cmsMacroProperty.macro=cmsMacro.id")

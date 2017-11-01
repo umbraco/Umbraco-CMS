@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.Select("*");
             expected.From("[cmsPropertyData]");
             expected.InnerJoin("[cmsPropertyType]").On("[cmsPropertyData].[propertytypeid] = [cmsPropertyType].[id]");
-            expected.Where("([cmsPropertyData].[contentNodeId] = @0)", 1050);
+            expected.Where("([cmsPropertyData].[nodeId] = @0)", 1050);
             expected.Where("([cmsPropertyData].[versionId] = @0)", new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07"));
 
             var sql = Sql();

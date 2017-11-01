@@ -71,8 +71,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var idGroup in ids)
                 {
                     var propSql = GetPropertySql(Constants.ObjectTypes.Media)
-                        .Where("contentNodeId IN (@ids)", new { ids = idGroup })
-                        .OrderBy("contentNodeId");
+                        .Where("nodeId IN (@ids)", new { ids = idGroup })
+                        .OrderBy("nodeId");
 
                     //This does NOT fetch all data into memory in a list, this will read
                     // over the records as a data reader, this is much better for performance and memory,
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories
                             // use the available enumerator.Current if any else move to next
                             while (hasCurrent || propertyDataSetEnumerator.MoveNext())
                             {
-                                if (propertyDataSetEnumerator.Current.contentNodeId == entity.Id)
+                                if (propertyDataSetEnumerator.Current.nodeId == entity.Id)
                                 {
                                     hasCurrent = false; // enumerator.Current is not available
 
@@ -102,9 +102,9 @@ namespace Umbraco.Core.Persistence.Repositories
                                     entity.AdditionalData[propertyDataSetEnumerator.Current.propertyTypeAlias] = new UmbracoEntity.EntityProperty
                                     {
                                         PropertyEditorAlias = propertyDataSetEnumerator.Current.propertyEditorAlias,
-                                        Value = StringExtensions.IsNullOrWhiteSpace(propertyDataSetEnumerator.Current.dataNtext)
-                                            ? propertyDataSetEnumerator.Current.dataNvarchar
-                                            : StringExtensions.ConvertToJsonIfPossible(propertyDataSetEnumerator.Current.dataNtext)
+                                        Value = StringExtensions.IsNullOrWhiteSpace(propertyDataSetEnumerator.Current.textValue)
+                                            ? propertyDataSetEnumerator.Current.varcharValue
+                                            : StringExtensions.ConvertToJsonIfPossible(propertyDataSetEnumerator.Current.textValue)
                                     };
                                 }
                                 else
@@ -418,7 +418,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private Sql<ISqlContext> GetPropertySql(Guid nodeObjectType)
         {
             var sql = Sql()
-                .Select("contentNodeId, versionId, dataNvarchar, dataNtext, propertyEditorAlias, alias as propertyTypeAlias")
+                .Select("nodeId, versionId, varcharValue, textValue, propertyEditorAlias, alias as propertyTypeAlias")
                 .From<PropertyDataDto>()
                 .InnerJoin<NodeDto>()
                 .On<PropertyDataDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
@@ -433,7 +433,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private Sql<ISqlContext> GetFullSqlForMedia(Sql<ISqlContext> entitySql, Action<Sql<ISqlContext>> filter = null)
         {
-            //this will add any dataNvarchar property to the output which can be added to the additional properties
+            //this will add any varcharValue property to the output which can be added to the additional properties
 
             var sql = GetPropertySql(Constants.ObjectTypes.Media);
 
@@ -448,7 +448,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Append(entitySql)
                 .Append(") tmpTbl LEFT JOIN (")
                 .Append(sql)
-                .Append(") as property ON id = property.contentNodeId")
+                .Append(") as property ON id = property.nodeId")
                 .OrderBy("sortOrder, id");
 
             return wrappedSql;
@@ -661,11 +661,11 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("propertyTypeAlias")]
             public string PropertyAlias { get; set; }
 
-            [Column("dataNvarchar")]
-            public string NVarcharValue { get; set; }
+            [Column("varcharValue")]
+            public string VarcharValue { get; set; }
 
-            [Column("dataNtext")]
-            public string NTextValue { get; set; }
+            [Column("textValue")]
+            public string TextValue { get; set; }
         }
 
         /// <summary>
@@ -707,8 +707,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 string pPropertyEditorAlias = a.propertyEditorAlias;
                 var pExists = pPropertyEditorAlias != null;
                 string pPropertyAlias = a.propertyTypeAlias;
-                string pNTextValue = a.dataNtext;
-                string pNVarcharValue = a.dataNvarchar;
+                string pTextValue = a.textValue;
+                string pNVarcharValue = a.varcharValue;
 
                 // Is this the same UmbracoEntity as the current one we're processing
                 if (Current != null && Current.Key == a.uniqueID)
@@ -719,9 +719,9 @@ namespace Umbraco.Core.Persistence.Repositories
                         Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
                         {
                             PropertyEditorAlias = pPropertyEditorAlias,
-                            Value = pNTextValue.IsNullOrWhiteSpace()
+                            Value = pTextValue.IsNullOrWhiteSpace()
                                 ? pNVarcharValue
-                                : pNTextValue.ConvertToJsonIfPossible()
+                                : pTextValue.ConvertToJsonIfPossible()
                         };
                     }
 
@@ -745,9 +745,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
                     {
                         PropertyEditorAlias = pPropertyEditorAlias,
-                        Value = pNTextValue.IsNullOrWhiteSpace()
+                        Value = pTextValue.IsNullOrWhiteSpace()
                             ? pNVarcharValue
-                            : pNTextValue.ConvertToJsonIfPossible()
+                            : pTextValue.ConvertToJsonIfPossible()
                     };
                 }
 

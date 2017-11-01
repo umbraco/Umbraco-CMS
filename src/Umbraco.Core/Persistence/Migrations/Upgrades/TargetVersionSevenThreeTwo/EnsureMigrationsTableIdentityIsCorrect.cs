@@ -29,8 +29,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
                 return string.Empty;
             });
             Delete.FromTable("umbracoMigration").AllRows();
-            Execute.Code(database =>
+            Execute.Code(context =>
             {
+                var database = context.Database;
                 if (migrations != null)
                 {
                     foreach (var migration in migrations)

@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations
         public string GetSql()
         {
             var sb = new StringBuilder();
-            foreach (var sql in Expressions.Select(x => x.Process(Database)))
+            foreach (var sql in Expressions.Select(x => x.Process(this)))
             {
                 sb.Append(sql);
                 sb.AppendLine();

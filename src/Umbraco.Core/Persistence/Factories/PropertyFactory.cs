@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Factories
                 var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
                 var property = propertyDataDto == null
                                    ? propertyType.CreatePropertyFromValue(null)
-                                   : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
+                                   : propertyType.CreatePropertyFromRawValue(propertyDataDto.Value,
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
                 try
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     if (property.Value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias)
                     {
-                        dto.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
+                        dto.IntegerValue = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
                                           ? 0
                                           : Convert.ToInt32(property.Value);
                     }
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Persistence.Factories
                         int val;
                         if ((property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false) && int.TryParse(property.Value.ToString(), out val))
                         {
-                            dto.Integer = val;
+                            dto.IntegerValue = val;
                         }
                     }
                 }
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Factories
                     decimal val;
                     if (decimal.TryParse(property.Value.ToString(), out val))
                     {
-                        dto.Decimal = val; // property value should be normalized already
+                        dto.DecimalValue = val; // property value should be normalized already
                     }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
@@ -113,16 +113,16 @@ namespace Umbraco.Core.Persistence.Factories
                     DateTime date;
                     if (DateTime.TryParse(property.Value.ToString(), out date))
                     {
-                        dto.Date = date;
+                        dto.DateValue = date;
                     }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
                 {
-                    dto.Text = property.Value.ToString();
+                    dto.TextValue = property.Value.ToString();
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && property.Value != null)
                 {
-                    dto.VarChar = property.Value.ToString();
+                    dto.VarcharValue = property.Value.ToString();
                 }
 
                 propertyDataDtos.Add(dto);

@@ -16,8 +16,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             Execute.Code(MigrationCode);
         }
 
-        private string MigrationCode(IUmbracoDatabase database)
+        private string MigrationCode(IMigrationContext context)
         {
+            var database = context.Database;
             var umbracoRedirectUrlTableName = "umbracoRedirectUrl";
             var local = Context.GetLocalMigration();
 

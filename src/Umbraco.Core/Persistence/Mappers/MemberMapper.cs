@@ -38,22 +38,22 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Member, MemberDto>(src => src.Username, dto => dto.LoginName);
             CacheMap<Member, MemberDto>(src => src.RawPasswordValue, dto => dto.Password);
 
-            CacheMap<Member, PropertyDataDto>(src => src.IsApproved, dto => dto.Integer);
-            CacheMap<Member, PropertyDataDto>(src => src.IsLockedOut, dto => dto.Integer);
-            CacheMap<Member, PropertyDataDto>(src => src.Comments, dto => dto.Text);
-            CacheMap<Member, PropertyDataDto>(src => src.RawPasswordAnswerValue, dto => dto.VarChar);
-            CacheMap<Member, PropertyDataDto>(src => src.PasswordQuestion, dto => dto.VarChar);
-            CacheMap<Member, PropertyDataDto>(src => src.FailedPasswordAttempts, dto => dto.Integer);
-            CacheMap<Member, PropertyDataDto>(src => src.LastLockoutDate, dto => dto.Date);
-            CacheMap<Member, PropertyDataDto>(src => src.LastLoginDate, dto => dto.Date);
-            CacheMap<Member, PropertyDataDto>(src => src.LastPasswordChangeDate, dto => dto.Date);
+            CacheMap<Member, PropertyDataDto>(src => src.IsApproved, dto => dto.IntegerValue);
+            CacheMap<Member, PropertyDataDto>(src => src.IsLockedOut, dto => dto.IntegerValue);
+            CacheMap<Member, PropertyDataDto>(src => src.Comments, dto => dto.TextValue);
+            CacheMap<Member, PropertyDataDto>(src => src.RawPasswordAnswerValue, dto => dto.VarcharValue);
+            CacheMap<Member, PropertyDataDto>(src => src.PasswordQuestion, dto => dto.VarcharValue);
+            CacheMap<Member, PropertyDataDto>(src => src.FailedPasswordAttempts, dto => dto.IntegerValue);
+            CacheMap<Member, PropertyDataDto>(src => src.LastLockoutDate, dto => dto.DateValue);
+            CacheMap<Member, PropertyDataDto>(src => src.LastLoginDate, dto => dto.DateValue);
+            CacheMap<Member, PropertyDataDto>(src => src.LastPasswordChangeDate, dto => dto.DateValue);
 
             /* Internal experiment */
-            CacheMap<Member, PropertyDataDto>(src => src.DateTimePropertyValue, dto => dto.Date);
-            CacheMap<Member, PropertyDataDto>(src => src.IntegerPropertyValue, dto => dto.Integer);
-            CacheMap<Member, PropertyDataDto>(src => src.BoolPropertyValue, dto => dto.Integer);
-            CacheMap<Member, PropertyDataDto>(src => src.LongStringPropertyValue, dto => dto.Text);
-            CacheMap<Member, PropertyDataDto>(src => src.ShortStringPropertyValue, dto => dto.VarChar);
+            CacheMap<Member, PropertyDataDto>(src => src.DateTimePropertyValue, dto => dto.DateValue);
+            CacheMap<Member, PropertyDataDto>(src => src.IntegerPropertyValue, dto => dto.IntegerValue);
+            CacheMap<Member, PropertyDataDto>(src => src.BoolPropertyValue, dto => dto.IntegerValue);
+            CacheMap<Member, PropertyDataDto>(src => src.LongStringPropertyValue, dto => dto.TextValue);
+            CacheMap<Member, PropertyDataDto>(src => src.ShortStringPropertyValue, dto => dto.VarcharValue);
             CacheMap<Member, PropertyTypeDto>(src => src.PropertyTypeAlias, dto => dto.Alias);
         }
     }

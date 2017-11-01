@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
             Execute.Code(MigrationCode);
         }
 
-        private string MigrationCode(IUmbracoDatabase database)
+        private string MigrationCode(IMigrationContext context)
         {
             var local = Context.GetLocalMigration();
 

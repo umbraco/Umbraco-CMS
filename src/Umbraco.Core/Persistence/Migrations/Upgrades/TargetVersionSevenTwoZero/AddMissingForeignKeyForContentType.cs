@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
                     Delete.FromTable("cmsTagRelationship").Row(new { nodeId = orphanedId });
                     Delete.FromTable("umbracoDomains").Row(new { domainRootStructureID = orphanedId });
                     Delete.FromTable("cmsDocument").Row(new { nodeId = orphanedId });
-                    Delete.FromTable("cmsPropertyData").Row(new { contentNodeId = orphanedId });
+                    Delete.FromTable("cmsPropertyData").Row(new { nodeId = orphanedId });
                     Delete.FromTable("cmsMember2MemberGroup").Row(new { Member = orphanedId });
                     Delete.FromTable("cmsMember").Row(new { nodeId = orphanedId });
                     Delete.FromTable("cmsPreviewXml").Row(new { nodeId = orphanedId });

@@ -17,8 +17,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             //Now we need to check if we can actually d6 this because we won't be able to if there's data in there that is too long
             //http://issues.umbraco.org/issue/U4-9758
 
-            Execute.Code(database =>
+            Execute.Code(context =>
             {
+                var database = context.Database;
                 var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(database);
 
                 var colLen = (SqlSyntax is MySqlSyntaxProvider)

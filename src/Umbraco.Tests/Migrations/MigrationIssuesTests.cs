@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Migrations
                 {
                     NodeId = n.NodeId,
                     PropertyTypeId = pt.Id,
-                    Text = "text",
+                    TextValue = "text",
                     VersionId = Guid.NewGuid()
                 };
                 database.Insert(data);
@@ -91,20 +91,20 @@ namespace Umbraco.Tests.Migrations
                 {
                     NodeId = n.NodeId,
                     PropertyTypeId = pt.Id,
-                    Text = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
+                    TextValue = "<root><node title=\"\" type=\"\" newwindow=\"\" link=\"\" /></root>",
                     VersionId = Guid.NewGuid()
                 };
                 database.Insert(data);
                 var migrationContext = new MigrationContext(database, Logger);
 
                 var migration = new UpdateRelatedLinksData(migrationContext);
-                migration.UpdateRelatedLinksDataDo(database);
+                migration.UpdateRelatedLinksDataDo(migrationContext);
 
                 data = database.Fetch<PropertyDataDto>("SELECT * FROM cmsPropertyData WHERE id=" + data.Id).FirstOrDefault();
                 Assert.IsNotNull(data);
-                Debug.Print(data.Text);
+                Debug.Print(data.TextValue);
                 Assert.AreEqual("[{\"title\":\"\",\"caption\":\"\",\"link\":\"\",\"newWindow\":false,\"type\":\"external\",\"internal\":null,\"edit\":false,\"isInternal\":false}]",
-                    data.Text);
+                    data.TextValue);
             }
         }
 

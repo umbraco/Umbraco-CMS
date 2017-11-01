@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM cmsDocument WHERE nodeId = @Id",
-                               "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsPropertyData WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
                                "DELETE FROM umbracoNode WHERE id = @Id"
@@ -189,12 +189,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
-            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarChar== umbracoFileValue));
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarChar == mediaPath));
+            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue== umbracoFileValue));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue == mediaPath));
 
             // If no result so far, try getting from a json value stored in the ntext / nvarchar column
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("dataNtext LIKE @0", "%" + umbracoFileValue + "%"));
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("dataNvarchar LIKE @0", "%" + umbracoFileValue + "%"));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("textValue LIKE @0", "%" + umbracoFileValue + "%"));
+            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("varcharValue LIKE @0", "%" + umbracoFileValue + "%"));
 
             return nodeId < 0 ? null : Get(nodeId);
         }
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // raise event first else potential FK issues
             OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
 
-            Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
         }
 

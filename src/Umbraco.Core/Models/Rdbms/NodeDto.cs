@@ -5,56 +5,57 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName(Constants.DatabaseSchema.Tables.Node)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class NodeDto
     {
+        private const string TableName = Constants.DatabaseSchema.Tables.Node;
         public const int NodeIdSeed = 1060;
 
         [Column("id")]
-        [PrimaryKeyColumn(Name = "PK_structure", IdentitySeed = NodeIdSeed)]
+        [PrimaryKeyColumn(Name = "PK_" + TableName, IdentitySeed = NodeIdSeed)]
         public int NodeId { get; set; }
 
-        [Column("trashed")]
-        [Constraint(Default = "0")]
-        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeTrashed")]
-        public bool Trashed { get; set; }
+        [Column("uniqueId")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_UniqueId")]
+        [Constraint(Default = SystemMethods.NewGuid)]
+        public Guid UniqueId { get; set; }
 
-        [Column("parentID")]
+        [Column("parentId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeParentId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ParentId")]
         public int ParentId { get; set; }
-
-        [Column("nodeUser")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public int? UserId { get; set; }
 
         [Column("level")]
         public short Level { get; set; }
 
         [Column("path")]
         [Length(150)]
-        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodePath")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Path")]
         public string Path { get; set; }
 
         [Column("sortOrder")]
         public int SortOrder { get; set; }
 
-        [Column("uniqueID")]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoNodeUniqueID")]
-        [Constraint(Default = SystemMethods.NewGuid)]
-        public Guid UniqueId { get; set; }
+        [Column("trashed")]
+        [Constraint(Default = "0")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Trashed")]
+        public bool Trashed { get; set; }
+
+        [Column("nodeUser")] // fixme dbfix rename userId
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? UserId { get; set; }
 
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Text { get; set; }
 
-        [Column("nodeObjectType")]
+        [Column("nodeObjectType")] // fixme dbfix rename objectType
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeObjectType")]
-        public Guid? NodeObjectType { get; set; }
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType")]
+        public Guid? NodeObjectType { get; set; } // fixme dbfix rename ObjectType
 
         [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]

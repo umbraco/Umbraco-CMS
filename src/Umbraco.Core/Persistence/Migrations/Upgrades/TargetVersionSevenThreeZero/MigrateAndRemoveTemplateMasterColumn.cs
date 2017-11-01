@@ -54,8 +54,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                     //FROM umbracoNode t1
                     //INNER JOIN cmsTemplate t2
                     //ON t1.id = t2.nodeId");
-            Execute.Code(database =>
+            Execute.Code(context =>
             {
+                var database = context.Database;
                 var templateData = database.Fetch<dynamic>("SELECT * FROM cmsTemplate");
 
                 foreach (var template in templateData)
@@ -72,8 +73,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             });
 
             //Now we can update the path, but this needs to be done in a delegate callback so that the query runs after the updates just completed
-            Execute.Code(database =>
+            Execute.Code(context =>
             {
+                var database = context.Database;
+
                 //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
                 var templates = database.Fetch<dynamic>(Sql().SelectAll().From<TemplateDto>());
                 foreach (var template in templates)

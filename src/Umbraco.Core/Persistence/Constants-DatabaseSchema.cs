@@ -15,19 +15,19 @@ namespace Umbraco.Core
                 public const string Node = /*TableNamePrefix*/ "umbraco" + "Node";
                 public const string NodeData = /*TableNamePrefix*/ "cms" + "ContentNu";
                 public const string NodeXml = /*TableNamePrefix*/ "cms" + "ContentXml";
-                public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // fixme kill merge with ContentXml
+                public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // fixme dbfix kill merge with ContentXml
 
-                public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType"; // fixme rename and split uElementType, uDocumentType
+                public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType"; // fixme dbfixrename and split uElementType, uDocumentType
                 public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
-                public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType"; // fixme must rename corresponding DTO
-                public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType"; // fixme why can't we just use uNode for this?
+                public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType"; // fixme dbfixmust rename corresponding DTO
+                public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType"; // fixme dbfixwhy can't we just use uNode for this?
                 public const string DataType = /*TableNamePrefix*/ "cms" + "DataType";
-                public const string DataTypePreValue = /*TableNamePrefix*/ "cms" + "DataTypePreValues"; // fixme kill merge with uDataType
+                public const string DataTypePreValue = /*TableNamePrefix*/ "cms" + "DataTypePreValues"; // fixme dbfixkill merge with uDataType
                 public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 
-                public const string Content = /*TableNamePrefix*/ "cms" + "Content"; // fixme merge into uDocument
-                public const string ContentVersion = /*TableNamePrefix*/ "cms" + "ContentVersion"; // fixme rename uDocumentVersion
-                public const string Document = /*TableNamePrefix*/ "cms" + "Document"; // fixme merge with others + no more version here
+                public const string Content = /*TableNamePrefix*/ "cms" + "Content"; // fixme dbfix merge into uDocument
+                public const string ContentVersion = /*TableNamePrefix*/ "cms" + "ContentVersion"; // fixme dbfix rename uDocumentVersion
+                public const string Document = /*TableNamePrefix*/ "cms" + "Document"; // fixme dbfix merge with others + no more version here
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";

@@ -975,6 +975,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Delete\Table\DeleteTableBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\ExecuteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Execute\ExecuteBuilderExtensions.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteCodeStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\IExecuteBuilder.cs" />
@@ -1013,6 +1014,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockObjects.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddLockTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\AddRedirectUrlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\VariantsMigration.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\RefactorXmlColumns.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionEight\Seven1.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFiveFive\AddLockObjects.cs" />

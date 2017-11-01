@@ -322,10 +322,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
             // from most recent content version for the given order by field
-            var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, "dataInt");
-            var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, "dataDate");
-            var sortedString = "COALESCE(dataNvarchar,'')"; // assuming COALESCE is ok for all syntaxes
-            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "dataDecimal");
+            var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, "intValue");
+            var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, "dateValue");
+            var sortedString = "COALESCE(varcharValue,'')"; // assuming COALESCE is ok for all syntaxes
+            var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "decimalValue");
 
             // variable query fragments that depend on what we are querying
             string andVersion, andNewest, idField;
@@ -353,14 +353,14 @@ namespace Umbraco.Core.Persistence.Repositories
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
             var outerJoinTempTable = $@"LEFT OUTER JOIN (
                     SELECT CASE
-                        WHEN dataInt IS NOT NULL THEN {sortedInt}
-                        WHEN dataDecimal IS NOT NULL THEN {sortedDecimal}
-                        WHEN dataDate IS NOT NULL THEN {sortedDate}
+                        WHEN intValue IS NOT NULL THEN {sortedInt}
+                        WHEN decimalValue IS NOT NULL THEN {sortedDecimal}
+                        WHEN dateValue IS NOT NULL THEN {sortedDate}
                         ELSE {sortedString}
                     END AS CustomPropVal,
                     cd.{idField} AS CustomPropValContentId
                     FROM {table} cd
-                    INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = cd.{idField}{andVersion}
+                    INNER JOIN cmsPropertyData cpd ON cpd.nodeId = cd.{idField}{andVersion}
                     INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
                     WHERE cpt.Alias = @{sql.Arguments.Length}{andNewest}) AS CustomPropData
                     ON CustomPropData.CustomPropValContentId = umbracoNode.id "; // trailing space is important!
@@ -731,8 +731,8 @@ INNER JOIN cmsPropertyType
 ON cmsPropertyData.propertytypeid = cmsPropertyType.id
 INNER JOIN
     (" + string.Format(parsedOriginalSql, "cmsContent.nodeId, cmsContentVersion.VersionId") + @") as docData
-ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.contentNodeId = docData.nodeId
-ORDER BY contentNodeId, versionId, propertytypeid
+ON cmsPropertyData.versionId = docData.VersionId AND cmsPropertyData.nodeId = docData.nodeId
+ORDER BY nodeId, versionId, propertytypeid
 ", docSql.Arguments);
 
             //This does NOT fetch all data into memory in a list, this will read

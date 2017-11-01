@@ -327,7 +327,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
-                "cmsPropertyData.dataDate", "cmsPropertyData.dataInt", "cmsPropertyData.dataNtext", "cmsPropertyData.dataNvarchar",
+                "cmsPropertyData.dateValue", "cmsPropertyData.intValue", "cmsPropertyData.textValue", "cmsPropertyData.varcharValue",
                 "cmsPropertyType.id", "cmsPropertyType.Alias", "cmsPropertyType.Description",
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
                 "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",

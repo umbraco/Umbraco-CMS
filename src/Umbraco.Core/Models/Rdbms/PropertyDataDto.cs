@@ -4,91 +4,97 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyData)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyDataDto
     {
+        private const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
+        public const int VarcharLength = 512;
+        public const int SegmentLength = 256;
+
+        private decimal? _decimalValue;
+
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
-        [Column("contentNodeId")]
+        [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyData_1", ForColumns = "contentNodeId,versionId,propertytypeid")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,versionId,propertyTypeId")]
         public int NodeId { get; set; }
 
         [Column("versionId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_2")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionId")]
         public Guid? VersionId { get; set; }
 
-        [Column("propertytypeid")]
+        [Column("propertyTypeId")]
         [ForeignKey(typeof(PropertyTypeDto))]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_3")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_PropertyTypeId")]
         public int PropertyTypeId { get; set; }
 
-        [Column("dataInt")]
+        [Column("languageId")]
+        [ForeignKey(typeof(LanguageDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int? Integer { get; set; }
+        public int LanguageId { get; set; }
 
-        private decimal? _decimalValue;
-
-        [Column("dataDecimal")]
+        [Column("segment")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Segment")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public decimal? Decimal
+        [Length(SegmentLength)]
+        public string Segment { get; set; }
+
+        [Column("intValue")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? IntegerValue { get; set; }
+
+        [Column("decimalValue")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public decimal? DecimalValue
         {
             get => _decimalValue;
             set => _decimalValue = value?.Normalize();
         }
 
-        [Column("dataDate")]
+        [Column("dateValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public DateTime? Date { get; set; }
+        public DateTime? DateValue { get; set; }
 
-        [Column("dataNvarchar")]
+        [Column("varcharValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(500)]
-        public string VarChar { get; set; }
+        [Length(VarcharLength)]
+        public string VarcharValue { get; set; }
 
-        [Column("dataNtext")]
+        [Column("textValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
-        public string Text { get; set; }
+        public string TextValue { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "PropertyTypeId")]
         public PropertyTypeDto PropertyTypeDto { get; set; }
 
         [Ignore]
-        public object GetValue
+        public object Value
         {
             get
             {
-                if (Integer.HasValue)
-                {
-                    return Integer.Value;
-                }
+                if (IntegerValue.HasValue)
+                    return IntegerValue.Value;
 
-                if (Decimal.HasValue)
-                {
-                    return Decimal.Value;
-                }
+                if (DecimalValue.HasValue)
+                    return DecimalValue.Value;
 
-                if (Date.HasValue)
-                {
-                    return Date.Value;
-                }
+                if (DateValue.HasValue)
+                    return DateValue.Value;
 
-                if (string.IsNullOrEmpty(VarChar) == false)
-                {
-                    return VarChar;
-                }
+                if (!string.IsNullOrEmpty(VarcharValue))
+                    return VarcharValue;
 
-                if (string.IsNullOrEmpty(Text) == false)
-                {
-                    return Text;
-                }
+                if (!string.IsNullOrEmpty(TextValue))
+                    return TextValue;
 
                 return null;
             }
@@ -103,12 +109,13 @@ namespace Umbraco.Core.Models.Rdbms
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((PropertyDataDto) obj);
         }
 
         public override int GetHashCode()
         {
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
             return Id;
         }
     }

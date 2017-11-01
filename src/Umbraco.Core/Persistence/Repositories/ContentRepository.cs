@@ -194,7 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM umbracoDomains WHERE domainRootStructureID = @Id",
                                "DELETE FROM cmsDocument WHERE nodeId = @Id",
-                               "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsPropertyData WHERE nodeId = @Id",
                                "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
@@ -274,7 +274,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // raise event first else potential FK issues
             OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
 
-            Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
         }

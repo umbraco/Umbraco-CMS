@@ -21,8 +21,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSixZero
             {
                 //This will remove any corrupt/duplicate data in the relation table before the index is applied
                 //Ensure this executes in a defered block which will be done inside of the migration transaction
-                this.Execute.Code(database =>
+                this.Execute.Code(context =>
                 {
+                    var database = context.Database;
+
                     //We need to check if this index has corrupted data and then clear that data
                     var duplicates = database.Fetch<dynamic>("SELECT parentId,childId,relType FROM umbracoRelation GROUP BY parentId,childId,relType HAVING COUNT(*) > 1");
                     if (duplicates.Count > 0)

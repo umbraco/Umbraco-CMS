@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
         public virtual string OldName { get; set; }
         public virtual string NewName { get; set; }
 
-        public override string Process(IUmbracoDatabase database)
+        public override string Process(IMigrationContext context)
         {
             if (CurrentDatabaseType.IsMySql())
             {
@@ -35,7 +35,7 @@ SELECT CONCAT(
   FROM INFORMATION_SCHEMA.COLUMNS
  WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", TableName, OldName);
 
-                var columnDefinition = database.ExecuteScalar<string>(columnDefinitionSql);
+                var columnDefinition = context.Database.ExecuteScalar<string>(columnDefinitionSql);
                 return this.ToString() + " " + columnDefinition;
             }
 

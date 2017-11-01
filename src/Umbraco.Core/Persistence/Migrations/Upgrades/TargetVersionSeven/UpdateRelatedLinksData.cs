@@ -30,8 +30,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             Execute.Code(UpdateRelatedLinksDataDo);
         }
 
-        public string UpdateRelatedLinksDataDo(IDatabase database)
+        public string UpdateRelatedLinksDataDo(IMigrationContext context)
         {
+            var database = context?.Database;
             if (database != null)
             {
                 var dtSql = Sql().Select("nodeId").From<DataTypeDto>()
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         + " WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { /*dataTypeIds =*/ dataTypeIds });
                 if (propertyData.Any() == false) return string.Empty;
 
-                var nodesIdsWithProperty = propertyData.Select(x => (int) x.contentNodeId).Distinct().ToArray();
+                var nodesIdsWithProperty = propertyData.Select(x => (int) x.nodeId).Distinct().ToArray();
 
                 var cmsContentXmlEntries = new List<ContentXmlDto>();
                 //We're doing an "IN" query here but SQL server only supports 2100 query parameters so we're going to split on that
@@ -65,25 +66,25 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
                 foreach (var data in propertyData)
                 {
-                    if (string.IsNullOrEmpty(data.dataNtext) == false)
+                    if (string.IsNullOrEmpty(data.textValue) == false)
                     {
                         XmlDocument xml;
                         //fetch the current data (that's in xml format)
                         try
                         {
                             xml = new XmlDocument();
-                            xml.LoadXml(data.dataNtext);
+                            xml.LoadXml(data.textValue);
                         }
                         catch (Exception ex)
                         {
                             int dataId = data.id;
-                            int dataNodeId = data.contentNodeId;
-                            string dataText = data.dataNtext;
+                            int dataNodeId = data.nodeId;
+                            string dataText = data.textValue;
                             Logger.Error<UpdateRelatedLinksData>("The data stored for property id " + dataId + " on document " + dataNodeId +
                                 " is not valid XML, the data will be removed because it cannot be converted to the new format. The value was: " + dataText, ex);
 
-                            data.dataNtext = "";
-                            database.Update("cmsPropertyData", "id", data, new[] { "dataNText" });
+                            data.textValue = "";
+                            database.Update("cmsPropertyData", "id", data, new[] { "textValue" });
 
                             UpdateXmlTable(propertyTypes, data, cmsContentXmlEntries, database);
 
@@ -116,9 +117,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
 
                         //store the serialized data
-                        data.dataNtext = JsonConvert.SerializeObject(links);
+                        data.textValue = JsonConvert.SerializeObject(links);
 
-                        database.Update("cmsPropertyData", "id", data, new[] { "dataNText" });
+                        database.Update("cmsPropertyData", "id", data, new[] { "textValue" });
 
                         UpdateXmlTable(propertyTypes, data, cmsContentXmlEntries, database);
 
@@ -139,14 +140,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             var propertyType = propertyTypes.SingleOrDefault(x => x.Id == data.propertytypeid);
             if (propertyType != null)
             {
-                var xmlItem = cmsContentXmlEntries.SingleOrDefault(x => x.NodeId == data.contentNodeId);
+                var xmlItem = cmsContentXmlEntries.SingleOrDefault(x => x.NodeId == data.nodeId);
                 if (xmlItem != null)
                 {
                     var x = XElement.Parse(xmlItem.Xml);
                     var prop = x.Element(propertyType.Alias);
                     if (prop != null)
                     {
-                        prop.ReplaceAll(new XCData(data.dataNtext));
+                        prop.ReplaceAll(new XCData(data.textValue));
                         database.Update(xmlItem);
                     }
                 }

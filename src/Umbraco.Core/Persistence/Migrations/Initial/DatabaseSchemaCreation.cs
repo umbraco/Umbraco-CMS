@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         #region All Ordered Tables
 
-        private static readonly Dictionary<int, Type> OrderedTables = new Dictionary<int, Type>
+        public static readonly Dictionary<int, Type> OrderedTables = new Dictionary<int, Type>
                                                                           {
                                                                               {0, typeof (NodeDto)},
                                                                               {1, typeof (ContentTypeDto)},

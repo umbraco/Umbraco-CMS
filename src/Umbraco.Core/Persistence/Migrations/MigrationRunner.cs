@@ -186,7 +186,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 int i = 1;
                 foreach (var expression in context.Expressions)
                 {
-                    var sql = expression.Process(context.Database);
+                    var sql = expression.Process(context);
                     if (string.IsNullOrEmpty(sql))
                     {
                         i++;
@@ -211,6 +211,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                 //Execute the SQL up to the point of a GO statement
                                 var exeSql = sb.ToString();
                                 _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
+                                Console.WriteLine("EXEC: " + exeSql);
                                 context.Database.Execute(exeSql);
 
                                 //restart the string builder
@@ -226,6 +227,7 @@ namespace Umbraco.Core.Persistence.Migrations
                         {
                             var exeSql = sb.ToString();
                             _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
+                            Console.WriteLine("EXEC: " + exeSql);
                             context.Database.Execute(exeSql);
                         }
                     }

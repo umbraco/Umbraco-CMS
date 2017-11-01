@@ -32,8 +32,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
         private void EnsureLockObject(int id, string name)
         {
-            Execute.Code(db =>
+            Execute.Code(context =>
             {
+                var db = context.Database;
                 var exists = db.Exists<LockDto>(id);
                 if (exists) return string.Empty;
                 // be safe: delete old umbracoNode lock objects if any

@@ -1150,10 +1150,10 @@ namespace Umbraco.Tests.Services
             }
 
             Assert.AreEqual(1, colResult.Count);
-            Assert.IsTrue(colResult.First().Date.HasValue);
-            Assert.IsFalse(colResult.First().Integer.HasValue);
-            Assert.IsNull(colResult.First().Text);
-            Assert.IsNull(colResult.First().VarChar);
+            Assert.IsTrue(colResult.First().DateValue.HasValue);
+            Assert.IsFalse(colResult.First().IntegerValue.HasValue);
+            Assert.IsNull(colResult.First().TextValue);
+            Assert.IsNull(colResult.First().VarcharValue);
         }
 
         [Test]

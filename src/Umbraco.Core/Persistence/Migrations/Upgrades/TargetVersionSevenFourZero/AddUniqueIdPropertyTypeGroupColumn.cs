@@ -39,8 +39,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
             }
         }
 
-        private static string UpdateGuids(IDatabase database)
+        private static string UpdateGuids(IMigrationContext context)
         {
+            var database = context.Database;
             var updates = new List<Tuple<Guid, int>>();
 
             foreach (var data in database.Query<dynamic>(@"

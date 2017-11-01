@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Migrations.Syntax.Create.Column;
+﻿using System;
+using Umbraco.Core.Persistence.Migrations.Syntax.Create.Column;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Constraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.ForeignKey;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Index;
@@ -9,6 +10,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
     public interface ICreateBuilder : IFluentSyntax
     {
         void Table<T>();
+        void KeysAndIndexes<T>();
+        void KeysAndIndexes(Type typeOfDto);
 
         ICreateTableWithColumnSyntax Table(string tableName);
         ICreateColumnOnTableSyntax Column(string columnName);

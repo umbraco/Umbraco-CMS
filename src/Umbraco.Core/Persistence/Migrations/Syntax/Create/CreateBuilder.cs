@@ -38,6 +38,28 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
                 AddSql(sql);
         }
 
+        public void KeysAndIndexes<T>()
+        {
+            var tableDefinition = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+
+            AddSql(SqlSyntax.FormatPrimaryKey(tableDefinition));
+            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
+                AddSql(sql);
+            foreach (var sql in SqlSyntax.Format(tableDefinition.Indexes))
+                AddSql(sql);
+        }
+
+        public void KeysAndIndexes(Type typeOfDto)
+        {
+            var tableDefinition = DefinitionFactory.GetTableDefinition(typeOfDto, SqlSyntax);
+
+            AddSql(SqlSyntax.FormatPrimaryKey(tableDefinition));
+            foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
+                AddSql(sql);
+            foreach (var sql in SqlSyntax.Format(tableDefinition.Indexes))
+                AddSql(sql);
+        }
+
         private void AddSql(string sql)
         {
             var expression = new ExecuteSqlStatementExpression(_context, _supportedDatabaseTypes) { SqlStatement = sql };

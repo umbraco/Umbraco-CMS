@@ -233,7 +233,7 @@
     <Compile Include="IO\ShadowFileSystemTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
-    <Compile Include="Migrations\CreateTableMigrationTests.cs" />
+    <Compile Include="Migrations\AdvancedMigrationTests.cs" />
     <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
