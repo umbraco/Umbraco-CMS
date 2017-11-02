@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedTextService.Localize("content/createDate"),
                     Description = localizedTextService.Localize("content/createDateDesc"),
-                    Value = display.CreateDate.ToIsoString(),
+                    Value = display.CreateDate.ToString(CultureInfo.CurrentCulture),
                     View = labelEditor
                 },
                 new ContentPropertyDisplay
@@ -92,7 +93,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedTextService.Localize("content/updateDate"),
                     Description = localizedTextService.Localize("content/updateDateDesc"),
-                    Value = display.UpdateDate.ToIsoString(),
+                    Value = display.UpdateDate.ToString(CultureInfo.CurrentCulture),
                     View = labelEditor
                 }
             };
