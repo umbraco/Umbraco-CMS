@@ -3,6 +3,7 @@ using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
@@ -46,8 +47,14 @@ namespace Umbraco.Core.Sync
         // settings: for unit tests only
         internal static void EnsureApplicationUrl(ApplicationContext appContext, HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
         {
-            // if initialized, return
-            if (appContext._umbracoApplicationUrl != null) return;
+            // if initialized and on the same DeploymentId, return
+            var deplayomentId = Environment.ExpandEnvironmentVariables("%WEBSITE_SITE_NAME%");
+            if (appContext._umbracoApplicationUrl != null && appContext._umbracoApplicationDeploymentId == deplayomentId) return;
+
+            if (appContext._umbracoApplicationDeploymentId != deplayomentId)
+                LogHelper.Info(typeof(ApplicationUrlHelper), $"DeploymentId changed: {deplayomentId}");
+
+            appContext._umbracoApplicationDeploymentId = deplayomentId;
 
             var logger = appContext.ProfilingLogger.Logger;
 

@@ -280,6 +280,8 @@ namespace Umbraco.Core
 	    // ReSharper disable once InconsistentNaming
 	    internal string _umbracoApplicationUrl;
 
+	    internal string _umbracoApplicationDeploymentId;
+
         private Lazy<bool> _configured;
         internal MainDom MainDom { get; private set; }
 
