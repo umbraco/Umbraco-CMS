@@ -85,6 +85,7 @@ namespace Umbraco.Web.Trees
                     entity.HasChildren && (isContainer == false));
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
+                node.AdditionalData.Add("contentTypeName", entity.ContentTypeName);
 
                 if (isContainer)
                 {
