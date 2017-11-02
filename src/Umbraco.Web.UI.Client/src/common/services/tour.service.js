@@ -259,7 +259,7 @@
                 "steps": [
                     {
                         title: "Render your content in a template",
-                        content: "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from asp.net MVC. - This tour is a sneak peak on how to write templates in Umbraco.</p><p>In this tour we will learn how to render content from our <b>Home</b> document type so we can see the content added to our Home page.</p>",
+                        content: "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from asp.net MVC. - This tour is a sneak peak on how to write templates in Umbraco.</p><p>In this tour you will learn how to render content from the <b>Home Page</b> document type so you can see the content added to our <b>Home</p> content page.</p>",
                         type: "intro"
                     },
                     {
@@ -278,16 +278,16 @@
                         view: "templatetree"
                     },
                     {
-                        element: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home']",
+                        element: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page']",
                         title: "Open Home template",
-                        content: "<p>Click the <b>Home</b> template to open and edit it.</p>",
-                        eventElement: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home'] a.umb-tree-item__label",
+                        content: "<p>Click the <b>Home Page</b> template to open and edit it.</p>",
+                        eventElement: "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page'] a.umb-tree-item__label",
                         event: "click"
                     },
                     {
                         element: "[data-element='editor-templates'] [data-element='code-editor']",
                         title: "Edit template",
-                        content: '<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>@Model.Content.GetPropertyValue("welcomeText")</pre></p>'
+                        content: '<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>&#60;h1&#62;@Model.Content.Name&#60;/h1&#62;<br>&#60;p&#62;@Model.Content.WelcomeText&#60;/p&#62;</pre></p>'
                     },
                     {
                         element: "[data-element='editor-templates'] [data-element='button-save']",
