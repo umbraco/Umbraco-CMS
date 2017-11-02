@@ -24,14 +24,16 @@
 
             scope.model.completeTour = function() {
                 unbindEvent();
-                tourService.completeTour(scope.model);
-                backdropService.close();
+                tourService.completeTour(scope.model).then(function() {
+                    backdropService.close();    
+                });
             };
 
             scope.model.disableTour = function() {
                 unbindEvent();
-                tourService.disableTour(scope.model);
-                backdropService.close();
+                tourService.disableTour(scope.model).then(function() {
+                    backdropService.close();    
+                });
             }
 
             function onInit() {

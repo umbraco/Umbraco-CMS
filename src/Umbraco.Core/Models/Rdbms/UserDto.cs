@@ -104,6 +104,14 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(500)]
         public string Avatar { get; set; }
 
+        /// <summary>
+        /// A Json blob stored for recording tour data for a user
+        /// </summary>
+        [Column("tourData")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
+        public string TourData { get; set; }
+
         [ResultColumn]
         public List<UserGroupDto> UserGroupDtos { get; set; }
 
