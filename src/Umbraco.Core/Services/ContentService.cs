@@ -65,7 +65,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                return repository.CountPublished();
+                return repository.CountPublished(contentTypeAlias);
             }
         }
 
