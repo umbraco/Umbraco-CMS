@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
 using Umbraco.Core.Configuration;
@@ -280,7 +281,9 @@ namespace Umbraco.Core
 	    // ReSharper disable once InconsistentNaming
 	    internal string _umbracoApplicationUrl;
 
-	    internal string _umbracoApplicationDeploymentId;
+        internal List<string> _umbracoApplicationDomains = new List<string>();
+
+        internal string _umbracoApplicationDeploymentId;
 
         private Lazy<bool> _configured;
         internal MainDom MainDom { get; private set; }
