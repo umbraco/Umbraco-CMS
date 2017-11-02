@@ -12,7 +12,7 @@ Umbraco is a free open source Content Management System built on the ASP.NET pla
 
 ## Building Umbraco from source ##
 
-The easiest way to get started is to run `build/build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`.
+The easiest way to get started is to run `build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`.  See [this page](BUILD.md) for more details.
 
 Note that you can always [download a nightly build](http://nightly.umbraco.org/?container=umbraco-750) so you don't have to build the code yourself.
 
