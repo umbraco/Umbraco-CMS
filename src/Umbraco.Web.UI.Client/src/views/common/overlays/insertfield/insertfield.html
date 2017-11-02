@@ -65,11 +65,14 @@
         <div class="control-group umb-control-group">
             <div class="umb-el-wrap">
                 <div class="controls">
-                    <label class="control-label" for="recursive">
+                    <label class="control-label" >
                         <localize key="templateEditor_recursive">Recursive</localize>
                     </label>
-                    <input type="checkbox" name="recursive" ng-model="vm.recursive">
-                    <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
+                    <label class="control-label" for="recursive">
+                        <input id="recursive" type="checkbox" name="recursive" ng-model="vm.recursive">
+                        <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
+
+                    </label>
                 </div>
             </div>
         </div>
