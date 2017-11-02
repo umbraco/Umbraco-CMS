@@ -17,7 +17,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 
 	//add to umbraco installer facts here
 	var facts = ['Umbraco helped millions of people watch a man jump from the edge of space',
-					'Over 420 000 websites are currently powered by Umbraco',
+					'Over 440 000 websites are currently powered by Umbraco',
 					"At least 2 people have named their cat 'Umbraco'",
 					'On an average day, more than 1000 people download Umbraco',
 					'<a target="_blank" href="https://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
@@ -31,10 +31,10 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					"At least 4 people have the Umbraco logo tattooed on them",
 					"'Umbraco' is the danish name for an allen key",
 					"Umbraco has been around since 2005, that's a looong time in IT",
-					"More than 550 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='https://umbra.co/codegarden'>CodeGarden</a>", 
+					"More than 600 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='https://umbra.co/codegarden'>CodeGarden</a>", 
 					"While you are installing Umbraco someone else on the other side of the planet is probably doing it too",
 					"You can extend Umbraco without modifying the source code using either JavaScript or C#",
-					"Umbraco was installed in more than 165 countries in 2015"
+					"Umbraco has been installed in more than 198 countries"
 					 ];
 
     /**
