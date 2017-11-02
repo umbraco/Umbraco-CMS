@@ -260,13 +260,21 @@ namespace Umbraco.Core
         /// - http://issues.umbraco.org/issue/U4-5728
         /// - http://issues.umbraco.org/issue/U4-5391
         /// </remarks>
-        internal string UmbracoApplicationUrl
+        public string UmbracoApplicationUrl
         {
             get
             {
                 ApplicationUrlHelper.EnsureApplicationUrl(this);
                 return _umbracoApplicationUrl;
             }
+        }
+
+        /// <summary>
+        /// Resets the url.
+        /// </summary>
+        public void ResetUmbracoApplicationUrl()
+        {
+            _umbracoApplicationUrl = null;
         }
 
 	    // ReSharper disable once InconsistentNaming
