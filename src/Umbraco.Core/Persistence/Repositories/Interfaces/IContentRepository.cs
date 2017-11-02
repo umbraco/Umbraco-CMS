@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// We require this on the repo because the IQuery{IContent} cannot supply the 'newest' parameter
         /// </remarks>
-        int CountPublished();
+        int CountPublished(string contentTypeAlias = null);
 
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
