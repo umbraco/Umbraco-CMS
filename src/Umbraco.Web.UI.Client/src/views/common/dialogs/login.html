@@ -149,7 +149,9 @@
 
             <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
               <label><localize key="general_password">Password</localize></label>
-              <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" umb-password-toggle />
+              <div class="password-toggle">
+                <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" /><a ng-click="togglePassword()">Toggle</a>
+              </div>
             </div>
 
             <div class="flex justify-between items-center">

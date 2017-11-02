@@ -1736,7 +1736,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   
   <area alias="validation">
     <key alias="validation">Validation</key>
-    <key alias="validateAsEmail">Validate as email</key>
+    <key alias="validateAsEmail">Validate as an email address</key>
     <key alias="validateAsNumber">Validate as a number</key>
     <key alias="validateAsUrl">Validate as a Url</key>
     <key alias="enterCustomValidation">...or enter a custom validation</key>
@@ -1748,7 +1748,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
-    <key alias="invalidEmail">Invalid email</key>
+    <key alias="invalidEmail">Invalid email address</key>
   </area>
   <area alias="healthcheck">
     <!-- The following keys get these tokens passed in:
