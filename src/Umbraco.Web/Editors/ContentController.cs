@@ -23,10 +23,13 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
+using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
 using Umbraco.Core.Events;
 using Constants = Umbraco.Core.Constants;
+using System.Collections;
+using umbraco;
 
 namespace Umbraco.Web.Editors
 {
@@ -1092,5 +1095,47 @@ namespace Umbraco.Web.Editors
             return allowed;
         }
 
-    }
+		[EnsureUserPermissionForContent("contentId", 'R')]
+		public List<Permission> GetNotificationOptions(int contentId)
+		{
+			List<Permission> notifications = new List<Permission>();
+
+			if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+			var content = Services.ContentService.GetById(contentId);
+			if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+			var node = new CMSNode(contentId);
+
+			ArrayList actionList = global::umbraco.BusinessLogic.Actions.Action.GetAll();
+
+			foreach (global::umbraco.interfaces.IAction a in actionList)
+			{
+				if (a.ShowInNotifier)
+				{
+
+					Permission n = new Permission
+					{
+						Name = ui.Text("actions", a.Alias),
+						Checked = (UmbracoUser.GetNotifications(node.Path).IndexOf(a.Letter) > -1),
+						PermissionCode = a.Letter.ToString()
+					};
+
+					notifications.Add(n);
+				}
+			}
+
+			return notifications;
+		}
+
+		public void SetNotificationOptions(int contentId, string notifyOptions = "")
+		{
+			if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+			var content = Services.ContentService.GetById(contentId);
+			if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+			var node = new CMSNode(contentId);
+
+			global::umbraco.cms.businesslogic.workflow.Notification.UpdateNotifications(UmbracoUser, node, notifyOptions ?? "");
+		}
+	}
 }
