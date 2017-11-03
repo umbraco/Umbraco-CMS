@@ -93,6 +93,7 @@ namespace Umbraco.Tests.Security
             var sessionId = Guid.NewGuid().ToString();
             var userData = new UserData(sessionId)
             {
+                SecurityStamp = sessionId,
                 AllowedApplications = new[] {"content", "media"},
                 Culture = "en-us",
                 Id = 1234,
@@ -113,6 +114,7 @@ namespace Umbraco.Tests.Security
             var sessionId = Guid.NewGuid().ToString();
             var userData = new UserData(sessionId)
             {
+                SecurityStamp = sessionId,
                 AllowedApplications = new[] { "content", "media" },
                 Culture = "en-us",
                 Id = 1234,
@@ -139,6 +141,7 @@ namespace Umbraco.Tests.Security
             var sessionId = Guid.NewGuid().ToString();
             var userData = new UserData(sessionId)
             {
+                SecurityStamp = sessionId,
                 AllowedApplications = new[] { "content", "media" },
                 Culture = "en-us",
                 Id = 1234,
@@ -162,6 +165,7 @@ namespace Umbraco.Tests.Security
             var sessionId = Guid.NewGuid().ToString();
             var userData = new UserData(sessionId)
             {
+                SecurityStamp = sessionId,
                 AllowedApplications = new[] { "content", "media" },
                 Culture = "en-us",
                 Id = 1234,

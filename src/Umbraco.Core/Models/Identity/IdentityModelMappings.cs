@@ -40,19 +40,22 @@ namespace Umbraco.Core.Models.Identity
                     identityUser.EnableChangeTracking();
                 });
             
-            config.CreateMap<BackOfficeIdentityUser, UserData>()
-                .ConstructUsing((BackOfficeIdentityUser user) => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
-                .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Roles.Select(x => x.RoleId).ToArray()))
-                .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.CalculatedContentStartNodeIds))
-                //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.CalculatedMediaStartNodeIds))
-                .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.UserName))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
-                .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
+            //config.CreateMap<BackOfficeIdentityUser, UserData>()
+            //    //TODO: SessionId is set at the DB level! change this OR , maybe it's generated here and we persist it to the db from here but i don't think so
+            //    .ConstructUsing((BackOfficeIdentityUser user) => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
+            //    .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
+            //    .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections))
+            //    .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Roles.Select(x => x.RoleId).ToArray()))
+            //    .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
+            //    //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
+            //    .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.CalculatedContentStartNodeIds))
+            //    //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
+            //    .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.CalculatedMediaStartNodeIds))
+            //    .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.UserName))
+            //    .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.Culture))
+
+            //    //TODO: This is not the sessionId!
+            //    .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
         }
 
         private string GetPasswordHash(string storedPass)

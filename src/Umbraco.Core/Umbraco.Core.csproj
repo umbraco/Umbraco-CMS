@@ -378,7 +378,7 @@
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
-    <Compile Include="Models\Rdbms\UserLoginsDto.cs" />
+    <Compile Include="Models\Rdbms\UserLoginDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\UserControl.cs" />
     <Compile Include="OrderedHashSet.cs" />
@@ -547,6 +547,7 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddUserLoginTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\ReduceDictionaryKeyColumnsSize.cs" />
@@ -694,11 +695,13 @@
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
+    <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
+    <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
