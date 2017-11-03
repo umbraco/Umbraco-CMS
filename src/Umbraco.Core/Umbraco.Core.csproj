@@ -548,6 +548,7 @@
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddIndexToPropertyTypeAliasColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddInstructionCountColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddCmsMediaTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
