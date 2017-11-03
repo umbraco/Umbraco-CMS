@@ -405,7 +405,7 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<IMemberTypeService>().Object,
                 new Mock<IMemberService>().Object,
                 new Mock<IUserService>().Object,
-            new Mock<ISectionService>().Object,
+                new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object,
                 new Mock<INotificationService>().Object,
