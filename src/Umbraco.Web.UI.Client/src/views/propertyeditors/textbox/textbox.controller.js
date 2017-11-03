@@ -10,11 +10,7 @@ function textboxController($scope) {
     }
 
     if ($scope.model.config && $scope.model.config.maxChars) {
-        if ($scope.model.config.maxChars < 500) {
-            $scope.model.showcharacterslefttext = true;
-        } else {
-            $scope.model.showcharacterslefttext = false;
-        }
+        $scope.model.showcharacterslefttext = $scope.model.config.maxChars < 500;
 
         if ($scope.model.value == undefined) {
             $scope.model.count = ($scope.model.config.maxChars * 1);
