@@ -67,7 +67,7 @@ namespace Umbraco.Core.Security
             var roles = identity.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToList();
             var allowedApps = identity.FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToList();
 
-            var userData = new UserData(session)
+            var userData = new UserData
             {
                 SecurityStamp = securityStamp,
                 SessionId = session,

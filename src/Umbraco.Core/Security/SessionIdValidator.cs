@@ -77,7 +77,11 @@ namespace Umbraco.Core.Security
                         //last checked date/time which allows us to avoid a bunch of requests being checked at the same time and thus a bunch of
                         //db calls to check the session id at the same time and also writing back cookies for each request. Essentially this just
                         //makes things perform  better to reduce the amount of db calls and cookie writing.
-                        var sessionChecker = SessionChecks.GetOrAdd(user.Id, i => new SessionCheck {LastChecked = issuedUtc ?? DateTimeOffset.UtcNow});
+                        var sessionChecker = SessionChecks.GetOrAdd(user.Id, i => new SessionCheck
+                        {
+                            LastChecked = issuedUtc ?? DateTimeOffset.UtcNow,
+                            Locker = new object()
+                        });
 
                         //re-evaluate
                         if (issuedUtc != null)
@@ -90,24 +94,35 @@ namespace Umbraco.Core.Security
                         //so that subsequent requests occuring at the same time don't perform the check
                         sessionChecker.LastChecked = DateTimeOffset.UtcNow;
 
-                        if (validate)
+                        //we use a lock per user to prevent having the same cookie being written multiple times if multiple requests come in at the very same
+                        //time. This has occured for me when clicking on a node that has multiple pickers and multiple REST calls are made at the same time this
+                        //validation occurs. This would mean that we would make more db lookups than required and also write the cookie out more times than required
+                        //so this prevents this scenario.
+                        if (validate && Monitor.TryEnter(sessionChecker.Locker))
                         {
-                            var sessionId = context.Identity.FindFirstValue(Constants.Security.SessionIdClaimType);
-                            if (await manager.ValidateSessionIdAsync(userId, sessionId))
+                            try
                             {
-                                reject = false;
+                                var sessionId = context.Identity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                                if (await manager.ValidateSessionIdAsync(userId, sessionId))
+                                {
+                                    reject = false;
 
-                                //we will re-issue the cookie last checked cookie
-                                context.Options.CookieManager.AppendResponseCookie(
-                                    context.OwinContext,
-                                    CookieName,
-                                    DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz"),
-                                    new CookieOptions
-                                    {
-                                        HttpOnly = true,
-                                        Secure = GlobalSettings.UseSSL || context.Request.IsSecure,
-                                        Path = "/"
-                                    });
+                                    //we will re-issue the cookie last checked cookie
+                                    context.Options.CookieManager.AppendResponseCookie(
+                                        context.OwinContext,
+                                        CookieName,
+                                        DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz"),
+                                        new CookieOptions
+                                        {
+                                            HttpOnly = true,
+                                            Secure = GlobalSettings.UseSSL || context.Request.IsSecure,
+                                            Path = "/"
+                                        });
+                                }
+                            }
+                            finally
+                            {
+                                Monitor.Exit(sessionChecker.Locker);
                             }
                         }
                     }
@@ -130,6 +145,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         private struct SessionCheck
         {
+            public object Locker { get; set; }
             public DateTimeOffset LastChecked { get; set; }
         }
     }

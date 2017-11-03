@@ -37,16 +37,10 @@ namespace Umbraco.Core.Security
         public override async Task<ClaimsIdentity> CreateAsync(UserManager<T, int> manager, T user, string authenticationType)
         {
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
-
-            //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
             
-            var session = _appCtx.IsConfigured && _appCtx.IsUpgrading == false
-                ? _appCtx.Services.UserService.CreateLoginSession(user.Id, GetCurrentRequestIpAddress())
-                : Guid.NewGuid();
-
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
-                //set a new session id
-                new UserData(session.ToString())
+                //NOTE - there is no session id assigned here, this is just creating the identity, a session id will be generated when the cookie is written
+                new UserData
                 {
                     Id = user.Id,
                     Username = user.UserName,
@@ -60,18 +54,7 @@ namespace Umbraco.Core.Security
                 });
 
             return umbracoIdentity;
-        }
-
-        /// <summary>
-        /// Returns the current request IP address for logging if there is one
-        /// </summary>
-        /// <returns></returns>
-        protected virtual string GetCurrentRequestIpAddress()
-        {
-            //TODO: inject a service to get this value, we should not be relying on the old HttpContext.Current especially in the ASP.NET Identity world - though it's difficult to get a reference to the request from the usermanager since the request holds a reference to the usermanager. Anyways, not time right now.
-            var httpContext = HttpContext.Current == null ? (HttpContextBase)null : new HttpContextWrapper(HttpContext.Current);
-            return httpContext.GetCurrentRequestIpAddress();
-        }
+        }        
     }
 
     public class BackOfficeClaimsIdentityFactory : BackOfficeClaimsIdentityFactory<BackOfficeIdentityUser>

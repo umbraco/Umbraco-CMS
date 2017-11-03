@@ -31,6 +31,24 @@ namespace Umbraco.Core.Security
             _appCtx = appCtx;
         }
 
+        public override void ResponseSignIn(CookieResponseSignInContext context)
+        {
+            var backOfficeIdentity = context.Identity as UmbracoBackOfficeIdentity;
+            if (backOfficeIdentity != null)
+            {
+                //generate a session id and assign it
+                //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
+
+                var session = _appCtx.IsConfigured && _appCtx.IsUpgrading == false
+                    ? _appCtx.Services.UserService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
+                    : Guid.NewGuid();
+
+                backOfficeIdentity.UserData.SessionId = session.ToString();
+            }            
+
+            base.ResponseSignIn(context);
+        }
+
         public override void ResponseSignOut(CookieResponseSignOutContext context)
         {
             //Clear the user's session on sign out
