@@ -378,6 +378,7 @@
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
+    <Compile Include="Models\Rdbms\MediaDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\UserControl.cs" />
     <Compile Include="OrderedHashSet.cs" />
@@ -546,7 +547,9 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddIndexToPropertyTypeAliasColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddInstructionCountColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddCmsMediaTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\ReduceDictionaryKeyColumnsSize.cs" />
