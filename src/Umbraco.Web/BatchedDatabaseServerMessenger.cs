@@ -99,7 +99,8 @@ namespace Umbraco.Web
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);
