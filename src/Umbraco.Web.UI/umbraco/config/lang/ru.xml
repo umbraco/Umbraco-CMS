@@ -700,6 +700,8 @@
     <key alias="chooseExtra">Выбрать дополнительно</key>
     <key alias="chooseDefault">Выбрать по-умолчанию</key>
     <key alias="areAdded">добавлены</key>
+    <key alias="maxItemsDescription">Оставьте пустым или задайте 0 для снятия лимита</key>
+    <key alias="maxItems">Максимальное количество</key>
   </area>
   <area alias="headers">
     <key alias="page">Страница</key>
