@@ -62,6 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 FormatDeleteStatement("cmsTagRelationship", "nodeId"),
                 FormatDeleteStatement("umbracoDomains", "domainRootStructureID"),
                 FormatDeleteStatement("cmsDocument", "nodeId"),
+                FormatDeleteStatement("cmsMedia", "nodeId"),
                 FormatDeleteStatement("cmsPropertyData", "contentNodeId"),
                 FormatDeleteStatement("cmsPreviewXml", "nodeId"),
                 FormatDeleteStatement("cmsContentVersion", "ContentId"),
