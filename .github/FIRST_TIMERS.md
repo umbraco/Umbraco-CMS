@@ -34,11 +34,11 @@ If you want to see the process done with GitHub client for Windows, watch
 
 Once the repository is cloned on your local machine, open the folder where you cloned it to and go into the "build" folder. From there you can run `build.bat` file. 
 
-This will set up everything for you and runs MSBuild and the Grunt build for you. Don't worry if you have no idea what that all means, it's all automatic and should look something like on the video [here](https://www.youtube.com/watch?v=nZHQeB3mCzo).
+This will set up everything for you and runs MSBuild and the Gulp build for you. Don't worry if you have no idea what that all means, it's all automatic and should look something like on the video [here](https://www.youtube.com/watch?v=nZHQeB3mCzo).
 
 Now that everything is set up for you, go into the "src" folder and open `umbraco.sln` in Visual Studio. 
 
-Once that loads you can hit **F5** or press the **"Play" button** to start the solution. 
+Once that loads set the startup project to **Umbraco.Web.UI** and hit **F5** or press the **"Play" button** to start the solution. 
 
 After a few minutes, you will see the Umbraco installer which will guide you through setting up a new Umbraco website. The process is exactly the same as for the standard Umbraco installation. You can preview it on the video [here](https://www.youtube.com/watch?v=7CMdRf-fxlg).
 
