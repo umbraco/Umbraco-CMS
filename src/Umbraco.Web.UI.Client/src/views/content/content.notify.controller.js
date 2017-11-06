@@ -13,8 +13,10 @@
 
   	vm.notifyOptions = [];
   	vm.save = save;
-
-    var successText = {};
+  	vm.cancel = cancel;
+  	vm.message = {
+  		name: $scope.currentNode.name
+  	};;
 
   	function onInit() {
   		vm.loading = true;
@@ -25,15 +27,9 @@
   		});
   	}
 
-    $scope.message = {
-      name: $scope.currentNode.name
-    };
-
-
-    $scope.cancel = function () {
+  	function cancel() {
       navigationService.hideMenu();
     };
-
 
     function save(notifyOptions) {
     	vm.saveState = "busy";
