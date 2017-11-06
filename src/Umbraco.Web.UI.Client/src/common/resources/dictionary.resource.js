@@ -88,7 +88,7 @@ function dictionaryResource($q, $http, umbRequestHelper) {
   **/
     function getById(id) {
         return umbRequestHelper.resourcePromise(
-            $http.post(
+            $http.get(
                 umbRequestHelper.getApiUrl(
                     "dictionaryApiBaseUrl",
                     "GetById",
