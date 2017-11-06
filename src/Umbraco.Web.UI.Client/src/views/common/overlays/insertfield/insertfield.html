@@ -31,7 +31,7 @@
                 <div class="umb-el-wrap">
                     <label class="control-label" for="altField"><localize key="templateEditor_fallbackField">Fallback field</localize></label>
                     <div class="controls">
-                        <select ng-model="vm.altField" >
+                        <select ng-model="vm.altField" id="altField">
                             <optgroup localize="label" label="@templateEditor_customFields">
                                 <option ng-repeat="(key, value) in vm.properties" value="{{value}}">{{value}}</option>
                             </optgroup>
@@ -42,6 +42,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
 
         <!-- Default value -->
@@ -55,7 +56,7 @@
                 <div class="umb-el-wrap">
                     <label class="control-label" for="altText"><localize key="templateEditor_defaultValue">Default value</localize></label>
                     <div class="controls">
-                        <input type="text" name="altText" ng-model="vm.altText" umb-auto-focus>
+                        <input type="text" id="altText" name="altText" ng-model="vm.altText" umb-auto-focus>
                     </div>
                 </div>
             </div>
@@ -134,7 +135,7 @@
                     <small><localize key="templateEditor_insertedBefore">Will be inserted before the field value</localize></small>
                 </label>
                 <div class="controls">
-                    <input type="text" name="insertBefore" class="-full-width-input" ng-model="vm.insertBefore">
+                    <input type="text" id="insertBefore" name="insertBefore" class="-full-width-input" ng-model="vm.insertBefore">
                 </div>
             </div>
         </div>
@@ -147,7 +148,7 @@
                     <small><localize key="templateEditor_insertedAfter">Will be inserted after the field value</localize></small>
                 </label>
                 <div class="controls">
-                    <input type="text" name="insertAfter" class="-full-width-input" ng-model="vm.insertAfter">
+                    <input type="text" id="insertAfter" name="insertAfter" class="-full-width-input" ng-model="vm.insertAfter">
                 </div>
             </div>
         </div>
@@ -161,8 +162,10 @@
 							<localize key="templateEditor_convertLineBreaks">Convert line breaks</localize>
 							<small><localize key="templateEditor_convertLineBreaksHelp">Replaces line breaks with break html tag</localize></small>
 						</span>
-                    <input type="checkbox" name="linebreaks" ng-model="vm.convertLinebreaks">
-                    <localize key="templateEditor_convertLineBreaksDescription">Yes, convert line breaks</localize>
+                    <label for="linebreaks">
+                      <input type="checkbox" id="linebreaks" name="linebreaks" ng-model="vm.convertLinebreaks">
+                      <localize key="templateEditor_convertLineBreaksDescription">Yes, convert line breaks</localize>
+                    </label>
 					</label>
                 </div>
             </div>

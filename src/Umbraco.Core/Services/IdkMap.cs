@@ -106,8 +106,8 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType); ;
-                _key2Id[val.Value] = new TypedId<int>();
+                _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType);
+                _key2Id[val.Value] = new TypedId<int>(id, umbracoObjectType);
             }
             finally
             {

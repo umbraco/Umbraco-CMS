@@ -110,7 +110,7 @@ Use this directive to generate a thumbnail grid of media items.
                     itemMinWidth = scope.itemMinWidth;
                 }
 
-                if (scope.itemMinWidth) {
+                if (scope.itemMinHeight) {
                     itemMinHeight = scope.itemMinHeight;
                 }
 

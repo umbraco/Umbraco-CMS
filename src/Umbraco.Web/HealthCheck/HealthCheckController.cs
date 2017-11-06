@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.Web.Http;
@@ -29,9 +30,26 @@ namespace Umbraco.Web.HealthCheck
                 .ToList();
         }
 
+        [Obsolete("Use the contructor specifying all parameters instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public HealthCheckController(IHealthCheckResolver healthCheckResolver)
         {
             _healthCheckResolver = healthCheckResolver;
+            var healthCheckConfig = UmbracoConfig.For.HealthCheck();
+            _disabledCheckIds = healthCheckConfig.DisabledChecks
+                .Select(x => x.Id)
+                .ToList();
+        }
+
+        public HealthCheckController(IHealthCheckResolver healthCheckResolver, IHealthChecks healthCheckConfig)
+        {
+            if (healthCheckResolver == null) throw new ArgumentNullException("healthCheckResolver");
+            if (healthCheckConfig == null) throw new ArgumentNullException("healthCheckConfig");
+
+            _healthCheckResolver = healthCheckResolver;
+            _disabledCheckIds = healthCheckConfig.DisabledChecks
+                .Select(x => x.Id)
+                .ToList();
         }
 
         /// <summary>
