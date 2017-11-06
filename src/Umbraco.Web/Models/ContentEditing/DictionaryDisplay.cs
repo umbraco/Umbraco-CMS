@@ -1,5 +1,6 @@
 ﻿namespace Umbraco.Web.Models.ContentEditing
 {
+    using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
@@ -21,5 +22,10 @@
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         public List<Notification> Notifications { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the parent id.
+        /// </summary>
+        public new Guid ParentId { get; set; }
     }
 }

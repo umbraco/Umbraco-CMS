@@ -1,3 +1,19 @@
-﻿<div ng-controller="Umbraco.Editors.Dictionary.EditController">
-  Edit view
+﻿<div ng-controller="Umbraco.Editors.Dictionary.EditController as vm">
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+    
+    <form name="contentForm"
+          ng-submit="save()"
+          novalidate
+          val-form-manager>
+        <umb-editor-view ng-if="!vm.page.loading">
+            <umb-editor-header
+                menu="vm.page.menu"
+                name="vm.content.name"
+                name-locked="vm.page.nameLocked"
+                hide-icon="true"
+                hide-description="true"
+                hide-alias="true">
+            </umb-editor-header>
+        </umb-editor-view>
+    </form>
 </div>
