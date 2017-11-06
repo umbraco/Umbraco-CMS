@@ -3,7 +3,7 @@
 We're really glad you're reading this - [#h5yr](http://h5yr.com)! People like you can contribute and help us make Umbraco CMS even greater! The following descriptions provide you information on how you can contribute to different parts of the project. 
 
 Remember that contribution is not just `code` but can also be:
-- constructive discussion and [issues reports](issues.umbraco.org)
+- constructive discussion and [issues reports](http://issues.umbraco.org)
 - contribution to documentation
 - providing translations to language files
 
