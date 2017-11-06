@@ -25,6 +25,7 @@ namespace Umbraco.Core.Models
         private bool _isDraft;
         private bool _hasPendingChanges;
         private string _contentTypeAlias;
+        private string _contentTypeName;
         private Guid _nodeObjectTypeId;
         
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -43,6 +44,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo IsDraftSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsDraft);
             public readonly PropertyInfo HasPendingChangesSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasPendingChanges);
             public readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
+            public readonly PropertyInfo ContentTypeNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeName);
             public readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
             public readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
             public readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
@@ -170,7 +172,16 @@ namespace Umbraco.Core.Models
                 AdditionalData["ContentTypeAlias"] = value;
             }
         }
-
+        public string ContentTypeName
+        {
+            get { return _contentTypeName; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeName, Ps.Value.ContentTypeNameSelector);
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                AdditionalData["ContentTypeName"] = value;
+            }
+        }
         public string ContentTypeIcon
         {
             get { return _contentTypeIcon; }
