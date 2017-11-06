@@ -4,7 +4,6 @@ function imageFilePickerController($scope) {
         $scope.mediaPickerOverlay = {
             view: "mediapicker",
             disableFolderSelect: true,
-            disableFolderSelect: true,
             onlyImages: true,
             show: true,
             submit: function (model) {
