@@ -32,6 +32,7 @@
          * @param {Number} tour.step.backdropOpacity Sets the backdrop opacity (default 0.4)
 		 */
         function registerTour(newTour) {
+            validateTour(newTour);
             tours.push(newTour);
             eventsService.emit("appState.tour.updatedTours", tours);
         }
@@ -47,6 +48,7 @@
 		 */
         function registerTours(newTours) {
             angular.forEach(newTours, function(newTour){
+                validateTour(newTour);
                 tours.push(newTour);
             });
             eventsService.emit("appState.tour.updatedTours", tours);
@@ -94,8 +96,9 @@
 		 * @param {Object} tour The tour which should be started
 		 */
         function startTour(tour) {
+            validateTour(tour);
             eventsService.emit("appState.tour.start", tour);
-            currentTour = tour;            
+            currentTour = tour;
         }
 
         /**
@@ -202,6 +205,33 @@
         }
 
         ///////////
+
+        function validateTour(tour) {
+
+            if (!tour) {
+                throw "A tour is not specified";
+            }
+
+            if(!tour.alias) {
+                throw "A tour alias is required";
+            }
+
+            if(!tour.steps) {
+                throw "Tour " + tour.alias + " is missing tour steps";
+            }
+
+            if(tour.steps && tour.steps.length === 0) {
+                throw "Tour " + tour.alias + " is missing tour steps";
+            }
+
+            // check for existing tours with the same alias
+            angular.forEach(tours, function(existingTour){
+                if(existingTour.alias === tour.alias) {
+                    throw "A tour with the alias " + tour.alias +  " is already registered";
+                }
+            });
+
+        }
 
         function setCompletedTours() {
 
