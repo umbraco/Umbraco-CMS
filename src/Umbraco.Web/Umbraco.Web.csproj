@@ -390,6 +390,7 @@
     <Compile Include="Models\ContentEditing\MemberPropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
+    <Compile Include="Models\ContentEditing\NotifySetting.cs" />
     <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFiles.cs" />
     <Compile Include="Models\ContentEditing\PostedFolder.cs" />

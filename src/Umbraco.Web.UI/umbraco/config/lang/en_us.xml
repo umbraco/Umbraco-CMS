@@ -2093,7 +2093,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="characters_left">characters left</key>
     </area>
     <area alias="notify">
-      <key alias="notifySet">Set your notification for</key>
-      <key alias="notificationsSavedFor">Notification settings saves for </key>
+      <key alias="notifySet">Select your notifications for</key>
+      <key alias="notificationsSavedFor">Notification settings saved for </key>
     </area>
 </language>

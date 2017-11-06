@@ -39,8 +39,8 @@
     	var selectedSting = "";
 
     	angular.forEach(notifyOptions, function (option) {
-    		if (option.checked === true) {
-    			selectedSting += option.permissionCode;
+    		if (option.checked === true && option.notifyCode) {
+    			selectedSting += option.notifyCode;
     		}
     	})
 

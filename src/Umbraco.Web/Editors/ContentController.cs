@@ -1096,9 +1096,9 @@ namespace Umbraco.Web.Editors
         }
 
 		[EnsureUserPermissionForContent("contentId", 'R')]
-		public List<Permission> GetNotificationOptions(int contentId)
+		public List<NotifySetting> GetNotificationOptions(int contentId)
 		{
-			List<Permission> notifications = new List<Permission>();
+			List<NotifySetting> notifications = new List<NotifySetting>();
 
 			if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 			var content = Services.ContentService.GetById(contentId);
@@ -1113,11 +1113,11 @@ namespace Umbraco.Web.Editors
 				if (a.ShowInNotifier)
 				{
 
-					Permission n = new Permission
+					NotifySetting n = new NotifySetting
 					{
 						Name = ui.Text("actions", a.Alias),
 						Checked = (UmbracoUser.GetNotifications(node.Path).IndexOf(a.Letter) > -1),
-						PermissionCode = a.Letter.ToString()
+						NotifyCode = a.Letter.ToString()
 					};
 
 					notifications.Add(n);
