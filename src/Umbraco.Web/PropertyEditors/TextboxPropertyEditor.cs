@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class TextboxPreValueEditor : PreValueEditor
         {
-            [PreValueField("maxChars", "Maximum allowed characters", "textstringnumber", Description = "If empty - 500 character limit")]
+            [PreValueField("maxChars", "Maximum allowed characters", "textstringlimited", Description = "If empty - 500 character limit")]
             public bool MaxChars { get; set; }
         }
     }
