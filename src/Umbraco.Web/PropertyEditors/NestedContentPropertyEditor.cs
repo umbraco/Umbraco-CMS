@@ -35,7 +35,8 @@ namespace Umbraco.Web.PropertyEditors
                 {NestedContentPreValueEditor.ContentTypesPreValueKey, ""},
                 {"minItems", 0},
                 {"maxItems", 0},
-                {"confirmDeletes", "1"},
+				{"allowDisabling", "0"},
+				{"confirmDeletes", "1"},
                 {"showIcons", "1"}
             };
         }
@@ -69,7 +70,10 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
             public string HideLabel { get; set; }
 
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+			[PreValueField("allowDisabling", "Allow Disabling", "boolean", Description = "Set whether to allow disabling items.")]
+			public string AllowDisabling { get; set; }
+
+			public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
             {
                 // re-format old style (v0.1.1) pre values if necessary
                 NestedContentHelper.ConvertPreValueCollectionFromV011(persistedPreVals);
@@ -407,7 +411,7 @@ namespace Umbraco.Web.PropertyEditors
 
         private static bool IsSystemPropertyKey(string propKey)
         {
-            return propKey == "name" || propKey == "key" || propKey == ContentTypeAliasPropertyKey;
+            return propKey == "name" || propKey == "key" || propKey == ContentTypeAliasPropertyKey || propKey == "ncDisabled";
         }
     }
 }
