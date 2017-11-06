@@ -24,6 +24,8 @@
 
             function setHighlight () {
 
+                scope.loading = true;
+
                 $timeout(function () {
 
                     // The element to highlight
@@ -48,10 +50,10 @@
                         var rectLeft = el.find(".umb-backdrop__rect--left");
                         
                         // Add the css
-                        rectTop.css({ "height": topDistance, "x": leftDistance });
-                        rectRight.css({ "x": leftAndWidth, "y": topDistance, "height": height });
-                        rectBottom.css({ "height": "100%", "y": topAndHeight, "x": leftDistance });                    
-                        rectLeft.css({ "width": leftDistance });
+                        scope.rectTopCss = { "height": topDistance, "left": leftDistance + "px", opacity: scope.backdropOpacity };
+                        scope.rectRightCss = { "left": leftAndWidth + "px", "top": topDistance + "px", "height": height, opacity: scope.backdropOpacity };
+                        scope.rectBottomCss = { "height": "100%", "top": topAndHeight + "px", "left": leftDistance + "px", opacity: scope.backdropOpacity };
+                        scope.rectLeftCss = { "width": leftDistance, opacity: scope.backdropOpacity };
 
                         // Prevent interaction in the highlighted area
                         if(scope.highlightPreventClick) {
@@ -60,6 +62,8 @@
                         }
 
                     }
+
+                    scope.loading = false; 
 
                 });
 

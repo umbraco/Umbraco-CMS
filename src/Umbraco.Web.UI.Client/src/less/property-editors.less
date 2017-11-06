@@ -109,16 +109,48 @@ ul.color-picker li a  {
 }
 
 /* pre-value editor */
+/*.control-group.color-picker-preval:before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}*/
+
+/*.control-group.color-picker-preval div.thumbnail {
+    display: inline-block;
+    vertical-align: middle;
+}*/
+.control-group.color-picker-preval div.color-picker-prediv {
+    display: inline-block;
+    width: 60%;
+}
 
 .control-group.color-picker-preval pre {
     display: inline;
     margin-right: 20px;
     margin-left: 10px;
+    width: 50%;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+
+.control-group.color-picker-preval btn {
+    //vertical-align: middle;
+}
+
+.control-group.color-picker-preval input[type="text"] {
+    min-width: 40%;
+    width: 40%;
+    display: inline-block;
+    margin-right: 20px;
+    margin-top: 1px;
 }
 
 .control-group.color-picker-preval label {
-    border:solid @white 1px;
-    padding:6px;
+    border: solid @white 1px;
+    padding: 6px;
 }
 
 
@@ -126,21 +158,21 @@ ul.color-picker li a  {
 // Media picker
 // --------------------------------------------------
 .umb-mediapicker .add-link {
-  display: inline-block;
-  height: 120px;
-  width: 120px;
-  text-align: center;
-  color: @gray-8;
-  border: 2px @gray-8 dashed;
-  line-height: 120px;
-  text-decoration: none;
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    width: 120px;
+    text-align: center;
+    color: @gray-8;
+    border: 2px @gray-8 dashed;
+    text-decoration: none;
 
-  transition: all 150ms ease-in-out;
+    transition: all 150ms ease-in-out;
 
-  &:hover {
-      color: @turquoise-d1;
-      border-color: @turquoise;
-  }
+    &:hover {
+        color: @turquoise-d1;
+        border-color: @turquoise;
+    }
 }
 
 .umb-mediapicker .picked-image {
@@ -163,6 +195,10 @@ ul.color-picker li a  {
   overflow: hidden;
   display: none;
   text-decoration: none;
+}
+
+.umb-mediapicker .add-link-square {
+  height: 120px;
 }
 
 
@@ -207,10 +243,9 @@ ul.color-picker li a  {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0;
+    margin: 0 5px 0 0;
     padding: 5px;
 }
-
 
 .umb-sortable-thumbnails li:hover a {
     display: flex;
@@ -219,16 +254,20 @@ ul.color-picker li a  {
 }
 
 .umb-sortable-thumbnails li img {
-  max-width:100%;
-  max-height:100%;
-  margin:auto;
-  display:block;
-  background-image: url(../img/checkered-background.png);
+    max-width:100%;
+    max-height:100%;
+    margin:auto;
+    display:block;
+    background-image: url(../img/checkered-background.png);
 }
 
-.umb-sortable-thumbnails li img.noScale{
-  max-width: none !important;
-  max-height: none !important;
+.umb-sortable-thumbnails li img.trashed {
+    opacity:0.3;
+}
+
+.umb-sortable-thumbnails li img.noScale {
+    max-width: none !important;
+    max-height: none !important;
 }
 
 .umb-sortable-thumbnails .umb-icon-holder {
@@ -254,8 +293,8 @@ ul.color-picker li a  {
 }
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
-  opacity: 1;
-  visibility: visible;
+    opacity: 1;
+    visibility: visible;
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__action {
@@ -285,27 +324,27 @@ ul.color-picker li a  {
 // -------------------------------------------------
 
 .umb-cropper{
-  position: relative;
+    position: relative;
 }
 
 .umb-cropper img, .umb-cropper-gravity img{
-   position: relative;
-   max-width: 100%;
-   height: auto;
-   top: 0;
-   left: 0;
+    position: relative;
+    max-width: 100%;
+    height: auto;
+    top: 0;
+    left: 0;
  }
 
  .umb-cropper img {
-     max-width: none;
+    max-width: none;
  }
 
  .umb-cropper .overlay, .umb-cropper-gravity .overlay {
-  top: 0;
-  left: 0;
-  cursor: move;
-  z-index: @zindexCropperOverlay;
-  position: absolute;
+    top: 0;
+    left: 0;
+    cursor: move;
+    z-index: @zindexCropperOverlay;
+    position: absolute;
 }
 
 .umb-cropper .viewport{
@@ -317,43 +356,43 @@ ul.color-picker li a  {
  }
 
 .umb-cropper-gravity .viewport{
-   overflow: hidden;
-   position: relative;
-   width: 100%;
-   height: 100%;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 
 .umb-cropper .viewport:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: @zindexCropperOverlay - 1;
-  -moz-opacity: .75;
-  opacity: .75;
-  filter: alpha(opacity=7);
-  -webkit-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
-  -moz-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
-  box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: @zindexCropperOverlay - 1;
+    -moz-opacity: .75;
+    opacity: .75;
+    filter: alpha(opacity=7);
+    -webkit-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+    -moz-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+    box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
 }
 
 .umb-cropper-gravity .overlay{
-  width: 14px;
-  height: 14px;
-  text-align: center;
-  border-radius: 20px;
-  background: @turquoise;
-  border: 3px solid @white;
-  opacity: 0.8;
+    width: 14px;
+    height: 14px;
+    text-align: center;
+    border-radius: 20px;
+    background: @turquoise;
+    border: 3px solid @white;
+    opacity: 0.8;
 }
 
 .umb-cropper-gravity .overlay i {
-  font-size: 26px;
-  line-height: 26px;
-  opacity: 0.8 !important;
+    font-size: 26px;
+    line-height: 26px;
+    opacity: 0.8 !important;
 }
 
 .umb-cropper .crop-container {
@@ -361,16 +400,16 @@ ul.color-picker li a  {
 }
 
 .umb-cropper .crop-slider {
-   padding: 10px;
-   border-top: 1px solid @gray-10;
-   margin-top: 10px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   flex-wrap: wrap;
-   @media (min-width: 769px) {
+    padding: 10px;
+    border-top: 1px solid @gray-10;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    @media (min-width: 769px) {
         padding: 10px 50px 10px 50px;
-   }
+    }
 }
 
 .umb-cropper .crop-slider i {

@@ -119,25 +119,12 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         /// <summary>
-        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan
-        /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
-        /// to be set to true if the SetupPluginManager has been overridden.
-        /// </summary>
-        protected virtual bool PluginManagerResetRequired
-        {
-            get { return false; }
-        }
-
-        /// <summary>
         /// Inheritors can resset the plugin manager if they choose to on teardown
         /// </summary>
         protected virtual void ResetPluginManager()
         {
-            if (PluginManagerResetRequired)
-            {
-                PluginManager.Current = null;
-            }
-        }        
+            PluginManager.Current = null;
+        }
 
         protected virtual CacheHelper CreateCacheHelper()
         {
@@ -185,26 +172,23 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupPluginManager()
         {
-            if (PluginManager.Current == null || PluginManagerResetRequired)
+            PluginManager.Current = new PluginManager(
+                new ActivatorServiceProvider(),
+                CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
-                PluginManager.Current = new PluginManager(
-                    new ActivatorServiceProvider(),
-                    CacheHelper.RuntimeCache, ProfilingLogger, false)
+                AssembliesToScan = new[]
                 {
-                    AssembliesToScan = new[]
-                    {
-                        Assembly.Load("Umbraco.Core"),
-                        Assembly.Load("umbraco"),
-                        Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("businesslogic"),
-                        Assembly.Load("cms"),
-                        Assembly.Load("controls"),
-                        Assembly.Load("umbraco.editorControls"),
-                        Assembly.Load("umbraco.MacroEngines"),
-                        Assembly.Load("umbraco.providers"),
-                    }
-                };
-            }
+                    Assembly.Load("Umbraco.Core"),
+                    Assembly.Load("umbraco"),
+                    Assembly.Load("Umbraco.Tests"),
+                    Assembly.Load("businesslogic"),
+                    Assembly.Load("cms"),
+                    Assembly.Load("controls"),
+                    Assembly.Load("umbraco.editorControls"),
+                    Assembly.Load("umbraco.MacroEngines"),
+                    Assembly.Load("umbraco.providers"),
+                }
+            };
         }
 
         /// <summary>

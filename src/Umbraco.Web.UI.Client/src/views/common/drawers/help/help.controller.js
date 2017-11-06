@@ -26,7 +26,10 @@
 
         function oninit() {
 
-            vm.tours = tourService.getGroupedTours();
+            tourService.getGroupedTours().then(function(groupedTours) {
+                vm.tours = groupedTours;
+                getTourGroupCompletedPercentage();
+            });
 
             // load custom help dashboard
             dashboardResource.getDashboard("user-help").then(function (dashboard) {
@@ -51,8 +54,6 @@
                 findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
 
             });
-
-            getTourGroupCompletedPercentage();
             
             // check if a tour is running - if it is open the matching group
             var currentTour = tourService.getCurrentTour();
@@ -156,9 +157,11 @@
         }
 
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
-            vm.tours = tourService.getGroupedTours();
-            openTourGroup(tour.alias);
-            getTourGroupCompletedPercentage();
+            tourService.getGroupedTours().then(function(groupedTours) {
+                vm.tours = groupedTours;
+                openTourGroup(tour.alias);
+                getTourGroupCompletedPercentage();
+            });
         }));
            
         $scope.$on('$destroy', function () {

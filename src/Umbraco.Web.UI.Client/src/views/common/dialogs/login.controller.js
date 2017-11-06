@@ -17,6 +17,10 @@
       acceptedFileTypes: mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes),
       uploaded: false
     }
+    $scope.togglePassword = function () {
+        var elem = $("form[name='loginForm'] input[name='password']");
+        elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+    }
 
     function init() {
       // Check if it is a new user
@@ -48,7 +52,7 @@
         ]).then(function () {
 
           $scope.inviteStep = Number(inviteVal);
-          
+
         });
       }
     }
@@ -82,7 +86,7 @@
           var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
 
           // set percentage property on file
-          $scope.avatarFile.uploadProgress = progressPercentage;  
+          $scope.avatarFile.uploadProgress = progressPercentage;
         }
 
       }).success(function (data, status, headers, config) {
@@ -149,11 +153,11 @@
 
             //error
             formHelper.handleError(err);
-            
+
             $scope.invitedUserPasswordModel.buttonState = "error";
 
           });
-      }      
+      }
     };
 
     var setFieldFocus = function (form, field) {
@@ -255,7 +259,7 @@
 
       //TODO: Do validation properly like in the invite password update
 
-      //if the login and password are not empty we need to automatically 
+      //if the login and password are not empty we need to automatically
       // validate them - this is because if there are validation errors on the server
       // then the user has to change both username & password to resubmit which isn't ideal,
       // so if they're not empty, we'll just make sure to set them to valid.
@@ -289,7 +293,7 @@
         });
 
       //setup a watch for both of the model values changing, if they change
-      // while the form is invalid, then revalidate them so that the form can 
+      // while the form is invalid, then revalidate them so that the form can
       // be submitted again.
       $scope.loginForm.username.$viewChangeListeners.push(function () {
         if ($scope.loginForm.username.$invalid) {

@@ -1,5 +1,8 @@
 <div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-editor umb-contentpicker">
 
+    <p ng-if="(renderModel|filter:{trashed:true}).length == 1"><localize key="contentPicker_pickedTrashedItem"></localize></p>
+    <p ng-if="(renderModel|filter:{trashed:true}).length > 1"><localize key="contentPicker_pickedTrashedItems"></localize></p>
+
     <ng-form name="contentPickerForm">
 
         <div ui-sortable="sortableOptions" ng-model="renderModel">

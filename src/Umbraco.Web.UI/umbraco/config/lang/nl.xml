@@ -1077,7 +1077,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 
     <key alias="allowAllEditors">Alle editors toelaten</key>
     <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
-	<key alias="setAsDefault">Instellen als standaard</key>
+    <key alias="maxItems">Maximale artikelen</key>
+    <key alias="maxItemsDescription">Laat dit leeg of is ingesteld op -1 voor onbeperkt</key>
+	  <key alias="setAsDefault">Instellen als standaard</key>
     <key alias="chooseExtra">Kies extra</key>
     <key alias="chooseDefault">Kies standaard</key>
     <key alias="areAdded">zijn toegevoegd</key>
