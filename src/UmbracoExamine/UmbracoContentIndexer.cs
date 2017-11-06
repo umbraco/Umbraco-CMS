@@ -218,7 +218,8 @@ namespace UmbracoExamine
                 new StaticField("writerName", FieldIndexTypes.ANALYZED, false, string.Empty),
                 new StaticField("creatorName", FieldIndexTypes.ANALYZED, false, string.Empty),
                 new StaticField("nodeTypeAlias", FieldIndexTypes.ANALYZED, false, string.Empty),
-                new StaticField("path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
+                new StaticField( "path", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField( "isPublished", FieldIndexTypes.NOT_ANALYZED, false, string.Empty)
             };
 
         #endregion
