@@ -4,7 +4,7 @@
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
 
     <div class="flex error">
-        <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
+        <ul ui-sortable="sortableOptions" ng-model="images" ng-if="images.length > 0" class="umb-sortable-thumbnails">
             <li class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images">
 
                 <!-- IMAGE -->
@@ -30,8 +30,8 @@
                 </div>
 
             </li>
-
         </ul>
+
         <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': images.length === 0}" ng-if="showAdd()" prevent-default>
             <i class="icon icon-add large"></i>
         </a>
