@@ -37,7 +37,7 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
         // get intro tour
         tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
             // start intro tour if it hasn't been completed or disabled
-            if (introTour.disabled !== true && introTour.completed !== true) {
+            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
                 tourService.startTour(introTour);
             }
         });
