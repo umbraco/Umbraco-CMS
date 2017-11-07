@@ -337,7 +337,7 @@
                 ]
             },
             {
-                "name": "The media library",
+                "name": "The Media library",
                 "alias": "umbIntroMediaSection",
                 "group": "Getting Started",
                 "steps": [
