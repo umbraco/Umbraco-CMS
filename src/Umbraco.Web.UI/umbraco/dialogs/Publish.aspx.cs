@@ -30,7 +30,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
             }
 
             DocumentId = doc.Id;
-            PageName = doc.Name;
+            PageName = Server.HtmlEncode(doc.Name);
             DocumentPath = doc.Path;
 
         }

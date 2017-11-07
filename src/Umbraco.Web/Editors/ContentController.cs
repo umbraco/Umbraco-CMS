@@ -644,8 +644,6 @@ namespace Umbraco.Web.Editors
                     break;
             }
 
-            UpdatePreviewContext(contentItem.PersistedContent.Id);
-
             //If the item is new and the operation was cancelled, we need to return a different
             // status code so the UI can handle it since it won't be able to redirect since there
             // is no Id to redirect to!
@@ -872,24 +870,6 @@ namespace Umbraco.Web.Editors
             {
                 content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
                 return content;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the user is currently in preview mode and if so will update the preview content for this item
-        /// </summary>
-        /// <param name="contentId"></param>
-        private void UpdatePreviewContext(int contentId)
-        {
-            var previewId = Request.GetPreviewCookieValue();
-            if (previewId.IsNullOrWhiteSpace()) return;
-            Guid id;
-            if (Guid.TryParse(previewId, out id))
-            {
-                var d = new Document(contentId);
-                var pc = new PreviewContent(UmbracoUser, id, false);
-                pc.PrepareDocument(UmbracoUser, d, true);
-                pc.SavePreviewSet();
             }
         }
 

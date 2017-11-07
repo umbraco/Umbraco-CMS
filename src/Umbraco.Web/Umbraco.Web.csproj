@@ -393,6 +393,7 @@
     <Compile Include="Models\ContentEditing\MemberTypeSave.cs" />
     <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFiles.cs" />
+    <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupBasic.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
@@ -427,6 +428,7 @@
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
+    <Compile Include="Models\UserTourStatus.cs" />
     <Compile Include="Models\ValidatePasswordResetCodeModel.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\DisableBrowserCacheAttribute.cs" />
@@ -649,7 +651,7 @@
     <Compile Include="Models\ContentEditing\StylesheetRule.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
     <Compile Include="Models\ContentEditing\AuditLogType.cs" />
-    <Compile Include="Models\Mapping\DashboardModelsMapper.cs" />
+    <Compile Include="Models\Mapping\MiscModelsMapper.cs" />
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberModelMapper.cs" />
     <Compile Include="Models\Mapping\TabModelMapper.cs" />

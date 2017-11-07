@@ -30,19 +30,17 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     function onInit() {
         
         // load tours
-        vm.tours = tourService.getGroupedTours();
+        tourService.getGroupedTours().then(function(groupedTours) {
+            vm.tours = groupedTours;
+        });
         
-        // get list of completed tours
-        var completedTours = tourService.getCompletedTours();
-
         // get intro tour
-        var introTour = tourService.getTourByAlias("umbIntroIntroduction");
-        
-        // start tour if it hasn't been completed
-        if(completedTours.indexOf(introTour.alias) === -1) {
-            tourService.startTour(introTour);
-        }
-        
+        tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+            // start intro tour if it hasn't been completed or disabled
+            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                tourService.startTour(introTour);
+            }
+        });
     }
 
     function startTour(tour) {

@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService) {
 
     var unsubscribe;
 
@@ -154,7 +154,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         }
     }
 
-
     if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
         //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
         dialogOptions.startNodeId = -1;
@@ -287,8 +286,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             entityResource.getUrl(entity.id, entityType).then(function(data){
                 // update url                
                 angular.forEach($scope.renderModel, function(item){
-                    if(item.id === entity.id) {
-                        item.url = data;
+                    if (item.id === entity.id) {
+                        if (entity.trashed) {
+                            item.url = localizationService.dictionary.general_recycleBin;
+                        } else {
+                            item.url = data;
+                        }
                     }
                 });
             });
@@ -330,6 +333,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
+            "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
         });

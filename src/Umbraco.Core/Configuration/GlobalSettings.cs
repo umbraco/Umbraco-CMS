@@ -538,24 +538,41 @@ namespace Umbraco.Core.Configuration
 
         internal static bool ContentCacheXmlStoredInCodeGen
         {
-            get { return ContentCacheXmlStorageLocation == ContentXmlStorage.AspNetTemp; }
+            get { return LocalTempStorageLocation == LocalTempStorage.AspNetTemp; }
         }
 
-        internal static ContentXmlStorage ContentCacheXmlStorageLocation
+        /// <summary>
+        /// This is the location type to store temporary files such as cache files or other localized files for a given machine
+        /// </summary>
+        /// <remarks>
+        /// Currently used for the xml cache file and the plugin cache files
+        /// </remarks>
+        internal static LocalTempStorage LocalTempStorageLocation
         {
             get
             {
+                //there's a bunch of backwards compat config checks here....
+
+                //This is the current one
+                if (ConfigurationManager.AppSettings.ContainsKey("umbracoLocalTempStorage"))
+                {
+                    return Enum<LocalTempStorage>.Parse(ConfigurationManager.AppSettings["umbracoLocalTempStorage"]);
+                }
+
+                //This one is old
                 if (ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLStorage"))
                 {
-                    return Enum<ContentXmlStorage>.Parse(ConfigurationManager.AppSettings["umbracoContentXMLStorage"]);
+                    return Enum<LocalTempStorage>.Parse(ConfigurationManager.AppSettings["umbracoContentXMLStorage"]);
                 }
+
+                //This one is older
                 if (ConfigurationManager.AppSettings.ContainsKey("umbracoContentXMLUseLocalTemp"))
                 {
                     return bool.Parse(ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"]) 
-                        ? ContentXmlStorage.AspNetTemp 
-                        : ContentXmlStorage.Default;
+                        ? LocalTempStorage.AspNetTemp 
+                        : LocalTempStorage.Default;
                 }
-                return ContentXmlStorage.Default;
+                return LocalTempStorage.Default;
             }
         }
 

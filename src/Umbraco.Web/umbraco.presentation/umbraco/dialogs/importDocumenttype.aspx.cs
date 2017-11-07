@@ -70,10 +70,11 @@ namespace umbraco.presentation.umbraco.dialogs
 		private void import_Click(object sender, EventArgs e)
 		{
             var xd = new XmlDocument();
+		    xd.XmlResolver = null;
             xd.Load(tempFile.Value);
 
 		    var userId = base.getUser().Id;
-
+            
             var element = XElement.Parse(xd.InnerXml);
 		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, userId);
 		    var contentType = importContentTypes.FirstOrDefault();
@@ -104,7 +105,8 @@ namespace umbraco.presentation.umbraco.dialogs
 			documentTypeFile.PostedFile.SaveAs(fileName);
 
 			var xd = new XmlDocument();
-			xd.Load(fileName);
+		    xd.XmlResolver = null;
+            xd.Load(fileName);
 			dtName.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Name").FirstChild.Value;
 			dtAlias.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Alias").FirstChild.Value;
 
