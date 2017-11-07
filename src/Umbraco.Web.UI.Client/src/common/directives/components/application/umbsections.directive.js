@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbSections
 * @restrict E
 **/
-function sectionsDirective($timeout, $window, navigationService, treeService, sectionService, appState, eventsService, $location) {
+function sectionsDirective($timeout, $window, navigationService, treeService, sectionService, appState, eventsService, $location, historyService) {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -161,7 +161,9 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                     $location.path(section.routePath);
                 }
                 else {
-                    $location.path(section.alias).search('');
+                    var lastAccessed = historyService.getLastAccessedItemForSection(section.alias);
+                    var path = lastAccessed != null ? lastAccessed.link : section.alias;                  
+                    $location.path(path).search('');
                 }
 			    
 			};
