@@ -35,7 +35,7 @@ namespace umbraco.editorControls.yesno
 
 		public override string DataTypeName
 		{
-			get {return "Single Checkbox";}
+			get {return "Checkbox";}
 		}
 		public override Guid Id 
 		{

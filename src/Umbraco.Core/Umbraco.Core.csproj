@@ -545,7 +545,7 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetUkUmbFest\RenameTrueFalseField.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\RenameTrueFalseField.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
