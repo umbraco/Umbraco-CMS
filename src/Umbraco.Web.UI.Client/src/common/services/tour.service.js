@@ -343,33 +343,33 @@
                 "steps": [
                     {
                         title: "How to use the media library",
-                        content: "<p>A website would be boring without media content. In Umbraco you can manage all your images, documents, videos etc. in the <b>Media section</b>. Here you can upload and organise your media items and see details about each item.</p><p>In this tour we will learn how to upload and orginise your Media library in Umbraco. It will also show you how to view details about a specific media item.</p>",
+                        content: "<p>A website would be boring without media content. In Umbraco you can manage all your images, documents, videos etc. in the <b>Media section</b>. Here you can upload and organise your media items and see details about each item.</p><p>In this tour you will learn how to upload and organise your Media library in Umbraco. It will also show you how to view details about a specific media item.</p>",
                         type: "intro"
                     },
                     {
                         element: "#applications [data-element='section-media']",
-                        title: "Navigate to the media section",
-                        content: "The <b>media</b> section is where you will manage all your media items.",
+                        title: "Navigate to the <b>Media</b> section",
+                        content: "The <b>media</b> section is where you manage all your media items.",
                         event: "click",
                         backdropOpacity: 0.6
                     },
                     {
                         element: "#tree [data-element='tree-root']",
                         title: "Create a new folder",
-                        content: "<p>Let's first create a folder for our images. Hover the media root and click the <b>three small dots</b> on the right side of the item.</p>",
+                        content: "<p>First create a folder for your images. Hover the media root node and click the <b>three small dots</b> on the right side of the item.</p>",
                         event: "click",
                         eventElement: "#tree [data-element='tree-root'] [data-element='tree-item-options']"
                     },
                     {
                         element: "#dialog [data-element='action-Folder']",
                         title: "Create a new folder",
-                        content: "<p>Select the <b>Folder</b> options to select the type folder.</p>",
+                        content: "<p>Select the <b>Folder</b> option to select the type folder.</p>",
                         event: "click"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='editor-name-field']",
                         title: "Enter a name",
-                        content: "<p>Enter <code>My folder</code> in the field.</p>"
+                        content: "<p>Enter <code>My Images</code> in the field.</p>"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='button-save']",
@@ -380,7 +380,7 @@
                     {
                         element: "[data-element='editor-media'] [data-element='dropzone']",
                         title: "Upload images",
-                        content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select a couple of images on your computer and upload them.</p>",
+                        content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select a couple of images on your computer and upload them.</p><p> You can also drag and drop the images directly in the upload and even drop entire folders - Umbraco will automagically create a folder and put the media items in the folder.</p>",
                         view: "uploadimages"
                     },
                     {
@@ -393,12 +393,12 @@
                     {
                         element: "[data-element='editor-media'] [data-element='property-umbracoFile']",
                         title: "The uploaded image",
-                        content: "<p>Here you can see the image you have uploaded.</p><p>You can use the dot in the center of the image to set a focal point on the image.</p>"
+                        content: "<p>Here you can see the image you have uploaded.</p>"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='property-umbracoBytes']",
                         title: "Image size",
-                        content: "<p>You will also find other details about the image, like the size.</p><p>You can add extra properties to an image by creating or editing the <b>Media types</b></p>"
+                        content: "<p>You will also find other details about the image, like the size.</p><p>Media items work in much the same way as content. So you can add extra properties to an image by creating or editing the <b>Media types</b> in the Settings section.</p>"
                     },
                     {
                         element: "[data-element='editor-media'] [data-element='tab-Generic properties']",
@@ -415,6 +415,11 @@
                         element: "[data-element='editor-media'] [data-element='property-_umb_updatedate']",
                         title: "Last edited",
                         content: "...and information about when the media item has been created and edited."
+                    },
+                    {
+                        element: "[data-element='editor-content']",
+                        title: "Using media items",
+                        content: "You can reference a media item directly in a template by using the path or try adding a Media Picker to a document type property so you can select media items from the content section."
                     }
                 ]
             }
