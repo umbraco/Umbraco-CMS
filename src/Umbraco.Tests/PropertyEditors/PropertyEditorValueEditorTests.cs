@@ -40,7 +40,8 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("hello world", false)]
         public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
         {
-            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Nvarchar), value);
+            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Nvarchar));
+            prop.SetValue(value);
 
             var valueEditor = new PropertyValueEditor
                 {
@@ -131,7 +132,8 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(PropertyEditorValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
-            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Nvarchar), val);
+            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Nvarchar));
+            prop.SetValue(val);
 
             var valueEditor = new PropertyValueEditor
                 {
@@ -151,7 +153,8 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = PropertyEditorValueTypes.Decimal
             };
 
-            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Decimal), value);
+            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Decimal));
+            prop.SetValue(value);
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
             Assert.AreEqual("12.34", result);
@@ -165,7 +168,8 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = PropertyEditorValueTypes.Decimal
             };
 
-            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Decimal), string.Empty);
+            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Decimal));
+            prop.SetValue(string.Empty);
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(string.Empty, result);
@@ -180,7 +184,8 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = PropertyEditorValueTypes.Date
             };
 
-            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Date), now);
+            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Date));
+            prop.SetValue(now);
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(now.ToIsoString(), result);

@@ -23,58 +23,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             MigratePropertyData();
             MigrateContent();
             MigrateContentVersion();
+            MigrateDocumentVersion();
             MigrateDocument();
 
             // re-create *all* keys and indexes
             //Create.KeysAndIndexes<PropertyDataDto>();
             foreach (var x in DatabaseSchemaCreation.OrderedTables)
                 Create.KeysAndIndexes(x.Value);
-        }
-
-        private void MigrateContent()
-        {
-            // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.Content))
-                return;
-
-            // migrate
-            if (ColumnExists(PreTables.Content, "contentType"))
-                ReplaceColumn<PropertyDataDto>(PreTables.Content, "contentType", "contentTypeId");
-            if (ColumnExists(PreTables.Content, "pk"))
-                ReplaceColumn<PropertyDataDto>(PreTables.Content, "pk", "id");
-            Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content);
-        }
-
-        private void MigrateContentVersion()
-        {
-            // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.ContentVersion))
-                return;
-
-            // migrate
-            if (!ColumnExists(PreTables.ContentVersion, "text"))
-                AddColumn<PropertyDataDto>(PreTables.ContentVersion, "text");
-            if (ColumnExists(PreTables.ContentVersion, "ContentId"))
-                ReplaceColumn<PropertyDataDto>(PreTables.Content, "ContentId", "nodeId");
-            Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion);
-        }
-
-        private void MigrateDocument()
-        {
-            // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.Document))
-                return;
-
-            // migrate
-            // todo!
-            // - rename nodeId
-            // - rename documentUser
-            // - only keep newest but update other versions with text?
-            // - document text vs node text?
-            // - we need uDocumentVersion FIRST not to lose templateId!
-            // - kill newest
-
-            Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document);
         }
 
         private void MigratePropertyData()
@@ -117,6 +72,151 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
 
             // rename table
             Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData);
+        }
+
+        private void MigrateContent()
+        {
+            // if the table has already been renamed, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.Content))
+                return;
+
+            // rename columns
+            if (ColumnExists(PreTables.Content, "contentType"))
+                ReplaceColumn<PropertyDataDto>(PreTables.Content, "contentType", "contentTypeId");
+            if (ColumnExists(PreTables.Content, "pk"))
+                ReplaceColumn<PropertyDataDto>(PreTables.Content, "pk", "id");
+
+            // rename table
+            Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content);
+        }
+
+        private void MigrateContentVersion()
+        {
+            // if the table has already been renamed, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.ContentVersion))
+                return;
+
+            // add text column
+            if (!ColumnExists(PreTables.ContentVersion, "text"))
+                AddColumn<ContentVersionDto>(PreTables.ContentVersion, "text");
+
+            // populate text column
+            Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
+SET cver.text=doc.text
+FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc WHERE cver.versionId=doc.versionId");
+
+            // add current column
+            if (!ColumnExists(PreTables.ContentVersion, "current"))
+                AddColumn<ContentVersionDto>(PreTables.ContentVersion, "current");
+
+            // populate current column => done during MigrateDocument
+
+            // rename contentId column
+            if (ColumnExists(PreTables.ContentVersion, "ContentId"))
+                ReplaceColumn<ContentVersionDto>(PreTables.Content, "ContentId", "nodeId");
+
+            // rename table
+            Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion);
+        }
+
+        private void MigrateDocumentVersion()
+        {
+            // if the table already exists, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.DocumentVersion))
+                return;
+
+            // create table
+            Create.Table<DocumentVersionDto>(withoutKeysAndIndexes: true);
+
+            Execute.Sql($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, contentVersionId, templateId)
+SELECT cver.Id, cver.versionId, doc.templateId
+FROM {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.versionId=cver.versionId");
+        }
+
+        private void MigrateDocument()
+        {
+            // if the table has already been renamed, we're done
+            if (TableExists(Constants.DatabaseSchema.Tables.Document))
+                return;
+
+            // drop some columns
+            Delete.Column("text").FromTable(PreTables.Document); // fixme usage
+            Delete.Column("templateId").FromTable(PreTables.Document); // fixme usage
+
+            // replace some columns
+            ReplaceColumn<DocumentDto>(PreTables.Document, "documentUser", "writerUserId");
+
+            // update PropertyData.Published for published versions
+            if (Context.SqlContext.DatabaseType.IsMySql())
+            {
+                // FIXME does MySql support such update syntax?
+                throw new NotSupportedException();
+            }
+            else
+            {
+                Execute.Sql($@"UPDATE pdata
+SET pdata.published=1
+FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyData)} pdata
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.versionId=pdata.versionId AND doc.published=1");
+            }
+
+            // collapse draft version into published version (if any)
+            // ie we keep the published version and remove the draft one
+            Execute.Code(context =>
+            {
+                var versions = context.Database.Fetch<dynamic>(@"SELECT
+	doc1.versionId versionId1, doc1.newest newest1, doc1.published published1,
+	doc2.versionId versionId2, doc2.newest newest2, doc2.published published2
+FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc1
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc2
+    ON doc1.nodeId=doc2.nodeId AND doc1.versionId<>doc2.versionId AND doc1.updateDate<doc2.updateDate
+WHERE doc1.newest=0 AND doc1.published=1 AND doc2.newest=1 AND doc2.published=0
+");
+                foreach (var version in versions)
+                {
+                    context.Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyData)}
+SET versionId='{version.versionId1}', published=1
+WHERE versionId='{version.versionId2}'");
+                    context.Database.Execute($@"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyData)}
+WHERE versionId='{version.versionId2}'");
+                    context.Database.Execute($@"DELETE FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)}
+WHERE versionId='{version.versionId2}'");
+                    context.Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Document)}
+SET newest=1 WHERE versionId='{version.versionId1}'");
+                }
+                return string.Empty;
+            });
+
+            // update content version
+            Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersion)}
+SET current=1
+FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersion)} ver
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON ver.versionId=doc.versionId
+WHERE doc.newest=1");
+
+            // keep only one row per document
+            Execute.Code(context =>
+            {
+                var versions = context.Database.Fetch<dynamic>(@"SELECT
+	doc.nodeId, doc.versionId versionId1
+FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
+WHERE doc.newest=1
+");
+                foreach (var version in versions)
+                {
+                    context.Database.Execute($@"DELETE FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)}
+WHERE nodeId={version.nodeId} AND versionId<>{version.versionId}");
+                }
+                return string.Empty;
+            });
+
+            // drop some columns
+            Delete.Column("versionId").FromTable(PreTables.Document); // fixme usage
+            Delete.Column("newest").FromTable(PreTables.Document); // fixme usage
+
+            // rename table
+            Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document);
         }
 
         private static class PreTables

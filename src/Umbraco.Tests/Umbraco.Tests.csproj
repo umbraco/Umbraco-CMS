@@ -458,7 +458,6 @@
     <Compile Include="Migrations\Stubs\Dummy.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
     <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
-    <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\ValidateOlderSchemaTest.cs" />

@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 {
     public interface ICreateBuilder : IFluentSyntax
     {
-        void Table<T>();
+        void Table<T>(bool withoutKeysAndIndexes = false);
         void KeysAndIndexes<T>();
         void KeysAndIndexes(Type typeOfDto);
 

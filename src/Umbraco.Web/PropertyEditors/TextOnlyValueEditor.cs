@@ -27,13 +27,13 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            if (property.Value == null) return string.Empty;
+            if (property.GetValue() == null) return string.Empty;
 
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Ntext:
                 case DataTypeDatabaseType.Nvarchar:
-                    return property.Value.ToString();
+                    return property.GetValue().ToString();
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
                 case DataTypeDatabaseType.Date:

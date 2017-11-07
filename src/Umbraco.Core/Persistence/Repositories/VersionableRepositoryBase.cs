@@ -11,7 +11,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -33,87 +32,79 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IAggregateRoot
         where TRepository : class, IRepository
     {
-        //private readonly IContentSection _contentSection;
-
-        protected VersionableRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger /*, IContentSection contentSection*/)
+        protected VersionableRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
             : base(work, cache, logger)
-        {
-            //_contentSection = contentSection;
-        }
+        { }
 
         protected abstract TRepository This { get; }
 
-        #region IRepositoryVersionable Implementation
+        #region Versions
 
-        /// <summary>
-        /// Gets a list of all versions for an <see cref="TEntity"/> ordered so latest is first
-        /// </summary>
-        /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
-        /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        public abstract IEnumerable<TEntity> GetAllVersions(int id);
-
-        /// <summary>
-        /// Gets a list of all version Ids for the given content item ordered so latest is first
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="maxRows">The maximum number of rows to return</param>
-        /// <returns></returns>
-        public virtual IEnumerable<Guid> GetVersionIds(int id, int maxRows)
-        {
-            var sql = SqlContext.Sql();
-            sql.Select("cmsDocument.versionId")
-                .From<DocumentDto>()
-                .InnerJoin<ContentDto>()
-                .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<NodeDto>(x => x.NodeId == id)
-                .OrderByDescending<DocumentDto>(x => x.UpdateDate);
-
-            return Database.Fetch<Guid>(SqlContext.SqlSyntax.SelectTop(sql, maxRows));
-        }
-
-        public virtual void DeleteVersion(Guid versionId)
-        {
-            var dto = Database.FirstOrDefault<ContentVersionDto>("WHERE versionId = @VersionId", new { VersionId = versionId });
-            if(dto == null) return;
-
-            //Ensure that the lastest version is not deleted
-            var latestVersionDto = Database.FirstOrDefault<ContentVersionDto>("WHERE ContentId = @Id ORDER BY VersionDate DESC", new { Id = dto.NodeId });
-            if(latestVersionDto.VersionId == dto.VersionId)
-                return;
-
-            PerformDeleteVersion(dto.NodeId, versionId);
-        }
-
-        public virtual void DeleteVersions(int id, DateTime versionDate)
-        {
-            //Ensure that the latest version is not part of the versions being deleted
-            var latestVersionDto = Database.FirstOrDefault<ContentVersionDto>("WHERE ContentId = @Id ORDER BY VersionDate DESC", new { Id = id });
-            var list =
-                Database.Fetch<ContentVersionDto>(
-                    "WHERE versionId <> @VersionId AND (ContentId = @Id AND VersionDate < @VersionDate)",
-                    new { /*VersionId =*/ latestVersionDto.VersionId, Id = id, VersionDate = versionDate});
-            if (list.Any() == false) return;
-
-            foreach (var dto in list)
-            {
-                PerformDeleteVersion(id, dto.VersionId);
-            }
-        }
-
+        // gets a specific version
         public abstract TEntity GetByVersion(Guid versionId);
 
-        /// <summary>
-        /// Protected method to execute the delete statements for removing a single version for a TEntity item.
-        /// </summary>
-        /// <param name="id">Id of the <see cref="TEntity"/> to delete a version from</param>
-        /// <param name="versionId">Guid id of the version to delete</param>
+        // gets all versions, current first
+        public abstract IEnumerable<TEntity> GetAllVersions(int nodeId);
+
+        // gets all version ids, current first
+        public virtual IEnumerable<Guid> GetVersionIds(int nodeId, int maxRows)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
+                tsql.Select<ContentVersionDto>(x => x.VersionId)
+                    .From<ContentVersionDto>()
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
+                    .OrderByDescending<ContentVersionDto>(x => x.Current) // current '1' comes before others '0'
+                    .AndByDescending<ContentVersionDto>(x => x.VersionDate) // most recent first
+            );
+            return Database.Fetch<Guid>(SqlSyntax.SelectTop(template.Sql(nodeId), maxRows));
+        }
+
+        // deletes a specific version
+        public virtual void DeleteVersion(Guid versionId)
+        {
+            // fixme test object node type?
+
+            // get the version we want to delete
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == SqlTemplate.Arg<Guid>("versionId"))
+            );
+            var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(versionId)).FirstOrDefault();
+
+            // nothing to delete
+            if (versionDto == null)
+                return;
+
+            // don't delete the current version
+            if (versionDto.Current)
+                throw new InvalidOperationException("Cannot delete the current version.");
+
+            PerformDeleteVersion(versionDto.NodeId, versionId);
+        }
+
+        // deletes all version older than a date
+        public virtual void DeleteVersions(int nodeId, DateTime versionDate)
+        {
+            // fixme test object node type?
+
+            // get the versions we want to delete, excluding the current one
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("date"))
+            );
+            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(nodeId, versionDate)); // fixme ok params?
+            foreach (var versionDto in versionDtos)
+                PerformDeleteVersion(versionDto.NodeId, versionDto.VersionId);
+        }
+
+        // actually deletes a version
         protected abstract void PerformDeleteVersion(int id, Guid versionId);
 
         #endregion
 
+        #region Count
+
+        /// <summary>
+        /// Count descendants of an item.
+        /// </summary>
         public int CountDescendants(int parentId, string contentTypeAlias = null)
         {
             var pathMatch = parentId == -1
@@ -145,6 +136,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.ExecuteScalar<int>(sql);
         }
 
+        /// <summary>
+        /// Count children of an item.
+        /// </summary>
         public int CountChildren(int parentId, string contentTypeAlias = null)
         {
             var sql = SqlContext.Sql()
@@ -173,10 +167,8 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Get the total count of entities
+        /// Count items.
         /// </summary>
-        /// <param name="contentTypeAlias"></param>
-        /// <returns></returns>
         public int Count(string contentTypeAlias = null)
         {
             var sql = SqlContext.Sql()
@@ -202,21 +194,21 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.ExecuteScalar<int>(sql);
         }
 
+        #endregion
+
+        #region Tags
+
         /// <summary>
-        /// This removes associated tags from the entity - used generally when an entity is recycled
+        /// Clears tags for an item.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="tagRepo"></param>
         protected void ClearEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             tagRepo.ClearTagsFromEntity(entity.Id);
         }
 
         /// <summary>
-        /// Updates the tag repository with any tag enabled properties and their values
+        /// Updates tags for an item.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="tagRepo"></param>
         protected void UpdateEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
@@ -241,10 +233,17 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// Determines if an item has a property that supports tags.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         protected bool HasTagProperty(IContentBase entity)
         {
             return entity.Properties.Any(x => x.TagSupport.Enable);
         }
+
+        #endregion
 
         private Sql<ISqlContext> PrepareSqlForPagedResults(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField, string table)
         {
@@ -430,14 +429,15 @@ namespace Umbraco.Core.Persistence.Repositories
             return mapper(pagedResult.Items);
         }
 
-        protected IDictionary<Guid, PropertyCollection> GetPropertyCollection(List<TempContent> temps)
+        protected IDictionary<Guid, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps)
+            where T : class, IContentBase
         {
-            var versions = temps.Select(x => x.Version).ToArray();
+            var versions = temps.Select(x => x.VersionId).ToArray();
             if (versions.Length == 0) return new Dictionary<Guid, PropertyCollection>();
 
             // get all PropertyDataDto for all definitions / versions
             var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, Guid>(versions, 2000, batch =>
-                    SqlContext.Sql()
+                SqlContext.Sql()
                     .Select<PropertyDataDto>()
                     .From<PropertyDataDto>()
                     .WhereIn<PropertyDataDto>(x => x.VersionId, batch))
@@ -472,10 +472,11 @@ namespace Umbraco.Core.Persistence.Repositories
             // - a lazy access to prevalues
             // and we need to build the proper property collections
 
-            return GetPropertyCollection(temps, allPropertyDataDtos, pre);
+            return GetPropertyCollections(temps, allPropertyDataDtos, pre);
         }
 
-        private IDictionary<Guid, PropertyCollection> GetPropertyCollection(List<TempContent> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues)
+        private IDictionary<Guid, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues)
+            where T : class, IContentBase
         {
             var result = new Dictionary<Guid, PropertyCollection>();
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
@@ -495,12 +496,12 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 // compositionProperties is the property types for the entire composition
                 // use an index for perfs
-                if (compositionPropertiesIndex.TryGetValue(temp.Composition.Id, out var compositionProperties) == false)
-                    compositionPropertiesIndex[temp.Composition.Id] = compositionProperties = temp.Composition.CompositionPropertyTypes.ToArray();
+                if (compositionPropertiesIndex.TryGetValue(temp.ContentType.Id, out var compositionProperties) == false)
+                    compositionPropertiesIndex[temp.ContentType.Id] = compositionProperties = temp.ContentType.CompositionPropertyTypes.ToArray();
 
                 // map the list of PropertyDataDto to a list of Property
-                var properties = indexedPropertyDataDtos.TryGetValue(temp.Version, out var propertyDataDtos)
-                    ? PropertyFactory.BuildEntity(propertyDataDtos, compositionProperties, temp.CreateDate, temp.VersionDate).ToList()
+                var properties = indexedPropertyDataDtos.TryGetValue(temp.VersionId, out var propertyDataDtos)
+                    ? PropertyFactory.BuildEntities(propertyDataDtos, compositionProperties).ToList()
                     : new List<Property>();
 
                 // deal with tags
@@ -523,19 +524,20 @@ namespace Umbraco.Core.Persistence.Repositories
                     var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
                     var preVals = new PreValueCollection(asDictionary);
                     if (additionalData == null) additionalData = new Dictionary<string, object>(); // reduce allocs
-                    var contentPropData = new ContentPropertyData(property.Value, preVals, additionalData);
-                    TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
+                    // fixme this is totally borked of course for variants
+                    var contentPropData = new ContentPropertyData(property.GetValue(), preVals, additionalData);
+                    TagExtractor.SetPropertyTags(property, contentPropData, property.GetValue(), tagSupport);
                 }
 
-                if (result.ContainsKey(temp.Version))
+                if (result.ContainsKey(temp.VersionId))
                 {
-                    var msg = $"The query returned multiple property sets for content {temp.Id}, {temp.Composition.Name}";
+                    var msg = $"The query returned multiple property sets for content {temp.Id}, {temp.ContentType.Name}";
                     if (VersionableRepositoryBase.ThrowOnWarning)
                         throw new InvalidOperationException(msg);
                     Logger.Warn<VersionableRepositoryBase<TId, TEntity, TRepository>>(msg);
                 }
 
-                result[temp.Version] = new PropertyCollection(properties);
+                result[temp.VersionId] = new PropertyCollection(properties);
             }
 
             //// iterate each definition grouped by it's content type,
@@ -932,25 +934,47 @@ ORDER BY nodeId, versionId, propertytypeid
 
         protected class TempContent
         {
-            public TempContent(int id, Guid version, DateTime versionDate, DateTime createDate, IContentTypeComposition composition, IContentBase content = null)
+            public TempContent(int id, Guid versionId, IContentTypeComposition contentType)
             {
                 Id = id;
-                Version = version;
-                VersionDate = versionDate;
-                CreateDate = createDate;
-                Composition = composition;
+                VersionId = versionId;
+                ContentType = contentType;
+            }
+
+            /// <summary>
+            /// Gets or sets the identifier of the content.
+            /// </summary>
+            public int Id { get; set; }
+
+            /// <summary>
+            /// Gets or sets the version identifier of the content.
+            /// </summary>
+            public Guid VersionId { get; set; }
+
+            /// <summary>
+            /// Gets or sets the content type.
+            /// </summary>
+            public IContentTypeComposition ContentType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the identifier of the template of the content.
+            /// </summary>
+            public int? TemplateId { get; set; }
+        }
+
+        protected class TempContent<T> : TempContent
+            where T : class, IContentBase
+        {
+            public TempContent(int id, Guid versionId, IContentTypeComposition contentType, T content = null)
+                : base(id, versionId, contentType)
+            {
                 Content = content;
             }
 
-            public int Id { get; set; }
-            public Guid Version { get; set; }
-            public DateTime VersionDate { get; set; }
-            public DateTime CreateDate { get; set; }
-            public IContentTypeComposition Composition { get; set; }
-
-            public IContentBase Content { get; set; }
-
-            public int? TemplateId { get; set; }
+            /// <summary>
+            /// Gets or sets the associated actual content.
+            /// </summary>
+            public T Content { get; set; }
         }
 
         // fixme copied from 7.6

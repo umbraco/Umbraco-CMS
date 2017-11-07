@@ -373,14 +373,14 @@ namespace Umbraco.Core.Services
             var props = content.Properties.ToArray();
             foreach (var p in props)
             {
-                var newText = p.Value != null ? p.Value.ToString() : "";
+                var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
                 var oldText = newText;
 
                 // check if something was changed and display the changes otherwise display the fields
                 if (oldDoc.Properties.Contains(p.PropertyType.Alias))
                 {
                     var oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                    oldText = oldProperty.Value != null ? oldProperty.Value.ToString() : "";
+                    oldText = oldProperty.GetValue() != null ? oldProperty.GetValue().ToString() : "";
 
                     // replace html with char equivalent
                     ReplaceHtmlSymbols(ref oldText);

@@ -35,41 +35,37 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override MemberRepository This => this;
 
-        #region Overrides of RepositoryBase<int, IMembershipUser>
+        #region Repository Base
+
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
 
         protected override IMember PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(QueryType.Single)
+                .Where<NodeDto>(x => x.NodeId == id)
+                .SelectTop(1);
 
-            var dto = Database.Fetch<MemberDto>(sql.SelectTop(1)).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var content = CreateMemberFromDto(dto, dto.ContentVersionDto.VersionId);
-
-            return content;
-
+            var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
+            return dto == null
+                ? null
+                : MapDtoToContent(dto);
         }
 
         protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false);
+            var sql = GetBaseQuery(QueryType.Many);
+
             if (ids.Any())
-            {
-                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
-            }
+                sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
-            return MapQueryDtos(Database.Fetch<MemberDto>(sql));
-
+            return MapDtosToContent(Database.Fetch<MemberDto>(sql));
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
         {
             var baseQuery = GetBaseQuery(false);
 
+            // fixme why is this different from content/media?!
             //check if the query is based on properties or not
 
             var wheres = query.GetWhereClauses();
@@ -84,7 +80,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 baseQuery.Append("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments)
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return MapQueryDtos(Database.Fetch<MemberDto>(baseQuery));
+                return MapDtosToContent(Database.Fetch<MemberDto>(baseQuery));
             }
             else
             {
@@ -92,63 +88,68 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate()
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
-                return MapQueryDtos(Database.Fetch<MemberDto>(sql));
+                return MapDtosToContent(Database.Fetch<MemberDto>(sql));
             }
 
         }
 
-        #endregion
-
-        #region Overrides of NPocoRepositoryBase<int,IMembershipUser>
-
-        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-        {
-            return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
-        }
-
         protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
         {
-            var sql = Sql();
+            return GetBaseQuery(queryType, true);
+        }
 
-            switch (queryType)
+        protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
+        {
+            var sql = SqlContext.Sql();
+
+            switch (queryType) // FIXME pretend we still need these queries for now
             {
                 case QueryType.Count:
                     sql = sql.SelectCount();
                     break;
                 case QueryType.Ids:
-                    sql = sql.Select("cmsMember.nodeId");
+                    sql = sql.Select<MemberDto>(x => x.NodeId);
                     break;
-                case QueryType.Many:
                 case QueryType.Single:
+                case QueryType.Many:
                     sql = sql.Select<MemberDto>(r =>
-                        r.Select(x => x.ContentVersionDto, r1 =>
-                            r1.Select(x => x.ContentDto, r2 =>
-                                r2.Select(x => x.NodeDto))));
+                        r.Select(x => x.ContentVersionDto)
+                         .Select(x => x.ContentDto, r1 =>
+                                r1.Select(x => x.NodeDto)));
                     break;
             }
 
             sql
                 .From<MemberDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                //We're joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
+                .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)
+
+                // joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
                 // types by default on the document and media repo's so we can query by content type there too.
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId);
+
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
+            if (current)
+                sql.Where<ContentVersionDto>(x => x.Current); // always get the current version
 
             return sql;
         }
 
-        protected override string GetBaseWhereClause()
+        // fixme - move that one up to Versionable! or better: kill it!
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
+        {
+            return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
+        }
+
+        protected override string GetBaseWhereClause() // fixme - can we kill / refactor this?
         {
             return "umbracoNode.id = @Id";
         }
 
+        // fixme wtf?
         protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData()
         {
             return Sql()
@@ -178,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
                                "DELETE FROM cmsMember2MemberGroup WHERE Member = @Id",
                                "DELETE FROM cmsMember WHERE nodeId = @Id",
-                               "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @Id",
                                "DELETE FROM umbracoNode WHERE id = @Id"
@@ -186,263 +187,27 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
-
         #endregion
 
-        #region Unit of Work Implementation
+        #region Versions
 
-        protected override void PersistNewItem(IMember entity)
+        public override IEnumerable<IMember> GetAllVersions(int nodeId)
         {
-            ((Member)entity).AddingEntity();
+            var sql = GetBaseQuery(QueryType.Many, false)
+                .Where<NodeDto>(x => x.NodeId == nodeId)
+                .OrderByDescending<ContentVersionDto>(x => x.Current)
+                .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            //Ensure that strings don't contain characters that are invalid in XML
-            entity.SanitizeEntityPropertiesForXmlStorage();
-
-            var factory = new MemberFactory(NodeObjectTypeId, entity.Id);
-            var dto = factory.BuildDto(entity);
-
-            //NOTE Should the logic below have some kind of fallback for empty parent ids ?
-            //Logic for setting Path, Level and SortOrder
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
-            var level = parent.Level + 1;
-            var sortOrder =
-                Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-                                                      new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
-
-            //Create the (base) node data - umbracoNode
-            var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
-            nodeDto.Path = parent.Path;
-            nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
-            nodeDto.SortOrder = sortOrder;
-            var unused = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
-
-            //Update with new correct path
-            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-            Database.Update(nodeDto);
-
-            //Update entity with correct values
-            entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
-            entity.Path = nodeDto.Path;
-            entity.SortOrder = sortOrder;
-            entity.Level = level;
-
-            //Create the Content specific data - cmsContent
-            var contentDto = dto.ContentVersionDto.ContentDto;
-            contentDto.NodeId = nodeDto.NodeId;
-            Database.Insert(contentDto);
-
-            //Create the first version - cmsContentVersion
-            //Assumes a new Version guid and Version date (modified date) has been set
-            dto.ContentVersionDto.NodeId = nodeDto.NodeId;
-            Database.Insert(dto.ContentVersionDto);
-
-            //Create the first entry in cmsMember
-            dto.NodeId = nodeDto.NodeId;
-
-            //if the password is empty, generate one with the special prefix
-            //this will hash the guid with a salt so should be nicely random
-            if (entity.RawPasswordValue.IsNullOrWhiteSpace())
-            {
-                var aspHasher = new PasswordHasher();
-                dto.Password = Constants.Security.EmptyPasswordPrefix +
-                               aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
-                //re-assign
-                entity.RawPasswordValue = dto.Password;
-            }
-
-            Database.Insert(dto);
-
-            //Create the PropertyData for this version
-            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
-            //Add Properties
-            // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
-            // - this can occur if the member type doesn't contain the built-in properties that the
-            // - member object contains.
-            var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
-            var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
-            var keyDictionary = new Dictionary<int, int>();
-
-            //Add Properties
-            foreach (var propertyDataDto in propertyDataDtos)
-            {
-                var primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-                keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
-            }
-
-            //Update Properties with its newly set Id
-            foreach (var property in propsToPersist)
-            {
-                property.Id = keyDictionary[property.PropertyTypeId];
-            }
-
-            UpdateEntityTags(entity, _tagRepository);
-
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
-
-            ((Member)entity).ResetDirtyProperties();
-        }
-
-        protected override void PersistUpdatedItem(IMember entity)
-        {
-            //Updates Modified date
-            ((Member)entity).UpdatingEntity();
-
-            //Ensure that strings don't contain characters that are invalid in XML
-            entity.SanitizeEntityPropertiesForXmlStorage();
-
-            var dirtyEntity = (ICanBeDirty)entity;
-
-            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
-            if (dirtyEntity.IsPropertyDirty("ParentId"))
-            {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
-                entity.Path = string.Concat(parent.Path, ",", entity.Id);
-                entity.Level = parent.Level + 1;
-                var maxSortOrder =
-                    Database.ExecuteScalar<int>(
-                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                        new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
-                entity.SortOrder = maxSortOrder + 1;
-            }
-
-            var factory = new MemberFactory(NodeObjectTypeId, entity.Id);
-            //Look up Content entry to get Primary for updating the DTO
-            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { /*Id =*/ entity.Id });
-            factory.SetPrimaryKey(contentDto.Id);
-            var dto = factory.BuildDto(entity);
-
-            //Updates the (base) node data - umbracoNode
-            var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
-            var unused = Database.Update(nodeDto);
-
-            //Only update this DTO if the contentType has actually changed
-            if (contentDto.ContentTypeId != ((Member)entity).ContentTypeId)
-            {
-                //Create the Content specific data - cmsContent
-                var newContentDto = dto.ContentVersionDto.ContentDto;
-                Database.Update(newContentDto);
-            }
-
-            //In order to update the ContentVersion we need to retrieve its primary key id
-            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
-            dto.ContentVersionDto.Id = contentVerDto.Id;
-            //Updates the current version - cmsContentVersion
-            //Assumes a Version guid exists and Version date (modified date) has been set/updated
-            Database.Update(dto.ContentVersionDto);
-
-            //Updates the cmsMember entry if it has changed
-
-            //NOTE: these cols are the REAL column names in the db
-            var changedCols = new List<string>();
-
-            if (dirtyEntity.IsPropertyDirty("Email"))
-            {
-                changedCols.Add("Email");
-            }
-            if (dirtyEntity.IsPropertyDirty("Username"))
-            {
-                changedCols.Add("LoginName");
-            }
-            // DO NOT update the password if it has not changed or if it is null or empty
-            if (dirtyEntity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
-            {
-                changedCols.Add("Password");
-            }
-            //only update the changed cols
-            if (changedCols.Count > 0)
-            {
-                Database.Update(dto, changedCols);
-            }
-
-            //TODO ContentType for the Member entity
-
-            //Create the PropertyData for this version
-            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
-            var keyDictionary = new Dictionary<int, int>();
-
-            //Add Properties
-            // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
-            // - this can occur if the member type doesn't contain the built-in properties that the
-            // - member object contains.
-            var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
-
-            var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
-
-            foreach (var propertyDataDto in propertyDataDtos)
-            {
-                if (propertyDataDto.Id > 0)
-                {
-                    Database.Update(propertyDataDto);
-                }
-                else
-                {
-                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-                    keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
-                }
-            }
-
-            //Update Properties with its newly set Id
-            if (keyDictionary.Any())
-            {
-                foreach (var property in ((Member)entity).Properties)
-                {
-                    if (keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
-
-                    property.Id = keyDictionary[property.PropertyTypeId];
-                }
-            }
-
-            UpdateEntityTags(entity, _tagRepository);
-
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
-
-            dirtyEntity.ResetDirtyProperties();
-        }
-
-        protected override void PersistDeletedItem(IMember entity)
-        {
-            // raise event first else potential FK issues
-            OnUowRemovingEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
-            base.PersistDeletedItem(entity);
-        }
-
-        #endregion
-
-        #region Overrides of VersionableRepositoryBase<IMembershipUser>
-
-        public override IEnumerable<IMember> GetAllVersions(int id)
-        {
-            var sql = GetBaseQuery(false)
-                .Where(GetBaseWhereClause(), new { Id = id })
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            return MapQueryDtos(Database.Fetch<MemberDto>(sql), true);
+            return MapDtosToContent(Database.Fetch<MemberDto>(sql), true);
         }
 
         public override IMember GetByVersion(Guid versionId)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(QueryType.Single)
+                .Where<ContentVersionDto>(x => x.VersionId == versionId);
 
             var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-            var member = MemberFactory.BuildEntity(dto, memberType);
-
-            var properties = GetPropertyCollection(new List<TempContent> { new TempContent(dto.NodeId, dto.ContentVersionDto.VersionId, member.UpdateDate, member.CreateDate, memberType) });
-
-            member.Properties = properties[dto.ContentVersionDto.VersionId];
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)member).ResetDirtyProperties(false);
-            return member;
-
+            return dto == null ? null : MapDtoToContent(dto);
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
@@ -452,6 +217,199 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+        }
+
+        #endregion
+
+        #region Persist
+
+        protected override void PersistNewItem(IMember entity)
+        {
+            ((Member) entity).AddingEntity();
+
+            // ensure that strings don't contain characters that are invalid in xml
+            // fixme - do we really want to keep doing this here?
+            entity.SanitizeEntityPropertiesForXmlStorage();
+
+            // create the dto
+            var dto = MemberFactory.BuildDto(entity);
+
+            // derive path and level from parent
+            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
+                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+            );
+            var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+            var level = parent.Level + 1;
+
+            // get sort order
+            var sortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+
+            // persist the node dto
+            var nodeDto = dto.ContentDto.NodeDto;
+            nodeDto.Path = parent.Path;
+            nodeDto.Level = Convert.ToInt16(level);
+            nodeDto.SortOrder = sortOrder;
+
+            // see if there's a reserved identifier for this unique id
+            // and then either update or insert the node dto
+            template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetReservedId", tsql =>
+                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            );
+            var id = Database.ExecuteScalar<int>(template.Sql(nodeDto.UniqueId)); // fixme can we mix named & non-named?
+            if (id > 0)
+            {
+                nodeDto.NodeId = id;
+                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+                nodeDto.ValidatePathWithException();
+                Database.Update(nodeDto);
+            }
+            else
+            {
+                Database.Insert(nodeDto);
+
+                // update path, now that we have an id
+                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+                nodeDto.ValidatePathWithException();
+                Database.Update(nodeDto);
+            }
+
+            // update entity
+            entity.Id = nodeDto.NodeId;
+            entity.Path = nodeDto.Path;
+            entity.SortOrder = sortOrder;
+            entity.Level = level;
+
+            // persist the content dto
+            var contentDto = dto.ContentDto;
+            contentDto.NodeId = nodeDto.NodeId;
+            Database.Insert(contentDto);
+
+            // persist the content version dto
+            // assumes a new version id and version date (modified date) has been set
+            var contentVersionDto = dto.ContentVersionDto; // fixme version id etc?
+            contentVersionDto.NodeId = nodeDto.NodeId;
+            contentVersionDto.Current = true;
+            Database.Insert(contentVersionDto);
+
+            // persist the member dto
+            dto.NodeId = nodeDto.NodeId; // fixme version id etc?
+
+            // if the password is empty, generate one with the special prefix
+            // this will hash the guid with a salt so should be nicely random
+            if (entity.RawPasswordValue.IsNullOrWhiteSpace())
+            {
+                var aspHasher = new PasswordHasher();
+                dto.Password = Constants.Security.EmptyPasswordPrefix + aspHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                entity.RawPasswordValue = dto.Password;
+            }
+
+            Database.Insert(dto);
+
+            // persist the property data
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
+            foreach (var propertyDataDto in propertyDataDtos)
+                Database.Insert(propertyDataDto);
+
+            // assign ids to properties, using propertyTypeId as a key
+            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
+            foreach (var property in entity.Properties)
+                property.Id = xids[property.PropertyTypeId];
+
+            UpdateEntityTags(entity, _tagRepository);
+
+            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override void PersistUpdatedItem(IMember entity)
+        {
+            //Updates Modified date
+            ((Member) entity).UpdatingEntity();
+
+            // ensure that strings don't contain characters that are invalid in xml
+            // fixme - do we really want to keep doing this here?
+            entity.SanitizeEntityPropertiesForXmlStorage();
+
+            // if parent has changed, get path, level and sort order
+            if (entity.IsPropertyDirty("ParentId"))
+            {
+                var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
+                    tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+                );
+                var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+            }
+
+            // create the dto
+            var dto = MemberFactory.BuildDto(entity);
+
+            // update the node dto
+            var nodeDto = dto.ContentDto.NodeDto;
+            Database.Update(nodeDto);
+
+            // update the content dto - only if the content type has changed
+            var origContentDto = Database.Fetch<ContentDto>(SqlContext.Sql().Select<ContentDto>().From<ContentDto>().Where<ContentDto>(x => x.NodeId == entity.Id)).FirstOrDefault();
+            if (origContentDto.ContentTypeId != entity.ContentTypeId)
+            {
+                dto.ContentDto.Id = origContentDto.Id; // fixme - annoying, needed?
+                Database.Update(dto.ContentDto);
+            }
+
+            // insert or update the content version dtos
+            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
+            dto.ContentVersionDto.Id = contentVerDto.Id;
+            //Updates the current version - cmsContentVersion
+            //Assumes a Version guid exists and Version date (modified date) has been set/updated
+            Database.Update(dto.ContentVersionDto);
+
+            // update the member dto
+            // but only the changed columns, 'cos we cannot update password if empty
+            var changedCols = new List<string>();
+
+            if (entity.IsPropertyDirty("Email"))
+                changedCols.Add("Email");
+
+            if (entity.IsPropertyDirty("Username"))
+                changedCols.Add("LoginName");
+
+            // do NOT update the password if it has not changed or if it is null or empty
+            if (entity.IsPropertyDirty("RawPasswordValue") && !string.IsNullOrWhiteSpace(entity.RawPasswordValue))
+                changedCols.Add("Password");
+
+            if (changedCols.Count > 0)
+                Database.Update(dto, changedCols);
+
+            // update the property data
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+                if (propertyDataDto.Id > 0)
+                    Database.Update(propertyDataDto);
+                else
+                    Database.Insert(propertyDataDto);
+            }
+
+            // assign ids to properties, using propertyTypeId as a key
+            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
+            foreach (var property in entity.Properties)
+                property.Id = xids[property.PropertyTypeId];
+
+            UpdateEntityTags(entity, _tagRepository);
+
+            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override void PersistDeletedItem(IMember entity)
+        {
+            // raise event first else potential FK issues
+            OnUowRemovingEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            base.PersistDeletedItem(entity);
         }
 
         #endregion
@@ -527,7 +485,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
-            return MapQueryDtos(Database.Fetch<MemberDto>(sql));
+            return MapDtosToContent(Database.Fetch<MemberDto>(sql));
 
         }
 
@@ -585,7 +543,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapQueryDtos(x), orderBy, orderDirection, orderBySystemField, "cmsMember",
+                x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField, "cmsMember",
                 filterSql);
         }
 
@@ -619,15 +577,16 @@ namespace Umbraco.Core.Persistence.Repositories
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
 
-        private IEnumerable<IMember> MapQueryDtos(List<MemberDto> dtos, bool withCache = false)
+        private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false)
         {
-            var content = new IMember[dtos.Count];
-            var temps = new List<TempContent>();
+            var temps = new List<TempContent<Member>>();
             var contentTypes = new Dictionary<int, IMemberType>();
+            var content = new Member[dtos.Count];
 
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
+                var versionId = dto.ContentVersionDto.VersionId;
 
                 if (withCache)
                 {
@@ -635,76 +594,61 @@ namespace Umbraco.Core.Persistence.Repositories
                     var cached = IsolatedCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
                     if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
                     {
-                        content[i] = cached;
+                        content[i] = (Member) cached; // fixme should we just cache Content not IContent?
                         continue;
                     }
                 }
 
-                // else, need to fetch from the database
+                // else, need to build it
 
                 // get the content type - the repository is full cache *but* still deep-clones
                 // whatever comes out of it, so use our own local index here to avoid this
-                if (contentTypes.TryGetValue(dto.ContentVersionDto.ContentDto.ContentTypeId, out IMemberType contentType) == false)
-                    contentTypes[dto.ContentVersionDto.ContentDto.ContentTypeId] = contentType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-
-                // fixme
-                //
-                // 7.6 ProcessQuery has an additional 'allVersions' flag that is false by default, meaning
-                // we should always get the latest version of each content item. meaning what what we
-                // are processing now is a more recent version than what we already processed, we need to
-                // replace
-                // but it has flaws: it's not dealing with what could be in the cache (should be the latest
-                // version, always) and it's not replacing the content that is already in the list...
-                // so considering it broken, not implementing now, MUST FIX
+                var contentTypeId = dto.ContentDto.ContentTypeId;
+                if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
+                    contentTypes[contentTypeId] = contentType = _memberTypeRepository.Get(contentTypeId);
 
                 var c = content[i] = MemberFactory.BuildEntity(dto, contentType);
 
                 // need properties
-                temps.Add(new TempContent(
-                    dto.NodeId,
-                    dto.ContentVersionDto.VersionId,
-                    dto.ContentVersionDto.VersionDate,
-                    dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                    contentType,
-                    c
-                ));
+                temps.Add(new TempContent<Member>(dto.NodeId, versionId, contentType, c));
             }
 
-            // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(temps);
+            // load all properties for all documents from database in 1 query - indexed by version id
+            var properties = GetPropertyCollections(temps);
 
-            // assign
+            // assign properites
             foreach (var temp in temps)
             {
-                temp.Content.Properties = propertyData[temp.Version];
+                temp.Content.Properties = properties[temp.VersionId];
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                ((Entity) temp.Content).ResetDirtyProperties(false);
+                // reset dirty initial properties (U4-1946)
+                temp.Content.ResetDirtyProperties(false);
             }
 
             return content;
         }
 
-        /// <summary>
-        /// Private method to create a member object from a MemberDto
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="versionId"></param>
-        /// <returns></returns>
-        private IMember CreateMemberFromDto(MemberDto dto, Guid versionId)
+        private IMember MapDtoToContent(MemberDto dto)
         {
-            var memberType = _memberTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+            var memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
             var member = MemberFactory.BuildEntity(dto, memberType);
-            var temp = new TempContent(dto.ContentVersionDto.NodeId, versionId, member.UpdateDate, member.CreateDate, memberType);
 
-            var properties = GetPropertyCollection(new List<TempContent> { temp });
+            // get properties - indexed by version id
+            var temp = new TempContent<Member>(dto.ContentDto.NodeId, dto.ContentVersionDto.VersionId, memberType);
+            var properties = GetPropertyCollections(new List<TempContent<Member>> { temp });
             member.Properties = properties[dto.ContentVersionDto.VersionId];
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)member).ResetDirtyProperties(false);
+            // clear dirty props on init - U4-1943
+            member.ResetDirtyProperties(false);
             return member;
+        }
+
+        private int GetNewChildSortOrder(int parentId, int first)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetSortOrder", tsql =>
+                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+            );
+            return Database.ExecuteScalar<int>(template.Sql(parentId)) + 1; // fixme can we mix named & non-named?
         }
     }
 }

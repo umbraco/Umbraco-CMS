@@ -83,7 +83,7 @@ namespace Umbraco.Web.PropertyEditors
                 return false;
             if (ensureValue == false)
                 return true;
-            return property.Value is string && string.IsNullOrWhiteSpace((string)property.Value) == false;
+            return property.GetValue() is string && string.IsNullOrWhiteSpace((string) property.GetValue()) == false;
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Umbraco.Web.PropertyEditors
             return allPropertyData.SelectMany(x => x.Value)
                 .Where(x => IsCropperField(x, true)).Select(x =>
                 {
-                    var jo = GetJObject((string) x.Value, true);
+                    var jo = GetJObject((string) x.GetValue(), true);
                     if (jo?["src"] == null) return null;
                     var src = jo["src"].Value<string>();
                     return string.IsNullOrWhiteSpace(src) ? null : _mediaFileSystem.GetRelativePath(src);
@@ -135,7 +135,7 @@ namespace Umbraco.Web.PropertyEditors
             return deletedEntities.SelectMany(x => x.Properties)
                 .Where(x => IsCropperField(x, true)).Select(x =>
                 {
-                    var jo = GetJObject((string) x.Value, true);
+                    var jo = GetJObject((string) x.GetValue(), true);
                     if (jo?["src"] == null) return null;
                     var src = jo["src"].Value<string>();
                     return string.IsNullOrWhiteSpace(src) ? null : _mediaFileSystem.GetRelativePath(src);
@@ -156,7 +156,7 @@ namespace Umbraco.Web.PropertyEditors
             var isUpdated = false;
             foreach (var property in properties)
             {
-                var jo = GetJObject((string) property.Value, true);
+                var jo = GetJObject((string) property.GetValue(), true);
                 if (jo == null || jo["src"] == null) continue;
 
                 var src = jo["src"].Value<string>();
@@ -218,7 +218,7 @@ namespace Umbraco.Web.PropertyEditors
                 var autoFillConfig = _autoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
-                var svalue = property.Value as string;
+                var svalue = property.GetValue() as string;
                 if (string.IsNullOrWhiteSpace(svalue))
                 {
                     _autoFillProperties.Reset(model, autoFillConfig);
@@ -238,7 +238,7 @@ namespace Umbraco.Web.PropertyEditors
                         .GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId).FirstOrDefault();
                     var crops = string.IsNullOrWhiteSpace(config) ? "[]" : config;
                     src = svalue;
-                    property.Value = "{\"src\": \"" + svalue + "\", \"crops\": " + crops + "}";
+                    property.SetValue("{\"src\": \"" + svalue + "\", \"crops\": " + crops + "}");
                 }
                 else
                 {

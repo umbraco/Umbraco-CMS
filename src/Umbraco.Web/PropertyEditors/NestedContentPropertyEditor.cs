@@ -168,10 +168,10 @@ namespace Umbraco.Web.PropertyEditors
             public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
                 // Convert / validate value
-                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
+                if (property.GetValue() == null || string.IsNullOrWhiteSpace(property.GetValue().ToString()))
                     return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(property.Value.ToString());
+                var value = JsonConvert.DeserializeObject<List<object>>(property.GetValue().ToString());
                 if (value == null)
                     return string.Empty;
 
@@ -206,7 +206,8 @@ namespace Umbraco.Web.PropertyEditors
                             try
                             {
                                 // Create a fake property using the property abd stored value
-                                var prop = new Property(propType, propValues[propKey] == null ? null : propValues[propKey].ToString());
+                                var prop = new Property(propType);
+                                prop.SetValue(propValues[propKey] == null ? null : propValues[propKey].ToString());
 
                                 // Lookup the property editor
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
@@ -228,7 +229,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 // Update the value on the property
-                property.Value = JsonConvert.SerializeObject(value);
+                property.SetValue(JsonConvert.SerializeObject(value));
 
                 // Pass the call down
                 return base.ConvertDbToString(property, propertyType, dataTypeService);
@@ -240,10 +241,10 @@ namespace Umbraco.Web.PropertyEditors
 
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
+                if (property.GetValue() == null || string.IsNullOrWhiteSpace(property.GetValue().ToString()))
                     return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(property.Value.ToString());
+                var value = JsonConvert.DeserializeObject<List<object>>(property.GetValue().ToString());
                 if (value == null)
                     return string.Empty;
 
@@ -278,7 +279,8 @@ namespace Umbraco.Web.PropertyEditors
                             try
                             {
                                 // Create a fake property using the property and stored value
-                                var prop = new Property(propType, propValues[propKey] == null ? null : propValues[propKey].ToString());
+                                var prop = new Property(propType);
+                                prop.SetValue(propValues[propKey] == null ? null : propValues[propKey].ToString());
 
                                 // Lookup the property editor
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
@@ -303,7 +305,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 // Update the value on the property
-                property.Value = JsonConvert.SerializeObject(value);
+                property.SetValue(JsonConvert.SerializeObject(value));
 
                 // Pass the call down
                 return base.ConvertDbToEditor(property, propertyType, dataTypeService);

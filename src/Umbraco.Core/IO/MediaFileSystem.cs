@@ -344,21 +344,21 @@ namespace Umbraco.Core.IO
         public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filename, Stream filestream)
         {
             var property = GetProperty(content, propertyTypeAlias);
-            var svalue = property.Value as string;
+            var svalue = property.GetValue() as string;
             var oldpath = svalue == null ? null : GetRelativePath(svalue);
             var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
-            property.Value = GetUrl(filepath);
+            property.SetValue(GetUrl(filepath));
             SetUploadFile(content, property, filepath, filestream);
         }
 
         public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filepath)
         {
             var property = GetProperty(content, propertyTypeAlias);
-            var svalue = property.Value as string;
+            var svalue = property.GetValue() as string;
             var oldpath = svalue == null ? null : GetRelativePath(svalue); // FIXME DELETE?
             if (string.IsNullOrWhiteSpace(oldpath) == false && oldpath != filepath)
                 DeleteFile(oldpath);
-            property.Value = GetUrl(filepath);
+            property.SetValue(GetUrl(filepath));
             using (var filestream = OpenFile(filepath))
             {
                 SetUploadFile(content, property, filepath, filestream);

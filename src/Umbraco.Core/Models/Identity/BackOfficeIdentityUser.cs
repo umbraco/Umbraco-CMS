@@ -76,17 +76,14 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Returns true if an Id has been set on this object this will be false if the object is new and not peristed to the database
         /// </summary>
-        public bool HasIdentity
-        {
-            get { return _hasIdentity; }
-        }
+        public bool HasIdentity => _hasIdentity;
 
         public int[] CalculatedMediaStartNodeIds { get; internal set; }
         public int[] CalculatedContentStartNodeIds { get; internal set; }
 
         public override int Id
         {
-            get { return _id; }
+            get => _id;
             set
             {
                 _id = value;
@@ -99,8 +96,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override string Email
         {
-            get { return _email; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
+            get => _email;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector);
         }
 
         /// <summary>
@@ -108,8 +105,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override string UserName
         {
-            get { return _userName; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector); }
+            get => _userName;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector);
         }
 
         /// <summary>
@@ -117,8 +114,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override DateTime? LastLoginDateUtc
         {
-            get { return _lastLoginDateUtc; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector); }
+            get => _lastLoginDateUtc;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector);
         }
 
         /// <summary>
@@ -126,8 +123,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override bool EmailConfirmed
         {
-            get { return _emailConfirmed; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, Ps.Value.EmailConfirmedSelector); }
+            get => _emailConfirmed;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _emailConfirmed, Ps.Value.EmailConfirmedSelector);
         }
 
         /// <summary>
@@ -135,8 +132,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
         }
 
         /// <summary>
@@ -144,8 +141,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override int AccessFailedCount
         {
-            get { return _accessFailedCount; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, Ps.Value.AccessFailedCountSelector); }
+            get => _accessFailedCount;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _accessFailedCount, Ps.Value.AccessFailedCountSelector);
         }
 
         /// <summary>
@@ -153,8 +150,8 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public override string PasswordHash
         {
-            get { return _passwordHash; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _passwordHash, Ps.Value.PasswordHashSelector); }
+            get => _passwordHash;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _passwordHash, Ps.Value.PasswordHashSelector);
         }
 
 
@@ -163,7 +160,7 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] StartContentIds
         {
-            get { return _startContentIds; }
+            get => _startContentIds;
             set
             {
                 if (value == null) value = new int[0];
@@ -176,7 +173,7 @@ namespace Umbraco.Core.Models.Identity
         /// </summary>
         public int[] StartMediaIds
         {
-            get { return _startMediaIds; }
+            get => _startMediaIds;
             set
             {
                 if (value == null) value = new int[0];
@@ -194,13 +191,13 @@ namespace Umbraco.Core.Models.Identity
 
         public string Culture
         {
-            get { return _culture; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector); }
+            get => _culture;
+            set => _tracker.SetPropertyValueAndDetectChanges(value, ref _culture, Ps.Value.CultureSelector);
         }
 
         public IReadOnlyUserGroup[] Groups
         {
-            get { return _groups; }
+            get => _groups;
             set
             {
                 //so they recalculate
@@ -242,7 +239,7 @@ namespace Umbraco.Core.Models.Identity
         {
             get
             {
-                var isLocked = (LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now);
+                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now;
                 return isLocked;
             }
         }
@@ -296,7 +293,7 @@ namespace Umbraco.Core.Models.Identity
         {
             Roles.Add(new IdentityUserRole<string>
             {
-                UserId = this.Id.ToString(),
+                UserId = Id.ToString(),
                 RoleId = role
             });
         }
@@ -304,10 +301,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// Override Roles because the value of these are the user's group aliases
         /// </summary>
-        public override ICollection<IdentityUserRole<string>> Roles
-        {
-            get { return _roles; }
-        }
+        public override ICollection<IdentityUserRole<string>> Roles => _roles;
 
         /// <summary>
         /// Used to set a lazy call back to populate the user's Login list
@@ -315,8 +309,7 @@ namespace Umbraco.Core.Models.Identity
         /// <param name="callback"></param>
         public void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback)
         {
-            if (callback == null) throw new ArgumentNullException("callback");
-            _getLogins = callback;
+            _getLogins = callback ?? throw new ArgumentNullException("callback");
         }
 
         #region Change tracking
@@ -368,14 +361,19 @@ namespace Umbraco.Core.Models.Identity
             return _tracker.WasPropertyDirty(propertyName);
         }
 
-        void IRememberBeingDirty.ForgetPreviouslyDirtyProperties()
+        IEnumerable<string> ICanBeDirty.GetDirtyProperties()
         {
-            _tracker.ForgetPreviouslyDirtyProperties();
+            return _tracker.GetDirtyProperties();
         }
 
-        public void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        void IRememberBeingDirty.ResetWereDirtyProperties()
         {
-            _tracker.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            _tracker.ResetWereDirtyProperties();
+        }
+
+        public void ResetDirtyProperties(bool rememberDirty)
+        {
+            _tracker.ResetDirtyProperties(rememberDirty);
         }
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -438,7 +436,5 @@ namespace Umbraco.Core.Models.Identity
             }
         }
         #endregion
-
-
     }
 }

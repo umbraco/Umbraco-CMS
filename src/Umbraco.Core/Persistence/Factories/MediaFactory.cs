@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -7,117 +6,106 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class MediaFactory
     {
-        private readonly IMediaType _contentType;
-        private readonly Guid _nodeObjectTypeId;
-        private readonly int _id;
-        private int _primaryKey;
-
-        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId, int id)
+        /// <summary>
+        /// Builds an IMedia item from a dto and content type.
+        /// </summary>
+        public static Models.Media BuildEntity(ContentDto dto, IMediaType contentType)
         {
-            _contentType = contentType;
-            _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
-        }
+            var nodeDto = dto.NodeDto;
+            var contentVersionDto = dto.ContentVersionDto;
 
-        public MediaFactory(Guid nodeObjectTypeId, int id)
-        {
-            _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
-        }
-
-        #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
-
-        public static IMedia BuildEntity(ContentVersionDto dto, IMediaType contentType)
-        {
-            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, contentType);
+            var content = new Models.Media(nodeDto.Text, nodeDto.ParentId, contentType);
 
             try
             {
-                media.DisableChangeTracking();
+                content.DisableChangeTracking();
 
-                media.Id = dto.NodeId;
-                media.Key = dto.ContentDto.NodeDto.UniqueId;
-                media.Path = dto.ContentDto.NodeDto.Path;
-                media.CreatorId = dto.ContentDto.NodeDto.UserId.Value;
-                media.Level = dto.ContentDto.NodeDto.Level;
-                media.ParentId = dto.ContentDto.NodeDto.ParentId;
-                media.SortOrder = dto.ContentDto.NodeDto.SortOrder;
-                media.Trashed = dto.ContentDto.NodeDto.Trashed;
-                media.CreateDate = dto.ContentDto.NodeDto.CreateDate;
-                media.UpdateDate = dto.VersionDate;
-                media.Version = dto.VersionId;
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                media.ResetDirtyProperties(false);
-                return media;
+                content.Id = dto.NodeId;
+                content.Key = nodeDto.UniqueId;
+                content.Version = contentVersionDto.VersionId;
+
+                // fixme missing names?
+
+                content.Path = nodeDto.Path;
+                content.Level = nodeDto.Level;
+                content.ParentId = nodeDto.ParentId;
+                content.SortOrder = nodeDto.SortOrder;
+                content.Trashed = nodeDto.Trashed;
+
+                content.CreatorId = nodeDto.UserId ?? 0;
+                // fixme missing writerId - which then should move to nodeDto
+                content.CreateDate = nodeDto.CreateDate;
+                content.UpdateDate = contentVersionDto.VersionDate;
+
+                // reset dirty initial properties (U4-1946)
+                content.ResetDirtyProperties(false);
+                return content;
             }
             finally
             {
-                media.EnableChangeTracking();
+                content.EnableChangeTracking();
             }
-
         }
 
-        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
-        public IMedia BuildEntity(ContentVersionDto dto)
+        /// <summary>
+        /// Buils a dto from an IMedia item.
+        /// </summary>
+        public static ContentDto BuildDto(IMedia entity)
         {
-            return BuildEntity(dto, _contentType);
-        }
-
-        public ContentVersionDto BuildDto(IMedia entity)
-        {
-            var dto = new ContentVersionDto
-                                        {
-                                            NodeId = entity.Id,
-                                            VersionDate = entity.UpdateDate,
-                                            VersionId = entity.Version,
-                                            ContentDto = BuildContentDto(entity)
-                                        };
+            var dto = BuildContentDto(entity);
+            dto.ContentVersionDto = BuildContentVersionDto(entity, dto);
             return dto;
         }
 
-        #endregion
-
-        public void SetPrimaryKey(int primaryKey)
+        private static ContentDto BuildContentDto(IMedia entity)
         {
-            _primaryKey = primaryKey;
-        }
-
-        private ContentDto BuildContentDto(IMedia entity)
-        {
-            var contentDto = new ContentDto
-                                 {
-                                     NodeId = entity.Id,
-                                     ContentTypeId = entity.ContentTypeId,
-                                     NodeDto = BuildNodeDto(entity)
-                                 };
-
-            if (_primaryKey > 0)
+            var dto = new ContentDto
             {
-                contentDto.Id = _primaryKey;
-            }
+                // Id = _primaryKey if >0 - fixme - kill that id entirely
+                NodeId = entity.Id,
+                ContentTypeId = entity.ContentTypeId,
 
-            return contentDto;
+                NodeDto = BuildNodeDto(entity)
+            };
+
+            return dto;
         }
 
-        private NodeDto BuildNodeDto(IMedia entity)
+        private static NodeDto BuildNodeDto(IMedia entity)
         {
-            var nodeDto = new NodeDto
-                              {
-                                  CreateDate = entity.CreateDate,
-                                  NodeId = entity.Id,
-                                  Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
-                                  NodeObjectType = _nodeObjectTypeId,
-                                  ParentId = entity.ParentId,
-                                  Path = entity.Path,
-                                  SortOrder = entity.SortOrder,
-                                  Text = entity.Name,
-                                  Trashed = entity.Trashed,
-                                  UniqueId = entity.Key,
-                                  UserId = entity.CreatorId
-                              };
+            var dto = new NodeDto
+            {
+                NodeId = entity.Id,
+                UniqueId = entity.Key,
+                ParentId = entity.ParentId,
+                Level = Convert.ToInt16(entity.Level),
+                Path = entity.Path,
+                SortOrder = entity.SortOrder,
+                Trashed = entity.Trashed,
+                UserId = entity.CreatorId,
+                Text = entity.Name,
+                NodeObjectType = Constants.ObjectTypes.Media,
+                CreateDate = entity.CreateDate
+            };
 
-            return nodeDto;
+            return dto;
+        }
+
+        private static ContentVersionDto BuildContentVersionDto(IMedia entity, ContentDto contentDto)
+        {
+            var dto = new ContentVersionDto
+            {
+                //Id =, // fixme
+                NodeId = entity.Id,
+                VersionId = entity.Version,
+                VersionDate = entity.UpdateDate,
+                Current = true, // always building the current one
+                Text = entity.Name,
+
+                ContentDto = contentDto
+            };
+
+            return dto;
         }
     }
 }

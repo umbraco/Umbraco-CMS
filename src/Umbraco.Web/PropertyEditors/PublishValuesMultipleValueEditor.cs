@@ -40,17 +40,17 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            if (property.Value == null)
+            if (property.GetValue() == null)
                 return null;
 
             //publishing ids, so just need to return the value as-is
             if (_publishIds)
             {
-                return property.Value.ToString();
+                return property.GetValue().ToString();
             }
 
             //get the multiple ids
-            var selectedIds = property.Value.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var selectedIds = property.GetValue().ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             if (selectedIds.Any() == false)
             {
                 //nothing there

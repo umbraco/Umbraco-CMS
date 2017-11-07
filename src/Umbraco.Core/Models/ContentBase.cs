@@ -20,74 +20,74 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : Entity, IContentBase
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
 
         private Lazy<int> _parentId;
-        private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
-        private int _sortOrder;
         private int _level;
         private string _path;
-        private int _creatorId;
+        private int _sortOrder;
+
         private bool _trashed;
-        private int _contentTypeId;
+        private int _creatorId;
+
+        // fixme need to deal with localized names, how?
+        // for the time being, this is the node text = unique
+        private string _name;
+
         private PropertyCollection _properties;
-        private readonly List<Property> _lastInvalidProperties = new List<Property>();
+        private readonly List<Property> _invalidProperties = new List<Property>();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData => _lazyAdditionalData.Value;
+        private readonly Lazy<Dictionary<string, object>> _lazyAdditionalData = new Lazy<Dictionary<string, object>>();
 
         /// <summary>
-        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        /// <param name="name">Localized Name of the entity</param>
-        /// <param name="parentId"></param>
-        /// <param name="contentType"></param>
-        /// <param name="properties"></param>
         protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties)
+            : this(name, contentType, properties)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
-
-            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            Version = Guid.NewGuid();
-
             _parentId = new Lazy<int>(() => parentId);
-            _name = name;
-            _contentTypeId = contentType.Id;
-            _properties = properties ?? throw new ArgumentNullException(nameof(properties));
-            _properties.EnsurePropertyTypes(PropertyTypes);
-            _additionalData = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        /// <param name="name">Localized Name of the entity</param>
-        /// <param name="parent"></param>
-        /// <param name="contentType"></param>
-        /// <param name="properties"></param>
         protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
+            : this(name, contentType, properties)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
-
-            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            Version = Guid.NewGuid();
-
             _parentId = new Lazy<int>(() => parent.Id);
+        }
+
+        private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties)
+        {
+            ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
+
+            // initially, all new instances have
+            Id = 0; // no identity
+            Version = Guid.NewGuid(); // a new unique version id
+
             _name = name;
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
             _properties.EnsurePropertyTypes(PropertyTypes);
-            _additionalData = new Dictionary<string, object>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
             public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ParentId);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
             public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
             public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
             public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
+            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
         }
@@ -98,7 +98,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Id of the Parent entity
+        /// Gets or sets the identifier of the parent entity.
         /// </summary>
         [DataMember]
         public virtual int ParentId
@@ -120,79 +120,78 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets the ParentId from the lazy integer id
+        /// Sets the identifier of the parent entity.
         /// </summary>
         /// <param name="parentId">Id of the Parent</param>
-        internal protected void SetLazyParentId(Lazy<int> parentId)
+        protected internal void SetLazyParentId(Lazy<int> parentId)
         {
             _parentId = parentId;
             OnPropertyChanged(Ps.Value.ParentIdSelector);
         }
 
         /// <summary>
-        /// Gets or sets the name of the entity
-        /// </summary>
-        [DataMember]
-        public virtual string Name
-        {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the sort order of the content entity
-        /// </summary>
-        [DataMember]
-        public virtual int SortOrder
-        {
-            get { return _sortOrder; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
-        }
-
-        /// <summary>
-        /// Gets or sets the level of the content entity
+        /// Gets or sets the level of the entity.
         /// </summary>
         [DataMember]
         public virtual int Level
         {
-            get { return _level; }
-            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
+            get => _level;
+            set => SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector);
         }
 
         /// <summary>
-        /// Gets or sets the path
+        /// Gets or sets the path of the entity.
         /// </summary>
         [DataMember]
         public virtual string Path //Setting this value should be handled by the class not the user
         {
-            get { return _path; }
-            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
+            get => _path;
+            set => SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector);
         }
 
         /// <summary>
-        /// Profile of the user who created this Content
+        /// Gets or sets the sort order of the  entity.
+        /// </summary>
+        [DataMember]
+        public virtual int SortOrder
+        {
+            get => _sortOrder;
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the entity is trashed.
+        /// </summary>
+        /// <remarks>A trashed entity is unpublished and in the recycle bin.</remarks>
+        [DataMember]
+        public virtual bool Trashed // fixme setting this value should be handled by the class not the user
+        {
+            get => _trashed;
+            internal set => SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector);
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the entity.
+        /// </summary>
+        [DataMember]
+        public virtual string Name
+        {
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+        }
+
+        /// <summary>
+        /// Gets or sets the identifier of the user who created the entity.
         /// </summary>
         [DataMember]
         public virtual int CreatorId
         {
-            get { return _creatorId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
+            get => _creatorId;
+            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector);
         }
 
         /// <summary>
-        /// Boolean indicating whether this Content is Trashed or not.
-        /// If Content is Trashed it will be located in the Recyclebin.
-        /// </summary>
-        /// <remarks>When content is trashed it should be unpublished</remarks>
-        [DataMember]
-        public virtual bool Trashed //Setting this value should be handled by the class not the user
-        {
-            get { return _trashed; }
-            internal set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
-        }
-
-        /// <summary>
-        /// Guid Id of the curent Version
+        /// Gets or sets the identifier of the version.
         /// </summary>
         [DataMember]
         public Guid Version { get; internal set; }
@@ -217,12 +216,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Collection of properties, which make up all the data available for this Content object
+        /// Gets or sets the collection of properties for the entity.
         /// </summary>
         [DataMember]
         public virtual PropertyCollection Properties
         {
-            get { return _properties; }
+            get => _properties;
             set
             {
                 _properties = value;
@@ -230,166 +229,317 @@ namespace Umbraco.Core.Models
             }
         }
 
-        private readonly IDictionary<string, object> _additionalData;
-
         /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData
-        {
-            get { return _additionalData; }
-        }
-
-        /// <summary>
-        /// List of PropertyGroups available on this Content object
+        /// Gets the enumeration of property groups for the entity.
+        /// fixme is a proxy, kill this
         /// </summary>
         [IgnoreDataMember]
-        public IEnumerable<PropertyGroup> PropertyGroups { get { return ContentTypeBase.CompositionPropertyGroups; } }
+        public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
 
         /// <summary>
-        /// List of PropertyTypes available on this Content object
+        /// Gets the numeration of property types for the entity.
+        /// fixme is a proxy, kill this
         /// </summary>
         [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes { get { return ContentTypeBase.CompositionPropertyTypes; } }
+        public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
+
+        #region Has, Get, Set Property Value
 
         /// <summary>
-        /// Indicates whether the content object has a property with the supplied alias
+        /// Gets a value indicating whether the content entity has a property with the supplied alias.
+        /// fixme with a value, or just the property?
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns>True if Property with given alias exists, otherwise False</returns>
         public virtual bool HasProperty(string propertyTypeAlias)
+            => Properties.Contains(propertyTypeAlias);
+
+        /// <summary>
+        /// Gets the neutral value of a property.
+        /// </summary>
+        public virtual object GetValue(string propertyTypeAlias, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias);
+            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].GetValue(published) : null;
         }
 
         /// <summary>
-        /// Gets the value of a Property
+        /// Gets the culture value of a property.
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
-        public virtual object GetValue(string propertyTypeAlias)
+        public virtual object GetValue(string propertyTypeAlias, int languageId, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].Value : null;
+            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].GetValue(languageId, published) : null;
         }
 
         /// <summary>
-        /// Gets the value of a Property
+        /// Gets the segment value of a property.
         /// </summary>
-        /// <typeparam name="TPassType">Type of the value to return</typeparam>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
-        public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
+        public virtual object GetValue(string propertyTypeAlias, int languageId, string segment, bool published = false)
+        {
+            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].GetValue(languageId, segment, published) : null;
+        }
+
+        /// <summary>
+        /// Gets the typed neutral value of a property.
+        /// </summary>
+        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, bool published = false)
         {
             if (Properties.Contains(propertyTypeAlias) == false)
-            {
-                return default(TPassType);
-            }
+                return default;
 
-            var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
-            return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
+            var convertAttempt = Properties[propertyTypeAlias].GetValue(published).TryConvertTo<TPropertyValue>();
+            return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Object"/> value of a Property
+        /// Gets the typed culture value of a property.
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int languageId, bool published = false)
+        {
+            if (Properties.Contains(propertyTypeAlias) == false)
+                return default;
+
+            var convertAttempt = Properties[propertyTypeAlias].GetValue(languageId, published).TryConvertTo<TPropertyValue>();
+            return convertAttempt.Success ? convertAttempt.Result : default;
+        }
+
+        /// <summary>
+        /// Gets the typed segment value of a property.
+        /// </summary>
+        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int languageId, string segment, bool published = false)
+        {
+            if (Properties.Contains(propertyTypeAlias) == false)
+                return default;
+
+            var convertAttempt = Properties[propertyTypeAlias].GetValue(languageId, segment, published).TryConvertTo<TPropertyValue>();
+            return convertAttempt.Success ? convertAttempt.Result : default;
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) value of a property.
+        /// </summary>
         public virtual void SetValue(string propertyTypeAlias, object value)
         {
             if (value == null)
             {
-                SetValueOnProperty(propertyTypeAlias, value);
+                SetValueOnProperty(propertyTypeAlias, null);
                 return;
             }
 
             // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
-            ((dynamic)this).SetPropertyValue(propertyTypeAlias, (dynamic)value);
+            ((dynamic) this).SetPropertyValue(propertyTypeAlias, (dynamic) value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.String"/> value of a Property
+        /// Sets the culture (draft) value of a property.
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetValue(string propertyTypeAlias, int languageId, object value)
+        {
+            if (value == null)
+            {
+                SetValueOnProperty(propertyTypeAlias, languageId, null);
+                return;
+            }
+
+            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
+            ((dynamic) this).SetPropertyValue(propertyTypeAlias, languageId, (dynamic) value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) value of a property.
+        /// </summary>
+        public virtual void SetValue(string propertyTypeAlias, int languageId, string segment, object value)
+        {
+            if (value == null)
+            {
+                SetValueOnProperty(propertyTypeAlias, languageId, segment, null);
+                return;
+            }
+
+            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
+            ((dynamic) this).SetPropertyValue(propertyTypeAlias, languageId, segment, (dynamic) value);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) string value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, string value)
         {
             SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Int32"/> value of a Property
+        /// Sets the culture (draft) string value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) string value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, string value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) int value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, int value)
         {
             SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Int64"/> value of a Property
+        /// Sets the culture (draft) int value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, int value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) int value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, int value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) long value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, long value)
         {
             SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Decimal"/> value of a Property
+        /// Sets the culture (draft) long value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, long value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) long value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, long value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) decimal value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, decimal value)
         {
             SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Double"/> value of a Property
+        /// Sets the culture (draft) decimal value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, decimal value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) decimal value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, decimal value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) double value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, double value)
         {
             SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Boolean"/> value of a Property
+        /// Sets the culture (draft) double value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, double value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) double value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, double value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) boolean value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, bool value)
         {
-            int val = Convert.ToInt32(value);
+            var val = Convert.ToInt32(value);
             SetValueOnProperty(propertyTypeAlias, val);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.DateTime"/> value of a Property
+        /// Sets the culture (draft) boolean value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, bool value)
+        {
+            var val = Convert.ToInt32(value);
+            SetValueOnProperty(propertyTypeAlias, languageId, val);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) boolean value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, bool value)
+        {
+            var val = Convert.ToInt32(value);
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, val);
+        }
+
+        /// <summary>
+        /// Sets the neutral (draft) DateTime value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, DateTime value)
         {
             SetValueOnProperty(propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Web.HttpPostedFile"/> value of a Property
+        /// Sets the culture (draft) DateTime value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, DateTime value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, value);
+        }
+
+        /// <summary>
+        /// Sets the segment (draft) DateTime value of a Property
+        /// </summary>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, DateTime value)
+        {
+            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+        }
+
+        // fixme - these three use an extension method that needs to be adapted too
+
+        /// <summary>
+        /// Sets the posted file value of a Property
+        /// </summary>
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Web.HttpPostedFileBase"/> value of a Property
+        /// Sets the posted file base value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
@@ -399,10 +549,8 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets the <see cref="System.Web.HttpPostedFileWrapper"/> value of a Property
+        /// Sets the posted file wrapper value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
         [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
         public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileWrapper value)
         {
@@ -410,143 +558,153 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Private method to set the value of a property
+        /// Sets the neutral (draft) value of a property.
         /// </summary>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="value"></param>
         private void SetValueOnProperty(string propertyTypeAlias, object value)
         {
             if (Properties.Contains(propertyTypeAlias))
             {
-                Properties[propertyTypeAlias].Value = value;
+                Properties[propertyTypeAlias].SetValue(value);
                 return;
             }
 
             var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null)
-            {
-                throw new Exception(String.Format("No PropertyType exists with the supplied alias: {0}", propertyTypeAlias));
-            }
-            Properties.Add(propertyType.CreatePropertyFromValue(value));
+                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
+
+            var property = propertyType.CreateProperty();
+            property.SetValue(value);
+            Properties.Add(property);
         }
 
         /// <summary>
-        /// Boolean indicating whether the content and its properties are valid
+        /// Sets the culture (draft) value of a property.
         /// </summary>
-        /// <returns>True if content is valid otherwise false</returns>
-        public virtual bool IsValid()
+        private void SetValueOnProperty(string propertyTypeAlias, int languageId, object value)
         {
-            _lastInvalidProperties.Clear();
-            _lastInvalidProperties.AddRange(Properties.Where(property => property.IsValid() == false));
-            return _lastInvalidProperties.Any() == false;
+            if (Properties.Contains(propertyTypeAlias))
+            {
+                Properties[propertyTypeAlias].SetValue(languageId, value);
+                return;
+            }
+
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            if (propertyType == null)
+                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
+
+            var property = propertyType.CreateProperty();
+            property.SetValue(languageId, value);
+            Properties.Add(property);
         }
 
         /// <summary>
-        /// Returns a collection of the result of the last validation process, this collection contains all invalid properties.
+        /// Sets the segment (draft) value of a property.
+        /// </summary>
+        private void SetValueOnProperty(string propertyTypeAlias, int languageId, string segment, object value)
+        {
+            if (Properties.Contains(propertyTypeAlias))
+            {
+                Properties[propertyTypeAlias].SetValue(languageId, segment, value);
+                return;
+            }
+
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            if (propertyType == null)
+                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
+
+            var property = propertyType.CreateProperty();
+            property.SetValue(languageId, segment, value);
+            Properties.Add(property);
+        }
+
+        #endregion
+
+        #region Validation
+
+        /// <summary>
+        /// Gets a value indicating whether the content and its properties are valid.
+        /// </summary>
+        public virtual bool Validate() // fixme would it depends on the property varyBy? or would we validate for a given culture/segment?
+        {
+            _invalidProperties.Clear();
+            _invalidProperties.AddRange(Properties.Where(property => property.IsValid() == false));
+            return _invalidProperties.Any() == false;
+        }
+
+        /// <summary>
+        /// Gets the properties marked as invalid during the last validation.
         /// </summary>
         [IgnoreDataMember]
-        internal IEnumerable<Property> LastInvalidProperties
-        {
-            get { return _lastInvalidProperties; }
-        }
+        internal IEnumerable<Property> InvalidProperties => _invalidProperties;
 
-        #region Dirty property handling
+        #endregion
+
+        #region Dirty
 
         /// <summary>
-        /// We will override this method to ensure that when we reset the dirty properties that we
-        /// also reset the dirty changes made to the content's Properties (user defined)
+        /// Resets dirty properties.
         /// </summary>
-        /// <param name="rememberPreviouslyChangedProperties"></param>
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
 
+            // also reset dirty changes made to user's properties
             foreach (var prop in Properties)
-            {
-                prop.ResetDirtyProperties(rememberPreviouslyChangedProperties);
-            }
+                prop.ResetDirtyProperties(rememberDirty);
         }
 
         /// <summary>
-        /// Indicates whether the current entity is dirty.
+        /// Gets a value indicating whether the current entity is dirty.
         /// </summary>
-        /// <returns>True if entity is dirty, otherwise False</returns>
         public override bool IsDirty()
         {
             return IsEntityDirty() || this.IsAnyUserPropertyDirty();
         }
 
         /// <summary>
-        /// Indicates whether the current entity was dirty.
+        /// Gets a value indicating whether the current entity was dirty.
         /// </summary>
-        /// <returns>True if entity was dirty, otherwise False</returns>
         public override bool WasDirty()
         {
             return WasEntityDirty() || this.WasAnyUserPropertyDirty();
         }
 
         /// <summary>
-        /// Returns true if only the entity properties are dirty
+        /// Gets a value indicating whether the current entity's own properties (not user) are dirty.
         /// </summary>
-        /// <returns></returns>
         public bool IsEntityDirty()
         {
             return base.IsDirty();
         }
 
         /// <summary>
-        /// Returns true if only the entity properties were dirty
+        /// Gets a value indicating whether the current entity's own properties (not user) were dirty.
         /// </summary>
-        /// <returns></returns>
         public bool WasEntityDirty()
         {
             return base.WasDirty();
         }
 
         /// <summary>
-        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
+        /// Gets a value indicating whether a user property is dirty.
         /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>
-        /// True if any of the class properties are dirty or
-        /// True if any of the user defined PropertyType properties are dirty based on their alias,
-        /// otherwise False
-        /// </returns>
         public override bool IsPropertyDirty(string propertyName)
         {
-            bool existsInEntity = base.IsPropertyDirty(propertyName);
-            if (existsInEntity)
+            if (base.IsPropertyDirty(propertyName))
                 return true;
 
-            if (Properties.Contains(propertyName))
-            {
-                return Properties[propertyName].IsDirty();
-            }
-
-            return false;
+            return Properties.Contains(propertyName) && Properties[propertyName].IsDirty();
         }
 
         /// <summary>
-        /// Indicates whether a specific property on the current entity was changed and the changes were committed
+        /// Gets a value indicating whether a user property was dirty.
         /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>
-        /// True if any of the class properties are dirty or
-        /// True if any of the user defined PropertyType properties are dirty based on their alias,
-        /// otherwise False
-        /// </returns>
         public override bool WasPropertyDirty(string propertyName)
         {
-            bool existsInEntity = base.WasPropertyDirty(propertyName);
-            if (existsInEntity)
+            if (base.WasPropertyDirty(propertyName))
                 return true;
 
-            if (Properties.Contains(propertyName))
-            {
-                return Properties[propertyName].WasDirty();
-            }
-
-            return false;
+            return Properties.Contains(propertyName) && Properties[propertyName].WasDirty();
         }
 
         #endregion

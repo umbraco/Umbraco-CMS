@@ -65,11 +65,11 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.Version.ToString(), (string)element.Attribute("version"));
             Assert.AreEqual("0", (string)element.Attribute("template"));
 
-            Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].Value.ToString(), element.Elements(Constants.Conventions.Media.File).Single().Value);
-            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Width].Value.ToString(), element.Elements(Constants.Conventions.Media.Width).Single().Value);
-            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].Value.ToString(), element.Elements(Constants.Conventions.Media.Height).Single().Value);
-            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].Value.ToString(), element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
-            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].Value.ToString(), element.Elements(Constants.Conventions.Media.Extension).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].GetValue().ToString(), element.Elements(Constants.Conventions.Media.File).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Width].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Width).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Height).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
+            Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Extension).Single().Value);
         }
     }
 }

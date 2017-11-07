@@ -437,7 +437,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.SaveAndPublishWithStatus(content);
 
             ResetEvents();
-            content.Properties.First().Value = "changed";
+            content.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content);
 
             Assert.AreEqual(2, _msgCount);
@@ -449,7 +449,7 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshNode/{1}", m, content.Id), _events[i].ToString());
 
             ResetEvents();
-            content.Properties.First().Value = "again";
+            content.Properties.First().SetValue("again");
             ServiceContext.ContentService.Save(content);
 
             Assert.AreEqual(2, _msgCount);
@@ -943,7 +943,7 @@ namespace Umbraco.Tests.Integration
             Assert.IsNotNull(content);
 
             ServiceContext.ContentService.PublishWithStatus(content);
-            content.Properties.First().Value = "changed";
+            content.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content);
 
             ResetEvents();
@@ -1132,7 +1132,7 @@ namespace Umbraco.Tests.Integration
             var content = CreateContent();
             Assert.IsNotNull(content);
             ServiceContext.ContentService.SaveAndPublishWithStatus(content);
-            content.Properties.First().Value = "changed";
+            content.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content);
 
             ResetEvents();
@@ -1258,7 +1258,7 @@ namespace Umbraco.Tests.Integration
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
             ServiceContext.ContentService.PublishWithStatus(content1);
-            content1.Properties.First().Value = "changed";
+            content1.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
@@ -1375,7 +1375,7 @@ namespace Umbraco.Tests.Integration
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
             ServiceContext.ContentService.PublishWithStatus(content1);
-            content1.Properties.First().Value = "changed";
+            content1.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
@@ -1399,7 +1399,7 @@ namespace Umbraco.Tests.Integration
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
             ServiceContext.ContentService.PublishWithStatus(content1);
-            content1.Properties.First().Value = "changed";
+            content1.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
@@ -1486,7 +1486,7 @@ namespace Umbraco.Tests.Integration
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
             ServiceContext.ContentService.PublishWithStatus(content2);
-            content2.Properties.First().Value = "changed";
+            content2.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content2);
             ServiceContext.ContentService.UnPublish(content1);
             var content3 = CreateContent();
@@ -1514,7 +1514,7 @@ namespace Umbraco.Tests.Integration
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
             ServiceContext.ContentService.PublishWithStatus(content2);
-            content2.Properties.First().Value = "changed";
+            content2.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content2);
             ServiceContext.ContentService.UnPublish(content1);
             var content3 = CreateContent();
@@ -1571,7 +1571,7 @@ namespace Umbraco.Tests.Integration
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
             ServiceContext.ContentService.PublishWithStatus(content2);
-            content2.Properties.First().Value = "changed";
+            content2.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content2);
             ServiceContext.ContentService.UnPublish(content1);
             var content3 = CreateContent();
@@ -2031,11 +2031,11 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.PublishWithStatus(content);
             var v1 = content.Version;
 
-            content.Properties.First().Value = "changed";
+            content.Properties.First().SetValue("changed");
             ServiceContext.ContentService.PublishWithStatus(content);
             var v2 = content.Version;
 
-            content.Properties.First().Value = "again";
+            content.Properties.First().SetValue("again");
             ServiceContext.ContentService.PublishWithStatus(content);
             var v3 = content.Version;
 

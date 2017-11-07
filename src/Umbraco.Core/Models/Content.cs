@@ -22,6 +22,8 @@ namespace Umbraco.Core.Models
         private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
 
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         /// <summary>
         /// Constructor for creating a Content object
         /// </summary>
@@ -70,8 +72,7 @@ namespace Umbraco.Core.Models
             PublishedState = PublishedState.Unpublished;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
@@ -94,8 +95,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual ITemplate Template
         {
-            get { return _template ?? _contentType.DefaultTemplate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector); }
+            get => _template ?? _contentType.DefaultTemplate;
+            set => SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector);
         }
 
         /// <summary>
@@ -132,7 +133,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool Published
         {
-            get { return _published; }
+            get => _published;
             internal set
             {
                 SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector);
@@ -142,10 +143,7 @@ namespace Umbraco.Core.Models
         }
 
         [IgnoreDataMember]
-        public bool PublishedOriginal
-        {
-            get { return _publishedOriginal ?? false; }
-        }
+        public bool PublishedOriginal => _publishedOriginal ?? false;
 
         /// <summary>
         /// Language of the data contained within this Content object.
@@ -154,8 +152,8 @@ namespace Umbraco.Core.Models
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string Language
         {
-            get { return _language; }
-            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
+            get => _language;
+            set => SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector);
         }
 
         /// <summary>
@@ -164,8 +162,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public DateTime? ReleaseDate
         {
-            get { return _releaseDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector); }
+            get => _releaseDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector);
         }
 
         /// <summary>
@@ -174,8 +172,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public DateTime? ExpireDate
         {
-            get { return _expireDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector); }
+            get => _expireDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector);
         }
 
         /// <summary>
@@ -184,8 +182,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int WriterId
         {
-            get { return _writer; }
-            set { SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector); }
+            get => _writer;
+            set => SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector);
         }
 
         /// <summary>
@@ -197,18 +195,15 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal string NodeName
         {
-            get { return _nodeName; }
-            set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
+            get => _nodeName;
+            set => SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector);
         }
 
         /// <summary>
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IContentType ContentType
-        {
-            get { return _contentType; }
-        }
+        public IContentType ContentType => _contentType;
 
         /// <summary>
         /// Changes the <see cref="ContentType"/> for the current content object
@@ -276,9 +271,9 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool IsBlueprint { get; internal set; }
 
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
             switch (PublishedState)
@@ -327,10 +322,7 @@ namespace Umbraco.Core.Models
             clone.ResetIdentity();
 
             foreach (var property in clone.Properties)
-            {
                 property.ResetIdentity();
-                property.Version = clone.Version;
-            }
 
             clone.PublishedVersionGuid = Guid.Empty;
 
@@ -339,7 +331,7 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
-            var clone = (Content)base.DeepClone();
+            var clone = (Content) base.DeepClone();
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to manually clone this since it's not settable

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 
@@ -94,24 +92,25 @@ namespace Umbraco.Core.Collections
             return this.OfType<IRememberBeingDirty>().Any(x => x.WasDirty());
         }
 
-        /// <summary>
-        /// Always returns false, the list has no properties we need to report
-        /// </summary>
-        /// <param name="propName"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
+        /// <remarks>Always return false, the list has no properties that can be dirty.</remarks>
         public bool IsPropertyDirty(string propName)
         {
             return false;
         }
 
-        /// <summary>
-        /// Always returns false, the list has no properties we need to report
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
+        /// <remarks>Always return false, the list has no properties that can be dirty.</remarks>
         public bool WasPropertyDirty(string propertyName)
         {
             return false;
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Always return an empty enumerable, the list has no properties that can be dirty.</remarks>
+        public IEnumerable<string> GetDirtyProperties()
+        {
+            return Enumerable.Empty<string>();
         }
 
         public void ResetDirtyProperties()
@@ -122,19 +121,19 @@ namespace Umbraco.Core.Collections
             }
         }
 
-        public void ForgetPreviouslyDirtyProperties()
+        public void ResetWereDirtyProperties()
         {
             foreach (var dc in this.OfType<IRememberBeingDirty>())
             {
-                dc.ForgetPreviouslyDirtyProperties();
+                dc.ResetWereDirtyProperties();
             }
         }
 
-        public void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public void ResetDirtyProperties(bool rememberDirty)
         {
             foreach (var dc in this.OfType<IRememberBeingDirty>())
             {
-                dc.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                dc.ResetDirtyProperties(rememberDirty);
             }
         }
     }

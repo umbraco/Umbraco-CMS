@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
                 return false;
             if (ensureValue == false)
                 return true;
-            var stringValue = property.Value as string;
+            var stringValue = property.GetValue() as string;
             return string.IsNullOrWhiteSpace(stringValue) == false;
         }
 
@@ -72,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return allPropertyData.SelectMany(x => x.Value)
                 .Where (x => IsUploadField(x, true))
-                .Select(x => _mediaFileSystem.GetRelativePath((string)x.Value))
+                .Select(x => _mediaFileSystem.GetRelativePath((string)x.GetValue()))
                 .ToList();
         }
 
@@ -84,7 +84,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return deletedEntities.SelectMany(x => x.Properties)
                 .Where(x => IsUploadField(x, true))
-                .Select(x => _mediaFileSystem.GetRelativePath((string) x.Value))
+                .Select(x => _mediaFileSystem.GetRelativePath((string) x.GetValue()))
                 .ToList();
         }
 
@@ -102,7 +102,7 @@ namespace Umbraco.Web.PropertyEditors
             var isUpdated = false;
             foreach (var property in properties)
             {
-                var sourcePath = _mediaFileSystem.GetRelativePath((string) property.Value);
+                var sourcePath = _mediaFileSystem.GetRelativePath((string) property.GetValue());
                 var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
                 args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath));
                 isUpdated = true;
@@ -158,7 +158,7 @@ namespace Umbraco.Web.PropertyEditors
                 var autoFillConfig = _mediaFileSystem.UploadAutoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
-                var svalue = property.Value as string;
+                var svalue = property.GetValue() as string;
                 if (string.IsNullOrWhiteSpace(svalue))
                     _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig);
                 else

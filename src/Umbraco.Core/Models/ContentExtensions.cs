@@ -380,10 +380,12 @@ namespace Umbraco.Core.Models
             entity.Name = entity.Name.ToValidXmlString();
             foreach (var property in entity.Properties)
             {
-                if (property.Value is string)
+                foreach (var propertyValue in property.Values)
                 {
-                    var value = (string) property.Value;
-                    property.Value = value.ToValidXmlString();
+                    if (propertyValue.DraftValue is string draftString)
+                        propertyValue.DraftValue = draftString.ToValidXmlString();
+                    if (propertyValue.PublishedValue is string publishedString)
+                        propertyValue.PublishedValue = publishedString.ToValidXmlString();
                 }
             }
         }
@@ -463,7 +465,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
-        public static void PropertyValues(this IContentBase content, object value)
+        public static void PropertyValues(this IContentBase content, object value) // fixme kill that one! won't work with variants
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");
@@ -474,23 +476,21 @@ namespace Umbraco.Core.Models
                 //Check if a PropertyType with alias exists thus being a valid property
                 var propertyType = content.PropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
                 if (propertyType == null)
-                    throw new Exception(
-                        string.Format(
-                            "The property alias {0} is not valid, because no PropertyType with this alias exists",
-                            propertyInfo.Name));
+                    throw new Exception($"The property alias {propertyInfo.Name} is not valid, because no PropertyType with this alias exists");
 
                 //Check if a Property with the alias already exists in the collection thus being updated or inserted
                 var item = content.Properties.FirstOrDefault(x => x.Alias == propertyInfo.Name);
                 if (item != null)
                 {
-                    item.Value = propertyInfo.GetValue(value, null);
+                    item.SetValue(propertyInfo.GetValue(value, null));
                     //Update item with newly added value
                     content.Properties.Add(item);
                 }
                 else
                 {
                     //Create new Property to add to collection
-                    var property = propertyType.CreatePropertyFromValue(propertyInfo.GetValue(value, null));
+                    var property = propertyType.CreateProperty();
+                    property.SetValue(propertyInfo.GetValue(value, null));
                     content.Properties.Add(property);
                 }
             }
@@ -710,9 +710,10 @@ namespace Umbraco.Core.Models
             property.SetTags(storageType, propertyTypeAlias, tags, replaceTags, tagGroup);
         }
 
+        // fixme - totally not ok with variants
         internal static void SetTags(this Property property, TagCacheStorageType storageType, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
         {
-            if (property == null) throw new ArgumentNullException("property");
+            if (property == null) throw new ArgumentNullException(nameof(property));
 
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
 
@@ -726,11 +727,11 @@ namespace Umbraco.Core.Models
                 switch (storageType)
                 {
                     case TagCacheStorageType.Csv:
-                        property.Value = string.Join(",", trimmedTags);
+                        property.SetValue(string.Join(",", trimmedTags));
                         break;
                     case TagCacheStorageType.Json:
                         //json array
-                        property.Value = JsonConvert.SerializeObject(trimmedTags);
+                        property.SetValue(JsonConvert.SerializeObject(trimmedTags));
                         break;
                 }
 
@@ -740,19 +741,19 @@ namespace Umbraco.Core.Models
                 switch (storageType)
                 {
                     case TagCacheStorageType.Csv:
-                        var currTags = property.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        var currTags = property.GetValue().ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                        .Select(x => x.Trim());
-                        property.Value = string.Join(",", trimmedTags.Union(currTags));
+                        property.SetValue(string.Join(",", trimmedTags.Union(currTags)));
                         break;
                     case TagCacheStorageType.Json:
-                        var currJson = JsonConvert.DeserializeObject<JArray>(property.Value.ToString());
+                        var currJson = JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString());
                         //need to append the new ones
                         foreach (var tag in trimmedTags)
                         {
                             currJson.Add(tag);
                         }
                         //json array
-                        property.Value = JsonConvert.SerializeObject(currJson);
+                        property.SetValue(JsonConvert.SerializeObject(currJson));
                         break;
                 }
             }
@@ -765,6 +766,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias"></param>
         /// <param name="tags"></param>
         /// <param name="tagGroup">The group/category that the tags are currently assigned to, the default value is "default"</param>
+        // fixme - totally not ok with variants
         public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string tagGroup = "default")
         {
             var property = content.Properties[propertyTypeAlias];
@@ -780,10 +782,10 @@ namespace Umbraco.Core.Models
             property.TagSupport.Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup));
 
             //set the property value
-            var currTags = property.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var currTags = property.GetValue().ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                        .Select(x => x.Trim());
 
-            property.Value = string.Join(",", currTags.Except(trimmedTags));
+            property.SetValue(string.Join(",", currTags.Except(trimmedTags)));
         }
 
         #endregion

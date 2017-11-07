@@ -101,12 +101,12 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            content.Properties["title"].Value = "This is the new title";
+            content.Properties["title"].SetValue("This is the new title");
 
             // Assert
             Assert.That(content.Properties.Any(), Is.True);
             Assert.That(content.Properties["title"], Is.Not.Null);
-            Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
+            Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Any(), Is.True);
             Assert.That(content.Properties["title"], Is.Not.Null);
-            Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
+            Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Any(), Is.True);
             Assert.That(content.Properties["title"], Is.Not.Null);
-            Assert.That(content.Properties["title"].Value, Is.StringContaining("sample.txt"));
+            Assert.That(content.Properties["title"].GetValue(), Is.StringContaining("sample.txt"));
         }
 
 
@@ -342,7 +342,11 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
-            clone.Properties.Add(new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Ntext, "blah"), "blah"));
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "blah");
+            var newProperty = new Property(1, propertyType);
+            newProperty.SetValue("blah");
+            clone.Properties.Add(newProperty);
+
             Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
         }
 
@@ -423,8 +427,8 @@ namespace Umbraco.Tests.Models
             Assert.That(content.Properties.Any(), Is.True);
             Assert.That(content.Properties["title"], Is.Not.Null);
             Assert.That(content.Properties["title"].Alias, Is.EqualTo("title"));
-            Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
-            Assert.That(content.Properties["description"].Value, Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
+            Assert.That(content.Properties["description"].GetValue(), Is.EqualTo("This is the meta description for a textpage"));
         }
 
         [Test]
@@ -508,11 +512,13 @@ namespace Umbraco.Tests.Models
                                         Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
-            content.Properties.Add(new Property(propertyType){Value = "This is a subtitle Test"});
+            var newProperty = new Property(propertyType);
+            newProperty.SetValue("This is a subtitle text");
+            content.Properties.Add(newProperty);
 
             // Assert
             Assert.That(content.Properties.Contains("subtitle"), Is.True);
-            Assert.That(content.Properties["subtitle"].Value, Is.EqualTo("This is a subtitle Test"));
+            Assert.That(content.Properties["subtitle"].GetValue(), Is.EqualTo("This is a subtitle Test"));
         }
 
         [Test]
@@ -534,14 +540,16 @@ namespace Umbraco.Tests.Models
             var propertyGroup = new PropertyGroup {Name = "Test Group", SortOrder = 3};
             propertyGroup.PropertyTypes.Add(propertyType);
             contentType.PropertyGroups.Add(propertyGroup);
-            content.Properties.Add(new Property(propertyType){ Value = "Subtitle Test"});
+            var newProperty = new Property(propertyType);
+            newProperty.SetValue("Subtitle Test");
+            content.Properties.Add(newProperty);
 
             // Assert
             Assert.That(content.Properties.Count, Is.EqualTo(5));
             Assert.That(content.PropertyTypes.Count(), Is.EqualTo(5));
             Assert.That(content.PropertyGroups.Count(), Is.EqualTo(3));
-            Assert.That(content.Properties["subtitle"].Value, Is.EqualTo("Subtitle Test"));
-            Assert.That(content.Properties["title"].Value, Is.EqualTo("Textpage textpage"));
+            Assert.That(content.Properties["subtitle"].GetValue(), Is.EqualTo("Subtitle Test"));
+            Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
         }
 
         [Test]
@@ -561,7 +569,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Count, Is.EqualTo(4));
             Assert.That(contentType.PropertyTypes.First(x => x.Alias == "title").SortOrder, Is.EqualTo(1));
-            Assert.That(content.Properties["title"].Value, Is.EqualTo("Textpage textpage"));
+            Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("Textpage textpage"));
         }
 
         [Test]
@@ -597,7 +605,7 @@ namespace Umbraco.Tests.Models
 
             // Assert
             Assert.That(content.Properties.Contains("author"), Is.True);
-            Assert.That(content.Properties["author"].Value, Is.EqualTo("John Doe"));
+            Assert.That(content.Properties["author"].GetValue(), Is.EqualTo("John Doe"));
         }
 
         [Test]
@@ -615,8 +623,8 @@ namespace Umbraco.Tests.Models
             Assert.That(content.Properties.Contains("author"), Is.True);
             Assert.That(content.Properties.Contains("keywords"), Is.True);
             Assert.That(content.Properties.Contains("description"), Is.True);
-            Assert.That(content.Properties["keywords"].Value, Is.EqualTo("text,page,meta"));
-            Assert.That(content.Properties["description"].Value, Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(content.Properties["keywords"].GetValue(), Is.EqualTo("text,page,meta"));
+            Assert.That(content.Properties["description"].GetValue(), Is.EqualTo("This is the meta description for a textpage"));
         }
 
         [Test]

@@ -14,7 +14,6 @@ namespace Umbraco.Core.Persistence.Mappers
         protected override void BuildMap()
         {
             CacheMap<Property, PropertyDataDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Property, PropertyDataDto>(src => src.Version, dto => dto.VersionId);
             CacheMap<Property, PropertyDataDto>(src => src.PropertyTypeId, dto => dto.PropertyTypeId);
         }
     }

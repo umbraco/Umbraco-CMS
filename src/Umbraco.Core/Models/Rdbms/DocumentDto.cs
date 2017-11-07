@@ -22,16 +22,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
         public bool Published { get; set; }
 
-        // fixme writerUserId
-        [Column("documentUser")]
+        [Column("writerUserId")]
         public int WriterUserId { get; set; }
-
-        [Column("versionId")]
-        [PrimaryKeyColumn(AutoIncrement = false)]
-        public Guid VersionId { get; set; }
-
-        [Column("text")]
-        public string Text { get; set; }
 
         [Column("releaseDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -45,24 +37,12 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime UpdateDate { get; set; }
 
-        [Column("templateId")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
-        public int? TemplateId { get; set; }
-
-        // fixme kill that one
-        [Column("newest")]
-        [Constraint(Default = "0")]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_newest")]
-        public bool Newest { get; set; }
-
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
-        public ContentVersionDto ContentVersionDto { get; set; }
+        public ContentDto ContentDto { get; set; }
 
-        // fixme wtf
         [ResultColumn]
-        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]
-        public DocumentPublishedReadOnlyDto DocumentPublishedReadOnlyDto { get; set; }
+        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")] // FIXME not one-to-one! BUT it depends on the query!
+        public DocumentVersionDto DocumentVersionDto { get; set; }
     }
 }

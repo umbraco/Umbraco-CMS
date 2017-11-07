@@ -32,9 +32,8 @@ namespace Umbraco.Tests.PropertyEditors
             var dataTypeService = dataTypeServiceMock.Object;
             var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, Mock.Of<ILogger>(), new PropertyValueEditor());
 
-            var prop = new Property(1, Guid.NewGuid(),
-                                    new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
-                                    "1234,4567,8910");
+            var prop = new Property(1, new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")));
+            prop.SetValue("1234,4567,8910");
 
             var result = editor.ConvertDbToString(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
 
@@ -58,9 +57,8 @@ namespace Umbraco.Tests.PropertyEditors
             var dataTypeService = dataTypeServiceMock.Object;
             var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, Mock.Of<ILogger>(), new PropertyValueEditor());
 
-            var prop = new Property(1, Guid.NewGuid(),
-                                    new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
-                                    "1234,4567,8910");
+            var prop = new Property(1, new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")));
+            prop.SetValue("1234,4567,8910");
 
             var result = editor.ConvertDbToString(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
 
@@ -83,9 +81,8 @@ namespace Umbraco.Tests.PropertyEditors
             var dataTypeService = dataTypeServiceMock.Object;
             var editor = new PublishValueValueEditor(dataTypeService, new PropertyValueEditor(), Mock.Of<ILogger>());
 
-            var prop = new Property(1, Guid.NewGuid(),
-                                    new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")),
-                                    "1234");
+            var prop = new Property(1, new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")));
+            prop.SetValue("1234");
 
             var result = editor.ConvertDbToString(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
 

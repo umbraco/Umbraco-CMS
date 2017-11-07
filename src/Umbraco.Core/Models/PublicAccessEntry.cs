@@ -143,13 +143,13 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, Ps.Value.ProtectedNodeIdSelector); }
         }
 
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
             _removedRules.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
             foreach (var publicAccessRule in _ruleCollection)
             {
-                publicAccessRule.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                publicAccessRule.ResetDirtyProperties(rememberDirty);
             }
         }
     }

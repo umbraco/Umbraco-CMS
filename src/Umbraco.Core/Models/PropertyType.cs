@@ -251,50 +251,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Create a new Property object from a "raw" database value.
+        /// Creates a new property of this property type.
         /// </summary>
-        /// <remarks>Can be used for the "old" values where no serialization type exists</remarks>
-        /// <param name="value"></param>
-        /// <param name="version"> </param>
-        /// <param name="id"> </param>
-        /// <returns></returns>
-        internal Property CreatePropertyFromRawValue(object value, Guid version, int id)
+        public Property CreateProperty()
         {
-            return new Property(id, version, this, value);
-        }
-
-        /// <summary>
-        /// Create a new Property object from a "raw" database value.
-        /// In some cases the value will need to be deserialized.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="serializationType"> </param>
-        /// <returns></returns>
-        internal Property CreatePropertyFromRawValue(object value, string serializationType)
-        {
-            //The value from the db needs to be deserialized and then added to the property
-            //if its not a simple type (Integer, Date, Nvarchar, Ntext)
-            /*if (DataTypeDatabaseType == DataTypeDatabaseType.Object)
-            {
-                Type type = Type.GetType(serializationType);
-                var stream = new MemoryStream(Encoding.UTF8.GetBytes(value.ToString()));
-                var objValue = _service.FromStream(stream, type);
-                return new Property(this, objValue);
-            }*/
-
-            return new Property(this, value);
-        }
-
-        /// <summary>
-        /// Create a new Property object that conforms to the Type of the DataType
-        /// and can be validated according to DataType validation / Mandatory-check.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public Property CreatePropertyFromValue(object value)
-        {
-            //Note that validation will occur when setting the value on the Property
-            return new Property(this, value);
+            return new Property(this);
         }
 
         /// <summary>

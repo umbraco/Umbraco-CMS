@@ -174,14 +174,14 @@ namespace Umbraco.Core.Models
             OnPropertyChanged(Ps.Value.PropertiesSelector);
         }
 
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
             _addedProperties.Clear();
             _removedProperties.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
             foreach (var prop in Properties)
             {
-                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberDirty);
             }
         }
 

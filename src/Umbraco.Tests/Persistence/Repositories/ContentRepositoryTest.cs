@@ -204,14 +204,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                     versionDtos.Add(versionDto);
                     unitOfWork.Database.Insert(new DocumentDto
                     {
-                        Newest = true,
+                        // fixme DocumentDto has changed!
+                        //Newest = true,
                         NodeId = content1.Id,
                         Published = true,
-                        Text = content1.Name,
-                        VersionId = version,
+                        //Text = content1.Name,
+                        //VersionId = version,
                         WriterUserId = 0,
                         UpdateDate = versionDate,
-                        TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?)content1.Template.Id
+                        //TemplateId = content1.Template == null || content1.Template.Id <= 0 ? null : (int?)content1.Template.Id
                     });
 
                     var content = repository.GetByQuery(unitOfWork.SqlContext.Query<IContent>().Where(c => c.Id == content1.Id)).ToArray();

@@ -510,7 +510,7 @@ namespace Umbraco.Core.Services
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+            foreach (var property in contentBase.Properties.Where(p => p != null && p.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
             {
                 xml.Add(Serialize(dataTypeService, property));
             }

@@ -450,7 +450,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // add the user props
             foreach (var prop in media.Properties)
-                values[prop.Alias] = prop.Value?.ToString();
+                values[prop.Alias] = prop.GetValue()?.ToString();
 
             return new CacheValues
             {

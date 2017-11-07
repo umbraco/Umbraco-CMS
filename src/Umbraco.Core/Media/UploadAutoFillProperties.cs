@@ -180,16 +180,16 @@ namespace Umbraco.Core.Media
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
             if (content.Properties.Contains(autoFillConfig.WidthFieldAlias))
-                content.Properties[autoFillConfig.WidthFieldAlias].Value = size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty;
+                content.Properties[autoFillConfig.WidthFieldAlias].SetValue(size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty);
 
             if (content.Properties.Contains(autoFillConfig.HeightFieldAlias))
-                content.Properties[autoFillConfig.HeightFieldAlias].Value = size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty;
+                content.Properties[autoFillConfig.HeightFieldAlias].SetValue(size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty);
 
             if (content.Properties.Contains(autoFillConfig.LengthFieldAlias))
-                content.Properties[autoFillConfig.LengthFieldAlias].Value = length;
+                content.Properties[autoFillConfig.LengthFieldAlias].SetValue(length);
 
             if (content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
-                content.Properties[autoFillConfig.ExtensionFieldAlias].Value = extension;
+                content.Properties[autoFillConfig.ExtensionFieldAlias].SetValue(extension);
         }
 
         private static void ResetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig)
@@ -198,16 +198,16 @@ namespace Umbraco.Core.Media
             if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
             if (content.Properties.Contains(autoFillConfig.WidthFieldAlias))
-                content.Properties[autoFillConfig.WidthFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.WidthFieldAlias].SetValue(string.Empty);
 
             if (content.Properties.Contains(autoFillConfig.HeightFieldAlias))
-                content.Properties[autoFillConfig.HeightFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.HeightFieldAlias].SetValue(string.Empty);
 
             if (content.Properties.Contains(autoFillConfig.LengthFieldAlias))
-                content.Properties[autoFillConfig.LengthFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.LengthFieldAlias].SetValue(string.Empty);
 
             if (content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
-                content.Properties[autoFillConfig.ExtensionFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.ExtensionFieldAlias].SetValue(string.Empty);
         }
     }
 }

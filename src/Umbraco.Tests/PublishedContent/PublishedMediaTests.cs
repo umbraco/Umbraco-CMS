@@ -88,7 +88,7 @@ namespace Umbraco.Tests.PublishedContent
                     });
             ServiceContext.MediaTypeService.Save(mType);
             var media = MockedMedia.CreateMediaImage(mType, -1);
-            media.Properties["content"].Value = "<div>This is some content</div>";
+            media.Properties["content"].SetValue("<div>This is some content</div>");
             ServiceContext.MediaService.Save(media);
 
             var publishedMedia = GetNode(media.Id);

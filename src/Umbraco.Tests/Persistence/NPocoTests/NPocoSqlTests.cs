@@ -193,14 +193,14 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             var expected = Sql();
             expected.SelectAll()
-                .From("[cmsDocument]")
+                .From("[cmsDocumentVersion]")
                 .InnerJoin("[cmsContentVersion]")
-                .On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]");
+                .On("[cmsDocumentVersion].[id] = [cmsContentVersion].[id]");
 
             var sql = Sql();
-            sql.SelectAll().From<DocumentDto>()
+            sql.SelectAll().From<DocumentVersionDto>()
                 .InnerJoin<ContentVersionDto>()
-                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId);
+                .On<DocumentVersionDto, ContentVersionDto>(left => left.Id, right => right.Id);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 

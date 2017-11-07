@@ -225,7 +225,7 @@ namespace Umbraco.Web.Security
                     //needs to be editable
                     .Where(p => member.ContentType.MemberCanEditProperty(p.Alias)))
                 {
-                    member.Properties[property.Alias].Value = property.Value;
+                    member.Properties[property.Alias].SetValue(property.Value);
                 }
             }
 
@@ -272,7 +272,7 @@ namespace Umbraco.Web.Security
                     foreach (var property in model.MemberProperties.Where(p => p.Value != null)
                         .Where(property => member.Properties.Contains(property.Alias)))
                     {
-                        member.Properties[property.Alias].Value = property.Value;
+                        member.Properties[property.Alias].SetValue(property.Value);
                     }
                 }
 
@@ -509,9 +509,9 @@ namespace Umbraco.Web.Security
                 if (member != null)
                 {
                     var propValue = member.Properties[prop.Alias];
-                    if (propValue != null && propValue.Value != null)
+                    if (propValue != null && propValue.GetValue() != null)
                     {
-                        value = propValue.Value.ToString();
+                        value = propValue.GetValue().ToString();
                     }
                 }
 

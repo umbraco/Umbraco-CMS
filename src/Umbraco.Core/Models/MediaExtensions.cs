@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
             var val = media.Properties[propertyType];
             if (val == null) return string.Empty;
 
-            var jsonString = val.Value as string;
+            var jsonString = val.GetValue() as string;
             if (jsonString == null) return string.Empty;
 
             if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)

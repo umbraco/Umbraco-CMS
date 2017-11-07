@@ -26,11 +26,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         private ISqlSyntaxProvider SqlSyntax => _context.Database.SqlContext.SqlSyntax;
 
-        public void Table<T>()
+        public void Table<T>(bool withoutKeysAndIndexes = false)
         {
             var tableDefinition = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
 
             AddSql(SqlSyntax.Format(tableDefinition));
+            if (withoutKeysAndIndexes)
+                return;
+
             AddSql(SqlSyntax.FormatPrimaryKey(tableDefinition));
             foreach (var sql in SqlSyntax.Format(tableDefinition.ForeignKeys))
                 AddSql(sql);

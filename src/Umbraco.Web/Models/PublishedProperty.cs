@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models
             return propertyTypes.Select(x =>
                 {
                     var p = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
-                    var v = p == null || p.Value == null ? null : p.Value;
+                    var v = p == null || p.GetValue() == null ? null : p.GetValue();
                     if (v != null)
                     {
                         var e = propertyEditors[x.PropertyEditorAlias];

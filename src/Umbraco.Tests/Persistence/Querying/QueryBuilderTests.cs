@@ -103,8 +103,9 @@ namespace Umbraco.Tests.Persistence.Querying
             var sql = Sql();
             sql.SelectAll()
                 .From<DocumentDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
+                // fixme DocumentDto does not have VersionId anymore
+                //.InnerJoin<ContentVersionDto>()
+                //.On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
                 .InnerJoin<ContentDto>()
                 .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>()

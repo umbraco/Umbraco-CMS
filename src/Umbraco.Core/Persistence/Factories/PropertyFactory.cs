@@ -6,50 +6,24 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PropertyFactory
+    internal static class PropertyFactory
     {
-        private readonly PropertyType[] _compositionTypeProperties;
-        private readonly Guid _version;
-        private readonly int _id;
-        private readonly DateTime _createDate;
-        private readonly DateTime _updateDate;
-
-        public PropertyFactory(PropertyType[] compositionTypeProperties, Guid version, int id)
-        {
-            _compositionTypeProperties = compositionTypeProperties;
-            _version = version;
-            _id = id;
-        }
-
-        public PropertyFactory(PropertyType[] compositionTypeProperties, Guid version, int id, DateTime createDate, DateTime updateDate)
-        {
-            _compositionTypeProperties = compositionTypeProperties;
-            _version = version;
-            _id = id;
-            _createDate = createDate;
-            _updateDate = updateDate;
-        }
-
-        public static IEnumerable<Property> BuildEntity(IReadOnlyCollection<PropertyDataDto> dtos, PropertyType[] compositionTypeProperties, DateTime createDate, DateTime updateDate)
+        public static IEnumerable<Property> BuildEntities(IReadOnlyCollection<PropertyDataDto> dtos, PropertyType[] propertyTypes)
         {
             var properties = new List<Property>();
 
-            foreach (var propertyType in compositionTypeProperties)
+            foreach (var propertyType in propertyTypes)
             {
-                var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
-                var property = propertyDataDto == null
-                                   ? propertyType.CreatePropertyFromValue(null)
-                                   : propertyType.CreatePropertyFromRawValue(propertyDataDto.Value,
-                                                                             propertyDataDto.VersionId.Value,
-                                                                             propertyDataDto.Id);
+                var property = propertyType.CreateProperty();
+
                 try
                 {
-                    //on initial construction we don't want to have dirty properties tracked
                     property.DisableChangeTracking();
 
-                    property.CreateDate = createDate;
-                    property.UpdateDate = updateDate;
-                    // http://issues.umbraco.org/issue/U4-1946
+                    var propDtos = dtos.Where(x => x.PropertyTypeId == propertyType.Id);
+                    foreach (var propDto in propDtos)
+                        property.SetValue(propDto.LanguageId, propDto.Segment, propDto.Value);
+
                     property.ResetDirtyProperties(false);
                     properties.Add(property);
                 }
@@ -57,78 +31,81 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     property.EnableChangeTracking();
                 }
-
             }
 
             return properties;
         }
 
-        [Obsolete("Use the static method instead, there's no reason to allocate one of these classes everytime we want to map values")]
-        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
+        private static PropertyDataDto BuildDto(int nodeId, Guid versionId, Property property, Property.PropertyValue propertyValue, bool published)
         {
-            return BuildEntity(dtos, _compositionTypeProperties, _createDate, _updateDate);
+            var dto = new PropertyDataDto { NodeId = nodeId, VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
+
+            if (property.HasIdentity)
+                dto.Id = property.Id;
+
+            if (propertyValue.LanguageId.HasValue)
+                dto.LanguageId = propertyValue.LanguageId;
+
+            if (propertyValue.Segment != null)
+                dto.Segment = propertyValue.Segment;
+
+            dto.Published = published;
+
+            var value = published ? propertyValue.PublishedValue : propertyValue.DraftValue;
+
+            if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
+            {
+                if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias)
+                {
+                    dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
+                }
+                else if (value != null && string.IsNullOrWhiteSpace(value.ToString()) == false && int.TryParse(value.ToString(), out var val))
+                {
+                    dto.IntegerValue = val;
+                }
+            }
+            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Decimal && value != null)
+            {
+                if (decimal.TryParse(value.ToString(), out var val))
+                {
+                    dto.DecimalValue = val; // property value should be normalized already
+                }
+            }
+            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && value != null && string.IsNullOrWhiteSpace(value.ToString()) == false)
+            {
+                if (DateTime.TryParse(value.ToString(), out var date))
+                {
+                    dto.DateValue = date;
+                }
+            }
+            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && value != null)
+            {
+                dto.TextValue = value.ToString();
+            }
+            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && value != null)
+            {
+                dto.VarcharValue = value.ToString();
+            }
+
+            return dto;
         }
 
-        public IEnumerable<PropertyDataDto> BuildDto(IEnumerable<Property> properties)
+        public static IEnumerable<PropertyDataDto> BuildDtos(int nodeId, Guid versionId, IEnumerable<Property> properties)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
 
             foreach (var property in properties)
             {
-                var dto = new PropertyDataDto { NodeId = _id, PropertyTypeId = property.PropertyTypeId, VersionId = _version };
-
-                //Check if property has an Id and set it, so that it can be updated if it already exists
-                if (property.HasIdentity)
+                foreach (var propertyValue in property.Values)
                 {
-                    dto.Id = property.Id;
+                    if (propertyValue.DraftValue != null)
+                        propertyDataDtos.Add(BuildDto(nodeId, versionId, property, propertyValue, false));
+                    if (propertyValue.PublishedValue != null)
+                        propertyDataDtos.Add(BuildDto(nodeId, versionId, property, propertyValue, true));
                 }
-
-                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
-                {
-                    if (property.Value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias)
-                    {
-                        dto.IntegerValue = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
-                                          ? 0
-                                          : Convert.ToInt32(property.Value);
-                    }
-                    else
-                    {
-                        int val;
-                        if ((property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false) && int.TryParse(property.Value.ToString(), out val))
-                        {
-                            dto.IntegerValue = val;
-                        }
-                    }
-                }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Decimal && property.Value != null)
-                {
-                    decimal val;
-                    if (decimal.TryParse(property.Value.ToString(), out val))
-                    {
-                        dto.DecimalValue = val; // property value should be normalized already
-                    }
-                }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
-                {
-                    DateTime date;
-                    if (DateTime.TryParse(property.Value.ToString(), out date))
-                    {
-                        dto.DateValue = date;
-                    }
-                }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
-                {
-                    dto.TextValue = property.Value.ToString();
-                }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && property.Value != null)
-                {
-                    dto.VarcharValue = property.Value.ToString();
-                }
-
-                propertyDataDtos.Add(dto);
             }
+
             return propertyDataDtos;
         }
-
     }
 }

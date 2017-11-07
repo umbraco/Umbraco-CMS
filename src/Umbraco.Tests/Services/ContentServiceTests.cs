@@ -123,10 +123,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(fromBlueprint);
 
             Assert.IsTrue(fromBlueprint.HasIdentity);
-            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].Value);
-            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].Value);
-            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].Value);
-            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].Value);
+            Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());
+            Assert.AreEqual("blueprint 2", fromBlueprint.Properties["bodyText"].GetValue());
+            Assert.AreEqual("blueprint 3", fromBlueprint.Properties["keywords"].GetValue());
+            Assert.AreEqual("blueprint 4", fromBlueprint.Properties["description"].GetValue());
         }
 
         [Test]
@@ -729,7 +729,7 @@ namespace Umbraco.Tests.Services
             // Assert
 
             //the value will have changed but the tags db table will not have
-            Assert.AreEqual(5, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
+            Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -763,7 +763,7 @@ namespace Umbraco.Tests.Services
             contentService.Publish(content);
 
             // Assert
-            Assert.AreEqual(4, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
+            Assert.AreEqual(4, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -797,7 +797,7 @@ namespace Umbraco.Tests.Services
             contentService.PublishWithStatus(content);
 
             // Assert
-            Assert.AreEqual(5, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
+            Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -831,7 +831,7 @@ namespace Umbraco.Tests.Services
             contentService.PublishWithStatus(content);
 
             // Assert
-            Assert.AreEqual(2, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
+            Assert.AreEqual(2, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1221,7 +1221,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(parentPublished, Is.True);
             Assert.That(published, Is.False);
-            Assert.That(content.IsValid(), Is.False);
+            Assert.That(content.Validate(), Is.False);
             Assert.That(parent.Published, Is.True);
             Assert.That(content.Published, Is.False);
         }
@@ -1377,11 +1377,11 @@ namespace Umbraco.Tests.Services
             var rootPublished = contentService.Publish(root);
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 3);
-            content.Properties["title"].Value = content.Properties["title"].Value + " Published";
+            content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
             var contentPublished = contentService.SaveAndPublish(content);
             var publishedVersion = content.Version;
 
-            content.Properties["title"].Value = content.Properties["title"].Value + " Saved";
+            content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Saved");
             contentService.Save(content);
             var savedVersion = content.Version;
 
@@ -1401,17 +1401,17 @@ namespace Umbraco.Tests.Services
             //Ensure that the published content version has the correct property value and is marked as published
             var publishedContentVersion = publishedDescendants.First(x => x.Version == publishedVersion);
             Assert.That(publishedContentVersion.Published, Is.True);
-            Assert.That(publishedContentVersion.Properties["title"].Value, Contains.Substring("Published"));
+            Assert.That(publishedContentVersion.Properties["title"].GetValue(), Contains.Substring("Published"));
 
             //Ensure that the saved content version has the correct property value and is not marked as published
             var savedContentVersion = contentService.GetByVersion(savedVersion);
             Assert.That(savedContentVersion.Published, Is.False);
-            Assert.That(savedContentVersion.Properties["title"].Value, Contains.Substring("Saved"));
+            Assert.That(savedContentVersion.Properties["title"].GetValue(), Contains.Substring("Saved"));
 
             //Ensure that the latest version of the content is the saved and not-yet-published one
             var currentContent = contentService.GetById(NodeDto.NodeIdSeed + 3);
             Assert.That(currentContent.Published, Is.False);
-            Assert.That(currentContent.Properties["title"].Value, Contains.Substring("Saved"));
+            Assert.That(currentContent.Properties["title"].GetValue(), Contains.Substring("Saved"));
             Assert.That(currentContent.Version, Is.EqualTo(savedVersion));
         }
 
@@ -1759,7 +1759,7 @@ namespace Umbraco.Tests.Services
             foreach (var property in copy.Properties)
             {
                 Assert.AreNotEqual(property.Id, content.Properties[property.Alias].Id);
-                Assert.AreEqual(property.Value, content.Properties[property.Alias].Value);
+                Assert.AreEqual(property.GetValue(), content.Properties[property.Alias].GetValue());
             }
             //Assert.AreNotEqual(content.Name, copy.Name);
         }

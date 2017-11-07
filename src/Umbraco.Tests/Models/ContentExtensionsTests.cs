@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Models
             content.ChangePublishedState(PublishedState.Publishing);
             content.ResetDirtyProperties(false); // => .Published
 
-            content.Properties.First().Value = "hello world"; // change data
+            content.Properties.First().SetValue("hello world"); // change data
             content.ChangePublishedState(PublishedState.Saving); // saving
 
             Assert.IsTrue(content.RequiresSaving());
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Models
 
             content.ResetDirtyProperties(false);
 
-            content.Properties.First().Value = "hello world"; // change data
+            content.Properties.First().SetValue("hello world"); // change data
 
             Assert.IsTrue(content.RequiresSaving());
         }
@@ -218,7 +218,7 @@ namespace Umbraco.Tests.Models
             content.ChangePublishedState(PublishedState.Publishing);
             content.ResetDirtyProperties(false); // => .Published
 
-            content.Properties.First().Value = "hello world"; // change data
+            content.Properties.First().SetValue("hello world"); // change data
             content.ChangePublishedState(PublishedState.Publishing);
 
             Assert.IsTrue(content.RequiresNewVersion());
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.Models
             content.ChangePublishedState(PublishedState.Publishing);
             content.ResetDirtyProperties(false); // => .Published
 
-            content.Properties.First().Value = "hello world"; // change data
+            content.Properties.First().SetValue("hello world"); // change data
             content.ChangePublishedState(PublishedState.Saving); // saving
 
             Assert.IsTrue(content.RequiresNewVersion());
@@ -318,7 +318,7 @@ namespace Umbraco.Tests.Models
 
             content.ResetDirtyProperties(false);
 
-            content.Properties.First().Value = "hello world"; // change user property
+            content.Properties.First().SetValue("hello world"); // change user property
 
             Assert.IsFalse(content.RequiresNewVersion());
         }
@@ -357,7 +357,7 @@ namespace Umbraco.Tests.Models
 
             content.ResetDirtyProperties(false);
 
-            content.Properties.First().Value = "hello world"; // change user property
+            content.Properties.First().SetValue("hello world"); // change user property
             content.ChangePublishedState(PublishedState.Publishing); // publishing
 
             Assert.IsFalse(content.RequiresNewVersion());
@@ -516,17 +516,17 @@ namespace Umbraco.Tests.Models
             // if you assign a user property with its value it is not dirty
             // if you assign it with another value then back, it is dirty
 
-            prop.Value = "A";
+            prop.SetValue("A");
             content.ResetDirtyProperties(false);
             Assert.IsFalse(prop.IsDirty());
-            prop.Value = "B";
+            prop.SetValue("B");
             Assert.IsTrue(prop.IsDirty());
             content.ResetDirtyProperties(false);
             Assert.IsFalse(prop.IsDirty());
-            prop.Value = "B";
+            prop.SetValue("B");
             Assert.IsFalse(prop.IsDirty());
-            prop.Value = "A";
-            prop.Value = "B";
+            prop.SetValue("A");
+            prop.SetValue("B");
             Assert.IsTrue(prop.IsDirty());
         }
 
@@ -539,7 +539,7 @@ namespace Umbraco.Tests.Models
 
             content.ResetDirtyProperties(false);
             var d = content.UpdateDate;
-            prop.Value = "A";
+            prop.SetValue("A");
             Assert.IsTrue(content.IsAnyUserPropertyDirty());
             Assert.IsFalse(content.IsEntityDirty());
             Assert.AreEqual(d, content.UpdateDate);
@@ -616,21 +616,21 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
             Assert.IsFalse(content.WasDirty());
-            prop.Value = "a";
-            prop.Value = "b";
+            prop.SetValue("a");
+            prop.SetValue("b");
             Assert.IsTrue(content.IsDirty());
             Assert.IsFalse(content.WasDirty());
             content.ResetDirtyProperties(false);
             Assert.IsFalse(content.IsDirty());
             Assert.IsFalse(content.WasDirty());
-            prop.Value = "a";
-            prop.Value = "b";
+            prop.SetValue("a");
+            prop.SetValue("b");
             content.ResetDirtyProperties(true); // what PersistUpdatedItem does
             Assert.IsFalse(content.IsDirty());
             //Assert.IsFalse(content.WasDirty()); // not impacted by user properties
             Assert.IsTrue(content.WasDirty()); // now it is!
-            prop.Value = "a";
-            prop.Value = "b";
+            prop.SetValue("a");
+            prop.SetValue("b");
             content.ResetDirtyProperties(); // what PersistUpdatedItem does
             Assert.IsFalse(content.IsDirty());
             //Assert.IsFalse(content.WasDirty()); // not impacted by user properties

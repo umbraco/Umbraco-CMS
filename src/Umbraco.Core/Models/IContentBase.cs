@@ -46,31 +46,54 @@ namespace Umbraco.Core.Models
         bool HasProperty(string propertyTypeAlias);
 
         /// <summary>
-        /// Gets the value of a Property
+        /// Gets the neutral value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
-        object GetValue(string propertyTypeAlias);
+        object GetValue(string propertyTypeAlias, bool published = false);
 
         /// <summary>
-        /// Gets the value of a Property
+        /// Gets the culture value of a Property
         /// </summary>
-        /// <typeparam name="TPassType">Type of the value to return</typeparam>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
-        TPassType GetValue<TPassType>(string propertyTypeAlias);
+        object GetValue(string propertyTypeAlias, int languageId, bool published = false);
 
         /// <summary>
-        /// Sets the <see cref="System.Object"/> value of a Property
+        /// Gets the segment value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
+        object GetValue(string propertyTypeAlias, int languageId, string segment, bool published = false);
+
+        /// <summary>
+        /// Gets the typed neutral value of a Property
+        /// </summary>
+        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, bool published = false);
+
+        /// <summary>
+        /// Gets the typed neutral value of a Property
+        /// </summary>
+        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int languageId, bool published = false);
+
+        /// <summary>
+        /// Gets the typed neutral value of a Property
+        /// </summary>
+        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int languageId, string segment, bool published = false);
+
+        /// <summary>
+        /// Sets the neutral (draft) value of a Property
+        /// </summary>
         void SetValue(string propertyTypeAlias, object value);
+
+        /// <summary>
+        /// Sets the culture (draft) value of a Property
+        /// </summary>
+        void SetValue(string propertyTypeAlias, int languageId, object value);
+
+        /// <summary>
+        /// Sets the segment (draft) value of a Property
+        /// </summary>
+        void SetValue(string propertyTypeAlias, int languageId, string segment, object value);
 
         /// <summary>
         /// Boolean indicating whether the content and its properties are valid
         /// </summary>
         /// <returns>True if content is valid otherwise false</returns>
-        bool IsValid();
+        bool Validate();
     }
 }

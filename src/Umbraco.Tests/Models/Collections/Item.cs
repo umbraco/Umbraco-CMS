@@ -135,6 +135,11 @@ namespace Umbraco.Tests.Models.Collections
             return _propertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
+        public virtual IEnumerable<string> GetDirtyProperties()
+        {
+            return _propertyChangedInfo.Keys;
+        }
+
         /// <summary>
         /// Indicates whether the current entity is dirty.
         /// </summary>

@@ -50,10 +50,10 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
             Assert.AreEqual(content.Template == null ? "0" : content.Template.Id.ToString(), (string)element.Attribute("template"));
 
-            Assert.AreEqual(content.Properties["title"].Value.ToString(), element.Elements("title").Single().Value);
-            Assert.AreEqual(content.Properties["bodyText"].Value.ToString(), element.Elements("bodyText").Single().Value);
-            Assert.AreEqual(content.Properties["keywords"].Value.ToString(), element.Elements("keywords").Single().Value);
-            Assert.AreEqual(content.Properties["description"].Value.ToString(), element.Elements("description").Single().Value);
+            Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
+            Assert.AreEqual(content.Properties["bodyText"].GetValue().ToString(), element.Elements("bodyText").Single().Value);
+            Assert.AreEqual(content.Properties["keywords"].GetValue().ToString(), element.Elements("keywords").Single().Value);
+            Assert.AreEqual(content.Properties["description"].GetValue().ToString(), element.Elements("description").Single().Value);
         }
     }
 }

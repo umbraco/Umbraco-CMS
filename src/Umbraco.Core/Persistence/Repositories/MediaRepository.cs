@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -37,95 +38,101 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override MediaRepository This => this;
 
-        public bool EnsureUniqueNaming { get; }
+        public bool EnsureUniqueNaming { get; set; }
 
-        #region Overrides of RepositoryBase<int,IMedia>
+        #region Repository Base
+
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Media;
 
         protected override IMedia PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(QueryType.Single)
+                .Where<NodeDto>(x => x.NodeId == id)
+                .SelectTop(1);
 
-            var dto = Database.Fetch<ContentVersionDto>(sql.SelectTop(1)).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var content = CreateMediaFromDto(dto, dto.VersionId);
-
-            return content;
+            var dto = Database.Fetch<ContentDto>(sql).FirstOrDefault();
+            return dto == null
+                ? null
+                : MapDtoToContent(dto);
         }
 
         protected override IEnumerable<IMedia> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false);
-            if (ids.Any())
-            {
-                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
-            }
+            var sql = GetBaseQuery(QueryType.Many);
 
-            return MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
+            if (ids.Any())
+                sql.WhereIn<NodeDto>(x => x.NodeId, ids);
+
+            return MapDtosToContent(Database.Fetch<ContentDto>(sql));
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
         {
-            var sqlClause = GetBaseQuery(false);
+            var sqlClause = GetBaseQuery(QueryType.Many);
+
             var translator = new SqlTranslator<IMedia>(sqlClause, query);
-            var sql = translator.Translate()
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+            var sql = translator.Translate();
 
-            return MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
-        }
+            sql // fixme why?
+                .OrderBy<NodeDto>(x => x.Level)
+                .OrderBy<NodeDto>(x => x.SortOrder);
 
-        #endregion
-
-        #region Overrides of NPocoRepositoryBase<int,IMedia>
-
-        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-        {
-            return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
+            return MapDtosToContent(Database.Fetch<ContentDto>(sql));
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
         {
-            var sql = Sql();
+            return GetBaseQuery(queryType, true);
+        }
 
-            switch (queryType)
+        protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
+        {
+            var sql = SqlContext.Sql();
+
+            switch (queryType) // FIXME pretend we still need these queries for now
             {
                 case QueryType.Count:
                     sql = sql.SelectCount();
                     break;
                 case QueryType.Ids:
-                    sql = sql.Select<ContentVersionDto>(x => x.NodeId);
+                    sql = sql.Select<ContentDto>(x => x.NodeId);
                     break;
-                case QueryType.Many:
                 case QueryType.Single:
-                    sql = sql.Select<ContentVersionDto>(r =>
-                        r.Select(x => x.ContentDto, r1 =>
-                            r1.Select(x => x.NodeDto)));
+                case QueryType.Many:
+                    sql = sql.Select<ContentDto>(r =>
+                        r.Select(x => x.NodeDto)
+                         .Select(x => x.ContentVersionDto));
                     break;
             }
 
             sql
-                .From<ContentVersionDto>()
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .From<ContentDto>()
+                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId);
+
+
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
+            if (current)
+                sql.Where<ContentVersionDto>(x => x.Current); // always get the current version
 
             return sql;
         }
 
-        protected override string GetBaseWhereClause()
+        // fixme - move that one up to Versionable! or better: kill it!
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
+        {
+            return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
+        }
+
+        protected override string GetBaseWhereClause() // fixme - can we kill / refactor this?
         {
             return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            var list = new List<string>
+            var list = new List<string> // fixme table names, escape everything, etc
                            {
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
@@ -135,42 +142,36 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
-                               "DELETE FROM cmsDocument WHERE nodeId = @Id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @Id",
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
-                               "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE ContentId = @Id",
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @Id",
                                "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Media;
-
         #endregion
 
-        #region Overrides of VersionableRepositoryBase<IContent>
+        #region Versions
 
-        public override IEnumerable<IMedia> GetAllVersions(int id)
+        public override IEnumerable<IMedia> GetAllVersions(int nodeId)
         {
-            var sql = GetBaseQuery(false)
-                .Where(GetBaseWhereClause(), new { Id = id })
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(QueryType.Many, false)
+                .Where<NodeDto>(x => x.NodeId == nodeId)
+                .OrderByDescending<ContentVersionDto>(x => x.Current)
+                .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapQueryDtos(Database.Fetch<ContentVersionDto>(sql), true);
+            return MapDtosToContent(Database.Fetch<ContentDto>(sql), true);
         }
 
         public override IMedia GetByVersion(Guid versionId)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(QueryType.Single)
+                .Where<ContentVersionDto>(x => x.VersionId == versionId);
 
-            var dto = Database.Fetch<ContentVersionDto>(sql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            return CreateMediaFromDto(dto, versionId);
+            var dto = Database.Fetch<ContentDto>(sql).FirstOrDefault();
+            return dto == null ? null : MapDtoToContent(dto);
         }
 
         public IMedia GetMediaByPath(string mediaPath)
@@ -223,93 +224,89 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region Unit of Work Implementation
+        #region Persist
 
         protected override void PersistNewItem(IMedia entity)
         {
-            ((Models.Media)entity).AddingEntity();
+            ((Models.Media) entity).AddingEntity();
 
-            //Ensure unique name on the same level
+            // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
-            //Ensure that strings don't contain characters that are invalid in XML
+            // ensure that strings don't contain characters that are invalid in xml
+            // fixme - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
-            var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
-            var dto = factory.BuildDto(entity);
+            // create the dto
+            var dto = MediaFactory.BuildDto(entity);
 
-            //NOTE Should the logic below have some kind of fallback for empty parent ids ?
-            //Logic for setting Path, Level and SortOrder
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
+            // derive path and level from parent
+            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
+                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+            );
+            var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
             var level = parent.Level + 1;
-            var maxSortOrder = Database.ExecuteScalar<int>(
-                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentId = @ParentId AND nodeObjectType = @NodeObjectType",
-                new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
-            var sortOrder = maxSortOrder + 1;
 
-            //Create the (base) node data - umbracoNode
-            var nodeDto = dto.ContentDto.NodeDto;
+            // get sort order
+            var sortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+
+            // persist the node dto
+            var nodeDto = dto.NodeDto;
             nodeDto.Path = parent.Path;
-            nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
+            nodeDto.Level = Convert.ToInt16(level);
             nodeDto.SortOrder = sortOrder;
 
-            // note:
-            // there used to be a check on Database.IsNew(nodeDto) here to either Insert or Update,
-            // but I cannot figure out what was the point, as the node should obviously be new if
-            // we reach that point - removed.
-
             // see if there's a reserved identifier for this unique id
-            var sql = new Sql("SELECT id FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", nodeDto.UniqueId, Constants.ObjectTypes.IdReservation);
-            var id = Database.ExecuteScalar<int>(sql);
+            // and then either update or insert the node dto
+            template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetReservedId", tsql =>
+                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            );
+            var id = Database.ExecuteScalar<int>(template.Sql(nodeDto.UniqueId)); // fixme can we mix named & non-named?
             if (id > 0)
             {
                 nodeDto.NodeId = id;
+                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+                nodeDto.ValidatePathWithException();
                 Database.Update(nodeDto);
             }
             else
             {
                 Database.Insert(nodeDto);
+
+                // update path, now that we have an id
+                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+                nodeDto.ValidatePathWithException();
+                Database.Update(nodeDto);
             }
 
-            //Update with new correct path
-            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-            nodeDto.ValidatePathWithException();
-            Database.Update(nodeDto);
-
-            //Update entity with correct values
-            entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
+            // update entity
+            entity.Id = nodeDto.NodeId;
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
             entity.Level = level;
 
-            //Create the Content specific data - cmsContent
-            var contentDto = dto.ContentDto;
-            contentDto.NodeId = nodeDto.NodeId;
-            Database.Insert(contentDto);
-
-            //Create the first version - cmsContentVersion
-            //Assumes a new Version guid and Version date (modified date) has been set
+            // persist the content dto
             dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
-            //Create the PropertyData for this version
-            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
-            var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
-            var keyDictionary = new Dictionary<int, int>();
+            // persist the content version dto
+            // assumes a new version id and version date (modified date) has been set
+            var contentVersionDto = dto.ContentVersionDto; // fixme version id etc?
+            contentVersionDto.NodeId = nodeDto.NodeId;
+            contentVersionDto.Current = true;
+            Database.Insert(contentVersionDto);
 
-            //Add Properties
+            // persist the property data
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
             foreach (var propertyDataDto in propertyDataDtos)
-            {
-                var primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-                keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
-            }
+                Database.Insert(propertyDataDto);
 
-            //Update Properties with its newly set Id
+            // assign ids to properties, using propertyTypeId as a key
+            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
             foreach (var property in entity.Properties)
-            {
-                property.Id = keyDictionary[property.PropertyTypeId];
-            }
+                property.Id = xids[property.PropertyTypeId];
 
+            // set tags
             UpdateEntityTags(entity, _tagRepository);
 
             OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
@@ -322,79 +319,64 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
-            //Ensure unique name on the same level
+            // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
-            //Ensure that strings don't contain characters that are invalid in XML
+            // ensure that strings don't contain characters that are invalid in xml
+            // fixme - do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
 
-            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
+            // if parent has changed, get path, level and sort order
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { /*ParentId =*/ entity.ParentId });
+                var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
+                    tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+                );
+                var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
-                var maxSortOrder =
-                    Database.ExecuteScalar<int>(
-                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                        new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
-                entity.SortOrder = maxSortOrder + 1;
+                entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
             }
 
-            var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
-            //Look up Content entry to get Primary for updating the DTO
-            var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { /*Id =*/ entity.Id });
-            factory.SetPrimaryKey(contentDto.Id);
-            var dto = factory.BuildDto(entity);
+            // create the dto
+            var dto = MediaFactory.BuildDto(entity);
 
-            //Updates the (base) node data - umbracoNode
-            var nodeDto = dto.ContentDto.NodeDto;
+            // update the node dto
+            var nodeDto = dto.NodeDto;
             nodeDto.ValidatePathWithException();
-            var unused = Database.Update(nodeDto);
+            Database.Update(nodeDto);
 
-            //Only update this DTO if the contentType has actually changed
-            if (contentDto.ContentTypeId != entity.ContentTypeId)
+            // update the content dto - only if the content type has changed
+            var origContentDto = Database.Fetch<ContentDto>(SqlContext.Sql().Select<ContentDto>().From<ContentDto>().Where<ContentDto>(x => x.NodeId == entity.Id)).FirstOrDefault();
+            if (origContentDto.ContentTypeId != entity.ContentTypeId)
             {
-                //Create the Content specific data - cmsContent
-                var newContentDto = dto.ContentDto;
-                Database.Update(newContentDto);
+                dto.Id = origContentDto.Id; // fixme - annoying, needed?
+                Database.Update(dto);
             }
 
-            //In order to update the ContentVersion we need to retrieve its primary key id
-            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
-            dto.Id = contentVerDto.Id;
-            //Updates the current version - cmsContentVersion
-            //Assumes a Version guid exists and Version date (modified date) has been set/updated
-            Database.Update(dto);
+            // update the content version dto
+            var contentVersionDto = dto.ContentVersionDto; // fixme version id etc?
+            contentVersionDto.Current = true;
+            // fixme this pk thing is annoying
+            var id = Database.ExecuteScalar<int>(SqlContext.Sql().Select<ContentVersionDto>(x => x.Id).From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == entity.Version));
+            contentVersionDto.Id = id;
+            Database.Update(contentVersionDto);
 
-            //Create the PropertyData for this version
-            var propertyFactory = new PropertyFactory(entity.ContentType.CompositionPropertyTypes.ToArray(), entity.Version, entity.Id);
-            var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
-            var keyDictionary = new Dictionary<int, int>();
-
-            //Add Properties
+            // update the property data
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
             foreach (var propertyDataDto in propertyDataDtos)
             {
                 if (propertyDataDto.Id > 0)
-                {
                     Database.Update(propertyDataDto);
-                }
                 else
-                {
-                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-                    keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
-                }
+                    Database.Insert(propertyDataDto);
             }
 
-            //Update Properties with its newly set Id
-            if (keyDictionary.Any())
-            {
-                foreach (var property in entity.Properties)
-                {
-                    if (keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
-                    property.Id = keyDictionary[property.PropertyTypeId];
-                }
-            }
+            // assign ids to properties, using propertyTypeId as a key
+            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
+            foreach (var property in entity.Properties)
+                property.Id = xids[property.PropertyTypeId];
 
             UpdateEntityTags(entity, _tagRepository);
 
@@ -412,13 +394,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        #region IRecycleBinRepository members
+        #region Recycle Bin
 
         protected override int RecycleBinId => Constants.System.RecycleBinMedia;
 
         #endregion
 
-        #region Read Repository implementation for GUID keys
+        #region Read Repository implementation for Guid keys
+
         public IMedia Get(Guid id)
         {
             return _mediaByGuidReadRepository.Get(id);
@@ -445,72 +428,69 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             private readonly MediaRepository _outerRepo;
 
-            public MediaByGuidReadRepository(MediaRepository outerRepo,
-                IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
+            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
                 : base(work, cache, logger)
             {
                 _outerRepo = outerRepo;
             }
 
+            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
+
             protected override IMedia PerformGet(Guid id)
             {
-                var sql = GetBaseQuery(false);
-                sql.Where(GetBaseWhereClause(), new { Id = id });
-                sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                var sql = _outerRepo.GetBaseQuery(QueryType.Single)
+                    .Where<NodeDto>(x => x.UniqueId == id);
 
-                var dto = Database.Fetch<ContentVersionDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+                var dto = Database.Fetch<ContentDto>(sql.SelectTop(1)).FirstOrDefault();
 
                 if (dto == null)
                     return null;
 
-                var content = _outerRepo.CreateMediaFromDto(dto, dto.VersionId);
+                var content = _outerRepo.MapDtoToContent(dto);
 
                 return content;
             }
 
             protected override IEnumerable<IMedia> PerformGetAll(params Guid[] ids)
             {
-                var sql = GetBaseQuery(false);
-                if (ids.Any())
-                {
-                    sql.Where("umbracoNode.uniqueID in (@ids)", new { ids = ids });
-                }
+                var sql = _outerRepo.GetBaseQuery(QueryType.Many);
+                if (ids.Length > 0)
+                    sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
 
-                return _outerRepo.MapQueryDtos(Database.Fetch<ContentVersionDto>(sql));
+                return _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+            }
+
+            protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
+            {
+                throw new WontImplementException();
+            }
+
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                throw new WontImplementException();
+            }
+
+            protected override void PersistNewItem(IMedia entity)
+            {
+                throw new WontImplementException();
+            }
+
+            protected override void PersistUpdatedItem(IMedia entity)
+            {
+                throw new WontImplementException();
             }
 
             protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
             {
-                return _outerRepo.GetBaseQuery(isCount);
+                throw new WontImplementException();
             }
 
             protected override string GetBaseWhereClause()
             {
-                return "umbracoNode.uniqueID = @Id";
+                throw new WontImplementException();
             }
-
-            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
-
-            #region Not needed to implement
-
-            protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
-            {
-                throw new NotImplementedException();
-            }
-            protected override IEnumerable<string> GetDeleteClauses()
-            {
-                throw new NotImplementedException();
-            }
-            protected override void PersistNewItem(IMedia entity)
-            {
-                throw new NotImplementedException();
-            }
-            protected override void PersistUpdatedItem(IMedia entity)
-            {
-                throw new NotImplementedException();
-            }
-            #endregion
         }
+
         #endregion
 
         /// <summary>
@@ -538,85 +518,74 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            return GetPagedResultsByQuery<ContentVersionDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapQueryDtos(x), orderBy, orderDirection, orderBySystemField, "cmsContentVersion",
+            return GetPagedResultsByQuery<ContentDto>(query, pageIndex, pageSize, out totalRecords,
+                x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField, "cmsContentVersion",
                 filterSql);
         }
 
-        private IEnumerable<IMedia> MapQueryDtos(List<ContentVersionDto> dtos, bool withCache = false)
+        private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
         {
-            var content = new IMedia[dtos.Count];
-            var temps = new List<TempContent>();
+            var temps = new List<TempContent<Models.Media>>();
             var contentTypes = new Dictionary<int, IMediaType>();
+            var content = new Models.Media[dtos.Count];
 
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
+                var versionId = dto.ContentVersionDto.VersionId;
 
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
                     var cached = IsolatedCache.GetCacheItem<IMedia>(GetCacheIdKey<IMedia>(dto.NodeId));
-                    if (cached != null)
+                    if (cached != null && cached.Version == versionId)
                     {
-                        content[i] = cached;
+                        content[i] = (Models.Media) cached; // fixme should we just cache Media not IMedia?
                         continue;
                     }
                 }
 
-                // else, need to fetch from the database
+                // else, need to build it
 
                 // get the content type - the repository is full cache *but* still deep-clones
                 // whatever comes out of it, so use our own local index here to avoid this
-                if (contentTypes.TryGetValue(dto.ContentDto.ContentTypeId, out IMediaType contentType) == false)
-                    contentTypes[dto.ContentDto.ContentTypeId] = contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+                var contentTypeId = dto.ContentTypeId;
+                if (contentTypes.TryGetValue(contentTypeId, out IMediaType contentType) == false)
+                    contentTypes[contentTypeId] = contentType = _mediaTypeRepository.Get(contentTypeId);
 
                 var c = content[i] = MediaFactory.BuildEntity(dto, contentType);
 
                 // need properties
-                temps.Add(new TempContent(
-                    dto.NodeId,
-                    dto.VersionId,
-                    dto.VersionDate,
-                    dto.ContentDto.NodeDto.CreateDate,
-                    contentType,
-                    c
-                ));
+                temps.Add(new TempContent<Models.Media>(dto.NodeId, versionId, contentType, c));
             }
 
-            // load all properties for all documents from database in 1 query
-            var propertyData = GetPropertyCollection(temps);
+            // load all properties for all documents from database in 1 query - indexed by version id
+            var properties = GetPropertyCollections(temps);
 
-            // assign
+            // assign properties
             foreach (var temp in temps)
             {
-                temp.Content.Properties = propertyData[temp.Version];
+                temp.Content.Properties = properties[temp.VersionId];
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                ((Entity) temp.Content).ResetDirtyProperties(false);
+                // reset dirty initial properties (U4-1946)
+                temp.Content.ResetDirtyProperties(false);
             }
 
             return content;
         }
 
-        /// <summary>
-        /// Private method to create a media object from a ContentDto
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="versionId"></param>
-        /// <returns></returns>
-        private IMedia CreateMediaFromDto(ContentVersionDto dto, Guid versionId)
+        private IMedia MapDtoToContent(ContentDto dto)
         {
-            var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            var contentType = _mediaTypeRepository.Get(dto.ContentTypeId);
             var media = MediaFactory.BuildEntity(dto, contentType);
-            var temp = new TempContent(dto.NodeId, versionId, media.UpdateDate, media.CreateDate, contentType);
-            var properties = GetPropertyCollection(new List<TempContent> { temp });
-            media.Properties = properties[versionId];
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)media).ResetDirtyProperties(false);
+            // get properties - indexed by version id
+            var temp = new TempContent<Models.Media>(dto.NodeId, dto.ContentVersionDto.VersionId, contentType);
+            var properties = GetPropertyCollections(new List<TempContent<Models.Media>> { temp });
+            media.Properties = properties[dto.ContentVersionDto.VersionId];
+
+            // clear dirty props on init - U4-1943
+            media.ResetDirtyProperties(false);
             return media;
         }
 
@@ -625,10 +594,23 @@ namespace Umbraco.Core.Persistence.Repositories
             if (EnsureUniqueNaming == false)
                 return nodeName;
 
-            var names = Database.Fetch<SimilarNodeName>("SELECT id, text AS name FROM umbracoNode WHERE nodeObjectType=@objectType AND parentId=@parentId",
-                new { objectType = NodeObjectTypeId, parentId });
+            var template = SqlContext.Templates.Get("Umbraco.Core.MediaRepository.EnsureUniqueNodeName", tsql => tsql
+                .Select<NodeDto>(x => x.NodeId, x => x.Text)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
+
+            var sql = template.Sql(NodeObjectTypeId, parentId);
+            var names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        }
+
+        private int GetNewChildSortOrder(int parentId, int first)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.MediaRepository.GetSortOrder", tsql =>
+                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+            );
+            return Database.ExecuteScalar<int>(template.Sql(parentId)) + 1; // fixme can we mix named & non-named?
         }
     }
 }

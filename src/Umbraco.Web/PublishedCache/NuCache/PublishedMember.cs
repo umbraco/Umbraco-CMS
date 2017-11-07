@@ -59,7 +59,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //    return new KeyValuePair<string, object>(property.Alias, v);
                 //})
                 //.ToDictionary(x => x.Key, x => x.Value);
-                .ToDictionary(x => x.Alias, x => x.Value, StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(x => x.Alias, x => x.GetValue(), StringComparer.OrdinalIgnoreCase);
 
             // see also PublishedContentType
             AddIf(contentType, properties, "Email", member.Email);

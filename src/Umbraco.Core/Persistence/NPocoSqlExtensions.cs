@@ -276,7 +276,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="sql">The Sql statement.</param>
         /// <param name="fields">Expressions specifying the fields.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> AndByDesc<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+        public static Sql<ISqlContext> AndByDescending<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)

@@ -332,9 +332,9 @@ namespace Umbraco.Examine
                     {"template", new object[] {c.Template?.Id ?? 0}}
                 };
 
-                foreach (var property in c.Properties.Where(p => p?.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in c.Properties.Where(p => p?.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
                 {
-                    values.Add(property.Alias, new[] {property.Value});
+                    values.Add(property.Alias, new[] {property.GetValue() });
                 }
 
                 var vs = new ValueSet(c.Id, IndexTypes.Content, c.ContentType.Alias, values);
@@ -366,9 +366,9 @@ namespace Umbraco.Examine
                     {"creatorName", new object[] {m.GetCreatorProfile(UserService).Name}}
                 };
 
-                foreach (var property in m.Properties.Where(p => p?.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in m.Properties.Where(p => p?.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
                 {
-                    values.Add(property.Alias, new[] { property.Value });
+                    values.Add(property.Alias, new[] { property.GetValue() });
                 }
 
                 var vs = new ValueSet(m.Id, IndexTypes.Media, m.ContentType.Alias, values);

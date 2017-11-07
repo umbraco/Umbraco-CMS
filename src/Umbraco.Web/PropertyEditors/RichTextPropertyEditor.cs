@@ -70,10 +70,10 @@ namespace Umbraco.Web.PropertyEditors
             /// <returns></returns>
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                if (property.Value == null)
+                if (property.GetValue() == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(property.Value.ToString(), new Dictionary<string, string>());
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(property.GetValue().ToString(), new Dictionary<string, string>());
                 return parsed;
             }
 

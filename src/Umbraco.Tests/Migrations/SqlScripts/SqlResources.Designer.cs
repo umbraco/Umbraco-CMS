@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Migrations.SqlScripts {
         ///(
         ///[nodeId] [int] NOT NULL,
         ///[published] [bit] NOT NULL,
-        ///[documentUser] [int] NOT [rest of string was truncated]&quot;;.
+        ///[writerUserId] [int] NOT [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SqlCeTotal_480 {
             get {

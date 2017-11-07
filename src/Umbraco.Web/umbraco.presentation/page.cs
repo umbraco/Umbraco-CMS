@@ -372,7 +372,7 @@ namespace umbraco
             public PagePublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, Umbraco.Core.Models.Property property)
                 : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
             {
-                _sourceValue = property.Value;
+                _sourceValue = property.GetValue();
                 _content = content;
             }
 

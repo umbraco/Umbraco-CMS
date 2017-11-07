@@ -205,12 +205,12 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.Alias, pDto.Alias);
             Assert.AreEqual(p.Id, pDto.Id);
 
-            if (p.Value == null)
+            if (p.GetValue() == null)
                 Assert.AreEqual(pDto.Value, string.Empty);
-            else if (p.Value is decimal)
-                Assert.AreEqual(pDto.Value, ((decimal) p.Value).ToString(NumberFormatInfo.InvariantInfo));
+            else if (p.GetValue() is decimal)
+                Assert.AreEqual(pDto.Value, ((decimal) p.GetValue()).ToString(NumberFormatInfo.InvariantInfo));
             else
-                Assert.AreEqual(pDto.Value, p.Value.ToString());
+                Assert.AreEqual(pDto.Value, p.GetValue().ToString());
         }
 
         private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)

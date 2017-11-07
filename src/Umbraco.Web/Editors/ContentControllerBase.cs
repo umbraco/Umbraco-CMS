@@ -104,7 +104,7 @@ namespace Umbraco.Web.Editors
                     //don't persist any bound value if the editor is readonly
                     if (valueEditor.IsReadOnly == false)
                     {
-                        var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
+                        var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.GetValue());
                         var supportTagsAttribute = TagExtractor.GetAttribute(property.PropertyEditor);
                         if (supportTagsAttribute != null)
                         {
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Editors
                         }
                         else
                         {
-                            dboProperty.Value = propVal;
+                            dboProperty.SetValue(propVal);
                         }
                     }
 

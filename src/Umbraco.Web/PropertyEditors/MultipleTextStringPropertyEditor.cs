@@ -182,9 +182,9 @@ namespace Umbraco.Web.PropertyEditors
             /// </remarks>
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                return property.Value == null
+                return property.GetValue() == null
                                   ? new JObject[] {}
-                                  : property.Value.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                                  : property.GetValue().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                                            .Select(x => JObject.FromObject(new {value = x}));
 
 

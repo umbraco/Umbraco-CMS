@@ -21,9 +21,9 @@ n.id Id, n.uniqueId Uid,
 uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
+docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
 nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
+docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN uContent ON (uContent.nodeId=n.id)
@@ -65,9 +65,9 @@ n.id Id, n.uniqueId Uid,
 uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
+docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
 nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
+docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN uContent ON (uContent.nodeId=n.id)
@@ -107,9 +107,9 @@ n.id Id, n.uniqueId Uid,
 uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
+docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
 nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
+docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
@@ -151,9 +151,9 @@ n.id Id, n.uniqueId Uid,
 uContent.contentTypeId ContentTypeId,
 n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
 n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.documentUser DraftWriterId, docDraft.templateId DraftTemplateId,
+docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
 nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.documentUser PubWriterId, docPub.templateId PubTemplateId,
+docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN uContent ON (uContent.nodeId=n.id)

@@ -193,9 +193,9 @@ namespace Umbraco.Examine
                     {"email", new object[] {m.Email}},
                 };
 
-                foreach (var property in m.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in m.Properties.Where(p => p != null && p.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
                 {
-                    values.Add(property.Alias, new[] { property.Value });
+                    values.Add(property.Alias, new[] { property.GetValue() });
                 }
 
                 var vs = new ValueSet(m.Id, IndexTypes.Content, m.ContentType.Alias, values);

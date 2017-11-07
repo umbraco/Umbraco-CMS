@@ -273,7 +273,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         public virtual object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            if (property.Value == null) return string.Empty;
+            if (property.GetValue() == null) return string.Empty;
 
             switch (GetDatabaseType())
             {
@@ -281,7 +281,7 @@ namespace Umbraco.Core.PropertyEditors
                 case DataTypeDatabaseType.Nvarchar:
                     //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
                     //to a real json object so we can pass the true json object directly to angular!
-                    var asString = property.Value.ToString();
+                    var asString = property.GetValue().ToString();
                     if (asString.DetectIsJson())
                     {
                         try
@@ -299,12 +299,12 @@ namespace Umbraco.Core.PropertyEditors
                 case DataTypeDatabaseType.Decimal:
                     //Decimals need to be formatted with invariant culture (dots, not commas)
                     //Anything else falls back to ToString()
-                    var decim = property.Value.TryConvertTo<decimal>();
+                    var decim = property.GetValue().TryConvertTo<decimal>();
                     return decim.Success
                         ? decim.Result.ToString(NumberFormatInfo.InvariantInfo)
-                        : property.Value.ToString();
+                        : property.GetValue().ToString();
                 case DataTypeDatabaseType.Date:
-                    var date = property.Value.TryConvertTo<DateTime?>();
+                    var date = property.GetValue().TryConvertTo<DateTime?>();
                     if (date.Success == false || date.Result == null)
                     {
                         return string.Empty;
@@ -334,7 +334,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual XNode ConvertDbToXml(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
-            if (property.Value == null || property.Value.ToString().IsNullOrWhiteSpace())
+            if (property.GetValue() == null || property.GetValue().ToString().IsNullOrWhiteSpace())
             {
                 return new XText(ConvertDbToString(property, propertyType, dataTypeService));
             }
@@ -363,25 +363,25 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         public virtual string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            if (property.Value == null)
+            if (property.GetValue() == null)
                 return string.Empty;
 
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
-                    property.Value.ToXmlString<string>();
-                    return property.Value.ToXmlString<string>();
+                    property.GetValue().ToXmlString<string>();
+                    return property.GetValue().ToXmlString<string>();
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
-                    return property.Value.ToXmlString(property.Value.GetType());
+                    return property.GetValue().ToXmlString(property.GetValue().GetType());
                 case DataTypeDatabaseType.Date:
                     //treat dates differently, output the format as xml format
-                    if (property.Value == null)
+                    if (property.GetValue() == null)
                     {
                         return string.Empty;
                     }
-                    var date = property.Value.TryConvertTo<DateTime?>();
+                    var date = property.GetValue().TryConvertTo<DateTime?>();
                     if (date.Success == false || date.Result == null)
                     {
                         return string.Empty;

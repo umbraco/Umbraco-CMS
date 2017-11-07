@@ -26,5 +26,9 @@ namespace Umbraco.Core.Models.Rdbms
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")] // FIXME not one-to-one! BUT it depends on the query!
+        public ContentVersionDto ContentVersionDto { get; set; }
     }
 }

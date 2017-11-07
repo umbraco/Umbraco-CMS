@@ -690,6 +690,7 @@
     <Compile Include="Models\Rdbms\DictionaryDto.cs" />
     <Compile Include="Models\Rdbms\DocumentDto.cs" />
     <Compile Include="Models\Rdbms\DocumentPublishedReadOnlyDto.cs" />
+    <Compile Include="Models\Rdbms\DocumentVersionDto.cs" />
     <Compile Include="Models\Rdbms\DomainDto.cs" />
     <Compile Include="Models\Rdbms\ExternalLoginDto.cs" />
     <Compile Include="Models\Rdbms\LanguageDto.cs" />

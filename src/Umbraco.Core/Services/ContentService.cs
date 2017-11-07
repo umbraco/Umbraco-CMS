@@ -2384,12 +2384,12 @@ namespace Umbraco.Core.Services
             }
 
             // check if the content is valid
-            if (content.IsValid() == false)
+            if (content.Validate() == false)
             {
                 Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because of invalid properties.");
                 return Attempt.Fail(new PublishStatus(PublishStatusType.FailedContentInvalid, evtMsgs, content)
                 {
-                    InvalidProperties = ((ContentBase)content).LastInvalidProperties
+                    InvalidProperties = ((ContentBase)content).InvalidProperties
                 });
             }
 
@@ -2823,7 +2823,7 @@ namespace Umbraco.Core.Services
             content.WriterId = userId;
 
             foreach (var property in blueprint.Properties)
-                content.SetValue(property.Alias, property.Value);
+                content.SetValue(property.Alias, property.GetValue());
 
             return content;
         }

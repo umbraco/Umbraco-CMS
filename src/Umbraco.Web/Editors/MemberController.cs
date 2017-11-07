@@ -529,7 +529,7 @@ namespace Umbraco.Web.Editors
                 var valueMapped = currProps.SingleOrDefault(x => x.Alias == p.Alias);
                 if (builtInAliases.Contains(p.Alias) == false && valueMapped != null)
                 {
-                    p.Value = valueMapped.Value;
+                    p.SetValue(valueMapped.GetValue());
                     p.TagSupport.Behavior = valueMapped.TagSupport.Behavior;
                     p.TagSupport.Enable = valueMapped.TagSupport.Enable;
                     p.TagSupport.Tags = valueMapped.TagSupport.Tags;

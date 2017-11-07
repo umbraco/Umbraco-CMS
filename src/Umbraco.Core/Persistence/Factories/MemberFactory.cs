@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -8,128 +6,118 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class MemberFactory
     {
-        private readonly IMemberType _contentType;
-        private readonly Guid _nodeObjectTypeId;
-        private readonly int _id;
-        private int _primaryKey;
-
-        public MemberFactory(IMemberType contentType, Guid nodeObjectTypeId, int id)
+        /// <summary>
+        /// Builds an IMedia item from a dto and content type.
+        /// </summary>
+        public static Member BuildEntity(MemberDto dto, IMemberType contentType)
         {
-            _contentType = contentType;
-            _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
-        }
+            var nodeDto = dto.ContentDto.NodeDto;
+            var contentVersionDto = dto.ContentVersionDto;
 
-        public MemberFactory(Guid nodeObjectTypeId, int id)
-        {
-            _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
-        }
-
-        #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
-
-        public static IMember BuildEntity(MemberDto dto, IMemberType contentType)
-        {
-            var member = new Member(
-                dto.ContentVersionDto.ContentDto.NodeDto.Text,
-                dto.Email, dto.LoginName, dto.Password, contentType);
+            var content = new Member(nodeDto.Text, dto.Email, dto.LoginName, dto.Password, contentType);
 
             try
             {
-                member.DisableChangeTracking();
+                content.DisableChangeTracking();
 
-                member.Id = dto.NodeId;
-                member.Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId;
-                member.Path = dto.ContentVersionDto.ContentDto.NodeDto.Path;
-                member.CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value;
-                member.Level = dto.ContentVersionDto.ContentDto.NodeDto.Level;
-                member.ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId;
-                member.SortOrder = dto.ContentVersionDto.ContentDto.NodeDto.SortOrder;
-                member.Trashed = dto.ContentVersionDto.ContentDto.NodeDto.Trashed;
-                member.CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate;
-                member.UpdateDate = dto.ContentVersionDto.VersionDate;
-                member.Version = dto.ContentVersionDto.VersionId;
+                content.Id = dto.NodeId;
+                content.Key = nodeDto.UniqueId;
+                content.Version = contentVersionDto.VersionId;
 
-                member.ProviderUserKey = member.Key;
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                member.ResetDirtyProperties(false);
-                return member;
+                // fixme missing names?
+
+                content.Path = nodeDto.Path;
+                content.Level = nodeDto.Level;
+                content.ParentId = nodeDto.ParentId;
+                content.SortOrder = nodeDto.SortOrder;
+                content.Trashed = nodeDto.Trashed;
+
+                content.CreatorId = nodeDto.UserId ?? 0;
+                // fixme missing writerId - which then should move to nodeDto
+                content.CreateDate = nodeDto.CreateDate;
+                content.UpdateDate = contentVersionDto.VersionDate;
+
+                content.ProviderUserKey = content.Key; // fixme explain
+
+                // reset dirty initial properties (U4-1946)
+                content.ResetDirtyProperties(false);
+                return content;
             }
             finally
             {
-                member.EnableChangeTracking();
+                content.EnableChangeTracking();
             }
         }
 
-        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
-        public IMember BuildEntity(MemberDto dto)
+        /// <summary>
+        /// Buils a dto from an IMember item.
+        /// </summary>
+        public static MemberDto BuildDto(IMember entity)
         {
-            return BuildEntity(dto, _contentType);
-        }
+            var contentDto = BuildContentDto(entity);
 
-        public MemberDto BuildDto(IMember entity)
-        {
             var dto = new MemberDto
             {
-                ContentVersionDto = new ContentVersionDto
-                {
-                    NodeId = entity.Id,
-                    VersionDate = entity.UpdateDate,
-                    VersionId = entity.Version,
-                    ContentDto = BuildContentDto(entity)
-                },
                 Email = entity.Email,
                 LoginName = entity.Username,
                 NodeId = entity.Id,
-                Password = entity.RawPasswordValue
+                Password = entity.RawPasswordValue,
+
+                ContentDto = contentDto,
+                ContentVersionDto = BuildContentVersionDto(entity, contentDto)
             };
             return dto;
         }
 
-        #endregion
-
-        public void SetPrimaryKey(int primaryKey)
+        private static ContentDto BuildContentDto(IMember entity)
         {
-            _primaryKey = primaryKey;
-        }
-
-        private ContentDto BuildContentDto(IMember entity)
-        {
-            var contentDto = new ContentDto
+            var dto = new ContentDto
             {
+                // Id = _primaryKey if >0 - fixme - kill that id entirely
                 NodeId = entity.Id,
                 ContentTypeId = entity.ContentTypeId,
+
                 NodeDto = BuildNodeDto(entity)
             };
 
-            if (_primaryKey > 0)
-            {
-                contentDto.Id = _primaryKey;
-            }
-
-            return contentDto;
+            return dto;
         }
 
-        private NodeDto BuildNodeDto(IMember entity)
+        private static NodeDto BuildNodeDto(IMember entity)
         {
-            var nodeDto = new NodeDto
+            var dto = new NodeDto
             {
-                CreateDate = entity.CreateDate,
                 NodeId = entity.Id,
-                Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
-                NodeObjectType = _nodeObjectTypeId,
+                UniqueId = entity.Key,
                 ParentId = entity.ParentId,
+                Level = Convert.ToInt16(entity.Level),
                 Path = entity.Path,
                 SortOrder = entity.SortOrder,
-                Text = entity.Name,
                 Trashed = entity.Trashed,
-                UniqueId = entity.Key,
-                UserId = entity.CreatorId
+                UserId = entity.CreatorId,
+                Text = entity.Name,
+                NodeObjectType = Constants.ObjectTypes.Member,
+                CreateDate = entity.CreateDate
             };
 
-            return nodeDto;
+            return dto;
+        }
+
+        private static ContentVersionDto BuildContentVersionDto(IMember entity, ContentDto contentDto)
+        {
+            var dto = new ContentVersionDto
+            {
+                //Id =, // fixme
+                NodeId = entity.Id,
+                VersionId = entity.Version,
+                VersionDate = entity.UpdateDate,
+                Current = true, // always building the current one
+                Text = entity.Name,
+
+                ContentDto = contentDto
+            };
+
+            return dto;
         }
     }
-
 }

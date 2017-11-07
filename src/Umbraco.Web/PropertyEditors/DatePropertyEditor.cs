@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
 
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                var date = property.Value.TryConvertTo<DateTime?>();
+                var date = property.GetValue().TryConvertTo<DateTime?>();
                 if (date.Success == false || date.Result == null)
                 {
                     return string.Empty;

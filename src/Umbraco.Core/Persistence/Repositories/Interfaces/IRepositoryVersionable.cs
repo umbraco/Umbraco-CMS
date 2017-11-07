@@ -30,9 +30,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets a list of all versions for an <see cref="TEntity"/> ordered so latest is first
         /// </summary>
-        /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
+        /// <param name="nodeId">Id of the <see cref="TEntity"/> to retrieve versions from</param>
         /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        IEnumerable<TEntity> GetAllVersions(int id);
+        IEnumerable<TEntity> GetAllVersions(int nodeId);
 
         /// <summary>
         /// Gets a list of all version Ids for the given content item
@@ -58,9 +58,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Deletes versions from an <see cref="TEntity"/> object prior to a specific date.
         /// </summary>
-        /// <param name="id">Id of the <see cref="TEntity"/> object to delete versions from</param>
+        /// <param name="nodeId">Id of the <see cref="TEntity"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
-        void DeleteVersions(int id, DateTime versionDate);
+        void DeleteVersions(int nodeId, DateTime versionDate);
 
         /// <summary>
         /// Gets paged content results
