@@ -172,9 +172,7 @@
                                     notificationsService.error(value);
                                 });
                             });
-
                         });
-
                     }
                 }];
             }
@@ -185,33 +183,23 @@
 
             //we are creating so get an empty data type item
             contentTypeResource.getScaffold($routeParams.id)
-				.then(function (dt) {
-
-				    init(dt);
-
-				    vm.page.loading = false;
-
-				});
+                .then(function(dt) {
+                    init(dt);
+                    vm.page.loading = false;
+                });
         }
         else {
             loadDocumentType();
         }
 
         function loadDocumentType() {
-
             vm.page.loading = true;
-
             contentTypeResource.getById($routeParams.id).then(function (dt) {
                 init(dt);
-
                 syncTreeNode(vm.contentType, dt.path, true);
-
                 vm.page.loading = false;
-
             });
-
         }
-
 
         /* ---------- SAVE ---------- */
 
@@ -241,7 +229,6 @@
                         vm.contentType.id = savedContentType.id;
                         vm.contentType.groups.forEach(function(group) {
                             if (!group.name) return;
-
                             var k = 0;
                             while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
                                 k++;
@@ -249,13 +236,11 @@
                                 group.id = 0;
                                 return;
                             }
-
                             var savedGroup = savedContentType.groups[k];
                             if (!group.id) group.id = savedGroup.id;
 
                             group.properties.forEach(function (property) {
                                 if (property.id || !property.alias) return;
-
                                 k = 0;
                                 while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
                                     k++;
@@ -263,7 +248,6 @@
                                     property.id = 0;
                                     return;
                                 }
-
                                 var savedProperty = savedGroup.properties[k];
                                 property.id = savedProperty.id;
                             });
@@ -289,13 +273,10 @@
                         });
                     }
                     vm.page.saveButtonState = "error";
-
                     deferred.reject(err);
                 });
                 return deferred.promise;
-
             }
-
         }
 
         function init(contentType) {
@@ -343,12 +324,11 @@
 
         function getDataTypeDetails(property) {
             if (property.propertyState !== "init") {
-
                 dataTypeResource.getById(property.dataTypeId)
-					.then(function (dataType) {
-					    property.dataTypeIcon = dataType.icon;
-					    property.dataTypeName = dataType.name;
-					});
+                    .then(function(dataType) {
+                        property.dataTypeIcon = dataType.icon;
+                        property.dataTypeName = dataType.name;
+                    });
             }
         }
 
@@ -369,7 +349,6 @@
                 eventsService.unsubscribe(evts[e]);
             }
         });
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.DocumentTypes.EditController", DocumentTypesEditController);
