@@ -250,5 +250,42 @@ namespace Umbraco.Core.Security
             }
             return null;
         }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Two factor verification step
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="code"></param>
+        /// <param name="isPersistent"></param>
+        /// <param name="rememberBrowser"></param>
+        /// <returns></returns>
+        public override async Task<SignInStatus> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
+        {
+            var userId = await GetVerifiedUserIdAsync();
+            if (userId == null)
+            {
+                return SignInStatus.Failure;
+            }
+            var user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return SignInStatus.Failure;
+            }
+            if (await UserManager.IsLockedOutAsync(user.Id))
+            {
+                return SignInStatus.LockedOut;
+            }
+            if (await UserManager.VerifyTwoFactorTokenAsync(user.Id, provider, code))
+            {
+                // When token is verified correctly, clear the access failed count used for lockout
+                await UserManager.ResetAccessFailedCountAsync(user.Id);
+                await SignInAsync(user, isPersistent, rememberBrowser);
+                return SignInStatus.Success;
+            }
+            // If the token is incorrect, record the failure which also may cause the user to be locked out
+            await UserManager.AccessFailedAsync(user.Id);
+            return SignInStatus.Failure;
+        }
     }
 }
