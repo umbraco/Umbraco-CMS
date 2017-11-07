@@ -11,7 +11,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
               "steps": [
                   {
                       title: "Welcome to Umbraco - The Friendly CMS",
-                      content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p><em>IIf you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.<em></p>",
+                      content: "<p>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p><p>In this quick tour we will introduce you to the main areas of Umbraco and show you how to best get started.</p><p><em>If you don't want to take the tour now you can always start it by opening the Help drawer in the bottom left corner.<em></p>",
                       type: "intro"
                   },
                   {
@@ -130,7 +130,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                   {
                       element: "[data-element='group-add']",
                       title: "Add tab",
-                      content: "Tabs are used organize properties on content in the Content section. Click <b>Add new tab</b> to add a tab.",
+                      content: "Tabs are used to organize properties on content in the Content section. Click <b>Add new tab</b> to add a tab.",
                       event: "click"
                   },
                   {
@@ -159,7 +159,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                   {
                       element: "[data-element~='overlay-property-settings'] [data-element='editor-add']",
                       title: "Add editor",
-                      content: "When you add an editor you choose the what the input method for this property will be. Click <b>Add editor</b> to open the editor picker dialog.",
+                      content: "When you add an editor you choose what the input method for this property will be. Click <b>Add editor</b> to open the editor picker dialog.",
                       event: "click"
                   },
                   {
@@ -256,7 +256,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
               "steps": [
                   {
                       title: "Render your content in a template",
-                      content: "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from asp.net MVC. - This tour is a sneak peak on how to write templates in Umbraco.</p><p>In this tour you will learn how to render content from the <b>Home Page</b> document type so you can see the content added to our <b>Home</p> content page.</p>",
+                      content: "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from asp.net MVC. - This tour is a sneak peak on how to write templates in Umbraco.</p><p>In this tour you will learn how to render content from the <b>Home Page</b> document type so you can see the content added to our <b>Home</b> content page.</p>",
                       type: "intro"
                   },
                   {
@@ -319,17 +319,17 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                       eventElement: "#tree [data-element='tree-item-Home'] a.umb-tree-item__label"
                   },
                   {
-                      element: "[data-element='editor-content'] [data-element='tab-Generic properties']",
-                      title: "Properties",
-                      content: "<p>Under the properties tab you will find the default information about a content item.</p>",
+                      element: "[data-element='editor-content'] [data-element='tab-_umb_infoTab']",
+                      title: "Info",
+                      content: "<p>Under the info tab you will find the default information about a content item.</p>",
                       event: "click"
                   },
                   {
-                      element: "[data-element='editor-content'] [data-element='property-_umb_urls']",
+                      element: "[data-element='editor-content'] [data-element='node-info-urls']",
                       title: "Open page",
                       content: "<p>Click the <b>Link to document</b> <i class='icon-out'></i> to view your page.</p><p>Tip: Click the preview button in the bottom right corner to preview changes without publishing them.</p>",
                       event: "click",
-                      eventElement: "[data-element='editor-content'] [data-element='property-_umb_urls'] a[target='_blank']"
+                      eventElement: "[data-element='editor-content'] [data-element='node-info-urls'] a[target='_blank']"
                   }
               ]
           },
@@ -377,7 +377,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                   {
                       element: "[data-element='editor-media'] [data-element='dropzone']",
                       title: "Upload images",
-                      content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Upload button</b> and select a couple of images on your computer and upload them.</p><p> You can also drag and drop the images directly in the upload and even drop entire folders - Umbraco will automagically create a folder and put the media items in the folder.</p>",
+                      content: "<p>In the upload area you can upload your media items.</p><p>Click the <b>Click here to choose files</b>-button and select a couple of images on your computer and upload them.</p>",
                       view: "uploadimages"
                   },
                   {
@@ -398,18 +398,18 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                       content: "<p>You will also find other details about the image, like the size.</p><p>Media items work in much the same way as content. So you can add extra properties to an image by creating or editing the <b>Media types</b> in the Settings section.</p>"
                   },
                   {
-                      element: "[data-element='editor-media'] [data-element='tab-Generic properties']",
-                      title: "Properties",
-                      content: "Like the content section you can also find default properties about the media item. You will find these under the properties tab.",
+                      element: "[data-element='editor-media'] [data-element='tab-_umb_infoTab']",
+                      title: "Info",
+                      content: "Like the content section you can also find default information about the media item. You will find these under the info tab.",
                       event: "click"
                   },
                   {
-                      element: "[data-element='editor-media'] [data-element='property-_umb_urls']",
+                      element: "[data-element='editor-media'] [data-element='node-info-urls']",
                       title: "Link to media",
                       content: "The path to the media item..."
                   },
                   {
-                      element: "[data-element='editor-media'] [data-element='property-_umb_updatedate']",
+                      element: "[data-element='editor-media'] [data-element='node-info-update-date']",
                       title: "Last edited",
                       content: "...and information about when the media item has been created and edited."
                   },
