@@ -8,6 +8,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
               "name": "Introduction",
               "alias": "umbIntroIntroduction",
               "group": "Getting Started",
+              "allowDisable": true,
               "steps": [
                   {
                       title: "Welcome to Umbraco - The Friendly CMS",
