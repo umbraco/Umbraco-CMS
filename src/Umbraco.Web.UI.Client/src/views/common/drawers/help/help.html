@@ -8,7 +8,7 @@
     <umb-drawer-content>
 
         <!-- Tours -->
-        <div data-element="help-tours" style="margin-bottom: 20px;">
+        <div ng-if="vm.tours" data-element="help-tours" style="margin-bottom: 20px;">
 
             <h5 style="margin-bottom: 10px; margin-top: 0;">Tours</h5>
             
@@ -17,7 +17,10 @@
                 <div class="umb-help-list">
 
                     <a href="" class="umb-help-list-item umb-help-list-item__content flex items-center justify-between" style="text-decoration: none;" ng-click="value.open = !value.open">
-                        <h5 class="umb-help-list-item__group-title"><i style="margin-right: 2px;text-decoration: none;" ng-class="{'icon-navigation-right': !value.open, 'icon-navigation-down': value.open}"></i>{{key}}</h5>
+                        <h5 class="umb-help-list-item__group-title"><i style="margin-right: 2px;text-decoration: none;" ng-class="{'icon-navigation-right': !value.open, 'icon-navigation-down': value.open}"></i>
+                            <span ng-if="key !== 'undefined'">{{key}}</span>
+                            <span ng-if="key === 'undefined'">Other</span>
+                        </h5>
                         <umb-progress-circle
                             percentage="{{value.completedPercentage}}"
                             size="40">
