@@ -11,7 +11,7 @@
         vm.initNextStep = initNextStep;
 
         function initNextStep() {
-            if(element.val() === "My folder") {
+            if(element.val().toLowerCase() === "my images") {
                 $scope.model.nextStep();
             } else {
                 vm.error = true;
