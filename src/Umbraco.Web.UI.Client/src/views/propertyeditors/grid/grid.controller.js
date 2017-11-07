@@ -652,7 +652,7 @@ angular.module("umbraco")
                 $scope.model.config.items.columns = 12;
             }
 
-            if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0 && $scope.model.value.sections[0].rows && $scope.model.value.sections[0].rows.length > 0) {
+            if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
 
                 if ($scope.model.value.name && angular.isArray($scope.model.config.items.templates)) {
 
