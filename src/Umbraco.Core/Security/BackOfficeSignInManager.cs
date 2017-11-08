@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
 {
+    //TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
     {
         private readonly ILogger _logger;
@@ -251,7 +252,6 @@ namespace Umbraco.Core.Security
             return null;
         }
 
-        /// <inheritdoc />
         /// <summary>
         /// Two factor verification step
         /// </summary>
@@ -260,10 +260,16 @@ namespace Umbraco.Core.Security
         /// <param name="isPersistent"></param>
         /// <param name="rememberBrowser"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
+        /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
+        /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
+        /// all of this code to check for -1 instead.
+        /// </remarks>
         public override async Task<SignInStatus> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
         {
             var userId = await GetVerifiedUserIdAsync();
-            if (userId == null)
+            if (userId == -1)
             {
                 return SignInStatus.Failure;
             }
@@ -286,6 +292,26 @@ namespace Umbraco.Core.Security
             // If the token is incorrect, record the failure which also may cause the user to be locked out
             await UserManager.AccessFailedAsync(user.Id);
             return SignInStatus.Failure;
+        }
+
+        /// <summary>Send a two factor code to a user</summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
+        /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
+        /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
+        /// all of this code to check for -1 instead.
+        /// </remarks>
+        public override async Task<bool> SendTwoFactorCodeAsync(string provider)
+        {
+            var userId = await GetVerifiedUserIdAsync();
+            if (userId == -1)
+                return false;
+
+            var token = await UserManager.GenerateTwoFactorTokenAsync(userId, provider);
+            var identityResult = await UserManager.NotifyTwoFactorTokenAsync(userId, provider, token);
+            return identityResult.Succeeded;
         }
     }
 }
