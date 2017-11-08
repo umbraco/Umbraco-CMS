@@ -37,14 +37,18 @@ namespace Umbraco.Core.Security
                 var identity = Thread.CurrentPrincipal.GetUmbracoIdentity();
                 if (identity != null)
                 {
+                    //get the user id from the identity
                     var userId = 0;
                     if(int.TryParse(identity.Id.ToString(), out userId))
                     {
                         var user = userService.GetUserById(userId);
-                        var userIsAdmin = user.IsAdmin();
-                        if (userIsAdmin)
+                        if (user != null)
                         {
-                            canReset = true;
+                            var userIsAdmin = user.IsAdmin();
+                            if (userIsAdmin)
+                            {
+                                canReset = true;
+                            }
                         }
                     }
                 }
