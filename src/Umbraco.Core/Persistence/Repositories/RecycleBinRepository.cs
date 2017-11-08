@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
+        protected RecycleBinRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax, contentSection)
         {
         }
@@ -42,8 +42,9 @@ namespace Umbraco.Core.Persistence.Repositories
             //Construct and execute delete statements for all trashed items by 'nodeObjectType'
             var deletes = new List<string>
             {
+                FormatDeleteStatement("cmsTask", "nodeId"),
                 FormatDeleteStatement("umbracoUser2NodeNotify", "nodeId"),
-                FormatDeleteStatement("umbracoUser2NodePermission", "nodeId"),
+                FormatDeleteStatement("umbracoUserGroup2NodePermission", "nodeId"),
                 @"DELETE FROM umbracoAccessRule WHERE umbracoAccessRule.accessId IN (
                     SELECT TB1.id FROM umbracoAccess as TB1 
                     INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id 
@@ -53,6 +54,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     SELECT TB1.id FROM umbracoRedirectUrl as TB1
                     INNER JOIN umbracoNode as TB2 ON TB1.contentKey = TB2.uniqueId
                     WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
+                FormatDeleteStatement("umbracoUserStartNode", "startNode"),
+                FormatUpdateStatement("umbracoUserGroup", "startContentId"),
+                FormatUpdateStatement("umbracoUserGroup", "startMediaId"),
                 FormatDeleteStatement("umbracoRelation", "parentId"),
                 FormatDeleteStatement("umbracoRelation", "childId"),
                 FormatDeleteStatement("cmsTagRelationship", "nodeId"),
@@ -63,6 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 FormatDeleteStatement("cmsContentVersion", "ContentId"),
                 FormatDeleteStatement("cmsContentXml", "nodeId"),
                 FormatDeleteStatement("cmsContent", "nodeId"),
+                //TODO: Why is this being done? We just delete this exact data in the next line
                 "UPDATE umbracoNode SET parentID = '" + RecycleBinId + "' WHERE trashed = '1' AND nodeObjectType = @NodeObjectType",
                 "DELETE FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType"
             };
@@ -91,14 +96,33 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// A delete statement that will delete anything in the table specified where its PK (keyName) is found in the
+        /// list of umbracoNode.id that have trashed flag set
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="keyName"></param>
+        /// <returns></returns>
         private string FormatDeleteStatement(string tableName, string keyName)
         {
-            //This query works with sql ce and sql server:
-            //DELETE FROM umbracoUser2NodeNotify WHERE umbracoUser2NodeNotify.nodeId IN 
-            //(SELECT nodeId FROM umbracoUser2NodeNotify as TB1 INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = 'C66BA18E-EAF3-4CFF-8A22-41B16D66A972')
             return
                 string.Format(
-                    "DELETE FROM {0} WHERE {0}.{1} IN (SELECT TB1.{1} FROM {0} as TB1 INNER JOIN umbracoNode as TB2 ON TB1.{1} = TB2.id WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
+                    "DELETE FROM {0} WHERE {0}.{1} IN (SELECT id FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType)",
+                    tableName, keyName);
+        }
+
+        /// <summary>
+        /// An update statement that will update a value to NULL in the table specified where its PK (keyName) is found in the
+        /// list of umbracoNode.id that have trashed flag set
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="keyName"></param>
+        /// <returns></returns>
+        private string FormatUpdateStatement(string tableName, string keyName)
+        {
+            return
+                string.Format(
+                    "UPDATE {0} SET {0}.{1} = NULL WHERE {0}.{1} IN (SELECT id FROM umbracoNode WHERE trashed = '1' AND nodeObjectType = @NodeObjectType)",
                     tableName, keyName);
         }
 

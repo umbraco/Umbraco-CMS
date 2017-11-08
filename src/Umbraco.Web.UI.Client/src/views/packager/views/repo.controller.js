@@ -30,6 +30,7 @@
         vm.openLightbox = openLightbox;
         vm.closeLightbox = closeLightbox;
         vm.search = search;
+        vm.installCompleted = false;
 
         var currSort = "Latest";
         //used to cancel any request in progress if another one needs to take it's place
@@ -192,13 +193,41 @@
                 .import(selectedPackage)
                 .then(function(pack) {
                         vm.installState.status = localizationService.localize("packager_installStateInstalling");
-                        vm.installState.progress = "33";
+                        vm.installState.progress = "25";
                         return packageResource.installFiles(pack);
                     },
                     error)
                 .then(function(pack) {
                         vm.installState.status = localizationService.localize("packager_installStateRestarting");
-                        vm.installState.progress = "66";
+                        vm.installState.progress = "50";
+                        var deferred = $q.defer();
+
+                        //check if the app domain is restarted ever 2 seconds
+                        var count = 0;
+                        function checkRestart() {
+                          $timeout(function () {
+                            packageResource.checkRestart(pack).then(function (d) {
+                                count++;
+                                //if there is an id it means it's not restarted yet but we'll limit it to only check 10 times
+                                if (d.isRestarting && count < 10) {
+                                  checkRestart();
+                                }
+                                else {
+                                  //it's restarted!
+                                  deferred.resolve(d);
+                                }
+                              },
+                              error);
+                          }, 2000);
+                        }
+
+                        checkRestart();
+                        
+                        return deferred.promise;
+                    }, error)
+                .then(function (pack) {
+                        vm.installState.status = localizationService.localize("packager_installStateRestarting");
+                        vm.installState.progress = "75";
                         return packageResource.installData(pack);
                     },
                     error)
@@ -215,10 +244,8 @@
                             localStorageService.set("packageInstallUri", result.postInstallationPath);
                         }
 
-                        //reload on next digest (after cookie)
-                        $timeout(function() {
-                            window.location.reload(true);
-                        });
+                        vm.installState.status = localizationService.localize("packager_installStateCompleted");
+                        vm.installCompleted = true;
 
                     },
                     error);
@@ -275,6 +302,13 @@
         function search(searchQuery) {
             vm.loading = true;
             searchDebounced();
+        }
+
+        vm.reloadPage = function () {
+            //reload on next digest (after cookie)
+            $timeout(function () {
+                window.location.reload(true);
+            });
         }
 
         init();

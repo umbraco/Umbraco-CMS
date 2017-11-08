@@ -48,9 +48,10 @@ namespace Umbraco.Web.Install
                 new MajorVersion7UpgradeReport(_umbContext.Application),
                 new Version73FileCleanup(_umbContext.HttpContext, _umbContext.Application.ProfilingLogger.Logger),
                 new DatabaseConfigureStep(_umbContext.Application),
+                new ConfigureMachineKey(_umbContext.Application),
                 new DatabaseInstallStep(_umbContext.Application),
                 new DatabaseUpgradeStep(_umbContext.Application),
-                new StarterKitDownloadStep(_umbContext.Application),
+                new StarterKitDownloadStep(_umbContext.Application, _umbContext.Security, _umbContext.HttpContext),
                 new StarterKitInstallStep(_umbContext.Application, _umbContext.HttpContext),
                 new StarterKitCleanupStep(_umbContext.Application),
                 new SetUmbracoVersionStep(_umbContext.Application, _umbContext.HttpContext),
@@ -146,7 +147,7 @@ namespace Umbraco.Web.Install
         {
             get
             {
-                var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
                 if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && _umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false)
                 {

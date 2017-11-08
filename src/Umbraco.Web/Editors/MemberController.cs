@@ -92,8 +92,7 @@ namespace Umbraco.Web.Editors
             {
                 long totalRecords;
                 var members = Services.MemberService
-            .GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField
-            , memberTypeAlias, filter).ToArray();
+                    .GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();
                 if (totalRecords == 0)
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);
@@ -235,8 +234,10 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                     }
 
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
                     emptyContent = new Member(contentType);
-                    emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
+                    emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(provider.MinRequiredPasswordLength, provider.MinRequiredNonAlphanumericCharacters);
                     return Mapper.Map<IMember, MemberDisplay>(emptyContent);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 //TODO: Support editing custom properties for members with a custom membership provider here.

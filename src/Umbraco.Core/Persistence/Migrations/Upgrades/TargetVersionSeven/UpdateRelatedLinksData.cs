@@ -16,7 +16,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 10, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 10, Constants.System.UmbracoMigrationName)]
     public class UpdateRelatedLinksData : MigrationBase
     {
         public UpdateRelatedLinksData(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

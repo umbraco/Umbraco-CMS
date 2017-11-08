@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : this(localizedTextService)
-        {         
+        {
             if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
             IgnoreProperties = ignoreProperties;
         }
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedTextService.Localize("content/createDate"),
                     Description = localizedTextService.Localize("content/createDateDesc"),
-                    Value = display.CreateDate.ToIsoString(),
+                    Value = display.CreateDate.ToString(CultureInfo.CurrentCulture),
                     View = labelEditor
                 },
                 new ContentPropertyDisplay
@@ -92,7 +93,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedTextService.Localize("content/updateDate"),
                     Description = localizedTextService.Localize("content/updateDateDesc"),
-                    Value = display.UpdateDate.ToIsoString(),
+                    Value = display.UpdateDate.ToString(CultureInfo.CurrentCulture),
                     View = labelEditor
                 }
             };
@@ -133,7 +134,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 case "content":
                     dtdId = Constants.System.DefaultContentListViewDataTypeId;
-                    
+
                     break;
                 case "media":
                     dtdId = Constants.System.DefaultMediaListViewDataTypeId;
@@ -146,7 +147,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //first try to get the custom one if there is one
-            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName) 
+            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName)
                 ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
 
             if (dt == null)
@@ -165,12 +166,20 @@ namespace Umbraco.Web.Models.Mapping
             var listViewTab = new Tab<ContentPropertyDisplay>();
             listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
             listViewTab.Label = localizedTextService.Localize("content/childItems");
-            listViewTab.Id = 25;
+            listViewTab.Id = display.Tabs.Count() + 1;
             listViewTab.IsActive = true;
 
             var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
+
+            //Override Tab Label if tabName is provided
+            if (listViewConfig.ContainsKey("tabName"))
+            {
+                var configTabName = listViewConfig["tabName"];
+                if (configTabName != null && string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
+                    listViewTab.Label = configTabName.ToString();
+            }
 
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
@@ -187,9 +196,9 @@ namespace Umbraco.Web.Models.Mapping
             SetChildItemsTabPosition(display, listViewConfig, listViewTab);
         }
 
-        private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, 
+        private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display,
                 IDictionary<string, object> listViewConfig,
-                Tab<ContentPropertyDisplay> listViewTab) 
+                Tab<ContentPropertyDisplay> listViewTab)
             where TPersisted : IContentBase
         {
             // Find position of tab from config
@@ -229,21 +238,24 @@ namespace Umbraco.Web.Models.Mapping
             var groupsGroupsByName = content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
             foreach (var groupsByName in groupsGroupsByName)
             {
-                var properties = new List<ContentPropertyDisplay>();
-                
+                var properties = new List<Property>();
+
                 // merge properties for groups with the same name
                 foreach (var group in groupsByName)
                 {
                     var groupProperties = content.GetPropertiesForGroup(group)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
 
-                    properties.AddRange(Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(groupProperties));
+                    properties.AddRange(groupProperties);
                 }
 
                 if (properties.Count == 0)
                     continue;
 
-                TranslateProperties(properties);
+                // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
+                var mappedProperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(properties.OrderBy(prop => prop.PropertyType.SortOrder));
+
+                TranslateProperties(mappedProperties);
 
                 // add the tab
                 // we need to pick an identifier... there is no "right" way...
@@ -256,7 +268,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = groupId,
                     Alias = groupName,
                     Label = _localizedTextService.UmbracoDictionaryTranslate(groupName),
-                    Properties = properties,
+                    Properties = mappedProperties,
                     IsActive = false
                 });
             }
@@ -271,7 +283,7 @@ namespace Umbraco.Web.Models.Mapping
             tabs.Add(new Tab<ContentPropertyDisplay>
             {
                 Id = 0,
-                    Label = _localizedTextService.Localize("general/properties"),
+                Label = _localizedTextService.Localize("general/properties"),
                 Alias = "Generic properties",
                 Properties = genericproperties
             });

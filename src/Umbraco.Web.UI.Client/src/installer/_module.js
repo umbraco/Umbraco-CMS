@@ -1,0 +1,1 @@
+﻿angular.module("umbraco.install", ["umbraco.directives"]);

@@ -43,23 +43,28 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 
 			if (xmlData.HasChildNodes)
 			{
-				string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
-				string dbConfig = SystemFiles.DashboardConfig;
+                string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
+                string dbConfig = SystemFiles.DashboardConfig;
 
-				XmlNode section = xmlData.SelectSingleNode("./section");
-				XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
+                XmlNode section = xmlData.SelectSingleNode("./section");
+                XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
 
-				XmlNode importedSection = dashboardFile.ImportNode(section, true);
+                //don't continue if it already exists
+                var found = dashboardFile.SelectNodes("//section[@alias='" + sectionAlias + "']");
+                if (found == null || found.Count <= 0)
+                {
+                    XmlNode importedSection = dashboardFile.ImportNode(section, true);
 
-                XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
-				importedSection.Attributes.Append(alias);
+                    XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
+                    importedSection.Attributes.Append(alias);
 
-				dashboardFile.DocumentElement.AppendChild(importedSection);
+                    dashboardFile.DocumentElement.AppendChild(importedSection);
 
-				dashboardFile.Save(IOHelper.MapPath(dbConfig));
+                    dashboardFile.Save(IOHelper.MapPath(dbConfig));
+                }
 
-				return true;
-			}
+                return true;
+            }
 
 			return false;
 		}

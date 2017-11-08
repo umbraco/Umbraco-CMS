@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 
-
 namespace umbraco.cms.businesslogic.datatype
 {
     /// <summary>
@@ -17,11 +16,6 @@ namespace umbraco.cms.businesslogic.datatype
     [Obsolete("This class is no longer used and will be removed from the codebase in the future.")]
     public class PreValues
     {
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
         /// <summary>
         /// Gets the pre values collection.
         /// </summary>
@@ -30,18 +24,20 @@ namespace umbraco.cms.businesslogic.datatype
         public static SortedList GetPreValues(int DataTypeId)
         {
             var retval = new SortedList();
-            var dr = SqlHelper.ExecuteReader(
-                "Select id, sortorder, [value], alias from cmsDataTypePreValues where DataTypeNodeId = @dataTypeId order by sortorder",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId));
-
-            int counter = 0;
-            while (dr.Read())
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(
+                "select id, sortorder, [value], alias from cmsDataTypePreValues where DataTypeNodeId = @dataTypeId order by sortorder",
+                sqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
             {
-                retval.Add(counter, new PreValue(dr.GetInt("id"), dr.GetInt("sortorder"), dr.GetString("value"), dr.GetString("alias")));
-                counter++;
+                var counter = 0;
+                while (dr.Read())
+                {
+                    retval.Add(counter, new PreValue(dr.GetInt("id"), dr.GetInt("sortorder"), dr.GetString("value"), dr.GetString("alias")));
+
+                    counter++;
+                }
+                return retval;
             }
-            dr.Close();
-            return retval;
         }
 
         /// <summary>
@@ -50,8 +46,9 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="dataTypeDefId"></param>
         public static void DeleteByDataTypeDefinition(int dataTypeDefId)
         {
-            SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid",
-                SqlHelper.CreateParameter("@dtdefid", dataTypeDefId));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid",
+                sqlHelper.CreateParameter("@dtdefid", dataTypeDefId));
         }
 
         /// <summary>
@@ -61,12 +58,10 @@ namespace umbraco.cms.businesslogic.datatype
         /// <returns></returns>
         public static int CountOfPreValues(int dataTypeDefId)
         {
-            return SqlHelper.ExecuteScalar<int>(
-                "select count(id) from cmsDataTypePreValues where dataTypeNodeId = @dataTypeId",
-                SqlHelper.CreateParameter("@dataTypeId", dataTypeDefId));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>(
+                    "select count(id) from cmsDataTypePreValues where dataTypeNodeId = @dataTypeId",
+                    sqlHelper.CreateParameter("@dataTypeId", dataTypeDefId));
         }
-
     }
-
-   
 }

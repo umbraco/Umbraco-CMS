@@ -7,7 +7,7 @@ using System.Text;
 namespace Umbraco.Core.Configuration
 {
     [ConfigurationCollection(typeof(FileSystemProviderElement), AddItemName = "Provider")]
-    public class FileSystemProviderElementCollection : ConfigurationElementCollection   
+    public class FileSystemProviderElementCollection : ConfigurationElementCollection, IEnumerable<IFileSystemProviderElement>
     {
         protected override ConfigurationElement CreateNewElement()
         {
@@ -19,12 +19,25 @@ namespace Umbraco.Core.Configuration
             return ((FileSystemProviderElement)(element)).Alias;
         }
 
-        new public FileSystemProviderElement this[string key]
+        public new FileSystemProviderElement this[string key]
         {
             get
             {
                 return (FileSystemProviderElement)BaseGet(key);
             }
+        }
+
+        IEnumerator<IFileSystemProviderElement> IEnumerable<IFileSystemProviderElement>.GetEnumerator()
+        {
+            for (var i = 0; i < Count; i++)
+            {
+                yield return BaseGet(i) as IFileSystemProviderElement;
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

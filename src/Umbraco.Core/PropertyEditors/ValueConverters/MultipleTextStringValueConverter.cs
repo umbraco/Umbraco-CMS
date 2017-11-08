@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(IEnumerable<string>))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
@@ -52,7 +53,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Fall back on normal behaviour
             if (values.Any() == false)
             {
-                return sourceString.Split(Environment.NewLine.ToCharArray());
+                return sourceString.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             }
 
             return values.ToArray();

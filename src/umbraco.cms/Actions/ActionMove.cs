@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked upon creation of a document, media, member
-	/// </summary>
-	public class ActionMove : IAction
+    /// <summary>
+    /// This action is invoked upon creation of a document, media, member
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.StructureCategory)]
+    public class ActionMove : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618
@@ -89,6 +92,6 @@ namespace umbraco.BusinessLogic.Actions
 				return true;
 			}
 		}
-		#endregion
-	}
+        #endregion
+    }
 }

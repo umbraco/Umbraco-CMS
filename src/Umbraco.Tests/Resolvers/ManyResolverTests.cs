@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Resolvers
         public class Resolved1 : Resolved
         { }
 
-        [WeightedPlugin(5)] // default is 10
+        [Weight(5)] // default is 100
         public class Resolved2 : Resolved
         { }
 

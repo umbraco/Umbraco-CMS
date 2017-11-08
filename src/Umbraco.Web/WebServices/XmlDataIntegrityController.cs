@@ -51,7 +51,7 @@ namespace Umbraco.Web.WebServices
         [HttpGet]
         public bool CheckMediaXmlTable()
         {
-            var total = Services.MediaService.Count();
+            var total = Services.MediaService.CountNotTrashed();
             var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
             var subQuery = new Sql()
                 .Select("Count(*)")

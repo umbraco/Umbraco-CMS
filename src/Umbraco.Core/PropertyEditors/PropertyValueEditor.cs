@@ -293,7 +293,7 @@ namespace Umbraco.Core.PropertyEditors
                             //swallow this exception, we thought it was json but it really isn't so continue returning a string
                         }
                     }
-                    return property.Value.ToString();
+                    return asString;
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
                     //Decimals need to be formatted with invariant culture (dots, not commas)

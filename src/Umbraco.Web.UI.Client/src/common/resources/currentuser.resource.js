@@ -5,11 +5,26 @@
     * 
     *
     **/
-function currentUserResource($q, $http, umbRequestHelper) {
+function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     //the factory object returned
     return {
-     
+
+        performSetInvitedUserPassword: function (newPassword) {
+
+            if (!newPassword) {
+                return angularHelper.rejectedPromise({ errorMsg: 'newPassword cannot be empty' });
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "currentUserApiBaseUrl",
+                        "PostSetInvitedUserPassword"),
+                    angular.toJson(newPassword)),
+                'Failed to change password');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.currentUserResource#changePassword
@@ -22,31 +37,21 @@ function currentUserResource($q, $http, umbRequestHelper) {
          *
          */
         changePassword: function (changePasswordArgs) {
+
+            changePasswordArgs = umbDataFormatter.formatChangePasswordModel(changePasswordArgs);
+            if (!changePasswordArgs) {
+                throw 'No password data to change';
+            }
+            
             return umbRequestHelper.resourcePromise(
-               $http.post(
-                   umbRequestHelper.getApiUrl(
-                       "currentUserApiBaseUrl",
-                       "PostChangePassword"),
-                       changePasswordArgs),
-               'Failed to change password');
-        },
-        
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.currentUserResource#getMembershipProviderConfig
-         * @methodOf umbraco.resources.currentUserResource
-         *
-         * @description
-         * Gets the configuration of the user membership provider which is used to configure the change password form         
-         */
-        getMembershipProviderConfig: function () {
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "currentUserApiBaseUrl",
-                       "GetMembershipProviderConfig")),
-               'Failed to retrieve membership provider config');
-        },
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "currentUserApiBaseUrl",
+                        "PostChangePassword"),
+                    changePasswordArgs),
+                'Failed to change password');
+        }
+
     };
 }
 

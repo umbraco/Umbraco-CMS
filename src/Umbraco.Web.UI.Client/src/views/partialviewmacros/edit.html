@@ -1,0 +1,123 @@
+<div ng-controller="Umbraco.Editors.PartialViewMacros.EditController as vm">
+
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+   <form name="contentForm"
+      ng-submit="vm.save()"
+      novalidate
+      val-form-manager>
+
+        <umb-editor-view ng-if="!vm.page.loading">
+
+            <umb-editor-header
+                name="vm.partialViewMacro.name"
+                hide-alias="true"
+                description="vm.partialViewMacro.virtualPath"
+                menu="vm.page.menu" 
+                description-locked="true"
+                hide-icon="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+
+                <div class="flex" style="margin-bottom: 30px;">
+
+                    <div class="flex" style="margin-left: auto;">
+                        <div class="btn-group umb-era-button-group dropdown" style="margin-right: 10px;">
+                            
+                            <button
+                                type="button"
+                                class="umb-era-button umb-button--s"
+                                ng-click="vm.openInsertOverlay()">
+                                <i class="icon icon-add"></i> <localize key="template_insert">Insert</localize>
+                            </button>
+
+                            <a class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </a>
+
+                            <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" role="menu">
+                                <li><a href="" ng-click="vm.openPageFieldOverlay()"><localize key="template_insertPageField">Value</localize></a></li>
+                                <li><a href="" ng-click="vm.openMacroOverlay()"><localize key="template_insertMacro">Macro</localize></a></li>
+                                <li><a href="" ng-click="vm.openDictionaryItemOverlay()"><localize key="template_insertDictionaryItem">Dictionary item</localize></a></li>
+                            </ul>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            style="margin-right: 10px;"
+                            class="umb-era-button umb-button--s"
+                            ng-click="vm.openQueryBuilderOverlay()">
+                            <i class="icon icon-wand"></i> <localize key="template_queryBuilder">Query builder</localize>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div
+                    auto-scale="85"
+                    umb-ace-editor="vm.aceOption"
+                    model="vm.partialViewMacro.content">
+                </div>
+
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+            <umb-editor-footer-content-right>
+
+               <umb-button
+                  type="submit"
+                  button-style="success"
+                  state="vm.page.saveButtonState"
+                  shortcut="ctrl+s"
+                  label="Save"
+                  label-key="buttons_save">
+               </umb-button>
+
+            </umb-editor-footer-content-right>
+
+         </umb-editor-footer>
+
+        </umb-editor-view>
+    </form>
+
+    <umb-overlay
+       ng-if="vm.insertOverlay.show"
+       model="vm.insertOverlay"
+       view="vm.insertOverlay.view"
+       position="right">
+   </umb-overlay>
+
+    <umb-overlay
+       ng-if="vm.macroPickerOverlay.show"
+       model="vm.macroPickerOverlay"
+       view="vm.macroPickerOverlay.view"
+       position="right">
+   </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.pageFieldOverlay.show"
+        model="vm.pageFieldOverlay"
+        position="right"
+        view="vm.pageFieldOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.dictionaryItemOverlay.show"
+        model="vm.dictionaryItemOverlay"
+        position="right"
+        view="vm.dictionaryItemOverlay.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="vm.queryBuilderOverlay.show"
+        model="vm.queryBuilderOverlay"
+        position="right"
+        view="vm.queryBuilderOverlay.view">
+    </umb-overlay>
+
+</div>

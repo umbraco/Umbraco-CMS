@@ -23,6 +23,9 @@ namespace umbraco.cms.businesslogic
     {
         private static readonly Guid TopLevelParent = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database")]
         protected static ISqlHelper SqlHelper
         {

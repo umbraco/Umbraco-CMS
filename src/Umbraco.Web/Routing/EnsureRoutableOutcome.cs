@@ -3,7 +3,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Represents the outcome of trying to route an incoming request.
     /// </summary>
-    internal enum EnsureRoutableOutcome
+    public enum EnsureRoutableOutcome
     {
         /// <summary>
         /// Request routes to a document.

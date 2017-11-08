@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
     /// <summary>
     /// This is here to re-remove these tables, we dropped them in 7.3 but new installs created them again so we're going to re-drop them
     /// </summary>
-    [Migration("7.5.0", 1, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.5.0", 1, Constants.System.UmbracoMigrationName)]
     public class RemoveStylesheetDataAndTablesAgain : MigrationBase
     {
         public RemoveStylesheetDataAndTablesAgain(ISqlSyntaxProvider sqlSyntax, ILogger logger)

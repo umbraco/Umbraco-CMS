@@ -29,8 +29,8 @@ namespace umbraco.cms.businesslogic.template
         
         #region Private members
 
-        private readonly ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
-        private readonly MasterPageHelper _masterPageHelper = new MasterPageHelper(new PhysicalFileSystem(SystemDirectories.Masterpages));
+        private readonly ViewHelper _viewHelper = new ViewHelper(FileSystemProviderManager.Current.MvcViewsFileSystem);
+        private readonly MasterPageHelper _masterPageHelper = new MasterPageHelper(FileSystemProviderManager.Current.MasterPagesFileSystem);
         internal ITemplate TemplateEntity;        
         private int? _mastertemplate;
         
@@ -357,7 +357,8 @@ namespace umbraco.cms.businesslogic.template
             if (!e.Cancel)
             {
                 //remove refs from documents
-                SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
 
                 
                 ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);

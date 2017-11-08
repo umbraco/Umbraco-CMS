@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Logging;
@@ -25,16 +26,40 @@ namespace Umbraco.Core
 
 		}
 
-		/// <summary>
-		/// Gets the <see cref="IPackageAction"/> implementations.
-		/// </summary>
-		public IEnumerable<IAction> Actions
+        /// <summary>
+        /// Gets the <see cref="IAction"/> implementations.
+        /// </summary>
+        public IEnumerable<IAction> Actions
 		{
 			get
 			{
 				return Values;
 			}
 		}
+
+        /// <summary>
+        /// This method will return a list of IAction's based on a string (letter) list. Each character in the list may represent
+        /// an IAction. This will associate any found IActions based on the Letter property of the IAction with the character being referenced.
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <returns>returns a list of actions that have an associated letter found in the action string list</returns>
+        public IEnumerable<IAction> FromActionSymbols(IEnumerable<string> actions)
+	    {
+	        var allActions = Actions.ToArray();
+	        return actions
+                .Select(c => allActions.FirstOrDefault(a => a.Letter.ToString(CultureInfo.InvariantCulture) == c))
+                .WhereNotNull()
+                .ToArray();
+	    }
+
+	    /// <summary>
+	    /// Returns the string (letter) representation of the actions that make up the actions collection
+	    /// </summary>
+	    /// <returns></returns>
+	    public IEnumerable<string> ToActionSymbols(IEnumerable<IAction> actions)
+	    {
+	        return actions.Select(x => x.Letter.ToString(CultureInfo.InvariantCulture)).ToArray();
+	    }
 
         /// <summary>
         /// Gets an Action if it exists.

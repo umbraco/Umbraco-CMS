@@ -8,6 +8,7 @@ function memberGroupPicker($scope, dialogService){
     }
 
     $scope.renderModel = [];
+    $scope.allowRemove = true;
     
     if ($scope.model.value) {
         var modelIds = $scope.model.value.split(',');

@@ -269,12 +269,13 @@
             var isSelected = false;
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
-                if (item.id === selectedItem.id) {
+                // if item.id is 2147483647 (int.MaxValue) use item.key
+                if ((item.id !== 2147483647 && item.id === selectedItem.id) || item.key === selectedItem.key) {
                     isSelected = true;
                 }
             }
             if (!isSelected) {
-                selection.push({ id: item.id });
+                selection.push({ id: item.id, key: item.key });
                 item.selected = true;
             }
         }
@@ -294,7 +295,8 @@
         function deselectItem(item, selection) {
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
-                if (item.id === selectedItem.id) {
+                // if item.id is 2147483647 (int.MaxValue) use item.key
+                if ((item.id !== 2147483647 && item.id === selectedItem.id) || item.key === selectedItem.key) {
                     selection.splice(i, 1);
                     item.selected = false;
                 }
@@ -366,7 +368,7 @@
                 var item = items[i];
 
                 if (checkbox.checked) {
-                    selection.push({ id: item.id });
+                    selection.push({ id: item.id, key: item.key });
                 } else {
                     clearSelection = true;
                 }
@@ -405,7 +407,8 @@
                 for (var selectedIndex = 0; selection.length > selectedIndex; selectedIndex++) {
                     var selectedItem = selection[selectedIndex];
 
-                    if (item.id === selectedItem.id) {
+                    // if item.id is 2147483647 (int.MaxValue) use item.key
+                    if ((item.id !== 2147483647 && item.id === selectedItem.id) || item.key === selectedItem.key) {
                         numberOfSelectedItem++;
                     }
                 }

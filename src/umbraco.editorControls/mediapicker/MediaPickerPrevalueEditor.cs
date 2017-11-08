@@ -17,7 +17,10 @@ namespace umbraco.editorControls.mediapicker
     [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class MediaPickerPrevalueEditor : System.Web.UI.WebControls.PlaceHolder, umbraco.interfaces.IDataPrevalue
     {
-
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -86,31 +89,36 @@ namespace umbraco.editorControls.mediapicker
             // Generate data-string
             string data = _checkboxShowPreview.Checked.ToString() + "|" + _checkboxShowAdvancedDialog.Checked.ToString();
 
-            // If the add new prevalue textbox is filled out - add the value to the collection.
-            IParameter[] SqlParams = new IParameter[] {
-			            SqlHelper.CreateParameter("@value",data),
-						SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-            SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", SqlParams);
-            
-            // For SQL CE 4 support we need this again!
-            SqlParams = new IParameter[] {
-			            SqlHelper.CreateParameter("@value",data),
-						SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-            SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                // If the add new prevalue textbox is filled out - add the value to the collection.
+                IParameter[] SqlParams = new IParameter[] {
+                        sqlHelper.CreateParameter("@value",data),
+                        sqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", SqlParams);
+
+                // For SQL CE 4 support we need this again!
+                SqlParams = new IParameter[] {
+                            sqlHelper.CreateParameter("@value",data),
+                            sqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
+                sqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
+            }
         }
 
         public string Configuration
         {
             get
             {
-                object conf =
-                    SqlHelper.ExecuteScalar<object>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid",
-                                            SqlHelper.CreateParameter("@datatypenodeid", _datatype.DataTypeDefinitionId));
-                if (conf != null)
-                    return conf.ToString();
-                else
-                    return "";
-
+                using (var sqlHelper = Application.SqlHelper)
+                {
+                    object conf =
+                        sqlHelper.ExecuteScalar<object>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid",
+                                                sqlHelper.CreateParameter("@datatypenodeid", _datatype.DataTypeDefinitionId));
+                    if (conf != null)
+                        return conf.ToString();
+                    else
+                        return "";
+                }
             }
         }
 

@@ -47,14 +47,6 @@ namespace Umbraco.Core.Services
         int GetCount(MemberCountType countType);
 
         /// <summary>
-        /// Gets the default MemberType alias
-        /// </summary>
-        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
-        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
-        /// <returns>Alias of the default MemberType</returns>
-        string GetDefaultMemberType();
-
-        /// <summary>
         /// Checks if a Member with the username exists
         /// </summary>
         /// <param name="username">Username to check</param>
@@ -71,6 +63,18 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias">Alias of the Type</param>
         /// <returns><see cref="IMembershipUser"/></returns>
         T CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias);
+
+        /// <summary>
+        /// Creates and persists a new <see cref="IMembershipUser"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">IsApproved of the <see cref="IMembershipUser"/> to create</param>
+        /// <returns><see cref="IMembershipUser"/></returns>
+        T CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved);
 
         /// <summary>
         /// Gets an <see cref="IMembershipUser"/> by its provider key
@@ -120,6 +124,14 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter to raise events. 
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(IEnumerable<T> entities, bool raiseEvents = true);
+
+        /// <summary>
+        /// Gets the default MemberType alias
+        /// </summary>
+        /// <remarks>By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll 
+        /// return the first type that is not an admin, otherwise if there's only one we will return that one.</remarks>
+        /// <returns>Alias of the default MemberType</returns>
+        string GetDefaultMemberType();
 
         /// <summary>
         /// Finds a list of <see cref="IMembershipUser"/> objects by a partial email string

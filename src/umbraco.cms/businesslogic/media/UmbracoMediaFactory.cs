@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -99,7 +100,7 @@ namespace umbraco.cms.businesslogic.media
                         
                         if (int.TryParse(subfolder, out subfolderId))
                         {
-                            var destFilePath = FileSystem.GetRelativePath(subfolderId, fileName);
+                            var destFilePath = GetRelativePath(subfolderId, fileName);
                             var destFileUrl = FileSystem.GetUrl(destFilePath);
 
                             if (prop.Value.ToString() == destFileUrl)
@@ -152,6 +153,17 @@ namespace umbraco.cms.businesslogic.media
             friendlyName = regex.Replace(friendlyName, @" ");
 
             return friendlyName;
+        }
+
+        public static string GetRelativePath(int propertyId, string fileName)
+        {
+            var contentConfig = UmbracoConfig.For.UmbracoSettings().Content;
+
+            var sep = contentConfig.UploadAllowDirectories
+                ? Path.DirectorySeparatorChar
+                : '-';
+
+            return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
         }
 
         #endregion

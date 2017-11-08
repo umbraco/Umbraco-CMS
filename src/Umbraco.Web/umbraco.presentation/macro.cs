@@ -46,6 +46,7 @@ using System.Linq;
 using File = System.IO.File;
 using MacroTypes = umbraco.cms.businesslogic.macro.MacroTypes;
 using Member = umbraco.cms.businesslogic.member.Member;
+using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco
 {
@@ -64,6 +65,10 @@ namespace umbraco
         private const string MacrosAddedKey = "macrosAdded";
         public IList<Exception> Exceptions = new List<Exception>();
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }

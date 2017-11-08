@@ -48,16 +48,10 @@ namespace umbraco.presentation.developer.packages
 
                 cp = new ContentPicker();
                 content.Controls.Add(cp);
-
-                bt_submitButton.Attributes.Add("onClick", "window.location = 'submitpackage.aspx?id=" + pack.Id.ToString() + "'; return false;");
-
+                
                 if (string.IsNullOrEmpty(pack.PackagePath) == false)
                 {
-                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";
-
-                    if (cms.businesslogic.packager.repositories.Repository.getAll().Count > 0)
-                        bt_submitButton.Visible = true;
-
+                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";                    
                 }
                 else
                 {
@@ -168,6 +162,13 @@ namespace umbraco.presentation.developer.packages
 
                     /*Data types */
                     cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+
+                    // sort array by name
+                    Array.Sort(umbDataType, delegate(cms.businesslogic.datatype.DataTypeDefinition umbDataType1, cms.businesslogic.datatype.DataTypeDefinition umbDataType2)
+                    {
+                        return umbDataType1.Text.CompareTo(umbDataType2.Text);
+                    });
+
                     foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
                     {
 

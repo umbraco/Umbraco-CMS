@@ -7,7 +7,7 @@ namespace umbraco.interfaces
     /// The IcacheRefresher Interface is used for loadbalancing.
     /// 
     /// </summary>
-    public interface ICacheRefresher
+    public interface ICacheRefresher : IDiscoverable
     {
         Guid UniqueIdentifier { get; }
         string Name { get; }

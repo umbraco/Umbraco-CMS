@@ -1,22 +1,28 @@
 version: '{build}'
 shallow_clone: true
+
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  
 build_script:
 - cmd: >-
-    cd build
+    SET SLN=%CD%
+
+    SET SRC=%SLN%\src
+
+    SET PACKAGES=%SRC%\packages
+
+    CD build
 
     SET "release="
 
     FOR /F "skip=1 delims=" %%i IN (UmbracoVersion.txt) DO IF NOT DEFINED release SET "release=%%i"
 
-    SET nuGetFolder=C:\Users\appveyor\.nuget\packages
-
-    ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
-
-    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-
-    IF EXIST ..\src\umbraco.businesslogic\packages.config ..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-
-    ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+    ECHO "Restoring NuGet into %PACKAGES%"
+    
+    %SRC%\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
+    
+    %SRC%\.nuget\NuGet.exe restore %SRC%\umbraco.sln -Verbosity Quiet -NonInteractive -PackagesDirectory %PACKAGES%
 
     ECHO Building Release %release% build%APPVEYOR_BUILD_NUMBER%
     
@@ -24,13 +30,12 @@ build_script:
     
     SET MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MsBuild.exe"
 
-    XCOPY "..\src\Umbraco.Tests\unit-test-log4net.CI.config" "..\src\Umbraco.Tests\unit-test-log4net.config" /Y
+    XCOPY "%SRC%\Umbraco.Tests\unit-test-log4net.CI.config" "%SRC%\Umbraco.Tests\unit-test-log4net.config" /Y
     
-    %MSBUILD% "..\src\Umbraco.Tests\Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly
+    %MSBUILD% "%SLN%/src/Umbraco.Tests/Umbraco.Tests.csproj" /consoleloggerparameters:Summary;ErrorsOnly;WarningsOnly /p:NugetPackagesDirectory=%PACKAGES%
     
-    build.bat nopause %release% build%APPVEYOR_BUILD_NUMBER%
+    build.bat -integration -release:%release% -comment:build%APPVEYOR_BUILD_NUMBER% -nugetfolder:%PACKAGES%
     
-    ECHO %PATH%
 test:
   assemblies: src\Umbraco.Tests\bin\Debug\Umbraco.Tests.dll
 artifacts:

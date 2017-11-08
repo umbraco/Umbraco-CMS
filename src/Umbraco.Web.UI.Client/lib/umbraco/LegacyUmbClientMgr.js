@@ -179,7 +179,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
                 var localizationService = injector.get("localizationService");
-                var userResource = injector.get("userResource");                
+                var usersResource = injector.get("usersResource");
                 //var appState = injector.get("appState");
                 var angularHelper = injector.get("angularHelper");
                 var $rootScope = injector.get("$rootScope");
@@ -194,7 +194,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                             if (currentMenuNode) {
                                 if (confirm(txtConfirmDisable + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
                                     angularHelper.safeApply($rootScope, function () {
-                                        userResource.disableUser(currentMenuNode.nodeId).then(function () {
+                                        usersResource.disableUsers(currentMenuNode.nodeId).then(function () {
                                             UmbClientMgr.mainTree().syncTree("-1," + currentMenuNode.nodeId, true);
                                         });
                                     });
@@ -362,10 +362,28 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 return getRootScope();
             },
 
-            reloadLocation: function() {
+            /**
+            This will reload the content frame based on it's current route, if pathToMatch is specified it will only reload it if the current
+            location matches the path
+            */
+            reloadLocation: function(pathToMatch) {
+
                 var injector = getRootInjector();
-                var $route = injector.get("$route");
-                $route.reload();
+                var doChange = true;
+                if (pathToMatch) {
+                    var $location = injector.get("$location");
+                    var path = $location.path();
+                    if (path != pathToMatch) {
+                        doChange = false;
+                    }
+                }
+
+                if (doChange) {
+                    var $route = injector.get("$route");
+                    $route.reload();
+                    var $rootScope = injector.get("$rootScope");
+                    $rootScope.$apply();
+                }
             },
             
             closeModalWindow: function(rVal) {

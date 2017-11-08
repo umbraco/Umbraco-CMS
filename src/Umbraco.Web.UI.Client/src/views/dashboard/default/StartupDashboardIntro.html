@@ -38,58 +38,34 @@
 
     <!-- Default content in case we cannot fetch content from the outside -->
     <div style="max-width: 1200px" ng-if="vm.showDefault">
-        <h3><strong>Welcome to The Friendly CMS</strong></h3>
-        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 30px; max-width: 760px;">
-            <span>Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</span>
-        </p>
-        <h4>Find out more:</h4>
-        <ul>
-            <li>Find the answers to your Umbraco questions in <a href="https://our.umbraco.org/documentation/" target="_blank" class="btn-link-underline">our Documentation</a></li>
-            <li>Ask a question in the <a href="https://our.umbraco.org" target="_blank" class="btn-link-underline">Community Forum</a></li>
-            <li>Find <a href="https://our.umbraco.org/projects" target="_blank" class="btn-link-underline">an add-on package</a> to help you get going quickly</li>
-            <li>Watch <a href="https://umbraco.tv" class="btn-link-underline">our tutorial videos</a> (some are free, some require a subscription)</li>
-            <li>Find out about <a href="https://umbraco.com/products-and-support" target="_blank" class="btn-link-underline">our productivity boosting tools and commercial support</a></li>
-            <li>Find out about <a href="https://umbraco.com/products/training" target="_blank" class="btn-link-underline">real-life training and certification opportunities</a></li>
-        </ul>            
 
-        <div class="row">
-            <div class="span4">
-                <a href="http://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=tv" target="_blank" class="nounderline">
-                    <img src="views/dashboard/default/umbracotv.png" alt="Umbraco.TV - Hours of Umbraco Video Tutorials" style="margin: 10px 0 10px 0" />
-                </a>
+        <div class="welcome-dashboard__intro">
+            <h1 class="welcome-dashboard__title">Welcome to The Friendly CMS</h1>
+            <p class="welcome-dashboard__intro-text">Thank you for choosing Umbraco - we think this could be the beginning of something beautiful. While it may feel overwhelming at first, we've done a lot to make the learning curve as smooth and fast as possible.</p>
+        </div>
 
+        <div class="welcome-dashboard__info-box-boxes">
+            <a ng-href="{{infoBox.url}}" target="_blank" class="welcome-dashboard__info-box" ng-repeat="infoBox in vm.defaultDashboard.infoBoxes">
+                <div class="welcome-dashboard__info-box-title">{{ infoBox.title }}</div>
+                <div class="welcome-dashboard__info-box-description">{{ infoBox.description }}</div>
+            </a>
+        </div>
 
-                <a href="http://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=tv" target="_blank" class="btn-link -underline">
-                    <h4> <strong>Umbraco.TV - Learn from the source!</strong> </h4>
-                </a>
-
-                <p style="line-height: 1.5;">
-                    Umbraco.TV will help you go from zero to Umbraco
-                    hero at a pace that suits you. Our easy to follow
-                    online training videos will give you the fundamental
-                    knowledge to start building awesome Umbraco websites.
-                </p>
-            </div>
-
-            <div class="span4 offset1">
-
-                <a href="http://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our" target="_blank" class="nounderline">
-                    <img src="views/dashboard/default/ourumbraco.png" alt="Our Umbraco" style="margin: 10px 0 10px 0" />
-                </a>
-
-                <a href="http://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=header&utm_campaign=our" target="_blank" class="btn-link -underline">
-                    <h4><strong>Our Umbraco - The Friendliest Community</strong></h4>
-                </a>
-
-                <p style="line-height: 1.5;">
-                    Our Umbraco - the official community site is your one
-                    stop for everything Umbraco. Whether you need a
-                    question answered or looking for cool plugins, the
-                    worlds best community is just a click away.
-                </p>
-
+        <div class="welcome-dashboard__cards">
+            <div class="welcome-dashboard__card" ng-repeat="article in vm.defaultDashboard.articles">
+                <div class="welcome-dashboard__card-image-wrapper">
+                    <a ng-href="{{article.url}}" target="_blank">
+                        <img class="welcome-dashboard__card-image" ng-src="{{article.img}}" alt="{{ article.altText }}" />
+                    </a>
+                </div>
+                <div class="welcome-dashboard__card-content">
+                    <h2 class="welcome-dashboard__card-title">{{ article.title }}</h2>
+                    <div class="welcome-dashboard__card-teaser">{{ article.description }}</div>
+                    <a class="btn btn-success" ng-href="{{article.url}}" target="_blank">{{article.buttonText}}</a>
+                </div>
             </div>
         </div>
-    </div> 
+        
+    </div>
 
 </div>
