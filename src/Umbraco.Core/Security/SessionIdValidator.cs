@@ -80,7 +80,8 @@ namespace Umbraco.Core.Security
                         var sessionChecker = SessionChecks.GetOrAdd(user.Id, i => new SessionCheck
                         {
                             LastChecked = issuedUtc ?? DateTimeOffset.UtcNow,
-                            Locker = new object()
+                            //1,1 means only one thread at a time
+                            Locker = new SemaphoreSlim(1, 1)
                         });
 
                         //re-evaluate
@@ -98,31 +99,44 @@ namespace Umbraco.Core.Security
                         //time. This has occured for me when clicking on a node that has multiple pickers and multiple REST calls are made at the same time this
                         //validation occurs. This would mean that we would make more db lookups than required and also write the cookie out more times than required
                         //so this prevents this scenario.
-                        if (validate && Monitor.TryEnter(sessionChecker.Locker))
-                        {
+                        if (validate)
+                        {                            
                             try
                             {
-                                var sessionId = context.Identity.FindFirstValue(Constants.Security.SessionIdClaimType);
-                                if (await manager.ValidateSessionIdAsync(userId, sessionId))
-                                {
-                                    reject = false;
+                                await sessionChecker.Locker.WaitAsync().ConfigureAwait(false);
 
-                                    //we will re-issue the cookie last checked cookie
-                                    context.Options.CookieManager.AppendResponseCookie(
-                                        context.OwinContext,
-                                        CookieName,
-                                        DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz"),
-                                        new CookieOptions
-                                        {
-                                            HttpOnly = true,
-                                            Secure = GlobalSettings.UseSSL || context.Request.IsSecure,
-                                            Path = "/"
-                                        });
+                                //re-evaluate inside the lock
+                                var timeElapsed = currentUtc.Subtract(sessionChecker.LastChecked);
+                                validate = timeElapsed > validateInterval;
+                                if (validate == false)
+                                {
+                                    //exit, another thread must have beat us to it
+                                    reject = false;
+                                }
+                                else
+                                {
+                                    var sessionId = context.Identity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                                    if (await manager.ValidateSessionIdAsync(userId, sessionId))
+                                    {
+                                        reject = false;
+
+                                        //we will re-issue the cookie last checked cookie
+                                        context.Options.CookieManager.AppendResponseCookie(
+                                            context.OwinContext,
+                                            CookieName,
+                                            DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz"),
+                                            new CookieOptions
+                                            {
+                                                HttpOnly = true,
+                                                Secure = GlobalSettings.UseSSL || context.Request.IsSecure,
+                                                Path = "/"
+                                            });
+                                    }
                                 }
                             }
                             finally
                             {
-                                Monitor.Exit(sessionChecker.Locker);
+                                sessionChecker.Locker.Release();
                             }
                         }
                     }
@@ -145,7 +159,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         private struct SessionCheck
         {
-            public object Locker { get; set; }
+            public SemaphoreSlim Locker { get; set; }
             public DateTimeOffset LastChecked { get; set; }
         }
     }
