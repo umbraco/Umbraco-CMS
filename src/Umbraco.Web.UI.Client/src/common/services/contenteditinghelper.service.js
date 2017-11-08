@@ -162,7 +162,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "saveAndPublish"
                         };
                     case "H":
                         //send to publish
@@ -171,7 +172,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_saveToPublish",
                             handler: args.methods.sendToPublish,
                             hotKey: "ctrl+p",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "sendToPublish"                            
                         };
                     case "A":
                         //save
@@ -180,7 +182,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_save",
                             handler: args.methods.save,
                             hotKey: "ctrl+s",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "save"                            
                         };
                     case "Z":
                         //unpublish
@@ -189,7 +192,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "content_unPublish",
                             handler: args.methods.unPublish,
                             hotKey: "ctrl+u",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "unpublish"                            
                         };
                     default:
                         return null;

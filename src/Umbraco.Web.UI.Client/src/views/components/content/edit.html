@@ -25,7 +25,7 @@
                     
                     <!-- Other tabs than info -->
                     <div ng-if="tab.id !== -1 && tab.alias !== '_umb_infoTab'">
-                        <umb-property ng-repeat="property in tab.properties" property="property">
+                        <umb-property data-element="property-{{property.alias}}" ng-repeat="property in tab.properties" property="property">
                             <umb-editor model="property"></umb-editor>
                         </umb-property>
                     </div>
@@ -61,6 +61,7 @@
             <umb-editor-footer-content-right>
                 
                 <umb-button
+                  alias="returnToListView"
                     ng-if="page.listViewPath"
                     type="link"
                     href="#{{page.listViewPath}}"
@@ -69,6 +70,7 @@
                 </umb-button>
 
                 <umb-button
+                  alias="preview"
                     ng-if="!page.isNew && content.allowPreview"
                     type="button"
                     button-style="info"

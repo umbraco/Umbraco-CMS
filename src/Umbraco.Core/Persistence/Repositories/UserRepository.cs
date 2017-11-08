@@ -479,7 +479,8 @@ ORDER BY colName";
                 {"updateDate", "UpdateDate"},
                 {"avatar", "Avatar"},
                 {"emailConfirmedDate", "EmailConfirmedDate"},
-                {"invitedDate", "InvitedDate"}
+                {"invitedDate", "InvitedDate"},
+                {"tourData", "TourData"}
             };
 
             //create list of properties that have changed

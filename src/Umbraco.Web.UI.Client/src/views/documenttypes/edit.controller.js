@@ -25,23 +25,27 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [
 			{
-			    "name": localizationService.localize("general_design"),
+                "name": localizationService.localize("general_design"),
+                "alias": "design",
 			    "icon": "icon-document-dashed-line",
 			    "view": "views/documenttypes/views/design/design.html",
 			    "active": true
 			},
 			{
-			    "name": localizationService.localize("general_listView"),
+                "name": localizationService.localize("general_listView"),
+                "alias": "listView",
 			    "icon": "icon-list",
 			    "view": "views/documenttypes/views/listview/listview.html"
 			},
 			{
-			    "name": localizationService.localize("general_rights"),
+                "name": localizationService.localize("general_rights"),
+                "alias": "permissions",
 			    "icon": "icon-keychain",
 			    "view": "views/documenttypes/views/permissions/permissions.html"
 			},
 			{
-			    "name": localizationService.localize("treeHeaders_templates"),
+                "name": localizationService.localize("treeHeaders_templates"),
+                "alias": "templates",
 			    "icon": "icon-layout",
 			    "view": "views/documenttypes/views/templates/templates.html"
 			}
@@ -117,6 +121,7 @@
             if (result) {
                 //Models builder mode:
                 vm.page.defaultButton = {
+                    alias: "save",
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
                     labelKey: "buttons_save",
@@ -125,6 +130,7 @@
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
+                    alias: "saveAndGenerateModels",
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
                     labelKey: "buttons_saveAndGenerateModels",
