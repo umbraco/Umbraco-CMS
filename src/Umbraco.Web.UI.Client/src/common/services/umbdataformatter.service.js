@@ -242,7 +242,7 @@
                 var propGroups = _.find(genericTab.properties, function (item) {
                     return item.alias === "_umb_membergroup";
                 });
-                saveModel.email = propEmail.value;
+                saveModel.email = propEmail.value.trim();
                 saveModel.username = propLogin.value.trim();
                 
                 saveModel.password = this.formatChangePasswordModel(propPass.value);
