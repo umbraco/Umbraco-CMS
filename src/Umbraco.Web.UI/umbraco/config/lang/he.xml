@@ -681,7 +681,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">המיון הושלם.</key>
     <key alias="sortHelp">יש לגרור את הפריטים מעלה או מטה כדי להגדיר את סדר התוכן. או לחץ על כותרת העמודה כדי למיין את כל פריטי התוכן</key>
-    <key alias="sortPleaseWait"><![CDATA[פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.<br/> <br/> נא לא לסגור את החלון בזמן המיון]]></key>
+    <key alias="sortPleaseWait"><![CDATA[פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">הפירסום בוטל על ידי תוסף צד שלישי</key>

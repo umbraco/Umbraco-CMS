@@ -646,7 +646,7 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Classificação concluída.</key>
     <key alias="sortHelp">Arraste os diferentes itens para cima ou para baixo para definir como os mesmos serão arranjados. Ou clique no título da coluna para classificar a coleção completa de itens</key>
-    <key alias="sortPleaseWait"><![CDATA[Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo. <br /><br /> Não feche esta janela durante a classificação]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publicação foi cancelada por add-in de terceiros</key>
