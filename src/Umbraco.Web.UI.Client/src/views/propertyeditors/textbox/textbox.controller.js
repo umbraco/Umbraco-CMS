@@ -5,12 +5,20 @@ function textboxController($scope) {
         $scope.model.config = {};
     }
 
+    $scope.model.maxlength = false;
+    if ($scope.model.config && $scope.model.config.maxChars) {
+        $scope.model.maxlength = true;
+    }
+
     if (!$scope.model.config.maxChars) {
+        // 500 is the maximum number that can be stored
+        // in the database, so set it to the max, even
+        // if no max is specified in the config
         $scope.model.config.maxChars = 500;
     }
 
-    if ($scope.model.config && $scope.model.config.maxChars) {
-        if ($scope.model.value == undefined) {
+    if ($scope.model.maxlength) {
+        if ($scope.model.value === undefined) {
             $scope.model.count = ($scope.model.config.maxChars * 1);
         } else {
             $scope.model.count = ($scope.model.config.maxChars * 1) - $scope.model.value.length;
@@ -19,7 +27,7 @@ function textboxController($scope) {
 
     $scope.model.change = function () {
         if ($scope.model.config && $scope.model.config.maxChars) {
-            if ($scope.model.value == undefined) {
+            if ($scope.model.value === undefined) {
                 $scope.model.count = ($scope.model.config.maxChars * 1);
             } else {
                 $scope.model.count = ($scope.model.config.maxChars * 1) - $scope.model.value.length;

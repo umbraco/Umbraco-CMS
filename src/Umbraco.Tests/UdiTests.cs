@@ -14,6 +14,12 @@ namespace Umbraco.Tests
     [TestFixture]
     public class UdiTests : BaseUmbracoApplicationTest
     {
+        [SetUp]
+        public void Setup()
+        {
+            Udi.ResetUdiTypes();
+        }
+
         [Test]
         public void StringUdiCtorTest()
         {
