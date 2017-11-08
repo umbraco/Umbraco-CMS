@@ -67,6 +67,11 @@ namespace Umbraco.Core.Security
             base.ResponseSignOut(context);
 
             //Make sure the definitely all of these cookies are cleared when signing out with cookies
+            context.Response.Cookies.Append(SessionIdValidator.CookieName, "", new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(-1),
+                Path = "/"
+            });
             context.Response.Cookies.Append(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "", new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(-1),
@@ -107,7 +112,7 @@ namespace Umbraco.Core.Security
         protected  virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
         {
             if (_appCtx.IsConfigured && _appCtx.IsUpgrading == false)
-                await SessionIdValidator.ValidateSession(TimeSpan.FromMinutes(1), context);
+                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
         }
 
         private void EnsureCulture(CookieValidateIdentityContext context)
