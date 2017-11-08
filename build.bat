@@ -10,6 +10,5 @@ IF ERRORLEVEL 1 (
 :error
 ECHO.
 ECHO Can not run build\build.ps1.
-ECHO If this is due to a SecurityError then make sure to run the following command from an administrator command prompt:
+ECHO If this is due to a SecurityError then please refer to BUILD.md for help!
 ECHO.
-ECHO powershell Set-ExecutionPolicy -ExecutionPolicy RemoteSigned

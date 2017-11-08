@@ -134,7 +134,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>()
+                .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId);
             //TODO: IF we want to enable querying on content type information this will need to be joined
             //.InnerJoin<ContentTypeDto>(SqlSyntax)
             //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);
@@ -833,11 +835,21 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
         }
 
-        public int CountPublished()
+        public int CountPublished(string contentTypeAlias = null)
         {
-            var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
+            if (contentTypeAlias.IsNullOrWhiteSpace())
+            {
+                var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
                 .Where<DocumentDto>(x => x.Published == true);
-            return Database.ExecuteScalar<int>(sql);
+                return Database.ExecuteScalar<int>(sql);
+            }
+            else
+            {
+                var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
+                .Where<DocumentDto>(x => x.Published == true)
+                .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+                return Database.ExecuteScalar<int>(sql);
+            }
         }
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
