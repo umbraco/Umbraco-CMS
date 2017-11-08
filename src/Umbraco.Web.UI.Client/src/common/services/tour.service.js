@@ -8,10 +8,26 @@
 (function () {
     'use strict';
 
-    function tourService(eventsService, currentUserResource, $q) {
+    function tourService(eventsService, currentUserResource, $q, tourResource) {
         
         var tours = [];
         var currentTour = null;
+
+        /**
+         * Registers all tours from the server and returns a promise
+         */
+        function registerAllTours() {
+            return tourResource.getTours().then(function(tourFiles) {
+                angular.forEach(tourFiles, function (tourFile) {
+                    angular.forEach(tourFile, function(newTour) {
+                        validateTour(newTour);
+                        validateTourRegistration(newTour);
+                        tours.push(newTour);    
+                    });
+                });
+                eventsService.emit("appState.tour.updatedTours", tours);
+            });
+        }
 
         /**
          * @ngdoc method
@@ -365,6 +381,7 @@
         }
 
         var service = {
+            registerAllTours: registerAllTours,
             registerTour: registerTour,
             registerTours: registerTours,
             unregisterTour: unregisterTour,

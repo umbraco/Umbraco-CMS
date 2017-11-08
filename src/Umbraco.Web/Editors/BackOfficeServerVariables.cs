@@ -118,6 +118,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetEnableState())
                         },
                         {
+                            "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
+                                controller => controller.GetTours())
+                        },
+                        {
                             "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                 controller => controller.GetEmbed("", 0, 0))
                         },

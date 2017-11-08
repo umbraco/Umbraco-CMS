@@ -518,6 +518,7 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
+    <Content Include="Config\BackOfficeTours\getting-started.json" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
