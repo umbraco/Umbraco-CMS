@@ -386,78 +386,20 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content
         /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
-        {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(skip, take, out totalRecords, term, useWildCards, searchProvider);
-
-            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (string.IsNullOrEmpty(searchProvider) == false)
-                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-
-            var results = searcher.Search(term, useWildCards);
-
-            totalRecords = results.TotalItemCount;
-
-            var records = results.Skip(skip);
-
-            if (take > 0)
-            {
-                records = records.Take(take);
-            }
-
-            return records.ConvertSearchResultToPublishedContent(_contentCache);
-        }
-
-        /// <summary>
-        /// Searches content
-        /// </summary>
         /// <param name="term"></param>
         /// <param name="useWildCards"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
         public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
         {
-            var total = 0;
+            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(term, useWildCards, searchProvider);
 
-            return TypedSearch(0, 0, out total, term, useWildCards, searchProvider);
-        }
+            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (string.IsNullOrEmpty(searchProvider) == false)
+                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
 
-        /// <summary>
-        /// Searhes content
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="totalRecords"></param>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-        {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(skip, take, out totalRecords, criteria, searchProvider);
-
-            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (searchProvider != null)
-                s = searchProvider;
-
-            var results = s.Search(criteria);
-
-            totalRecords = results.TotalItemCount;
-
-            var records = results.Skip(skip);
-
-            if (take > 0)
-            {
-                records = records.Take(take);
-            }
-
-            return records.ConvertSearchResultToPublishedContent(_contentCache);
+            var results = searcher.Search(term, useWildCards);
+            return results.ConvertSearchResultToPublishedContent(_contentCache);
         }
 
         /// <summary>
@@ -468,9 +410,14 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
-            var total = 0;
+            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(criteria, searchProvider);
 
-            return TypedSearch(0, 0, out total, criteria, searchProvider);
+            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (searchProvider != null)
+                s = searchProvider;
+
+            var results = s.Search(criteria);
+            return results.ConvertSearchResultToPublishedContent(_contentCache);
         }
 
         #endregion
