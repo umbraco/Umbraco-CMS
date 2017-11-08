@@ -356,19 +356,6 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IProfile, UserProfile>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
-
-            config.CreateMap<IUser, UserData>()
-                .ConstructUsing((IUser user) => new UserData())
-                .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections.ToArray()))
-                .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
-                .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
-                .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
-            
         }
 
         private IEnumerable<EntityBasic> GetStartNodeValues(int[] startNodeIds,

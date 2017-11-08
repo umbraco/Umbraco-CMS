@@ -24,4 +24,5 @@ namespace Umbraco.Core.Models.Rdbms
         [ResultColumn]
         public NodeDto NodeDto { get; set; }
     }
+    
 }

@@ -1,18 +1,69 @@
 using System;
+using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Globalization;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
 {
     public class BackOfficeCookieAuthenticationProvider : CookieAuthenticationProvider
     {
+        private readonly ApplicationContext _appCtx;
+
+        [Obsolete("Use the ctor specifying all dependencies")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public BackOfficeCookieAuthenticationProvider()
+            : this(ApplicationContext.Current)
+        {
+        }
+
+        public BackOfficeCookieAuthenticationProvider(ApplicationContext appCtx)
+        {
+            if (appCtx == null) throw new ArgumentNullException("appCtx");
+            _appCtx = appCtx;
+        }
+
+        public override void ResponseSignIn(CookieResponseSignInContext context)
+        {
+            var backOfficeIdentity = context.Identity as UmbracoBackOfficeIdentity;
+            if (backOfficeIdentity != null)
+            {
+                //generate a session id and assign it
+                //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
+
+                var session = _appCtx.IsConfigured && _appCtx.IsUpgrading == false
+                    ? _appCtx.Services.UserService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
+                    : Guid.NewGuid();
+
+                backOfficeIdentity.UserData.SessionId = session.ToString();
+            }            
+
+            base.ResponseSignIn(context);
+        }
+
         public override void ResponseSignOut(CookieResponseSignOutContext context)
         {
+            //Clear the user's session on sign out
+            if (context != null && context.OwinContext != null && context.OwinContext.Authentication != null
+                && context.OwinContext.Authentication.User != null && context.OwinContext.Authentication.User.Identity != null)
+            {
+                var claimsIdentity = context.OwinContext.Authentication.User.Identity as ClaimsIdentity;
+                var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                Guid guidSession;
+                if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
+                {
+                    _appCtx.Services.UserService.ClearLoginSession(guidSession);
+                }
+            }
+
             base.ResponseSignOut(context);
 
             //Make sure the definitely all of these cookies are cleared when signing out with cookies
@@ -34,21 +85,45 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Ensures that the culture is set correctly for the current back office user
+        /// Ensures that the culture is set correctly for the current back office user and that the user's session token is valid
         /// </summary>
         /// <param name="context"/>
         /// <returns/>
-        public override Task ValidateIdentity(CookieValidateIdentityContext context)
+        public override async Task ValidateIdentity(CookieValidateIdentityContext context)
+        {
+            EnsureCulture(context);
+
+            await EnsureValidSessionId(context);
+
+            await base.ValidateIdentity(context);
+        }        
+
+        /// <summary>
+        /// Ensures that the user has a valid session id
+        /// </summary>
+        /// <remarks>
+        /// So that we are not overloading the database this throttles it's check to every minute
+        /// </remarks>
+        protected  virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
+        {
+            if (_appCtx.IsConfigured && _appCtx.IsUpgrading == false)
+                await SessionIdValidator.ValidateSession(TimeSpan.FromMinutes(1), context);
+        }
+
+        private void EnsureCulture(CookieValidateIdentityContext context)
         {
             var umbIdentity = context.Identity as UmbracoBackOfficeIdentity;
             if (umbIdentity != null && umbIdentity.IsAuthenticated)
             {
                 Thread.CurrentThread.CurrentCulture =
                     Thread.CurrentThread.CurrentUICulture =
-                        new CultureInfo(umbIdentity.Culture);
+                        UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
             }
-
-            return base.ValidateIdentity(context);
         }
+
+        /// <summary>
+        /// Used so that we aren't creating a new CultureInfo object for every single request
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
     }
 }
