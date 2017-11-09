@@ -115,7 +115,7 @@
             {
                 element: "[data-element='editor-name-field']",
                 title: "Enter a name",
-                content: "<p>Your Document Type needs a name. Enter <code>Home Page</code> in the field and click <b>Next</b>.",
+                content: "<p>Your Document Type needs a name. Enter <code>My Home Page</code> in the field and click <b>Next</b>.",
                 view: "doctypename"
             },
             {
