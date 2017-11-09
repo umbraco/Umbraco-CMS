@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
+using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
 
@@ -31,6 +32,8 @@ namespace Umbraco.Core.Security
             _appCtx = appCtx;
         }
 
+        private static readonly SemVersion MinUmbracoVersionSupportingLoginSessions = new SemVersion(7, 8);
+
         public override void ResponseSignIn(CookieResponseSignInContext context)
         {
             var backOfficeIdentity = context.Identity as UmbracoBackOfficeIdentity;
@@ -39,7 +42,10 @@ namespace Umbraco.Core.Security
                 //generate a session id and assign it
                 //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
 
-                var session = _appCtx.IsConfigured && _appCtx.IsUpgrading == false
+                //NOTE - special check because when we are upgrading to 7.8 we cannot create a session since the db isn't ready and we'll get exceptions
+                var canAcquireSession = _appCtx.IsUpgrading == false || _appCtx.CurrentVersion() >= MinUmbracoVersionSupportingLoginSessions;
+
+                var session = canAcquireSession
                     ? _appCtx.Services.UserService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
                     : Guid.NewGuid();
 
