@@ -24,8 +24,8 @@
             </label>
             <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" autocomplete="off" ng-minlength="{{invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
             <span class="help-inline" val-msg-for="password" val-toggle-msg="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
-            <span class="help-inline" val-msg-for="password" val-toggle-msg="minlength">Minimum {{invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>    
-            <span class="help-inline" val-msg-for="password" val-toggle-msg="valServerField"></span>     
+            <span class="help-inline" val-msg-for="password" val-toggle-msg="minlength">Minimum {{invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
+            <span class="help-inline" val-msg-for="password" val-toggle-msg="valServerField"></span>
           </div>
 
           <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
@@ -49,15 +49,15 @@
       <div class="form" ng-if="inviteStep === 2">
 
         <div class="flex justify-center items-center">
-          
+
           <ng-form name="avatarForm">
-            
+
             <umb-progress-bar style="max-width: 100px; margin-bottom: 5px;"
                               ng-show="avatarFile.uploadStatus === 'uploading'"
                               progress="{{ avatarFile.uploadProgress }}"
                               size="s">
             </umb-progress-bar>
-            
+
             <div class="umb-info-local-item text-error mt3" ng-if="avatarFile.uploadStatus === 'error'">
               {{ avatarFile.serverErrorMessage }}
             </div>
@@ -69,7 +69,7 @@
                  ngf-multiple="false"
                  ngf-pattern="{{avatarFile.acceptedFileTypes}}"
                  ngf-max-size="{{ avatarFile.maxFileSize }}">
-                  
+
                   <umb-avatar color="gray"
                               size="xl"
                               unknown-char="+"
@@ -77,7 +77,7 @@
                               img-srcset="{{invitedUser.avatars[4]}} 2x, {{invitedUser.avatars[4]}} 3x">
                   </umb-avatar>
               </a>
-            
+
           </ng-form>
         </div>
 
@@ -149,7 +149,9 @@
 
             <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
               <label><localize key="general_password">Password</localize></label>
-              <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
+              <div class="password-toggle">
+                <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" /><a ng-click="togglePassword()">Toggle</a>
+              </div>
             </div>
 
             <div class="flex justify-between items-center">

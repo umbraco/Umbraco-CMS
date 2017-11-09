@@ -1012,7 +1012,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="sortCreationDate">Data utworzenia</key>
     <key alias="sortDone">Sortowanie zakończone.</key>
     <key alias="sortHelp">Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności lub kliknij na nagłówku kolumny, aby posortować całą kolekcję elementów</key>
-    <key alias="sortPleaseWait"><![CDATA[Proszę czekać. Trwa sortowanie elementów.<br/><br/>Nie zamykaj tego okna podczas sortowania]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Proszę czekać. Trwa sortowanie elementów.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="validationFailedHeader">Walidacja</key>

@@ -685,8 +685,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Ordenación completa.</key>
     <key alias="sortHelp">Arrastra las diferentes páginas debajo para colocarlas como deberían estar. O haz click en las cabeceras de las columnas para ordenar todas las páginas</key>
-    <key alias="sortPleaseWait"><![CDATA[Espere por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.<br/>
-<br/> No cierre esta ventana mientras se está ordenando ]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Espere por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">La publicación fue cancelada por un complemento de terceros</key>
@@ -789,6 +788,9 @@
 
     <key alias="allowAllEditors">Permitir todos los controles de edición</key>
     <key alias="allowAllRowConfigurations">Permitir todas las configuraciones de fila</key>
+    <key alias="maxItems">Artículos máximos</key>
+    <key alias="maxItemsDescription">Laat dit leeg of is ingesteld op -1 voor onbeperkt</key>
+    <key alias="maxItemsDescription">Dejar en blanco o se establece en 0 para ilimitada</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Campo opcional</key>

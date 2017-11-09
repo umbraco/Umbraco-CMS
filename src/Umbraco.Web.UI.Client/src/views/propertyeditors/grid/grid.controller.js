@@ -81,6 +81,7 @@ angular.module("umbraco")
 
         var notIncludedRte = [];
         var cancelMove = false;
+        var startingArea;
 
         $scope.sortableOptionsCell = {
             distance: 10,
@@ -112,9 +113,11 @@ angular.module("umbraco")
             },
 
             over: function (event, ui) {
-                var allowedEditors = $(event.target).scope().area.allowed;
+                var area = $(event.target).scope().area;
+                var allowedEditors = area.allowed;
 
-                if ($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) {
+                if (($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                        (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                     $scope.$apply(function () {
                         $(event.target).scope().area.dropNotAllowed = true;
@@ -167,6 +170,10 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
+
+                //Get the starting area for reference
+                var area = $(e.target).scope().area;
+                startingArea = area;
 
                 // fade out control when sorting
                 ui.item.context.style.display = "block";

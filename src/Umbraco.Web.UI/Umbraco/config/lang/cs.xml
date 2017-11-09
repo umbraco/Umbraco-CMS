@@ -771,7 +771,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Třídění bylo ukončeno.</key>
     <key alias="sortHelp">Abyste nastavili, jak mají být položky seřazeny, přetáhněte jednotlivé z nich nahoru či dolů. Anebo klikněte na hlavičku sloupce pro setřídění celé kolekce</key>
-    <key alias="sortPleaseWait"><![CDATA[ Čekejte, prosím. Položky jsou tříděny a může to chvíli trvat.<br/> <br/> Během třídění nezavírejte toto okno]]></key>
+    <key alias="sortPleaseWait"><![CDATA[ Čekejte, prosím. Položky jsou tříděny a může to chvíli trvat.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publikování bylo zrušeno doplňkem třetí strany</key>

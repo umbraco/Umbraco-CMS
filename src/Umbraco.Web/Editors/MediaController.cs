@@ -599,12 +599,14 @@ namespace Umbraco.Web.Editors
                 throw;
             }
         }
-
-        [EnsureUserPermissionForMedia("folder.ParentId")]
-        public MediaItemDisplay PostAddFolder(EntityBasic folder)
+        
+        public MediaItemDisplay PostAddFolder(PostedFolder folder)
         {
+            var intParentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
+            
             var mediaService = ApplicationContext.Services.MediaService;
-            var f = mediaService.CreateMedia(folder.Name, folder.ParentId, Constants.Conventions.MediaTypes.Folder);
+
+            var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
             mediaService.Save(f, Security.CurrentUser.Id);
 
             return Mapper.Map<IMedia, MediaItemDisplay>(f);
@@ -639,63 +641,12 @@ namespace Umbraco.Web.Editors
             }
 
             //get the string json from the request
-            int parentId; bool entityFound; GuidUdi parentUdi;
             string currentFolderId = result.FormData["currentFolder"];
-            // test for udi
-            if (GuidUdi.TryParse(currentFolderId, out parentUdi))
-            {
-                currentFolderId = parentUdi.Guid.ToString();
-            }
-
-            if (int.TryParse(currentFolderId, out parentId) == false)
-            {
-                // if a guid then try to look up the entity
-                Guid idGuid;
-                if (Guid.TryParse(currentFolderId, out idGuid))
-                {
-                    var entity = Services.EntityService.GetByKey(idGuid);
-                    if (entity != null)
-                    {
-                        entityFound = true;
-                        parentId = entity.Id;
-                    }
-                    else
-                    {
-                        throw new EntityNotFoundException(currentFolderId, "The passed id doesn't exist");
-                    }
-                }
-                else
-                {
-                    return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer or Guid");
-                }
-
-                if (entityFound == false)
-                {
-                    return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer or Guid");
-                }
-            }
-
-
-            //ensure the user has access to this folder by parent id!
-            if (CheckPermissions(
-               new Dictionary<string, object>(),
-               Security.CurrentUser,
-               Services.MediaService,
-               Services.EntityService,
-               parentId) == false)
-            {
-                return Request.CreateResponse(
-                    HttpStatusCode.Forbidden,
-                    new SimpleNotificationModel(new Notification(
-                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                        Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
-                        SpeechBubbleIcon.Warning)));
-            }
-
+            int parentId = GetParentIdAsInt(currentFolderId, validatePermissions: true);
+           
             var tempFiles = new PostedFiles();
             var mediaService = ApplicationContext.Services.MediaService;
-
-
+            
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (result.FormData.ContainsKey("path"))
             {
@@ -828,6 +779,69 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
+        }
+
+        /// <summary>
+        /// Given a parent id which could be a GUID, UDI or an INT, this will resolve the INT
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="validatePermissions">
+        /// If true, this will check if the current user has access to the resolved integer parent id
+        /// and if that check fails an unauthorized exception will occur
+        /// </param>
+        /// <returns></returns>
+        private int GetParentIdAsInt(string parentId, bool validatePermissions)
+        {
+            int intParentId;
+            GuidUdi parentUdi;
+
+            // test for udi
+            if (GuidUdi.TryParse(parentId, out parentUdi))
+            {
+                parentId = parentUdi.Guid.ToString();
+            }
+
+            //if it's not an INT then we'll check for GUID
+            if (int.TryParse(parentId, out intParentId) == false)
+            {
+                // if a guid then try to look up the entity
+                Guid idGuid;
+                if (Guid.TryParse(parentId, out idGuid))
+                {
+                    var entity = Services.EntityService.GetByKey(idGuid);
+                    if (entity != null)
+                    {
+                        intParentId = entity.Id;
+                    }
+                    else
+                    {
+                        throw new EntityNotFoundException(parentId, "The passed id doesn't exist");
+                    }
+                }
+                else
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse("The request was not formatted correctly, the parentId is not an integer, Guid or UDI"));
+                }
+            }
+
+            //ensure the user has access to this folder by parent id!
+            if (validatePermissions && CheckPermissions(
+                    new Dictionary<string, object>(),
+                    Security.CurrentUser,
+                    Services.MediaService,
+                    Services.EntityService,
+                    intParentId) == false)
+            {
+                throw new HttpResponseException(Request.CreateResponse(
+                    HttpStatusCode.Forbidden,
+                    new SimpleNotificationModel(new Notification(
+                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                        Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
+                        SpeechBubbleIcon.Warning))));
+            }
+
+            return intParentId;
         }
 
         /// <summary>

@@ -935,6 +935,15 @@ Mange hilsner fra Umbraco robotten
   <area alias="colorpicker">
     <key alias="noColors">Du har ikke konfigureret nogen godkendte farver</key>
   </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Du har valgt et dokument som er slettet eller lagt i papirkurven</key>
+    <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
+    <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
+    <key alias="deletedItem">Slettet medie</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
     <key alias="chooseInternal">vælg en intern side</key>
@@ -1005,7 +1014,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortCreationDate">Oprettelsesdato</key>
     <key alias="sortDone">Sortering udført</key>
     <key alias="sortHelp">Træk de forskellige sider op eller ned for at indstille hvordan de skal arrangeres, eller klik på kolonnehovederne for at sortere hele rækken af sider</key>
-    <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid<br/><br/>Luk ikke dette vindue imens]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationCancelledHeader">Annulleret</key>
@@ -1250,6 +1259,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="chooseExtra">Vælg ekstra</key>
     <key alias="chooseDefault">Vælg standard</key>
     <key alias="areAdded">er tilføjet</key>
+
+    <key alias="maxItems">Maksimalt emner</key>
+    <key alias="maxItemsDescription">Efterlad blank eller sat til 0 ubegrænset for</key>
 
   </area>
   <area alias="contentTypeEditor">

@@ -949,7 +949,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sorteren gereed.</key>
     <key alias="sortHelp">Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolom-header om alle pagina's daarop te sorteren.</key>
-    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.<br/> <br/> Sluit dit venster niet tijdens het sorteren]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.]]></key>
   </area>
   <area alias="speechBubbles">
 	<key alias="validationFailedHeader">Validatie</key>
@@ -1077,7 +1077,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 
     <key alias="allowAllEditors">Alle editors toelaten</key>
     <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
-	<key alias="setAsDefault">Instellen als standaard</key>
+    <key alias="maxItems">Maximale artikelen</key>
+    <key alias="maxItemsDescription">Laat dit leeg of is ingesteld op -1 voor onbeperkt</key>
+	  <key alias="setAsDefault">Instellen als standaard</key>
     <key alias="chooseExtra">Kies extra</key>
     <key alias="chooseDefault">Kies standaard</key>
     <key alias="areAdded">zijn toegevoegd</key>

@@ -1065,7 +1065,7 @@
     <key alias="sortCreationDate">创建日期</key>
     <key alias="sortDone">排序完成。</key>
     <key alias="sortHelp">上下拖拽项目或单击列头进行排序</key>
-    <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…<br/><br/>请不要关闭窗口]]></key>
+    <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="validationFailedHeader">验证</key>

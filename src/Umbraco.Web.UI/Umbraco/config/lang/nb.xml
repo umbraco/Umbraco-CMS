@@ -733,7 +733,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortering ferdig.</key>
     <key alias="sortHelp">Dra elementene opp eller ned for å arrangere dem. Du kan også klikke kolonneoverskriftene for å sortere alt på en gang.</key>
-    <key alias="sortPleaseWait"><![CDATA[Vennligst vent. Elementene blir sortert, dette kan ta litt tid.<br/> <br/> Ikke lukk dette vinduet under sortering]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Vennligst vent. Elementene blir sortert, dette kan ta litt tid.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationFailedHeader">En feil oppsto</key>

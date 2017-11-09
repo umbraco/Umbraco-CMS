@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -21,6 +20,38 @@ namespace Umbraco.Core
     {
         private static volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private static readonly object LocalFilteredAssemblyCacheLocker = new object();
+        private static readonly List<string> NotifiedLoadExceptionAssemblies = new List<string>();
+        private static string[] _assembliesAcceptingLoadExceptions;
+
+        private static string[] AssembliesAcceptingLoadExceptions
+        {
+            get
+            {
+                if (_assembliesAcceptingLoadExceptions != null)
+                    return _assembliesAcceptingLoadExceptions;
+
+                var s = ConfigurationManager.AppSettings["Umbraco.AssembliesAcceptingLoadExceptions"];
+                return _assembliesAcceptingLoadExceptions = string.IsNullOrWhiteSpace(s)
+                    ? new string[0]
+                    : s.Split(',').Select(x => x.Trim()).ToArray();
+            }
+        }
+
+        private static bool AcceptsLoadExceptions(Assembly a)
+        {
+            if (AssembliesAcceptingLoadExceptions.Length == 0)
+                return false;
+            if (AssembliesAcceptingLoadExceptions.Length == 1 && AssembliesAcceptingLoadExceptions[0] == "*")
+                return true;
+            var name = a.GetName().Name; // simple name of the assembly
+            return AssembliesAcceptingLoadExceptions.Any(pattern =>
+            {
+                if (pattern.Length > name.Length) return false; // pattern longer than name
+                if (pattern.Length == name.Length) return pattern.InvariantEquals(name); // same length, must be identical
+                if (pattern[pattern.Length] != '.') return false; // pattern is shorter than name, must end with dot
+                return name.StartsWith(pattern); // and name must start with pattern
+            });
+        }
 
         /// <summary>
         /// lazily load a reference to all assemblies and only local assemblies.
@@ -45,7 +76,7 @@ namespace Umbraco.Core
             HashSet<Assembly> assemblies = null;
             try
             {
-                var isHosted = HttpContext.Current != null || HostingEnvironment.IsHosted;
+                var isHosted = IOHelper.IsHosted;
 
                 try
                 {
@@ -529,8 +560,21 @@ namespace Umbraco.Core
                 foreach (var loaderException in rex.LoaderExceptions.WhereNotNull())
                     AppendLoaderException(sb, loaderException);
 
-                // rethrow with new message
-                throw new ReflectionTypeLoadException(rex.Types, rex.LoaderExceptions, sb.ToString());
+                var ex = new ReflectionTypeLoadException(rex.Types, rex.LoaderExceptions, sb.ToString());
+
+                // rethrow with new message, unless accepted
+                if (AcceptsLoadExceptions(a) == false) throw ex;
+
+                // log a warning, and return what we can
+                lock (NotifiedLoadExceptionAssemblies)
+                {
+                    if (NotifiedLoadExceptionAssemblies.Contains(a.FullName) == false)
+                    {
+                        NotifiedLoadExceptionAssemblies.Add(a.FullName);
+                        LogHelper.WarnWithException(typeof(TypeFinder), "Could not load all types from " + a.GetName().Name + ".", ex);
+                    }
+                }
+                return rex.Types.WhereNotNull().ToArray();
             }
         }
 

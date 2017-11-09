@@ -1,5 +1,5 @@
 <h3>Hours of Umbraco training videos are only a click away</h3>
-<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a class="btn-link -underline"  href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco, then visit <a class="btn-link -underline"  href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos.</p>
 
 <div class="row-fluid"
 	ng-init="init('http://umbraco.tv/videos/developer/chapterrss?sort=no')"
@@ -7,14 +7,12 @@
 
 	<ul class="thumbnails" >
 		<li class="span2" ng-repeat="video in videos">
-	    	<div class="thumbnail" style="margin-right: 20px; padding: 20px;">
-		    	<a class="btn-link -underline"  target="_blank" href="{{video.link}}" title="{{video.title}}">
-		    		<img ng-src="{{video.thumbnail}}"  alt="{{video.title}}">
-		    	</a>
-		    	<a target="_blank" href="{{video.link}}" title="{{video.title}}">
-		    		<div style="font-weight: bold; text-align: center; margin: 20px 0 0;">{{video.title}}</div>
-		    	</a>
-	    	</div>
+            <a class="btn-link" target="_blank" href="{{video.link}}" title="{{video.title}}">
+                <div class="thumbnail" style="margin-right: 20px; padding: 20px;">
+                    <img ng-src="{{video.thumbnail}}" alt="{{video.title}}">
+                    <div style="font-weight: bold; text-align: center; margin: 20px 0 0;">{{video.title}}</div>
+                </div>
+            </a>
 	    </li>
 	</ul>
 </div>
