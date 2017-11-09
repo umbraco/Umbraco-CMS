@@ -341,7 +341,7 @@
             },
             {
                 element: "#applications [data-element='section-media']",
-                title: "Navigate to the <b>Media</b> section",
+                title: "Navigate to the Media section",
                 content: "The <b>media</b> section is where you manage all your media items.",
                 event: "click",
                 backdropOpacity: 0.6
