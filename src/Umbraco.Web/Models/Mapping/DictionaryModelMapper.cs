@@ -22,7 +22,13 @@
             var lazyDictionaryService = new Lazy<ILocalizationService>(() => applicationContext.Services.LocalizationService);
             
             config.CreateMap<IDictionaryItem, DictionaryDisplay>()
-                .ForMember(x => x.Translations, opt  => opt.Ignore())
+                .ForMember(x => x.Translations, expression => expression.Ignore())
+                .ForMember(x => x.Notifications, expression => expression.Ignore())
+                .ForMember(x => x.Icon, expression => expression.Ignore())
+                .ForMember(x => x.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.Path, expression => expression.Ignore())
+                .ForMember(x => x.AdditionalData, expression => expression.Ignore())
                 .ForMember(
                     x => x.Udi,
                     expression => expression.MapFrom(
