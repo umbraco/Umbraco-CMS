@@ -887,7 +887,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">ソートが完了しました。</key>
     <key alias="sortHelp">上下にアイテムをドラッグするなどして適当に配置したり、列のヘッダーをクリックしてコレクション全体をソートできます</key>
-    <key alias="sortPleaseWait"><![CDATA[ 項目の並べ替えには少し時間がかかります。しばらくお待ちください。<br/> <br/> 並び替え中はウィンドウを閉じないでください。]]></key>
+    <key alias="sortPleaseWait"><![CDATA[ 項目の並べ替えには少し時間がかかります。しばらくお待ちください。]]></key>
   </area>
   <area alias="speechBubbles">
 	<key alias="validationFailedHeader">検証</key>

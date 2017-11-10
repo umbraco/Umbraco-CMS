@@ -658,7 +658,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">정렬 완료</key>
     <key alias="sortHelp">다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다</key>
-    <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다<br/><br/>정렬하는 동안 이 창을 닫지 마십시오]]></key>
+    <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">3rd party add-in 때문에 발행이 취소되었습니다.</key>
