@@ -17,8 +17,8 @@ namespace Umbraco.Core.Models.Rdbms
         public int Id { get; set; }
 
         [Column("nodeId")]
-        [ForeignKey(typeof(ContentDto), Column = "nodeId")]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId")]
+        [ForeignKey(typeof(ContentDto))]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeIdVersionId", ForColumns = "nodeId, versionId")]
         public int NodeId { get; set; }
 
         [Column("versionId")]

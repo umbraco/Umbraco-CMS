@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new ContentMapper().Map(new SqlCeSyntaxProvider(), "Published");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsDocument].[published]"));
+            Assert.That(column, Is.EqualTo("[uDocument].[published]"));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new ContentMapper().Map(new SqlCeSyntaxProvider(), "Version");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionId]"));
+            Assert.That(column, Is.EqualTo("[uContentVersion].[versionId]"));
         }
     }
 }

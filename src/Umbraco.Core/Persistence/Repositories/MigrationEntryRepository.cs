@@ -35,8 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MigrationEntryFactory();
             var entity = factory.BuildEntity(dto);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
 
             return entity;
@@ -82,14 +81,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "id = @Id";
+            return "id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                "DELETE FROM umbracoMigration WHERE id = @Id"
+                "DELETE FROM umbracoMigration WHERE id = @id"
             };
             return list;
         }

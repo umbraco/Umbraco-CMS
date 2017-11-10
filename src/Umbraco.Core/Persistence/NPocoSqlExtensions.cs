@@ -26,9 +26,9 @@ namespace Umbraco.Core.Persistence
         /// <param name="sql">The Sql statement.</param>
         /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate)
+        public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
         {
-            var expresionist = new PocoToSqlExpressionVisitor<TDto>(sql.SqlContext);
+            var expresionist = new PocoToSqlExpressionVisitor<TDto>(sql.SqlContext, alias);
             var whereExpression = expresionist.Visit(predicate);
             sql.Where(whereExpression, expresionist.GetSqlParameters());
             return sql;
@@ -148,13 +148,18 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
+        /// <param name="alias">An optional table alias</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> From<TDto>(this Sql<ISqlContext> sql)
+        public static Sql<ISqlContext> From<TDto>(this Sql<ISqlContext> sql, string alias = null)
         {
             var type = typeof (TDto);
             var tableName = type.GetTableName();
 
-            sql.From(sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName));
+            var from = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
+            if (!string.IsNullOrWhiteSpace(alias))
+                from += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+            sql.From(from);
+
             return sql;
         }
 
@@ -394,12 +399,12 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TDto2">The type of Dto 2.</typeparam>
         /// <param name="sqlJoin">The SqlJoin statement.</param>
         /// <param name="predicate">A predicate to transform and use as the ON clause body.</param>
-        /// <param name="alias1">An optional alias for Dto 1 table.</param>
-        /// <param name="alias2">An optional alias for Dto 2 table.</param>
+        /// <param name="aliasLeft">An optional alias for Dto 1 table.</param>
+        /// <param name="aliasRight">An optional alias for Dto 2 table.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> On<TDto1, TDto2>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, bool>> predicate, string alias1 = null, string alias2 = null)
+        public static Sql<ISqlContext> On<TDto1, TDto2>(this Sql<ISqlContext>.SqlJoinClause<ISqlContext> sqlJoin, Expression<Func<TDto1, TDto2, bool>> predicate, string aliasLeft = null, string aliasRight = null)
         {
-            var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlJoin.SqlContext, alias1, alias2);
+            var expresionist = new PocoToSqlExpressionVisitor<TDto1, TDto2>(sqlJoin.SqlContext, aliasLeft, aliasRight);
             var onExpression = expresionist.Visit(predicate);
             return sqlJoin.On(onExpression, expresionist.GetSqlParameters());
         }
@@ -630,6 +635,82 @@ namespace Umbraco.Core.Persistence
         public static string Columns<TDto>(this Sql<ISqlContext> sql, string alias, params Expression<Func<TDto, object>>[] fields)
         {
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, tableAlias: alias));
+        }
+
+        #endregion
+
+        #region Delete
+
+        public static Sql<ISqlContext> Delete(this Sql<ISqlContext> sql)
+        {
+            sql.Append("DELETE");
+            return sql;
+        }
+
+        public static Sql<ISqlContext> Delete<TDto>(this Sql<ISqlContext> sql)
+        {
+            var type = typeof(TDto);
+            var tableName = type.GetTableName();
+
+            sql.Append($"DELETE {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
+            return sql;
+        }
+
+        #endregion
+
+        #region Update
+
+        public static Sql<ISqlContext> Update(this Sql<ISqlContext> sql)
+        {
+            sql.Append("UPDATE");
+            return sql;
+        }
+
+        public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql)
+        {
+            var type = typeof(TDto);
+            var tableName = type.GetTableName();
+
+            sql.Append($"UPDATE {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)}");
+            return sql;
+        }
+
+        public static Sql<ISqlContext> Update<TDto>(this Sql<ISqlContext> sql, Func<SqlUpd<TDto>, SqlUpd<TDto>> updates)
+        {
+            var type = typeof(TDto);
+            var tableName = type.GetTableName();
+
+            sql.Append($"UPDATE {sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName)} SET");
+
+            var u = new SqlUpd<TDto>(sql.SqlContext);
+            u = updates(u);
+            for (var i = 0; i < u.SetExpressions.Count; i++)
+            {
+                var setExpression = u.SetExpressions[i];
+                sql.Append(setExpression.Item1 + "=@0" + (i < u.SetExpressions.Count - 1 ? "," : ""), setExpression.Item2);
+            }
+
+            return sql;
+        }
+
+        public class SqlUpd<TDto>
+        {
+            private readonly ISqlContext _sqlContext;
+            private readonly List<Tuple<string, object>> _setExpressions = new List<Tuple<string, object>>();
+
+            public SqlUpd(ISqlContext sqlContext)
+            {
+                _sqlContext = sqlContext;
+            }
+
+            public SqlUpd<TDto> Set(Expression<Func<TDto, object>> fieldSelector, object value)
+            {
+                var fieldName = GetFieldName(fieldSelector, _sqlContext.SqlSyntax);
+                _setExpressions.Add(new Tuple<string, object>(fieldName, value));
+                return this;
+            }
+
+            public List<Tuple<string, object>> SetExpressions => _setExpressions;
         }
 
         #endregion

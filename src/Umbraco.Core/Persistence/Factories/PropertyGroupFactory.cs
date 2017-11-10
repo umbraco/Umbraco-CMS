@@ -79,8 +79,7 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyType.CreateDate = _createDate;
                             propertyType.UpdateDate = _updateDate;
 
-                            //on initial construction we don't want to have dirty properties tracked
-                            // http://issues.umbraco.org/issue/U4-1946
+                            // reset dirty initial properties (U4-1946)
                             propertyType.ResetDirtyProperties(false);
                             group.PropertyTypes.Add(propertyType);
                         }
@@ -89,8 +88,8 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyType.EnableChangeTracking();
                         }
                     }
-                    //on initial construction we don't want to have dirty properties tracked
-                    // http://issues.umbraco.org/issue/U4-1946
+
+                    // reset dirty initial properties (U4-1946)
                     group.ResetDirtyProperties(false);
                     propertyGroups.Add(group);
                 }

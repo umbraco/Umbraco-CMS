@@ -323,7 +323,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="value"></param>
         /// <returns>True if valid, otherwise false</returns>
-        public bool IsPropertyValueValid(object value)
+        public bool IsValidPropertyValue(object value)
         {
             //If the Property is mandatory and value is null or empty, return false as the validation failed
             if (Mandatory && (value == null || string.IsNullOrEmpty(value.ToString())))

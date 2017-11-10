@@ -271,17 +271,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUserGroup.id = @Id";
+            return "umbracoUserGroup.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                            {
-                               "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @Id",
-                               "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @Id",
-                               "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @Id",
-                               "DELETE FROM umbracoUserGroup WHERE id = @Id"
+                               "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @id",
+                               "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
+                               "DELETE FROM umbracoUserGroup WHERE id = @id"
                            };
             return list;
         }

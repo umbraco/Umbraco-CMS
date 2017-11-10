@@ -92,6 +92,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
@@ -123,6 +124,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
@@ -163,6 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
@@ -206,6 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
@@ -247,6 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
@@ -284,6 +289,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
@@ -329,6 +335,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -374,6 +381,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -420,6 +428,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -456,6 +465,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -497,6 +507,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -542,6 +553,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -588,6 +600,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -633,6 +646,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -681,6 +695,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -740,6 +755,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -792,6 +808,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
@@ -833,6 +850,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
 
@@ -918,6 +936,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Flush();
 

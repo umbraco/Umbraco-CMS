@@ -64,14 +64,14 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         protected override string GetBaseWhereClause()
         {
-            return "id = @Id";
+            return "id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoRedirectUrl WHERE id = @Id"
+                    "DELETE FROM umbracoRedirectUrl WHERE id = @id"
                 };
             return list;
         }

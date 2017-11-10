@@ -115,20 +115,20 @@ namespace Umbraco.Core.Persistence.Repositories
                     sql = sql.Select<MemberDto>(r =>
                         r.Select(x => x.ContentVersionDto)
                          .Select(x => x.ContentDto, r1 =>
-                                r1.Select(x => x.NodeDto)));
+                            r1.Select(x => x.NodeDto)));
                     break;
             }
 
             sql
                 .From<MemberDto>()
-                .InnerJoin<ContentDto>().On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
 
                 // joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
                 // types by default on the document and media repo's so we can query by content type there too.
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId);
+                .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId);
 
             sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause() // fixme - can we kill / refactor this?
         {
-            return "umbracoNode.id = @Id";
+            return "umbracoNode.id = @id";
         }
 
         // fixme wtf?
@@ -170,19 +170,19 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               "DELETE FROM cmsTask WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
-                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
-                               "DELETE FROM umbracoRelation WHERE childId = @Id",
-                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
-                               "DELETE FROM cmsMember2MemberGroup WHERE Member = @Id",
-                               "DELETE FROM cmsMember WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE ContentId = @Id",
-                               "DELETE FROM cmsContentXml WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
+                               "DELETE FROM cmsTask WHERE nodeId = @id",
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+                               "DELETE FROM umbracoRelation WHERE parentId = @id",
+                               "DELETE FROM umbracoRelation WHERE childId = @id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @id",
+                               "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
+                               "DELETE FROM cmsMember WHERE nodeId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE ContentId = @id",
+                               "DELETE FROM cmsContentXml WHERE nodeId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                               "DELETE FROM umbracoNode WHERE id = @id"
                            };
             return list;
         }
@@ -235,10 +235,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = MemberFactory.BuildDto(entity);
 
             // derive path and level from parent
-            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
-            );
-            var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+            var parent = GetParentNodeDto(entity.ParentId);
             var level = parent.Level + 1;
 
             // get sort order
@@ -252,10 +249,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // see if there's a reserved identifier for this unique id
             // and then either update or insert the node dto
-            template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetReservedId", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
-            );
-            var id = Database.ExecuteScalar<int>(template.Sql(nodeDto.UniqueId)); // fixme can we mix named & non-named?
+            var id = GetReservedId(nodeDto.UniqueId);
             if (id > 0)
             {
                 nodeDto.NodeId = id;
@@ -306,14 +300,9 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
-
-            // assign ids to properties, using propertyTypeId as a key
-            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
-            foreach (var property in entity.Properties)
-                property.Id = xids[property.PropertyTypeId];
 
             UpdateEntityTags(entity, _tagRepository);
 
@@ -334,10 +323,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // if parent has changed, get path, level and sort order
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
-                    tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
-                );
-                var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+                var parent = GetParentNodeDto(entity.ParentId);
 
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
@@ -351,19 +337,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var nodeDto = dto.ContentDto.NodeDto;
             Database.Update(nodeDto);
 
-            // update the content dto - only if the content type has changed
-            var origContentDto = Database.Fetch<ContentDto>(SqlContext.Sql().Select<ContentDto>().From<ContentDto>().Where<ContentDto>(x => x.NodeId == entity.Id)).FirstOrDefault();
-            if (origContentDto.ContentTypeId != entity.ContentTypeId)
-            {
-                dto.ContentDto.Id = origContentDto.Id; // fixme - annoying, needed?
-                Database.Update(dto.ContentDto);
-            }
+            // update the content dto
+            Database.Update(dto.ContentDto);
 
-            // insert or update the content version dtos
-            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { /*Version =*/ entity.Version });
-            dto.ContentVersionDto.Id = contentVerDto.Id;
-            //Updates the current version - cmsContentVersion
-            //Assumes a Version guid exists and Version date (modified date) has been set/updated
+            // update the content version dto
+            // fixme this pk thing is annoying - could we store that ID somewhere?
+            var id = Database.ExecuteScalar<int>(SqlContext.Sql().Select<ContentVersionDto>(x => x.Id).From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == entity.Version));
+            dto.ContentVersionDto.Id = id;
             Database.Update(dto.ContentVersionDto);
 
             // update the member dto
@@ -383,20 +363,12 @@ namespace Umbraco.Core.Persistence.Repositories
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // update the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
+            // replace the property data
+            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version);
+            Database.Execute(deletePropertyDataSql);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
             foreach (var propertyDataDto in propertyDataDtos)
-            {
-                if (propertyDataDto.Id > 0)
-                    Database.Update(propertyDataDto);
-                else
-                    Database.Insert(propertyDataDto);
-            }
-
-            // assign ids to properties, using propertyTypeId as a key
-            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
-            foreach (var property in entity.Properties)
-                property.Id = xids[property.PropertyTypeId];
+                Database.Insert(propertyDataDto);
 
             UpdateEntityTags(entity, _tagRepository);
 
@@ -513,37 +485,22 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Gets paged member results
+        /// Gets paged member results.
         /// </summary>
-        /// <param name="query">
-        /// The where clause, if this is null all records are queried
-        /// </param>
-        /// <param name="pageIndex">Index of the page.</param>
-        /// <param name="pageSize">Size of the page.</param>
-        /// <param name="totalRecords">The total records.</param>
-        /// <param name="orderBy">The order by column</param>
-        /// <param name="orderDirection">The order direction.</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter">Search query</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using NPoco paging (SQL paging)
-        /// </remarks>
         public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null, bool newest = true)
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IMember> filter = null)
         {
             Sql<ISqlContext> filterSql = null;
+
             if (filter != null)
             {
                 filterSql = Sql();
                 foreach (var clause in filter.GetWhereClauses())
-                {
                     filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
-                }
             }
 
             return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField, "cmsMember",
+                x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }
 
@@ -638,17 +595,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var properties = GetPropertyCollections(new List<TempContent<Member>> { temp });
             member.Properties = properties[dto.ContentVersionDto.VersionId];
 
-            // clear dirty props on init - U4-1943
+            // reset dirty initial properties (U4-1946)
             member.ResetDirtyProperties(false);
             return member;
-        }
-
-        private int GetNewChildSortOrder(int parentId, int first)
-        {
-            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetSortOrder", tsql =>
-                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
-            );
-            return Database.ExecuteScalar<int>(template.Sql(parentId)) + 1; // fixme can we mix named & non-named?
         }
     }
 }

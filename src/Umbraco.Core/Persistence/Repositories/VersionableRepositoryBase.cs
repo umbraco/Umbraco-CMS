@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
                 tsql.Select<ContentVersionDto>(x => x.VersionId)
                     .From<ContentVersionDto>()
-                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.ArgValue<int>("nodeId"))
                     .OrderByDescending<ContentVersionDto>(x => x.Current) // current '1' comes before others '0'
                     .AndByDescending<ContentVersionDto>(x => x.VersionDate) // most recent first
             );
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // get the version we want to delete
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
-                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == SqlTemplate.Arg<Guid>("versionId"))
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == SqlTemplate.ArgValue<Guid>("versionId"))
             );
             var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(versionId)).FirstOrDefault();
 
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // get the versions we want to delete, excluding the current one
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
-                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("date"))
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.ArgValue<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.ArgValue<DateTime>("date"))
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(nodeId, versionDate)); // fixme ok params?
             foreach (var versionDto in versionDtos)
@@ -245,7 +245,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        private Sql<ISqlContext> PrepareSqlForPagedResults(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField, string table)
+        // sql: the main sql
+        // filterSql: a filtering ? fixme different from v7?
+        // orderBy: the name of an ordering field
+        // orderDirection: direction for orderBy
+        // orderBySystemField: whether orderBy is a system field or a custom field (property value)
+        private Sql<ISqlContext> PrepareSqlForPagedResults(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField)
         {
             if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
 
@@ -263,7 +268,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // else apply sort
             var dbfield = orderBySystemField
                 ? GetOrderBySystemField(ref psql, orderBy)
-                : GetOrderByNonSystemField(ref psql, orderBy, table);
+                : GetOrderByNonSystemField(ref psql, orderBy);
 
             if (orderDirection == Direction.Ascending)
                 psql.OrderBy(dbfield);
@@ -272,23 +277,23 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // no matter what we always MUST order the result also by umbracoNode.id to ensure that all records being ordered by are unique.
             // if we do not do this then we end up with issues where we are ordering by a field that has duplicate values (i.e. the 'text' column
-            // is empty for many nodes)
-            // see: http://issues.umbraco.org/issue/U4-8831
-            // fixme - commented out is 7.6 and looks suspicious ??!!
-            //if (orderBySystemField && orderBy.InvariantEquals("umbraconode.id") == false)
+            // is empty for many nodes) - see: http://issues.umbraco.org/issue/U4-8831
+
             dbfield = GetDatabaseFieldNameForOrderBy("umbracoNode", "id");
             if (orderBySystemField == false || orderBy.InvariantEquals(dbfield) == false)
             {
+                // get alias, if aliased
                 var matches = VersionableRepositoryBaseAliasRegex.For(SqlContext.SqlSyntax).Matches(sql.SQL);
                 var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
-                if (match != null)
-                    dbfield = match.Groups[2].Value;
+                if (match != null) dbfield = match.Groups[2].Value;
+
+                // add field
                 psql.OrderBy(dbfield);
             }
 
-            // fixme - temp - for the time being NPoco PagingHelper cannot deal with multiline
-            psql = new Sql<ISqlContext>(psql.SqlContext, psql.SQL.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " "), psql.Arguments);
-
+            // create prepared sql
+            // ensure it's single-line as NPoco PagingHelper has issues with multi-lines
+            psql = new Sql<ISqlContext>(psql.SqlContext, psql.SQL.ToSingleLine(), psql.Arguments);
             return psql;
         }
 
@@ -309,60 +314,39 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // note: ContentTypeAlias is not properly managed because it's not part of the query to begin with!
 
+            // get alias, if aliased
             var matches = VersionableRepositoryBaseAliasRegex.For(SqlContext.SqlSyntax).Matches(sql.SQL);
             var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
-            if (match != null)
-                dbfield = match.Groups[2].Value;
+            if (match != null) dbfield = match.Groups[2].Value;
 
             return dbfield;
         }
 
-        private string GetOrderByNonSystemField(ref Sql<ISqlContext> sql, string orderBy, string table)
+        private string GetOrderByNonSystemField(ref Sql<ISqlContext> sql, string orderBy)
         {
-            // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
-            // from most recent content version for the given order by field
+            // sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through value
+            // from 'current' content version for the given order by field
             var sortedInt = string.Format(SqlContext.SqlSyntax.ConvertIntegerToOrderableString, "intValue");
             var sortedDate = string.Format(SqlContext.SqlSyntax.ConvertDateToOrderableString, "dateValue");
             var sortedString = "COALESCE(varcharValue,'')"; // assuming COALESCE is ok for all syntaxes
             var sortedDecimal = string.Format(SqlContext.SqlSyntax.ConvertDecimalToOrderableString, "decimalValue");
 
-            // variable query fragments that depend on what we are querying
-            string andVersion, andNewest, idField;
-            switch (table)
-            {
-                case "cmsDocument":
-                    andVersion = " AND cpd.versionId = cd.versionId";
-                    andNewest = " AND cd.newest = 1";
-                    idField = "nodeId";
-                    break;
-                case "cmsMember":
-                    andVersion = string.Empty;
-                    andNewest = string.Empty;
-                    idField = "nodeId";
-                    break;
-                case "cmsContentVersion":
-                    andVersion = " AND cpd.versionId = cd.versionId";
-                    andNewest = string.Empty;
-                    idField = "contentId";
-                    break;
-                default:
-                    throw new NotSupportedException($"Table {table} is not supported.");
-            }
-
             // needs to be an outer join since there's no guarantee that any of the nodes have values for this property
-            var outerJoinTempTable = $@"LEFT OUTER JOIN (
-                    SELECT CASE
-                        WHEN intValue IS NOT NULL THEN {sortedInt}
-                        WHEN decimalValue IS NOT NULL THEN {sortedDecimal}
-                        WHEN dateValue IS NOT NULL THEN {sortedDate}
-                        ELSE {sortedString}
-                    END AS CustomPropVal,
-                    cd.{idField} AS CustomPropValContentId
-                    FROM {table} cd
-                    INNER JOIN " + Constants.DatabaseSchema.Tables.PropertyData + @" cpd ON cpd.nodeId = cd.{idField}{andVersion}
-                    INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
-                    WHERE cpt.Alias = @{sql.Arguments.Length}{andNewest}) AS CustomPropData
-                    ON CustomPropData.CustomPropValContentId = umbracoNode.id "; // trailing space is important!
+            var innerSql = Sql().Select($@"CASE
+                            WHEN intValue IS NOT NULL THEN {sortedInt}
+                            WHEN decimalValue IS NOT NULL THEN {sortedDecimal}
+                            WHEN dateValue IS NOT NULL THEN {sortedDate}
+                            ELSE {sortedString}
+                        END AS customPropVal,
+                        cver.nodeId AS customPropNodeId")
+                .From<ContentVersionDto>("cver")
+                .InnerJoin<PropertyDataDto>("opdata").On<ContentVersionDto, PropertyDataDto>((left, right) => left.NodeId == right.NodeId && left.VersionId == right.VersionId && left.Current, "cver", "opdata")
+                .InnerJoin<PropertyTypeDto>("optype").On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "opdata", "optype")
+                .Where<PropertyTypeDto>(x => x.Alias == "", "optype");
+
+            var innerSqlString = innerSql.SQL.Replace("@0", "1").Replace("@1", "@" + sql.Arguments.Length);
+            var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
+                ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
 
             // insert this just above the last WHERE
             var pos = sql.SQL.InvariantIndexOf("WHERE");
@@ -373,44 +357,20 @@ namespace Umbraco.Core.Persistence.Repositories
             newArgs.Add(orderBy);
 
             // insert the SQL selected field, too, else ordering cannot work
-            if (sql.SQL.StartsWith("SELECT ") == false) throw new Exception("Oops, SELECT not found.");
-            newSql = newSql.Insert("SELECT ".Length, "CustomPropData.CustomPropVal, ");
+            if (sql.SQL.StartsWith("SELECT ") == false) throw new Exception("Oops: SELECT not found.");
+            newSql = newSql.Insert("SELECT ".Length, "customPropData.customPropVal, ");
 
             sql = new Sql<ISqlContext>(sql.SqlContext, newSql, newArgs.ToArray());
 
             // and order by the custom field
-            return "CustomPropData.CustomPropVal";
+            return "customPropData.customPropVal";
         }
 
-        // fixme
-        //
-        // mergin from 7.6... well we cannot just merge what comes from 7.6 - too much distance
-        //
-        // need to understand what's been done in 7.6 and why, and reproduce here
-        // - 2a4e73c on 01/22 uses static factories, well we should use them everywhere but l8tr
-        // - c7b505f on 01/24 introduces QueryType and 2 queries for fetching content <<< why?
-        //                      because in 7.6, ProcessQuery calls GetPropertyCollection passing the sql which runs again
-        //                      but in v8 GetPropertyCollection has been refactored to use WhereIn() instead of a subquery
-        //                      as in most cases we won't get more than 2000 items -> nothing to do
-        // - 7f905bc on 01/26 fixes a "nasty" issue with reading properties
-        // - f192f24 on 01/31 fixes paged queries getting *all* property data
-        // - 86b2dac on 01/31 introduces the whole PagingQuery thing
-        // - 32d757b on 01/31 introduces the QueryType.Single vs .Many difference
-        // - af287c3 on 02/16 improves corruption handling for content (published/newest)
-        // - (more) on 02/22-27 fixes various minor issues
-        //
-        // so we want
-        // - to deal with the number of queries and getting *all* property data and outer joins
-        // - to deal with published/newest corruption
-        //
-        // but getting property data was already optimized, and we prob don't need the two queries thing
-        // so... doing our best but not really merging v7
-        // see also Content/Member/Media repositories
-
-        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
-            Func<List<TDto>, IEnumerable<TEntity>> mapper,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string table,
-            Sql<ISqlContext> filterSql = null)
+        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query,
+            long pageIndex, int pageSize, out long totalRecords,
+            Func<List<TDto>, IEnumerable<TEntity>> mapDtos,
+            string orderBy, Direction orderDirection, bool orderBySystemField,
+            Sql<ISqlContext> filterSql = null) // fixme filter is different on v7?
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
@@ -419,14 +379,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlNodeIds = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
 
             // sort and filter
-            sqlNodeIds = PrepareSqlForPagedResults(sqlNodeIds, filterSql, orderBy, orderDirection, orderBySystemField, table);
+            sqlNodeIds = PrepareSqlForPagedResults(sqlNodeIds, filterSql, orderBy, orderDirection, orderBySystemField);
 
             // get a page of DTOs and the total count
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIds);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
             // map the DTOs and return
-            return mapper(pagedResult.Items);
+            return mapDtos(pagedResult.Items);
         }
 
         protected IDictionary<Guid, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps)
@@ -486,7 +446,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var indexedPropertyDataDtos = new Dictionary<Guid, List<PropertyDataDto>>();
             foreach (var dto in allPropertyDataDtos)
             {
-                var version = dto.VersionId.Value;
+                var version = dto.VersionId;
                 if (indexedPropertyDataDtos.TryGetValue(version, out var list) == false)
                     indexedPropertyDataDtos[version] = list = new List<PropertyDataDto>();
                 list.Add(dto);
@@ -1186,6 +1146,50 @@ ORDER BY nodeId, versionId, propertytypeid
             }
         }
         */
+
+        #endregion
+
+        #region Utilities
+
+        protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.EnsureUniqueNodeName", tsql => tsql
+                .Select<NodeDto>(x => x.NodeId, x => x.Text)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.ArgValue<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.ArgValue<int>("parentId")));
+
+            var sql = template.Sql(NodeObjectTypeId, parentId);
+            var names = Database.Fetch<SimilarNodeName>(sql);
+
+            return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        }
+
+        protected virtual int GetNewChildSortOrder(int parentId, int first)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetSortOrder", tsql =>
+                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.ArgValue<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+            );
+
+            return Database.ExecuteScalar<int>(template.Sql(new { parentId })) + 1;
+        }
+
+        protected virtual NodeDto GetParentNodeDto(int parentId)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetParentNode", tsql =>
+                tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.ArgValue<int>("parentId"))
+            );
+
+            return Database.Fetch<NodeDto>(template.Sql(parentId)).First();
+        }
+
+        protected virtual int GetReservedId(Guid uniqueId)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetReservedId", tsql =>
+                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.ArgValue<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            );
+            var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
+            return id ?? 0;
+        }
 
         #endregion
     }

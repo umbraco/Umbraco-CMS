@@ -33,9 +33,9 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Trashed = nodeDto.Trashed;
 
                 content.CreatorId = nodeDto.UserId ?? 0;
-                // fixme missing writerId - which then should move to nodeDto
+                content.WriterId = dto.ContentDto.WriterUserId;
                 content.CreateDate = nodeDto.CreateDate;
-                content.UpdateDate = contentVersionDto.VersionDate;
+                content.UpdateDate = dto.ContentDto.UpdateDate;
 
                 content.ProviderUserKey = content.Key; // fixme explain
 
@@ -73,9 +73,10 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new ContentDto
             {
-                // Id = _primaryKey if >0 - fixme - kill that id entirely
                 NodeId = entity.Id,
                 ContentTypeId = entity.ContentTypeId,
+                WriterUserId = entity.WriterId,
+                UpdateDate = entity.UpdateDate,
 
                 NodeDto = BuildNodeDto(entity)
             };

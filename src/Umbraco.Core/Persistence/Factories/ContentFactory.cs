@@ -26,8 +26,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Key = nodeDto.UniqueId;
                 content.Version = contentVersionDto.VersionId;
 
-                content.Name = nodeDto.Text;
-                content.NodeName = nodeDto.Text;
+                content.Name = contentVersionDto.Text;
+                content.NodeName = contentVersionDto.Text;
 
                 content.Path = nodeDto.Path;
                 content.Level = nodeDto.Level;
@@ -36,9 +36,9 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Trashed = nodeDto.Trashed;
 
                 content.CreatorId = nodeDto.UserId ?? 0;
-                content.WriterId = dto.WriterUserId;
+                content.WriterId = contentDto.WriterUserId;
                 content.CreateDate = nodeDto.CreateDate;
-                content.UpdateDate = contentVersionDto.VersionDate;
+                content.UpdateDate = contentDto.UpdateDate;
 
                 content.Published = dto.Published;
                 content.ExpireDate = dto.ExpiresDate;
@@ -68,10 +68,8 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 Published = entity.Published,
-                WriterUserId = entity.WriterId,
                 ReleaseDate = entity.ReleaseDate,
                 ExpiresDate = entity.ExpireDate,
-                UpdateDate = entity.UpdateDate,
 
                 ContentDto = contentDto,
                 DocumentVersionDto = BuildDocumentVersionDto(entity, contentDto)
@@ -84,9 +82,10 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new ContentDto
             {
-                // Id = _primaryKey if >0 - fixme - kill that id entirely
                 NodeId = entity.Id,
                 ContentTypeId = entity.ContentTypeId,
+                WriterUserId = entity.WriterId,
+                UpdateDate = entity.UpdateDate,
 
                 NodeDto = BuildNodeDto(entity)
             };
@@ -108,7 +107,7 @@ namespace Umbraco.Core.Persistence.Factories
                 UserId = entity.CreatorId,
                 Text = entity.Name,
                 NodeObjectType = Constants.ObjectTypes.Document,
-                CreateDate = entity.CreateDate,
+                CreateDate = entity.CreateDate
             };
 
             return dto;
@@ -119,7 +118,7 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new DocumentVersionDto
             {
                 //Id =, // fixme
-                TemplateId = entity.Template?.Id ?? 0,
+                TemplateId = entity.Template?.Id,
 
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto)
             };

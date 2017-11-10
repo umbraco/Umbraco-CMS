@@ -56,8 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new ExternalLoginFactory();
             var entity = factory.BuildEntity(dto);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
 
             return entity;
@@ -90,8 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new ExternalLoginFactory();
             foreach (var entity in dtos.Select(factory.BuildEntity))
             {
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
 
                 yield return entity;
@@ -125,14 +123,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoExternalLogin.id = @Id";
+            return "umbracoExternalLogin.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoExternalLogin WHERE id = @Id"
+                    "DELETE FROM umbracoExternalLogin WHERE id = @id"
                 };
             return list;
         }

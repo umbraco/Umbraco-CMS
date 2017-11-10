@@ -13,11 +13,13 @@ namespace Umbraco.Core.Persistence.Querying
     internal class PocoToSqlExpressionVisitor<TDto> : ExpressionVisitorBase
     {
         private readonly PocoData _pd;
+        private readonly string _alias;
 
-        public PocoToSqlExpressionVisitor(ISqlContext sqlContext)
+        public PocoToSqlExpressionVisitor(ISqlContext sqlContext, string alias)
             : base(sqlContext.SqlSyntax)
         {
             _pd = sqlContext.PocoDataFactory.ForType(typeof(TDto));
+            _alias = alias;
         }
 
         protected override string VisitMethodCall(MethodCallExpression m)
@@ -26,7 +28,7 @@ namespace Umbraco.Core.Persistence.Querying
             if (declaring != typeof (SqlTemplate))
                 return base.VisitMethodCall(m);
 
-            if (m.Method.Name != "Arg" && m.Method.Name != "ArgIn")
+            if (m.Method.Name != "ArgValue" && m.Method.Name != "ArgValueIn")
                 throw new NotSupportedException($"Method SqlTemplate.{m.Method.Name} is not supported.");
 
             var parameters = m.Method.GetParameters();
@@ -48,7 +50,7 @@ namespace Umbraco.Core.Persistence.Querying
                 name = getter().ToString();
             }
 
-            SqlParameters.Add(RemoveQuote(name));
+            SqlParameters.Add(new SqlTemplate.TemplateArg(RemoveQuote(name)));
 
             return Visited
                 ? string.Empty
@@ -59,22 +61,12 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter && m.Expression.Type == typeof(TDto))
             {
-                //don't execute if compiled
-                if (Visited == false)
-                    return GetFieldName(_pd, m.Member.Name);
-
-                //already compiled, return
-                return string.Empty;
+                return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name, _alias);
             }
 
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
             {
-                //don't execute if compiled
-                if (Visited == false)
-                    return GetFieldName(_pd, m.Member.Name);
-
-                //already compiled, return
-                return string.Empty;
+                return Visited ? string.Empty : GetFieldName(_pd, m.Member.Name, _alias);
             }
 
             var member = Expression.Convert(m, typeof(object));
@@ -84,21 +76,16 @@ namespace Umbraco.Core.Persistence.Querying
 
             SqlParameters.Add(o);
 
-            //don't execute if compiled
-            if (Visited == false)
-                return $"@{SqlParameters.Count - 1}";
-
-            //already compiled, return
-            return string.Empty;
+            return Visited ? string.Empty : "@" + (SqlParameters.Count - 1);
         }
 
-        protected virtual string GetFieldName(PocoData pocoData, string name)
+        protected virtual string GetFieldName(PocoData pocoData, string name, string alias)
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfoData.Name == name);
-            var tableName = SqlSyntax.GetQuotedTableName(pocoData.TableInfo.TableName);
+            var tableName = SqlSyntax.GetQuotedTableName(alias ?? pocoData.TableInfo.TableName);
             var columnName = SqlSyntax.GetQuotedColumnName(column.Value.ColumnName);
 
-            return $"{tableName}.{columnName}";
+            return tableName + "." + columnName;
         }
     }
 
@@ -167,7 +154,7 @@ namespace Umbraco.Core.Persistence.Querying
             SqlParameters.Add(o);
 
             // execute if not already compiled
-            return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
+            return Visited ? string.Empty : "@" + (SqlParameters.Count - 1);
         }
 
         protected virtual string GetFieldName(PocoData pocoData, string name, string alias)

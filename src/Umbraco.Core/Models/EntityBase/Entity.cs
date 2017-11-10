@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models.EntityBase
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector);
-                HasIdentity = true; //set the has Identity
+                HasIdentity = value != 0; //set the has Identity
             }
         }
 

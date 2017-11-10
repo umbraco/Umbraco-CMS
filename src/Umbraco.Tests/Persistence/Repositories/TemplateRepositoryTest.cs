@@ -407,8 +407,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
-                var textpage = MockedContent.CreateSimpleContent(contentType);
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.AddOrUpdate(contentType);
+                var textpage = MockedContent.CreateSimpleContent(contentType);
                 contentRepo.AddOrUpdate(textpage);
                 unitOfWork.Flush();
 

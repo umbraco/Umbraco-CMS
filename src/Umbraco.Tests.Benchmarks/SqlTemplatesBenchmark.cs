@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Benchmarks
                 var template = SqlTemplates.Get("test", s => s
                     .Select<NPocoFetchTests.Thing1Dto>()
                     .From<NPocoFetchTests.Thing1Dto>()
-                    .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
+                    .Where<NPocoFetchTests.Thing1Dto>(x => x.Name == SqlTemplate.ArgValue<string>("name")));
 
                 var sql = template.Sql(new { name = "yada" });
 

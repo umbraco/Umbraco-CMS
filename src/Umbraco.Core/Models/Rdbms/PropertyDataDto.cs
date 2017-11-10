@@ -15,19 +15,19 @@ namespace Umbraco.Core.Models.Rdbms
 
         private decimal? _decimalValue;
 
+        // fixme - should we just kill that one? we never update!
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,versionId,propertyTypeId")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,versionId,propertyTypeId,languageId,segment,published")]
         public int NodeId { get; set; }
 
         [Column("versionId")]
-        [NullSetting(NullSetting = NullSettings.Null)]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionId")]
-        public Guid? VersionId { get; set; }
+        public Guid VersionId { get; set; }
 
         [Column("propertyTypeId")]
         [ForeignKey(typeof(PropertyTypeDto))]

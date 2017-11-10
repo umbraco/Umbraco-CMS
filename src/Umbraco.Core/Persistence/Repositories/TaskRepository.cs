@@ -77,14 +77,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsTask.id = @Id";
+            return "cmsTask.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                 {
-                    "DELETE FROM cmsTask WHERE id = @Id"
+                    "DELETE FROM cmsTask WHERE id = @id"
                 };
             return list;
         }

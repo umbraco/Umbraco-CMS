@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void MemberRepository_Can_Get_Member_By_Id()
+        public void GetMember()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Get_Members_By_Ids()
+        public void GetMembers()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void MemberRepository_Can_Get_All_Members()
+        public void GetAllMembers()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void MemberRepository_Can_Perform_GetByQuery_With_Key()
+        public void QueryMember()
         {
             // Arrange
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Persist_Member()
+        public void SaveMember()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
@@ -141,18 +141,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.HasIdentity, Is.True);
-                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.Name, Is.EqualTo("Johnny Hefty"));
                 Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
                 Assert.That(sut.Username, Is.EqualTo("hefty"));
 
-                TestHelper.AssertAllPropertyValuesAreEquals(sut, member, "yyyy-MM-dd HH:mm:ss");
+                TestHelper.AssertPropertyValuesAreEqual(sut, member, "yyyy-MM-dd HH:mm:ss");
             }
         }
 
         [Test]
-        public void New_Member_Has_Built_In_Properties_By_Default()
+        public void MemberHasBuiltinProperties()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
@@ -174,7 +173,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(2));
                 Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 var grp = sut.PropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
                 Assert.IsNotNull(grp);
                 var aliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
@@ -186,7 +184,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void MemberRepository_Does_Not_Replace_Password_When_Null()
+        public void SavingPreservesPassword()
         {
             IMember sut;
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
@@ -216,7 +214,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void MemberRepository_Can_Update_Email_And_Login_When_Changed()
+        public void SavingUpdatesNameAndEmail()
         {
             IMember sut;
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
@@ -247,7 +245,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Create_Correct_Subquery()
+        public void QueryMember_WithSubQuery()
         {
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
 

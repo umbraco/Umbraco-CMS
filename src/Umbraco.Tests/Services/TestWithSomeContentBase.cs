@@ -22,6 +22,7 @@ namespace Umbraco.Tests.Services
             //Create and Save ContentType "umbTextpage" -> 1060
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1061
@@ -32,7 +33,6 @@ namespace Umbraco.Tests.Services
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1062
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             subpage.ReleaseDate = DateTime.Now.AddMinutes(-5);
-            subpage.ChangePublishedState(PublishedState.Saving);
             ServiceContext.ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1063

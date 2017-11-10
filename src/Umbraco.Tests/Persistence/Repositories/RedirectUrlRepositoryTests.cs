@@ -197,6 +197,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = Guid.NewGuid();
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)

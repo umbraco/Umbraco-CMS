@@ -29,8 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
                 group.Key = dto.UniqueId;
                 group.Name = dto.Text;
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 group.ResetDirtyProperties(false);
                 return group;
             }

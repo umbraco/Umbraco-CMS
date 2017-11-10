@@ -21,7 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(AuditItem entity)
         {
-            throw new NotImplementedException();
+            Database.Insert(new LogDto
+            {
+                Comment = entity.Comment,
+                Datestamp = DateTime.Now,
+                Header = entity.AuditType.ToString(),
+                NodeId = entity.Id,
+                UserId = entity.UserId
+            });
         }
 
         protected override void PersistUpdatedItem(AuditItem entity)
@@ -80,7 +87,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "id = @Id";
+            return "id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

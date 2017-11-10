@@ -83,8 +83,22 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             // rename columns
             if (ColumnExists(PreTables.Content, "contentType"))
                 ReplaceColumn<PropertyDataDto>(PreTables.Content, "contentType", "contentTypeId");
+
+            // add columns
+            if (!ColumnExists(PreTables.Content, "writerUserId"))
+                AddColumn<ContentDto>(PreTables.Content, "writerUserId");
+            if (!ColumnExists(PreTables.Content, "updateDate"))
+                AddColumn<ContentDto>(PreTables.Content, "updateDate");
+
+            // copy data for added columns
+            Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Content)}
+SET writerUserId=doc.documentUser, updateDate=doc.updateDate,
+FROM {SqlSyntax.GetQuotedTableName(PreTables.Content)} con
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON con.nodeId=doc.nodeId AND doc.newest=1");
+
+            // drop columns
             if (ColumnExists(PreTables.Content, "pk"))
-                ReplaceColumn<PropertyDataDto>(PreTables.Content, "pk", "id");
+                Delete.Column("pk").FromTable(PreTables.Content);
 
             // rename table
             Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content);
@@ -143,9 +157,8 @@ JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.versionId=cve
             // drop some columns
             Delete.Column("text").FromTable(PreTables.Document); // fixme usage
             Delete.Column("templateId").FromTable(PreTables.Document); // fixme usage
-
-            // replace some columns
-            ReplaceColumn<DocumentDto>(PreTables.Document, "documentUser", "writerUserId");
+            Delete.Column("documentUser").FromTable(PreTables.Document); // fixme usage
+            Delete.Column("updateDate").FromTable(PreTables.Document); // fixme usage
 
             // update PropertyData.Published for published versions
             if (Context.SqlContext.DatabaseType.IsMySql())

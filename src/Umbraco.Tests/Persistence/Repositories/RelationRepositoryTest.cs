@@ -118,8 +118,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(relation, Is.Not.Null);
                 Assert.That(relation.HasIdentity, Is.True);
-                Assert.That(relation.ChildId, Is.EqualTo(NodeDto.NodeIdSeed + 2));
-                Assert.That(relation.ParentId, Is.EqualTo(NodeDto.NodeIdSeed + 1));
+                Assert.That(relation.ChildId, Is.EqualTo(NodeDto.NodeIdSeed + 3));
+                Assert.That(relation.ParentId, Is.EqualTo(NodeDto.NodeIdSeed + 2));
                 Assert.That(relation.RelationType.Alias, Is.EqualTo("relateContentOnCopy"));
             }
         }
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out repositoryType);
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<IRelation>().Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
+                var query = unitOfWork.SqlContext.Query<IRelation>().Where(x => x.ParentId == NodeDto.NodeIdSeed + 2);
                 int count = repository.Count(query);
 
                 // Assert
@@ -237,7 +237,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 RelationTypeRepository repositoryType;
                 var repository = CreateRepository(unitOfWork, out repositoryType);
 
-                var content = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
+                var content = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 3);
                 ServiceContext.ContentService.Delete(content, 0);
 
                 // Act
@@ -273,6 +273,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 ServiceContext.ContentTypeService.Save(contentType);
 
                 //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)

@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = SqlContext.Sql();
 
-            switch (queryType) // FIXME pretend we still need these queries for now
+            switch (queryType)
             {
                 case QueryType.Count:
                     sql = sql.SelectCount();
@@ -130,41 +130,43 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        // fixme - move that one up to Versionable! or better: kill it!
+        // fixme - kill, eventually
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
         }
 
-        protected override string GetBaseWhereClause() // fixme - can we kill / refactor this?
+        // fixme - kill, eventually
+        // ah maybe not, that what's used for eg Exists in base repo
+        protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @Id";
+            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            var list = new List<string> // fixme table names, escape everything, etc
-                           {
-                               "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
-                               "DELETE FROM cmsTask WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUserStartNode WHERE startNode = @Id",
-                               "UPDATE umbracoUserGroup SET startContentId = NULL WHERE startContentId = @Id",
-                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
-                               "DELETE FROM umbracoRelation WHERE childId = @Id",
-                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
-                               "DELETE FROM umbracoDomains WHERE domainRootStructureID = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @Id",
-                               "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE ContentId = @Id",
-                               "DELETE FROM cmsContentXml WHERE nodeId = @Id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @Id",
-                               "DELETE FROM umbracoAccess WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
-                           };
+            var list = new List<string>
+            {
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Task + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
+                "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @id",
+                "DELETE FROM cmsPreviewXml WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
+                "DELETE FROM cmsContentXml WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            };
             return list;
         }
 
@@ -184,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override IContent GetByVersion(Guid versionId)
         {
-            var sql = GetBaseQuery(QueryType.Single)
+            var sql = GetBaseQuery(QueryType.Single, false)
                 .Where<ContentVersionDto>(x => x.VersionId == versionId);
 
             var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
@@ -225,10 +227,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = ContentFactory.BuildDto(entity);
 
             // derive path and level from parent
-            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
-            );
-            var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+            var parent = GetParentNodeDto(entity.ParentId);
             var level = parent.Level + 1;
 
             // get sort order
@@ -242,26 +241,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // see if there's a reserved identifier for this unique id
             // and then either update or insert the node dto
-            template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetReservedId", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
-            );
-            var id = Database.ExecuteScalar<int>(template.Sql(nodeDto.UniqueId)); // fixme can we mix named & non-named?
+            var id = GetReservedId(nodeDto.UniqueId);
             if (id > 0)
-            {
                 nodeDto.NodeId = id;
-                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-                nodeDto.ValidatePathWithException();
-                Database.Update(nodeDto);
-            }
             else
-            {
                 Database.Insert(nodeDto);
 
-                // update path, now that we have an id
-                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-                nodeDto.ValidatePathWithException();
-                Database.Update(nodeDto);
-            }
+            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            nodeDto.ValidatePathWithException();
+            Database.Update(nodeDto);
 
             // update entity
             entity.Id = nodeDto.NodeId;
@@ -276,29 +264,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // persist the content version dto
             // assumes a new version id and version date (modified date) has been set
-            var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto; // fixme version id etc?
+            var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
 
             // persist the document version dto
             var documentVersionDto = dto.DocumentVersionDto;
-            documentVersionDto.Id = contentVersionDto.Id; // fixme do we want this?
+            documentVersionDto.Id = contentVersionDto.Id;
             Database.Insert(documentVersionDto);
 
             // persist the document dto
-            dto.NodeId = nodeDto.NodeId; // fixme version id etc?
+            dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
-
-            // assign ids to properties, using propertyTypeId as a key
-            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
-            foreach (var property in entity.Properties)
-                property.Id = xids[property.PropertyTypeId];
 
             // if published, set tags accordingly
             if (entity.Published)
@@ -307,8 +290,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // published => update published version infos, else leave it blank
             if (entity.Published)
             {
-                // fixme anything else we should do?
-                ((Content) entity).PublishedDate = dto.UpdateDate;
+                ((Content) entity).PublishedDate = contentDto.UpdateDate;
             }
 
             OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
@@ -319,27 +301,27 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistUpdatedItem(IContent entity)
         {
             var content = (Content) entity;
-            var publishedState = content.PublishedState;
-            var publishedStateChanged = publishedState == PublishedState.Publishing || publishedState == PublishedState.Unpublishing;
 
             // check if we need to make any database changes at all
-            if (entity.RequiresSaving(publishedState) == false)
+            if (content.PublishedState == PublishedState.Published || content.PublishedState == PublishedState.Unpublished)
             {
-                entity.ResetDirtyProperties();
-                return;
+                if (!content.IsEntityDirty() && !content.IsAnyUserPropertyDirty())
+                    return; // no change to save, do nothing, don't even update dates
             }
 
-            //check if we need to create a new version
-            var requiresNewVersion = entity.RequiresNewVersion(publishedState);
+            // check if we need to create a new version
+            var requiresNewVersion = content.PublishedState == PublishedState.Publishing && content.Published || content.PublishedState == PublishedState.Unpublishing;
             if (requiresNewVersion)
             {
                 // drop all draft infos for the current version, won't need it anymore
-                Database.Delete<PropertyDataDto>("WHERE nodeId=@nodeId AND versionId=@versionId AND published=@published",
-                    new { nodeId = content.Id, versionId = content.Version, published = false });
+                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version && x.Published);
+                Database.Execute(deletePropertyDataSql);
 
                 // current version is not current anymore
-                Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersion)} SET current=0 WHERE nodeId=@nodeId AND versionId=@versionId",
-                    new { nodeId = content.Id, versionId = content.Version });
+                var updateCurrentSql = SqlContext.Sql()
+                    .Update<ContentVersionDto>(u => u.Set(x => x.Current, false))
+                    .Where<ContentVersionDto>(x => x.VersionId == content.Version);
+                Database.Execute(updateCurrentSql);
 
                 // resets identifiers ie get a new version id
                 content.UpdatingEntity();
@@ -361,10 +343,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // if parent has changed, get path, level and sort order
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetParentNode", tsql =>
-                    tsql.Select<NodeDto>(x => x.NodeId).Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
-                );
-                var parent = Database.Fetch<NodeDto>(template.Sql(entity.ParentId)).First();
+                var parent = GetParentNodeDto(entity.ParentId);
 
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
@@ -379,36 +358,23 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
-            // update the content dto - only if the content type has changed
-            var origContentDto = Database.Fetch<ContentDto>(SqlContext.Sql().Select<ContentDto>().From<ContentDto>().Where<ContentDto>(x => x.NodeId == entity.Id)).FirstOrDefault();
-            if (origContentDto.ContentTypeId != entity.ContentTypeId)
-            {
-                dto.ContentDto.Id = origContentDto.Id; // fixme - annoying, needed?
-                Database.Update(dto.ContentDto);
-            }
-
-            //If Published state has changed then previous versions should have their publish state reset.
-            //If state has been changed to unpublished the previous versions publish state should also be reset.
-            //if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
-            if (entity.RequiresClearPublishedFlag(publishedState, requiresNewVersion))
-                ClearPublishedFlag(entity); // FIXME OUCH NO
-
-            //Look up (newest) entries by id in cmsDocument table to set newest = false
-            ClearNewestFlag(entity); // FIXME OUCH NO
+            // update the content dto
+            Database.Update(dto.ContentDto);
 
             // insert or update the content & document version dtos
-            var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto; // fixme version id etc?
+            var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.Current = true;
             var documentVersionDto = dto.DocumentVersionDto;
             if (requiresNewVersion)
             {
                 // assumes a new version id and date (modified date) have been set
                 Database.Insert(contentVersionDto);
+                documentVersionDto.Id = contentVersionDto.Id;
                 Database.Insert(documentVersionDto);
             }
             else
             {
-                // fixme this pk thing is annoying
+                // fixme this pk thing is annoying - could we store that ID somewhere?
                 var id = Database.ExecuteScalar<int>(SqlContext.Sql().Select<ContentVersionDto>(x => x.Id).From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == entity.Version));
                 contentVersionDto.Id = id;
                 Database.Update(contentVersionDto);
@@ -417,25 +383,26 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // update the document dto
+            // at that point, when un/publishing, the entity still has its old Published value
+            // so we need to explicitely update the dto to persist the correct value
+            if (content.PublishedState == PublishedState.Publishing)
+                dto.Published = true;
+            else if (content.PublishedState == PublishedState.Unpublishing)
+                dto.Published = false;
             Database.Update(dto);
 
-            // update the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties).ToArray();
-            foreach (var propertyDataDto in propertyDataDtos)
+            // replace the property data
+            if (!requiresNewVersion)
             {
-                if (requiresNewVersion == false && propertyDataDto.Id > 0)
-                    Database.Update(propertyDataDto);
-                else
-                    Database.Insert(propertyDataDto);
+                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version);
+                Database.Execute(deletePropertyDataSql);
             }
-
-            // assign ids to properties, using propertyTypeId as a key
-            var xids = propertyDataDtos.ToDictionary(x => x.PropertyTypeId, x => x.Id);
-            foreach (var property in entity.Properties)
-                property.Id = xids[property.PropertyTypeId];
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            foreach (var propertyDataDto in propertyDataDtos)
+                Database.Insert(propertyDataDto);
 
             // update tags
-            if (HasTagProperty(entity)) // fixme what-if it had and now has not?
+            if (HasTagProperty(entity)) // fixme - what-if it had and now has not?
             {
                 switch (content.PublishedState)
                 {
@@ -447,13 +414,11 @@ namespace Umbraco.Core.Persistence.Repositories
                         // explicitely unpublishing, must clear tags
                         ClearEntityTags(entity, _tagRepository);
                         break;
-                    case PublishedState.Saving:
-                        // saving, nothing to do
-                        break;
                     case PublishedState.Published:
                     case PublishedState.Unpublished:
                         // no change, depends on path-published
                         // that should take care of trashing and un-trashing
+                        // fixme why, how would that work at all???
                         if (IsPathPublished(entity)) // slightly expensive ;-(
                             UpdateEntityTags(entity, _tagRepository);
                         else
@@ -462,7 +427,16 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            content.PublishedDate = dto.UpdateDate;
+            // flip the entity's published property
+            // this also flips its published state
+            if (content.PublishedState == PublishedState.Publishing)
+                content.Published = true;
+            else if (content.PublishedState == PublishedState.Unpublishing)
+                content.Published = false;
+
+            if (content.Published)
+                content.PublishedDate = dto.ContentDto.UpdateDate;
+
             OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
 
             entity.ResetDirtyProperties();
@@ -490,22 +464,6 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Content Repository
-
-        // fixme could we at least document what's that supposed to do?
-        public IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query)
-        {
-            // we WANT to return contents in top-down order, ie parents should come before children
-            // ideal would be pure xml "document order" - which we cannot achieve at database level
-
-            var sqlClause = GetBaseQuery(QueryType.Many);
-            var translator = new SqlTranslator<IContent>(sqlClause, query);
-            var sql = translator.Translate()
-                                .Where<DocumentDto>(x => x.Published)
-                                .OrderBy<NodeDto>(x => x.Level)
-                                .OrderBy<NodeDto>(x => x.SortOrder);
-
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
-        }
 
         public int CountPublished(string contentTypeAlias = null)
         {
@@ -542,18 +500,6 @@ namespace Umbraco.Core.Persistence.Repositories
             PermissionRepository.ReplaceEntityPermissions(permissionSet);
         }
 
-        public void ClearPublishedFlag(IContent content)
-        {
-            var sql = "UPDATE cmsDocument SET published=0 WHERE nodeId=@id AND published=1";
-            Database.Execute(sql, new { id = content.Id });
-        }
-
-        public void ClearNewestFlag(IContent content)
-        {
-            var sql = "UPDATE cmsDocument SET newest=0 WHERE nodeId=@id AND newest=1";
-            Database.Execute(sql, new { id = content.Id });
-        }
-
         /// <summary>
         /// Assigns a single permission to the current content item for the specified group ids
         /// </summary>
@@ -579,35 +525,26 @@ namespace Umbraco.Core.Persistence.Repositories
             PermissionRepository.AddOrUpdate(permission);
         }
 
-        // fixme must refactor entirely, will not work!
         /// <summary>
-        /// Gets paged content results
+        /// Gets paged content results.
         /// </summary>
-        /// <param name="query">Query to excute</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
-        /// <param name="filter"></param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter = null, bool newest = true)
+        public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query,
+            long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField,
+            IQuery<IContent> filter = null)
         {
-            var filterSql = SqlContext.Sql();
-            if (newest)
-                filterSql.Append("AND (cmsDocument.newest = 1)");
+            Sql<ISqlContext> filterSql = null;
 
             if (filter != null)
             {
+                filterSql = Sql();
                 foreach (var filterClause in filter.GetWhereClauses())
-                    filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
+                    filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);                
             }
 
             return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x),
-                orderBy, orderDirection, orderBySystemField, "cmsDocument",
+                orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }
 
@@ -658,13 +595,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return _contentByGuidReadRepository.Exists(id);
         }
 
-        /// <summary>
-        /// A reading repository purely for looking up by GUID
-        /// </summary>
-        /// <remarks>
-        /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
-        /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
-        /// </remarks>
+        // reading repository purely for looking up by GUID
+        // fixme - ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
         private class ContentByGuidReadRepository : NPocoRepositoryBase<Guid, IContent>
         {
             private readonly ContentRepository _outerRepo;
@@ -743,10 +675,10 @@ namespace Umbraco.Core.Persistence.Repositories
             switch (orderBy.ToUpperInvariant())
             {
                 case "UPDATER":
-                    // fixme This isn't going to work very nicely because it's going to order by ID, not by letter
+                    // fixme orders by id not letter = bad
                     return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "writerUserId");
                 case "PUBLISHED":
-                    // fixme is this still relevant?
+                    // fixme kill
                     return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "published");
                 case "CONTENTTYPEALIAS":
                     throw new NotSupportedException("Don't know how to support ContentTypeAlias.");
@@ -754,8 +686,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return base.GetDatabaseFieldNameForOrderBy(orderBy);
         }
-
-        // fixme - we are not implementing the double-query thing for pagination from 7.6, need to do it differently!
 
         private IEnumerable<IContent> MapDtosToContent(List<DocumentDto> dtos, bool withCache = false)
         {
@@ -776,7 +706,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     var cached = IsolatedCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
                     if (cached != null && cached.Version == versionId)
                     {
-                        content[i] = (Content) cached; // fixme should we just cache Content not IContent?
+                        content[i] = (Content) cached;
                         continue;
                     }
                 }
@@ -839,33 +769,18 @@ namespace Umbraco.Core.Persistence.Repositories
             var properties = GetPropertyCollections(new List<TempContent<Content>> { temp });
             content.Properties = properties[dto.DocumentVersionDto.ContentVersionDto.VersionId];
 
-            // clear dirty props on init - U4-1943
+            // reset dirty initial properties (U4-1946)
             content.ResetDirtyProperties(false);
             return content;
         }
 
-        private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
+        #region Utilities
+
+        protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
-            if (EnsureUniqueNaming == false)
-                return nodeName;
-
-            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.EnsureUniqueNodeName", tsql => tsql
-                .Select<NodeDto>(x => x.NodeId, x => x.Text)
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
-
-            var sql = template.Sql(NodeObjectTypeId, parentId);
-            var names = Database.Fetch<SimilarNodeName>(sql);
-
-            return SimilarNodeName.GetUniqueName(names, id, nodeName);
+            return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
         }
 
-        private int GetNewChildSortOrder(int parentId, int first)
-        {
-            var template = SqlContext.Templates.Get("Umbraco.Core.ContentRepository.GetSortOrder", tsql =>
-                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
-            );
-            return Database.ExecuteScalar<int>(template.Sql(parentId)) + 1; // fixme can we mix named & non-named?
-        }
+        #endregion
     }
 }

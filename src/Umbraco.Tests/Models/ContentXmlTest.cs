@@ -19,6 +19,7 @@ namespace Umbraco.Tests.Models
         {
             // Arrange
             var contentType = MockedContentTypes.CreateTextpageContentType();
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
 
             var content = MockedContent.CreateTextpageContent(contentType, "Root Home", -1);

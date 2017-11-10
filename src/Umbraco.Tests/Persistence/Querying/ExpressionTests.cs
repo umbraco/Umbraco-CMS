@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Debug.Print("Model to Sql ExpressionHelper: \n" + result);
 
-            Assert.AreEqual("([umbracoNode].[parentID] = @0)", result);
+            Assert.AreEqual("([umbracoNode].[parentId] = @0)", result);
             Assert.AreEqual(-1, modelToSqlExpressionHelper.GetSqlParameters()[0]);
         }
 
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var sqlContext = new SqlContext(sqlSyntax, DatabaseType.MySQL, SqlContext.PocoDataFactory);
 
             Expression<Func<UserDto, bool>> predicate = user => user.Login.StartsWith("mydomain\\myuser");
-            var modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(sqlContext);
+            var modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(sqlContext, null);
             var result = modelToSqlExpressionHelper.Visit(predicate);
 
             Debug.Print("Poco to Sql ExpressionHelper: \n" + result);

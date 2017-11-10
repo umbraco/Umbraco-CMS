@@ -761,7 +761,6 @@ namespace Umbraco.Core
             return stringToConvert.GenerateHash("SHA1");
         }
 
-
         /// <summary>Generate a hash of a string based on the hashType passed in
         /// </summary>
         /// <param name="str">Referrs to itself</param>
@@ -948,6 +947,18 @@ namespace Umbraco.Core
         public static string StripNewLines(this string input)
         {
             return input.Replace("\r", "").Replace("\n", "");
+        }
+
+        /// <summary>
+        /// Converts to single line by replacing line breaks with spaces.
+        /// </summary>
+        public static string ToSingleLine(this string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            text = text.Replace("\r\n", " "); // remove CRLF
+            text = text.Replace("\r", " "); // remove CR
+            text = text.Replace("\n", " "); // remove LF
+            return text;
         }
 
         public static string OrIfNullOrWhiteSpace(this string input, string alternative)

@@ -52,8 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var entity = ConvertFromDto(dto);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             ((Entity)entity).ResetDirtyProperties(false);
 
             return entity;
@@ -108,7 +107,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsDictionary.pk = @Id";
+            return "cmsDictionary.pk = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -319,7 +318,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override string GetBaseWhereClause()
             {
-                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " = @Id";
+                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " = @id";
             }
 
             protected override IDictionaryItem ConvertToEntity(DictionaryDto dto)
@@ -373,7 +372,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override string GetBaseWhereClause()
             {
-                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " = @Id";
+                return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " = @id";
             }
 
             protected override IDictionaryItem ConvertToEntity(DictionaryDto dto)

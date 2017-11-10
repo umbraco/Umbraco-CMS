@@ -313,19 +313,19 @@ ORDER BY colName";
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUser.id = @Id";
+            return "umbracoUser.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                "DELETE FROM cmsTask WHERE userId = @Id",
-                "DELETE FROM cmsTask WHERE parentUserId = @Id",
-                "DELETE FROM umbracoUser2UserGroup WHERE userId = @Id",
-                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
-                "DELETE FROM umbracoUser WHERE id = @Id",
-                "DELETE FROM umbracoExternalLogin WHERE id = @Id"
+                "DELETE FROM cmsTask WHERE userId = @id",
+                "DELETE FROM cmsTask WHERE parentUserId = @id",
+                "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
+                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
+                "DELETE FROM umbracoUser WHERE id = @id",
+                "DELETE FROM umbracoExternalLogin WHERE id = @id"
             };
             return list;
         }

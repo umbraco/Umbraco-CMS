@@ -141,8 +141,7 @@ namespace Umbraco.Core.Cache
                 input = cloneable.DeepClone();
             }
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             var tracksChanges = input as IRememberBeingDirty;
             if (tracksChanges != null)
             {

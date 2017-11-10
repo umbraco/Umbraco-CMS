@@ -20,8 +20,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.IsBidirectional = dto.Dual;
                 entity.Name = dto.Name;
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 entity.ResetDirtyProperties(false);
                 return entity;
             }

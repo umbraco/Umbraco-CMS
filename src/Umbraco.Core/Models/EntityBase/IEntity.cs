@@ -4,41 +4,36 @@ using System.Runtime.Serialization;
 namespace Umbraco.Core.Models.EntityBase
 {
     /// <summary>
-    /// Defines an Entity.
-    /// Entities should always have an Id, Created and Modified date
+    /// Defines an entity.
     /// </summary>
-    /// <remarks>The current database schema doesn't provide a modified date
-    /// for all entities, so this will have to be changed at a later stage.</remarks>
     public interface IEntity : IDeepCloneable
     {
         /// <summary>
-        /// The Id of the entity
+        /// The integer identifier of the entity.
         /// </summary>
         [DataMember]
         int Id { get; set; }
 
         /// <summary>
-        /// Guid based Id
+        /// The Guid unique identifier of the entity.
         /// </summary>
-        /// <remarks>The key is currectly used to store the Unique Id from the
-        /// umbracoNode table, which many of the entities are based on.</remarks>
         [DataMember]
         Guid Key { get; set; }
 
         /// <summary>
-        /// Gets or sets the Created Date
+        /// Gets or sets the creation date.
         /// </summary>
         [DataMember]
         DateTime CreateDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the Modified Date
+        /// Gets or sets the last update date.
         /// </summary>
         [DataMember]
         DateTime UpdateDate { get; set; }
 
         /// <summary>
-        /// Indicates whether the current entity has an identity, eg. Id.
+        /// Gets a value indicating whether the entity has an identity.
         /// </summary>
         [IgnoreDataMember]
         bool HasIdentity { get; }

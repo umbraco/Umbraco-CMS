@@ -139,12 +139,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @Id";
+            return "umbracoNode.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            return new List<string>();
+            return Array.Empty<string>();
         }
 
         protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DataType;
@@ -456,8 +456,13 @@ AND umbracoNode.id <> @id",
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-            var names = Database.Fetch<SimilarNodeName>("SELECT id, text AS name FROM umbracoNode WHERE nodeObjectType=@objectType",
-                new { objectType = NodeObjectTypeId });
+            var template = SqlContext.Templates.Get("Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName", tsql => tsql
+                .Select<NodeDto>(x => x.NodeId, x => x.Text)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.ArgValue<Guid>("nodeObjectType")));
+
+            var sql = template.Sql(NodeObjectTypeId);
+            var names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
         }
@@ -510,7 +515,7 @@ AND umbracoNode.id <> @id",
 
             protected override IEnumerable<string> GetDeleteClauses()
             {
-                return new List<string>();
+                return Array.Empty<string>();
             }
 
             protected override Guid NodeObjectTypeId

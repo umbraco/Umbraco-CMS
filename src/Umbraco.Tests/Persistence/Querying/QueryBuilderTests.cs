@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (([umbracoNode].[parentID] = @0))";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (([umbracoNode].[parentId] = @0))";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
@@ -95,32 +95,24 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Build_PublishedDescendants_Query_For_IContent()
         {
-            // Arrange
-            var path = "-1,1046,1076,1089";
-            var id = 1046;
-            var nodeObjectTypeId = Constants.ObjectTypes.Document;
+            const string path = "-1,1046,1076,1089";
+            const int id = 1046;
 
             var sql = Sql();
             sql.SelectAll()
-                .From<DocumentDto>()
-                // fixme DocumentDto does not have VersionId anymore
-                //.InnerJoin<ContentVersionDto>()
-                //.On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
+                .From<DocumentDto>(); // the actual SELECT really does not matter
 
-            var query = new Query<IContent>(SqlContext).Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
+            var query = SqlContext.Query<IContent>().Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published && x.Trashed == false);
 
-            // Act
             var translator = new SqlTranslator<IContent>(sql, query);
             var result = translator.Translate();
-            var strResult = result.SQL;
 
-            // Assert
-            Debug.Print(strResult);
+            result.WriteToConsole();
+
+            Assert.AreEqual("-1,1046,1076,1089%", result.Arguments[0]);
+            Assert.AreEqual(1046, result.Arguments[1]);
+            Assert.AreEqual(true, result.Arguments[2]);
+            Assert.AreEqual(true, result.Arguments[3]);
         }
     }
 }

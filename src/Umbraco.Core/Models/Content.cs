@@ -15,11 +15,10 @@ namespace Umbraco.Core.Models
         private IContentType _contentType;
         private ITemplate _template;
         private bool _published;
-        private bool? _publishedOriginal;
+        private PublishedState _publishedState;
         private string _language;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
@@ -45,7 +44,7 @@ namespace Umbraco.Core.Models
             : base(name, parent, contentType, properties)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            PublishedState = PublishedState.Unpublished;
+            _publishedState = PublishedState.Unpublished;
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace Umbraco.Core.Models
             : base(name, parentId, contentType, properties)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            PublishedState = PublishedState.Unpublished;
+            _publishedState = PublishedState.Unpublished;
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -80,7 +79,6 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
             public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
         }
 
@@ -124,26 +122,40 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Boolean indicating whether this Content is Published or not
+        /// Gets or sets a value indicating whether this content item is published or not.
         /// </summary>
-        /// <remarks>
-        /// Setting Published to true/false should be private or internal and should ONLY be used for wiring up the value
-        /// from the db or modifying it based on changing the published state.
-        /// </remarks>
         [DataMember]
         public bool Published
         {
             get => _published;
+
+            // the setter is internal and should only be invoked from
+            // - the ContentFactory when creating a content entity from a dto
+            // - the ContentRepository when updating a content entity
             internal set
             {
                 SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector);
-                _publishedOriginal = _publishedOriginal ?? _published;
-                PublishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
+                _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
             }
         }
 
-        [IgnoreDataMember]
-        public bool PublishedOriginal => _publishedOriginal ?? false;
+        /// <summary>
+        /// Gets the published state of the content item.
+        /// </summary>
+        /// <remarks>The state should be Published or Unpublished, depending on whether Published
+        /// is true or false, but can also temporarily be Publishing or Unpublishing when the
+        /// content item is about to be saved.</remarks>
+        [DataMember]
+        internal PublishedState PublishedState
+        {
+            get => _publishedState;
+            set
+            {
+                if (value != PublishedState.Publishing && value != PublishedState.Unpublishing)
+                    throw new ArgumentException("Invalid state, only Publishing and Unpublishing are accepted.");
+                _publishedState = value;
+            }
+        }
 
         /// <summary>
         /// Language of the data contained within this Content object.
@@ -174,16 +186,6 @@ namespace Umbraco.Core.Models
         {
             get => _expireDate;
             set => SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector);
-        }
-
-        /// <summary>
-        /// Id of the user who wrote/updated this Content
-        /// </summary>
-        [DataMember]
-        public virtual int WriterId
-        {
-            get => _writer;
-            set => SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector);
         }
 
         /// <summary>
@@ -241,20 +243,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Changes the Published state of the content object
-        /// </summary>
-        public void ChangePublishedState(PublishedState state)
-        {
-            if (state == PublishedState.Published || state == PublishedState.Unpublished)
-                throw new ArgumentException("Invalid state.");
-            Published = state == PublishedState.Publishing;
-            PublishedState = state;
-        }
-
-        [DataMember]
-        internal PublishedState PublishedState { get; private set; }
-
-        /// <summary>
         /// Gets or sets the unique identifier of the published version, if any.
         /// </summary>
         [IgnoreDataMember]
@@ -263,7 +251,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content has a published version.
         /// </summary>
-        public bool HasPublishedVersion => PublishedVersionGuid != default(Guid);
+        public bool HasPublishedVersion => PublishedVersionGuid != default;
 
         [IgnoreDataMember]
         internal DateTime PublishedDate { get; set; }
@@ -276,18 +264,7 @@ namespace Umbraco.Core.Models
             base.ResetDirtyProperties(rememberDirty);
 
             // take care of the published state
-            switch (PublishedState)
-            {
-                case PublishedState.Saving:
-                case PublishedState.Unpublishing:
-                    PublishedState = PublishedState.Unpublished;
-                    break;
-                case PublishedState.Publishing:
-                    PublishedState = PublishedState.Published;
-                    break;
-            }
-
-            _publishedOriginal = _published;
+            _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
         }
 
         /// <summary>

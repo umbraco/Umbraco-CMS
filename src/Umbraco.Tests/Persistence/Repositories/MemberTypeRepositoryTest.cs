@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
 
-                TestHelper.AssertAllPropertyValuesAreEquals(sut, memberType, "yyyy-MM-dd HH:mm:ss");
+                TestHelper.AssertPropertyValuesAreEqual(sut, memberType, "yyyy-MM-dd HH:mm:ss");
             }
         }
 

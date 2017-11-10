@@ -133,13 +133,13 @@ namespace Umbraco.Core.Persistence.Factories
                         UpdateDate = memberType.UpdateDate,
                         Key = typeDto.UniqueId
                     };
-                    //on initial construction we don't want to have dirty properties tracked
-                    // http://issues.umbraco.org/issue/U4-1946
+
+                    // reset dirty initial properties (U4-1946)
                     propertyType.ResetDirtyProperties(false);
                     group.PropertyTypes.Add(propertyType);
                 }
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+
+                // reset dirty initial properties (U4-1946)
                 group.ResetDirtyProperties(false);
                 propertyGroups.Add(group);
             }

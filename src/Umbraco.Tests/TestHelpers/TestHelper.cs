@@ -10,7 +10,9 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -95,87 +97,86 @@ namespace Umbraco.Tests.TestHelpers
                 File.Delete(umbracoSettingsFile);
         }
 
-        public static void AssertAllPropertyValuesAreEquals(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
+        // fixme obsolete the dateTimeFormat thing and replace with dateDelta
+        public static void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
         {
+            const int dateDeltaMilliseconds = 500; // .5s
+
             var properties = expected.GetType().GetProperties();
             foreach (var property in properties)
             {
-                //ignore properties that are attributed with this
+                // ignore properties that are attributed with EditorBrowsableState.Never
                 var att = property.GetCustomAttribute<EditorBrowsableAttribute>(false);
                 if (att != null && att.State == EditorBrowsableState.Never)
                     continue;
 
+                // ignore explicitely ignored properties
                 if (ignoreProperties != null && ignoreProperties.Contains(property.Name))
                     continue;
 
-                var expectedValue = property.GetValue(expected, null);
                 var actualValue = property.GetValue(actual, null);
+                var expectedValue = property.GetValue(expected, null);
 
-                if (((actualValue is string) == false) && actualValue is IEnumerable)
-                {
-                    AssertListsAreEquals(property, (IEnumerable)actualValue, (IEnumerable)expectedValue, dateTimeFormat, sorter);
-                }
-                else if (dateTimeFormat.IsNullOrWhiteSpace() == false && actualValue is DateTime)
-                {
-                    // round to second else in some cases tests can fail ;-(
-                    var expectedDateTime = (DateTime) expectedValue;
-                    expectedDateTime = expectedDateTime.AddTicks(-(expectedDateTime.Ticks%TimeSpan.TicksPerSecond));
-                    var actualDateTime = (DateTime) actualValue;
-                    actualDateTime = actualDateTime.AddTicks(-(actualDateTime.Ticks % TimeSpan.TicksPerSecond));
-
-                    Assert.AreEqual(expectedDateTime.ToString(dateTimeFormat), actualDateTime.ToString(dateTimeFormat), "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expectedValue, actualValue);
-                }
-                else
-                {
-                    Assert.AreEqual(expectedValue, actualValue, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expectedValue, actualValue);
-                }
+                AssertAreEqual(property, expectedValue, actualValue, sorter, dateDeltaMilliseconds);
             }
         }
 
-        private static void AssertListsAreEquals(PropertyInfo property, IEnumerable actualList, IEnumerable expectedList, string dateTimeFormat, Func<IEnumerable, IEnumerable> sorter)
+        private static void AssertAreEqual(PropertyInfo property, object expected, object actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
+        {
+            if (!(expected is string) && expected is IEnumerable)
+            {
+                // compare lists
+                AssertListsAreEqual(property, (IEnumerable) actual, (IEnumerable) expected, sorter, dateDeltaMilliseconds);
+            }
+            else if (expected is DateTime expectedDateTime)
+            {
+                // compare date & time with delta
+                var actualDateTime = (DateTime) actual;
+                var delta = (actualDateTime - expectedDateTime).TotalMilliseconds;
+                Assert.IsTrue(Math.Abs(delta) <= dateDeltaMilliseconds, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expected, actual);
+            }
+            else if (expected is Property expectedProperty)
+            {
+                // compare values
+                var actualProperty = (Property) actual;
+                var expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.LanguageId).ThenBy(x => x.Segment).ToArray();
+                var actualPropertyValues = actualProperty.Values.OrderBy(x => x.LanguageId).ThenBy(x => x.Segment).ToArray();
+                if (expectedPropertyValues.Length != actualPropertyValues.Length)
+                    Assert.Fail($"{property.DeclaringType.Name}.{property.Name}: Expected {expectedPropertyValues.Length} but got {actualPropertyValues.Length}.");
+                for (var i = 0; i < expectedPropertyValues.Length; i++)
+                {
+                    Assert.AreEqual(expectedPropertyValues[i].DraftValue, actualPropertyValues[i].DraftValue, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].DraftValue}\" but got \"{actualPropertyValues[i].DraftValue}\".");
+                    Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].DraftValue}\" but got \"{actualPropertyValues[i].DraftValue}\".");
+                }
+            }
+            else
+            {
+                // directly compare values
+                Assert.AreEqual(expected, actual, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expected, actual);
+            }
+        }
+
+        private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
         {
             if (sorter == null)
             {
-                //this is pretty hackerific but saves us some code to write
+                // this is pretty hackerific but saves us some code to write
                 sorter = enumerable =>
                 {
-                    //semi-generic way of ensuring any collection of IEntity are sorted by Ids for comparison
+                    // semi-generic way of ensuring any collection of IEntity are sorted by Ids for comparison
                     var entities = enumerable.OfType<IEntity>().ToList();
-                    if (entities.Count > 0)
-                    {
-                        return entities.OrderBy(x => x.Id);
-                    }
-                    else
-                    {
-                        return enumerable;
-                    }
+                    return entities.Count > 0 ? (IEnumerable) entities.OrderBy(x => x.Id) : entities;
                 };
             }
 
-            var actualListEx = sorter(actualList).Cast<object>().ToList();
-            var expectedListEx = sorter(expectedList).Cast<object>().ToList();
+            var expectedListEx = sorter(expected).Cast<object>().ToList();
+            var actualListEx = sorter(actual).Cast<object>().ToList();
 
             if (actualListEx.Count != expectedListEx.Count)
                 Assert.Fail("Collection {0}.{1} does not match. Expected IEnumerable containing {2} elements but was IEnumerable containing {3} elements", property.PropertyType.Name, property.Name, expectedListEx.Count, actualListEx.Count);
 
-            for (int i = 0; i < actualListEx.Count; i++)
-            {
-                var actualValue = actualListEx[i];
-                var expectedValue = expectedListEx[i];
-
-                if (((actualValue is string) == false) && actualValue is IEnumerable)
-                {
-                    AssertListsAreEquals(property, (IEnumerable)actualValue, (IEnumerable)expectedValue, dateTimeFormat, sorter);
-                }
-                else if (dateTimeFormat.IsNullOrWhiteSpace() == false && actualValue is DateTime)
-                {
-                    Assert.AreEqual(((DateTime)expectedValue).ToString(dateTimeFormat), ((DateTime)actualValue).ToString(dateTimeFormat), "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expectedValue, actualValue);
-                }
-                else
-                {
-                    Assert.AreEqual(expectedValue, actualValue, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expectedValue, actualValue);
-                }
-            }
+            for (var i = 0; i < actualListEx.Count; i++)
+                AssertAreEqual(property, expectedListEx[i], actualListEx[i], sorter, dateDeltaMilliseconds);
         }
 
         public static void DeleteDirectory(string path)

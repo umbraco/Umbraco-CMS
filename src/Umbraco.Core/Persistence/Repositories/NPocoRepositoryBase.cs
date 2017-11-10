@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override bool PerformExists(TId id)
         {
             var sql = GetBaseQuery(true);
-            sql.Where(GetBaseWhereClause(), new { Id = id});
+            sql.Where(GetBaseWhereClause(), new { id = id});
             var count = Database.ExecuteScalar<int>(sql);
             return count == 1;
         }
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var deletes = GetDeleteClauses();
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new { Id = GetEntityId(entity) });
+                Database.Execute(delete, new { id = GetEntityId(entity) });
             }
             entity.DeletedDate = DateTime.Now;
         }

@@ -193,9 +193,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             var expected = Sql();
             expected.SelectAll()
-                .From("[cmsDocumentVersion]")
-                .InnerJoin("[cmsContentVersion]")
-                .On("[cmsDocumentVersion].[id] = [cmsContentVersion].[id]");
+                .From("[uDocumentVersion]")
+                .InnerJoin("[uContentVersion]")
+                .On("[uDocumentVersion].[id] = [uContentVersion].[id]");
 
             var sql = Sql();
             sql.SelectAll().From<DocumentVersionDto>()

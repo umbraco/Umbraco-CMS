@@ -698,8 +698,7 @@ AND umbracoNode.id <> @id",
                                 //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)
                             }
 
-                            //on initial construction we don't want to have dirty properties tracked
-                            // http://issues.umbraco.org/issue/U4-1946
+                            // reset dirty initial properties (U4-1946)
                             ((Entity)contentType).ResetDirtyProperties(false);
                         }
                     }
@@ -1251,16 +1250,16 @@ WHERE uContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", ne
 
             var list = new List<string>
             {
-                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
-                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
-                "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
-                "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",
-                "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id",
-                "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @Id)",
-                "DELETE FROM cmsPropertyType WHERE contentTypeId = @Id",
-                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id",
+                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+                "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
+                "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
+                "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
+                "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
+                "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
+                "DELETE FROM cmsPropertyType WHERE contentTypeId = @id",
+                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @id",
             };
             return list;
         }

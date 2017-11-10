@@ -38,8 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 VirtualPath = FileSystem.GetUrl(path)
             };
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             xsltFile.ResetDirtyProperties(false);
 
             return xsltFile;

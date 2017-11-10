@@ -10,16 +10,32 @@ namespace Umbraco.Core.Persistence
     {
         private readonly ISqlContext _sqlContext;
         private readonly string _sql;
-        private readonly Dictionary<int, string> _args;
+        private readonly Dictionary<int, object> _args;
+
+        // these are created in PocoToSqlExpressionVisitor
+        internal class TemplateArg
+        {
+            public TemplateArg(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+
+            public override string ToString()
+            {
+                return "@" + Name;
+            }
+        }
 
         internal SqlTemplate(ISqlContext sqlContext, string sql, object[] args)
         {
             _sqlContext = sqlContext;
             _sql = sql;
             if (args.Length > 0)
-                _args = new Dictionary<int, string>();
+                _args = new Dictionary<int, object>();
             for (var i = 0; i < args.Length; i++)
-                _args[i] = args[i].ToString();
+                _args[i] = args[i];
         }
 
         public Sql<ISqlContext> Sql()
@@ -27,7 +43,7 @@ namespace Umbraco.Core.Persistence
             return new Sql<ISqlContext>(_sqlContext, _sql);
         }
 
-        // must pass the args in the proper order, faster
+        // must pass the args, all of them, in the proper order, faster
         public Sql<ISqlContext> Sql(params object[] args)
         {
             // if the type is an "unspeakable name" it is an anonymous compiler-generated object
@@ -47,7 +63,7 @@ namespace Umbraco.Core.Persistence
             return new Sql<ISqlContext>(_sqlContext, isBuilt, _sql, args);
         }
 
-        // can pass named args, slower
+        // can pass named args, not necessary all of them, slower
         // so, not much different from what Where(...) does (ie reflection)
         public Sql<ISqlContext> SqlNamed(object nargs)
         {
@@ -56,10 +72,19 @@ namespace Umbraco.Core.Persistence
             var properties = nargs.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(nargs));
             for (var i = 0; i < _args.Count; i++)
             {
-                if (!properties.TryGetValue(_args[i], out var value))
-                    throw new InvalidOperationException($"Missing argument \"{_args[i]}\".");
+                object value;
+                if (_args[i] is TemplateArg templateArg)
+                {
+                    if (!properties.TryGetValue(templateArg.Name, out value))
+                        throw new InvalidOperationException($"Missing argument \"{templateArg.Name}\".");
+                    properties.Remove(templateArg.Name);
+                }
+                else
+                {
+                    value = _args[i];
+                }
+
                 args[i] = value;
-                properties.Remove(_args[i]);
 
                 // if value is enumerable then we'll need to expand arguments
                 if (value is IEnumerable)
@@ -72,15 +97,14 @@ namespace Umbraco.Core.Persistence
 
         internal void WriteToConsole()
         {
-            new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.Cast<object>().ToArray()).WriteToConsole();
+            new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.ToArray()).WriteToConsole();
         }
 
-        public static T Arg<T>(string name)
-        {
-            return default (T);
-        }
+        public static object Arg(string name) => new TemplateArg(name);
 
-        public static IEnumerable<T> ArgIn<T>(string name)
+        public static T ArgValue<T>(string name) => default;
+
+        public static IEnumerable<T> ArgValueIn<T>(string name)
         {
             // don't return an empty enumerable, as it breaks NPoco
             // fixme - should we cache these arrays?

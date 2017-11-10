@@ -460,7 +460,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return repository.GetByPublishedVersion(query);
+                return repository.GetByQuery(query);
             }
         }
 
@@ -845,7 +845,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                return repository.GetByPublishedVersion(QueryNotTrashed);
+                return repository.GetByQuery(QueryNotTrashed);
             }
         }
 
@@ -1041,11 +1041,6 @@ namespace Umbraco.Core.Services
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
-                // saving the Published version => indicate we are .Saving
-                // saving the Unpublished version => remains .Unpublished
-                if (content.Published)
-                    content.ChangePublishedState(PublishedState.Saving);
-
                 repository.AddOrUpdate(content);
 
                 if (raiseEvents)
@@ -1108,11 +1103,6 @@ namespace Umbraco.Core.Services
                     if (content.HasIdentity == false)
                         content.CreatorId = userId;
                     content.WriterId = userId;
-
-                    // saving the Published version => indicate we are .Saving
-                    // saving the Unpublished version => remains .Unpublished
-                    if (content.Published)
-                        content.ChangePublishedState(PublishedState.Saving);
 
                     repository.AddOrUpdate(content);
                 }
@@ -1594,7 +1584,7 @@ namespace Umbraco.Core.Services
                 {
                     // however, it had been masked when being trashed, so there's no need for
                     // any special event here - just change its state
-                    content.ChangePublishedState(PublishedState.Unpublishing);
+                    ((Content) content).PublishedState = PublishedState.Unpublishing;
                 }
 
                 PerformMoveLocked(repository, content, parentId, parent, userId, moves, trashed);
@@ -1766,8 +1756,9 @@ namespace Umbraco.Core.Services
 
                 // a copy is .Saving and will be .Unpublished
                 // update the create author and last edit author
-                if (copy.Published)
-                    copy.ChangePublishedState(PublishedState.Saving);
+                // fixme - not like this!
+                //if (copy.Published)
+                //    copy.ChangePublishedState(PublishedState.Unpublished);
                 copy.CreatorId = userId;
                 copy.WriterId = userId;
 
@@ -1806,8 +1797,9 @@ namespace Umbraco.Core.Services
 
                         // a copy is .Saving and will be .Unpublished
                         // update the create author and last edit author
-                        if (descendantCopy.Published)
-                            descendantCopy.ChangePublishedState(PublishedState.Saving);
+                        // fixme - not like this!
+                        //if (descendantCopy.Published)
+                        //    descendantCopy.ChangePublishedState(PublishedState.Unpublished);
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
 
@@ -1901,7 +1893,8 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 // a rolled back version is .Saving and will be .Unpublished
-                content.ChangePublishedState(PublishedState.Saving);
+                // fixme - not like this!
+                //content.ChangePublishedState(PublishedState.Unpublished);
 
                 repository.AddOrUpdate(content);
 
@@ -2014,7 +2007,7 @@ namespace Umbraco.Core.Services
         {
             var pathMatch = content.Path + ",";
             var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& x.Trashed == false*/);
-            var contents = repository.GetByPublishedVersion(query);
+            var contents = repository.GetByQuery(query);
 
             // beware! contents contains all published version below content
             // including those that are not directly published because below an unpublished content
@@ -2463,7 +2456,7 @@ namespace Umbraco.Core.Services
                 return attempt;
 
             // change state to publishing
-            content.ChangePublishedState(PublishedState.Publishing);
+            ((Content) content).PublishedState = PublishedState.Publishing;
 
             Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' has been published.");
 
@@ -2601,7 +2594,7 @@ namespace Umbraco.Core.Services
 
             // version is published or unpublished, but content is published
             // change state to unpublishing
-            content.ChangePublishedState(PublishedState.Unpublishing);
+            ((Content) content).PublishedState = PublishedState.Unpublishing;
 
             Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' has been unpublished.");
 

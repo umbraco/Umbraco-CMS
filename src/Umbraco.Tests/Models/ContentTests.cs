@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Models
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
-            content.ChangePublishedState(PublishedState.Published);
+            //content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Models
             // should not try to clone something that's not Published or Unpublished
             // (and in fact it will not work)
             // but we cannot directly set the state to Published - hence this trick
-            content.ChangePublishedState(PublishedState.Publishing);
+            //content.ChangePublishedState(PublishedState.Publishing);
             content.ResetDirtyProperties(false); // => .Published
 
             var i = 200;
@@ -373,7 +373,7 @@ namespace Umbraco.Tests.Models
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
-            content.ChangePublishedState(PublishedState.Publishing);
+            //content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
             content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
@@ -513,7 +513,7 @@ namespace Umbraco.Tests.Models
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             var newProperty = new Property(propertyType);
-            newProperty.SetValue("This is a subtitle text");
+            newProperty.SetValue("This is a subtitle Test");
             content.Properties.Add(newProperty);
 
             // Assert
@@ -647,18 +647,34 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Verify_Content_Is_Published()
         {
-            // Arrange
             var contentType = MockedContentTypes.CreateTextpageContentType();
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
-            // Act
             content.ResetDirtyProperties();
-            content.ChangePublishedState(PublishedState.Publishing);
+            content.PublishedState = PublishedState.Publishing;
 
-            // Assert
-            Assert.That(content.IsPropertyDirty("Published"), Is.True);
-            Assert.That(content.Published, Is.True);
-            Assert.That(content.IsPropertyDirty("Name"), Is.False);
+            Assert.IsFalse(content.IsPropertyDirty("Published"));
+            Assert.IsFalse(content.Published);
+            Assert.IsFalse(content.IsPropertyDirty("Name"));
+            Assert.AreEqual(PublishedState.Publishing, content.PublishedState);
+
+            // the repo would do
+            content.Published = true;
+
+            // and then
+            Assert.IsTrue(content.IsPropertyDirty("Published"));
+            Assert.IsTrue(content.Published);
+            Assert.IsFalse(content.IsPropertyDirty("Name"));
+            Assert.AreEqual(PublishedState.Published, content.PublishedState);
+
+            // and before returning,
+            content.ResetDirtyProperties();
+
+            // and then
+            Assert.IsFalse(content.IsPropertyDirty("Published"));
+            Assert.IsTrue(content.Published);
+            Assert.IsFalse(content.IsPropertyDirty("Name"));
+            Assert.AreEqual(PublishedState.Published, content.PublishedState);
         }
 
         [Test]

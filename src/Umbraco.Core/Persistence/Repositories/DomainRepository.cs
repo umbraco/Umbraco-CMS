@@ -69,14 +69,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoDomains.id = @Id";
+            return "umbracoDomains.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                 {
-                    "DELETE FROM umbracoDomains WHERE id = @Id"
+                    "DELETE FROM umbracoDomains WHERE id = @id"
                 };
             return list;
         }
@@ -195,8 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     LanguageId = dto.DefaultLanguage,
                     RootContentId = dto.RootStructureId
                 };
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 domain.ResetDirtyProperties(false);
                 return domain;
             }

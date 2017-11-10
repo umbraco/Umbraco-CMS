@@ -34,11 +34,6 @@ namespace Umbraco.Core.Models
         DateTime? ExpireDate { get; set; }
 
         /// <summary>
-        /// Id of the user who wrote/updated the Content
-        /// </summary>
-        int WriterId { get; set; }
-
-        /// <summary>
         /// Gets the ContentType used by this content object
         /// </summary>
         IContentType ContentType { get; }
@@ -62,11 +57,6 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">New ContentType for this content</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
         void ChangeContentType(IContentType contentType, bool clearProperties);
-
-        /// <summary>
-        /// Changes the Published state of the content object
-        /// </summary>
-        void ChangePublishedState(PublishedState state);
 
         /// <summary>
         /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset

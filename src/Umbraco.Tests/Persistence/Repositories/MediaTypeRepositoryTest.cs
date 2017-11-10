@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.Path.Contains(","), Is.True);
                 Assert.That(contentType.SortOrder, Is.GreaterThan(0));
 
-                TestHelper.AssertAllPropertyValuesAreEquals(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new[] { "UpdateDate" });
+                TestHelper.AssertPropertyValuesAreEqual(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new[] { "UpdateDate" });
             }
 
 

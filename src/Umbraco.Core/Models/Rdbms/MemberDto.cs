@@ -3,15 +3,16 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
-    [TableName(Constants.DatabaseSchema.Tables.Member)]
+    [TableName(TableName)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class MemberDto
     {
+        private const string TableName = Constants.DatabaseSchema.Tables.Member;
+
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]
-        [ForeignKey(typeof(ContentDto), Column = "nodeId")]
-        [ForeignKey(typeof(NodeDto))]
+        [ForeignKey(typeof(ContentDto))]
         public int NodeId { get; set; }
 
         [Column("Email")]

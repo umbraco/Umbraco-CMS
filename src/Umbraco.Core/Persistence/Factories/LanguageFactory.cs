@@ -9,8 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
         public ILanguage BuildEntity(LanguageDto dto)
         {
             var lang = new Language(dto.IsoCode) { CultureName = dto.CultureName, Id = dto.Id };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             lang.ResetDirtyProperties(false);
             return lang;
         }

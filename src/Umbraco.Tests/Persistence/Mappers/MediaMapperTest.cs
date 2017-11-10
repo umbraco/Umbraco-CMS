@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new MediaMapper().Map(new SqlCeSyntaxProvider(), "UpdateDate");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionDate]"));
+            Assert.That(column, Is.EqualTo("[uContentVersion].[versionDate]"));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new MediaMapper().Map(new SqlCeSyntaxProvider(), "Version");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionId]"));
+            Assert.That(column, Is.EqualTo("[uContentVersion].[versionId]"));
         }
     }
 }

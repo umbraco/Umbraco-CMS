@@ -16,9 +16,14 @@ namespace Umbraco.Core.Models
         int ContentTypeId { get; }
 
         /// <summary>
-        /// Gets the Guid Id of the Content's Version
+        /// Gets the Guid identifier of the content's version.
         /// </summary>
         Guid Version { get; }
+
+        /// <summary>
+        /// Gets the identifier of the writer.
+        /// </summary>
+        int WriterId { get; set; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object

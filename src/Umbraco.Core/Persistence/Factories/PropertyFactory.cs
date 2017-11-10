@@ -40,9 +40,6 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new PropertyDataDto { NodeId = nodeId, VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
 
-            if (property.HasIdentity)
-                dto.Id = property.Id;
-
             if (propertyValue.LanguageId.HasValue)
                 dto.LanguageId = propertyValue.LanguageId;
 

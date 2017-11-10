@@ -45,6 +45,9 @@ namespace Umbraco.Core.Models
             public string Segment { get; set; }
             public object PublishedValue { get; set; }
             public object DraftValue { get; set; }
+
+            public PropertyValue Clone()
+                => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, DraftValue = DraftValue };
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -57,27 +60,18 @@ namespace Umbraco.Core.Models
                 {
                     if (o == null && o1 == null) return true;
 
-                    //custom comparer for strings.
+                    // custom comparer for strings.
+                    // if one is null and another is empty then they are the same
                     if (o is string || o1 is string)
-                    {
-                        //if one is null and another is empty then they are the same
-                        if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
-                        {
-                            return true;
-                        }
-                        if (o == null || o1 == null) return false;
-                        return o.Equals(o1);
-                    }
+                        return ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace()) || (o != null && o1 != null && o.Equals(o1));
 
                     if (o == null || o1 == null) return false;
 
-                    //Custom comparer for enumerable if it is enumerable
-                    var enum1 = o as IEnumerable;
-                    var enum2 = o1 as IEnumerable;
-                    if (enum1 != null && enum2 != null)
-                    {
-                        return enum1.Cast<object>().UnsortedSequenceEqual(enum2.Cast<object>());
-                    }
+                    // custom comparer for enumerable
+                    // ReSharper disable once MergeCastWithTypeCheck
+                    if (o is IEnumerable && o1 is IEnumerable)
+                        return ((IEnumerable) o).Cast<object>().UnsortedSequenceEqual(((IEnumerable) o1).Cast<object>());
+
                     return o.Equals(o1);
                 }, o => o.GetHashCode());
         }
@@ -98,6 +92,8 @@ namespace Umbraco.Core.Models
             set
             {
                 _values = value;
+
+                _pvalue = value.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
 
                 _lvalues = value.Where(x => x.LanguageId.HasValue && x.Segment == null)
                     .ToDictionary(x => x.LanguageId.Value, x => x);
@@ -164,20 +160,68 @@ namespace Umbraco.Core.Models
             return published ? value.PublishedValue : value.DraftValue;
         }
 
+        internal void PublishValues()
+        {
+            (var pvalue, _) = GetPropertyValue(false);
+            if (pvalue == null) return;
+            PublishPropertyValue(pvalue);
+        }
+
+        internal void PublishValues(int? nLanguageId)
+        {
+            if (nLanguageId == null)
+            {
+                PublishValues();
+                return;
+            }
+
+            var languageId = nLanguageId.Value;
+
+            (var pvalue, _) = GetPropertyValue(languageId, false);
+            if (pvalue == null) return;
+            PublishPropertyValue(pvalue);
+        }
+
+        internal void PublishValues(int? nLanguageId, string segment)
+        {
+            if (segment == null)
+            {
+                PublishValues(nLanguageId);
+                return;
+            }
+
+            if (!nLanguageId.HasValue)
+                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
+
+            var languageId = nLanguageId.Value;
+
+            (var pvalue, _) = GetPropertyValue(languageId, segment, false);
+            if (pvalue == null) return;
+            PublishPropertyValue(pvalue);
+        }
+
+        internal void PublishAllValues()
+        {
+            foreach (var pvalue in Values)
+                PublishPropertyValue(pvalue);
+        }
+
+        private void PublishPropertyValue(PropertyValue pvalue)
+        {
+            var origValue = pvalue.PublishedValue;
+            pvalue.PublishedValue = ConvertSetValue(pvalue.DraftValue);
+            DetectChanges(pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+        }
+
         /// <summary>
         /// Sets a (draft) neutral value.
         /// </summary>
         public void SetValue(object value)
         {
-            var change = false;
-            if (_pvalue == null)
-            {
-                _pvalue = new PropertyValue();
-                _values.Add(_pvalue);
-                change = true;
-            }
-            var origValue = _pvalue.DraftValue;
-            _pvalue.DraftValue = ConvertSetValue(value);
+            (var pvalue, var change) = GetPropertyValue(true);
+
+            var origValue = pvalue.DraftValue;
+            pvalue.DraftValue = ConvertSetValue(value);
 
             DetectChanges(_pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
         }
@@ -195,18 +239,8 @@ namespace Umbraco.Core.Models
 
             var languageId = nLanguageId.Value;
 
-            var change = false;
-            if (_lvalues == null)
-            {
-                _lvalues = new Dictionary<int, PropertyValue>();
-                change = true;
-            }
-            if (!_lvalues.TryGetValue(languageId, out var pvalue))
-            {
-                pvalue = _lvalues[languageId] = new PropertyValue();
-                _values.Add(pvalue);
-                change = true;
-            }
+            (var pvalue, var change) = GetPropertyValue(languageId, true);
+
             var origValue = pvalue.DraftValue;
             pvalue.DraftValue = ConvertSetValue(value);
 
@@ -226,30 +260,71 @@ namespace Umbraco.Core.Models
 
             if (!nLanguageId.HasValue)
                 throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
-
             var languageId = nLanguageId.Value;
 
+            (var pvalue, var change) = GetPropertyValue(languageId, segment, true);
+
+            var origValue = pvalue.DraftValue;
+            pvalue.DraftValue = ConvertSetValue(value);
+
+            DetectChanges(pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+        }
+
+        private (PropertyValue, bool) GetPropertyValue(bool create)
+        {
+            var change = false;
+            if (_pvalue == null)
+            {
+                if (!create) return (null, false);
+                _pvalue = new PropertyValue();
+                _values.Add(_pvalue);
+                change = true;
+            }
+            return (_pvalue, change);
+        }
+
+        private (PropertyValue, bool) GetPropertyValue(int languageId, bool create)
+        {
+            var change = false;
+            if (_lvalues == null)
+            {
+                if (!create) return (null, false);
+                _lvalues = new Dictionary<int, PropertyValue>();
+                change = true;
+            }
+            if (!_lvalues.TryGetValue(languageId, out var pvalue))
+            {
+                if (!create) return (null, false);
+                pvalue = _lvalues[languageId] = new PropertyValue();
+                _values.Add(pvalue);
+                change = true;
+            }
+            return (pvalue, change);
+        }
+
+        private (PropertyValue, bool) GetPropertyValue(int languageId, string segment, bool create)
+        {
             var change = false;
             if (_svalues == null)
             {
+                if (!create) return (null, false);
                 _svalues = new Dictionary<int, Dictionary<string, PropertyValue>>();
                 change = true;
             }
             if (!_svalues.TryGetValue(languageId, out var svalue))
             {
+                if (!create) return (null, false);
                 svalue = _svalues[languageId] = new Dictionary<string, PropertyValue>();
                 change = true;
             }
             if (!svalue.TryGetValue(segment, out var pvalue))
             {
+                if (!create) return (null, false);
                 pvalue = svalue[segment] = new PropertyValue();
                 _values.Add(pvalue);
                 change = true;
             }
-            var origValue = pvalue.DraftValue;
-            pvalue.DraftValue = ConvertSetValue(value);
-
-            DetectChanges(pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+            return (pvalue, change);
         }
 
         private object ConvertSetValue(object value)
@@ -309,7 +384,7 @@ namespace Umbraco.Core.Models
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid()
         {
-            return IsValid(_pvalue.DraftValue);
+            return IsValid(GetValue());
         }
 
         /// <summary>
@@ -335,9 +410,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="value"></param>
         /// <returns>True is property value is valid, otherwise false</returns>
-        public bool IsValid(object value)
+        private bool IsValid(object value)
         {
-            return _propertyType.IsPropertyValueValid(value);
+            return _propertyType.IsValidPropertyValue(value);
         }
 
         public override object DeepClone()

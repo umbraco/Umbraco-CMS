@@ -497,12 +497,13 @@ AND (umbracoNode.id=@id)";
 
         public XmlNode GetPreviewXmlNode(int contentId)
         {
+            // fixme - probably borked
             const string sql = @"SELECT umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.Level,
 cmsPreviewXml.xml, cmsDocument.published
 FROM umbracoNode
 JOIN cmsPreviewXml ON (cmsPreviewXml.nodeId=umbracoNode.id)
 JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest=1
+WHERE umbracoNode.nodeObjectType = @nodeObjectType
 AND (umbracoNode.id=@id)";
 
             XmlDto xmlDto;
@@ -1749,9 +1750,8 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                // make sure we do NOT add (cmsDocument.newest = 1) to the query
-                // because we already have the condition on the content being published
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true, newest: false);
+                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                // fixme serializing published or draft values?!
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml = _xmlContentSerializer(c).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

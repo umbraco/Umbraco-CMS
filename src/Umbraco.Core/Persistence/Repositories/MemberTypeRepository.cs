@@ -180,15 +180,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @Id";
+            return "umbracoNode.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var l = (List<string>) base.GetDeleteClauses(); // we know it's a list
-            l.Add("DELETE FROM cmsMemberType WHERE NodeId = @Id");
-            l.Add("DELETE FROM cmsContentType WHERE nodeId = @Id");
-            l.Add("DELETE FROM umbracoNode WHERE id = @Id");
+            l.Add("DELETE FROM cmsMemberType WHERE NodeId = @id");
+            l.Add("DELETE FROM cmsContentType WHERE nodeId = @id");
+            l.Add("DELETE FROM umbracoNode WHERE id = @id");
             return l;
         }
 

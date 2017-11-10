@@ -20,8 +20,7 @@ namespace Umbraco.Core.Persistence.Factories
                     model.Properties.Add(new MacroProperty(p.Id, p.UniqueId, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
                 }
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 model.ResetDirtyProperties(false);
                 return model;
             }

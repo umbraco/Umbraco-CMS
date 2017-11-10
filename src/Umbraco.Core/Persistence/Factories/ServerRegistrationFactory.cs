@@ -8,8 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
             var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive, dto.IsMaster);
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             model.ResetDirtyProperties(false);
             return model;
         }

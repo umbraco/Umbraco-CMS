@@ -464,7 +464,6 @@
     <Compile Include="Models\Collections\PropertyCollectionTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />
-    <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\DataTypeDefinitionRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ExpressionTests.cs" />

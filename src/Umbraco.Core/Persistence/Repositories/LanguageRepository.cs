@@ -81,7 +81,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoLanguage.id = @Id";
+            return "umbracoLanguage.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -91,8 +91,8 @@ namespace Umbraco.Core.Persistence.Repositories
                            {
                                //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
                                // but we still need to remove them
-                               "DELETE FROM cmsLanguageText WHERE languageId = @Id",
-                               "DELETE FROM umbracoLanguage WHERE id = @Id"
+                               "DELETE FROM cmsLanguageText WHERE languageId = @id",
+                               "DELETE FROM umbracoLanguage WHERE id = @id"
                            };
             return list;
         }

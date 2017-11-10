@@ -64,10 +64,13 @@ namespace Umbraco.Tests.Services
         public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
         {
             IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+            ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+            ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType2);
             IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+            ServiceContext.FileService.SaveTemplate(contentType3.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType3);
 
             var contentTypes = new[] { contentType1, contentType2, contentType3 };
@@ -163,10 +166,13 @@ namespace Umbraco.Tests.Services
             try
             {
                 IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+                ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
                 ServiceContext.ContentTypeService.Save(contentType1);
                 IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+                ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
                 ServiceContext.ContentTypeService.Save(contentType2);
                 IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+                ServiceContext.FileService.SaveTemplate(contentType3.DefaultTemplate);
                 ServiceContext.ContentTypeService.Save(contentType3);
 
                 var contentTypes = new[] { contentType1, contentType2, contentType3 };
@@ -203,10 +209,13 @@ namespace Umbraco.Tests.Services
             try
             {
                 IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+                ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
                 ServiceContext.ContentTypeService.Save(contentType1);
                 IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+                ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
                 ServiceContext.ContentTypeService.Save(contentType2);
                 IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+                ServiceContext.FileService.SaveTemplate(contentType3.DefaultTemplate);
                 ServiceContext.ContentTypeService.Save(contentType3);
 
                 var root = MockedContent.CreateSimpleContent(contentType1, "Root", -1);
@@ -247,6 +256,7 @@ namespace Umbraco.Tests.Services
         public void Deleting_PropertyType_Removes_The_Property_From_Content()
         {
             IContentType contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent contentItem = MockedContent.CreateTextpageContent(contentType1, "Testing", -1);
             ServiceContext.ContentService.SaveAndPublishWithStatus(contentItem);
@@ -268,7 +278,9 @@ namespace Umbraco.Tests.Services
         public void Rebuild_Content_Xml_On_Alias_Change()
         {
             var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "Test2");
+            ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             ServiceContext.ContentTypeService.Save(contentType2);
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
@@ -305,6 +317,7 @@ namespace Umbraco.Tests.Services
         public void Rebuild_Content_Xml_On_Property_Removal()
         {
             var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
+            ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
             foreach (var x in contentItems1)

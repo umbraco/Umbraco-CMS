@@ -8,9 +8,9 @@ using NPoco;
 namespace Umbraco.Core.Persistence.Querying
 {
     /// <summary>
-    /// Represents the Query Builder for building LINQ translatable queries
+    /// Represents a query builder.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <remarks>A query builder translates Linq queries into Sql queries.</remarks>
     public class Query<T> : IQuery<T>
     {
         private readonly ISqlContext _sqlContext;
@@ -22,10 +22,8 @@ namespace Umbraco.Core.Persistence.Querying
         }
 
         /// <summary>
-        /// Adds a where clause to the query
+        /// Adds a where clause to the query.
         /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns>This instance so calls to this method are chainable</returns>
         public virtual IQuery<T> Where(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null) return this;
@@ -36,6 +34,9 @@ namespace Umbraco.Core.Persistence.Querying
             return this;
         }
 
+        /// <summary>
+        /// Adds a where-in clause to the query.
+        /// </summary>
         public virtual IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable values)
         {
             if (fieldSelector == null) return this;
@@ -49,8 +50,6 @@ namespace Umbraco.Core.Persistence.Querying
         /// <summary>
         /// Adds a set of OR-ed where clauses to the query.
         /// </summary>
-        /// <param name="predicates"></param>
-        /// <returns>This instance so calls to this method are chainable.</returns>
         public virtual IQuery<T> WhereAny(IEnumerable<Expression<Func<T, bool>>> predicates)
         {
             if (predicates == null) return this;
@@ -84,7 +83,6 @@ namespace Umbraco.Core.Persistence.Querying
             if (sb == null) return this;
 
             sb.Append(")");
-            //_wheres.Add(Tuple.Create(sb.ToString(), parameters.ToArray()));
             _wheres.Add(Tuple.Create("(" + sql.SQL + ")", sql.Arguments));
 
             return this;
@@ -93,7 +91,6 @@ namespace Umbraco.Core.Persistence.Querying
         /// <summary>
         /// Returns all translated where clauses and their sql parameters
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<Tuple<string, object[]>> GetWhereClauses()
         {
             return _wheres;

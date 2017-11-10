@@ -33,8 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new TagFactory();
             var entity = factory.BuildEntity(tagDto);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
 
             return entity;
@@ -71,8 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new TagFactory();
             foreach (var entity in dtos.Select(factory.BuildEntity))
             {
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
                 yield return entity;
             }
@@ -103,15 +101,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "id = @Id";
+            return "id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                 {
-                    "DELETE FROM cmsTagRelationship WHERE tagId = @Id",
-                    "DELETE FROM cmsTags WHERE id = @Id"
+                    "DELETE FROM cmsTagRelationship WHERE tagId = @id",
+                    "DELETE FROM cmsTags WHERE id = @id"
                 };
             return list;
         }

@@ -111,7 +111,7 @@ namespace Umbraco.Core.Models
                             property.Id = existing.Id;
 
                         if (property.Values.Count == 0 && existing.Values.Count > 0)
-                            property.Values = existing.Values;
+                            property.Values = existing.Values.Select(x => x.Clone()).ToList();
 
                         // replace existing with property and return,
                         // SetItem invokes OnCollectionChanged (but not OnAdd)

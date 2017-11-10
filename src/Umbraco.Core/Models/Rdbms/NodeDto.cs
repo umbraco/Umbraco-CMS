@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.Rdbms
         public const int NodeIdSeed = 1060;
 
         [Column("id")]
-        [PrimaryKeyColumn(Name = "PK_" + TableName, IdentitySeed = NodeIdSeed)]
+        [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
         public int NodeId { get; set; }
 
         [Column("uniqueId")]

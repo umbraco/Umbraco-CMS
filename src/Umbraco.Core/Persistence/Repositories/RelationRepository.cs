@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IRelation PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { id });
 
             var dto = Database.Fetch<RelationDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (dto == null)
@@ -89,8 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var entity = factory.BuildEntity(dto);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
 
             return entity;
@@ -116,14 +115,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoRelation.id = @Id";
+            return "umbracoRelation.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
                            {
-                               "DELETE FROM umbracoRelation WHERE id = @Id"
+                               "DELETE FROM umbracoRelation WHERE id = @id"
                            };
             return list;
         }

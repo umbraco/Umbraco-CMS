@@ -175,35 +175,27 @@ namespace Umbraco.Core.Persistence.Querying
             var operand = BindOperant(b.NodeType);
             if (operand == "AND" || operand == "OR")
             {
-                var m = b.Left as MemberExpression;
-                if (m != null && m.Expression != null)
+                if (b.Left is MemberExpression mLeft && mLeft.Expression != null)
                 {
-                    string r = VisitMemberAccess(m);
+                    var r = VisitMemberAccess(mLeft);
 
-                    SqlParameters.Add(1);
+                    SqlParameters.Add(true);
 
-                    //don't execute if compiled
                     if (Visited == false)
-                    {
-                        left = string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
-                    }
+                        left = $"{r} = @{SqlParameters.Count - 1}";
                 }
                 else
                 {
                     left = Visit(b.Left);
                 }
-                m = b.Right as MemberExpression;
-                if (m != null && m.Expression != null)
+                if (b.Right is MemberExpression mRight && mRight.Expression != null)
                 {
-                    var r = VisitMemberAccess(m);
+                    var r = VisitMemberAccess(mRight);
 
-                    SqlParameters.Add(1);
+                    SqlParameters.Add(true);
 
-                    //don't execute if compiled
                     if (Visited == false)
-                    {
-                        right = string.Format("{0} = @{1}", r, SqlParameters.Count - 1);
-                    }
+                        right = $"{r} = @{SqlParameters.Count - 1}";
                 }
                 else
                 {
@@ -213,29 +205,25 @@ namespace Umbraco.Core.Persistence.Querying
             else if (operand == "=")
             {
                 // deal with (x == true|false) - most common
-                var constRight = b.Right as ConstantExpression;
-                if (constRight != null && constRight.Type == typeof(bool))
-                    return (bool)constRight.Value ? VisitNotNot(b.Left) : VisitNot(b.Left);
+                if (b.Right is ConstantExpression constRight && constRight.Type == typeof(bool))
+                    return (bool) constRight.Value ? VisitNotNot(b.Left) : VisitNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false == x) - why not
-                var constLeft = b.Left as ConstantExpression;
-                if (constLeft != null && constLeft.Type == typeof(bool))
-                    return (bool)constLeft.Value ? VisitNotNot(b.Right) : VisitNot(b.Right);
+                if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof(bool))
+                    return (bool) constLeft.Value ? VisitNotNot(b.Right) : VisitNot(b.Right);
                 left = Visit(b.Left);
             }
             else if (operand == "<>")
             {
                 // deal with (x != true|false) - most common
-                var constRight = b.Right as ConstantExpression;
-                if (constRight != null && constRight.Type == typeof (bool))
-                    return (bool)constRight.Value ? VisitNot(b.Left) : VisitNotNot(b.Left);
+                if (b.Right is ConstantExpression constRight && constRight.Type == typeof (bool))
+                    return (bool) constRight.Value ? VisitNot(b.Left) : VisitNotNot(b.Left);
                 right = Visit(b.Right);
 
                 // deal with (true|false != x) - why not
-                var constLeft = b.Left as ConstantExpression;
-                if (constLeft != null && constLeft.Type == typeof (bool))
-                    return (bool)constLeft.Value ? VisitNot(b.Right) : VisitNotNot(b.Right);
+                if (b.Left is ConstantExpression constLeft && constLeft.Type == typeof (bool))
+                    return (bool) constLeft.Value ? VisitNot(b.Right) : VisitNotNot(b.Right);
                 left = Visit(b.Left);
             }
             else
@@ -307,33 +295,20 @@ namespace Umbraco.Core.Persistence.Querying
                 var o = getter();
 
                 SqlParameters.Add(o);
-
-                //don't execute if compiled
-                if (Visited == false)
-                {
-                    return string.Format("@{0}", SqlParameters.Count - 1);
-                }
-                //already compiled, return
-                return string.Empty;
+                return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
             }
             catch (InvalidOperationException)
             {
-                //don't execute if compiled
-                if (Visited == false)
+                if (Visited) return string.Empty;
+
+                var exprs = VisitExpressionList(nex.Arguments);
+                var r = new StringBuilder();
+                foreach (var e in exprs)
                 {
-                    // FieldName ?
-                    List<object> exprs = VisitExpressionList(nex.Arguments);
-                    var r = new StringBuilder();
-                    foreach (var e in exprs)
-                    {
-                        r.AppendFormat("{0}{1}",
-                            r.Length > 0 ? "," : "",
-                            e);
-                    }
-                    return r.ToString();
+                    if (r.Length > 0) r.Append(",");
+                    r.Append(e);
                 }
-                //already compiled, return
-                return string.Empty;
+                return r.ToString();
             }
         }
 
@@ -348,14 +323,7 @@ namespace Umbraco.Core.Persistence.Querying
                 return "null";
 
             SqlParameters.Add(c.Value);
-
-            //don't execute if compiled
-            if (Visited == false)
-            {
-                return string.Format("@{0}", SqlParameters.Count - 1);
-            }
-            //already compiled, return
-            return string.Empty;
+            return Visited ? string.Empty : $"@{SqlParameters.Count - 1}";
         }
 
         protected virtual string VisitUnary(UnaryExpression u)
@@ -381,22 +349,10 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.MemberAccess:
                     // false property , i.e. x => !Trashed
                     SqlParameters.Add(true);
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        return string.Format("NOT ({0} = @{1})", o, SqlParameters.Count - 1);
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"NOT ({o} = @{SqlParameters.Count - 1})";
                 default:
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        // could be anything else, such as: x => !x.Path.StartsWith("-20")
-                        return string.Concat("NOT (", o, ")");
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    // could be anything else, such as: x => !x.Path.StartsWith("-20")
+                    return Visited ? string.Empty : string.Concat("NOT (", o, ")");
             }
         }
 
@@ -409,17 +365,10 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.MemberAccess:
                     // true property, i.e. x => Trashed
                     SqlParameters.Add(true);
-
-                    //don't execute if compiled
-                    if (Visited == false)
-                    {
-                        return string.Format("({0} = @{1})", o, SqlParameters.Count - 1);
-                    }
-                    //already compiled, return
-                    return string.Empty;
+                    return Visited ? string.Empty : $"({o} = @{SqlParameters.Count - 1})";
                 default:
                     // could be anything else, such as: x => x.Path.StartsWith("-20")
-                    return o;
+                    return Visited ? string.Empty : o;
             }
         }
 

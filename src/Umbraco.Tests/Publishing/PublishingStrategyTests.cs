@@ -185,6 +185,7 @@ namespace Umbraco.Tests.Publishing
 
             //Create and Save ContentType "umbTextpage" -> 1045
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
             var mandatoryType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             ServiceContext.ContentTypeService.Save(mandatoryType);

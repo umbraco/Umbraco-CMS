@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -25,19 +24,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="permissionSet"></param>
         void ReplaceContentPermissions(EntityPermissionSet permissionSet);
-
-        /// <summary>
-        /// Clears the published flag for a content.
-        /// </summary>
-        /// <param name="content"></param>
-        void ClearPublishedFlag(IContent content);
-
-        /// <summary>
-        /// Gets all published Content by the specified query
-        /// </summary>
-        /// <param name="query">Query to execute against published versions</param>
-        /// <returns>An enumerable list of <see cref="IContent"/></returns>
-        IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query);
 
         /// <summary>
         /// Assigns a single permission to the current content item for the specified user group ids

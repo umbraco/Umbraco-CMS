@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Factories
             }
 
             var model = new MigrationEntry(dto.Id, dto.CreateDate, dto.Name, parsed);
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+
+            // reset dirty initial properties (U4-1946)
             model.ResetDirtyProperties(false);
             return model;
         }

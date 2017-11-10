@@ -294,7 +294,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
 
-                TestHelper.AssertAllPropertyValuesAreEquals(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate" });
+                TestHelper.AssertPropertyValuesAreEqual(contentType, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate" });
             }
         }
 

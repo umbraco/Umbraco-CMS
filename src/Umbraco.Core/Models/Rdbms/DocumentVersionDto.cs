@@ -4,14 +4,14 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName(TableName)]
-    [PrimaryKey("id")]
+    [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentVersionDto
     {
         private const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
 
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(AutoIncrement = false)]
         [ForeignKey(typeof(ContentVersionDto))]
         public int Id { get; set; }
 

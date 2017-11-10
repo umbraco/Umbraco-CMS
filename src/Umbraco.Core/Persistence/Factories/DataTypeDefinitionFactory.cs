@@ -39,8 +39,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataTypeDefinition.Trashed = dto.NodeDto.Trashed;
                 dataTypeDefinition.CreatorId = dto.NodeDto.UserId.Value;
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 dataTypeDefinition.ResetDirtyProperties(false);
                 return dataTypeDefinition;
             }

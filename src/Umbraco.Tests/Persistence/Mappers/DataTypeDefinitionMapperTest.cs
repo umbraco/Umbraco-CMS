@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new DataTypeDefinitionMapper().Map(new SqlCeSyntaxProvider(), "Key");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueID]"));
+            Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueId]"));
         }
 
         [Test]

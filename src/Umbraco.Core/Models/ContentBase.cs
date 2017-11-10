@@ -32,6 +32,7 @@ namespace Umbraco.Core.Models
 
         private bool _trashed;
         private int _creatorId;
+        private int _writerId;
 
         // fixme need to deal with localized names, how?
         // for the time being, this is the node text = unique
@@ -90,6 +91,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
+            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -191,6 +193,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Id of the user who wrote/updated this entity
+        /// </summary>
+        [DataMember]
+        public virtual int WriterId
+        {
+            get => _writerId;
+            set => SetPropertyValueAndDetectChanges(value, ref _writerId, Ps.Value.WriterSelector);
+        }
+
+        /// <summary>
         /// Gets or sets the identifier of the version.
         /// </summary>
         [DataMember]
@@ -243,7 +255,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
 
-        #region Has, Get, Set Property Value
+        #region Has, Get, Set, Publish Property Value
 
         /// <summary>
         /// Gets a value indicating whether the content entity has a property with the supplied alias.
@@ -310,6 +322,42 @@ namespace Umbraco.Core.Models
 
             var convertAttempt = Properties[propertyTypeAlias].GetValue(languageId, segment, published).TryConvertTo<TPropertyValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
+        }
+
+        /// <summary>
+        /// Publish the neutral value.
+        /// </summary>
+        internal virtual void PublishValues()
+        {
+            foreach (var property in Properties)
+                property.PublishValues();
+        }
+
+        /// <summary>
+        /// Publish the culture value.
+        /// </summary>
+        internal virtual void PublishValues(int? nLanguageId)
+        {
+            foreach (var property in Properties)
+                property.PublishValues(nLanguageId);
+        }
+
+        /// <summary>
+        /// Publish the segment value.
+        /// </summary>
+        internal virtual void PublishValues(int? nLanguageId, string segment)
+        {
+            foreach (var property in Properties)
+                property.PublishValues(nLanguageId, segment);
+        }
+
+        /// <summary>
+        /// Publish all values.
+        /// </summary>
+        internal virtual void PublishAllValues()
+        {
+            foreach (var property in Properties)
+                property.PublishAllValues();
         }
 
         /// <summary>

@@ -124,20 +124,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @Id";
+            return Constants.DatabaseSchema.Tables.Node + ".id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
-                           {
-                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
-                               "UPDATE cmsDocument SET templateId = NULL WHERE templateId = @Id",
-                               "DELETE FROM cmsDocumentType WHERE templateNodeId = @Id",
-                               "DELETE FROM cmsTemplate WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
-                           };
+            {
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+                "UPDATE " + Constants.DatabaseSchema.Tables.DocumentVersion + " SET templateId = NULL WHERE templateId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Template + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            };
             return list;
         }
 
@@ -294,14 +294,14 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 foreach (var delete in deletes)
                 {
-                    Database.Execute(delete, new { Id = GetEntityId(descendant) });
+                    Database.Execute(delete, new { id = GetEntityId(descendant) });
                 }
             }
 
             //now we can delete this one
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new { Id = GetEntityId(entity) });
+                Database.Execute(delete, new { id = GetEntityId(entity) });
             }
 
             if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
@@ -370,8 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // path changes - but do not get content, will get loaded only when required
             GetFileContent(template, true);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             template.ResetDirtyProperties(false);
 
             return template;
