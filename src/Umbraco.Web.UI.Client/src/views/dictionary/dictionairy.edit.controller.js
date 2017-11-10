@@ -30,9 +30,9 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
                 //share state
                 editorState.set(vm.content);
                
-                //navigationService.syncTree({ tree: "dictionary", path: data.path }).then(function (syncArgs) {
-                //    vm.page.menu.currentNode = syncArgs.node;
-                //});
+                navigationService.syncTree({ tree: "dictionary", path: data.path }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
 
                 vm.page.loading = false;
 
