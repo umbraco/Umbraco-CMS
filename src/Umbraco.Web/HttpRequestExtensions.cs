@@ -16,23 +16,37 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the left part of a URL
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">The request determines both the schema and the URI to resolve the left part for</param>
         /// <param name="leftPart"></param>
         /// <returns></returns>
         /// <remarks>
         /// The scheme is determined by the data found in the request, not just based on the request's URI
         /// </remarks>
         internal static string GetLeftUriPart(this HttpRequestBase request, UriPartial leftPart)
+        {
+            return request.GetLeftUriPart(request.Url, leftPart);
+        }
+
+	    /// <summary>
+	    /// Gets the left part of a URL
+	    /// </summary>
+	    /// <param name="request">The request determines the scheme of the left part</param>
+	    /// <param name="uri">An explicit URI to get the left part for</param>
+	    /// <param name="leftPart"></param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// The scheme is determined by the data found in the request, not just based on the request's URI
+	    /// </remarks>
+	    internal static string GetLeftUriPart(this HttpRequestBase request, Uri uri, UriPartial leftPart)
 	    {
 	        if (request == null) throw new ArgumentNullException("request");
-	        var uri = request.Url;
 	        if (uri == null) throw new ArgumentException("request.uri");
 
-            var left = uri.GetLeftPart(leftPart);
+	        var left = uri.GetLeftPart(leftPart);
 	        var withoutScheme = left.Substring(uri.Scheme.Length);
 
 	        //TODO: This should call into a service/resolve (i.e. ISecureRequest)
-            var scheme = request.GetScheme();
+	        var scheme = request.GetScheme();
 
 	        return scheme + withoutScheme;
 	    }

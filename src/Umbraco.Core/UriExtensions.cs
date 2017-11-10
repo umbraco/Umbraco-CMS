@@ -12,23 +12,6 @@ namespace Umbraco.Core
     public static class UriExtensions
     {
         /// <summary>
-        /// Gets the left part of a URL with a forced scheme
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="leftPart"></param>
-        /// <param name="scheme"></param>
-        /// <returns></returns>
-        internal static string GetLeftPartWithScheme(this Uri uri, UriPartial leftPart, string scheme)
-        {
-            if (uri == null) throw new ArgumentNullException("uri");
-            if (string.IsNullOrWhiteSpace(scheme)) throw new ArgumentException("Value cannot be null or whitespace.", "scheme");
-
-            var left = uri.GetLeftPart(leftPart);
-            var withoutScheme = left.Substring(uri.Scheme.Length);
-            return scheme + withoutScheme;
-        }
-
-        /// <summary>
         /// Compares the Uris left parts 
         /// </summary>
         /// <param name="uri"></param>

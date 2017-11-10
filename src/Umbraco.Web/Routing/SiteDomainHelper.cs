@@ -200,7 +200,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual DomainAndUri MapDomain(Uri current, HttpRequestBase httpRequest, DomainAndUri[] domainAndUris)
         {
-            var currentAuthority = current.GetLeftPartWithScheme(UriPartial.Authority, httpRequest.GetScheme());
+            var currentAuthority = httpRequest.GetLeftUriPart(current, UriPartial.Authority);
             var qualifiedSites = GetQualifiedSites(current, httpRequest);
 
             return MapDomain(httpRequest, domainAndUris, qualifiedSites, currentAuthority);
@@ -227,9 +227,7 @@ namespace Umbraco.Web.Routing
         /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
         public virtual IEnumerable<DomainAndUri> MapDomains(Uri current, HttpRequestBase httpRequest, DomainAndUri[] domainAndUris, bool excludeDefault)
         {
-            var scheme = httpRequest.GetScheme();
-
-            var currentAuthority = current.GetLeftPartWithScheme(UriPartial.Authority, scheme);
+            var currentAuthority = httpRequest.GetLeftUriPart(current, UriPartial.Authority);
             KeyValuePair<string, string[]>[] candidateSites = null;
             IEnumerable<DomainAndUri> ret = domainAndUris;
 
@@ -282,7 +280,7 @@ namespace Umbraco.Web.Routing
             // if we are able to filter, then filter, else return the whole lot
             return candidateSites == null ? ret : ret.Where(d =>
                 {
-                    var authority = d.Uri.GetLeftPartWithScheme(UriPartial.Authority, scheme);
+                    var authority = httpRequest.GetLeftUriPart(d.Uri, UriPartial.Authority);
                     return candidateSites.Any(site => site.Value.Contains(authority));
                 });
         }
@@ -367,7 +365,7 @@ namespace Umbraco.Web.Routing
         private static string GetLeftPartWithBackwardsCompat(HttpRequestBase httpRequest, Uri uri)
         {
             return httpRequest != null
-                ? uri.GetLeftPartWithScheme(UriPartial.Authority, httpRequest.GetScheme())
+                ? httpRequest.GetLeftUriPart(uri, UriPartial.Authority)
                 : uri.GetLeftPart(UriPartial.Authority);
         }
     }

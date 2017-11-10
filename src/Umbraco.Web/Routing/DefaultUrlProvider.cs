@@ -170,7 +170,7 @@ namespace Umbraco.Web.Routing
                 switch (mode)
                 {
                     case UrlProviderMode.Absolute:
-                        uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPartWithScheme(UriPartial.Path, httpRequest.GetScheme()), path));
+                        uri = new Uri(CombinePaths(httpRequest.GetLeftUriPart(domainUri.Uri, UriPartial.Path), path));
                         break;
                     case UrlProviderMode.Relative:
                         uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative);
@@ -200,7 +200,7 @@ namespace Umbraco.Web.Routing
 
             // if no domain was found and then we have no "other" url
             // else return absolute urls, ignoring vdir at that point
-            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPartWithScheme(UriPartial.Path, httpRequest.GetScheme()), path)));
+            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(httpRequest.GetLeftUriPart(domainUri.Uri, UriPartial.Path), path)));
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!

@@ -82,7 +82,7 @@ namespace Umbraco.Web.Routing
             }
 
             return domainUris
-                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPartWithScheme(UriPartial.Path, umbracoContext.HttpContext.Request.GetScheme()), path)))
+                .Select(domainUri => new Uri(CombinePaths(umbracoContext.HttpContext.Request.GetLeftUriPart(domainUri.Uri, UriPartial.Path), path)))
                 .Select(uri => UriUtility.UriFromUmbraco(uri).ToString());
         }
 
