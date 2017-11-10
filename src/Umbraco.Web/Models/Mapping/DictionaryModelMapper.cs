@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using AutoMapper;
 
@@ -19,8 +20,9 @@
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             var lazyDictionaryService = new Lazy<ILocalizationService>(() => applicationContext.Services.LocalizationService);
-
+            
             config.CreateMap<IDictionaryItem, DictionaryDisplay>()
+                .ForMember(x => x.Translations, opt  => opt.Ignore())
                 .ForMember(
                     x => x.Udi,
                     expression => expression.MapFrom(
@@ -47,6 +49,20 @@
                             else
                             {
                                 dest.Path = "-1," + src.Id;
+                            }
+
+                            // add all languages and  the translations
+                            foreach (var lang in lazyDictionaryService.Value.GetAllLanguages())
+                            {
+                                var langId = lang.Id;
+                                var translation = src.Translations.FirstOrDefault(x => x.LanguageId == langId);
+                                 
+                                dest.Translations.Add(new DictionaryTranslationDisplay
+                                                          {
+                                                              IsoCode = lang.IsoCode,
+                                                              DisplayName = lang.CultureName,
+                                                              Translation = (translation != null) ? translation.Value : string.Empty
+                                                          });
                             }
                         });
                 

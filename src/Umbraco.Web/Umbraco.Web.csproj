@@ -400,6 +400,7 @@
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
