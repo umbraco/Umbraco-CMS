@@ -163,7 +163,7 @@ namespace umbraco.presentation
         //TODO: This doesn't seem to be used for anything....
         public virtual string GetBaseUrl()
         {
-            return Request.Url.GetLeftPartWithScheme(UriPartial.Authority, Request.GetScheme());
+            return Request.GetLeftUriPart(UriPartial.Authority);
         }
 
         public virtual UmbracoServerUtility Server

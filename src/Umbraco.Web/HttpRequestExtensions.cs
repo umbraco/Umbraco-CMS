@@ -13,13 +13,37 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HttpRequestExtensions
 	{
-	    /// <summary>
-	    /// Returns either https or http depending on the information in the request
-	    /// </summary>
-	    /// <param name="request"></param>
-	    /// <returns></returns>
-	    public static string GetScheme(this HttpRequestBase request)
+        /// <summary>
+        /// Gets the left part of a URL
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="leftPart"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The scheme is determined by the data found in the request, not just based on the request's URI
+        /// </remarks>
+        internal static string GetLeftUriPart(this HttpRequestBase request, UriPartial leftPart)
 	    {
+	        if (request == null) throw new ArgumentNullException("request");
+	        var uri = request.Url;
+	        if (uri == null) throw new ArgumentException("request.uri");
+
+            var left = uri.GetLeftPart(leftPart);
+	        var withoutScheme = left.Substring(uri.Scheme.Length);
+
+	        //TODO: This should call into a service/resolve (i.e. ISecureRequest)
+            var scheme = request.GetScheme();
+
+	        return scheme + withoutScheme;
+	    }
+
+        /// <summary>
+        /// Returns either https or http depending on the information in the request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static string GetScheme(this HttpRequestBase request)
+	    {            
 	        return GetScheme(request, DefaultUrlProvider.KnownForwardedHttpsHeaders);
 	    }
 

@@ -212,7 +212,7 @@ namespace Umbraco.Web.Routing
             {
                 // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
                 var httpRequest = new HttpRequestWrapper(context.Request);
-                var authority = context.Request.Url.GetLeftPartWithScheme(UriPartial.Authority, httpRequest.GetScheme());
+                var authority = httpRequest.GetLeftUriPart(UriPartial.Authority);
                 domain.DomainName = authority + domain.DomainName;
             }
             return domain;
