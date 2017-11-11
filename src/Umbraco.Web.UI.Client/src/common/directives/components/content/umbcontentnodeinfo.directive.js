@@ -83,6 +83,14 @@
 
                 logResource.getPagedEntityLog(scope.auditTrailOptions)
                     .then(function (data) {
+
+                        // get current backoffice user and format dates
+                        userService.getCurrentUser().then(function (currentUser) {
+                            angular.forEach(data.items, function(item) {
+                                item.timestampFormatted = getLocalDate(item.timestamp, currentUser.locale, 'LLL');
+                            });
+                        });
+                    
                         scope.auditTrail = data.items;
                         scope.auditTrailOptions.pageNumber = data.pageNumber;
                         scope.auditTrailOptions.pageSize = data.pageSize;
