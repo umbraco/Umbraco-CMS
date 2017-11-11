@@ -107,14 +107,14 @@
                                     <div class="date-wrapper__date">{{node.releaseDate | amDateFormat:'dddd'}} {{node.releaseDate | amDateFormat:'HH:mm'}}</div>
                                 </div>
 
-                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>                                                    
+                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>                                                    
                                 
                             </div>
 
                         </umb-date-time-picker>
                         
                         <a ng-if="node.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
-                            <small>Clear date</small>
+                            <small><localize key="content_removeDate">Clear date</localize></small>
                         </a>
 
                     </div>
@@ -139,14 +139,14 @@
                                     <div class="date-wrapper__date">{{node.removeDate | amDateFormat:'dddd'}} {{node.removeDate | amDateFormat:'HH:mm'}}</div>
                                 </div>
 
-                                <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>
+                                <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
 
                             </div>
 
                         </umb-date-time-picker>
 
                         <a ng-if="node.removeDate" ng-click="clearUnpublishDate()" href="" style="text-decoration: underline;">
-                            <small>Clear date</small>
+                            <small><localize key="content_removeDate">Clear date</localize></small>
                         </a>
                     </div>
 
