@@ -26,7 +26,7 @@
     <key alias="notify">Notificeringer</key>
     <key alias="protect">Offentlig adgang</key>
     <key alias="publish">Udgiv</key>
-    <key alias="unpublish">Fortryd udgivelse</key>
+    <key alias="unpublish">Afpublicér</key>
     <key alias="refreshNode">Genindlæs elementer</key>
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="rename" version="7.3.0">Omdøb</key>
