@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService) {
 
         function link(scope, element, attrs, ctrl) {
             
@@ -38,6 +38,10 @@
                         loadAuditTrail();
                     }
                 });
+
+                // make sure dates are formatted to the user's locale
+                formatDatesToLocal();
+                
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -112,6 +116,9 @@
                 // update publish value
                 scope.node.releaseDate = date;
 
+                // make sure dates are formatted to the user's locale
+                formatDatesToLocal();
+
                 // emit event
                 var args = { node: scope.node, date: date };
                 eventsService.emit("editors.content.changePublishDate", args);
@@ -134,6 +141,9 @@
                 // update publish value
                 scope.node.removeDate = date;
 
+                // make sure dates are formatted to the user's locale
+                formatDatesToLocal();
+
                 // emit event
                 var args = { node: scope.node, date: date };
                 eventsService.emit("editors.content.changeUnpublishDate", args);
@@ -149,6 +159,36 @@
                 var args = { node: scope.node, date: null };
                 eventsService.emit("editors.content.changeUnpublishDate", args);
 
+            }
+            
+            function ucfirst(hest) {
+                return hest.charAt(0).toUpperCase() + hest.slice(1);
+            } 
+
+            function getLocalDate(date, culture, format) {
+                if (date) {
+                    var dateVal;
+                    var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+                    var localOffset = new Date().getTimezoneOffset();
+                    var serverTimeNeedsOffsetting = -serverOffset !== localOffset;
+                    if (serverTimeNeedsOffsetting) {
+                        dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
+                    } else {
+                        dateVal = moment(date, 'YYYY-MM-DD HH:mm:ss');
+                    }
+                    return dateVal.locale(culture).format(format);
+                }
+            }
+
+            function formatDatesToLocal() {
+                // get current backoffice user and format dates
+                userService.getCurrentUser().then(function (currentUser) {
+                    scope.node.createDateFormatted = getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
+                    scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
+                    scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
+                    scope.node.removeDateDay = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
+                });
             }
 
             onInit();
