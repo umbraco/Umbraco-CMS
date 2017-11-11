@@ -182,6 +182,7 @@
     <key alias="membergroup">Medlemsgruppe</key>
     <key alias="memberrole">Rolle</key>
     <key alias="membertype">Medlemstype</key>
+    <key alias="noChanges">Der er endnu ikke lavet nogle ændringer.</key>
     <key alias="noDate">Ingen dato valgt</key>
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
