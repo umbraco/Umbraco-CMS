@@ -164,7 +164,7 @@
             <umb-box-content class="block-form">
                 
                 <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
-                    {{node.createDate | amDateFormat:'MMMM Do YYYY, HH:mm'}} by {{ node.owner.name }}
+                    {{node.createDate | amDateFormat:'MMMM Do YYYY, HH:mm'}} <localize key="general_by">by</localize> {{ node.owner.name }}
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
