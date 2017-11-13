@@ -520,11 +520,8 @@ namespace Umbraco.Web.Editors
             {
                 var contentService = Services.ContentService;
 
-                // content service GetByIds does order the content items based on the order of Ids passed in
-                var content = contentService.GetByIds(sorted.IdSortOrder);
-
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(content) == false)
+                if (contentService.Sort(sorted.IdSortOrder) == false)
                 {
                     LogHelper.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
