@@ -14,6 +14,12 @@
                 hide-description="true"
                 hide-alias="true">
             </umb-editor-header>
+            
+            <umb-editor-container class="form-horizontal">
+                <umb-property ng-repeat="translation in vm.content.translations" property="vm.tranformTranslationToProperty(translation)">
+                    <textarea ng-model="translation.translation"></textarea>
+                </umb-property>
+            </umb-editor-container>
         </umb-editor-view>
     </form>
 </div>

@@ -16,7 +16,7 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
     vm.page.menu = {};
     vm.page.menu.currentSection = appState.getSectionState("currentSection");
     vm.page.menu.currentNode = null;
-
+  
     function loadDictionary() {
 
         vm.page.loading = true;
@@ -24,7 +24,8 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
         //we are editing so get the content item from the server
         dictionaryResource.getById($routeParams.id)
             .then(function (data) {
-
+                
+                //
                 vm.content = data;                
 
                 //share state
@@ -38,6 +39,16 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
 
             });
     }
+
+    function tranformTranslationToProperty(translation) {
+        return {
+            alias: translation.isoCode,
+            label: translation.displayName,
+            hideLabel : false
+        }
+    }
+
+    vm.tranformTranslationToProperty = tranformTranslationToProperty;
 
     function onInit() {
         loadDictionary();
