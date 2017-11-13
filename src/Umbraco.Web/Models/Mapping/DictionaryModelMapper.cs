@@ -66,7 +66,7 @@
                                 dest.Translations.Add(new DictionaryTranslationDisplay
                                                           {
                                                               IsoCode = lang.IsoCode,
-                                                              DisplayName = lang.CultureName,
+                                                              DisplayName = lang.CultureInfo.DisplayName,
                                                               Translation = (translation != null) ? translation.Value : string.Empty
                                                           });
                             }
