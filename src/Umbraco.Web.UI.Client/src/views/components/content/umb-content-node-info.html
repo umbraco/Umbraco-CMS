@@ -7,10 +7,14 @@
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in node.urls">
-                        <a href="{{url}}" target="_blank">
+                        <a ng-if="node.published" href="{{url}}" target="_blank">
                             <i class="icon icon-window-popin"></i>
                             <span>{{url}}</span>
                         </a>
+                        <div ng-if="!node.published">
+                            <i class="icon icon-window-popin"></i>
+                            <span>{{url}}</span>
+                        </div>
                     </li>
                 </ul>
             </umb-box-content>
@@ -107,14 +111,14 @@
                                     <div class="date-wrapper__date">{{node.releaseDateDay}} {{node.releaseDate | amDateFormat:'HH:mm'}}</div>
                                 </div>
 
-                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>                                                    
+                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>                                                    
                                 
                             </div>
 
                         </umb-date-time-picker>
                         
                         <a ng-if="node.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
-                            <small>Clear date</small>
+                            <small><localize key="content_removeDate">Clear date</localize></small>
                         </a>
 
                     </div>
@@ -139,14 +143,14 @@
                                     <div class="date-wrapper__date">{{node.removeDateDay}} {{node.removeDate | amDateFormat:'HH:mm'}}</div>
                                 </div>
 
-                                <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;">Set date</a>
+                                <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
 
                             </div>
 
                         </umb-date-time-picker>
 
                         <a ng-if="node.removeDate" ng-click="clearUnpublishDate()" href="" style="text-decoration: underline;">
-                            <small>Clear date</small>
+                            <small><localize key="content_removeDate">Clear date</localize></small>
                         </a>
                     </div>
 
@@ -160,7 +164,7 @@
             <umb-box-content class="block-form">
                 
                 <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
-                    {{node.createDateFormatted | amDateFormat:'MMMM Do YYYY, HH:mm'}} by {{ node.owner.name }}
+                    {{node.createDateFormatted | amDateFormat:'MMMM Do YYYY, HH:mm'}} <localize key="general_by">by</localize> {{ node.owner.name }}
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">

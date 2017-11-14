@@ -987,6 +987,10 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember entity, bool raiseEvents = true)
         {
+            //trimming username and email to make sure we have no trailing space
+            entity.Username = entity.Username.Trim();
+            entity.Email = entity.Email.Trim();
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(entity);

@@ -182,6 +182,7 @@
     <key alias="membergroup">Medlemsgruppe</key>
     <key alias="memberrole">Rolle</key>
     <key alias="membertype">Medlemstype</key>
+    <key alias="noChanges">Der er endnu ikke lavet nogle ændringer.</key>
     <key alias="noDate">Ingen dato valgt</key>
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
@@ -194,6 +195,7 @@
     <key alias="releaseDate">Udgivelsesdato</key>
     <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
     <key alias="removeDate">Fjern dato</key>
+    <key alias="setDate">Vælg dato</key>
     <key alias="sortDone">Sorteringsrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
@@ -530,6 +532,7 @@
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
     <key alias="hide">Skjul</key>
+    <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
     <key alias="import">Importer</key>
     <key alias="innerMargin">Indre margen</key>
@@ -576,6 +579,7 @@
     <key alias="retrieve">Hent</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
+    <key alias="scheduledPublishing">Planlagt publicering</key>
     <key alias="search">Søg</key>
     <key alias="searchNoResult">Beklager, vi kan ikke finde det, du leder efter.</key>
     <key alias="noItemsInList">Ingen elementer er blevet tilføjet</key>
