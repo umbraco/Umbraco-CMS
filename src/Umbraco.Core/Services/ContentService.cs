@@ -1784,7 +1784,7 @@ namespace Umbraco.Core.Services
                 {
                     var asArray = items.ToArray();
                     var saveEventArgs = new SaveEventArgs<IContent>(asArray);
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
                         return false;
@@ -1831,7 +1831,7 @@ namespace Umbraco.Core.Services
                     if (raiseEvents)
                     {
                         saveEventArgs.CanCancel = false;
-                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                        uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                     }
 
                     if (shouldBePublished.Any())
@@ -1874,7 +1874,7 @@ namespace Umbraco.Core.Services
                 {
                     var asArray = items.ToArray();
                     var saveEventArgs = new SaveEventArgs<IContent>(asArray);
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     {
                         uow.Commit();
                         return false;
@@ -1921,7 +1921,7 @@ namespace Umbraco.Core.Services
                     if (raiseEvents)
                     {
                         saveEventArgs.CanCancel = false;
-                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                        uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                     }
 
                     if (shouldBePublished.Any())
