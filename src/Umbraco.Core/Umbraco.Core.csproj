@@ -366,6 +366,7 @@
     <Compile Include="HashGenerator.cs" />
     <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="Logging\CustomRollingFileAppender.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
     <Compile Include="Models\IUserControl.cs" />
