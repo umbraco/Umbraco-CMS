@@ -60,21 +60,29 @@
 
 //------------------- HISTORY ------------------
 
+.history {
+    position: relative;
+}
 
 .history-line {
     width: 2px;
-    height: 24px;
+    height: 100%;
     margin: 0 0 0 14px;
     background-color: @gray-8;
+    position: absolute;
+    z-index: 0;
 }
 
-.history-row {
+.history-item {
     display: flex;
     align-items: center;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
 }
 
-.history-item__avatar{
-    min-width: 30px;
+.history-item__avatar {
+    margin-right: 7px;
 }
 
 .history-item__date {
@@ -82,74 +90,18 @@
     color: @gray-5;
 }
 
-.name-date-container {
-    margin: 0 30px 0 7px;
-    height: 30px;
-    min-width: 170px;
-}
-
-.last-history-item .history-line {
-    display: none;
-}
-
-//--------- META DATA --------
-.meta-data-section {
-    display: flex;
-    flex-direction: column;
-}
-
-.meta-data-title {
-    font-size: 15px;
-    color: @black;
-    font-weight: bold;
-    line-height: 20px;
-}
-
-.meta-data-description {
-    font-size: 13px;
-    color: @gray-5;
-}
-
-.meta-data {
-    font-size: 15px;
-    color: @gray-2;
-    line-height: 20px;
-}
-
-/*  RESPONSIVE  */
-
 .history-item__break {
     display: flex;
     align-items: center;
     min-width: 230px;
+    font-size: 14px;
 }
-@media (max-width: 979px) {
+
+/*  RESPONSIVE  */
+@media (min-width: 1101px) and (max-width: 1365px), (max-width: 979px) {
     
-    .history-row {
+    .history-item {
         display: block;
-        padding: 10px 0;
-    }
-
-    .history-item__break {
-        padding: 7px 0;
-    }
-
-    .history-line {
-        display: none;
-    }
-}
-@media (max-width: 1535px) {
-    
-    .history-line {
-        visibility: hidden;
-    }
-}
-
-@media (min-width: 1101px) and (max-width: 1365px) {
-    
-    .history-row {
-        display: block;
-        padding: 10px 0;
     }
 
     .history-item__break {

@@ -111,6 +111,7 @@
                             item.logTypeColor = "success";
                             break;
                         case "UnPublish":
+                        case "Delete":
                             item.logTypeColor = "danger";
                             break;
                         default:

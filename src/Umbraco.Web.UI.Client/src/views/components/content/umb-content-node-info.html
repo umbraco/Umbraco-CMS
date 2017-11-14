@@ -36,10 +36,13 @@
                             <localize key="content_noChanges"></localize>
                         </umb-empty-state>
                     </div>
+
+                    <div class="history">
+
+                        <div ng-if="auditTrail.length > 1" class="history-line"></div>                            
                     
-                    <div class="history-item" ng-repeat="item in auditTrail" ng-class="{'last-history-item': $last}">
-                        <div class="history-row">
-                        
+                        <div class="history-item" ng-repeat="item in auditTrail">
+                            
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
                                     <umb-avatar
@@ -51,7 +54,7 @@
                                     </umb-avatar>
                                 </div>
 
-                                <div class="name-date-container">
+                                <div>
                                     <div>{{ item.userName }}</div>
                                     <div class="history-item__date">{{item.timestampFormatted}}</div>
                                 </div>
@@ -59,14 +62,14 @@
                             
                             <div class="history-item__break">
                                 <umb-badge
-                                    size="s"
+                                    size="xs"
                                     color="{{item.logTypeColor}}">
                                     {{ item.logType }}
                                 </umb-badge>
                                 <span>{{ item.comment }}</span>
                             </div>
+                            
                         </div>
-                        <div class="history-line"></div>
                     </div>
 
                 </div>
