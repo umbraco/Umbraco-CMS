@@ -7,12 +7,19 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Deploy;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests
 {
     [TestFixture]
-    public class UdiTests
+    public class UdiTests : BaseUmbracoApplicationTest
     {
+        [SetUp]
+        public void Setup()
+        {
+            Udi.ResetUdiTypes();
+        }
+
         [Test]
         public void StringUdiCtorTest()
         {

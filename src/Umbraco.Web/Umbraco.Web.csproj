@@ -116,9 +116,8 @@
     <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
       <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.83.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.83\lib\net45\Examine.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Examine, Version=0.1.88.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.88\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
@@ -1982,7 +1981,6 @@
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\TagsController.cs" />
-    <Compile Include="WebServices\ScheduledPublishController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
