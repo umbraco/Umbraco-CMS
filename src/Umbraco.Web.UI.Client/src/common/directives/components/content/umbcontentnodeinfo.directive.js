@@ -169,8 +169,8 @@
 
             }
             
-            function ucfirst(hest) {
-                return hest.charAt(0).toUpperCase() + hest.slice(1);
+            function ucfirst(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
             } 
 
             function getLocalDate(date, culture, format) {
