@@ -321,16 +321,14 @@ namespace Umbraco.Core.Persistence.Repositories
                         END AS customPropVal,
                         cver.nodeId AS customPropNodeId")
                 .From<ContentVersionDto>("cver")
-                .InnerJoin<PropertyDataDto>("opdata").On<ContentVersionDto, PropertyDataDto>((left, right) => left.NodeId == right.NodeId && left.VersionId == right.VersionId, "cver", "opdata")
+                .InnerJoin<PropertyDataDto>("opdata").On<ContentVersionDto, PropertyDataDto>((left, right) => left.Id == right.Id, "cver", "opdata")
                 .InnerJoin<PropertyTypeDto>("optype").On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "opdata", "optype")
-                .Where<ContentVersionDto>(x => x.Current, "cver")
-                .Where<PropertyDataDto>(x => !x.Published, "opdata") // always query on edit values
+                .Where<ContentVersionDto>(x => x.Current, "cver") // always query on current (edit) values
                 .Where<PropertyTypeDto>(x => x.Alias == "", "optype");
 
             // @0 is for x.Current ie 'true' = 1
-            // @1 is for x.Published ie 'true' = 1
-            // @2 is for x.Alias
-            var innerSqlString = innerSql.SQL.Replace("@0", "1").Replace("@1", "1").Replace("@2", "@" + sql.Arguments.Length);
+            // @1 is for x.Alias
+            var innerSqlString = innerSql.SQL.Replace("@0", "1").Replace("@1", "@" + sql.Arguments.Length);
             var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
                 ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
 
@@ -375,14 +373,20 @@ namespace Umbraco.Core.Persistence.Repositories
             return mapDtos(pagedResult.Items);
         }
 
-        protected IDictionary<Guid, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps)
+        protected IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps)
             where T : class, IContentBase
         {
-            var versions = temps.Select(x => x.VersionId).ToArray();
-            if (versions.Length == 0) return new Dictionary<Guid, PropertyCollection>();
+            var versions = new List<int>();
+            foreach (var temp in temps)
+            {
+                versions.Add(temp.VersionId);
+                if (temp.PublishedVersionId > 0)
+                    versions.Add(temp.PublishedVersionId);
+            }
+            if (versions.Count == 0) return new Dictionary<int, PropertyCollection>();
 
             // get all PropertyDataDto for all definitions / versions
-            var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, Guid>(versions, 2000, batch =>
+            var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, 2000, batch =>
                 SqlContext.Sql()
                     .Select<PropertyDataDto>()
                     .From<PropertyDataDto>()
@@ -421,20 +425,29 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetPropertyCollections(temps, allPropertyDataDtos, pre);
         }
 
-        private IDictionary<Guid, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues)
+        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues)
             where T : class, IContentBase
         {
-            var result = new Dictionary<Guid, PropertyCollection>();
+            var result = new Dictionary<int, PropertyCollection>();
             var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
             var compositionPropertiesIndex = new Dictionary<int, PropertyType[]>();
 
+            // index version ids
+            var indexedVersionId = new Dictionary<int, int>();
+            foreach (var temp in temps)
+                if (temp.PublishedVersionId > 0)
+                    indexedVersionId[temp.PublishedVersionId] = temp.VersionId;
+
             // index PropertyDataDto per versionId for perfs
-            var indexedPropertyDataDtos = new Dictionary<Guid, List<PropertyDataDto>>();
+            // merge edited and published dtos
+            var indexedPropertyDataDtos = new Dictionary<int, List<PropertyDataDto>>();
             foreach (var dto in allPropertyDataDtos)
             {
-                var version = dto.VersionId;
-                if (indexedPropertyDataDtos.TryGetValue(version, out var list) == false)
-                    indexedPropertyDataDtos[version] = list = new List<PropertyDataDto>();
+                var versionId = dto.VersionId;
+                if (indexedVersionId.TryGetValue(versionId, out var id)) // map published -> version
+                    versionId = id;
+                if (indexedPropertyDataDtos.TryGetValue(versionId, out var list) == false)
+                    indexedPropertyDataDtos[versionId] = list = new List<PropertyDataDto>();
                 list.Add(dto);
             }
 
@@ -447,7 +460,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 // map the list of PropertyDataDto to a list of Property
                 var properties = indexedPropertyDataDtos.TryGetValue(temp.VersionId, out var propertyDataDtos)
-                    ? PropertyFactory.BuildEntities(propertyDataDtos, compositionProperties).ToList()
+                    ? PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId).ToList()
                     : new List<Property>();
 
                 // deal with tags
@@ -485,60 +498,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 result[temp.VersionId] = new PropertyCollection(properties);
             }
-
-            //// iterate each definition grouped by it's content type,
-            //// this will mean less property type iterations while building
-            //// up the property collections
-            //foreach (var compositionGroup in documentDefs.GroupBy(x => x.Composition))
-            //{
-            //    // compositionGroup.Key is the composition
-            //    // compositionProperties is the property types for the entire composition
-            //    var compositionProperties = compositionGroup.Key.CompositionPropertyTypes.ToArray();
-
-            //    foreach (var def in compositionGroup)
-            //    {
-            //        var properties = indexedPropertyDataDtos.TryGetValue(def.Version, out var propertyDataDtos)
-            //            ? PropertyFactory.BuildEntity(propertyDataDtos, compositionProperties, def.CreateDate, def.VersionDate).ToList()
-            //            : new List<Property>();
-
-            //        foreach (var property in properties)
-            //        {
-            //            //NOTE: The benchmarks run with and without the following code show very little change so this is not a perf bottleneck
-            //            var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
-
-            //            var tagSupport = propertiesWithTagSupport.ContainsKey(property.PropertyType.PropertyEditorAlias)
-            //                ? propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias]
-            //                : TagExtractor.GetAttribute(editor);
-
-            //            if (tagSupport == null) continue;
-
-            //            //add to local cache so we don't need to reflect next time for this property editor alias
-            //            propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport;
-
-            //            //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-            //            var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
-            //                .Distinct()
-            //                .ToArray();
-
-            //            var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-            //            var preVals = new PreValueCollection(asDictionary);
-
-            //            var contentPropData = new ContentPropertyData(property.Value, preVals, new Dictionary<string, object>());
-
-            //            TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
-            //        }
-
-            //        if (result.ContainsKey(def.Version))
-            //        {
-            //            var msg = $"The query returned multiple property sets for document definition {def.Id}, {def.Composition.Name}";
-            //            if (ThrowOnWarning)
-            //                throw new InvalidOperationException(msg);
-            //            Logger.Warn<VersionableRepositoryBase<TId, TEntity, TRepository>>(msg);
-            //        }
-
-            //        result[def.Version] = new PropertyCollection(properties);
-            //    }
-            //}
 
             return result;
         }
@@ -880,10 +839,11 @@ ORDER BY nodeId, versionId, propertytypeid
 
         protected class TempContent
         {
-            public TempContent(int id, Guid versionId, IContentTypeComposition contentType)
+            public TempContent(int id, int versionId, int publishedVersionId, IContentTypeComposition contentType)
             {
                 Id = id;
                 VersionId = versionId;
+                PublishedVersionId = publishedVersionId;
                 ContentType = contentType;
             }
 
@@ -895,7 +855,12 @@ ORDER BY nodeId, versionId, propertytypeid
             /// <summary>
             /// Gets or sets the version identifier of the content.
             /// </summary>
-            public Guid VersionId { get; set; }
+            public int VersionId { get; set; }
+
+            /// <summary>
+            /// Gets or sets the published version identifier of the content.
+            /// </summary>
+            public int PublishedVersionId { get; set; }
 
             /// <summary>
             /// Gets or sets the content type.
@@ -916,8 +881,8 @@ ORDER BY nodeId, versionId, propertytypeid
         protected class TempContent<T> : TempContent
             where T : class, IContentBase
         {
-            public TempContent(int id, Guid versionId, IContentTypeComposition contentType, T content = null)
-                : base(id, versionId, contentType)
+            public TempContent(int id, int versionId, int publishedVersionId, IContentTypeComposition contentType, T content = null)
+                : base(id, versionId, publishedVersionId, contentType)
             {
                 Content = content;
             }

@@ -125,6 +125,31 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 ThingId = 3,
                 GroupId = 3
             });
+
+            database.Execute(@"
+                CREATE TABLE zbThingA1 (
+                    id int PRIMARY KEY NOT NULL,
+                    name NVARCHAR(255) NULL
+                );");
+
+            database.Execute(@"
+                CREATE TABLE zbThingA2 (
+                    id int PRIMARY KEY NOT NULL,
+                    name NVARCHAR(255) NULL
+                );");
+
+            database.Execute(@"
+                CREATE TABLE zbThingA3 (
+                    id int PRIMARY KEY NOT NULL,
+                    name NVARCHAR(255) NULL
+                );");
+
+            database.Execute(@"
+                CREATE TABLE zbThingA12 (
+                    thing1id int NOT NULL,
+                    thing2id int NOT NULL,
+                    name NVARCHAR(255) NOT NULL
+                );");
         }
 
         [Test]
@@ -397,6 +422,62 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             }
         }
 
+        [Test]
+        public void TestMultipleOneToOne()
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var tA1A = new ThingA1Dto { Id = 1, Name = "a1_a" };
+                scope.Database.Insert(tA1A);
+                var tA1B = new ThingA1Dto { Id = 2, Name = "a1_b" };
+                scope.Database.Insert(tA1B);
+                var tA1C = new ThingA1Dto { Id = 3, Name = "a1_c" };
+                scope.Database.Insert(tA1C);
+
+                var tA2A = new ThingA2Dto { Id = 1, Name = "a2_a" };
+                scope.Database.Insert(tA2A);
+                var tA2B = new ThingA2Dto { Id = 2, Name = "a2_b" };
+                scope.Database.Insert(tA2B);
+                var tA2C = new ThingA2Dto { Id = 3, Name = "a2_c" };
+                scope.Database.Insert(tA2C);
+
+                var tA3A = new ThingA3Dto { Id = 1, Name = "a3_a" };
+                scope.Database.Insert(tA3A);
+                var tA3B = new ThingA3Dto { Id = 2, Name = "a3_b" };
+                scope.Database.Insert(tA3B);
+
+                var k1 = new ThingA12Dto { Name = "a", Thing1Id = tA1A.Id, Thing2Id = tA2A.Id };
+                scope.Database.Insert(k1);
+                var k2 = new ThingA12Dto { Name = "B", Thing1Id = tA1A.Id, Thing2Id = tA2B.Id };
+                scope.Database.Insert(k2);
+
+                var sql = @"SELECT a1.id, a1.name,
+a2.id AS T2A__Id, a2.name AS T2A__Name, a3.id AS T2A__T3__Id, a3.name AS T2A__T3__Name,
+a2x.id AS T2B__Id, a2x.name AS T2B__Name, a3x.id AS T2B__T3__Id, a3x.name AS T2B__T3__Name
+FROM zbThingA1 a1
+JOIN zbThingA12 a12 ON a1.id=a12.thing1id AND a12.name='a'
+JOIN zbThingA2 a2 ON a12.thing2id=a2.id
+JOIN zbThingA3 a3 ON a2.id=a3.id
+JOIN zbThingA12 a12x ON a1.id=a12x.thing1id AND a12x.name='b'
+JOIN zbThingA2 a2x ON a12x.thing2id=a2x.id
+JOIN zbThingA3 a3x ON a2x.id=a3x.id
+";
+
+                var ts = scope.Database.Fetch<ThingA1Dto>(sql);
+                Assert.AreEqual(1, ts.Count);
+
+                var t = ts.First();
+                Assert.AreEqual("a1_a", t.Name);
+                Assert.AreEqual("a2_a", t.T2A.Name);
+                Assert.AreEqual("a2_b", t.T2B.Name);
+
+                Assert.AreEqual("a3_a", t.T2A.T3.Name);
+                Assert.AreEqual("a3_b", t.T2B.T3.Name);
+
+                scope.Complete();
+            }
+        }
+
         [TableName("zbThing1")]
         [PrimaryKey("id", AutoIncrement = false)]
         [ExplicitColumns]
@@ -502,6 +583,68 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             [ResultColumn] // not included in insert/update, not sql-generated
                            //[ComputedColumn] // not included in insert/update, sql-generated
             public int GroupCount { get; set; }
+        }
+
+        [TableName("zbThingA1")]
+        [PrimaryKey("id", AutoIncrement = false)]
+        [ExplicitColumns]
+        public class ThingA1Dto
+        {
+            [Column("id")]
+            public int Id { get; set; }
+
+            [Column("name")]
+            public string Name { get; set; }
+
+            [ResultColumn]
+            [Reference(ReferenceType.OneToOne)]
+            public ThingA2Dto T2A { get; set; }
+
+            [ResultColumn]
+            [Reference(ReferenceType.OneToOne)]
+            public ThingA2Dto T2B { get; set; }
+        }
+
+        [TableName("zbThingA2")]
+        [PrimaryKey("id", AutoIncrement = false)]
+        [ExplicitColumns]
+        public class ThingA2Dto
+        {
+            [Column("id")]
+            public int Id { get; set; }
+
+            [Column("name")]
+            public string Name { get; set; }
+
+            [ResultColumn]
+            [Reference(ReferenceType.OneToOne)]
+            public ThingA3Dto T3 { get; set; }
+        }
+
+        [TableName("zbThingA3")]
+        [PrimaryKey("id", AutoIncrement = false)]
+        [ExplicitColumns]
+        public class ThingA3Dto
+        {
+            [Column("id")]
+            public int Id { get; set; }
+
+            [Column("name")]
+            public string Name { get; set; }
+        }
+
+        [TableName("zbThingA12")]
+        [ExplicitColumns]
+        public class ThingA12Dto
+        {
+            [Column("thing1id")]
+            public int Thing1Id { get; set; }
+
+            [Column("thing2id")]
+            public int Thing2Id { get; set; }
+
+            [Column("name")]
+            public string Name { get; set; }
         }
     }
 }

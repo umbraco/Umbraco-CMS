@@ -13,8 +13,9 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var contentDto = dto.ContentDto;
             var nodeDto = contentDto.NodeDto;
-            var versionDto = dto.DocumentVersionDto;
-            var contentVersionDto = versionDto.ContentVersionDto;
+            var documentVersionDto = dto.DocumentVersionDto;
+            var contentVersionDto = documentVersionDto.ContentVersionDto;
+            var publishedVersionDto = dto.PublishedVersionDto;
 
             var content = new Content(nodeDto.Text, nodeDto.ParentId, contentType);
 
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Id = dto.NodeId;
                 content.Key = nodeDto.UniqueId;
                 content.Version = contentVersionDto.VersionId;
+                content.VersionPk = contentVersionDto.Id;
 
                 content.Name = contentVersionDto.Text;
                 content.NodeName = contentVersionDto.Text;
@@ -47,10 +49,13 @@ namespace Umbraco.Core.Persistence.Factories
 
                 if (dto.Published)
                 {
-                    content.PublishDate = dto.PublishDate;
-                    content.PublishName = dto.PublishName;
-                    content.PublisherId = dto.PublishUserId;
+                    content.PublishedVersionPk = publishedVersionDto.Id;
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
                 }
+
+                // templates = ignored, managed by the repository
 
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
@@ -118,12 +123,15 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
+        // always build the current / VersionPk dto
+        // we're never going to build / save old versions (which are immutable)
         private static DocumentVersionDto BuildDocumentVersionDto(IContent entity, ContentDto contentDto)
         {
             var dto = new DocumentVersionDto
             {
-                //Id =, // fixme
+                Id = ((ContentBase) entity).VersionPk,
                 TemplateId = entity.Template?.Id,
+                Published = entity.Published,
 
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto)
             };
@@ -131,14 +139,17 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
+        // always build the current / VersionPk dto
+        // we're never going to build / save old versions (which are immutable)
         private static ContentVersionDto BuildContentVersionDto(IContent entity, ContentDto contentDto)
         {
             var dto = new ContentVersionDto
             {
-                //Id =, // fixme
+                Id = ((ContentBase) entity).VersionPk,
                 NodeId = entity.Id,
                 VersionId = entity.Version,
                 VersionDate = entity.UpdateDate,
+                UserId = entity.WriterId,
                 Current = true, // always building the current one
                 Text = entity.Name,
 

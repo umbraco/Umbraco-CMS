@@ -8,10 +8,10 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class PropertyFactory
     {
-        public static IEnumerable<Property> BuildEntities(IReadOnlyCollection<PropertyDataDto> dtos, PropertyType[] propertyTypes)
+        public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId)
         {
             var properties = new List<Property>();
-            var propsDtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>) x);
+            var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>) x);
 
             foreach (var propertyType in propertyTypes)
             {
@@ -23,10 +23,10 @@ namespace Umbraco.Core.Persistence.Factories
 
                     // see notes in BuildDtos - we always have edit+published dtos
 
-                    if (propsDtos.TryGetValue(propertyType.Id, out var propDtos))
+                    if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
                     {
                         foreach (var propDto in propDtos)
-                            property.FactorySetValue(propDto.LanguageId, propDto.Segment, propDto.Published, propDto.Value);
+                            property.FactorySetValue(propDto.LanguageId, propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
                     }
 
                     property.ResetDirtyProperties(false);
@@ -41,17 +41,15 @@ namespace Umbraco.Core.Persistence.Factories
             return properties;
         }
 
-        private static PropertyDataDto BuildDto(int nodeId, Guid versionId, Property property, Property.PropertyValue propertyValue, bool published, object value)
+        private static PropertyDataDto BuildDto(int versionId, Property property, int? nLanguageId, string segment, object value)
         {
-            var dto = new PropertyDataDto { NodeId = nodeId, VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
+            var dto = new PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
 
-            if (propertyValue.LanguageId.HasValue)
-                dto.LanguageId = propertyValue.LanguageId;
+            if (nLanguageId.HasValue)
+                dto.LanguageId = nLanguageId;
 
-            if (propertyValue.Segment != null)
-                dto.Segment = propertyValue.Segment;
-
-            dto.Published = published;
+            if (segment != null)
+                dto.Segment = segment;
 
             if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
             {
@@ -90,7 +88,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<PropertyDataDto> BuildDtos(int nodeId, Guid versionId, IEnumerable<Property> properties, out bool edited)
+        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, out bool edited)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
             edited = false;
@@ -102,16 +100,17 @@ namespace Umbraco.Core.Persistence.Factories
                     // publishing = deal with edit and published values
                     foreach (var propertyValue in property.Values)
                     {
-                        // create a dto for both edit and published - make sure we have one for edit
-                        // we *could* think of optimizing by creating a dto for edit only if EditValue != PublishedValue
-                        // but then queries in db would be way more complicated and require coalescing between edit and
-                        // published dtos - not worth it
-                        if (propertyValue.PublishedValue != null)
-                            propertyDataDtos.Add(BuildDto(nodeId, versionId, property, propertyValue, true, propertyValue.PublishedValue));
+                        // deal with published value
+                        if (propertyValue.PublishedValue != null && publishedVersionId > 0)
+                            propertyDataDtos.Add(BuildDto(publishedVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.PublishedValue));
+
+                        // deal with edit value
                         if (propertyValue.EditValue != null)
-                            propertyDataDtos.Add(BuildDto(nodeId, versionId, property, propertyValue, false, propertyValue.EditValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditValue));
+
+                        // deal with missing edit value (fix inconsistencies)
                         else if (propertyValue.PublishedValue != null)
-                            propertyDataDtos.Add(BuildDto(nodeId, versionId, property, propertyValue, false, propertyValue.PublishedValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.PublishedValue));
 
                         // use explicit equals here, else object comparison fails at comparing eg strings
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditValue);
@@ -124,8 +123,9 @@ namespace Umbraco.Core.Persistence.Factories
                     {
                         // not publishing = only deal with edit values
                         if (propertyValue.EditValue != null)
-                            propertyDataDtos.Add(BuildDto(nodeId, versionId, property, propertyValue, false, propertyValue.EditValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditValue));
                     }
+                    edited = true;
                 }
             }
 

@@ -23,6 +23,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Id = dto.NodeId;
                 content.Key = nodeDto.UniqueId;
                 content.Version = contentVersionDto.VersionId;
+                content.VersionPk = contentVersionDto.Id;
 
                 // fixme missing names?
 
@@ -54,7 +55,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MemberDto BuildDto(IMember entity)
         {
-            var contentDto = BuildContentDto(entity);
+            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Member);
 
             var dto = new MemberDto
             {
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static ContentDto BuildContentDto(IMember entity)
+        private static ContentDto BuildContentDto(IMember entity, Guid objectType)
         {
             var dto = new ContentDto
             {
@@ -78,13 +79,13 @@ namespace Umbraco.Core.Persistence.Factories
                 WriterUserId = entity.WriterId,
                 UpdateDate = entity.UpdateDate,
 
-                NodeDto = BuildNodeDto(entity)
+                NodeDto = BuildNodeDto(entity, objectType)
             };
 
             return dto;
         }
 
-        private static NodeDto BuildNodeDto(IMember entity)
+        private static NodeDto BuildNodeDto(IMember entity, Guid objectType)
         {
             var dto = new NodeDto
             {
@@ -97,7 +98,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Trashed = entity.Trashed,
                 UserId = entity.CreatorId,
                 Text = entity.Name,
-                NodeObjectType = Constants.ObjectTypes.Member,
+                NodeObjectType = objectType,
                 CreateDate = entity.CreateDate
             };
 
@@ -108,10 +109,11 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new ContentVersionDto
             {
-                //Id =, // fixme
+                Id = ((ContentBase) entity).VersionPk,
                 NodeId = entity.Id,
                 VersionId = entity.Version,
                 VersionDate = entity.UpdateDate,
+                UserId = entity.WriterId,
                 Current = true, // always building the current one
                 Text = entity.Name,
 

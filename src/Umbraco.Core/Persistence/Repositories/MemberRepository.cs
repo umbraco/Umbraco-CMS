@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 .LeftJoin<PropertyDataDto>().On(x => x
                     .Where<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                    .Where<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.VersionId))
+                    .Where<PropertyDataDto, ContentVersionDto>((left, right) => left.Id == right.Id))
 
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
         }
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRelation WHERE parentId = @id",
                                "DELETE FROM umbracoRelation WHERE childId = @id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                                "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
                                "DELETE FROM cmsMember WHERE nodeId = @id",
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
@@ -228,7 +228,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IMember entity)
         {
-            ((Member) entity).AddingEntity();
+            var member = (Member) entity;
+            member.AddingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // fixme - do we really want to keep doing this here?
@@ -283,13 +284,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // persist the content version dto
             // assumes a new version id and version date (modified date) has been set
-            var contentVersionDto = dto.ContentVersionDto; // fixme version id etc?
+            var contentVersionDto = dto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
+            member.VersionPk = contentVersionDto.Id;
 
             // persist the member dto
-            dto.NodeId = nodeDto.NodeId; // fixme version id etc?
+            dto.NodeId = nodeDto.NodeId;
 
             // if the password is empty, generate one with the special prefix
             // this will hash the guid with a salt so should be nicely random
@@ -303,7 +305,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionPk, 0, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -316,8 +318,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IMember entity)
         {
-            //Updates Modified date
-            ((Member) entity).UpdatingEntity();
+            var member = (Member) entity;
+
+            // update
+            member.UpdatingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // fixme - do we really want to keep doing this here?
@@ -344,9 +348,6 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(dto.ContentDto);
 
             // update the content version dto
-            // fixme this pk thing is annoying - could we store that ID somewhere?
-            var id = Database.ExecuteScalar<int>(SqlContext.Sql().Select<ContentVersionDto>(x => x.Id).From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == entity.Version));
-            dto.ContentVersionDto.Id = id;
             Database.Update(dto.ContentVersionDto);
 
             // update the member dto
@@ -367,9 +368,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(dto, changedCols);
 
             // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version);
+            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionPk);
             Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionPk, 0, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -546,7 +547,7 @@ namespace Umbraco.Core.Persistence.Repositories
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
-                var versionId = dto.ContentVersionDto.VersionId;
+                var versionGuid = dto.ContentVersionDto.VersionId;
 
                 if (withCache)
                 {
@@ -570,7 +571,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 var c = content[i] = MemberFactory.BuildEntity(dto, contentType);
 
                 // need properties
-                temps.Add(new TempContent<Member>(dto.NodeId, versionId, contentType, c));
+                var versionId = dto.ContentVersionDto.Id;
+                temps.Add(new TempContent<Member>(dto.NodeId, versionId, 0, contentType, c));
             }
 
             // load all properties for all documents from database in 1 query - indexed by version id
@@ -594,9 +596,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var member = MemberFactory.BuildEntity(dto, memberType);
 
             // get properties - indexed by version id
-            var temp = new TempContent<Member>(dto.ContentDto.NodeId, dto.ContentVersionDto.VersionId, memberType);
+            var versionId = dto.ContentVersionDto.Id;
+            var temp = new TempContent<Member>(dto.ContentDto.NodeId,versionId, 0, memberType);
             var properties = GetPropertyCollections(new List<TempContent<Member>> { temp });
-            member.Properties = properties[dto.ContentVersionDto.VersionId];
+            member.Properties = properties[versionId];
 
             // reset dirty initial properties (U4-1946)
             member.ResetDirtyProperties(false);

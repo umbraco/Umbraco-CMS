@@ -208,6 +208,12 @@ namespace Umbraco.Core.Models
         [DataMember]
         public Guid Version { get; internal set; }
 
+        [IgnoreDataMember]
+        internal int VersionPk { get; set; }
+
+        [IgnoreDataMember]
+        internal int PublishedVersionPk { get; set; }
+
         /// <summary>
         /// Integer Id of the default ContentType
         /// </summary>
@@ -322,145 +328,6 @@ namespace Umbraco.Core.Models
 
             var convertAttempt = Properties[propertyTypeAlias].GetValue(languageId, segment, published).TryConvertTo<TPropertyValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
-        }
-
-        /// <summary>
-        /// Publish the neutral value.
-        /// </summary>
-        internal virtual void PublishValues()
-        {
-            foreach (var property in Properties)
-                property.PublishValues();
-        }
-
-        /// <summary>
-        /// Publish the culture value.
-        /// </summary>
-        internal virtual void PublishValues(int? nLanguageId)
-        {
-            foreach (var property in Properties)
-                property.PublishValues(nLanguageId);
-        }
-
-        /// <summary>
-        /// Publish the segment value.
-        /// </summary>
-        internal virtual void PublishValues(int? nLanguageId, string segment)
-        {
-            foreach (var property in Properties)
-                property.PublishValues(nLanguageId, segment);
-        }
-
-        /// <summary>
-        /// Publish all values.
-        /// </summary>
-        internal virtual void PublishAllValues()
-        {
-            foreach (var property in Properties)
-                property.PublishAllValues();
-        }
-
-        internal virtual void RollbackValues(IContentBase other)
-        {
-            // clear all existing properties
-            ClearEditValues(null, null);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, otherProperty.GetValue(true));
-            }
-        }
-
-        internal virtual void RollbackValues(IContentBase other, int? nLanguageId)
-        {
-            if (!nLanguageId.HasValue)
-            {
-                RollbackValues(other);
-                return;
-            }
-
-            var languageId = nLanguageId.Value;
-
-            // clear all existing properties
-            ClearEditValues(nLanguageId, null);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, languageId, otherProperty.GetValue(languageId, true));
-            }
-        }
-
-        internal virtual void RollbackValues(IContentBase other, int? nLanguageId, string segment)
-        {
-            if (segment == null)
-            {
-                RollbackValues(other, nLanguageId);
-                return;
-            }
-
-            if (!nLanguageId.HasValue)
-                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
-
-            var languageId = nLanguageId.Value;
-
-            // clear all existing properties
-            ClearEditValues(nLanguageId, segment);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, languageId, segment, otherProperty.GetValue(languageId, segment, true));
-            }
-        }
-
-        private void ClearEditValues()
-        {
-            // clear all existing properties
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-            foreach (var property in Properties)
-            foreach (var pvalue in property.Values)
-                property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
-        }
-
-        private void ClearEditValues(int? nLanguageId, string segment)
-        {
-            // clear all existing properties
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-            foreach (var property in Properties)
-            foreach (var pvalue in property.Values)
-                if (pvalue.LanguageId == nLanguageId && pvalue.Segment == segment)
-                    property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
-        }
-
-        internal virtual void RollbackAllValues(IContentBase other)
-        {
-            // clear all existing properties
-            ClearEditValues();
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                foreach (var pvalue in otherProperty.Values)
-                {
-                    // fixme can we update SetValue to accept null lang/segment and fallback?
-                    if (!pvalue.LanguageId.HasValue)
-                        SetValue(alias, pvalue.PublishedValue);
-                    else if (pvalue.Segment == null)
-                        SetValue(alias, pvalue.LanguageId.Value, pvalue.PublishedValue);
-                    else
-                        SetValue(alias, pvalue.LanguageId.Value, pvalue.Segment, pvalue.PublishedValue);
-                }
-            }
         }
 
         /// <summary>

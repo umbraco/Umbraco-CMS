@@ -318,7 +318,7 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <summary>
-        /// Appends an LEFT JOIN clause to the Sql statement.
+        /// Appends a LEFT JOIN clause to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
@@ -335,7 +335,31 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <summary>
-        /// Appends an RIGHT JOIN clause to the Sql statement.
+        /// Appends a LEFT JOIN clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="nestedJoin">A nested join statement.</param>
+        /// <param name="alias">An optional alias for the joined table.</param>
+        /// <returns>A SqlJoin statement.</returns>
+        /// <remarks>Nested statement produces LEFT JOIN xxx JOIN yyy ON ... ON ...</remarks>
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null)
+        {
+            var type = typeof(TDto);
+            var tableName = type.GetTableName();
+            var join = sql.SqlContext.SqlSyntax.GetQuotedTableName(tableName);
+            if (alias != null) join += " " + sql.SqlContext.SqlSyntax.GetQuotedTableName(alias);
+
+            var nestedSql = new Sql<ISqlContext>(sql.SqlContext);
+            nestedSql = nestedJoin(nestedSql);
+
+            var sqlJoin = sql.LeftJoin(join);
+            sql.Append(nestedSql);
+            return sqlJoin;
+        }
+
+        /// <summary>
+        /// Appends a RIGHT JOIN clause to the Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>

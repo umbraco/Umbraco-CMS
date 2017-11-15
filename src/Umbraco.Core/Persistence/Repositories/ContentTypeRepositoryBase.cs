@@ -300,10 +300,11 @@ AND umbracoNode.id <> @id",
                             var nodeId = contentDto.NodeId;
                             var propertyTypeId = propertyType.Id;
                             var propertySql = Sql()
-                                .Select(Constants.DatabaseSchema.Tables.PropertyData + ".id")
+                                .Select<PropertyDataDto>(x => x.Id)
                                 .From<PropertyDataDto>()
-                                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                                .Where<PropertyDataDto>(x => x.NodeId == nodeId)
+                                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
+                                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
+                                .Where<ContentVersionDto>(x => x.NodeId == nodeId)
                                 .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
 
                             // finally delete the properties that match our criteria for removing a ContentType from the composition

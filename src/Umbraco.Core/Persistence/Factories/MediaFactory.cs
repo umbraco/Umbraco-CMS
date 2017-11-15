@@ -23,6 +23,7 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Id = dto.NodeId;
                 content.Key = nodeDto.UniqueId;
                 content.Version = contentVersionDto.VersionId;
+                content.VersionPk = contentVersionDto.Id;
 
                 // fixme missing names?
 
@@ -52,12 +53,12 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static ContentDto BuildDto(IMedia entity)
         {
-            var dto = BuildContentDto(entity);
+            var dto = BuildContentDto(entity, Constants.ObjectTypes.Media);
             dto.ContentVersionDto = BuildContentVersionDto(entity, dto);
             return dto;
         }
 
-        private static ContentDto BuildContentDto(IMedia entity)
+        private static ContentDto BuildContentDto(IMedia entity, Guid objectType)
         {
             var dto = new ContentDto
             {
@@ -66,13 +67,13 @@ namespace Umbraco.Core.Persistence.Factories
                 WriterUserId = entity.WriterId,
                 UpdateDate = entity.UpdateDate,
 
-                NodeDto = BuildNodeDto(entity)
+                NodeDto = BuildNodeDto(entity, objectType)
             };
 
             return dto;
         }
 
-        private static NodeDto BuildNodeDto(IMedia entity)
+        private static NodeDto BuildNodeDto(IMedia entity, Guid objectType)
         {
             var dto = new NodeDto
             {
@@ -85,21 +86,24 @@ namespace Umbraco.Core.Persistence.Factories
                 Trashed = entity.Trashed,
                 UserId = entity.CreatorId,
                 Text = entity.Name,
-                NodeObjectType = Constants.ObjectTypes.Media,
+                NodeObjectType = objectType,
                 CreateDate = entity.CreateDate
             };
 
             return dto;
         }
 
+        // always build the current / VersionPk dto
+        // we're never going to build / save old versions (which are immutable)
         private static ContentVersionDto BuildContentVersionDto(IMedia entity, ContentDto contentDto)
         {
             var dto = new ContentVersionDto
             {
-                //Id =, // fixme
+                Id = ((ContentBase) entity).VersionPk,
                 NodeId = entity.Id,
                 VersionId = entity.Version,
                 VersionDate = entity.UpdateDate,
+                UserId = entity.WriterId,
                 Current = true, // always building the current one
                 Text = entity.Name,
 

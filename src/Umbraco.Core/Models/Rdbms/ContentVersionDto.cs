@@ -29,15 +29,16 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime VersionDate { get; set; }
 
+        [Column("userId")]
+        public int UserId { get; set; }
+
         [Column("current")]
-        [Constraint(Default = false)] // fixme or true? unique index on NodeId,current!!
         public bool Current { get; set; }
 
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Text { get; set; }
 
-        // fixme assess whether we really want this
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]
         public ContentDto ContentDto { get; set; }

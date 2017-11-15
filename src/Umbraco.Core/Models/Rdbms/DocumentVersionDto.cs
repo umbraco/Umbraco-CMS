@@ -20,8 +20,11 @@ namespace Umbraco.Core.Models.Rdbms
         [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
         public int? TemplateId { get; set; }
 
+        [Column("published")]
+        public bool Published { get; set; }
+
         [ResultColumn]
-        [Reference(ReferenceType.OneToOne, ReferenceMemberName = "VersionId")]
+        [Reference(ReferenceType.OneToOne)]
         public ContentVersionDto ContentVersionDto { get; set; }
     }
 }

@@ -624,11 +624,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void GetAllContentManyVersions()
         {
+            IContent[] result;
+
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, out _);
-                var result = repository.GetAll().ToArray();
+                result = repository.GetAll().ToArray();
 
                 // save them all
                 foreach (var content in result)
@@ -647,7 +649,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
                 unitOfWork.Flush();
 
-                // get them all again
+                unitOfWork.Complete();
+            }
+
+            // get them all again
+            using (var unitOfWork = provider.CreateUnitOfWork())
+            {
+                var repository = CreateRepository(unitOfWork, out _);
                 var result2 = repository.GetAll().ToArray();
 
                 Assert.AreEqual(result.Length, result2.Length);
@@ -707,7 +715,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, out _);
-                
+
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 try
@@ -787,7 +795,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, out _);
-                
+
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Page 2"));

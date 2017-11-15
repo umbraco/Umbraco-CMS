@@ -15,19 +15,21 @@ namespace Umbraco.Core.Models.Rdbms
 
         private decimal? _decimalValue;
 
-        // fixme - should we just kill that one? we never update!
+        // pk, not used at the moment (never updating)
         [Column("id")]
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
-        [Column("nodeId")]
-        [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,versionId,propertyTypeId,languageId,segment,published")]
-        public int NodeId { get; set; }
+        //[Column("nodeId")]
+        //[ForeignKey(typeof(NodeDto))]
+        //[Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,versionId,propertyTypeId,languageId,segment,published")]
+        //public int NodeId { get; set; }
 
         [Column("versionId")]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionId")]
-        public Guid VersionId { get; set; }
+        [ForeignKey(typeof(ContentVersionDto))]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,propertyTypeId,languageId,segment")]
+        //[Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionId")]
+        public int VersionId { get; set; }
 
         [Column("propertyTypeId")]
         [ForeignKey(typeof(PropertyTypeDto))]
@@ -46,9 +48,9 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(SegmentLength)]
         public string Segment { get; set; }
 
-        [Column("published")]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
-        public bool Published { get; set; }
+        //[Column("published")]
+        //[Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
+        //public bool Published { get; set; }
 
         [Column("intValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -109,12 +111,12 @@ namespace Umbraco.Core.Models.Rdbms
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((PropertyDataDto) obj);
+            return
+                !ReferenceEquals(null, other) // other is not null
+                && (ReferenceEquals(this, other) // and either ref-equals, or same id
+                    || other is PropertyDataDto pdata && pdata.Id == Id);
         }
 
         public override int GetHashCode()

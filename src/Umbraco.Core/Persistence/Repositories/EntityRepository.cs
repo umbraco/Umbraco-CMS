@@ -414,11 +414,12 @@ namespace Umbraco.Core.Persistence.Repositories
         private Sql<ISqlContext> GetPropertySql(Guid nodeObjectType)
         {
             var sql = Sql()
-                .Select<PropertyDataDto>(x => x.NodeId, x => x.VersionId, x => x.TextValue, x => x.VarcharValue)
+                .Select<PropertyDataDto>(x => x.VersionId, x => x.TextValue, x => x.VarcharValue)
                 .AndSelect<DataTypeDto>(x => x.PropertyEditorAlias)
                 .AndSelectAs<PropertyTypeDto>(x => x.Alias, "propertyTypeAlias")
                 .From<PropertyDataDto>()
-                .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
+                .InnerJoin<NodeDto>().On<ContentVersionDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
                 .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
                 .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
