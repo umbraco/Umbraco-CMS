@@ -276,7 +276,16 @@
         } else {
           contentResource.getById(relation.parentId).then(function (data) {
             target = data;
+
+            // make sure the target item isn't in the recycle bin
+            if(target.path.indexOf("-20") !== -1) {
+              notificationsService.error(error.headline, "The item you want to restore it under (" + target.name + ") is in the recycle bin. Use the Move menu item to move the item manually.");
+              $scope.page.buttonRestore = "error";              
+              return;
+            }
+
             moveNode(content, target);
+
           }, function (err) {
             $scope.page.buttonRestore = "error";
             notificationsService.error(error.headline, error.content);

@@ -29,6 +29,17 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 			    contentResource.getById($scope.relation.parentId).then(function (data) {
 					$scope.target = data;
 
+					// make sure the target item isn't in the recycle bin
+					if($scope.target.path.indexOf("-20") !== -1) {
+						$scope.error = {
+							errorMsg: "Cannot automatically restore this item",
+							data: {
+								Message: "The item you want to restore it under (" + $scope.target.name + ") is in the recycle bin. Use the Move menu item to move the item manually."								
+							}
+						};
+						$scope.success = false;
+					}
+
 				}, function (err) {
 					$scope.success = false;
 					$scope.error = err;
