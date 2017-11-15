@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
@@ -19,6 +18,8 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyType : Entity, IEquatable<PropertyType>
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         private readonly bool _isExplicitDbType;
         private string _name;
         private string _alias;
@@ -51,13 +52,11 @@ namespace Umbraco.Core.Models
 
         public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
             : this(propertyEditorAlias, dataTypeDatabaseType, false)
-        {
-        }
+        { }
 
         public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, string propertyTypeAlias)
             : this(propertyEditorAlias, dataTypeDatabaseType, false, propertyTypeAlias)
-        {
-        }
+        { }
 
         /// <summary>
         /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
@@ -87,8 +86,7 @@ namespace Umbraco.Core.Models
             _alias = GetAlias(propertyTypeAlias);
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
@@ -104,14 +102,16 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
         }
 
+        public bool IsPublishing { get; internal set; }
+
         /// <summary>
         /// Gets of Sets the Name of the PropertyType
         /// </summary>
         [DataMember]
         public string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
         }
 
         /// <summary>
@@ -120,8 +120,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Alias
         {
-            get { return _alias; }
-            set { SetPropertyValueAndDetectChanges(GetAlias(value), ref _alias, Ps.Value.AliasSelector); }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(GetAlias(value), ref _alias, Ps.Value.AliasSelector);
         }
 
         /// <summary>
@@ -130,8 +130,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string Description
         {
-            get { return _description; }
-            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
+            get => _description;
+            set => SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector);
         }
 
         /// <summary>
@@ -141,15 +141,15 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int DataTypeDefinitionId
         {
-            get { return _dataTypeDefinitionId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector); }
+            get => _dataTypeDefinitionId;
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector);
         }
 
         [DataMember]
         public string PropertyEditorAlias
         {
-            get { return _propertyEditorAlias; }
-            set { SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector); }
+            get => _propertyEditorAlias;
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
         }
 
         /// <summary>
@@ -159,11 +159,7 @@ namespace Umbraco.Core.Models
         [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead. This method will return a generated GUID for any property editor alias not explicitly mapped to a legacy ID")]
         public Guid DataTypeId
         {
-            get
-            {
-                return LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(
-                    _propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId).Value;
-            }
+            get => LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId).Value;
             set
             {
                 var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);
@@ -177,12 +173,11 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal DataTypeDatabaseType DataTypeDatabaseType
         {
-            get { return _dataTypeDatabaseType; }
+            get => _dataTypeDatabaseType;
             set
             {
                 //don't allow setting this if an explicit declaration has been made in the ctor
                 if (_isExplicitDbType) return;
-
                 SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);
             }
         }
@@ -194,8 +189,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal Lazy<int> PropertyGroupId
         {
-            get { return _propertyGroupId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Ps.Value.PropertyGroupIdSelector); }
+            get => _propertyGroupId;
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Ps.Value.PropertyGroupIdSelector);
         }
 
         /// <summary>
@@ -204,8 +199,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool Mandatory
         {
-            get { return _mandatory; }
-            set { SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector); }
+            get => _mandatory;
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector);
         }
 
         /// <summary>
@@ -215,8 +210,8 @@ namespace Umbraco.Core.Models
         [Obsolete("Not used anywhere, will be removed in future versions")]
         public string HelpText
         {
-            get { return _helpText; }
-            set { SetPropertyValueAndDetectChanges(value, ref _helpText, Ps.Value.HelpTextSelector); }
+            get => _helpText;
+            set => SetPropertyValueAndDetectChanges(value, ref _helpText, Ps.Value.HelpTextSelector);
         }
 
         /// <summary>
@@ -225,8 +220,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int SortOrder
         {
-            get { return _sortOrder; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
+            get => _sortOrder;
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
         }
 
         /// <summary>
@@ -235,11 +230,11 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string ValidationRegExp
         {
-            get { return _validationRegExp; }
-            set { SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector); }
+            get => _validationRegExp;
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector);
         }
 
-        private string GetAlias(string value)
+        private static string GetAlias(string value)
         {
             //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
             // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
@@ -339,7 +334,7 @@ namespace Umbraco.Core.Models
                 }
                 catch
                 {
-                         throw new Exception(string .Format("Invalid validation expression on property {0}",this.Alias));
+                         throw new Exception($"Invalid validation expression on property {Alias}");
                 }
 
             }

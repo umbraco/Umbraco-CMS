@@ -40,16 +40,16 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="propertyType"></param>
         /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
-            if (property.GetValue() == null)
+            if (value == null)
                 return null;
 
-            var idAttempt = property.GetValue().TryConvertTo<int>();
+            var idAttempt = value.TryConvertTo<int>();
             if (idAttempt.Success)
             {
                 var preValId = idAttempt.Result;
-                var preVals = GetPreValues(property);
+                var preVals = GetPreValues(propertyType);
                 if (preVals != null)
                 {
                     if (preVals.Any(x => x.Value.Id == preValId))
@@ -57,16 +57,17 @@ namespace Umbraco.Web.PropertyEditors
                         return preVals.Single(x => x.Value.Id == preValId).Value.Value;
                     }
 
-                    _logger.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
+                    _logger.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + propertyType.Alias);
                 }
             }
 
-            return base.ConvertDbToString(property, propertyType, dataTypeService);
+            // fallback to default
+            return base.ConvertDbToString(propertyType, value, dataTypeService);
         }
 
-        protected IDictionary<string, PreValue> GetPreValues(Property property)
+        protected IDictionary<string, PreValue> GetPreValues(PropertyType propertyType)
         {
-            var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+            var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeDefinitionId);
             if (preVals != null)
             {
                 var dictionary = preVals.FormatAsDictionary();

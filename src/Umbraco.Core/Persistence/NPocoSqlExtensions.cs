@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using NPoco;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -16,6 +17,12 @@ namespace Umbraco.Core.Persistence
         // note: here we take benefit from the fact that NPoco methods that return a Sql, such as
         // when doing "sql = sql.Where(...)" actually append to, and return, the original Sql, not
         // a new one.
+
+        #region Alias
+
+        // would love to implement per-column alias in select, where, etc...
+
+        #endregion
 
         #region Where
 
@@ -389,7 +396,8 @@ namespace Umbraco.Core.Persistence
         {
             var sql = new Sql<ISqlContext>(sqlJoin.SqlContext);
             sql = on(sql);
-            return sqlJoin.On(sql.SQL, sql.Arguments);
+            var text = sql.SQL.Trim().TrimStart("WHERE").Trim();
+            return sqlJoin.On(text, sql.Arguments);
         }
 
         /// <summary>
@@ -475,6 +483,47 @@ namespace Umbraco.Core.Persistence
         public static Sql<ISqlContext> Select<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
             return sql.Select(sql.GetColumns(columnExpressions: fields));
+        }
+
+        /// <summary>
+        /// Creates a SELECT Sql statement for an aliased column.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="field">Expression indicating the column to select.</param>
+        /// <param name="alias">The column alias</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> SelectAs<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string alias)
+        {
+            return sql.Select(string.Join(", ", sql.GetColumns(columnExpressions: new[] { field }, withAlias: false)) + " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias));
+        }
+
+        /// <summary>
+        /// Adds columns to a SELECT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
+        /// <returns>The Sql statement.</returns>
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> AndSelect<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
+        {
+            return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields)));
+        }
+
+        /// <summary>
+        /// Adds an aliased column to a SELECT Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
+        /// <param name="sql">The origin sql.</param>
+        /// <param name="field">Expression indicating the column to select.</param>
+        /// <param name="alias">The column alias</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> AndSelectAs<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string alias)
+        {
+            return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: new[] { field }, withAlias: false)) + " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias));
         }
 
         /// <summary>

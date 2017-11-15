@@ -16,19 +16,32 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public ContentNodeKit GetContentSource(IScopeUnitOfWork uow, int id)
         {
+            // fixme - missing things
+            //
+            // new: documentDto.publishDate
+            // new: documentDto.publishUserId
+            // new: documentDto.templateId - the published one
+            // fixme still, we have an issue with names
+            //
+            // node.text == contentVersion.text (and we use contentVersion.text to keep track of things)
+            // !! when creating a new version, the old version versionDate = publishDate, what else?
+            //
+            // new: documentDto.publishName === THE ONE WE USE FOR URLS !!
+            //
             var dto = uow.Database.Fetch<ContentSourceDto>(new Sql(@"SELECT
 n.id Id, n.uniqueId Uid,
 uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
+n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId, cver.versionId Version,
 n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
+cver.text DraftName, c.updateDate DraftVersionDate, c.writerUserId DraftWriterId, dver.templateId DraftTemplateId, doc.edited Edited,
 nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
+docPub.text PubName, doc.publishDate PubVersionDate, doc.publishUserId PubWriterId, doc.templateId PubTemplateId, doc.published Published,
 nuPub.data PubData
 FROM umbracoNode n
-JOIN uContent ON (uContent.nodeId=n.id)
-LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
-LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
+JOIN uContent c ON (c.nodeId=n.id)
+LEFT JOIN uDocument doc ON (doc.nodeId=n.id)
+LEFT JOIN uContentVersion cver ON (n.id=cver.nodeId AND cver.current=1)
+LEFT JOIN uDocumentVersion dver ON (cver.id=dver.id)
 LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND n.id=@id
@@ -49,7 +62,7 @@ n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN uContent ON (uContent.nodeId=n.id)
-JOIN cmsContentVersion ver ON (ver.contentId=n.id)
+JOIN uContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND n.id=@id
 ", new { objType = Constants.ObjectTypes.Media, /*id =*/ id })).FirstOrDefault();
@@ -93,7 +106,7 @@ n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN uContent ON (uContent.nodeId=n.id)
-JOIN cmsContentVersion ver ON (ver.contentId=n.id)
+JOIN uContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType
 ORDER BY n.level, n.sortOrder
@@ -137,7 +150,7 @@ nuPub.data PubData
 FROM umbracoNode n
 JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
 JOIN uContent ON (uContent.nodeId=n.id)
-JOIN cmsContentVersion ver ON (ver.contentId=n.id)
+JOIN uContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND x.id=@id
 ORDER BY n.level, n.sortOrder
@@ -179,7 +192,7 @@ n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
 nuPub.data PubData
 FROM umbracoNode n
 JOIN uContent ON (uContent.nodeId=n.id)
-JOIN cmsContentVersion ver ON (ver.contentId=n.id)
+JOIN uContentVersion ver ON (ver.contentId=n.id)
 LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
 WHERE n.nodeObjectType=@objType AND uContent.contentTypeId IN (@ids)
 ORDER BY n.level, n.sortOrder
@@ -191,7 +204,7 @@ ORDER BY n.level, n.sortOrder
             ContentData d = null;
             ContentData p = null;
 
-            if (dto.DraftVersion != Guid.Empty)
+            if (dto.Edited)
             {
                 if (dto.DraftData == null)
                 {
@@ -205,7 +218,7 @@ ORDER BY n.level, n.sortOrder
                         Name = dto.DraftName,
                         Published = false,
                         TemplateId = dto.DraftTemplateId,
-                        Version = dto.DraftVersion,
+                        Version = dto.Version,
                         VersionDate = dto.DraftVersionDate,
                         WriterId = dto.DraftWriterId,
                         Properties = DeserializeData(dto.DraftData)
@@ -213,7 +226,7 @@ ORDER BY n.level, n.sortOrder
                 }
             }
 
-            if (dto.PubVersion != Guid.Empty)
+            if (dto.Published)
             {
                 if (dto.PubData == null)
                 {
@@ -227,7 +240,7 @@ ORDER BY n.level, n.sortOrder
                         Name = dto.PubName,
                         Published = true,
                         TemplateId = dto.PubTemplateId,
-                        Version = dto.PubVersion,
+                        Version = dto.Version,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
                         Properties = DeserializeData(dto.PubData)
@@ -259,7 +272,7 @@ ORDER BY n.level, n.sortOrder
                 Name = dto.PubName,
                 Published = true,
                 TemplateId = -1,
-                Version = dto.PubVersion,
+                Version = dto.Version,
                 VersionDate = dto.PubVersionDate,
                 WriterId = dto.CreatorId, // what-else?
                 Properties = DeserializeData(dto.PubData)

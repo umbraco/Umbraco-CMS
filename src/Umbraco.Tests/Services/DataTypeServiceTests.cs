@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Services
             Assert.That(deletedDefinition, Is.Null);
 
             //Further assertions against the ContentType that contains PropertyTypes based on the TextField
-            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed);
+            var contentType = ServiceContext.ContentTypeService.Get(NodeDto.NodeIdSeed+1);
             Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
         }

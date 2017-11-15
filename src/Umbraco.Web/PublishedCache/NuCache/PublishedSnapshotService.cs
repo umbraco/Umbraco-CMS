@@ -998,7 +998,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache)),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, memberTypeCache, PublishedSnapshotAccessor),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache
@@ -1093,13 +1093,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 // saving the published version = update data
                 pc = content;
-            }
-            else
-            {
-                // saving the non-published version, but there is a published version
-                // check whether we have changes that impact the published version (move...)
-                if (content.HasPublishedVersion && HasChangesImpactingAllVersions(content))
-                    pc = sender.GetByVersion(content.PublishedVersionGuid);
             }
 
             if (pc == null)
@@ -1281,11 +1274,7 @@ WHERE cmsContentNu.nodeId IN (
                 var items = new List<ContentNuDto>();
                 var guids = new List<Guid>();
                 foreach (var c in descendants)
-                {
                     items.Add(GetDto(c, c.Published));
-                    if (c.Published == false && c.HasPublishedVersion)
-                        guids.Add(c.PublishedVersionGuid);
-                }
                 items.AddRange(guids.Select(x => GetDto(repository.GetByVersion(x), true)));
 
                 db.BulkInsertRecords(items);

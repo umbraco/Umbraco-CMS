@@ -429,32 +429,11 @@ namespace Umbraco.Core.Services
         IContent GetByVersion(Guid versionId);
 
         /// <summary>
-        /// Gets the published version of an <see cref="IContent"/> item
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
-        /// <returns>An <see cref="IContent"/> item</returns>
-        IContent GetPublishedVersion(int id);
-
-        /// <summary>
-        /// Gets the published version of a <see cref="IContent"/> item.
-        /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <returns>The published version, if any; otherwise, null.</returns>
-        IContent GetPublishedVersion(IContent content);
-
-        /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any children
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/></param>
         /// <returns>True if the content has any children otherwise False</returns>
         bool HasChildren(int id);
-
-        /// <summary>
-        /// Checks whether an <see cref="IContent"/> item has any published versions
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/></param>
-        /// <returns>True if the content has any published version otherwise False</returns>
-        bool HasPublishedVersion(int id);
 
         /// <summary>
         /// Publishes a single <see cref="IContent"/> object

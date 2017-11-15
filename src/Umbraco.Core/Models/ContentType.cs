@@ -13,6 +13,9 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        public const bool IsPublishingConst = true;
+
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
 
@@ -48,8 +51,10 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        /// <inheritdoc />
+        public override bool IsPublishing => IsPublishingConst;
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);

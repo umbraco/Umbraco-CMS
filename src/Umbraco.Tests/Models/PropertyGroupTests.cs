@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Models
         public void Can_Deep_Clone()
         {
             var pg = new PropertyGroup(
-                new PropertyTypeCollection(new[]
+                new PropertyTypeCollection(false, new[]
                 {
                     new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
                     {
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Models
             var ss = new SerializationService(new JsonNetSerializer());
 
             var pg = new PropertyGroup(
-                new PropertyTypeCollection(new[]
+                new PropertyTypeCollection(false, new[]
                 {
                     new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
                     {

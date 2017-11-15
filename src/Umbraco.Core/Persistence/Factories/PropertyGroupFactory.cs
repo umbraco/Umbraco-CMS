@@ -30,14 +30,14 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
 
-        public IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> groupDtos)
+        public IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> groupDtos, bool isPublishing)
         {
             // groupDtos contains all the groups, those that are defined on the current
             // content type, and those that are inherited from composition content types
             var propertyGroups = new PropertyGroupCollection();
             foreach (var groupDto in groupDtos)
             {
-                var group = new PropertyGroup();
+                var group = new PropertyGroup(isPublishing);
 
                 try
                 {
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                     group.Name = groupDto.Text;
                     group.SortOrder = groupDto.SortOrder;
-                    group.PropertyTypes = new PropertyTypeCollection();
+                    group.PropertyTypes = new PropertyTypeCollection(isPublishing);
                     group.Key = groupDto.UniqueId;
 
                     //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Persistence.Factories
                 UniqueId = propertyType.Key
             };
 
-            if (tabId != default(int))
+            if (tabId != default)
             {
                 propertyTypeDto.PropertyTypeGroupId = tabId;
             }

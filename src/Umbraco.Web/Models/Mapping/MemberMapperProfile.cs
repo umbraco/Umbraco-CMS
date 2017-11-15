@@ -61,6 +61,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.FailedPasswordAttempts, opt => opt.Ignore())
                 .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.WriterId, opt => opt.Ignore())
                 //TODO: Support these eventually
                 .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
                 .ForMember(dest => dest.RawPasswordAnswerValue, opt => opt.Ignore());
@@ -85,7 +86,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
                 .ForMember(dest => dest.TreeNodeUrl, opt => opt.Ignore())
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.Ignore())
                 .AfterMap((src, dest) => MapGenericCustomProperties(memberService, userService, src, dest, textService));
 
             //FROM IMember TO MemberBasic
@@ -99,8 +99,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Published, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore());
 
             //FROM MembershipUser TO MemberBasic
             CreateMap<MembershipUser, MemberBasic>()
@@ -124,8 +123,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore())
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.Ignore());
+                .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             CreateMap<IMember, ContentItemDto<IMember>>()
@@ -135,7 +133,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dest => dest.Properties, opt => opt.ResolveUsing(src => memberDtoPropertiesResolver.Resolve(src)));
 

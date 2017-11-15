@@ -20,6 +20,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
+            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -54,6 +55,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
+            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -86,6 +88,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
+            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);
@@ -122,6 +125,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var ct = MockedContentTypes.CreateSimpleContentType("blah", "Blah");
+            ServiceContext.FileService.SaveTemplate(ct.DefaultTemplate);
             contentTypeService.Save(ct);
             var c = MockedContent.CreateSimpleContent(ct, "Test", -1);
             contentService.Save(c);

@@ -34,6 +34,8 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger)
         { }
 
+        protected abstract bool IsPublishing { get; }
+
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
             var parentId = Constants.System.Root;
@@ -480,7 +482,7 @@ AND umbracoNode.id <> @id",
                 .Fetch<PropertyTypeGroupDto>(sql);
 
             var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
-            var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
+            var propertyGroups = propertyGroupFactory.BuildEntity(dtos, IsPublishing);
             return new PropertyGroupCollection(propertyGroups);
         }
 
@@ -497,7 +499,7 @@ AND umbracoNode.id <> @id",
 
             //TODO Move this to a PropertyTypeFactory
             var list = new List<PropertyType>();
-            foreach (var dto in dtos.Where(x => (x.PropertyTypeGroupId > 0) == false))
+            foreach (var dto in dtos.Where(x => x.PropertyTypeGroupId <= 0))
             {
                 var propType = CreatePropertyType(dto.DataTypeDto.PropertyEditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
                 propType.DataTypeDefinitionId = dto.DataTypeId;
@@ -515,7 +517,7 @@ AND umbracoNode.id <> @id",
             //Reset dirty properties
             Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 
-            return new PropertyTypeCollection(list);
+            return new PropertyTypeCollection(IsPublishing, list);
         }
 
         protected void ValidateAlias(PropertyType pt)
@@ -584,7 +586,6 @@ AND umbracoNode.id <> @id",
 
         internal static class ContentTypeQueryMapper
         {
-
             public class AssociatedTemplate
             {
                 public AssociatedTemplate(int templateId, string @alias, string templateName)
@@ -618,7 +619,7 @@ AND umbracoNode.id <> @id",
             }
 
             public static IEnumerable<IMediaType> GetMediaTypes<TRepo>(
-                IDatabase db, ISqlSyntaxProvider sqlSyntax,
+                IDatabase db, ISqlSyntaxProvider sqlSyntax, bool isPublishing,
                 TRepo contentTypeRepository)
                 where TRepo : IReadRepository<int, TEntity>
             {
@@ -626,13 +627,13 @@ AND umbracoNode.id <> @id",
                 var mediaTypes = MapMediaTypes(db, sqlSyntax, out allParentMediaTypeIds)
                     .ToArray();
 
-                MapContentTypeChildren(mediaTypes, db, sqlSyntax, contentTypeRepository, allParentMediaTypeIds);
+                MapContentTypeChildren(mediaTypes, db, sqlSyntax, isPublishing, contentTypeRepository, allParentMediaTypeIds);
 
                 return mediaTypes;
             }
 
             public static IEnumerable<IContentType> GetContentTypes<TRepo>(
-                IDatabase db, ISqlSyntaxProvider sqlSyntax,
+                IDatabase db, ISqlSyntaxProvider sqlSyntax, bool isPublishing,
                 TRepo contentTypeRepository,
                 ITemplateRepository templateRepository)
                 where TRepo : IReadRepository<int, TEntity>
@@ -647,15 +648,14 @@ AND umbracoNode.id <> @id",
                     MapContentTypeTemplates(
                             contentTypes, db, contentTypeRepository, templateRepository, allAssociatedTemplates);
 
-                    MapContentTypeChildren(
-                            contentTypes, db, sqlSyntax, contentTypeRepository, allParentContentTypeIds);
+                    MapContentTypeChildren(contentTypes, db, sqlSyntax, isPublishing, contentTypeRepository, allParentContentTypeIds);
                 }
 
                 return contentTypes;
             }
 
             internal static void MapContentTypeChildren<TRepo>(IContentTypeComposition[] contentTypes,
-                IDatabase db, ISqlSyntaxProvider sqlSyntax,
+                IDatabase db, ISqlSyntaxProvider sqlSyntax, bool isPublishing,
                 TRepo contentTypeRepository,
                 IDictionary<int, List<int>> allParentContentTypeIds)
                 where TRepo : IReadRepository<int, TEntity>
@@ -665,7 +665,7 @@ AND umbracoNode.id <> @id",
                 var ids = contentTypes.Select(x => x.Id).ToArray();
                 IDictionary<int, PropertyGroupCollection> allPropGroups;
                 IDictionary<int, PropertyTypeCollection> allPropTypes;
-                MapGroupsAndProperties(ids, db, sqlSyntax, out allPropTypes, out allPropGroups);
+                MapGroupsAndProperties(ids, db, sqlSyntax, isPublishing, out allPropTypes, out allPropGroups);
 
                 foreach (var contentType in contentTypes)
                 {
@@ -1068,7 +1068,7 @@ AND umbracoNode.id <> @id",
                 return contentType;
             }
 
-            internal static void MapGroupsAndProperties(int[] contentTypeIds, IDatabase db, ISqlSyntaxProvider sqlSyntax,
+            internal static void MapGroupsAndProperties(int[] contentTypeIds, IDatabase db, ISqlSyntaxProvider sqlSyntax, bool isPublishing,
                 out IDictionary<int, PropertyTypeCollection> allPropertyTypeCollection,
                 out IDictionary<int, PropertyGroupCollection> allPropertyGroupCollection)
             {
@@ -1114,7 +1114,7 @@ ORDER BY contentTypeId, groupId, id";
 
                 foreach (var contentTypeId in contentTypeIds)
                 {
-                    var propertyTypeCollection = allPropertyTypeCollection[contentTypeId] = new PropertyTypeCollection();
+                    var propertyTypeCollection = allPropertyTypeCollection[contentTypeId] = new PropertyTypeCollection(isPublishing);
                     var propertyGroupCollection = allPropertyGroupCollection[contentTypeId] = new PropertyGroupCollection();
 
                     while (prop != null && prop.contentTypeId == contentTypeId && prop.groupId == null)
@@ -1125,7 +1125,7 @@ ORDER BY contentTypeId, groupId, id";
 
                     while (group != null && group.contentTypeId == contentTypeId)
                     {
-                        var propertyGroup = new PropertyGroup(new PropertyTypeCollection())
+                        var propertyGroup = new PropertyGroup(new PropertyTypeCollection(isPublishing))
                         {
                             Id = group.id,
                             Name = group.text,

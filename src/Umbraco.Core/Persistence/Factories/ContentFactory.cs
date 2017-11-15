@@ -41,11 +41,16 @@ namespace Umbraco.Core.Persistence.Factories
                 content.UpdateDate = contentDto.UpdateDate;
 
                 content.Published = dto.Published;
+                content.Edited = dto.Edited;
                 content.ExpireDate = dto.ExpiresDate;
                 content.ReleaseDate = dto.ReleaseDate;
 
-                // if not published, published date has no meaning really
-                content.PublishedDate = dto.Published ? contentVersionDto.VersionDate : DateTime.MinValue;
+                if (dto.Published)
+                {
+                    content.PublishDate = dto.PublishDate;
+                    content.PublishName = dto.PublishName;
+                    content.PublisherId = dto.PublishUserId;
+                }
 
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
@@ -60,9 +65,9 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Buils a dto from an IContent item.
         /// </summary>
-        public static DocumentDto BuildDto(IContent entity)
+        public static DocumentDto BuildDto(IContent entity, Guid objectType)
         {
-            var contentDto = BuildContentDto(entity);
+            var contentDto = BuildContentDto(entity, objectType);
 
             var dto = new DocumentDto
             {
@@ -78,7 +83,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static ContentDto BuildContentDto(IContent entity)
+        private static ContentDto BuildContentDto(IContent entity, Guid objectType)
         {
             var dto = new ContentDto
             {
@@ -87,13 +92,13 @@ namespace Umbraco.Core.Persistence.Factories
                 WriterUserId = entity.WriterId,
                 UpdateDate = entity.UpdateDate,
 
-                NodeDto = BuildNodeDto(entity)
+                NodeDto = BuildNodeDto(entity, objectType)
             };
 
             return dto;
         }
 
-        private static NodeDto BuildNodeDto(IContent entity)
+        private static NodeDto BuildNodeDto(IContent entity, Guid objectType)
         {
             var dto = new NodeDto
             {
@@ -106,7 +111,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Trashed = entity.Trashed,
                 UserId = entity.CreatorId,
                 Text = entity.Name,
-                NodeObjectType = Constants.ObjectTypes.Document,
+                NodeObjectType = objectType,
                 CreateDate = entity.CreateDate
             };
 

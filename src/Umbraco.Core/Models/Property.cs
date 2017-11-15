@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models
     public class Property : Entity
     {
         private PropertyType _propertyType;
-        private readonly PropertyTags _tagSupport = new PropertyTags(); // fixme allocating even if no support?
+        private List<PropertyTagChange> _tagChanges;
 
         private List<PropertyValue> _values = new List<PropertyValue>();
         private PropertyValue _pvalue;
@@ -41,13 +41,13 @@ namespace Umbraco.Core.Models
 
         public class PropertyValue
         {
-            public int? LanguageId { get; set; }
-            public string Segment { get; set; }
-            public object PublishedValue { get; set; }
-            public object DraftValue { get; set; }
+            public int? LanguageId { get; internal set; }
+            public string Segment { get; internal set; }
+            public object EditValue { get; internal set; }
+            public object PublishedValue { get; internal set; }
 
             public PropertyValue Clone()
-                => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, DraftValue = DraftValue };
+                => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, EditValue = EditValue };
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -105,9 +105,14 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Returns the instance of the tag support, by default tags are not enabled
+        /// Gets the tag changes.
         /// </summary>
-        internal PropertyTags TagSupport => _tagSupport;
+        internal List<PropertyTagChange> TagChanges => _tagChanges ?? (_tagChanges = new List<PropertyTagChange>());
+
+        /// <summary>
+        /// Gets a value indicating whether the property has tag changes.
+        /// </summary>
+        internal bool HasTagChanges => _tagChanges != null;
 
         /// <summary>
         /// Returns the Alias of the PropertyType, which this Property is based on
@@ -135,8 +140,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public object GetValue(bool published = false)
         {
-            if (_pvalue == null) return null;
-            return published ? _pvalue.PublishedValue : _pvalue.DraftValue;
+            return _pvalue == null ? null : GetPropertyValue(_pvalue, published);
         }
 
         /// <summary>
@@ -145,8 +149,8 @@ namespace Umbraco.Core.Models
         public object GetValue(int languageId, bool published = false)
         {
             if (_lvalues == null) return null;
-            if (!_lvalues.TryGetValue(languageId, out var value)) return null;
-            return published ? value.PublishedValue : value.DraftValue;
+            if (!_lvalues.TryGetValue(languageId, out var pvalue)) return null;
+            return GetPropertyValue(pvalue, published);
         }
 
         /// <summary>
@@ -156,8 +160,15 @@ namespace Umbraco.Core.Models
         {
             if (_svalues == null) return null;
             if (!_svalues.TryGetValue(languageId, out var svalues)) return null;
-            if (!svalues.TryGetValue(segment, out var value)) return null;
-            return published ? value.PublishedValue : value.DraftValue;
+            if (!svalues.TryGetValue(segment, out var pvalue)) return null;
+            return GetPropertyValue(pvalue, published);
+        }
+
+        private object GetPropertyValue(PropertyValue pvalue, bool published)
+        {
+            return _propertyType.IsPublishing
+                ? (published ? pvalue.PublishedValue : pvalue.EditValue)
+                : pvalue.EditValue;
         }
 
         internal void PublishValues()
@@ -208,26 +219,24 @@ namespace Umbraco.Core.Models
 
         private void PublishPropertyValue(PropertyValue pvalue)
         {
+            if (!_propertyType.IsPublishing)
+                throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
-            pvalue.PublishedValue = ConvertSetValue(pvalue.DraftValue);
-            DetectChanges(pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+            pvalue.PublishedValue = ConvertSetValue(pvalue.EditValue);
+            DetectChanges(pvalue.EditValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
         }
 
         /// <summary>
-        /// Sets a (draft) neutral value.
+        /// Sets a (edit) neutral value.
         /// </summary>
         public void SetValue(object value)
         {
             (var pvalue, var change) = GetPropertyValue(true);
-
-            var origValue = pvalue.DraftValue;
-            pvalue.DraftValue = ConvertSetValue(value);
-
-            DetectChanges(_pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+            SetPropertyValue(pvalue, value, change);
         }
 
         /// <summary>
-        /// Sets a (draft) culture value.
+        /// Sets a (edit) culture value.
         /// </summary>
         public void SetValue(int? nLanguageId, object value)
         {
@@ -240,15 +249,11 @@ namespace Umbraco.Core.Models
             var languageId = nLanguageId.Value;
 
             (var pvalue, var change) = GetPropertyValue(languageId, true);
-
-            var origValue = pvalue.DraftValue;
-            pvalue.DraftValue = ConvertSetValue(value);
-
-            DetectChanges(pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+            SetPropertyValue(pvalue, value, change);
         }
 
         /// <summary>
-        /// Sets a (draft) segment value.
+        /// Sets a (edit) segment value.
         /// </summary>
         public void SetValue(int? nLanguageId, string segment, object value)
         {
@@ -263,11 +268,61 @@ namespace Umbraco.Core.Models
             var languageId = nLanguageId.Value;
 
             (var pvalue, var change) = GetPropertyValue(languageId, segment, true);
+            SetPropertyValue(pvalue, value, change);
+        }
 
-            var origValue = pvalue.DraftValue;
-            pvalue.DraftValue = ConvertSetValue(value);
+        private void SetPropertyValue(PropertyValue pvalue, object value, bool change)
+        {
+            var origValue = pvalue.EditValue;
+            var setValue = ConvertSetValue(value);
 
-            DetectChanges(pvalue.DraftValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+            pvalue.EditValue = setValue;
+
+            DetectChanges(setValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
+        }
+
+        private void FactorySetValue(bool published, object value)
+        {
+            (var pvalue, _) = GetPropertyValue(true);
+            FactorySetPropertyValue(pvalue, published, value);
+        }
+
+        private void FactorySetValue(int? nLanguageId, bool published, object value)
+        {
+            if (nLanguageId == null)
+            {
+                FactorySetValue(published, value);
+                return;
+            }
+
+            var languageId = nLanguageId.Value;
+            (var pvalue, _) = GetPropertyValue(languageId, true);
+            FactorySetPropertyValue(pvalue, published, value);
+        }
+
+        // bypasses all changes detection and is the *only* to set the published value
+        internal void FactorySetValue(int? nLanguageId, string segment, bool published, object value)
+        {
+            if (segment == null)
+            {
+                FactorySetValue(nLanguageId, published, value);
+                return;
+            }
+
+            if (!nLanguageId.HasValue)
+                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
+            var languageId = nLanguageId.Value;
+
+            (var pvalue, _) = GetPropertyValue(languageId, segment, true);
+            FactorySetPropertyValue(pvalue, published, value);
+        }
+
+        private void FactorySetPropertyValue(PropertyValue pvalue, bool published, object value)
+        {
+            if (published && _propertyType.IsPublishing)
+                pvalue.PublishedValue = value;
+            else
+                pvalue.EditValue = value;
         }
 
         private (PropertyValue, bool) GetPropertyValue(bool create)
@@ -379,7 +434,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (draft) neutral value is valid.
+        /// Gets a value indicating whether the (edit) neutral value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid()
@@ -388,7 +443,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (draft) culture value is valid.
+        /// Gets a value indicating whether the (edit) culture value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid(int languageId)
@@ -397,7 +452,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (draft) segment value is valid.
+        /// Gets a value indicating whether the (edit) segment value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValue(int languageId, string segment)

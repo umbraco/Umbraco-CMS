@@ -20,6 +20,9 @@ namespace Umbraco.Core.Models.Rdbms
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
         public bool Published { get; set; }
 
+        [Column("edited")]
+        public bool Edited { get; set; }
+
         [Column("releaseDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? ReleaseDate { get; set; }
@@ -27,6 +30,22 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("expireDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? ExpiresDate { get; set; }
+
+        [Column("publishDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? PublishDate { get; set; }
+
+        [Column("publishUserId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? PublishUserId { get; set; }
+
+        [Column("publishName")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public string PublishName { get; set; }
+
+        [Column("publishTemplateId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? PublishTemplateId { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]

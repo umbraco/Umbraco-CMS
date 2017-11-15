@@ -421,6 +421,9 @@ namespace Umbraco.Tests.Services.Importing
             var packagingService = ServiceContext.PackagingService;
             var fileService = ServiceContext.FileService;
 
+            // kill default test data
+            fileService.DeleteTemplate("Textpage");
+
             // Act
             var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
             var templates = packagingService.ImportTemplates(templateElement);

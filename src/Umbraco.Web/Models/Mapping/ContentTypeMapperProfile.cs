@@ -179,6 +179,8 @@ namespace Umbraco.Web.Models.Mapping
 
                 .IgnoreEntityCommonProperties()
 
+                .ForMember(dest => dest.IsPublishing, opt => opt.Ignore())
+
                 // see note above - have to do this here?
                 .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
                 .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())

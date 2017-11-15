@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
                 tsql.Select<ContentVersionDto>(x => x.VersionId)
                     .From<ContentVersionDto>()
-                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.ArgValue<int>("nodeId"))
+                    .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
                     .OrderByDescending<ContentVersionDto>(x => x.Current) // current '1' comes before others '0'
                     .AndByDescending<ContentVersionDto>(x => x.VersionDate) // most recent first
             );
@@ -66,9 +66,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // get the version we want to delete
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
-                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == SqlTemplate.ArgValue<Guid>("versionId"))
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == SqlTemplate.Arg<Guid>("versionId"))
             );
-            var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(versionId)).FirstOrDefault();
+            var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
 
             // nothing to delete
             if (versionDto == null)
@@ -87,10 +87,10 @@ namespace Umbraco.Core.Persistence.Repositories
             // fixme test object node type?
 
             // get the versions we want to delete, excluding the current one
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
-                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.ArgValue<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.ArgValue<DateTime>("date"))
+            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersions", tsql =>
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
             );
-            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(nodeId, versionDate)); // fixme ok params?
+            var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
             foreach (var versionDto in versionDtos)
                 PerformDeleteVersion(versionDto.NodeId, versionDto.VersionId);
         }
@@ -211,36 +211,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         protected void UpdateEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
-            foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
+            foreach (var property in entity.Properties.Where(x => x.HasTagChanges))
             {
-                if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
+                foreach (var change in property.TagChanges)
                 {
-                    //remove the specific tags
-                    tagRepo.RemoveTagsFromProperty(
-                        entity.Id,
-                        tagProp.PropertyTypeId,
-                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }));
-                }
-                else
-                {
-                    //assign the tags
-                    tagRepo.AssignTagsToProperty(
-                        entity.Id,
-                        tagProp.PropertyTypeId,
-                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }),
-                        tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
+                    var tags = change.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 });
+                    if (change.Type == PropertyTagChange.ChangeType.Remove)
+                        tagRepo.RemoveTagsFromProperty(entity.Id, property.PropertyTypeId, tags);
+                    else
+                        tagRepo.AssignTagsToProperty(entity.Id, property.PropertyTypeId, tags, change.Type == PropertyTagChange.ChangeType.Replace);
                 }
             }
-        }
-
-        /// <summary>
-        /// Determines if an item has a property that supports tags.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        protected bool HasTagProperty(IContentBase entity)
-        {
-            return entity.Properties.Any(x => x.TagSupport.Enable);
         }
 
         #endregion
@@ -340,11 +321,16 @@ namespace Umbraco.Core.Persistence.Repositories
                         END AS customPropVal,
                         cver.nodeId AS customPropNodeId")
                 .From<ContentVersionDto>("cver")
-                .InnerJoin<PropertyDataDto>("opdata").On<ContentVersionDto, PropertyDataDto>((left, right) => left.NodeId == right.NodeId && left.VersionId == right.VersionId && left.Current, "cver", "opdata")
+                .InnerJoin<PropertyDataDto>("opdata").On<ContentVersionDto, PropertyDataDto>((left, right) => left.NodeId == right.NodeId && left.VersionId == right.VersionId, "cver", "opdata")
                 .InnerJoin<PropertyTypeDto>("optype").On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id, "opdata", "optype")
+                .Where<ContentVersionDto>(x => x.Current, "cver")
+                .Where<PropertyDataDto>(x => !x.Published, "opdata") // always query on edit values
                 .Where<PropertyTypeDto>(x => x.Alias == "", "optype");
 
-            var innerSqlString = innerSql.SQL.Replace("@0", "1").Replace("@1", "@" + sql.Arguments.Length);
+            // @0 is for x.Current ie 'true' = 1
+            // @1 is for x.Published ie 'true' = 1
+            // @2 is for x.Alias
+            var innerSqlString = innerSql.SQL.Replace("@0", "1").Replace("@1", "1").Replace("@2", "@" + sql.Arguments.Length);
             var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
                 ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
 
@@ -376,13 +362,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // start with base query, and apply the supplied IQuery
             if (query == null) query = UnitOfWork.SqlContext.Query<TEntity>();
-            var sqlNodeIds = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
+            var sql = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
 
             // sort and filter
-            sqlNodeIds = PrepareSqlForPagedResults(sqlNodeIds, filterSql, orderBy, orderDirection, orderBySystemField);
+            sql = PrepareSqlForPagedResults(sql, filterSql, orderBy, orderDirection, orderBySystemField);
 
             // get a page of DTOs and the total count
-            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sqlNodeIds);
+            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
             // map the DTOs and return
@@ -917,9 +903,14 @@ ORDER BY nodeId, versionId, propertytypeid
             public IContentTypeComposition ContentType { get; set; }
 
             /// <summary>
-            /// Gets or sets the identifier of the template of the content.
+            /// Gets or sets the identifier of the template 1 of the content.
             /// </summary>
-            public int? TemplateId { get; set; }
+            public int? Template1Id { get; set; }
+
+            /// <summary>
+            /// Gets or sets the identifier of the template 2 of the content.
+            /// </summary>
+            public int? Template2Id { get; set; }
         }
 
         protected class TempContent<T> : TempContent
@@ -1154,9 +1145,9 @@ ORDER BY nodeId, versionId, propertytypeid
         protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.EnsureUniqueNodeName", tsql => tsql
-                .Select<NodeDto>(x => x.NodeId, x => x.Text)
+                .SelectAs<NodeDto>(x => x.NodeId, "id").AndSelectAs<NodeDto>(x => x.Text, "name")
                 .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.ArgValue<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.ArgValue<int>("parentId")));
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
             var sql = template.Sql(NodeObjectTypeId, parentId);
             var names = Database.Fetch<SimilarNodeName>(sql);
@@ -1167,7 +1158,7 @@ ORDER BY nodeId, versionId, propertytypeid
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetSortOrder", tsql =>
-                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.ArgValue<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
             );
 
             return Database.ExecuteScalar<int>(template.Sql(new { parentId })) + 1;
@@ -1176,7 +1167,7 @@ ORDER BY nodeId, versionId, propertytypeid
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetParentNode", tsql =>
-                tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.ArgValue<int>("parentId"))
+                tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
             );
 
             return Database.Fetch<NodeDto>(template.Sql(parentId)).First();
@@ -1185,7 +1176,7 @@ ORDER BY nodeId, versionId, propertytypeid
         protected virtual int GetReservedId(Guid uniqueId)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetReservedId", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.ArgValue<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
             );
             var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
             return id ?? 0;

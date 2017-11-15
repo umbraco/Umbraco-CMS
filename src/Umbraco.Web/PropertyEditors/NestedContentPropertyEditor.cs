@@ -165,79 +165,59 @@ namespace Umbraco.Web.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
             {
-                // Convert / validate value
-                if (property.GetValue() == null || string.IsNullOrWhiteSpace(property.GetValue().ToString()))
+                if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(property.GetValue().ToString());
+                var value = JsonConvert.DeserializeObject<List<object>>(propertyValue.ToString());
                 if (value == null)
                     return string.Empty;
 
-                // Process value
-                PreValueCollection preValues = null;
-                for (var i = 0; i < value.Count; i++)
+                foreach (var o in value)
                 {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
+                    var propValues = (JObject) o;
 
                     var contentType = GetElementType(propValues);
                     if (contentType == null)
-                    {
                         continue;
-                    }
 
-                    var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
-
-                    foreach (var propKey in propValueKeys)
+                    var propAliases = propValues.Properties().Select(x => x.Name).ToArray();
+                    foreach (var propAlias in propAliases)
                     {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
+                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propAlias);
                         if (propType == null)
                         {
-                            if (IsSystemPropertyKey(propKey) == false)
-                            {
-                                // Property missing so just delete the value
-                                propValues[propKey] = null;
-                            }
+                            // type not found, and property is not system: just delete the value
+                            if (IsSystemPropertyKey(propAlias) == false)
+                                propValues[propAlias] = null;
                         }
                         else
                         {
                             try
                             {
-                                // Create a fake property using the property abd stored value
-                                var prop = new Property(propType);
-                                prop.SetValue(propValues[propKey] == null ? null : propValues[propKey].ToString());
-
-                                // Lookup the property editor
+                                // convert the value, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-
-                                // Get the editor to do it's conversion, and store it back
-                                propValues[propKey] = propEditor.ValueEditor.ConvertDbToString(prop, propType, dataTypeService);
+                                var convValue = propEditor.ValueEditor.ConvertDbToString(propType, propValues[propAlias], dataTypeService);
+                                propValues[propAlias] = convValue;
                             }
                             catch (InvalidOperationException)
                             {
-                                // https://github.com/umco/umbraco-nested-content/issues/111
-                                // Catch any invalid cast operations as likely means courier failed due to missing
-                                // or trashed item so couldn't convert a guid back to an int
-
-                                propValues[propKey] = null;
+                                // deal with weird situations by ignoring them (no comment)
+                                propValues[propAlias] = null;
                             }
                         }
-
                     }
                 }
 
-                // Update the value on the property
-                property.SetValue(JsonConvert.SerializeObject(value));
-
-                // Pass the call down
-                return base.ConvertDbToString(property, propertyType, dataTypeService);
+                return JsonConvert.SerializeObject(value).ToXmlString<string>();
             }
 
             #endregion
 
-            #region DB to Editor
+            #region Convert database // editor
+
+            // note: there is NO variant support here
 
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
@@ -248,72 +228,50 @@ namespace Umbraco.Web.PropertyEditors
                 if (value == null)
                     return string.Empty;
 
-                // Process value
-                PreValueCollection preValues = null;
-                for (var i = 0; i < value.Count; i++)
+                foreach (var o in value)
                 {
-                    var o = value[i];
-                    var propValues = ((JObject)o);
+                    var propValues = (JObject) o;
 
                     var contentType = GetElementType(propValues);
                     if (contentType == null)
-                    {
                         continue;
-                    }
 
-                    var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
-
-                    foreach (var propKey in propValueKeys)
+                    var propAliases = propValues.Properties().Select(x => x.Name).ToArray();
+                    foreach (var propAlias in propAliases)
                     {
-                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
+                        var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propAlias);
                         if (propType == null)
                         {
-                            if (IsSystemPropertyKey(propKey) == false)
-                            {
-                                // Property missing so just delete the value
-                                propValues[propKey] = null;
-                            }
+                            // type not found, and property is not system: just delete the value
+                            if (IsSystemPropertyKey(propAlias) == false)
+                                propValues[propAlias] = null;
                         }
                         else
                         {
                             try
                             {
-                                // Create a fake property using the property and stored value
-                                var prop = new Property(propType);
-                                prop.SetValue(propValues[propKey] == null ? null : propValues[propKey].ToString());
+                                // create a temp property with the value
+                                var tempProp = new Property(propType);
+                                tempProp.SetValue(propValues[propAlias] == null ? null : propValues[propAlias].ToString());
 
-                                // Lookup the property editor
+                                // convert that temp property, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-
-                                // Get the editor to do it's conversion
-                                var newValue = propEditor.ValueEditor.ConvertDbToEditor(prop, propType, dataTypeService);
-
-                                // Store the value back
-                                propValues[propKey] = (newValue == null) ? null : JToken.FromObject(newValue);
+                                var convValue = propEditor.ValueEditor.ConvertDbToEditor(tempProp, propType, dataTypeService);
+                                propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
                             }
                             catch (InvalidOperationException)
                             {
-                                // https://github.com/umco/umbraco-nested-content/issues/111
-                                // Catch any invalid cast operations as likely means courier failed due to missing
-                                // or trashed item so couldn't convert a guid back to an int
-
-                                propValues[propKey] = null;
+                                // deal with weird situations by ignoring them (no comment)
+                                propValues[propAlias] = null;
                             }
                         }
 
                     }
                 }
 
-                // Update the value on the property
-                property.SetValue(JsonConvert.SerializeObject(value));
-
-                // Pass the call down
-                return base.ConvertDbToEditor(property, propertyType, dataTypeService);
+                // return json
+                return value;
             }
-
-            #endregion
-
-            #region Editor to DB
 
             public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {

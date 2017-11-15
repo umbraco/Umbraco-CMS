@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models
@@ -27,6 +25,9 @@ namespace Umbraco.Web.Models
             var propertyEditors = Current.PropertyEditors;
             var dataTypeService = Current.Services.DataTypeService;
 
+            // fixme not dealing with variants
+            // but the entire thing should die anyways
+
             return propertyTypes.Select(x =>
                 {
                     var p = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Models
                         // nothing ensures that the two methods are consistent.
 
                         if (e != null)
-                            v = e.ValueEditor.ConvertDbToString(p, p.PropertyType, dataTypeService);
+                            v = e.ValueEditor.ConvertDbToString(p.PropertyType, v, dataTypeService);
                     }
 
                     return map(x, v);

@@ -72,8 +72,8 @@ namespace Umbraco.Core.Services
         /// <param name="replaceTags">Whether or not to replace the tags with the new value or append them (true to replace, false to append)</param>
         /// <param name="tagGroup">The tag group to use when tagging</param>
         /// <param name="valueType">Defines how the tag values will be extracted</param>
-        /// <param name="storageType">Defines how to store the tags in cache (CSV or Json)</param>
-        internal static void SetPropertyTags(Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType, TagCacheStorageType storageType)
+        /// <param name="storage">Defines how to store the tags in cache (CSV or Json)</param>
+        internal static void SetPropertyTags(Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType, TagCacheStorageType storage)
         {
             if (convertedPropertyValue == null)
             {
@@ -84,24 +84,24 @@ namespace Umbraco.Core.Services
             {
                 case TagValueType.FromDelimitedValue:
                     var tags = convertedPropertyValue.ToString().Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
-                    property.SetTags(storageType, property.Alias, tags, replaceTags, tagGroup);
+                    property.SetTags(property.Alias, tags, replaceTags, tagGroup, storage);
                     break;
                 case TagValueType.CustomTagList:
                     //for this to work the object value must be IENumerable<string>
                     var stringList = convertedPropertyValue as IEnumerable<string>;
                     if (stringList != null)
                     {
-                        property.SetTags(storageType, property.Alias, stringList, replaceTags, tagGroup);
+                        property.SetTags(property.Alias, stringList, replaceTags, tagGroup, storage);
                     }
                     else
                     {
                         //it's not enumerable string, so lets see if we can automatically make it that way based on the current storage type
-                        switch (storageType)
+                        switch (storage)
                         {
                             case TagCacheStorageType.Csv:
                                 var split = convertedPropertyValue.ToString().Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
                                 //recurse with new value
-                                SetPropertyTags(property, split, delimiter, replaceTags, tagGroup, valueType, storageType);
+                                SetPropertyTags(property, split, delimiter, replaceTags, tagGroup, valueType, storage);
                                 break;
                             case TagCacheStorageType.Json:
                                 try
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Services
                                     if (parsedJson != null)
                                     {
                                         //recurse with new value
-                                        SetPropertyTags(property, parsedJson, delimiter, replaceTags, tagGroup, valueType, storageType);
+                                        SetPropertyTags(property, parsedJson, delimiter, replaceTags, tagGroup, valueType, storage);
                                     }
                                 }
                                 catch (Exception ex)
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Services
                                 }
                                 break;
                             default:
-                                throw new ArgumentOutOfRangeException(nameof(storageType));
+                                throw new ArgumentOutOfRangeException(nameof(storage));
                         }
                     }
                     break;

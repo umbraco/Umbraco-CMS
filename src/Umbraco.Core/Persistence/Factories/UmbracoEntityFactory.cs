@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -27,8 +24,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         internal UmbracoEntity BuildEntityFromDynamic(dynamic d)
         {
-            var asDictionary = (IDictionary<string, object>)d;
-
+            var asDictionary = (IDictionary<string, object>) d;
             var entity = new UmbracoEntity(d.trashed);
 
             try
@@ -49,24 +45,12 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty;
                 entity.ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty;
                 entity.ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty;
+                //entity.VersionId = asDictionary.ContainsKey("versionId") ? asDictionary["versionId"] : Guid.Empty;
 
-                var publishedVersion = default(Guid);
-                //some content items don't have a published/newest version
-                if (asDictionary.ContainsKey("publishedVersion") && asDictionary["publishedVersion"] != null)
-                {
-                    Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);
-                }
-                var newestVersion = default(Guid);
-                if (asDictionary.ContainsKey("newestVersion") && d.newestVersion != null)
-                {
-                    Guid.TryParse(d.newestVersion.ToString(), out newestVersion);
-                }
+                entity.Published = asDictionary.ContainsKey("published") && (bool) asDictionary["published"];
+                entity.Edited = asDictionary.ContainsKey("edits") && (bool) asDictionary["edits"];
 
-                entity.IsPublished = publishedVersion != default(Guid) || (newestVersion != default(Guid) && publishedVersion == newestVersion);
-                entity.IsDraft = newestVersion != default(Guid) && (publishedVersion == default(Guid) || publishedVersion != newestVersion);
-                entity.HasPendingChanges = (publishedVersion != default(Guid) && newestVersion != default(Guid)) && publishedVersion != newestVersion;
-
-                //Now we can assign the additional data!
+                // assign the additional data
                 AddAdditionalData(entity, asDictionary);
 
                 return entity;

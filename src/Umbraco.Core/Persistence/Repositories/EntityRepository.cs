@@ -19,18 +19,14 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <remarks>
     /// This is limited to objects that are based in the umbracoNode-table.
     /// </remarks>
-    internal class EntityRepository : DisposableObject, IEntityRepository
+    internal class EntityRepository : IEntityRepository
     {
         public EntityRepository(IScopeUnitOfWork work)
         {
             UnitOfWork = work;
         }
 
-        /// <summary>
-        /// Gets the repository's unit of work.
-        /// </summary>
         protected internal IScopeUnitOfWork UnitOfWork { get; }
-
         protected Sql<ISqlContext> Sql() => UnitOfWork.SqlContext.Sql();
 
         #region Query Methods
@@ -71,8 +67,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var idGroup in ids)
                 {
                     var propSql = GetPropertySql(Constants.ObjectTypes.Media)
-                        .Where("nodeId IN (@ids)", new { ids = idGroup })
-                        .OrderBy("nodeId");
+                        .WhereIn<NodeDto>(x => x.NodeId, idGroup)
+                        .OrderBy<NodeDto>(x => x.NodeId);
 
                     //This does NOT fetch all data into memory in a list, this will read
                     // over the records as a data reader, this is much better for performance and memory,
@@ -185,7 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // else
 
-            //query = read forward data reader, do not load everything into mem
+            // query = read forward data reader, do not load everything into mem
             // fixme wtf is this collection thing?!
             var dtos = UnitOfWork.Database.Query<dynamic>(sql);
             var collection = new EntityDefinitionCollection();
@@ -245,8 +241,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
             }
+
             var found = collection.FirstOrDefault();
-            return found != null ? found.BuildFromDynamic() : null;
+            return found?.BuildFromDynamic();
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
@@ -259,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys)
         {
             return keys.Any()
-                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.uniqueID in (@keys)", new { keys }))
+                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.uniqueId in (@keys)", new { keys }))
                 : PerformGetAll(objectTypeId);
         }
 
@@ -385,8 +382,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-
-        #region Sql Statements
+        #region Sql
 
         protected Sql<ISqlContext> GetFullSqlForEntityType(Guid key, bool isContent, bool isMedia, Guid objectTypeId)
         {
@@ -418,15 +414,14 @@ namespace Umbraco.Core.Persistence.Repositories
         private Sql<ISqlContext> GetPropertySql(Guid nodeObjectType)
         {
             var sql = Sql()
-                .Select("nodeId, versionId, varcharValue, textValue, propertyEditorAlias, alias as propertyTypeAlias")
+                .Select<PropertyDataDto>(x => x.NodeId, x => x.VersionId, x => x.TextValue, x => x.VarcharValue)
+                .AndSelect<DataTypeDto>(x => x.PropertyEditorAlias)
+                .AndSelectAs<PropertyTypeDto>(x => x.Alias, "propertyTypeAlias")
                 .From<PropertyDataDto>()
-                .InnerJoin<NodeDto>()
-                .On<PropertyDataDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyTypeDto, PropertyDataDto>(dto => dto.Id, dto => dto.PropertyTypeId)
-                .InnerJoin<DataTypeDto>()
-                .On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
-                .Where("umbracoNode.nodeObjectType = @nodeObjectType", new { nodeObjectType });
+                .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
+                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
 
             return sql;
         }
@@ -439,7 +434,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             filter?.Invoke(sql);
 
-            //We're going to create a query to query against the entity SQL
+            // We're going to create a query to query against the entity SQL
             // because we cannot group by nText columns and we have a COUNT in the entitySql we cannot simply left join
             // the entitySql query, we have to join the wrapped query to get the ntext in the result
 
@@ -482,22 +477,22 @@ namespace Umbraco.Core.Persistence.Repositories
                     "umbracoNode.text",
                     "umbracoNode.nodeObjectType",
                     "umbracoNode.createDate",
-                    "COUNT(parent.parentID) as children"
+                    "COUNT(child.id) as children"
                 });
 
                 if (isContent)
                 {
-                    columns.Add("published.versionId as publishedVersion");
-                    columns.Add("document.versionId as newestVersion");
-                    columns.Add("contentversion.id as versionId");
+                    columns.Add("contentVersion.versionId as versionId");
+                    columns.Add("document.published");
+                    columns.Add("document.edited");
                 }
 
                 if (isContent || isMedia)
                 {
-                    columns.Add("contenttype.alias");
-                    columns.Add("contenttype.icon");
-                    columns.Add("contenttype.thumbnail");
-                    columns.Add("contenttype.isContainer");
+                    columns.Add("contentType.alias");
+                    columns.Add("contentType.icon");
+                    columns.Add("contentType.thumbnail");
+                    columns.Add("contentType.isContainer");
                 }
             }
 
@@ -505,31 +500,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var entitySql = Sql()
                 .Select(columns.ToArray())
-                .From("umbracoNode umbracoNode");
+                .From<NodeDto>();
 
             if (isContent || isMedia)
             {
                 entitySql
-                    .InnerJoin("uContent content").On("content.nodeId = umbracoNode.id");
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .LeftJoin<ContentTypeDto>("contentType").On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasRight: "contentType");
             }
 
             if (isContent)
             {
                 entitySql
-                    .InnerJoin("cmsDocument document").On("document.nodeId = umbracoNode.id")
-                    .InnerJoin("cmsContentVersion contentversion").On("contentversion.VersionId = document.versionId")
-                    .LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1 GROUP BY nodeId, versionId) as published").On("umbracoNode.id = published.nodeId");
-                    //.LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest").On("umbracoNode.id = latest.nodeId");
-            }
-
-            if (isContent || isMedia)
-            {
-                entitySql
-                   .LeftJoin("cmsContentType contenttype").On("contenttype.nodeId = content.contentType");
+                    .InnerJoin<ContentVersionDto>("contentVersion").On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current, aliasRight: "contentVersion")
+                    .InnerJoin<DocumentDto>("document").On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "document");
             }
 
             if (isCount == false)
-                entitySql.LeftJoin("umbracoNode parent").On("parent.parentID = umbracoNode.id");
+                entitySql
+                    .LeftJoin<NodeDto>("child").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.ParentId, aliasRight: "child");
 
             customFilter?.Invoke(entitySql);
 
@@ -539,18 +528,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Action<Sql<ISqlContext>> filter, Guid nodeObjectType)
         {
             var sql = baseQuery(isContent, isMedia, filter)
-                .Where("umbracoNode.nodeObjectType = @nodeObjectType", new { nodeObjectType });
-            if (isContent)
-                sql.Where("document.newest = 1");
+                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
             return sql;
         }
 
         protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.id = @id", new { id });
-            if (isContent)
-                sql.Where("document.newest = 1");
+                .Where<NodeDto>(x => x.NodeId == id);
             sql.Append(GetGroupBy(isContent, isMedia));
             return sql;
         }
@@ -558,9 +543,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.uniqueID = @uniqueID", new { uniqueID = key });
-            if (isContent)
-                sql.Where("document.newest = 1");
+                .Where<NodeDto>(x => x.UniqueId == key);
             sql.Append(GetGroupBy(isContent, isMedia));
             return sql;
         }
@@ -568,18 +551,14 @@ namespace Umbraco.Core.Persistence.Repositories
         protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.id = @id AND umbracoNode.nodeObjectType = @nodeObjectType", new { id, nodeObjectType});
-            if (isContent)
-                sql.Where("document.newest = 1");
+                .Where<NodeDto>(x => x.NodeId == id && x.NodeObjectType == nodeObjectType);
             return sql;
         }
 
         protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
         {
             var sql = baseQuery(isContent, isMedia, null)
-                .Where("umbracoNode.uniqueID = @uniqueID AND umbracoNode.nodeObjectType = @nodeObjectType", new { uniqueID = key, nodeObjectType });
-            if (isContent)
-                sql.Where("document.newest = 1");
+                .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == nodeObjectType);
             return sql;
         }
 
@@ -589,12 +568,12 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 "umbracoNode.id",
                 "umbracoNode.trashed",
-                "umbracoNode.parentID",
+                "umbracoNode.parentId",
                 "umbracoNode.nodeUser",
                 "umbracoNode.level",
                 "umbracoNode.path",
                 "umbracoNode.sortOrder",
-                "umbracoNode.uniqueID",
+                "umbracoNode.uniqueId",
                 "umbracoNode.text",
                 "umbracoNode.nodeObjectType",
                 "umbracoNode.createDate"
@@ -602,17 +581,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (isContent)
             {
-                columns.Add("published.versionId");
-                columns.Add("document.versionId");
-                columns.Add("contentVersion.id");
+                columns.Add("contentVersion.versionId");
+                columns.Add("document.published");
+                columns.Add("document.edited");
             }
 
             if (isContent || isMedia)
             {
-                columns.Add("contenttype.alias");
-                columns.Add("contenttype.icon");
-                columns.Add("contenttype.thumbnail");
-                columns.Add("contenttype.isContainer");
+                columns.Add("contentType.alias");
+                columns.Add("contentType.icon");
+                columns.Add("contentType.thumbnail");
+                columns.Add("contentType.isContainer");
             }
 
             var sql = Sql().GroupBy(columns.ToArray());
@@ -627,26 +606,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            UnitOfWork.DisposeIfDisposable();
-        }
-
         public bool Exists(Guid key)
         {
-            var sql = new Sql().Select("COUNT(*)").From("umbracoNode").Where("uniqueID=@uniqueID", new { uniqueID = key });
+            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
             return UnitOfWork.Database.ExecuteScalar<int>(sql) > 0;
         }
 
         public bool Exists(int id)
         {
-            var sql = new Sql().Select("COUNT(*)").From("umbracoNode").Where("id=@id", new { id });
+            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
             return UnitOfWork.Database.ExecuteScalar<int>(sql) > 0;
         }
 

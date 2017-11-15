@@ -25,6 +25,8 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger)
         { }
 
+        protected override bool IsPublishing => MemberType.IsPublishingConst;
+
         protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
         {
             return new FullDataSetRepositoryCachePolicy<IMemberType, int>(runtimeCache, GetEntityId, /*expires:*/ true);

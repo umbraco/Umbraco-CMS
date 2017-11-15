@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private int _numPos = -2;
 
         public int Id { get; set; }
-        public string Text { get; set; }
+        public string Name { get; set; }
 
         // cached - reused
         public int NumPos
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (_numPos != -2) return _numPos;
 
-                var name = Text;
+                var name = Name;
 
                 if (name[name.Length - 1] != ')')
                     return _numPos = -1;
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (NumPos < 0)
                     throw new InvalidOperationException();
                 int num;
-                if (int.TryParse(Text.Substring(NumPos + 1, Text.Length - 2 - NumPos), out num))
+                if (int.TryParse(Name.Substring(NumPos + 1, Name.Length - 2 - NumPos), out num))
                     return num;
                 return 0;
             }
@@ -56,8 +56,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 var xpos = x.NumPos;
                 var ypos = y.NumPos;
 
-                var xname = x.Text;
-                var yname = y.Text;
+                var xname = x.Name;
+                var yname = y.Name;
 
                 if (xpos < 0 || ypos < 0 || xpos != ypos)
                     return string.Compare(xname, yname, StringComparison.Ordinal);
@@ -95,12 +95,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 if (uniqueing)
                 {
-                    if (name.NumPos > 0 && name.Text.StartsWith(nodeName) && name.NumVal == uniqueNumber)
+                    if (name.NumPos > 0 && name.Name.StartsWith(nodeName) && name.NumVal == uniqueNumber)
                         uniqueNumber++;
                     else
                         break;
                 }
-                else if (name.Text.InvariantEquals(nodeName))
+                else if (name.Name.InvariantEquals(nodeName))
                 {
                     uniqueing = true;
                 }

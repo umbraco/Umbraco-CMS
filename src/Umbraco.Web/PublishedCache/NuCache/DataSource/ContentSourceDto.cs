@@ -14,21 +14,24 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         public int SortOrder { get; set; }
         public int ParentId { get; set; }
 
+        public Guid Version { get; set; }
+
         public DateTime CreateDate { get; set; }
         public int CreatorId { get; set; }
 
         public string DraftName { get; set; }
-        public Guid DraftVersion { get; set; }
         public DateTime DraftVersionDate { get; set; }
         public int DraftWriterId { get; set; }
         public int DraftTemplateId { get; set; }
         public string DraftData { get; set; }
 
         public string PubName { get; set; }
-        public Guid PubVersion { get; set; }
         public DateTime PubVersionDate { get; set; }
         public int PubWriterId { get; set; }
         public int PubTemplateId { get; set; }
         public string PubData { get; set; }
+
+        public bool Published { get; set; }
+        public bool Edited { get; set; }
     }
 }

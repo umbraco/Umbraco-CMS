@@ -250,12 +250,8 @@ namespace Umbraco.Web.Search
                     }
 
                     IContent published = null;
-                    if (content.HasPublishedVersion && ((ContentService)contentService).IsPathPublished(content))
-                    {
-                        published = content.Published
-                            ? content
-                            : contentService.GetByVersion(content.PublishedVersionGuid);
-                    }
+                    if (content.Published && ((ContentService)contentService).IsPathPublished(content))
+                        published = content;
 
                     // just that content
                     ReIndexForContent(content, published);
@@ -270,16 +266,10 @@ namespace Umbraco.Web.Search
                             published = null;
                             if (masked != null) // else everything is masked
                             {
-                                if (masked.Contains(descendant.ParentId) || descendant.HasPublishedVersion == false)
-                                {
+                                if (masked.Contains(descendant.ParentId) || !descendant.Published)
                                     masked.Add(descendant.Id);
-                                }
                                 else
-                                {
-                                    published = descendant.Published
-                                        ? descendant
-                                        : contentService.GetByVersion(descendant.PublishedVersionGuid);
-                                }
+                                    published = descendant;
                             }
 
                             ReIndexForContent(descendant, published);

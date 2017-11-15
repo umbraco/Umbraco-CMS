@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
         IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
-        /// Indicates whether the content object has a property with the supplied alias
+        /// Gets a value indicating whether the content object has a property with the supplied alias.
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <returns>True if Property with given alias exists, otherwise False</returns>

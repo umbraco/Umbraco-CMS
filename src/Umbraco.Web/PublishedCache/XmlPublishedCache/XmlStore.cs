@@ -40,15 +40,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// </remarks>
     class XmlStore : IDisposable
     {
-        private Func<IContent, XElement> _xmlContentSerializer;
-        private Func<IMember, XElement> _xmlMemberSerializer;
-        private Func<IMedia, XElement> _xmlMediaSerializer;
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
         private bool _withRepositoryEvents;
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly PublishedContentTypeCache _contentTypeCache;
+        private readonly IEnumerable<IUrlSegmentProvider> _segmentProviders;
         private readonly RoutesCache _routesCache;
         private readonly ServiceContext _serviceContext; // fixme WHY
         private readonly IScopeUnitOfWorkProvider _uowProvider;
@@ -81,8 +79,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _routesCache = routesCache;
             _contentTypeCache = contentTypeCache;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
-
-            InitializeSerializers(segmentProviders);
+            _segmentProviders = segmentProviders;
 
             if (testing)
             {
@@ -116,14 +113,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _xmlFileEnabled = false;
 
             // do not plug events, we may not have what it takes to handle them
-        }
-
-        private void InitializeSerializers(IEnumerable<IUrlSegmentProvider> segmentProviders)
-        {
-            var exs = new EntityXmlSerializer();
-            _xmlContentSerializer = c => exs.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, segmentProviders, c);
-            _xmlMemberSerializer = m => exs.Serialize(_serviceContext.DataTypeService, m);
-            _xmlMediaSerializer = m => exs.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, segmentProviders, m);
         }
 
         private void InitializeFilePersister(MainDom mainDom)
@@ -497,12 +486,11 @@ AND (umbracoNode.id=@id)";
 
         public XmlNode GetPreviewXmlNode(int contentId)
         {
-            // fixme - probably borked
             const string sql = @"SELECT umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.Level,
-cmsPreviewXml.xml, cmsDocument.published
+cmsPreviewXml.xml, uDocument.published
 FROM umbracoNode
 JOIN cmsPreviewXml ON (cmsPreviewXml.nodeId=umbracoNode.id)
-JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
+JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType
 AND (umbracoNode.id=@id)";
 
@@ -841,30 +829,30 @@ AND (umbracoNode.id=@id)";
 
         private const string ReadTreeCmsContentXmlSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsContentXml.xml, cmsContentXml.rv, cmsDocument.published
+    cmsContentXml.xml, cmsContentXml.rv, uDocument.published
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
-JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1
+JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private const string ReadBranchCmsContentXmlSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsContentXml.xml, cmsContentXml.rv, cmsDocument.published
+    cmsContentXml.xml, cmsContentXml.rv, uDocument.published
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
-JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1 AND (umbracoNode.id = @id OR umbracoNode.path LIKE @path)
+JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1 AND (umbracoNode.id = @id OR umbracoNode.path LIKE @path)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private const string ReadCmsContentXmlForContentTypesSql = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsContentXml.xml, cmsContentXml.rv, cmsDocument.published
+    cmsContentXml.xml, cmsContentXml.rv, uDocument.published
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
-JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
-JOIN uContent ON (cmsDocument.nodeId=uContent.nodeId)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.published=1 AND uContent.contentTypeId IN (@ids)
+JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
+JOIN uContent ON (uDocument.nodeId=uContent.nodeId)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1 AND uContent.contentTypeId IN (@ids)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private const string ReadMoreCmsContentXmlSql = @"SELECT
@@ -877,11 +865,11 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private const string ReadCmsPreviewXmlSql1 = @"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsPreviewXml.xml, cmsPreviewXml.rv, cmsDocument.published
+    cmsPreviewXml.xml, cmsPreviewXml.rv, uDocument.published
 FROM umbracoNode
 JOIN cmsPreviewXml ON (cmsPreviewXml.nodeId=umbracoNode.id)
-JOIN cmsDocument ON (cmsDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest=1
+JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1
 AND (umbracoNode.path=@path OR"; // @path LIKE concat(umbracoNode.path, ',%')";
 
         private const string ReadCmsPreviewXmlSql2 = @")
@@ -1062,7 +1050,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     var content = _serviceContext.ContentService.GetById(payload.Id);
                     var current = safeXml.Xml.GetElementById(payload.Id.ToInvariantString());
 
-                    if (content == null || content.HasPublishedVersion == false || content.Trashed)
+                    if (content == null || content.Published == false || content.Trashed)
                     {
                         // no published version
                         Current.Logger.Debug<XmlStore>($"Notified, content {payload.Id} has no published version.");
@@ -1525,19 +1513,20 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             var db = args.UnitOfWork.Database;
             var entity = args.Entity;
 
-            var xml = _xmlContentSerializer(entity).ToDataString();
+            // serialize edit values for preview
+            var editXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, false).ToDataString();
 
             // change below to write only one row - not one per version
             var dto1 = new PreviewXmlDto
             {
                 NodeId = entity.Id,
-                Xml = xml
+                Xml = editXml
             };
             OnRepositoryRefreshed(db, dto1);
 
             // if unpublishing, remove from table
 
-            if (((Core.Models.Content)entity).PublishedState == PublishedState.Unpublishing)
+            if (((Content) entity).PublishedState == PublishedState.Unpublishing)
             {
                 db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@id", new { id = entity.Id });
                 return;
@@ -1546,25 +1535,16 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // need to update the published xml if we're saving the published version,
             // or having an impact on that version - we update the published xml even when masked
 
-            IContent pc = null;
-            if (entity.Published)
-            {
-                // saving the published version = update xml
-                pc = entity;
-            }
-            else
-            {
-                // saving the non-published version, but there is a published version
-                // check whether we have changes that impact the published version (move...)
-                if (entity.HasPublishedVersion && HasChangesImpactingAllVersions(entity))
-                    pc = sender.GetByVersion(entity.PublishedVersionGuid);
-            }
+            // fixme - in the repo... either its 'unpublished' and 'publishing', or 'published' and 'published', this has changed!
+            // fixme - what are we serializing really? which properties?
 
-            if (pc == null)
+            // if not publishing, no change to published xml
+            if (((Content) entity).PublishedState != PublishedState.Publishing)
                 return;
 
-            xml = _xmlContentSerializer(pc).ToDataString();
-            var dto2 = new ContentXmlDto { NodeId = entity.Id, Xml = xml };
+            // serialize published values for content cache
+            var publishedXml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity, true).ToDataString();
+            var dto2 = new ContentXmlDto { NodeId = entity.Id, Xml = publishedXml };
             OnRepositoryRefreshed(db, dto2);
 
         }
@@ -1579,7 +1559,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             if (entity.Trashed)
                 db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@id", new { id = entity.Id });
 
-            var xml = _xmlMediaSerializer(entity).ToDataString();
+            var xml = EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, entity).ToDataString();
 
             var dto1 = new ContentXmlDto { NodeId = entity.Id, Xml = xml };
             OnRepositoryRefreshed(db, dto1);
@@ -1590,7 +1570,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             var db = args.UnitOfWork.Database;
             var entity = args.Entity;
 
-            var xml = _xmlMemberSerializer(entity).ToDataString();
+            var xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, entity).ToDataString();
 
             var dto1 = new ContentXmlDto { NodeId = entity.Id, Xml = xml };
             OnRepositoryRefreshed(db, dto1);
@@ -1751,8 +1731,9 @@ WHERE cmsContentXml.nodeId IN (
             do
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
-                // fixme serializing published or draft values?!
-                var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml = _xmlContentSerializer(c).ToDataString() }).ToArray();
+                const bool published = true; // contentXml contains published content!
+                var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml =
+                    EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1822,13 +1803,14 @@ WHERE cmsPreviewXml.nodeId IN (
             long total;
             do
             {
-                // .GetPagedResultsByQuery implicitely adds (cmsDocument.newest = 1) which
+                // .GetPagedResultsByQuery implicitely adds (uDocument.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                const bool published = true; // previewXml contains edit content!
                 var items = descendants.Select(c => new PreviewXmlDto
                 {
                     NodeId = c.Id,
-                    Xml = _xmlContentSerializer(c).ToDataString()
+                    Xml = EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString()
                 }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
@@ -1900,7 +1882,8 @@ WHERE cmsContentXml.nodeId IN (
             do
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
-                var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = _xmlMediaSerializer(m).ToDataString() }).ToArray();
+                var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml =
+                    EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1971,7 +1954,7 @@ WHERE cmsContentXml.nodeId IN (
             do
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
-                var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = _xmlMemberSerializer(m).ToDataString() }).ToArray();
+                var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -2000,7 +1983,7 @@ WHERE cmsContentXml.nodeId IN (
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN cmsDocument ON (umbracoNode.id=cmsDocument.nodeId and cmsDocument.published=1)
+JOIN uDocument ON (umbracoNode.id=uDocument.nodeId and uDocument.published=1)
 LEFT JOIN cmsContentXml ON (umbracoNode.id=cmsContentXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
@@ -2042,7 +2025,7 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN cmsDocument ON (umbracoNode.id=cmsDocument.nodeId and cmsDocument.published=1)
+JOIN uDocument ON (umbracoNode.id=uDocument.nodeId and uDocument.published=1)
 LEFT JOIN cmsContentXml ON (umbracoNode.id=cmsContentXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'

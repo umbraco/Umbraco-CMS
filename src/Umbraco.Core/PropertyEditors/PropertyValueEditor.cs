@@ -14,36 +14,27 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Represents the value editor for the property editor during content editing
+    /// Represents a value editor for content properties.
     /// </summary>
-    /// <remarks>
-    /// The Json serialization attributes are required for manifest property editors to work
-    /// </remarks>
     public class PropertyValueEditor : IValueEditor
     {
         /// <summary>
-        /// assign defaults
+        /// Initializes a new instance of the <see cref="PropertyValueEditor"/> class.
         /// </summary>
         public PropertyValueEditor()
         {
             ValueType = PropertyEditorValueTypes.String;
-            //set a default for validators
             Validators = new List<IPropertyValidator>();
         }
 
         /// <summary>
-        /// Creates a new editor with the specified view
+        /// Initializes a new instance of the <see cref="PropertyValueEditor"/> class.
         /// </summary>
-        /// <param name="view"></param>
-        /// <param name="validators">Allows adding custom validators during construction instead of specifying them later</param>
         public PropertyValueEditor(string view, params IPropertyValidator[] validators)
             : this()
         {
             View = view;
-            foreach (var v in validators)
-            {
-                Validators.Add(v);
-            }
+            Validators.AddRange(validators);
         }
 
         private PreValueCollection _preVals;
@@ -75,11 +66,12 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Defines the view to use for the editor, this can be one of 3 things:
-        /// * the full virtual path or
-        /// * the relative path to the current Umbraco folder
-        /// * a simple view name which will map to the views/propertyeditors/{view}/{view}.html
+        /// Gets or sets the editor view.
         /// </summary>
+        /// <remarks>
+        /// <para>The view can be three things: (1) the full virtual path, or (2) the relative path to the current Umbraco
+        /// folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.</para>
+        /// </remarks>
         [JsonProperty("view", Required = Required.Always)]
         public string View { get; set; }
 
@@ -225,6 +217,13 @@ namespace Umbraco.Core.PropertyEditors
             return value.TryConvertTo(valueType);
         }
 
+        // fixme - not dealing with variants here!
+        //
+        // editors should declare whether they support variants, and then we should have a common
+        // way of dealing with it, ie of sending and receiving values, etc.
+        // eg
+        // [ { "value": "hello" }, { "lang": "fr-fr", "value": "bonjour" } ]
+
         /// <summary>
         /// A method to deserialize the string value that has been saved in the content editor
         /// to an object to be stored in the database.
@@ -257,8 +256,6 @@ namespace Umbraco.Core.PropertyEditors
             }
             return result.Result;
         }
-
-        //TODO: Change the result to object so we can pass back JSON or json converted clr types if we want!
 
         /// <summary>
         /// A method used to format the database value to a value that can be used by the editor
@@ -316,27 +313,55 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
+        // fixme - the methods below should be replaced by proper property value convert ToXPath usage!
+
         /// <summary>
-        /// Converts the property db value to an XML fragment
+        /// Converts a property to Xml fragments.
         /// </summary>
-        /// <param name="property"></param>
-        /// <param name="propertyType"></param>
-        /// <param name="dataTypeService"></param>
-        /// <returns></returns>
+        public IEnumerable<XElement> ConvertDbToXml(Property property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published)
+        {
+            published &= property.PropertyType.IsPublishing;
+
+            var nodeName = property.PropertyType.Alias.ToSafeAlias();
+
+            foreach (var pvalue in property.Values)
+            {
+                var value = published ? pvalue.PublishedValue : pvalue.EditValue;
+                if (value == null || value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
+                    continue;
+
+                var xElement = new XElement(nodeName);
+                if (pvalue.LanguageId.HasValue)
+                {
+                    var language = localizationService.GetLanguageById(pvalue.LanguageId.Value);
+                    if (language == null) continue; // uh?
+                    xElement.Add(new XAttribute("lang", language.IsoCode));
+                }
+                if (pvalue.Segment != null)
+                    xElement.Add(new XAttribute("segment", pvalue.Segment));
+
+                var xValue = ConvertDbToXml(property.PropertyType, value, dataTypeService);
+                xElement.Add(xValue);
+
+                yield return xElement;
+            }
+        }
+
+        /// <summary>
+        /// Converts a property value to an Xml fragment.
+        /// </summary>
         /// <remarks>
-        /// By default this will just return the value of ConvertDbToString but ensure that if the db value type is nvarchar or text
-        /// it is a CDATA fragment, otherwise it is just a text fragment.
-        ///
-        /// This method by default will only return XText or XCData which must be wrapped in an element!
-        ///
-        /// If the value is empty we will not return as CDATA since that will just take up more space in the file.
+        /// <para>By default, this returns the value of ConvertDbToString but ensures that if the db value type is
+        /// NVarchar or NText, the value is returned as a CDATA fragment - elxe it's a Text fragment.</para>
+        /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
+        /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public virtual XNode ConvertDbToXml(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public XNode ConvertDbToXml(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
-            if (property.GetValue() == null || property.GetValue().ToString().IsNullOrWhiteSpace())
+            if (value == null || value.ToString().IsNullOrWhiteSpace())
             {
-                return new XText(ConvertDbToString(property, propertyType, dataTypeService));
+                return new XText(ConvertDbToString(propertyType, value, dataTypeService));
             }
 
             switch (GetDatabaseType())
@@ -344,48 +369,37 @@ namespace Umbraco.Core.PropertyEditors
                 case DataTypeDatabaseType.Date:
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
-                    return new XText(ConvertDbToString(property, propertyType, dataTypeService));
+                    return new XText(ConvertDbToString(propertyType, value, dataTypeService));
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
                     //put text in cdata
-                    return new XCData(ConvertDbToString(property, propertyType, dataTypeService));
+                    return new XCData(ConvertDbToString(propertyType, value, dataTypeService));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
         /// <summary>
-        /// Converts the property value for use in the front-end cache
+        /// Converts a property value to a string.
         /// </summary>
-        /// <param name="property"></param>
-        /// <param name="propertyType"></param>
-        /// <param name="dataTypeService"></param>
-        /// <returns></returns>
-        public virtual string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public virtual string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
-            if (property.GetValue() == null)
+            if (value == null)
                 return string.Empty;
 
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
-                    property.GetValue().ToXmlString<string>();
-                    return property.GetValue().ToXmlString<string>();
+                    return value.ToXmlString<string>();
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
-                    return property.GetValue().ToXmlString(property.GetValue().GetType());
+                    return value.ToXmlString(value.GetType());
                 case DataTypeDatabaseType.Date:
                     //treat dates differently, output the format as xml format
-                    if (property.GetValue() == null)
-                    {
-                        return string.Empty;
-                    }
-                    var date = property.GetValue().TryConvertTo<DateTime?>();
+                    var date = value.TryConvertTo<DateTime?>();
                     if (date.Success == false || date.Result == null)
-                    {
                         return string.Empty;
-                    }
                     return date.Result.ToXmlString<DateTime>();
                 default:
                     throw new ArgumentOutOfRangeException();

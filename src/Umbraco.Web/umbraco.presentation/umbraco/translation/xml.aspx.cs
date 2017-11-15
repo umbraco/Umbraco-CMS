@@ -85,8 +85,8 @@ namespace umbraco.presentation.translation
 
             var content = Current.Services.ContentService.GetById(t.TaskEntity.EntityId);
 
-            var exs = new EntityXmlSerializer();
-            var x = exs.Serialize(Current.Services.ContentService, Current.Services.DataTypeService, Current.Services.UserService, Current.UrlSegmentProviders, content);
+            const bool published = false; // no idea really
+            var x = EntityXmlSerializer.Serialize(Current.Services.ContentService, Current.Services.DataTypeService, Current.Services.UserService, Current.Services.LocalizationService, Current.UrlSegmentProviders, content, published);
 
 
             var xTask = xd.CreateElement("task");

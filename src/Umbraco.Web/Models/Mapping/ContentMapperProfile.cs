@@ -32,18 +32,18 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
-                    Udi.Create(src.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
+                    Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
                 .ForMember(dest => dest.IsContainer, opt => opt.MapFrom(src => src.ContentType.IsContainer))
+                .ForMember(dest => dest.IsBlueprint, opt => opt.MapFrom(src => src.Blueprint))
                 .ForMember(dest => dest.IsChildOfListView, opt => opt.Ignore())
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
-                .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => GetPublishedDate(src)))
+                .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
                 .ForMember(dest => dest.TemplateAlias, opt => opt.MapFrom(src => src.Template.Alias))
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.MapFrom(src => src.HasPublishedVersion))
                 .ForMember(dest => dest.Urls, opt => opt.MapFrom(src =>
                         UmbracoContext.Current == null
                             ? new[] {"Cannot generate urls without a current Umbraco Context"}
@@ -61,30 +61,22 @@ namespace Umbraco.Web.Models.Mapping
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
-                    Udi.Create(src.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
+                    Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.MapFrom(src => src.HasPublishedVersion))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore());
 
             //FROM IContent TO ContentItemDto<IContent>
             CreateMap<IContent, ContentItemDto<IContent>>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
-                    Udi.Create(src.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
+                    Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.HasPublishedVersion, opt => opt.MapFrom(src => src.HasPublishedVersion))
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore());
-        }
-
-        private static DateTime? GetPublishedDate(IContent content)
-        {
-            var date = ((Content) content).PublishedDate;
-            return date == default (DateTime) ? (DateTime?) null : date;
         }
 
         /// <summary>

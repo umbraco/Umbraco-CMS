@@ -33,7 +33,7 @@ namespace Umbraco.Web.Routing
 
             var urls = new List<string>();
 
-            if (content.HasPublishedVersion == false)
+            if (content.Published == false)
             {
                 urls.Add(TextService.Localize("content/itemNotPublished"));
                 return urls;

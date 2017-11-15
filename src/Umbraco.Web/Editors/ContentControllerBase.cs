@@ -101,21 +101,21 @@ namespace Umbraco.Web.Editors
                 else
                 {
                     var valueEditor = property.PropertyEditor.ValueEditor;
-                    //don't persist any bound value if the editor is readonly
-                    if (valueEditor.IsReadOnly == false)
-                    {
-                        var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.GetValue());
-                        var supportTagsAttribute = TagExtractor.GetAttribute(property.PropertyEditor);
-                        if (supportTagsAttribute != null)
-                        {
-                            TagExtractor.SetPropertyTags(dboProperty, data, propVal, supportTagsAttribute);
-                        }
-                        else
-                        {
-                            dboProperty.SetValue(propVal);
-                        }
-                    }
 
+                    // don't persist if the editor is readonly
+                    if (valueEditor.IsReadOnly) continue;
+
+                    // else
+                    var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.GetValue());
+                    var supportTagsAttribute = TagExtractor.GetAttribute(property.PropertyEditor);
+                    if (supportTagsAttribute != null)
+                    {
+                        TagExtractor.SetPropertyTags(dboProperty, data, propVal, supportTagsAttribute);
+                    }
+                    else
+                    {
+                        dboProperty.SetValue(propVal);
+                    }
                 }
             }
         }

@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var comparer = new SimilarNodeName.Comparer();
 
-            var result = comparer.Compare(new SimilarNodeName { Text = name1 }, new SimilarNodeName { Text = name2 });
+            var result = comparer.Compare(new SimilarNodeName { Name = name1 }, new SimilarNodeName { Name = name2 });
             if (expected == 0)
                 Assert.AreEqual(0, result);
             else if (expected < 0)
@@ -38,16 +38,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var names = new[]
             {
-                new SimilarNodeName { Id = 1, Text = "Alpha (2)" },
-                new SimilarNodeName { Id = 2, Text = "Alpha" },
-                new SimilarNodeName { Id = 3, Text = "Golf" },
-                new SimilarNodeName { Id = 4, Text = "Zulu" },
-                new SimilarNodeName { Id = 5, Text = "Mike" },
-                new SimilarNodeName { Id = 6, Text = "Kilo (1)" },
-                new SimilarNodeName { Id = 7, Text = "Yankee" },
-                new SimilarNodeName { Id = 8, Text = "Kilo" },
-                new SimilarNodeName { Id = 9, Text = "Golf (2)" },
-                new SimilarNodeName { Id = 10, Text = "Alpha (1)" },
+                new SimilarNodeName { Id = 1, Name = "Alpha (2)" },
+                new SimilarNodeName { Id = 2, Name = "Alpha" },
+                new SimilarNodeName { Id = 3, Name = "Golf" },
+                new SimilarNodeName { Id = 4, Name = "Zulu" },
+                new SimilarNodeName { Id = 5, Name = "Mike" },
+                new SimilarNodeName { Id = 6, Name = "Kilo (1)" },
+                new SimilarNodeName { Id = 7, Name = "Yankee" },
+                new SimilarNodeName { Id = 8, Name = "Kilo" },
+                new SimilarNodeName { Id = 9, Name = "Golf (2)" },
+                new SimilarNodeName { Id = 10, Name = "Alpha (1)" },
             };
 
             var ordered = names.OrderBy(x => x, new SimilarNodeName.Comparer()).ToArray();
@@ -76,16 +76,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var names = new[]
             {
-                new SimilarNodeName { Id = 1, Text = "Alpha (2)" },
-                new SimilarNodeName { Id = 2, Text = "Alpha" },
-                new SimilarNodeName { Id = 3, Text = "Golf" },
-                new SimilarNodeName { Id = 4, Text = "Zulu" },
-                new SimilarNodeName { Id = 5, Text = "Mike" },
-                new SimilarNodeName { Id = 6, Text = "Kilo (1)" },
-                new SimilarNodeName { Id = 7, Text = "Yankee" },
-                new SimilarNodeName { Id = 8, Text = "Kilo" },
-                new SimilarNodeName { Id = 9, Text = "Golf (2)" },
-                new SimilarNodeName { Id = 10, Text = "Alpha (1)" },
+                new SimilarNodeName { Id = 1, Name = "Alpha (2)" },
+                new SimilarNodeName { Id = 2, Name = "Alpha" },
+                new SimilarNodeName { Id = 3, Name = "Golf" },
+                new SimilarNodeName { Id = 4, Name = "Zulu" },
+                new SimilarNodeName { Id = 5, Name = "Mike" },
+                new SimilarNodeName { Id = 6, Name = "Kilo (1)" },
+                new SimilarNodeName { Id = 7, Name = "Yankee" },
+                new SimilarNodeName { Id = 8, Name = "Kilo" },
+                new SimilarNodeName { Id = 9, Name = "Golf (2)" },
+                new SimilarNodeName { Id = 10, Name = "Alpha (1)" },
             };
 
             Assert.AreEqual(expected, SimilarNodeName.GetUniqueName(names, nodeId, nodeName));

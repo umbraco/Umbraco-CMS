@@ -145,8 +145,8 @@ namespace Umbraco.Tests.TestHelpers
                     Assert.Fail($"{property.DeclaringType.Name}.{property.Name}: Expected {expectedPropertyValues.Length} but got {actualPropertyValues.Length}.");
                 for (var i = 0; i < expectedPropertyValues.Length; i++)
                 {
-                    Assert.AreEqual(expectedPropertyValues[i].DraftValue, actualPropertyValues[i].DraftValue, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].DraftValue}\" but got \"{actualPropertyValues[i].DraftValue}\".");
-                    Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].DraftValue}\" but got \"{actualPropertyValues[i].DraftValue}\".");
+                    Assert.AreEqual(expectedPropertyValues[i].EditValue, actualPropertyValues[i].EditValue, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditValue}\" but got \"{actualPropertyValues[i].EditValue}\".");
+                    Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].EditValue}\" but got \"{actualPropertyValues[i].EditValue}\".");
                 }
             }
             else

@@ -293,7 +293,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(contentVersionDto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -349,7 +349,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // update the property data
             var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version);
             Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 

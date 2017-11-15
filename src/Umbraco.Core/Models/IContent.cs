@@ -9,39 +9,74 @@ namespace Umbraco.Core.Models
     public interface IContent : IContentBase
     {
         /// <summary>
-        /// Gets or sets the template used by the Content.
-        /// This is used to override the default one from the ContentType.
+        /// Gets or sets the template used to render the content.
         /// </summary>
         ITemplate Template { get; set; }
 
         /// <summary>
-        /// Boolean indicating whether the Content is Published or not
+        /// Gets a value indicating whether the content is published.
         /// </summary>
         bool Published { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the content has been edited.
+        /// </summary>
+        bool Edited { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the content item is a blueprint.
+        /// </summary>
+        bool Blueprint { get; }
+
+        /// <summary>
+        /// Gets the template used to render the published version of the content.
+        /// </summary>
+        /// <remarks>When editing the content, the template can change, but this will
+        /// not until the content is published.</remarks>
+        ITemplate PublishTemplate { get; }
+
+        /// <summary>
+        /// Gets the name of the published version of the content.
+        /// </summary>
+        /// <remarks>When editing the content, the name can change, but this will
+        /// not until the content is published.</remarks>
+        string PublishName { get; }
+
+        /// <summary>
+        /// Gets the identifier of the user who published the content.
+        /// </summary>
+        int? PublisherId { get; }
+
+        /// <summary>
+        /// Gets the date and time the content was published.
+        /// </summary>
+        DateTime? PublishDate { get; }
 
         [Obsolete("This will be removed in future versions")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         string Language { get; set; }
 
         /// <summary>
-        /// Gets or Sets the date the Content should be released and thus be published
+        /// Gets or sets the date and time the content item should be published.
         /// </summary>
         DateTime? ReleaseDate { get; set; }
 
         /// <summary>
-        /// Gets or Sets the date the Content should expire and thus be unpublished
+        /// Gets or sets the date and time the content should be unpublished.
         /// </summary>
         DateTime? ExpireDate { get; set; }
 
         /// <summary>
-        /// Gets the ContentType used by this content object
+        /// Gets the content type of this content.
         /// </summary>
         IContentType ContentType { get; }
 
         /// <summary>
-        /// Gets the current status of the Content
+        /// Gets the current status of the content.
         /// </summary>
         ContentStatus Status { get; }
+
+        // fixme - these two should move to some kind of service
 
         /// <summary>
         /// Changes the <see cref="IContentType"/> for the current content object
@@ -63,20 +98,5 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a published version.
-        /// </summary>
-        bool HasPublishedVersion { get; }
-
-        /// <summary>
-        /// Gets the unique identifier of the published version, if any.
-        /// </summary>
-        Guid PublishedVersionGuid { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the content item is a blueprint.
-        /// </summary>
-        bool IsBlueprint { get; }
     }
 }

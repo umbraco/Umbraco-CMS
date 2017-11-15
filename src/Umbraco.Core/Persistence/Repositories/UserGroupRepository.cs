@@ -169,7 +169,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IUserGroup PerformGet(int id)
         {
             var sql = GetBaseQuery(QueryType.Single);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { id = id });
 
             AppendGroupBy(sql);
             sql.OrderBy<UserGroupDto>(x => x.Id); // required for references

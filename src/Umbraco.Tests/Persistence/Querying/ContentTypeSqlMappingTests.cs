@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 scope.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66668, UniqueId = 66668.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77778, Alias = "property7", Name = "Property 7", SortOrder = 6, Mandatory = false, ValidationRegExp = null, Description = null });
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("cmsPropertyType"))));
 
-                ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, scope.Database, SqlSyntax, out allPropTypeCollection, out allPropGroupCollection);
+                ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, scope.Database, SqlSyntax, true, out allPropTypeCollection, out allPropGroupCollection);
 
                 scope.Complete();
             }

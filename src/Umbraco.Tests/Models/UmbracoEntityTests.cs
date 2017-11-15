@@ -170,9 +170,8 @@ namespace Umbraco.Tests.Models
                 ContentTypeIcon = "icon",
                 ContentTypeThumbnail = "thumb",
                 HasChildren = true,
-                HasPendingChanges = true,
-                IsDraft = true,
-                IsPublished = true,
+                Edited = true,
+                Published = true,
                 NodeObjectTypeId = Guid.NewGuid()
             };
             item.AdditionalData.Add("test1", 3);
@@ -206,9 +205,8 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.ContentTypeIcon, item.ContentTypeIcon);
             Assert.AreEqual(clone.ContentTypeThumbnail, item.ContentTypeThumbnail);
             Assert.AreEqual(clone.HasChildren, item.HasChildren);
-            Assert.AreEqual(clone.HasPendingChanges, item.HasPendingChanges);
-            Assert.AreEqual(clone.IsDraft, item.IsDraft);
-            Assert.AreEqual(clone.IsPublished, item.IsPublished);
+            Assert.AreEqual(clone.Edited, item.Edited);
+            Assert.AreEqual(clone.Published, item.Published);
             Assert.AreEqual(clone.NodeObjectTypeId, item.NodeObjectTypeId);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
             Assert.AreEqual(clone.AdditionalData.Count, item.AdditionalData.Count);
@@ -243,9 +241,8 @@ namespace Umbraco.Tests.Models
                 ContentTypeIcon = "icon",
                 ContentTypeThumbnail = "thumb",
                 HasChildren = true,
-                HasPendingChanges = true,
-                IsDraft = true,
-                IsPublished = true,
+                Edited = true,
+                Published = true,
                 NodeObjectTypeId = Guid.NewGuid()
             };
             item.AdditionalData.Add("test1", 3);

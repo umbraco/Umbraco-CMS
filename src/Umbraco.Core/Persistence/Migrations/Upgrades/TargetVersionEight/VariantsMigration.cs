@@ -178,6 +178,9 @@ JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.versionId=pda
             // ie we keep the published version and remove the draft one
             Execute.Code(context =>
             {
+                // xxx1 is published, non-newest
+                // xxx2 is newest, non-published
+                // we want to move data from 2 to 1
                 var versions = context.Database.Fetch<dynamic>(@"SELECT
 	doc1.versionId versionId1, doc1.newest newest1, doc1.published published1,
 	doc2.versionId versionId2, doc2.newest newest2, doc2.published published2
@@ -188,14 +191,16 @@ WHERE doc1.newest=0 AND doc1.published=1 AND doc2.newest=1 AND doc2.published=0
 ");
                 foreach (var version in versions)
                 {
+                    // move property data from 2 to 1, with published=0
                     context.Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyData)}
-SET versionId='{version.versionId1}', published=1
+SET versionId='{version.versionId1}', published=0
 WHERE versionId='{version.versionId2}'");
-                    context.Database.Execute($@"DELETE FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.PropertyData)}
-WHERE versionId='{version.versionId2}'");
+                    // and then there is no property data anymore for 2
+                    // so we can delete the corresp. document table row
                     context.Database.Execute($@"DELETE FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)}
 WHERE versionId='{version.versionId2}'");
-                    context.Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Document)}
+                    // and mark 1 as newest
+                    context.Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)}
 SET newest=1 WHERE versionId='{version.versionId1}'");
                 }
                 return string.Empty;
@@ -203,10 +208,9 @@ SET newest=1 WHERE versionId='{version.versionId1}'");
 
             // update content version
             Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersion)}
-SET current=1
+SET current=doc.newest
 FROM {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.ContentVersion)} ver
-JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON ver.versionId=doc.versionId
-WHERE doc.newest=1");
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON ver.versionId=doc.versionId");
 
             // keep only one row per document
             Execute.Code(context =>
@@ -227,6 +231,42 @@ WHERE nodeId={version.nodeId} AND versionId<>{version.versionId}");
             // drop some columns
             Delete.Column("versionId").FromTable(PreTables.Document); // fixme usage
             Delete.Column("newest").FromTable(PreTables.Document); // fixme usage
+
+            // ensure that every 'published' property data has a corresponding 'non-published' one
+            // but only for the current version
+            Execute.Sql($@"INSERT INTO {Constants.DatabaseSchema.Tables.PropertyData} (nodeId, versionId, propertyTypeId, languageId, segment, published, intValue, decimalValue, dateValue, varcharValue, textValue)
+SELECT p1.nodeId, p1.versionId, p1.propertyTypeId, p1.languageId, p1.segment, 0, p1.intValue, p1.decimalValue, p1.dateValue, p1.varcharValue, p1.textValue
+FROM {Constants.DatabaseSchema.Tables.PropertyData} p1
+JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON p1.versionId=cver.versionId AND cver.current=1
+WHERE NOT EXIST (
+    SELECT p2.id
+    FROM {Constants.DatabaseSchema.Tables.PropertyData} p2
+    WHERE
+        p1.nodeId=p2.nodeId AND p1.versionId=p2.versionId
+        AND p1.propertyTypeId=p2.propertyTypeId
+        AND p1.lang=p2.lang AND p1.segment=p2.segment
+        AND p2.published=0
+)");
+
+            // create some columns
+            if (!ColumnExists(PreTables.Document, "edits"))
+            {
+                AddColumn<DocumentDto>(PreTables.Document, "edits", out var notNull);
+                Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edits=0");
+                Execute.Sql(notNull);
+
+                // set 'edits' to true whenever a 'non-published' property data is != a published one
+                Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edits=0");
+
+                Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edits=1 WHERE nodeId IN (
+SELECT p1.nodeId
+FROM {Constants.DatabaseSchema.Tables.PropertyData} p1
+JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON p1.versionId=cver.versionId AND cver.current=1
+JOIN {Constants.DatabaseSchema.Tables.PropertyData} p2
+ON p1.nodeId=p2.nodeId AND p1.versionId=p2.versionId AND AND p1.propertyTypeId=p2.propertyTypeId AND p1.lang=p2.lang AND p1.segment=p2.segment AND p2.published=0
+    AND (p1.intValue<>p2.intValue OR p1.decimalValue<>p2.decimalValue OR p1.dateValue<>p2.dateValue OR p1.varcharValue<>p2.varcharValue OR p1.textValue<>p2.textValue)
+WHERE p1.published=1)");
+            }
 
             // rename table
             Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document);

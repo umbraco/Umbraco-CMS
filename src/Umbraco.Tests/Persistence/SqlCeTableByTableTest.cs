@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_cmsContentVersion_Table()
+        public void Can_Create_ContentVersion_Table()
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_cmsDocument_Table()
+        public void Can_Create_Document_Table()
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_cmsDocumentType_Table()
+        public void Can_Create_DocumentType_Table()
         {
             using (var scope = ScopeProvider.CreateScope())
             {

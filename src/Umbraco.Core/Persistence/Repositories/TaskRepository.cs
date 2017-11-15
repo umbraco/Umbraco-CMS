@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Task PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { id = id });
 
             var taskDto = Database.Fetch<TaskDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)

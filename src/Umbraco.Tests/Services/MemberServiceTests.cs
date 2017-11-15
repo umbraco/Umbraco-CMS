@@ -458,14 +458,15 @@ namespace Umbraco.Tests.Services
             //NOTE: This will not trigger a property isDirty because this is not based on a 'Property', it is
             // just a c# property of the Member object
             resolved.Email = "changed@test.com";
+
             //NOTE: this WILL trigger a property isDirty because setting this c# property actually sets a value of
             // the underlying 'Property'
             resolved.FailedPasswordAttempts = 1234;
 
-            var dirtyMember = (ICanBeDirty)resolved;
+            var dirtyMember = (ICanBeDirty) resolved;
             var dirtyProperties = resolved.Properties.Where(x => x.IsDirty()).ToList();
             Assert.IsTrue(dirtyMember.IsDirty());
-            Assert.AreEqual(1, dirtyProperties.Count());
+            Assert.AreEqual(1, dirtyProperties.Count);
         }
 
         [Test]

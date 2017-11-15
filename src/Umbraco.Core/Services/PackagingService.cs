@@ -98,8 +98,8 @@ namespace Umbraco.Core.Services
                     return new XElement(nodeName);
             }
 
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_contentService, _dataTypeService, _userService, _urlSegmentProviders, content, deep);
+            const bool published = false; // fixme - what shall we export?
+            var xml = EntityXmlSerializer.Serialize(_contentService, _dataTypeService, _userService, _localizationService, _urlSegmentProviders, content, published, deep);
 
             if (raiseEvents)
                 ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
@@ -1408,8 +1408,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
         public XElement Export(IMember member)
         {
-            var exporter = new EntityXmlSerializer();
-            return exporter.Serialize(_dataTypeService, member);
+            return EntityXmlSerializer.Serialize(_dataTypeService, _localizationService, member);
         }
 
         #endregion
@@ -1433,8 +1432,7 @@ namespace Umbraco.Core.Services
                     return new XElement(nodeName);
             }
 
-            var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_mediaService, _dataTypeService, _userService, _urlSegmentProviders, media, deep);
+            var xml = EntityXmlSerializer.Serialize(_mediaService, _dataTypeService, _userService, _localizationService, _urlSegmentProviders, media, deep);
 
             if (raiseEvents)
                 ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);

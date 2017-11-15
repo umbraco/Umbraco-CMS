@@ -352,7 +352,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 const string dateTimePropertyAlias = "datetimeProperty";
                 var dateValue = new DateTime(2016, 1, 6);
 
-                var propertyTypeCollection = new PropertyTypeCollection(
+                var propertyTypeCollection = new PropertyTypeCollection(true,
                     new List<PropertyType>
                     {
                         MockedPropertyTypes.CreateDecimalProperty(decimalPropertyAlias, "Decimal property", dtd.Id),

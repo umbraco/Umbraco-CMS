@@ -636,11 +636,9 @@
     <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
-    <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
     <Compile Include="Models\PropertyGroupCollection.cs" />
-    <Compile Include="Models\PropertyTagBehavior.cs" />
-    <Compile Include="Models\PropertyTags.cs" />
+    <Compile Include="Models\PropertyTagChange.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />

@@ -455,7 +455,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            contentType.PropertyGroups.Add(new PropertyGroup{ Name = "Test Group", SortOrder = 3 });
+            contentType.PropertyGroups.Add(new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 });
 
             // Assert
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(3));
@@ -537,7 +537,7 @@ namespace Umbraco.Tests.Models
                                        SortOrder = 3,
                                        DataTypeDefinitionId = -88
                                    };
-            var propertyGroup = new PropertyGroup {Name = "Test Group", SortOrder = 3};
+            var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3};
             propertyGroup.PropertyTypes.Add(propertyType);
             contentType.PropertyGroups.Add(propertyGroup);
             var newProperty = new Property(propertyType);
@@ -685,7 +685,7 @@ namespace Umbraco.Tests.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            var propertyGroup = new PropertyGroup { Name = "Test Group", SortOrder = 3 };
+            var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 };
             contentType.PropertyGroups.Add(propertyGroup);
 
             // Assert
@@ -800,7 +800,7 @@ namespace Umbraco.Tests.Models
             // Arrange
             var simpleContentType = MockedContentTypes.CreateSimpleContentType();
             var simple2ContentType = MockedContentTypes.CreateSimpleContentType("anotherSimple", "Another Simple Page",
-                                                                                new PropertyTypeCollection(
+                                                                                new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
                                                                                             new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
@@ -831,7 +831,7 @@ namespace Umbraco.Tests.Models
             var metaContentType = MockedContentTypes.CreateMetaContentType();
             var simpleContentType = MockedContentTypes.CreateSimpleContentType();
             var simple2ContentType = MockedContentTypes.CreateSimpleContentType("anotherSimple", "Another Simple Page",
-                                                                                new PropertyTypeCollection(
+                                                                                new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
                                                                                             new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
@@ -864,7 +864,7 @@ namespace Umbraco.Tests.Models
             var textPage = MockedContentTypes.CreateTextpageContentType();
             var parent = MockedContentTypes.CreateSimpleContentType("parent", "Parent", null, true);
             var meta = MockedContentTypes.CreateMetaContentType();
-            var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(
+            var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
                                                                                             new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
@@ -876,7 +876,7 @@ namespace Umbraco.Tests.Models
                                                                                                     DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
-            var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(
+            var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
                                                                                             new PropertyType("test", DataTypeDatabaseType.Ntext, "author")

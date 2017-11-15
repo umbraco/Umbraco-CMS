@@ -78,10 +78,10 @@ namespace Umbraco.Web.Trees
                 }
 
 
-                if (entity.IsPublished == false)
+                if (entity.Published == false)
                     node.SetNotPublishedStyle();
 
-                if (entity.HasPendingChanges)
+                if (entity.Edited)
                     node.SetHasUnpublishedVersionStyle();
 
                 if (Services.PublicAccessService.IsProtected(e.Path))

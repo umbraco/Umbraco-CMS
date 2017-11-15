@@ -1228,7 +1228,7 @@ namespace Umbraco.Core.Services
             var identity = int.MaxValue;
 
             var memType = new MemberType(-1);
-            var propGroup = new PropertyGroup
+            var propGroup = new PropertyGroup(MemberType.IsPublishingConst)
             {
                 Name = "Membership",
                 Id = --identity

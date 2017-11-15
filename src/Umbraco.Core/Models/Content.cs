@@ -157,6 +157,9 @@ namespace Umbraco.Core.Models
             }
         }
 
+        [IgnoreDataMember]
+        public bool Edited { get; internal set; }
+
         /// <summary>
         /// Language of the data contained within this Content object.
         /// </summary>
@@ -207,6 +210,21 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public IContentType ContentType => _contentType;
 
+        [IgnoreDataMember]
+        public DateTime? PublishDate { get; internal set; }
+
+        [IgnoreDataMember]
+        public int? PublisherId { get; internal set; }
+
+        [IgnoreDataMember]
+        public ITemplate PublishTemplate { get; internal set; }
+
+        [IgnoreDataMember]
+        public string PublishName { get; internal set; }
+
+        [DataMember]
+        public bool Blueprint { get; internal set; }
+
         /// <summary>
         /// Changes the <see cref="ContentType"/> for the current content object
         /// </summary>
@@ -241,23 +259,6 @@ namespace Umbraco.Core.Models
 
             ChangeContentType(contentType);
         }
-
-        /// <summary>
-        /// Gets or sets the unique identifier of the published version, if any.
-        /// </summary>
-        [IgnoreDataMember]
-        public Guid PublishedVersionGuid { get; internal set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a published version.
-        /// </summary>
-        public bool HasPublishedVersion => PublishedVersionGuid != default;
-
-        [IgnoreDataMember]
-        internal DateTime PublishedDate { get; set; }
-
-        [DataMember]
-        public bool IsBlueprint { get; internal set; }
 
         public override void ResetDirtyProperties(bool rememberDirty)
         {
@@ -300,8 +301,6 @@ namespace Umbraco.Core.Models
 
             foreach (var property in clone.Properties)
                 property.ResetIdentity();
-
-            clone.PublishedVersionGuid = Guid.Empty;
 
             return clone;
         }

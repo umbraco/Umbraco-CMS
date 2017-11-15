@@ -40,11 +40,6 @@ namespace Umbraco.Tests.Integration
 
             // ensure there's a current context
             GetUmbracoContext("http://www.example.com/", 0, null, true);
-
-            // prepare content type
-            _contentType = MockedContentTypes.CreateSimpleContentType("whatever", "Whatever");
-            _contentType.Key = Guid.NewGuid();
-            ServiceContext.ContentTypeService.Save(_contentType);
         }
 
         protected override void Compose()
@@ -58,6 +53,17 @@ namespace Umbraco.Tests.Integration
                 .Add<ContentTypeCacheRefresher>()
                 .Add<ContentCacheRefresher>()
                 .Add<MacroCacheRefresher>();
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            // prepare content type
+            _contentType = MockedContentTypes.CreateSimpleContentType("whatever", "Whatever");
+            _contentType.Key = Guid.NewGuid();
+            ServiceContext.FileService.SaveTemplate(_contentType.DefaultTemplate);
+            ServiceContext.ContentTypeService.Save(_contentType);
         }
 
         public override void TearDown()
@@ -216,7 +222,7 @@ namespace Umbraco.Tests.Integration
                         {
                             state += "x";
                         }
-                        else if (x.HasPublishedVersion)
+                        else if (x.Published)
                         {
                             var isPathPublished = ((ContentRepository)sender).IsPathPublished(x); // expensive!
                             if (isPathPublished == false)

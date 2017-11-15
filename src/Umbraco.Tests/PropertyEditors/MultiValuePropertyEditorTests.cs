@@ -35,7 +35,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")));
             prop.SetValue("1234,4567,8910");
 
-            var result = editor.ConvertDbToString(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
 
             Assert.AreEqual("1234,4567,8910", result);
         }
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")));
             prop.SetValue("1234,4567,8910");
 
-            var result = editor.ConvertDbToString(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType(new DataTypeDefinition(1, "Test.TestEditor")));
             prop.SetValue("1234");
 
-            var result = editor.ConvertDbToString(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
 
             Assert.AreEqual("Value 2", result);
         }

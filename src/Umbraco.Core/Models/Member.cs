@@ -536,66 +536,37 @@ namespace Umbraco.Core.Models
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
-            Action doLog = () => Current.Logger.Warn<Member>(
-                        "Trying to access the '"
-                        + propertyName
-                        + "' property on "
-                        + typeof(Member)
-                        + " but the "
-                        + propertyAlias
-                        + " property does not exist on the member type so a default value is returned. Ensure that you have a property type with alias: "
-                        + propertyAlias
-                        + " configured on your member type in order to use the '"
-                        + propertyName
-                        + "' property on the model correctly.");
+            void DoLog(string logPropertyAlias, string logPropertyName)
+                => Current.Logger.Warn<Member>($"Trying to access the '{logPropertyName}' property on " + typeof(Member)
+                + $" but the {logPropertyAlias} property does not exist on the member type so a default value is returned. Ensure that you have a property type with alias: "
+                + logPropertyAlias + $" configured on your member type in order to use the '{logPropertyName}' property on the model correctly.");
 
-            //if the property doesn't exist, then do the logging and return a failure
+            // if the property doesn't exist,
             if (Properties.Contains(propertyAlias) == false)
             {
-                //we'll put a warn in the log if this entity has been persisted
+                // put a warn in the log if this entity has been persisted
+                // then return a failure
                 if (HasIdentity)
-                {
-                    doLog();
-                }
-                return Attempt<T>.Fail(defaultVal);
-            }
-
-            //if the property doesn't have an identity but we do, then do logging and return failure
-            var prop = Properties.Single(x => x.Alias == propertyAlias);
-            if (prop.HasIdentity == false && HasIdentity)
-            {
-                doLog();
+                    DoLog(propertyAlias, propertyName);
                 return Attempt<T>.Fail(defaultVal);
             }
 
             return Attempt<T>.Succeed();
         }
 
-        private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyname)
+        private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyName)
         {
-            Action doLog = () => Current.Logger.Warn<Member>("An attempt was made to set a value on the property '"
-                        + propertyname
-                        + "' on type "
-                        + typeof(Member)
-                        + " but the property type "
-                        + propertyAlias
-                        + " does not exist on the member type, ensure that this property type exists so that setting this property works correctly.");
+            void DoLog(string logPropertyAlias, string logPropertyName)
+                => Current.Logger.Warn<Member>($"An attempt was made to set a value on the property '{logPropertyName}' on type " + typeof(Member)
+                + $" but the property type {logPropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.");
 
-            //if the property doesn't exist, then do the logging and return a failure
+            // if the property doesn't exist,
             if (Properties.Contains(propertyAlias) == false)
             {
+                // put a warn in the log if this entity has been persisted
+                // then return a failure
                 if (HasIdentity)
-                {
-                    doLog();
-                }
-                return false;
-            }
-
-            //if the property doesn't have an identity but we do, then do logging and return failure
-            var prop = Properties.Single(x => x.Alias == propertyAlias);
-            if (prop.HasIdentity == false && HasIdentity)
-            {
-                doLog();
+                    DoLog(propertyAlias, propertyName);
                 return false;
             }
 

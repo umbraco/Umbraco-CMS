@@ -19,15 +19,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ICacheProvider _snapshotCache;
         private readonly IMemberService _memberService;
         private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly bool _previewDefault;
 
-        public MemberCache(bool previewDefault, ICacheProvider snapshotCache, IMemberService memberService, IDataTypeService dataTypeService, PublishedContentTypeCache contentTypeCache, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public MemberCache(bool previewDefault, ICacheProvider snapshotCache, IMemberService memberService, IDataTypeService dataTypeService, ILocalizationService localizationService, PublishedContentTypeCache contentTypeCache, IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             _snapshotCache = snapshotCache;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _memberService = memberService;
             _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
             _previewDefault = previewDefault;
             _contentTypeCache = contentTypeCache;
         }
@@ -137,8 +139,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var result = _memberService.GetById(id);
             if (result == null) return null;
 
-            var exs = new EntityXmlSerializer();
-            var s = exs.Serialize(_dataTypeService, result);
+            var s = EntityXmlSerializer.Serialize(_dataTypeService, _localizationService, result);
             var n = s.GetXmlNode();
             return n.CreateNavigator();
         }

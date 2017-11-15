@@ -210,7 +210,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IContent entity)
         {
-            ((Content) entity).AddingEntity();
+            var content = (Content) entity;
+            content.AddingEntity();
 
             // ensure that the default template is assigned
             if (entity.Template == null)
@@ -224,7 +225,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentFactory.BuildDto(entity);
+            var dto = ContentFactory.BuildDto(entity, NodeObjectTypeId);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -274,26 +275,60 @@ namespace Umbraco.Core.Persistence.Repositories
             documentVersionDto.Id = contentVersionDto.Id;
             Database.Insert(documentVersionDto);
 
-            // persist the document dto
-            dto.NodeId = nodeDto.NodeId;
-            Database.Insert(dto);
-
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out var edited);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
+
+            // persist the document dto
+            // at that point, when publishing, the entity still has its old Published value
+            // so we need to explicitely update the dto to persist the correct value
+            if (content.PublishedState == PublishedState.Publishing)
+            {
+                dto.Published = true;
+                dto.PublishName = dto.DocumentVersionDto.ContentVersionDto.Text;
+                dto.PublishTemplateId = dto.DocumentVersionDto.TemplateId;
+                dto.PublishUserId = dto.ContentDto.WriterUserId;
+                dto.PublishDate = dto.DocumentVersionDto.ContentVersionDto.VersionDate;
+            } // else it all stays null
+            dto.NodeId = nodeDto.NodeId;
+            dto.Edited = edited;
+            Database.Insert(dto);
+
+            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+
+            // flip the entity's published property
+            // this also flips its published state
+            if (content.PublishedState == PublishedState.Publishing)
+            {
+                content.Published = true;
+                content.PublishName = dto.PublishName;
+                content.PublishTemplate = content.Template;
+                content.PublisherId = dto.PublishUserId;
+                content.PublishDate = dto.ContentDto.UpdateDate;
+            }
+            else if (content.PublishedState == PublishedState.Published)
+            {
+                // saving a 'published' one... that one is special for rollback
+                content.PublishName = dto.DocumentVersionDto.ContentVersionDto.Text;
+                content.PublishTemplate = content.Template;
+                content.PublisherId = dto.ContentDto.WriterUserId;
+                content.PublishDate = dto.DocumentVersionDto.ContentVersionDto.VersionDate;
+            }
+            else if (content.PublishedState == PublishedState.Unpublishing)
+            {
+                content.Published = false;
+                content.PublishName = null;
+                content.PublishTemplate = null;
+                content.PublisherId = null;
+                content.PublishDate = null;
+            }
+
+            ((Content) entity).Edited = dto.Edited;
 
             // if published, set tags accordingly
             if (entity.Published)
                 UpdateEntityTags(entity, _tagRepository);
-
-            // published => update published version infos, else leave it blank
-            if (entity.Published)
-            {
-                ((Content) entity).PublishedDate = contentDto.UpdateDate;
-            }
-
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
 
             entity.ResetDirtyProperties();
         }
@@ -309,19 +344,33 @@ namespace Umbraco.Core.Persistence.Repositories
                     return; // no change to save, do nothing, don't even update dates
             }
 
+            // whatever we do, we must check that we are saving the current version
+            var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == entity.Version)).FirstOrDefault();
+            if (version == null || !version.Current )
+                throw new InvalidOperationException("Cannot save a non-current version.");
+
             // check if we need to create a new version
             var requiresNewVersion = content.PublishedState == PublishedState.Publishing && content.Published || content.PublishedState == PublishedState.Unpublishing;
             if (requiresNewVersion)
             {
                 // drop all draft infos for the current version, won't need it anymore
-                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version && x.Published);
+                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version && !x.Published);
                 Database.Execute(deletePropertyDataSql);
 
                 // current version is not current anymore
-                var updateCurrentSql = SqlContext.Sql()
-                    .Update<ContentVersionDto>(u => u.Set(x => x.Current, false))
+                var updateContentVersionSql = (entity.Published
+                    ? SqlContext.Sql().Update<ContentVersionDto>(u => u.Set(x => x.Current, false).Set(x => x.Text, entity.PublishName).Set(x => x.VersionDate, entity.PublishDate))
+                    : SqlContext.Sql().Update<ContentVersionDto>(u => u.Set(x => x.Current, false)))
                     .Where<ContentVersionDto>(x => x.VersionId == content.Version);
-                Database.Execute(updateCurrentSql);
+                Database.Execute(updateContentVersionSql);
+
+                if (entity.Published)
+                {
+                    var updateDocumentVersionSql = SqlContext.Sql()
+                        .Update<DocumentVersionDto>(u => u.Set(x => x.TemplateId, entity.PublishTemplate?.Id))
+                        .Where<DocumentVersionDto>(x => x.Id == version.Id);
+                    Database.Execute(updateDocumentVersionSql);
+                }
 
                 // resets identifiers ie get a new version id
                 content.UpdatingEntity();
@@ -351,7 +400,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // create the dto
-            var dto = ContentFactory.BuildDto(entity);
+            var dto = ContentFactory.BuildDto(entity, NodeObjectTypeId);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -374,22 +423,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                // fixme this pk thing is annoying - could we store that ID somewhere?
-                var id = Database.ExecuteScalar<int>(SqlContext.Sql().Select<ContentVersionDto>(x => x.Id).From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == entity.Version));
-                contentVersionDto.Id = id;
+                contentVersionDto.Id = version.Id;
                 Database.Update(contentVersionDto);
-                documentVersionDto.Id = id;
+                documentVersionDto.Id = version.Id;
                 Database.Update(documentVersionDto);
             }
-
-            // update the document dto
-            // at that point, when un/publishing, the entity still has its old Published value
-            // so we need to explicitely update the dto to persist the correct value
-            if (content.PublishedState == PublishedState.Publishing)
-                dto.Published = true;
-            else if (content.PublishedState == PublishedState.Unpublishing)
-                dto.Published = false;
-            Database.Update(dto);
 
             // replace the property data
             if (!requiresNewVersion)
@@ -397,47 +435,53 @@ namespace Umbraco.Core.Persistence.Repositories
                 var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version);
                 Database.Execute(deletePropertyDataSql);
             }
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out var edited);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
-            // update tags
-            if (HasTagProperty(entity)) // fixme - what-if it had and now has not?
+            // update the document dto
+            // at that point, when un/publishing, the entity still has its old Published value
+            // so we need to explicitely update the dto to persist the correct value
+            if (content.PublishedState == PublishedState.Publishing)
             {
-                switch (content.PublishedState)
-                {
-                    case PublishedState.Publishing:
-                        // explicitely publishing, must update tags
-                        UpdateEntityTags(entity, _tagRepository);
-                        break;
-                    case PublishedState.Unpublishing:
-                        // explicitely unpublishing, must clear tags
-                        ClearEntityTags(entity, _tagRepository);
-                        break;
-                    case PublishedState.Published:
-                    case PublishedState.Unpublished:
-                        // no change, depends on path-published
-                        // that should take care of trashing and un-trashing
-                        // fixme why, how would that work at all???
-                        if (IsPathPublished(entity)) // slightly expensive ;-(
-                            UpdateEntityTags(entity, _tagRepository);
-                        else
-                            ClearEntityTags(entity, _tagRepository);
-                        break;
-                }
+                dto.Published = true;
+                dto.PublishName = dto.DocumentVersionDto.ContentVersionDto.Text;
+                dto.PublishTemplateId = dto.DocumentVersionDto.TemplateId;
+                dto.PublishUserId = dto.ContentDto.WriterUserId;
+                dto.PublishDate = dto.DocumentVersionDto.ContentVersionDto.VersionDate;
             }
+            else if (content.PublishedState == PublishedState.Unpublishing)
+                dto.Published = false; // and everything is null 'cos not mapped in factories
+            dto.Edited = edited;
+            Database.Update(dto);
+
+            // if entity is publishing, update tags, else leave tags there
+            // means that implicitely unpublished, or trashed, entities *still* have tags in db
+            if (content.PublishedState == PublishedState.Publishing)
+                UpdateEntityTags(entity, _tagRepository);
+
+            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
 
             // flip the entity's published property
             // this also flips its published state
             if (content.PublishedState == PublishedState.Publishing)
+            {
                 content.Published = true;
+                content.PublishName = dto.PublishName;
+                content.PublishTemplate = content.Template;
+                content.PublisherId = dto.PublishUserId;
+                content.PublishDate = dto.ContentDto.UpdateDate;
+            }
             else if (content.PublishedState == PublishedState.Unpublishing)
+            {
                 content.Published = false;
+                content.PublishName = null;
+                content.PublishTemplate = null;
+                content.PublisherId = null;
+                content.PublishDate = null;
+            }
 
-            if (content.Published)
-                content.PublishedDate = dto.ContentDto.UpdateDate;
-
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            ((Content) entity).Edited = dto.Edited;
 
             entity.ResetDirtyProperties();
         }
@@ -556,7 +600,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // succeed fast
             if (content.ParentId == -1)
-                return content.HasPublishedVersion;
+                return content.Published;
 
             var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
 
@@ -721,15 +765,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var c = content[i] = ContentFactory.BuildEntity(dto, contentType);
 
-                // need template
+                // need templates
                 var templateId = dto.DocumentVersionDto.TemplateId;
+                if (templateId.HasValue && templateId.Value > 0)
+                    templateIds.Add(templateId.Value);
+                templateId = dto.PublishTemplateId;
                 if (templateId.HasValue && templateId.Value > 0)
                     templateIds.Add(templateId.Value);
 
                 // need properties
                 temps.Add(new TempContent<Content>(dto.NodeId, versionId, contentType, c)
                 {
-                    TemplateId = dto.DocumentVersionDto.TemplateId
+                    Template1Id = dto.DocumentVersionDto.TemplateId,
+                    Template2Id = dto.PublishTemplateId
                 });
             }
 
@@ -744,7 +792,9 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var temp in temps)
             {
                 // complete the item
-                if (temp.TemplateId.HasValue && templates.TryGetValue(temp.TemplateId.Value, out var template))
+                if (temp.Template1Id.HasValue && templates.TryGetValue(temp.Template1Id.Value, out var template))
+                    temp.Content.Template = template;
+                if (temp.Template2Id.HasValue && templates.TryGetValue(temp.Template2Id.Value, out template))
                     temp.Content.Template = template;
                 temp.Content.Properties = properties[temp.VersionId];
 

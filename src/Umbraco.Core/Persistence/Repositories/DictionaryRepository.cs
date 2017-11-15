@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IDictionaryItem PerformGet(int id)
         {
             var sql = GetBaseQuery(false)
-                .Where(GetBaseWhereClause(), new { Id = id })
+                .Where(GetBaseWhereClause(), new { id = id })
                 .OrderBy<DictionaryDto>(x => x.UniqueId);
 
             var dto = Database
@@ -328,7 +328,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override object GetBaseWhereClauseArguments(Guid id)
             {
-                return new { Id = id };
+                return new { id = id };
             }
 
             protected override string GetWhereInClauseForGetAll()
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override object GetBaseWhereClauseArguments(string id)
             {
-                return new { Id = id };
+                return new { id = id };
             }
 
             protected override string GetWhereInClauseForGetAll()

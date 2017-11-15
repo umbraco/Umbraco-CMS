@@ -100,11 +100,20 @@ namespace Umbraco.Core.Persistence
             new Sql<ISqlContext>(_sqlContext, _sql, _args.Values.ToArray()).WriteToConsole();
         }
 
+        /// <summary>
+        /// Gets a named argument.
+        /// </summary>
         public static object Arg(string name) => new TemplateArg(name);
 
-        public static T ArgValue<T>(string name) => default;
+        /// <summary>
+        /// Gets a WHERE expression argument.
+        /// </summary>
+        public static T Arg<T>(string name) => default;
 
-        public static IEnumerable<T> ArgValueIn<T>(string name)
+        /// <summary>
+        /// Gets a WHERE IN expression argument.
+        /// </summary>
+        public static IEnumerable<T> ArgIn<T>(string name)
         {
             // don't return an empty enumerable, as it breaks NPoco
             // fixme - should we cache these arrays?

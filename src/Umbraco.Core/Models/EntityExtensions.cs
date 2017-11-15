@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -17,7 +16,7 @@ namespace Umbraco.Core.Models
         /// </remarks>
         public static bool IsNewEntity(this IEntity entity)
         {
-            var dirty = (IRememberBeingDirty)entity;
+            var dirty = (IRememberBeingDirty) entity;
             return dirty.WasPropertyDirty("Id");
         }
     }

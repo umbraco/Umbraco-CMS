@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Querying
             if (declaring != typeof (SqlTemplate))
                 return base.VisitMethodCall(m);
 
-            if (m.Method.Name != "ArgValue" && m.Method.Name != "ArgValueIn")
+            if (m.Method.Name != "Arg" && m.Method.Name != "ArgIn")
                 throw new NotSupportedException($"Method SqlTemplate.{m.Method.Name} is not supported.");
 
             var parameters = m.Method.GetParameters();

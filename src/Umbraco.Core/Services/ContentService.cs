@@ -797,30 +797,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the published version of an <see cref="IContent"/> item
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
-        /// <returns>An <see cref="IContent"/> item</returns>
-        public IContent GetPublishedVersion(int id)
-        {
-            var version = GetVersions(id);
-            return version.FirstOrDefault(x => x.Published);
-        }
-
-        /// <summary>
-        /// Gets the published version of a <see cref="IContent"/> item.
-        /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <returns>The published version, if any; otherwise, null.</returns>
-        public IContent GetPublishedVersion(IContent content)
-        {
-            if (content.Published) return content;
-            return content.HasPublishedVersion
-                ? GetByVersion(content.PublishedVersionGuid)
-                : null;
-        }
-
-        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
@@ -916,23 +892,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Checks whether an <see cref="IContent"/> item has any published versions
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/></param>
-        /// <returns>True if the content has any published version otherwise False</returns>
-        public bool HasPublishedVersion(int id)
-        {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
-            {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-                var query = Query<IContent>().Where(x => x.Published && x.Id == id && x.Trashed == false);
-                var count = repository.Count(query);
-                return count > 0;
-            }
-        }
-
-        /// <summary>
         /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
@@ -975,7 +934,7 @@ namespace Umbraco.Core.Services
                 var sql = uow.SqlContext.Sql(@"
                     SELECT id
                     FROM umbracoNode
-                    JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
+                    JOIN uDocument ON umbracoNode.id=uDocument.nodeId AND uDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
                     true, false, ids);
                 var x = uow.Database.Fetch<int>(sql);
@@ -1352,7 +1311,7 @@ namespace Umbraco.Core.Services
                 // if it's not trashed yet, and published, we should unpublish
                 // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                 // just raise the event
-                if (content.Trashed == false && content.HasPublishedVersion)
+                if (content.Trashed == false && content.Published)
                     uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
 
                 DeleteLocked(uow, repository, content);
@@ -1460,7 +1419,9 @@ namespace Umbraco.Core.Services
 
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
-                repository.DeleteVersion(versionId);
+                var c = repository.Get(id);
+                if (c.Version != versionId) // don't delete the current version
+                    repository.DeleteVersion(versionId);
 
                 uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
                 Audit(uow, AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
@@ -1580,7 +1541,7 @@ namespace Umbraco.Core.Services
                 // if the content was trashed under another content, and so has a published version,
                 // it cannot move back as published but has to be unpublished first - that's for the
                 // root content, everything underneath will retain its published status
-                if (content.Trashed && content.HasPublishedVersion)
+                if (content.Trashed && content.Published)
                 {
                     // however, it had been masked when being trashed, so there's no need for
                     // any special event here - just change its state
@@ -1754,11 +1715,10 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                // a copy is .Saving and will be .Unpublished
+                // a copy is not published (but not really unpublishing either)
                 // update the create author and last edit author
-                // fixme - not like this!
-                //if (copy.Published)
-                //    copy.ChangePublishedState(PublishedState.Unpublished);
+                if (copy.Published)
+                    ((Content) copy).Published = false;
                 copy.CreatorId = userId;
                 copy.WriterId = userId;
 
@@ -1795,11 +1755,10 @@ namespace Umbraco.Core.Services
                         if (uow.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
                             continue;
 
-                        // a copy is .Saving and will be .Unpublished
+                        // a copy is not published (but not really unpublishing either)
                         // update the create author and last edit author
-                        // fixme - not like this!
-                        //if (descendantCopy.Published)
-                        //    descendantCopy.ChangePublishedState(PublishedState.Unpublished);
+                        if (descendantCopy.Published)
+                            ((Content) descendantCopy).Published = false;
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
 
@@ -1870,43 +1829,41 @@ namespace Umbraco.Core.Services
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Rollback(int id, Guid versionId, int userId = 0)
         {
-            var content = GetByVersion(versionId);
-
             using (var uow = UowProvider.CreateUnitOfWork())
             {
-                var rollbackEventArgs = new RollbackEventArgs<IContent>(content);
-                if (uow.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))
-                {
-                    uow.Complete();
-                    return content;
-                }
-
-                content.CreatorId = userId;
-
-                // need to make sure that the repository is going to save a new version
-                // but if we're not changing anything, the repository would not save anything
-                // so - make sure the property IS dirty, doing a flip-flop with an impossible value
-                content.WriterId = -1;
-                content.WriterId = userId;
-
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
 
-                // a rolled back version is .Saving and will be .Unpublished
-                // fixme - not like this!
-                //content.ChangePublishedState(PublishedState.Unpublished);
+                var currContent = repository.Get(id);
+                var origContent = repository.GetByVersion(versionId);
 
-                repository.AddOrUpdate(content);
+                var rollbackEventArgs = new RollbackEventArgs<IContent>(origContent);
+                if (uow.Events.DispatchCancelable(RollingBack, this, rollbackEventArgs))
+                {
+                    uow.Complete();
+                    return origContent;
+                }
+
+                ((Content) currContent).RollbackAllValues(origContent);
+                currContent.WriterId = userId;
+
+                // publish name is always the current publish name
+                // but name is the actual version name, this is what we want
+                currContent.Name = origContent.Name;
+                currContent.Template = origContent.Template;
+
+                // save the values
+                repository.AddOrUpdate(currContent);
 
                 rollbackEventArgs.CanCancel = false;
                 uow.Events.Dispatch(RolledBack, this, rollbackEventArgs);
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
-                Audit(uow, AuditType.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
+                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(currContent, TreeChangeTypes.RefreshNode).ToEventArgs());
+                Audit(uow, AuditType.RollBack, "Content rollback performed by user", currContent.WriterId, currContent.Id);
 
                 uow.Complete();
-            }
 
-            return content;
+                return currContent;
+            }
         }
 
         /// <summary>
@@ -1957,8 +1914,6 @@ namespace Umbraco.Core.Services
                     // since we're not really publishing it and it cannot be cancelled etc
                     if (content.Published)
                         published.Add(content);
-                    else if (content.HasPublishedVersion)
-                        published.Add(GetByVersion(content.PublishedVersionGuid));
 
                     // save
                     saved.Add(content);
@@ -2112,7 +2067,7 @@ namespace Umbraco.Core.Services
                 var newest = GetById(content.Id); // ensure we have the newest version
                 if (content.Version != newest.Version) // but use the original object if it's already the newest version
                     content = newest;
-                if (content.Published == false && content.HasPublishedVersion == false)
+                if (content.Published == false)
                 {
                     uow.Complete();
                     return Attempt.Succeed(new UnPublishStatus(UnPublishedStatusType.SuccessAlreadyUnPublished, evtMsgs, content)); // already unpublished
@@ -2161,7 +2116,7 @@ namespace Umbraco.Core.Services
 
                 var isNew = content.IsNewEntity();
                 var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
-                var previouslyPublished = content.HasIdentity && content.HasPublishedVersion;
+                var previouslyPublished = content.HasIdentity && content.Published;
 
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
@@ -2178,6 +2133,10 @@ namespace Umbraco.Core.Services
                 if (content.HasIdentity == false)
                     content.CreatorId = userId;
                 content.WriterId = userId;
+
+                // fixme - this should be done OUTSIDE the service
+                // but for the time being... it needs to be done
+                ((Content) content).PublishAllValues();
 
                 repository.AddOrUpdate(content);
 
@@ -2415,23 +2374,7 @@ namespace Umbraco.Core.Services
 
                 // else check ancestors - we know we are not trashed
                 if (pathIsOk == false)
-                {
-                    // ensure all ancestors are published
-                    // because content may be new its Path may be null - start with parent
-                    var path = content.Path ?? content.Parent(this).Path;
-                    if (path != null) // if parent is also null, give up
-                    {
-                        var ancestorIds = path.Split(',')
-                            .Skip(1) // remove leading "-1"
-                            .Reverse()
-                            .Select(int.Parse);
-                        if (content.Path != null)
-                            ancestorIds = ancestorIds.Skip(1); // remove trailing content.Id
-
-                        if (ancestorIds.All(HasPublishedVersion))
-                            pathIsOk = true;
-                    }
-                }
+                    pathIsOk = IsPathPublished(content.Parent());
 
                 if (pathIsOk == false)
                 {
@@ -2518,24 +2461,6 @@ namespace Umbraco.Core.Services
                 {
                     // newest is published already
                     statuses.Add(Attempt.Succeed(new PublishStatus(PublishStatusType.SuccessAlreadyPublished, evtMsgs, content)));
-                    continue;
-                }
-
-                if (content.HasPublishedVersion)
-                {
-                    // newest is published already but we are topLevel, or
-                    // newest is not published, but another version is - publish newest
-                    var r = StrategyPublish(uow, content, alreadyCheckedA.Contains(content), userId, evtMsgs);
-                    if (r.Success == false)
-                    {
-                        // we tried to publish and it failed, but it already had / still has a published version,
-                        // the rule in remarks says that we should skip the underlying branch if includeUnpublished
-                        // is false, else process it - not that it makes much sense, but keep it like that for now
-                        if (includeUnpublished == false)
-                            excude.Add(content.Id);
-                    }
-
-                    statuses.Add(r);
                     continue;
                 }
 
@@ -2658,7 +2583,7 @@ namespace Umbraco.Core.Services
                     // if it's not trashed yet, and published, we should unpublish
                     // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                     // just raise the event
-                    if (content.Trashed == false && content.HasPublishedVersion)
+                    if (content.Trashed == false && content.Published)
                         uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
 
                     // if current content has children, move them to trash
@@ -2741,7 +2666,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentBlueprintRepository>();
                 var blueprint = repository.Get(id);
                 if (blueprint != null)
-                    ((Content) blueprint).IsBlueprint = true;
+                    ((Content) blueprint).Blueprint = true;
                 return blueprint;
             }
         }
@@ -2754,7 +2679,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentBlueprintRepository>();
                 var blueprint = repository.Get(id);
                 if (blueprint != null)
-                    ((Content) blueprint).IsBlueprint = true;
+                    ((Content) blueprint).Blueprint = true;
                 return blueprint;
             }
         }
@@ -2765,7 +2690,7 @@ namespace Umbraco.Core.Services
             if (content.ParentId != -1)
                 content.ParentId = -1;
 
-            ((Content) content).IsBlueprint = true;
+            ((Content) content).Blueprint = true;
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -2834,7 +2759,7 @@ namespace Umbraco.Core.Services
                 }
                 return repository.GetByQuery(query).Select(x =>
                 {
-                    ((Content) x).IsBlueprint = true;
+                    ((Content) x).Blueprint = true;
                     return x;
                 });
             }

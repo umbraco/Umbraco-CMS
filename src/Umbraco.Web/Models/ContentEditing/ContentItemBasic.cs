@@ -15,7 +15,6 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemBasic : EntityBasic
     {
-
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
 
@@ -24,9 +23,6 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "published")]
         public bool Published { get; set; }
-
-        [DataMember(Name = "hasPublishedVersion")]
-        public bool HasPublishedVersion { get; set; }
 
         [DataMember(Name = "owner")]
         public UserProfile Owner { get; set; }

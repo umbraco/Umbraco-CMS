@@ -201,8 +201,8 @@ namespace Umbraco.Core.Models
             {
                 foreach (var propertyValue in property.Values)
                 {
-                    if (propertyValue.DraftValue is string draftString)
-                        propertyValue.DraftValue = draftString.ToValidXmlString();
+                    if (propertyValue.EditValue is string editString)
+                        propertyValue.EditValue = editString.ToValidXmlString();
                     if (propertyValue.PublishedValue is string publishedString)
                         propertyValue.PublishedValue = publishedString.ToValidXmlString();
                 }
@@ -478,133 +478,119 @@ namespace Umbraco.Core.Models
             return userService.GetProfileById(content.WriterId);
         }
 
+        /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Writer of this content.
+        /// </summary>
+        public static IProfile GetWriterProfile(this IMedia content, IUserService userService)
+        {
+            return userService.GetProfileById(content.WriterId);
+        }
+
         #endregion
 
-        /// <summary>
-        /// Checks whether an <see cref="IContent"/> item has any published versions
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns>True if the content has any published versiom otherwise False</returns>
-        [Obsolete("Use the HasPublishedVersion property.", false)]
-        public static bool HasPublishedVersion(this IContent content)
-        {
-            return content.HasPublishedVersion;
-        }
-
-        #region Tag methods
-
-
+        #region Tags
 
         /// <summary>
-        /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
+        /// Sets tags.
         /// </summary>
-        /// <param name="content">The content item to assign the tags to</param>
-        /// <param name="propertyTypeAlias">The property alias to assign the tags to</param>
-        /// <param name="tags">The tags to assign</param>
-        /// <param name="replaceTags">True to replace the tags on the current property with the tags specified or false to merge them with the currently assigned ones</param>
-        /// <param name="tagGroup">The group/category to assign the tags, the default value is "default"</param>
-        /// <returns></returns>
-        public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
-        {
-            content.SetTags(TagCacheStorageType.Csv, propertyTypeAlias, tags, replaceTags, tagGroup);
-        }
-
-        /// <summary>
-        /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
-        /// </summary>
-        /// <param name="content">The content item to assign the tags to</param>
-        /// <param name="storageType">The tag storage type in cache (default is csv)</param>
-        /// <param name="propertyTypeAlias">The property alias to assign the tags to</param>
-        /// <param name="tags">The tags to assign</param>
-        /// <param name="replaceTags">True to replace the tags on the current property with the tags specified or false to merge them with the currently assigned ones</param>
-        /// <param name="tagGroup">The group/category to assign the tags, the default value is "default"</param>
-        /// <returns></returns>
-        public static void SetTags(this IContentBase content, TagCacheStorageType storageType, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        /// <param name="content">The content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="replaceTags">True to replace the tags with the specified tags or false to merge them with the currently assigned ones.</param>
+        /// <param name="tagGroup">The tags group.</param>
+        /// <param name="storage">The tags storage type.</param>
+        public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags = true, string tagGroup = "default", TagCacheStorageType storage = TagCacheStorageType.Csv)
         {
             var property = content.Properties[propertyTypeAlias];
             if (property == null)
-            {
                 throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
-            }
-            property.SetTags(storageType, propertyTypeAlias, tags, replaceTags, tagGroup);
+            property.SetTags(propertyTypeAlias, tags, replaceTags, tagGroup, storage);
         }
 
         // fixme - totally not ok with variants
-        internal static void SetTags(this Property property, TagCacheStorageType storageType, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        internal static void SetTags(this Property property, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags = true, string tagGroup = "default", TagCacheStorageType storage = TagCacheStorageType.Csv)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
+            var changes = property.TagChanges;
 
-            property.TagSupport.Enable = true;
-            property.TagSupport.Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup));
-            property.TagSupport.Behavior = replaceTags ? PropertyTagBehavior.Replace : PropertyTagBehavior.Merge;
+            changes.Add(new PropertyTagChange
+            {
+                Type = replaceTags ? PropertyTagChange.ChangeType.Replace : PropertyTagChange.ChangeType.Merge,
+                Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup))
+            });
 
-            //ensure the property value is set to the same thing
+            // ensure the property value is set to the same thing
             if (replaceTags)
             {
-                switch (storageType)
+                switch (storage)
                 {
                     case TagCacheStorageType.Csv:
-                        property.SetValue(string.Join(",", trimmedTags));
+                        property.SetValue(string.Join(",", trimmedTags)); // csv string
                         break;
                     case TagCacheStorageType.Json:
-                        //json array
-                        property.SetValue(JsonConvert.SerializeObject(trimmedTags));
+                        property.SetValue(JsonConvert.SerializeObject(trimmedTags)); // json array
                         break;
                 }
-
             }
-            else
+            else // merge
             {
-                switch (storageType)
+                IEnumerable<string> currentTags;
+                switch (storage)
                 {
                     case TagCacheStorageType.Csv:
-                        var currTags = property.GetValue().ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                                       .Select(x => x.Trim());
-                        property.SetValue(string.Join(",", trimmedTags.Union(currTags)));
+                        currentTags = property.GetValue().ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                        property.SetValue(string.Join(",", currentTags.Union(trimmedTags))); // csv string
                         break;
                     case TagCacheStorageType.Json:
-                        var currJson = JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString());
-                        //need to append the new ones
-                        foreach (var tag in trimmedTags)
-                        {
-                            currJson.Add(tag);
-                        }
-                        //json array
-                        property.SetValue(JsonConvert.SerializeObject(currJson));
+                        currentTags = JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString());
+                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray())); // json array
                         break;
                 }
             }
         }
 
         /// <summary>
-        /// Remove any of the tags specified in the collection from the property if they are currently assigned.
+        /// Remove tags.
         /// </summary>
-        /// <param name="content"></param>
-        /// <param name="propertyTypeAlias"></param>
-        /// <param name="tags"></param>
-        /// <param name="tagGroup">The group/category that the tags are currently assigned to, the default value is "default"</param>
+        /// <param name="content">The content item.</param>
+        /// <param name="propertyTypeAlias">The property alias.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="tagGroup">The tags group.</param>
         // fixme - totally not ok with variants
         public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string tagGroup = "default")
         {
             var property = content.Properties[propertyTypeAlias];
             if (property == null)
-            {
                 throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
-            }
 
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
+            var changes = property.TagChanges;
 
-            property.TagSupport.Behavior = PropertyTagBehavior.Remove;
-            property.TagSupport.Enable = true;
-            property.TagSupport.Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup));
+            changes.Add(new PropertyTagChange
+            {
+                Type = PropertyTagChange.ChangeType.Remove,
+                Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup))
+            });
 
-            //set the property value
-            var currTags = property.GetValue().ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                                       .Select(x => x.Trim());
+            // set the property value
+            var value = property.GetValue()?.ToString();
+            if (string.IsNullOrWhiteSpace(value)) return;
 
-            property.SetValue(string.Join(",", currTags.Except(trimmedTags)));
+            var storage = value.StartsWith("[") ? TagCacheStorageType.Json : TagCacheStorageType.Csv;
+            IEnumerable<string> currentTags;
+            switch (storage)
+            {
+                case TagCacheStorageType.Csv:
+                    currentTags = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                    property.SetValue(string.Join(",", currentTags.Except(trimmedTags)));
+                    break;
+                case TagCacheStorageType.Json:
+                    currentTags = JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString());
+                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray())); // json array
+                    break;
+            }
         }
 
         #endregion

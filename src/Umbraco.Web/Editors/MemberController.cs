@@ -530,9 +530,11 @@ namespace Umbraco.Web.Editors
                 if (builtInAliases.Contains(p.Alias) == false && valueMapped != null)
                 {
                     p.SetValue(valueMapped.GetValue());
-                    p.TagSupport.Behavior = valueMapped.TagSupport.Behavior;
-                    p.TagSupport.Enable = valueMapped.TagSupport.Enable;
-                    p.TagSupport.Tags = valueMapped.TagSupport.Tags;
+
+                    // fixme - ok, I give up, at that point tags are dead here, until we figure it out
+                    //p.TagChanges.Behavior = valueMapped.TagChanges.Behavior;
+                    //p.TagChanges.Enable = valueMapped.TagChanges.Enable;
+                    //p.TagChanges.Tags = valueMapped.TagChanges.Tags;
                 }
             }
         }

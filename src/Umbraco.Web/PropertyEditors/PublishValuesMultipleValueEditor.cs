@@ -34,38 +34,38 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// If publishing ids, we don't need to do anything, otherwise we need to look up the pre-values and get the string values
         /// </summary>
-        /// <param name="property"></param>
         /// <param name="propertyType"></param>
+        /// <param name="propertyValue"></param>
         /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
         {
-            if (property.GetValue() == null)
+            if (propertyValue == null)
                 return null;
 
             //publishing ids, so just need to return the value as-is
             if (_publishIds)
             {
-                return property.GetValue().ToString();
+                return propertyValue.ToString();
             }
 
             //get the multiple ids
-            var selectedIds = property.GetValue().ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var selectedIds = propertyValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             if (selectedIds.Any() == false)
             {
-                //nothing there
-                return base.ConvertDbToString(property, propertyType, dataTypeService);
+                //nothing there, fallback to base
+                return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
             }
 
-            var preValues = GetPreValues(property);
+            var preValues = GetPreValues(propertyType);
             if (preValues != null)
             {
                 //get all pre-values matching our Ids
-                return string.Join(",",
-                                   preValues.Where(x => selectedIds.Contains(x.Value.Id.ToInvariantString())).Select(x => x.Value.Value));
+                return string.Join(",", preValues.Where(x => selectedIds.Contains(x.Value.Id.ToInvariantString())).Select(x => x.Value.Value));
             }
 
-            return base.ConvertDbToString(property, propertyType, dataTypeService);
+            // bah, fallback to base
+            return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
         }
 
         /// <summary>

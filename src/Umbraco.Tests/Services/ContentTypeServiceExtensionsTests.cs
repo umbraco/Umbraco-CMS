@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Services
         {
             Action<string, IContentType> addPropType = (alias, ct) =>
             {
-                var contentCollection = new PropertyTypeCollection
+                var contentCollection = new PropertyTypeCollection(true)
                 {
                     new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) {Alias = alias, Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88}
                 };
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Services
         {
             Action<IContentType> addPropType = ct =>
             {
-                var contentCollection = new PropertyTypeCollection
+                var contentCollection = new PropertyTypeCollection(true)
                 {
                     new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) {Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88}
                 };
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Services
         {
             Action<IContentType> addPropType = ct =>
             {
-                var contentCollection = new PropertyTypeCollection
+                var contentCollection = new PropertyTypeCollection(true)
                 {
                     new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) {Alias = "title", Name = "Title", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88}
                 };

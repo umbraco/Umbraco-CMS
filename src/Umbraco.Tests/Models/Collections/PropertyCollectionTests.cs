@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Models.Collections
         public void PropertyTypeCollection_Returns_Null_On_FirstOrDefault_When_Empty()
         {
             var list = new List<PropertyType>();
-            var collection = new PropertyTypeCollection(list);
+            var collection = new PropertyTypeCollection(false, list);
 
             Assert.That(collection.FirstOrDefault(), Is.Null);
             Assert.That(collection.FirstOrDefault(x => x.Alias.InvariantEquals("Test")) == null, Is.True);

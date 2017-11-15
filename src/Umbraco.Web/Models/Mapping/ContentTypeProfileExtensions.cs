@@ -25,6 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             where TPropertyTypeBasic : PropertyTypeBasic
         {
             return mapping
+                .ConstructUsing(x => new PropertyGroup(false)) // fixme - we have NO idea of isPublishing here = wtf?
                 .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(src => src.Id > 0))
                 .ForMember(dest => dest.Key, map => map.Ignore())
@@ -158,6 +159,9 @@ namespace Umbraco.Web.Models.Mapping
             where TDestination : IContentTypeComposition
             where TSourcePropertyType : PropertyTypeBasic
         {
+            // fixme not so clean really
+            var isPublishing = typeof(IContentType).IsAssignableFrom(typeof(TDestination));
+
             return mapping
                 //only map id if set to something higher then zero
                 .ForMember(dest => dest.Id, opt => opt.Condition(src => (Convert.ToInt32(src.Id) > 0)))
@@ -221,7 +225,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         // ensure no duplicate alias, then assign the group properties collection
                         EnsureUniqueAliases(destProperties);
-                        destGroup.PropertyTypes = new PropertyTypeCollection(destProperties);
+                        destGroup.PropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
                         destGroups.Add(destGroup);
                     }
 
@@ -244,7 +248,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         // ensure no duplicate alias, then assign the generic properties collection
                         EnsureUniqueAliases(destProperties);
-                        dest.NoGroupPropertyTypes = new PropertyTypeCollection(destProperties);
+                        dest.NoGroupPropertyTypes = new PropertyTypeCollection(isPublishing, destProperties);
                     }
 
                     // because all property collections were rebuilt, there is no need to remove

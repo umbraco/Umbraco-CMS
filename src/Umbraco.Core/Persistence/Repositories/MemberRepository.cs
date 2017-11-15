@@ -161,8 +161,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
                 .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = cmsContentVersion.VersionId")
+
+                .LeftJoin<PropertyDataDto>().On(x => x
+                    .Where<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
+                    .Where<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.VersionId))
+
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
         }
 
@@ -179,7 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE nodeId = @id",
                                "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
                                "DELETE FROM cmsMember WHERE nodeId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE ContentId = @id",
+                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
                                "DELETE FROM cmsContentXml WHERE nodeId = @id",
                                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
                                "DELETE FROM umbracoNode WHERE id = @id"
@@ -300,7 +303,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -366,7 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // replace the property data
             var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.Version);
             Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties);
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.Id, entity.Version, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 

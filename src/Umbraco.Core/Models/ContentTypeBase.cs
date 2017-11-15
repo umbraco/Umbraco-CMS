@@ -19,6 +19,8 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public abstract class ContentTypeBase : Entity, IContentTypeBase
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         private Lazy<int> _parentId;
         private string _name;
         private int _level;
@@ -29,14 +31,13 @@ namespace Umbraco.Core.Models
         private string _icon = "icon-folder";
         private string _thumbnail = "folder.png";
         private int _creatorId;
-        private bool _allowedAsRoot;
+        private bool _allowedAsRoot; // note: only one that's not 'pure element type'
         private bool _isContainer;
         private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _propertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
         private bool _hasPropertyTypeBeenRemoved;
-
 
         protected ContentTypeBase(int parentId)
         {
@@ -45,14 +46,17 @@ namespace Umbraco.Core.Models
             _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
-            _propertyTypes = new PropertyTypeCollection();
-            _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
+
+            // actually OK as IsPublishing is constant
+            // ReSharper disable once VirtualMemberCallInConstructor
+            _propertyTypes = new PropertyTypeCollection(IsPublishing);
+            _propertyTypes.CollectionChanged += PropertyTypesChanged;
         }
 
-        protected ContentTypeBase(IContentTypeBase parent) : this(parent, null)
-        {
-        }
+        protected ContentTypeBase(IContentTypeBase parent)
+            : this(parent, null)
+        { }
 
         protected ContentTypeBase(IContentTypeBase parent, string alias)
         {
@@ -62,13 +66,28 @@ namespace Umbraco.Core.Models
             _parentId = new Lazy<int>(() => parent.Id);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
-            _propertyTypes = new PropertyTypeCollection();
-            _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
+
+            // actually OK as IsPublishing is constant
+            // ReSharper disable once VirtualMemberCallInConstructor
+            _propertyTypes = new PropertyTypeCollection(IsPublishing);
+            _propertyTypes.CollectionChanged += PropertyTypesChanged;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        /// <summary>
+        /// Gets a value indicating whether the content type is publishing.
+        /// </summary>
+        /// <remarks>
+        /// <para>A publishing content type supports draft and published values for properties.
+        /// It is possible to retrieve either the draft (default) or published value of a property.
+        /// Setting the value always sets the draft value, which then needs to be published.</para>
+        /// <para>A non-publishing content type only supports one value for properties. Getting
+        /// the draft or published value of a property returns the same thing, and publishing
+        /// a value property has no effect.</para>
+        /// </remarks>
+        public abstract bool IsPublishing { get; }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
@@ -95,7 +114,6 @@ namespace Umbraco.Core.Models
                     (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
                     sorts => sorts.GetHashCode());
         }
-
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -136,8 +154,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Name
         {
-            get { return _name; }
-            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
+            get => _name;
+            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
         }
 
         /// <summary>
@@ -146,8 +164,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int Level //NOTE Is this relevant for a ContentType?
         {
-            get { return _level; }
-            set { SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector); }
+            get => _level;
+            set => SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector);
         }
 
         /// <summary>
@@ -156,8 +174,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Path //NOTE Is this relevant for a ContentType?
         {
-            get { return _path; }
-            set { SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector); }
+            get => _path;
+            set => SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector);
         }
 
         /// <summary>
@@ -166,14 +184,11 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Alias
         {
-            get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(
-                    value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
-                    ref _alias,
-                    Ps.Value.AliasSelector);
-            }
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(
+                value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase),
+                ref _alias,
+                Ps.Value.AliasSelector);
         }
 
         /// <summary>
@@ -182,8 +197,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Description
         {
-            get { return _description; }
-            set { SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector); }
+            get => _description;
+            set => SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector);
         }
 
         /// <summary>
@@ -192,8 +207,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int SortOrder
         {
-            get { return _sortOrder; }
-            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
+            get => _sortOrder;
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
         }
 
         /// <summary>
@@ -202,8 +217,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Icon
         {
-            get { return _icon; }
-            set { SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector); }
+            get => _icon;
+            set => SetPropertyValueAndDetectChanges(value, ref _icon, Ps.Value.IconSelector);
         }
 
         /// <summary>
@@ -212,8 +227,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Thumbnail
         {
-            get { return _thumbnail; }
-            set { SetPropertyValueAndDetectChanges(value, ref _thumbnail, Ps.Value.ThumbnailSelector); }
+            get => _thumbnail;
+            set => SetPropertyValueAndDetectChanges(value, ref _thumbnail, Ps.Value.ThumbnailSelector);
         }
 
         /// <summary>
@@ -222,8 +237,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int CreatorId
         {
-            get { return _creatorId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
+            get => _creatorId;
+            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector);
         }
 
         /// <summary>
@@ -232,8 +247,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual bool AllowedAsRoot
         {
-            get { return _allowedAsRoot; }
-            set { SetPropertyValueAndDetectChanges(value, ref _allowedAsRoot, Ps.Value.AllowedAsRootSelector); }
+            get => _allowedAsRoot;
+            set => SetPropertyValueAndDetectChanges(value, ref _allowedAsRoot, Ps.Value.AllowedAsRootSelector);
         }
 
         /// <summary>
@@ -245,8 +260,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual bool IsContainer
         {
-            get { return _isContainer; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector); }
+            get => _isContainer;
+            set => SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector);
         }
 
         /// <summary>
@@ -256,8 +271,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual bool Trashed //NOTE Is this relevant for a ContentType?
         {
-            get { return _trashed; }
-            set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
+            get => _trashed;
+            set => SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector);
         }
 
         private readonly IDictionary<string, object> _additionalData;
@@ -265,10 +280,7 @@ namespace Umbraco.Core.Models
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData
-        {
-            get { return _additionalData; }
-        }
+        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData;
 
         /// <summary>
         /// Gets or sets a list of integer Ids for allowed ContentTypes
@@ -276,12 +288,9 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual IEnumerable<ContentTypeSort> AllowedContentTypes
         {
-            get { return _allowedContentTypes; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
-                    Ps.Value.ContentTypeSortComparer);
-            }
+            get => _allowedContentTypes;
+            set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
+                Ps.Value.ContentTypeSortComparer);
         }
 
         /// <summary>
@@ -293,7 +302,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual PropertyGroupCollection PropertyGroups
         {
-            get { return _propertyGroups; }
+            get => _propertyGroups;
             set
             {
                 _propertyGroups = value;
@@ -320,10 +329,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         public IEnumerable<PropertyType> NoGroupPropertyTypes
         {
-            get { return _propertyTypes; }
+            get => _propertyTypes;
             set
             {
-                _propertyTypes = new PropertyTypeCollection(value);
+                _propertyTypes = new PropertyTypeCollection(IsPublishing, value);
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
                 PropertyTypesChanged(_propertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
@@ -339,7 +348,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         internal bool HasPropertyTypeBeenRemoved
         {
-            get { return _hasPropertyTypeBeenRemoved; }
+            get => _hasPropertyTypeBeenRemoved;
             private set
             {
                 _hasPropertyTypeBeenRemoved = value;
@@ -416,10 +425,8 @@ namespace Umbraco.Core.Models
             propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
 
             // remove from old group, if any - add to new group, if any
-            if (oldPropertyGroup != null)
-                oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
-            if (newPropertyGroup != null)
-                newPropertyGroup.PropertyTypes.Add(propertyType);
+            oldPropertyGroup?.PropertyTypes.RemoveItem(propertyTypeAlias);
+            newPropertyGroup?.PropertyTypes.Add(propertyType);
 
             return true;
         }
@@ -484,10 +491,7 @@ namespace Umbraco.Core.Models
         /// PropertyTypes that are not part of a PropertyGroup
         /// </summary>
         [IgnoreDataMember]
-        internal PropertyTypeCollection PropertyTypeCollection
-        {
-             get { return _propertyTypes; }
-        }
+        internal PropertyTypeCollection PropertyTypeCollection => _propertyTypes;
 
         /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.

@@ -160,13 +160,13 @@ namespace Umbraco.Web.PropertyEditors
         }
 
 
-        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
-            if (property.GetValue() == null || string.IsNullOrEmpty(property.GetValue().ToString()))
+            if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
 
             // if we dont have a json structure, we will get it from the property type
-            var val = property.GetValue().ToString();
+            var val = value.ToString();
             if (val.DetectIsJson())
                 return val;
 

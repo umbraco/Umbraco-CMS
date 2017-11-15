@@ -287,11 +287,12 @@ namespace umbraco
         {
             var media = Current.Services.MediaService.GetById(mediaId);
             if (media == null) return null;
-            var serializer = new EntityXmlSerializer();
-            var serialized = serializer.Serialize(
+
+            var serialized = EntityXmlSerializer.Serialize(
                 Current.Services.MediaService,
                 Current.Services.DataTypeService,
                 Current.Services.UserService,
+                Current.Services.LocalizationService,
                 Current.UrlSegmentProviders,
                 media,
                 deep);
@@ -343,9 +344,9 @@ namespace umbraco
         {
             var member = Current.Services.MemberService.GetById(MemberId);
             if (member == null) return null;
-            var serializer = new EntityXmlSerializer();
-            var serialized = serializer.Serialize(
-                Current.Services.DataTypeService, member);
+
+            var serialized = EntityXmlSerializer.Serialize(
+                Current.Services.DataTypeService, Current.Services.LocalizationService, member);
             return serialized;
         }
 
@@ -1535,11 +1536,12 @@ namespace umbraco
         /// </returns>
         public static XPathNodeIterator GetRelatedNodesAsXml(int NodeId)
         {
-            var xmlSerializer = new EntityXmlSerializer();
-
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<relations/>");
             var rels = Current.Services.RelationService.GetByParentOrChildId(NodeId);
+
+            const bool published = true; // work with published versions?
+
             foreach (var r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
@@ -1556,11 +1558,12 @@ namespace umbraco
                     var parent = Current.Services.ContentService.GetById(r.ParentId);
                     if (parent != null)
                     {
-                        var x = xmlSerializer.Serialize(
+                        var x = EntityXmlSerializer.Serialize(
                             Current.Services.ContentService,
                             Current.Services.DataTypeService,
                             Current.Services.UserService,
-                            Current.UrlSegmentProviders, parent).GetXmlNode(xd);
+                            Current.Services.LocalizationService,
+                            Current.UrlSegmentProviders, parent, published).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }
@@ -1569,11 +1572,12 @@ namespace umbraco
                     var child = Current.Services.ContentService.GetById(r.ChildId);
                     if (child != null)
                     {
-                        var x = xmlSerializer.Serialize(
+                        var x = EntityXmlSerializer.Serialize(
                             Current.Services.ContentService,
                             Current.Services.DataTypeService,
                             Current.Services.UserService,
-                            Current.UrlSegmentProviders, child).GetXmlNode(xd);
+                            Current.Services.LocalizationService,
+                            Current.UrlSegmentProviders, child, published).GetXmlNode(xd);
                         n.AppendChild(x);
                     }
                 }

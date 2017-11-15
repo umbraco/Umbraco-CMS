@@ -279,20 +279,45 @@ namespace Umbraco.Tests.Services
         {
             var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "Test1");
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
+            ServiceContext.ContentTypeService.Save(contentType1);
+
             var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "Test2");
             ServiceContext.FileService.SaveTemplate(contentType2.DefaultTemplate);
-            ServiceContext.ContentTypeService.Save(contentType1);
             ServiceContext.ContentTypeService.Save(contentType2);
+
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
             foreach (var x in contentItems1)
                 ServiceContext.ContentService.SaveAndPublishWithStatus(x);
+
             var contentItems2 = MockedContent.CreateTextpageContent(contentType2, -1, 5).ToArray();
             foreach (var x in contentItems2)
                 ServiceContext.ContentService.SaveAndPublishWithStatus(x);
-            //only update the contentType1 alias which will force an xml rebuild for all content of that type
+
+            // make sure we have everything
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                foreach (var c in contentItems1)
+                {
+                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                    Assert.IsNotNull(xml);
+                    Assert.IsTrue(xml.Xml.StartsWith("<test1"));
+                }
+
+                foreach (var c in contentItems2)
+                {
+                    var xml = scope.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id });
+                    Assert.IsNotNull(xml);
+                    Assert.IsTrue(xml.Xml.StartsWith("<test2"));
+                }
+
+                scope.Complete();
+            }
+
+            // only update the contentType1 alias which will force an xml rebuild for all content of that type
             contentType1.Alias = "newAlias";
             ServiceContext.ContentTypeService.Save(contentType1);
 
+            // make sure updates have taken place
             using (var scope = ScopeProvider.CreateScope())
             {
                 foreach (var c in contentItems1)
@@ -1203,7 +1228,7 @@ namespace Umbraco.Tests.Services
 
             //Change the name of the tab on the "root" content type 'page'.
             var propertyGroup = contentPage.PropertyGroups["Content_"];
-            Assert.Throws<Exception>(() => contentPage.PropertyGroups.Add(new PropertyGroup
+            Assert.Throws<Exception>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
             {
                 Id = propertyGroup.Id,
                 Name = "Content",
@@ -1353,7 +1378,7 @@ namespace Umbraco.Tests.Services
 
             Assert.That(page.PropertyGroups.Contains("Content_"), Is.True);
             var propertyGroup = page.PropertyGroups["Content_"];
-            page.PropertyGroups.Add(new PropertyGroup{ Id = propertyGroup.Id, Name = "ContentTab", SortOrder = 0});
+            page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "ContentTab", SortOrder = 0});
             service.Save(page);
 
             // Assert
@@ -1423,7 +1448,7 @@ namespace Umbraco.Tests.Services
 
             //Change the name of the tab on the "root" content type 'page'.
             var propertyGroup = page.PropertyGroups["Content_"];
-            page.PropertyGroups.Add(new PropertyGroup { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
+            page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
             service.Save(page);
 
             // Assert
@@ -1484,7 +1509,7 @@ namespace Umbraco.Tests.Services
 
             //Change the name of the tab on the "root" content type 'page'.
             var propertyGroup = page.PropertyGroups["Content_"];
-            page.PropertyGroups.Add(new PropertyGroup { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
+            page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
             service.Save(page);
 
             // Assert
@@ -1711,7 +1736,7 @@ namespace Umbraco.Tests.Services
                 Trashed = false
             };
 
-            var contentCollection = new PropertyTypeCollection();
+            var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "componentGroup") { Name = "Component Group", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             component.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Component", SortOrder = 1 });
 
@@ -1759,7 +1784,7 @@ namespace Umbraco.Tests.Services
                 Trashed = false
             };
 
-            var contentCollection = new PropertyTypeCollection();
+            var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "hostname") { Name = "Hostname", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             site.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Site Settings", SortOrder = 1 });
 
@@ -1781,7 +1806,7 @@ namespace Umbraco.Tests.Services
                 Trashed = false
             };
 
-            var contentCollection = new PropertyTypeCollection();
+            var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "title") { Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             contentCollection.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "bodyText") { Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -87 });
             contentCollection.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "author") { Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });

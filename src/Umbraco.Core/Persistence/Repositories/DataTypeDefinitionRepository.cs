@@ -457,9 +457,9 @@ AND umbracoNode.id <> @id",
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName", tsql => tsql
-                .Select<NodeDto>(x => x.NodeId, x => x.Text)
+                .SelectAs<NodeDto>(x => x.NodeId, "id").AndSelectAs<NodeDto>(x => x.Text, "name")
                 .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.ArgValue<Guid>("nodeObjectType")));
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
 
             var sql = template.Sql(NodeObjectTypeId);
             var names = Database.Fetch<SimilarNodeName>(sql);

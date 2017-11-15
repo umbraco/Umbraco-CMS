@@ -86,32 +86,30 @@ namespace Umbraco.Core
         {
             Expression expressionToCheck = lambdaExpression;
 
-            bool done = false;
+            var loop = true;
 
-            while (!done)
+            while (loop)
             {
                 switch (expressionToCheck.NodeType)
                 {
                     case ExpressionType.Convert:
-                        expressionToCheck = ((UnaryExpression)expressionToCheck).Operand;
+                        expressionToCheck = ((UnaryExpression) expressionToCheck).Operand;
                         break;
                     case ExpressionType.Lambda:
-                        expressionToCheck = ((LambdaExpression)expressionToCheck).Body;
+                        expressionToCheck = ((LambdaExpression) expressionToCheck).Body;
                         break;
                     case ExpressionType.MemberAccess:
-                        var memberExpression = ((MemberExpression)expressionToCheck);
+                        var memberExpression = (MemberExpression) expressionToCheck;
 
                         if (memberExpression.Expression.NodeType != ExpressionType.Parameter &&
                             memberExpression.Expression.NodeType != ExpressionType.Convert)
                         {
-                            throw new ArgumentException(string.Format("Expression '{0}' must resolve to top-level member and not any child object's properties. Use a custom resolver on the child type or the AfterMap option instead.", lambdaExpression), "lambdaExpression");
+                            throw new ArgumentException($"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. Use a custom resolver on the child type or the AfterMap option instead.", "lambdaExpression");
                         }
 
-                        MemberInfo member = memberExpression.Member;
-
-                        return member;
+                        return memberExpression.Member;
                     default:
-                        done = true;
+                        loop = false;
                         break;
                 }
             }
