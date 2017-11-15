@@ -37,14 +37,16 @@ namespace Umbraco.Web.PropertyEditors
                             new {name = "Grid", path = "views/propertyeditors/listview/layouts/grid/grid.html", icon = "icon-thumbnails-small", isSystem = 1, selected = true}
                         }
                     },
-                    {"bulkActionPermissions", new
+                    {
+                        "bulkActionPermissions", new
                         {
                             allowBulkPublish = true,
                             allowBulkUnpublish = true,
                             allowBulkCopy = true,
                             allowBulkMove = false,
                             allowBulkDelete = true
-                        }}
+                        }
+                    }
                 };
             }
         }
@@ -52,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class ListViewPreValueEditor : PreValueEditor
         {
             [PreValueField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
-            public int TabName { get; set; }
+            public string TabName { get; set; }
 
             [PreValueField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
             public int DisplayAtTabNumber { get; set; }
@@ -61,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
             public int PageSize { get; set; }
 
             [PreValueField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
-            public int Layouts { get; set; }
+            public object Layouts { get; set; }
 
             [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
                 Description = "The properties that will be displayed for each column")]
@@ -69,10 +71,10 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
                 Description = "The default sort order for the list")]
-            public int OrderBy { get; set; }
+            public string OrderBy { get; set; }
 
             [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
-            public int OrderDirection { get; set; }
+            public string OrderDirection { get; set; }
 
             [PreValueField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
                 Description = "The bulk actions that are allowed from the list view")]
