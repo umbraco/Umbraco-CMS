@@ -26,7 +26,7 @@
     <key alias="notify">Notificeringer</key>
     <key alias="protect">Offentlig adgang</key>
     <key alias="publish">Udgiv</key>
-    <key alias="unpublish">Fortryd udgivelse</key>
+    <key alias="unpublish">Afpublicér</key>
     <key alias="refreshNode">Genindlæs elementer</key>
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="rename" version="7.3.0">Omdøb</key>
@@ -193,7 +193,7 @@
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
-    <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
+    <key alias="unpublishDate">Afpubliceringsdato</key>
     <key alias="removeDate">Fjern dato</key>
     <key alias="setDate">Vælg dato</key>
     <key alias="sortDone">Sorteringsrækkefølgen er opdateret</key>
@@ -202,7 +202,7 @@
     <key alias="titleOptional">Titel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
-    <key alias="unPublish">Fortryd udgivelse</key>
+    <key alias="unPublish">Afpublicér</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
