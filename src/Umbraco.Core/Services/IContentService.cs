@@ -645,6 +645,20 @@ namespace Umbraco.Core.Services
         bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of node Ids passed in.
+        /// </summary>
+        /// <remarks>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
+        /// </remarks>
+        /// <param name="ids"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(int[] ids, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
         /// Gets the parent of the current content as an <see cref="IContent"/> item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
