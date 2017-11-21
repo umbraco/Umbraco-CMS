@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var baseQuery = GetBaseQuery(false);
 
             // fixme why is this different from content/media?!
-            //check if the query is based on properties or not
+            // check if the query is based on properties or not
 
             var wheres = query.GetWhereClauses();
             //this is a pretty rudimentary check but wil work, we just need to know if this query requires property
@@ -155,16 +155,17 @@ namespace Umbraco.Core.Persistence.Repositories
             return Sql()
                 .Select("DISTINCT(umbracoNode.id)")
                 .From<NodeDto>()
-                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<MemberDto>().On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId)
+
+                .LeftJoin<PropertyTypeDto>().On<ContentDto, PropertyTypeDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
 
                 .LeftJoin<PropertyDataDto>().On(x => x
                     .Where<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                    .Where<PropertyDataDto, ContentVersionDto>((left, right) => left.Id == right.Id))
+                    .Where<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id))
 
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
         }
@@ -172,21 +173,21 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
-                           {
-                               "DELETE FROM cmsTask WHERE nodeId = @id",
-                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
-                               "DELETE FROM umbracoRelation WHERE parentId = @id",
-                               "DELETE FROM umbracoRelation WHERE childId = @id",
-                               "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                               "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
-                               "DELETE FROM cmsMember WHERE nodeId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                               "DELETE FROM cmsContentXml WHERE nodeId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-                               "DELETE FROM umbracoNode WHERE id = @id"
-                           };
+            {
+                "DELETE FROM cmsTask WHERE nodeId = @id",
+                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+                "DELETE FROM umbracoRelation WHERE parentId = @id",
+                "DELETE FROM umbracoRelation WHERE childId = @id",
+                "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
+                "DELETE FROM cmsMember WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
+                "DELETE FROM cmsContentXml WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM umbracoNode WHERE id = @id"
+            };
             return list;
         }
 

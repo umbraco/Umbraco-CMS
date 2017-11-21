@@ -506,6 +506,9 @@ namespace Umbraco.Core.Persistence.Querying
 
                     if (methodArgs[0].NodeType != ExpressionType.Constant)
                     {
+                        // if it's a field accessor, we could Visit(methodArgs[0]) and get [a].[b]
+                        // but then, what if we want more, eg .StartsWith(node.Path + ',') ? => not
+
                         //This occurs when we are getting a value from a non constant such as: x => x.Path.StartsWith(content.Path)
                         // So we'll go get the value:
                         var member = Expression.Convert(methodArgs[0], typeof(object));
@@ -652,6 +655,42 @@ namespace Umbraco.Core.Persistence.Querying
                 //case "As":
                 //    return string.Format("{0} As {1}", r,
                 //                                GetQuotedColumnName(RemoveQuoteFromAlias(RemoveQuote(args[0].ToString()))));
+
+                case "SqlText":
+                    if (m.Method.DeclaringType != typeof(NPocoSqlExtensions.Statics))
+                        goto default;
+                    if (m.Arguments.Count == 2)
+                    {
+                        var n1 = Visit(m.Arguments[0]);
+                        var f = m.Arguments[2];
+                        if (!(f is Expression<Func<string, string>> fl))
+                            throw new NotSupportedException("Expression is not a proper lambda.");
+                        var ff = fl.Compile();
+                        return ff(n1);
+                    }
+                    else if (m.Arguments.Count == 3)
+                    {
+                        var n1 = Visit(m.Arguments[0]);
+                        var n2 = Visit(m.Arguments[1]);
+                        var f = m.Arguments[2];
+                        if (!(f is Expression<Func<string, string, string>> fl))
+                            throw new NotSupportedException("Expression is not a proper lambda.");
+                        var ff = fl.Compile();
+                        return ff(n1, n2);
+                    }
+                    else if (m.Arguments.Count == 4)
+                    {
+                        var n1 = Visit(m.Arguments[0]);
+                        var n2 = Visit(m.Arguments[1]);
+                        var n3 = Visit(m.Arguments[3]);
+                        var f = m.Arguments[3];
+                        if (!(f is Expression<Func<string, string, string, string>> fl))
+                            throw new NotSupportedException("Expression is not a proper lambda.");
+                        var ff = fl.Compile();
+                        return ff(n1, n2, n3);
+                    }
+                    else
+                        throw new NotSupportedException("Expression is not a proper lambda.");
 
                 default:
 

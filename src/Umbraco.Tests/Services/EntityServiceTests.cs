@@ -503,13 +503,19 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll(UmbracoObjectTypes.Media).ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Count(), Is.EqualTo(5));
+            Assert.That(entities.Length, Is.EqualTo(5));
 
-            Assert.That(
-                entities.Any(
-                    x =>
-                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty
-                        && ((UmbracoEntity.EntityProperty)y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
+            foreach (var entity in entities)
+            {
+                Console.WriteLine();
+                foreach (var data in entity.AdditionalData)
+                {
+                    Console.WriteLine($"{entity.Id} {data.Key} {data.Value} {(data.Value is UmbracoEntity.EntityProperty p ? p.PropertyEditorAlias : "")}");
+                }
+            }
+
+            Assert.That(entities.Any(x =>
+                x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty && ((UmbracoEntity.EntityProperty) y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
         [Test]

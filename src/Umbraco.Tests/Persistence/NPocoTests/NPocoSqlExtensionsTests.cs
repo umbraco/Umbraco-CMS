@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Tests.Persistence.NPocoTests
 {
@@ -86,6 +87,28 @@ INNER JOIN [dto3] ON [dto2].[id] = [dto3].[dto2id]".NoCrLf(), sql.SQL.NoCrLf());
 , [dto2].[id] AS [Dto2s__Id], [dto2].[dto1id] AS [Dto2s__Dto1Id], [dto2].[name] AS [Dto2s__Name]
 FROM [dto1]
 INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
+        }
+
+        [Test]
+        public void SelectAliasTests()
+        {
+            // and select - not good
+            var sql = Sql()
+                .Select<Dto1>(x => x.Id)
+                .Select<Dto2>(x => x.Id);
+            Assert.AreEqual("SELECT [dto1].[id] AS [Id] SELECT [dto2].[id] AS [Id]".NoCrLf(), sql.SQL.NoCrLf());
+
+            // and select - good
+            sql = Sql()
+                .Select<Dto1>(x => x.Id)
+                .AndSelect<Dto2>(x => x.Id);
+            Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [Id]".NoCrLf(), sql.SQL.NoCrLf());
+
+            // and select + alias
+            sql = Sql()
+                .Select<Dto1>(x => x.Id)
+                .AndSelect<Dto2>(x => Alias(x.Id, "id2"));
+            Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [id2]".NoCrLf(), sql.SQL.NoCrLf());
         }
 
         [TableName("dto1")]

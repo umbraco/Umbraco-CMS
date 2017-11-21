@@ -64,6 +64,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatPrimaryKey(TableDefinition table);
         string GetQuotedValue(string value);
         string Format(ColumnDefinition column);
+        string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
         string Format(IndexDefinition index);
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);

@@ -1139,7 +1139,7 @@ namespace Umbraco.Tests.Services
             var sql = Current.SqlContext.Sql().Select<PropertyDataDto>()
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
-                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.Id == right.Id)
+                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
                 .Where<ContentVersionDto>(dto => dto.NodeId == member.Id)
                 .Where<PropertyTypeDto>(dto => dto.Alias == Constants.Conventions.Member.LastLoginDate);
 

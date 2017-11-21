@@ -518,7 +518,7 @@ namespace Umbraco.Core.Services
         public virtual IEnumerable<IUmbracoEntity> GetAll<T>(params int[] ids) where T : IUmbracoEntity
         {
             var typeFullName = typeof(T).FullName;
-            if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
+            if (typeFullName == null || _supportedObjectTypes.ContainsKey(typeFullName) == false)
                 throw new NotSupportedException("The passed in type is not supported");
 
             var objectType = _supportedObjectTypes[typeFullName].Item1;
@@ -536,7 +536,7 @@ namespace Umbraco.Core.Services
             var entityType = GetEntityType(umbracoObjectType);
 
             var typeFullName = entityType.FullName;
-            if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
+            if (typeFullName == null || _supportedObjectTypes.ContainsKey(typeFullName) == false)
                 throw new NotSupportedException("The passed in type is not supported");
 
             var objectTypeId = umbracoObjectType.GetGuid();
@@ -552,7 +552,7 @@ namespace Umbraco.Core.Services
             var entityType = GetEntityType(umbracoObjectType);
 
             var typeFullName = entityType.FullName;
-            if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
+            if (typeFullName == null || _supportedObjectTypes.ContainsKey(typeFullName) == false)
                 throw new NotSupportedException("The passed in type is not supported");
 
             var objectTypeId = umbracoObjectType.GetGuid();
@@ -567,7 +567,7 @@ namespace Umbraco.Core.Services
         {
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;
-            if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
+            if (typeFullName == null || _supportedObjectTypes.ContainsKey(typeFullName) == false)
                 throw new NotSupportedException("The passed in type is not supported.");
 
             var objectTypeId = umbracoObjectType.GetGuid();
@@ -582,7 +582,7 @@ namespace Umbraco.Core.Services
         {
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;
-            if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
+            if (typeFullName == null || _supportedObjectTypes.ContainsKey(typeFullName) == false)
                 throw new NotSupportedException("The passed in type is not supported.");
 
             var objectTypeId = umbracoObjectType.GetGuid();
@@ -605,7 +605,7 @@ namespace Umbraco.Core.Services
             var entityType = GetEntityType(umbracoObjectType);
 
             var typeFullName = entityType.FullName;
-            if (_supportedObjectTypes.ContainsKey(typeFullName) == false)
+            if (typeFullName == null || _supportedObjectTypes.ContainsKey(typeFullName) == false)
                 throw new NotSupportedException("The passed in type is not supported");
 
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
@@ -660,10 +660,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="UmbracoObjectTypes"/></returns>
         public virtual UmbracoObjectTypes GetObjectType(IUmbracoEntity entity)
         {
-            var entityImpl = entity as UmbracoEntity;
-            return entityImpl == null
-                ? GetObjectType(entity.Id)
-                : UmbracoObjectTypesExtensions.GetUmbracoObjectType(entityImpl.NodeObjectTypeId);
+            return entity is UmbracoEntity entityImpl
+                ? UmbracoObjectTypesExtensions.GetUmbracoObjectType(entityImpl.NodeObjectTypeId)
+                : GetObjectType(entity.Id);
         }
 
         /// <summary>

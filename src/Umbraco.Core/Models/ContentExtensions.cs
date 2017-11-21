@@ -201,8 +201,8 @@ namespace Umbraco.Core.Models
             {
                 foreach (var propertyValue in property.Values)
                 {
-                    if (propertyValue.EditValue is string editString)
-                        propertyValue.EditValue = editString.ToValidXmlString();
+                    if (propertyValue.EditedValue is string editString)
+                        propertyValue.EditedValue = editString.ToValidXmlString();
                     if (propertyValue.PublishedValue is string publishedString)
                         propertyValue.PublishedValue = publishedString.ToValidXmlString();
                 }

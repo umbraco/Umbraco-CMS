@@ -175,6 +175,30 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         }
 
         [Test]
+        public void Where_Null()
+        {
+            var sql = Sql().SelectAll().From<NodeDto>().WhereNull<NodeDto>(x => x.NodeId);
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] IS NULL))", sql.SQL.Replace("\n", " "));
+        }
+
+        [Test]
+        public void Where_Not_Null()
+        {
+            var sql = Sql().SelectAll().From<NodeDto>().WhereNotNull<NodeDto>(x => x.NodeId);
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (([umbracoNode].[id] IS NOT NULL))", sql.SQL.Replace("\n", " "));
+        }
+
+        [Test]
+        public void Where_Any()
+        {
+            var sql = Sql().SelectAll().From<NodeDto>().WhereAny(
+                s => s.Where<NodeDto>(x => x.NodeId == 1),
+                s => s.Where<NodeDto>(x => x.NodeId == 2));
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (( (([umbracoNode].[id] = @0)) ) OR ( (([umbracoNode].[id] = @1)) ))", sql.SQL.Replace("\n", " "));
+        }
+
+        [Test]
         public void Can_Select_From_With_Type()
         {
             var expected = Sql();

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core
 {
@@ -82,32 +83,39 @@ namespace Umbraco.Core
                     });
         }
 
-        public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
+        public static (MemberInfo, string) FindProperty(LambdaExpression lambda)
         {
-            Expression expressionToCheck = lambdaExpression;
+            void Throw()
+            {
+                throw new ArgumentException($"Expression '{lambda}' must resolve to top-level member and not any child object's properties. Use a custom resolver on the child type or the AfterMap option instead.", nameof(lambda));
+            }
 
+            Expression expr = lambda;
             var loop = true;
-
+            string alias = null;
             while (loop)
             {
-                switch (expressionToCheck.NodeType)
+                switch (expr.NodeType)
                 {
                     case ExpressionType.Convert:
-                        expressionToCheck = ((UnaryExpression) expressionToCheck).Operand;
+                        expr = ((UnaryExpression) expr).Operand;
                         break;
                     case ExpressionType.Lambda:
-                        expressionToCheck = ((LambdaExpression) expressionToCheck).Body;
+                        expr = ((LambdaExpression) expr).Body;
+                        break;
+                    case ExpressionType.Call:
+                        var callExpr = (MethodCallExpression) expr;
+                        var method = callExpr.Method;
+                        if (method.DeclaringType != typeof(NPocoSqlExtensions.Statics) || method.Name != "Alias" || !(callExpr.Arguments[1] is ConstantExpression aliasExpr))
+                            Throw();
+                        expr = callExpr.Arguments[0];
+                        alias = aliasExpr.Value.ToString();
                         break;
                     case ExpressionType.MemberAccess:
-                        var memberExpression = (MemberExpression) expressionToCheck;
-
-                        if (memberExpression.Expression.NodeType != ExpressionType.Parameter &&
-                            memberExpression.Expression.NodeType != ExpressionType.Convert)
-                        {
-                            throw new ArgumentException($"Expression '{lambdaExpression}' must resolve to top-level member and not any child object's properties. Use a custom resolver on the child type or the AfterMap option instead.", "lambdaExpression");
-                        }
-
-                        return memberExpression.Member;
+                        var memberExpr = (MemberExpression) expr;
+                        if (memberExpr.Expression.NodeType != ExpressionType.Parameter && memberExpr.Expression.NodeType != ExpressionType.Convert)
+                            Throw();
+                        return (memberExpr.Member, alias);
                     default:
                         loop = false;
                         break;

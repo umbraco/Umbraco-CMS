@@ -1844,13 +1844,27 @@ namespace Umbraco.Core.Services
                     return origContent;
                 }
 
-                ((Content) currContent).RollbackAllValues(origContent);
+                // orig content versions
+                // pk < published pk = normal, rollback to an older version
+                // pk = published pk = normal, rollback to currently published version
+                // pk > published pk = special, rollback to current 'edit' version
+                //
+                // in that last case, we want to copy the published values
+                var copyPublished = ((Content) origContent).VersionPk > ((Content) origContent).PublishedVersionPk;
+                ((Content) currContent).CopyAllValues(origContent, copyPublished);
                 currContent.WriterId = userId;
 
-                // publish name is always the current publish name
-                // but name is the actual version name, this is what we want
-                currContent.Name = origContent.Name;
-                currContent.Template = origContent.Template;
+                // builtin values
+                if (copyPublished)
+                {
+                    currContent.Name = origContent.PublishName;
+                    currContent.Template = origContent.PublishTemplate;
+                }
+                else
+                {
+                    currContent.Name = origContent.Name;
+                    currContent.Template = origContent.Template;
+                }
 
                 // save the values
                 repository.AddOrUpdate(currContent);

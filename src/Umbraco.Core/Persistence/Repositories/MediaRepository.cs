@@ -192,7 +192,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // If the stripped-down url returns null, we try again with the original url.
             // Previously, the function would fail on e.g. "my_x_image.jpg"
-            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue== umbracoFileValue));
+            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue == umbracoFileValue));
             if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue == mediaPath));
 
             // If no result so far, try getting from a json value stored in the ntext / nvarchar column
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = Sql().Select<ContentVersionDto>(x => x.NodeId)
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.Id == right.Id)
+                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
                 .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
                 .Append(query);
 

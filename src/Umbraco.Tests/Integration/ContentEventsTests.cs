@@ -208,34 +208,25 @@ namespace Umbraco.Tests.Integration
                 Name = "Refresh",
                 Args = string.Join(",", entities.Select(x =>
                 {
-                    // saved content
-                    var state = (x.Published ? "p" : "u");
+                    var publishedState = ((Content) x).PublishedState;
 
-                    // published version
-                    if (x.Published == false)
-                    {
-                        // x is not a published version
-
-                        // unpublishing content, clear
-                        //  handlers would probably clear data
-                        if (((Content)x).PublishedState == PublishedState.Unpublishing)
-                        {
-                            state += "x";
-                        }
-                        else if (x.Published)
-                        {
-                            var isPathPublished = ((ContentRepository)sender).IsPathPublished(x); // expensive!
-                            if (isPathPublished == false)
-                                state += "m"; // masked
-                            else if (HasChangesImpactingAllVersions(x))
-                                state += "p"; // refresh (using published = sender.GetByVersion(x.PublishedVersionGuid))
-                            else
-                                state += "u"; // no impact on published version
-                        }
-                        else
-                            state += "u"; // no published version
-                    }
+                    var xstate = x.Published ? "p" : "u";
+                    if (publishedState == PublishedState.Publishing)
+                        xstate += "+" + (sender.IsPathPublished(x) ? "p" : "m");
+                    else if (publishedState == PublishedState.Unpublishing)
+                        xstate += "-u";
                     else
+                        xstate += "=" + (x.Published ? (sender.IsPathPublished(x) ? "p" : "m") : "u");
+
+                    return $"{xstate}-{x.Id}";
+
+
+                    var willBePublished = publishedState == PublishedState.Publishing || x.Published; // && ((Content) x).PublishedState == PublishedState.Unpublishing;
+
+                    // saved content
+                    var state = willBePublished ? "p" : "u";
+
+                    if (publishedState == PublishedState.Publishing)
                     {
                         // content is published and x is the published version
                         //   figure out whether it is masked or not - what to do exactly in each case
@@ -247,6 +238,63 @@ namespace Umbraco.Tests.Integration
                         else
                             state += "m"; // masked
                     }
+                    else if (publishedState == PublishedState.Unpublishing)
+                    {
+                        // unpublishing content, clear
+                        //  handlers would probably clear data
+                        state += "x";
+                    }
+                    else if (publishedState == PublishedState.Published)
+                    {
+                        var isPathPublished = sender.IsPathPublished(x); // expensive!
+                        if (isPathPublished == false)
+                            state += "m"; // masked
+                        else if (HasChangesImpactingAllVersions(x))
+                            state += "p"; // refresh (using published = sender.GetByVersion(x.PublishedVersionGuid))
+                        else
+                            state += "u"; // no impact on published version
+                    }
+                    else // Unpublished
+                    {
+                        state += "u"; // no published version
+                    }
+
+                    //// published version
+                    //if (x.Published == false)
+                    //{
+                    //    // x is not a published version
+
+                    //    // unpublishing content, clear
+                    //    //  handlers would probably clear data
+                    //    if (((Content)x).PublishedState == PublishedState.Unpublishing)
+                    //    {
+                    //        state += "x";
+                    //    }
+                    //    else if (x.Published)
+                    //    {
+                    //        var isPathPublished = sender.IsPathPublished(x); // expensive!
+                    //        if (isPathPublished == false)
+                    //            state += "m"; // masked
+                    //        else if (HasChangesImpactingAllVersions(x))
+                    //            state += "p"; // refresh (using published = sender.GetByVersion(x.PublishedVersionGuid))
+                    //        else
+                    //            state += "u"; // no impact on published version
+                    //    }
+                    //    else
+                    //        state += "u"; // no published version
+                    //}
+                    //else
+                    //{
+                    //    // content is published and x is the published version
+                    //    //   figure out whether it is masked or not - what to do exactly in each case
+                    //    //   would depend on the handler implementation - ie is it still updating
+                    //    //   data for masked version or not
+                    //    var isPathPublished = sender.IsPathPublished(x); // expensive!
+                    //    if (isPathPublished)
+                    //        state += "p"; // refresh (using x)
+                    //    else
+                    //        state += "m"; // masked
+                    //}
 
                     return $"{state}-{x.Id}";
                 }))
@@ -354,7 +402,7 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual(2, _events.Count);
             var i = 0;
             var m = 0;
-            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/uu-{1}", m, content.Id), _events[i++].ToString());
+            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/u=u-{1}", m, content.Id), _events[i++].ToString());
             m++;
             Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshNode/{1}", m, content.Id), _events[i].ToString());
         }
@@ -378,7 +426,7 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual(2, _events.Count);
             var i = 0;
             var m = 0;
-            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/uu-{1}", m, content.Id), _events[i++].ToString());
+            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/u=u-{1}", m, content.Id), _events[i++].ToString());
             m++;
             Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshNode/{1}", m, content.Id), _events[i].ToString());
 
@@ -390,7 +438,7 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual(2, _events.Count);
             i = 0;
             m = 0;
-            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/uu-{1}", m, content.Id), _events[i++].ToString());
+            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/u=u-{1}", m, content.Id), _events[i++].ToString());
             m++;
             Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshNode/{1}", m, content.Id), _events[i].ToString());
         }
@@ -414,7 +462,7 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual(2, _events.Count);
             var i = 0;
             var m = 0;
-            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/up-{1}", m, content.Id), _events[i++].ToString());
+            Assert.AreEqual(string.Format("{0:000}: ContentRepository/Refresh/p=p-{1}", m, content.Id), _events[i++].ToString());
             m++;
             Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshNode/{1}", m, content.Id), _events[i].ToString());
 

@@ -43,11 +43,11 @@ namespace Umbraco.Core.Models
         {
             public int? LanguageId { get; internal set; }
             public string Segment { get; internal set; }
-            public object EditValue { get; internal set; }
+            public object EditedValue { get; internal set; }
             public object PublishedValue { get; internal set; }
 
             public PropertyValue Clone()
-                => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, EditValue = EditValue };
+                => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -167,8 +167,8 @@ namespace Umbraco.Core.Models
         private object GetPropertyValue(PropertyValue pvalue, bool published)
         {
             return _propertyType.IsPublishing
-                ? (published ? pvalue.PublishedValue : pvalue.EditValue)
-                : pvalue.EditValue;
+                ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
+                : pvalue.EditedValue;
         }
 
         internal void PublishValues()
@@ -222,8 +222,8 @@ namespace Umbraco.Core.Models
             if (!_propertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
-            pvalue.PublishedValue = ConvertSetValue(pvalue.EditValue);
-            DetectChanges(pvalue.EditValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
+            pvalue.PublishedValue = ConvertSetValue(pvalue.EditedValue);
+            DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
         }
 
         /// <summary>
@@ -273,10 +273,10 @@ namespace Umbraco.Core.Models
 
         private void SetPropertyValue(PropertyValue pvalue, object value, bool change)
         {
-            var origValue = pvalue.EditValue;
+            var origValue = pvalue.EditedValue;
             var setValue = ConvertSetValue(value);
 
-            pvalue.EditValue = setValue;
+            pvalue.EditedValue = setValue;
 
             DetectChanges(setValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
         }
@@ -322,7 +322,7 @@ namespace Umbraco.Core.Models
             if (published && _propertyType.IsPublishing)
                 pvalue.PublishedValue = value;
             else
-                pvalue.EditValue = value;
+                pvalue.EditedValue = value;
         }
 
         private (PropertyValue, bool) GetPropertyValue(bool create)
@@ -351,6 +351,7 @@ namespace Umbraco.Core.Models
             {
                 if (!create) return (null, false);
                 pvalue = _lvalues[languageId] = new PropertyValue();
+                pvalue.LanguageId = languageId;
                 _values.Add(pvalue);
                 change = true;
             }
@@ -376,6 +377,8 @@ namespace Umbraco.Core.Models
             {
                 if (!create) return (null, false);
                 pvalue = svalue[segment] = new PropertyValue();
+                pvalue.LanguageId = languageId;
+                pvalue.Segment = segment;
                 _values.Add(pvalue);
                 change = true;
             }

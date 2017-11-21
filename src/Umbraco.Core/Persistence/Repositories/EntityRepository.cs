@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    // fixme - use sql templates everywhere!
+
     /// <summary>
     /// Represents the EntityRepository used to query <see cref="IUmbracoEntity"/> objects.
     /// </summary>
@@ -26,141 +27,119 @@ namespace Umbraco.Core.Persistence.Repositories
             UnitOfWork = work;
         }
 
-        protected internal IScopeUnitOfWork UnitOfWork { get; }
+        protected IScopeUnitOfWork UnitOfWork { get; }
+        protected IUmbracoDatabase Database => UnitOfWork.Database;
         protected Sql<ISqlContext> Sql() => UnitOfWork.SqlContext.Sql();
 
-        #region Query Methods
+        #region Repository
 
-        // fixme need to review that ... one
-        public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,
+        // get a page of entities
+        public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
-            var factory = new UmbracoEntityFactory();
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
 
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql =>
+            var sql = GetBaseWhere(isContent, isMedia, false, x =>
             {
-                if (filter != null)
-                {
-                    foreach (var filterClause in filter.GetWhereClauses())
-                    {
-                        sql.Where(filterClause.Item1, filterClause.Item2);
-                    }
-                }
-            }, objectTypeId);
-            var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var entitySql = translator.Translate();
-            var pagedSql = entitySql.Append(GetGroupBy(isContent, isMedia, false)).OrderBy("umbracoNode.id");
+                if (filter == null) return;
+                foreach (var filterClause in filter.GetWhereClauses())
+                    x.Where(filterClause.Item1, filterClause.Item2);
+            }, objectType);
 
-            IEnumerable<IUmbracoEntity> result;
+            var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
+            sql = translator.Translate();
+            sql = AddGroupBy(isContent, isMedia, sql);
+            sql = sql.OrderBy<NodeDto>(x => x.NodeId);
+
+            //IEnumerable<IUmbracoEntity> result;
+            //
+            //if (isMedia)
+            //{
+            //    //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
+            //    var pagedResult = UnitOfWork.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
+
+            //    var ids = pagedResult.Items.Select(x => (int)x.id).InGroupsOf(2000);
+            //    var entities = pagedResult.Items.Select(BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+
+            //    //Now we need to merge in the property data since we need paging and we can't do this the way that the big media query was working before
+            //    foreach (var idGroup in ids)
+            //    {
+            //        var propSql = GetPropertySql(Constants.ObjectTypes.Media)
+            //            .WhereIn<NodeDto>(x => x.NodeId, idGroup)
+            //            .OrderBy<NodeDto>(x => x.NodeId);
+
+            //        //This does NOT fetch all data into memory in a list, this will read
+            //        // over the records as a data reader, this is much better for performance and memory,
+            //        // but it means that during the reading of this data set, nothing else can be read
+            //        // from SQL server otherwise we'll get an exception.
+            //        var allPropertyData = UnitOfWork.Database.Query<dynamic>(propSql);
+
+            //        //keep track of the current property data item being enumerated
+            //        var propertyDataSetEnumerator = allPropertyData.GetEnumerator();
+            //        var hasCurrent = false; // initially there is no enumerator.Current
+
+            //        try
+            //        {
+            //            //This must be sorted by node id (which is done by SQL) because this is how we are sorting the query to lookup property types above,
+            //            // which allows us to more efficiently iterate over the large data set of property values.
+            //            foreach (var entity in entities)
+            //            {
+            //                // assemble the dtos for this def
+            //                // use the available enumerator.Current if any else move to next
+            //                while (hasCurrent || propertyDataSetEnumerator.MoveNext())
+            //                {
+            //                    if (propertyDataSetEnumerator.Current.nodeId == entity.Id)
+            //                    {
+            //                        hasCurrent = false; // enumerator.Current is not available
+
+            //                        //the property data goes into the additional data
+            //                        entity.AdditionalData[propertyDataSetEnumerator.Current.propertyTypeAlias] = new UmbracoEntity.EntityProperty
+            //                        {
+            //                            PropertyEditorAlias = propertyDataSetEnumerator.Current.propertyEditorAlias,
+            //                            Value = StringExtensions.IsNullOrWhiteSpace(propertyDataSetEnumerator.Current.textValue)
+            //                                ? propertyDataSetEnumerator.Current.varcharValue
+            //                                : StringExtensions.ConvertToJsonIfPossible(propertyDataSetEnumerator.Current.textValue)
+            //                        };
+            //                    }
+            //                    else
+            //                    {
+            //                        hasCurrent = true; // enumerator.Current is available for another def
+            //                        break; // no more propertyDataDto for this def
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        finally
+            //        {
+            //            propertyDataSetEnumerator.Dispose();
+            //        }
+            //    }
+
+            //    result = entities;
+            //}
+            //else
+            //{
+            //    var pagedResult = UnitOfWork.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
+            //    result = pagedResult.Items.Select(BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
+            //}
+
+            var page = Database.Page<BaseDto>(pageIndex + 1, pageSize, sql);
+            var dtos = page.Items;
+            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
             if (isMedia)
-            {
-                //Treat media differently for now, as an Entity it will be returned with ALL of it's properties in the AdditionalData bag!
-                var pagedResult = UnitOfWork.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
+                BuildProperties(entities, dtos);
 
-                var ids = pagedResult.Items.Select(x => (int)x.id).InGroupsOf(2000);
-                var entities = pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
-
-                //Now we need to merge in the property data since we need paging and we can't do this the way that the big media query was working before
-                foreach (var idGroup in ids)
-                {
-                    var propSql = GetPropertySql(Constants.ObjectTypes.Media)
-                        .WhereIn<NodeDto>(x => x.NodeId, idGroup)
-                        .OrderBy<NodeDto>(x => x.NodeId);
-
-                    //This does NOT fetch all data into memory in a list, this will read
-                    // over the records as a data reader, this is much better for performance and memory,
-                    // but it means that during the reading of this data set, nothing else can be read
-                    // from SQL server otherwise we'll get an exception.
-                    var allPropertyData = UnitOfWork.Database.Query<dynamic>(propSql);
-
-                    //keep track of the current property data item being enumerated
-                    var propertyDataSetEnumerator = allPropertyData.GetEnumerator();
-                    var hasCurrent = false; // initially there is no enumerator.Current
-
-                    try
-                    {
-                        //This must be sorted by node id (which is done by SQL) because this is how we are sorting the query to lookup property types above,
-                        // which allows us to more efficiently iterate over the large data set of property values.
-                        foreach (var entity in entities)
-                        {
-                            // assemble the dtos for this def
-                            // use the available enumerator.Current if any else move to next
-                            while (hasCurrent || propertyDataSetEnumerator.MoveNext())
-                            {
-                                if (propertyDataSetEnumerator.Current.nodeId == entity.Id)
-                                {
-                                    hasCurrent = false; // enumerator.Current is not available
-
-                                    //the property data goes into the additional data
-                                    entity.AdditionalData[propertyDataSetEnumerator.Current.propertyTypeAlias] = new UmbracoEntity.EntityProperty
-                                    {
-                                        PropertyEditorAlias = propertyDataSetEnumerator.Current.propertyEditorAlias,
-                                        Value = StringExtensions.IsNullOrWhiteSpace(propertyDataSetEnumerator.Current.textValue)
-                                            ? propertyDataSetEnumerator.Current.varcharValue
-                                            : StringExtensions.ConvertToJsonIfPossible(propertyDataSetEnumerator.Current.textValue)
-                                    };
-                                }
-                                else
-                                {
-                                    hasCurrent = true; // enumerator.Current is available for another def
-                                    break; // no more propertyDataDto for this def
-                                }
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        propertyDataSetEnumerator.Dispose();
-                    }
-                }
-
-                result = entities;
-            }
-            else
-            {
-                var pagedResult = UnitOfWork.Database.Page<dynamic>(pageIndex + 1, pageSize, pagedSql);
-                result = pagedResult.Items.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
-            }
-
-            //The total items from the PetaPoco page query will be wrong due to the Outer join used on parent, depending on the search this will
-            //return duplicate results when the COUNT is used in conjuction with it, so we need to get the total on our own.
-
-            //generate a query that does not contain the LEFT Join for parent, this would cause
-            //the COUNT(*) query to return the wrong
-            var sqlCountClause = GetBaseWhere(
-                (isC, isM, f) => GetBase(isC, isM, f, true), //true == is a count query
-                isContent, isMedia, sql =>
-                {
-                    if (filter != null)
-                    {
-                        foreach (var filterClause in filter.GetWhereClauses())
-                        {
-                            sql.Where(filterClause.Item1, filterClause.Item2);
-                        }
-                    }
-                }, objectTypeId);
-            var translatorCount = new SqlTranslator<IUmbracoEntity>(sqlCountClause, query);
-            var countSql = translatorCount.Translate();
-
-            totalRecords = UnitOfWork.Database.ExecuteScalar<int>(countSql);
-
-            return result;
+            totalRecords = page.TotalItems;
+            return entities;
         }
 
         public IUmbracoEntity GetByKey(Guid key)
         {
-            var sql = GetBaseWhere(GetBase, false, false, key);
-            var nodeDto = UnitOfWork.Database.FirstOrDefault<dynamic>(sql);
-            if (nodeDto == null)
-                return null;
-
-            var factory = new UmbracoEntityFactory();
-            var entity = factory.BuildEntityFromDynamic(nodeDto);
-
-            return entity;
+            var sql = GetBaseWhere(false, false, false, key);
+            var dto = Database.FirstOrDefault<BaseDto>(sql);
+            return dto == null ? null : BuildEntity(false, false, dto);
         }
 
         public IUmbracoEntity GetByKey(Guid key, Guid objectTypeId)
@@ -168,51 +147,23 @@ namespace Umbraco.Core.Persistence.Repositories
             var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
-            var sql = GetFullSqlForEntityType(key, isContent, isMedia, objectTypeId);
+            var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, key);
+            var dto = Database.FirstOrDefault<BaseDto>(sql);
+            if (dto == null) return null;
+
+            var entity = BuildEntity(isContent, isMedia, dto);
 
             if (isMedia)
-            {
-                //for now treat media differently and include all property data too
-                return UnitOfWork.Database
-                    .Fetch<dynamic>(sql)
-                    .Transform(new UmbracoEntityRelator().MapAll)
-                    .FirstOrDefault();
-            }
-
-            // else
-
-            // query = read forward data reader, do not load everything into mem
-            // fixme wtf is this collection thing?!
-            var dtos = UnitOfWork.Database.Query<dynamic>(sql);
-            var collection = new EntityDefinitionCollection();
-            var factory = new UmbracoEntityFactory();
-            foreach (var dto in dtos)
-            {
-                collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
-            }
-            var found = collection.FirstOrDefault();
-            return found != null ? found.BuildFromDynamic() : null;
-
-            var nodeDto = UnitOfWork.Database.FirstOrDefault<dynamic>(sql);
-            if (nodeDto == null)
-                return null;
-
-            var entity = factory.BuildEntityFromDynamic(nodeDto);
+                BuildProperties(entity, dto);
 
             return entity;
         }
 
         public virtual IUmbracoEntity Get(int id)
         {
-            var sql = GetBaseWhere(GetBase, false, false, id);
-            var nodeDto = UnitOfWork.Database.FirstOrDefault<dynamic>(sql);
-            if (nodeDto == null)
-                return null;
-
-            var factory = new UmbracoEntityFactory();
-            var entity = factory.BuildEntityFromDynamic(nodeDto);
-
-            return entity;
+            var sql = GetBaseWhere(false, false, false, id);
+            var dto = Database.FirstOrDefault<BaseDto>(sql);
+            return dto == null ? null : BuildEntity(false, false, dto);
         }
 
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
@@ -220,404 +171,396 @@ namespace Umbraco.Core.Persistence.Repositories
             var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
-            var sql = GetFullSqlForEntityType(id, isContent, isMedia, objectTypeId);
+            var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, id);
+            var dto = Database.FirstOrDefault<BaseDto>(sql);
+            if (dto == null) return null;
+
+            var entity = BuildEntity(isContent, isMedia, dto);
 
             if (isMedia)
-            {
-                //for now treat media differently and include all property data too
-                return UnitOfWork.Database
-                    .Fetch<dynamic>(sql)
-                    .Transform(new UmbracoEntityRelator().MapAll)
-                    .FirstOrDefault();
-            }
+                BuildProperties(entity, dto);
 
-            // else
-
-            //query = read forward data reader, do not load everything into mem
-            var dtos = UnitOfWork.Database.Query<dynamic>(sql);
-            var collection = new EntityDefinitionCollection();
-            var factory = new UmbracoEntityFactory();
-            foreach (var dto in dtos)
-            {
-                collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
-            }
-
-            var found = collection.FirstOrDefault();
-            return found?.BuildFromDynamic();
+            return entity;
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
+        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectType, params int[] ids)
         {
-            return ids.Any()
-                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.id in (@ids)", new { ids }))
-                : PerformGetAll(objectTypeId);
+            return ids.Length > 0
+                ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
+                : PerformGetAll(objectType);
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys)
+        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectType, params Guid[] keys)
         {
-            return keys.Any()
-                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.uniqueId in (@keys)", new { keys }))
-                : PerformGetAll(objectTypeId);
+            return keys.Length > 0
+                ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+                : PerformGetAll(objectType);
         }
 
-        private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectTypeId, Action<Sql> filter = null)
+        private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
-            var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, filter);
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
+
+            var sql = GetFullSqlForEntityType(isContent, isMedia, objectType, filter);
+            var dtos = Database.Fetch<BaseDto>(sql);
+            if (dtos.Count == 0) return Enumerable.Empty<IUmbracoEntity>();
+
+            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
             if (isMedia)
-            {
-                //for now treat media differently  and include all property data too
-                return UnitOfWork.Database
-                    .Fetch<dynamic>(sql)
-                    .Transform(new UmbracoEntityRelator().MapAll);
-            }
+                BuildProperties(entities, dtos);
 
-            //query = read forward data reader, do not load everything into mem
-            var dtos = UnitOfWork.Database.Query<dynamic>(sql);
-            var collection = new EntityDefinitionCollection();
-            var factory = new UmbracoEntityFactory();
-            foreach (var dto in dtos)
-            {
-                collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
-            }
-            return collection.Select(x => x.BuildFromDynamic()).ToList();
+            return entities;
         }
 
-        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params int[] ids)
+        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectType, params int[] ids)
         {
             return ids.Any()
-                ? PerformGetAllPaths(objectTypeId, sql => sql.Append(" AND umbracoNode.id in (@ids)", new { ids }))
-                : PerformGetAllPaths(objectTypeId);
+                ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
+                : PerformGetAllPaths(objectType);
         }
 
-        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params Guid[] keys)
+        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectType, params Guid[] keys)
         {
             return keys.Any()
-                ? PerformGetAllPaths(objectTypeId, sql => sql.Append(" AND umbracoNode.uniqueID in (@keys)", new { keys }))
-                : PerformGetAllPaths(objectTypeId);
+                ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+                : PerformGetAllPaths(objectType);
         }
 
-        private IEnumerable<EntityPath> PerformGetAllPaths(Guid objectTypeId, Action<Sql> filter = null)
+        private IEnumerable<EntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
-            var sql = new Sql("SELECT id, path FROM umbracoNode WHERE umbracoNode.nodeObjectType=@type", new { type = objectTypeId });
+            var sql = Sql().Select<NodeDto>(x => x.NodeId, x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
             filter?.Invoke(sql);
-            return UnitOfWork.Database.Fetch<EntityPath>(sql);
+            return Database.Fetch<EntityPath>(sql);
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {
             var sqlClause = GetBase(false, false, null);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var sql = translator.Translate().Append(GetGroupBy(false, false));
-
-            var dtos = UnitOfWork.Database.Fetch<dynamic>(sql);
-
-            var factory = new UmbracoEntityFactory();
-            var list = dtos.Select(factory.BuildEntityFromDynamic).Cast<IUmbracoEntity>().ToList();
-
-            return list;
+            var sql = translator.Translate();
+            sql = AddGroupBy(false, false, sql);
+            var dtos = Database.Fetch<BaseDto>(sql);
+            return dtos.Select(x => BuildEntity(false, false, x)).ToList();
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
+        public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
         {
-            var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectTypeId == Constants.ObjectTypes.Media;
+            var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Constants.ObjectTypes.Media;
 
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
+            var sql = GetBaseWhere(isContent, isMedia, false, null, objectType);
+            var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
+            sql = translator.Translate();
+            sql = AddGroupBy(isContent, isMedia, sql);
+            var dtos = Database.Fetch<BaseDto>(sql);
+            if (dtos.Count == 0) return Enumerable.Empty<IUmbracoEntity>();
 
-            var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var entitySql = translator.Translate();
+            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
             if (isMedia)
-            {
-                var wheres = query.GetWhereClauses().ToArray();
+                BuildProperties(entities, dtos);
 
-                var mediaSql = GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), sql =>
-                {
-                    //adds the additional filters
-                    foreach (var whereClause in wheres)
-                    {
-                        sql.Where(whereClause.Item1, whereClause.Item2);
-                    }
-                });
-
-                //for now treat media differently and include all property data too
-                return UnitOfWork.Database
-                    .Fetch<dynamic>(mediaSql)
-                    .Transform(new UmbracoEntityRelator().MapAll);
-            }
-
-            // else
-
-            //use dynamic so that we can get ALL properties from the SQL so we can chuck that data into our AdditionalData
-            var finalSql = entitySql.Append(GetGroupBy(isContent, false));
-            //query = read forward data reader, do not load everything into mem
-            var dtos = UnitOfWork.Database.Query<dynamic>(finalSql);
-            var collection = new EntityDefinitionCollection();
-            var factory = new UmbracoEntityFactory();
-            foreach (var dto in dtos)
-            {
-                collection.AddOrUpdate(new EntityDefinition(factory, dto, isContent, false));
-            }
-            return collection.Select(x => x.BuildFromDynamic()).ToList();
+            return entities;
         }
 
         public UmbracoObjectTypes GetObjectType(int id)
         {
-            var sql = Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
-            var nodeObjectTypeId = UnitOfWork.Database.ExecuteScalar<Guid>(sql);
-            var objectTypeId = nodeObjectTypeId;
-            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+            var sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
+            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
         }
 
         public UmbracoObjectTypes GetObjectType(Guid key)
         {
-            var sql = Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
-            var nodeObjectTypeId = UnitOfWork.Database.ExecuteScalar<Guid>(sql);
-            var objectTypeId = nodeObjectTypeId;
-            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+            var sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
+            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+        }
+
+        public bool Exists(Guid key)
+        {
+            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        public bool Exists(int id)
+        {
+            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        private void BuildProperties(UmbracoEntity entity, BaseDto dto)
+        {
+            var pdtos = Database.Fetch<PropertyDataDto>(GetPropertyData(dto.VersionId));
+            foreach (var pdto in pdtos)
+                BuildProperty(entity, pdto);
+        }
+
+        private void BuildProperties(UmbracoEntity[] entities, List<BaseDto> dtos)
+        {
+            var versionIds = dtos.Select(x => x.VersionId).Distinct().ToArray();
+            var pdtos = Database.FetchByGroups<PropertyDataDto, int>(versionIds, 2000, GetPropertyData);
+
+            var xentity = entities.ToDictionary(x => x.Id, x => x); // nodeId -> entity
+            var xdto = dtos.ToDictionary(x => x.VersionId, x => x.NodeId); // versionId -> nodeId
+            foreach (var pdto in pdtos)
+            {
+                var nodeId = xdto[pdto.VersionId];
+                var entity = xentity[nodeId];
+                BuildProperty(entity, pdto);
+            }
+        }
+
+        private void BuildProperty(UmbracoEntity entity, PropertyDataDto pdto)
+        {
+            // explain ?!
+            var value = string.IsNullOrWhiteSpace(pdto.TextValue)
+                ? pdto.VarcharValue
+                : pdto.TextValue.ConvertToJsonIfPossible();
+
+            entity.AdditionalData[pdto.PropertyTypeDto.Alias] = new UmbracoEntity.EntityProperty
+            {
+                PropertyEditorAlias = pdto.PropertyTypeDto.DataTypeDto.PropertyEditorAlias,
+                Value = value
+            };
         }
 
         #endregion
 
         #region Sql
 
-        protected Sql<ISqlContext> GetFullSqlForEntityType(Guid key, bool isContent, bool isMedia, Guid objectTypeId)
+        // gets the full sql for a given object type and a given unique id
+        protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectType, Guid uniqueId)
         {
-            var entitySql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, key);
-
-            return isMedia
-                ? GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)))
-                : entitySql.Append(GetGroupBy(isContent, false));
+            var sql = GetBaseWhere(isContent, isMedia, false, objectType, uniqueId);
+            return AddGroupBy(isContent, isMedia, sql);
         }
 
-        protected Sql<ISqlContext> GetFullSqlForEntityType(int id, bool isContent, bool isMedia, Guid objectTypeId)
+        // gets the full sql for a given object type and a given node id
+        protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectType, int nodeId)
         {
-            var entitySql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, id);
-
-            return isMedia
-                ? GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)))
-                : entitySql.Append(GetGroupBy(isContent, false));
+            var sql = GetBaseWhere(isContent, isMedia, false, objectType, nodeId);
+            return AddGroupBy(isContent, isMedia, sql);
         }
 
-        protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectTypeId, Action<Sql<ISqlContext>> filter)
+        // gets the full sql for a given object type, with a given filter
+        protected Sql<ISqlContext> GetFullSqlForEntityType(bool isContent, bool isMedia, Guid objectType, Action<Sql<ISqlContext>> filter)
         {
-            var entitySql = GetBaseWhere(GetBase, isContent, isMedia, filter, objectTypeId);
-
-            return isMedia
-                ? GetFullSqlForMedia(entitySql.Append(GetGroupBy(isContent, true, false)), filter)
-                : entitySql.Append(GetGroupBy(isContent, false));
+            var sql = GetBaseWhere(isContent, isMedia, false, filter, objectType);
+            return AddGroupBy(isContent, isMedia, sql);
         }
 
-        private Sql<ISqlContext> GetPropertySql(Guid nodeObjectType)
+        // fixme kill this nonsense
+        //// gets the SELECT + FROM + WHERE sql
+        //// to get all property data for all items of the specified object type
+        //private Sql<ISqlContext> GetPropertySql(Guid objectType)
+        //{
+        //    return Sql()
+        //        .Select<PropertyDataDto>(x => x.VersionId, x => x.TextValue, x => x.VarcharValue)
+        //        .AndSelect<NodeDto>(x => x.NodeId)
+        //        .AndSelect<DataTypeDto>(x => x.PropertyEditorAlias)
+        //        .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "propertyTypeAlias"))
+        //        .From<PropertyDataDto>()
+        //        .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
+        //        .InnerJoin<NodeDto>().On<ContentVersionDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
+        //        .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
+        //        .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
+        //        .Where<NodeDto>(x => x.NodeObjectType == objectType);
+        //}
+
+        private Sql<ISqlContext> GetPropertyData(int versionId)
         {
-            var sql = Sql()
-                .Select<PropertyDataDto>(x => x.VersionId, x => x.TextValue, x => x.VarcharValue)
-                .AndSelect<DataTypeDto>(x => x.PropertyEditorAlias)
-                .AndSelectAs<PropertyTypeDto>(x => x.Alias, "propertyTypeAlias")
+            return Sql()
+                .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
                 .From<PropertyDataDto>()
-                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
-                .InnerJoin<NodeDto>().On<ContentVersionDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
-                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(dto => dto.PropertyTypeId, dto => dto.Id)
-                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(dto => dto.DataTypeId, dto => dto.DataTypeId)
-                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
-
-            return sql;
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.DataTypeId)
+                .Where<PropertyDataDto>(x => x.VersionId == versionId);
         }
 
-        private Sql<ISqlContext> GetFullSqlForMedia(Sql<ISqlContext> entitySql, Action<Sql<ISqlContext>> filter = null)
+        private Sql<ISqlContext> GetPropertyData(IEnumerable<int> versionIds)
         {
-            //this will add any varcharValue property to the output which can be added to the additional properties
-
-            var sql = GetPropertySql(Constants.ObjectTypes.Media);
-
-            filter?.Invoke(sql);
-
-            // We're going to create a query to query against the entity SQL
-            // because we cannot group by nText columns and we have a COUNT in the entitySql we cannot simply left join
-            // the entitySql query, we have to join the wrapped query to get the ntext in the result
-
-            var wrappedSql = Sql()
-                .Append("SELECT * FROM (")
-                .Append(entitySql)
-                .Append(") tmpTbl LEFT JOIN (")
-                .Append(sql)
-                .Append(") as property ON id = property.nodeId")
-                .OrderBy("sortOrder, id");
-
-            return wrappedSql;
+            return Sql()
+                .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.DataTypeId)
+                .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
+                .OrderBy<PropertyDataDto>(x => x.VersionId);
         }
 
-        protected virtual Sql<ISqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<ISqlContext>> customFilter)
+        // fixme - wtf is this?
+        //private Sql<ISqlContext> GetFullSqlForMedia(Sql<ISqlContext> entitySql, Action<Sql<ISqlContext>> filter = null)
+        //{
+        //    //this will add any varcharValue property to the output which can be added to the additional properties
+
+        //    var sql = GetPropertySql(Constants.ObjectTypes.Media);
+
+        //    filter?.Invoke(sql);
+
+        //    // We're going to create a query to query against the entity SQL
+        //    // because we cannot group by nText columns and we have a COUNT in the entitySql we cannot simply left join
+        //    // the entitySql query, we have to join the wrapped query to get the ntext in the result
+
+        //    var wrappedSql = Sql()
+        //        .Append("SELECT * FROM (")
+        //        .Append(entitySql)
+        //        .Append(") tmpTbl LEFT JOIN (")
+        //        .Append(sql)
+        //        .Append(") as property ON id = property.nodeId")
+        //        .OrderBy("sortOrder, id");
+
+        //    return wrappedSql;
+        //}
+
+        // the DTO corresponding to fields selected by GetBase
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private class BaseDto
         {
-            return GetBase(isContent, isMedia, customFilter, false);
+            // ReSharper disable UnusedAutoPropertyAccessor.Local
+            // ReSharper disable UnusedMember.Local
+            public int NodeId { get; set; }
+            public bool Trashed { get; set; }
+            public int ParentId { get; set; }
+            public int? UserId { get; set; }
+            public int Level { get; set; }
+            public string Path { get; set; }
+            public int SortOrder { get; set; }
+            public Guid UniqueId { get; set; }
+            public string Text { get; set; }
+            public Guid NodeObjectType { get; set; }
+            public DateTime CreateDate { get; set; }
+            public int Children { get; set; }
+            public int VersionId { get; set; }
+            public bool Published { get; set; }
+            public bool Edited { get; set; }
+            public string Alias { get; set; }
+            public string Icon { get; set; }
+            public string Thumbnail { get; set; }
+            public bool IsContainer { get; set; }
+            // ReSharper restore UnusedAutoPropertyAccessor.Local
+            // ReSharper restore UnusedMember.Local
         }
 
-        protected virtual Sql<ISqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<ISqlContext>> customFilter, bool isCount)
+        // gets the base SELECT + FROM [+ filter] sql
+        // always from the 'current' content version
+        protected virtual Sql<ISqlContext> GetBase(bool isContent, bool isMedia, Action<Sql<ISqlContext>> filter, bool isCount = false)
         {
-            var columns = new List<object>();
+            var sql = Sql();
 
             if (isCount)
             {
-                columns.Add("COUNT(*)");
+                sql.SelectCount();
             }
             else
             {
-                columns.AddRange(new[]
-                {
-                    "umbracoNode.id",
-                    "umbracoNode.trashed",
-                    "umbracoNode.parentID",
-                    "umbracoNode.nodeUser",
-                    "umbracoNode.level",
-                    "umbracoNode.path",
-                    "umbracoNode.sortOrder",
-                    "umbracoNode.uniqueID",
-                    "umbracoNode.text",
-                    "umbracoNode.nodeObjectType",
-                    "umbracoNode.createDate",
-                    "COUNT(child.id) as children"
-                });
+                sql
+                    .Select<NodeDto>(x => x.NodeId, x => x.Trashed, x => x.ParentId, x => x.UserId, x => x.Level, x => x.Path)
+                    .AndSelect<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType, x => x.CreateDate)
+                    .Append(", COUNT(child.id) AS children");
 
                 if (isContent)
-                {
-                    columns.Add("contentVersion.versionId as versionId");
-                    columns.Add("document.published");
-                    columns.Add("document.edited");
-                }
+                    sql
+                        .AndSelect<DocumentDto>(x => x.Published, x => x.Edited);
 
                 if (isContent || isMedia)
-                {
-                    columns.Add("contentType.alias");
-                    columns.Add("contentType.icon");
-                    columns.Add("contentType.thumbnail");
-                    columns.Add("contentType.isContainer");
-                }
+                    sql
+                        .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"))
+                        .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer);
             }
 
-            //Creates an SQL query to return a single row for the entity
-
-            var entitySql = Sql()
-                .Select(columns.ToArray())
+            sql
                 .From<NodeDto>();
 
             if (isContent || isMedia)
             {
-                entitySql
+                sql
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
                     .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-                    .LeftJoin<ContentTypeDto>("contentType").On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasRight: "contentType");
+                    .LeftJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId);
             }
 
             if (isContent)
             {
-                entitySql
-                    .InnerJoin<ContentVersionDto>("contentVersion").On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current, aliasRight: "contentVersion")
-                    .InnerJoin<DocumentDto>("document").On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "document");
+                sql
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId);
             }
 
             if (isCount == false)
-                entitySql
+                sql
                     .LeftJoin<NodeDto>("child").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.ParentId, aliasRight: "child");
 
-            customFilter?.Invoke(entitySql);
+            filter?.Invoke(sql);
 
-            return entitySql;
-        }
-
-        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Action<Sql<ISqlContext>> filter, Guid nodeObjectType)
-        {
-            var sql = baseQuery(isContent, isMedia, filter)
-                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectType);
             return sql;
         }
 
-        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, int id)
+        // gets the base SELECT + FROM [+ filter] + WHERE sql
+        // for a given object type, with a given filter
+        protected virtual Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isCount, Action<Sql<ISqlContext>> filter, Guid objectType)
         {
-            var sql = baseQuery(isContent, isMedia, null)
+            return GetBase(isContent, isMedia, filter, isCount)
+                .Where<NodeDto>(x => x.NodeObjectType == objectType);
+        }
+
+        // gets the base SELECT + FROM + WHERE sql
+        // for a given node id
+        protected virtual Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isCount, int id)
+        {
+            var sql = GetBase(isContent, isMedia, null, isCount)
                 .Where<NodeDto>(x => x.NodeId == id);
-            sql.Append(GetGroupBy(isContent, isMedia));
-            return sql;
+            return AddGroupBy(isContent, isMedia, sql);
         }
 
-        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid key)
+        // gets the base SELECT + FROM + WHERE sql
+        // for a given unique id
+        protected virtual Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isCount, Guid uniqueId)
         {
-            var sql = baseQuery(isContent, isMedia, null)
-                .Where<NodeDto>(x => x.UniqueId == key);
-            sql.Append(GetGroupBy(isContent, isMedia));
-            return sql;
+            var sql = GetBase(isContent, isMedia, null, isCount)
+                .Where<NodeDto>(x => x.UniqueId == uniqueId);
+            return AddGroupBy(isContent, isMedia, sql);
         }
 
-        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
+        // gets the base SELECT + FROM + WHERE sql
+        // for a given object type and node id
+        protected virtual Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isCount, Guid objectType, int nodeId)
         {
-            var sql = baseQuery(isContent, isMedia, null)
-                .Where<NodeDto>(x => x.NodeId == id && x.NodeObjectType == nodeObjectType);
-            return sql;
+            return GetBase(isContent, isMedia, null, isCount)
+                .Where<NodeDto>(x => x.NodeId == nodeId && x.NodeObjectType == objectType);
         }
 
-        protected virtual Sql<ISqlContext> GetBaseWhere(Func<bool, bool, Action<Sql<ISqlContext>>, Sql<ISqlContext>> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
+        // gets the base SELECT + FROM + WHERE sql
+        // for a given object type and unique id
+        protected virtual Sql<ISqlContext> GetBaseWhere(bool isContent, bool isMedia, bool isCount, Guid objectType, Guid uniqueId)
         {
-            var sql = baseQuery(isContent, isMedia, null)
-                .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == nodeObjectType);
-            return sql;
+            return GetBase(isContent, isMedia, null, isCount)
+                .Where<NodeDto>(x => x.UniqueId == uniqueId && x.NodeObjectType == objectType);
         }
 
-        protected virtual Sql<ISqlContext> GetGroupBy(bool isContent, bool isMedia, bool includeSort = true)
+        // gets the GROUP BY / ORDER BY sql
+        // required in order to count children
+        protected virtual Sql<ISqlContext> AddGroupBy(bool isContent, bool isMedia, Sql<ISqlContext> sql, bool sort = true)
         {
-            var columns = new List<object>
-            {
-                "umbracoNode.id",
-                "umbracoNode.trashed",
-                "umbracoNode.parentId",
-                "umbracoNode.nodeUser",
-                "umbracoNode.level",
-                "umbracoNode.path",
-                "umbracoNode.sortOrder",
-                "umbracoNode.uniqueId",
-                "umbracoNode.text",
-                "umbracoNode.nodeObjectType",
-                "umbracoNode.createDate"
-            };
+            sql
+                .GroupBy<NodeDto>(x => x.NodeId, x => x.Trashed, x => x.ParentId, x => x.UserId, x => x.Level, x => x.Path)
+                .AndBy<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType, x => x.CreateDate);
 
             if (isContent)
-            {
-                columns.Add("contentVersion.versionId");
-                columns.Add("document.published");
-                columns.Add("document.edited");
-            }
+                sql
+                    .AndBy<DocumentDto>(x => x.Published, x => x.Edited);
 
             if (isContent || isMedia)
-            {
-                columns.Add("contentType.alias");
-                columns.Add("contentType.icon");
-                columns.Add("contentType.thumbnail");
-                columns.Add("contentType.isContainer");
-            }
+                sql
+                    .AndBy<ContentVersionDto>(x => x.Id)
+                    .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer);
 
-            var sql = Sql().GroupBy(columns.ToArray());
-
-            if (includeSort)
-            {
-                sql = sql.OrderBy("umbracoNode.sortOrder");
-            }
+            if (sort)
+                sql.OrderBy<NodeDto>(x => x.SortOrder);
 
             return sql;
         }
 
         #endregion
-
-        public bool Exists(Guid key)
-        {
-            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
-            return UnitOfWork.Database.ExecuteScalar<int>(sql) > 0;
-        }
-
-        public bool Exists(int id)
-        {
-            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
-            return UnitOfWork.Database.ExecuteScalar<int>(sql) > 0;
-        }
 
         #region Classes
 
@@ -637,6 +580,7 @@ namespace Umbraco.Core.Persistence.Repositories
             public string TextValue { get; set; }
         }
 
+        // fixme kill
         /// <summary>
         /// This is a special relator in that it is not returning a DTO but a real resolved entity and that it accepts
         /// a dynamic instance.
@@ -645,175 +589,276 @@ namespace Umbraco.Core.Persistence.Repositories
         /// We're doing this because when we query the db, we want to use dynamic so that it returns all available fields not just the ones
         ///     defined on the entity so we can them to additional data
         /// </remarks>
-        internal class UmbracoEntityRelator
-        {
-            internal UmbracoEntity Current;
-            private readonly UmbracoEntityFactory _factory = new UmbracoEntityFactory();
+        //internal class UmbracoEntityRelator
+        //{
+        //    internal UmbracoEntity Current;
 
-            public IEnumerable<IUmbracoEntity> MapAll(IEnumerable<dynamic> input)
-            {
-                UmbracoEntity entity;
+        //    public IEnumerable<IUmbracoEntity> MapAll(IEnumerable<dynamic> input)
+        //    {
+        //        UmbracoEntity entity;
 
-                foreach (var x in input)
-                {
-                    entity = Map(x);
-                    if (entity != null) yield return entity;
-                }
+        //        foreach (var x in input)
+        //        {
+        //            entity = Map(x);
+        //            if (entity != null) yield return entity;
+        //        }
 
-                entity = Map((dynamic) null);
-                if (entity != null) yield return entity;
-            }
+        //        entity = Map((dynamic) null);
+        //        if (entity != null) yield return entity;
+        //    }
 
-            // must be called one last time with null in order to return the last one!
-            public UmbracoEntity Map(dynamic a)
-            {
-                // Terminating call.  Since we can return null from this function
-                // we need to be ready for NPoco to callback later with null
-                // parameters
-                if (a == null)
-                    return Current;
+        //    // must be called one last time with null in order to return the last one!
+        //    public UmbracoEntity Map(dynamic a)
+        //    {
+        //        // Terminating call.  Since we can return null from this function
+        //        // we need to be ready for NPoco to callback later with null
+        //        // parameters
+        //        if (a == null)
+        //            return Current;
 
-                string pPropertyEditorAlias = a.propertyEditorAlias;
-                var pExists = pPropertyEditorAlias != null;
-                string pPropertyAlias = a.propertyTypeAlias;
-                string pTextValue = a.textValue;
-                string pNVarcharValue = a.varcharValue;
+        //        string pPropertyEditorAlias = a.propertyEditorAlias;
+        //        var pExists = pPropertyEditorAlias != null;
+        //        string pPropertyAlias = a.propertyTypeAlias;
+        //        string pTextValue = a.textValue;
+        //        string pNVarcharValue = a.varcharValue;
 
-                // Is this the same UmbracoEntity as the current one we're processing
-                if (Current != null && Current.Key == a.uniqueID)
-                {
-                    if (pExists && pPropertyAlias.IsNullOrWhiteSpace() == false)
-                    {
-                        // Add this UmbracoProperty to the current additional data
-                        Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
-                        {
-                            PropertyEditorAlias = pPropertyEditorAlias,
-                            Value = pTextValue.IsNullOrWhiteSpace()
-                                ? pNVarcharValue
-                                : pTextValue.ConvertToJsonIfPossible()
-                        };
-                    }
+        //        // Is this the same UmbracoEntity as the current one we're processing
+        //        if (Current != null && Current.Key == a.uniqueID)
+        //        {
+        //            if (pExists && pPropertyAlias.IsNullOrWhiteSpace() == false)
+        //            {
+        //                // Add this UmbracoProperty to the current additional data
+        //                Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
+        //                {
+        //                    PropertyEditorAlias = pPropertyEditorAlias,
+        //                    Value = pTextValue.IsNullOrWhiteSpace()
+        //                        ? pNVarcharValue
+        //                        : pTextValue.ConvertToJsonIfPossible()
+        //                };
+        //            }
 
-                    // Return null to indicate we're not done with this UmbracoEntity yet
-                    return null;
-                }
+        //            // Return null to indicate we're not done with this UmbracoEntity yet
+        //            return null;
+        //        }
 
-                // This is a different UmbracoEntity to the current one, or this is the
-                // first time through and we don't have a Tab yet
+        //        // This is a different UmbracoEntity to the current one, or this is the
+        //        // first time through and we don't have a Tab yet
 
-                // Save the current UmbracoEntityDto
-                var prev = Current;
+        //        // Save the current UmbracoEntityDto
+        //        var prev = Current;
 
-                // Setup the new current UmbracoEntity
+        //        // Setup the new current UmbracoEntity
 
-                Current = _factory.BuildEntityFromDynamic(a);
+        //        Current = BuildEntityFromDynamic(a);
 
-                if (pExists && pPropertyAlias.IsNullOrWhiteSpace() == false)
-                {
-                    //add the property/create the prop list if null
-                    Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
-                    {
-                        PropertyEditorAlias = pPropertyEditorAlias,
-                        Value = pTextValue.IsNullOrWhiteSpace()
-                            ? pNVarcharValue
-                            : pTextValue.ConvertToJsonIfPossible()
-                    };
-                }
+        //        if (pExists && pPropertyAlias.IsNullOrWhiteSpace() == false)
+        //        {
+        //            //add the property/create the prop list if null
+        //            Current.AdditionalData[pPropertyAlias] = new UmbracoEntity.EntityProperty
+        //            {
+        //                PropertyEditorAlias = pPropertyEditorAlias,
+        //                Value = pTextValue.IsNullOrWhiteSpace()
+        //                    ? pNVarcharValue
+        //                    : pTextValue.ConvertToJsonIfPossible()
+        //            };
+        //        }
 
-                // Return the now populated previous UmbracoEntity (or null if first time through)
-                return prev;
-            }
-        }
+        //        // Return the now populated previous UmbracoEntity (or null if first time through)
+        //        return prev;
+        //    }
+        //}
 
         // fixme need to review what's below
         // comes from 7.6, similar to what's in VersionableRepositoryBase
         // not sure it really makes sense...
 
-        private class EntityDefinitionCollection : KeyedCollection<int, EntityDefinition>
+        //private class EntityDefinitionCollection : KeyedCollection<int, EntityDefinition>
+        //{
+        //    protected override int GetKeyForItem(EntityDefinition item)
+        //    {
+        //        return item.Id;
+        //    }
+
+        //    /// <summary>
+        //    /// if this key already exists if it does then we need to check
+        //    /// if the existing item is 'older' than the new item and if that is the case we'll replace the older one
+        //    /// </summary>
+        //    /// <param name="item"></param>
+        //    /// <returns></returns>
+        //    public bool AddOrUpdate(EntityDefinition item)
+        //    {
+        //        if (Dictionary == null)
+        //        {
+        //            Add(item);
+        //            return true;
+        //        }
+
+        //        var key = GetKeyForItem(item);
+        //        if (TryGetValue(key, out EntityDefinition found))
+        //        {
+        //            //it already exists and it's older so we need to replace it
+        //            if (item.VersionId > found.VersionId)
+        //            {
+        //                var currIndex = Items.IndexOf(found);
+        //                if (currIndex == -1)
+        //                    throw new IndexOutOfRangeException("Could not find the item in the list: " + found.Id);
+
+        //                //replace the current one with the newer one
+        //                SetItem(currIndex, item);
+        //                return true;
+        //            }
+        //            //could not add or update
+        //            return false;
+        //        }
+
+        //        Add(item);
+        //        return true;
+        //    }
+
+        //    private bool TryGetValue(int key, out EntityDefinition val)
+        //    {
+        //        if (Dictionary != null) return Dictionary.TryGetValue(key, out val);
+
+        //        val = null;
+        //        return false;
+        //    }
+        //}
+
+        // fixme wtf is this, why dynamics here, this is horrible !!
+        //private class EntityDefinition
+        //{
+        //    private readonly dynamic _entity;
+        //    private readonly bool _isContent;
+        //    private readonly bool _isMedia;
+
+        //    public EntityDefinition(dynamic entity, bool isContent, bool isMedia)
+        //    {
+        //        _entity = entity;
+        //        _isContent = isContent;
+        //        _isMedia = isMedia;
+        //    }
+
+        //    public IUmbracoEntity BuildFromDynamic()
+        //    {
+        //        return BuildEntityFromDynamic(_entity);
+        //    }
+
+        //    public int Id => _entity.id;
+
+        //    public int VersionId
+        //    {
+        //        get
+        //        {
+        //            if (_isContent || _isMedia)
+        //            {
+        //                return _entity.versionId;
+        //            }
+        //            return _entity.id;
+        //        }
+        //    }
+        //}
+
+        #endregion
+
+        #region Factory
+
+        // fixme kill all this
+        //private static void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
+        //{
+        //    var entityProps = typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray();
+
+        //    // figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
+        //    foreach (var k in originalEntityProperties.Keys
+        //        .Select(x => new { orig = x, title = x.ToCleanString(CleanStringType.PascalCase | CleanStringType.Ascii | CleanStringType.ConvertCase) })
+        //        .Where(x => entityProps.InvariantContains(x.title) == false))
+        //    {
+        //        entity.AdditionalData[k.title] = originalEntityProperties[k.orig];
+        //    }
+        //}
+
+        //private static UmbracoEntity BuildEntityFromDynamic(dynamic d)
+        //{
+        //    var asDictionary = (IDictionary<string, object>) d;
+        //    var entity = new UmbracoEntity(d.trashed);
+
+        //    try
+        //    {
+        //        entity.DisableChangeTracking();
+
+        //        entity.CreateDate = d.createDate;
+        //        entity.CreatorId = d.nodeUser == null ? 0 : d.nodeUser;
+        //        entity.Id = d.id;
+        //        entity.Key = d.uniqueID;
+        //        entity.Level = d.level;
+        //        entity.Name = d.text;
+        //        entity.NodeObjectTypeId = d.nodeObjectType;
+        //        entity.ParentId = d.parentID;
+        //        entity.Path = d.path;
+        //        entity.SortOrder = d.sortOrder;
+        //        entity.HasChildren = d.children > 0;
+
+        //        entity.ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty;
+        //        entity.ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty;
+        //        entity.ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty;
+        //        //entity.VersionId = asDictionary.ContainsKey("versionId") ? asDictionary["versionId"] : Guid.Empty;
+
+        //        entity.Published = asDictionary.ContainsKey("published") && (bool) asDictionary["published"];
+        //        entity.Edited = asDictionary.ContainsKey("edited") && (bool) asDictionary["edited"];
+
+        //        // assign the additional data
+        //        AddAdditionalData(entity, asDictionary);
+
+        //        return entity;
+        //    }
+        //    finally
+        //    {
+        //        entity.EnableChangeTracking();
+        //    }
+        //}
+
+        private static UmbracoEntity BuildEntity(bool isContent, bool isMedia, BaseDto dto)
         {
-            protected override int GetKeyForItem(EntityDefinition item)
-            {
-                return item.Id;
-            }
+            var entity = new UmbracoEntity(dto.Trashed);
 
-            /// <summary>
-            /// if this key already exists if it does then we need to check
-            /// if the existing item is 'older' than the new item and if that is the case we'll replace the older one
-            /// </summary>
-            /// <param name="item"></param>
-            /// <returns></returns>
-            public bool AddOrUpdate(EntityDefinition item)
+            try
             {
-                if (Dictionary == null)
+                entity.DisableChangeTracking();
+
+                entity.CreateDate = dto.CreateDate;
+                entity.CreatorId = dto.UserId ?? 0;
+                entity.Id = dto.NodeId;
+                entity.Key = dto.UniqueId;
+                entity.Level = dto.Level;
+                entity.Name = dto.Text;
+                entity.NodeObjectTypeId = dto.NodeObjectType;
+                entity.ParentId = dto.ParentId;
+                entity.Path = dto.Path;
+                entity.SortOrder = dto.SortOrder;
+                entity.HasChildren = dto.Children > 0;
+
+                if (isContent)
                 {
-                    Add(item);
-                    return true;
+                    entity.Published = dto.Published;
+                    entity.Edited = dto.Edited;
                 }
 
-                var key = GetKeyForItem(item);
-                if (TryGetValue(key, out EntityDefinition found))
+                // fixme what shall we do with versions?
+                //entity.VersionId = asDictionary.ContainsKey("versionId") ? asDictionary["versionId"] : Guid.Empty;
+
+                if (isContent || isMedia)
                 {
-                    //it already exists and it's older so we need to replace it
-                    if (item.VersionId > found.VersionId)
-                    {
-                        var currIndex = Items.IndexOf(found);
-                        if (currIndex == -1)
-                            throw new IndexOutOfRangeException("Could not find the item in the list: " + found.Id);
-
-                        //replace the current one with the newer one
-                        SetItem(currIndex, item);
-                        return true;
-                    }
-                    //could not add or update
-                    return false;
-                }
-
-                Add(item);
-                return true;
-            }
-
-            private bool TryGetValue(int key, out EntityDefinition val)
-            {
-                if (Dictionary != null) return Dictionary.TryGetValue(key, out val);
-
-                val = null;
-                return false;
-            }
-        }
-
-        private class EntityDefinition
-        {
-            private readonly UmbracoEntityFactory _factory;
-            private readonly dynamic _entity;
-            private readonly bool _isContent;
-            private readonly bool _isMedia;
-
-            public EntityDefinition(UmbracoEntityFactory factory, dynamic entity, bool isContent, bool isMedia)
-            {
-                _factory = factory;
-                _entity = entity;
-                _isContent = isContent;
-                _isMedia = isMedia;
-            }
-
-            public IUmbracoEntity BuildFromDynamic()
-            {
-                return _factory.BuildEntityFromDynamic(_entity);
-            }
-
-            public int Id => _entity.id;
-
-            public int VersionId
-            {
-                get
-                {
-                    if (_isContent || _isMedia)
-                    {
-                        return _entity.versionId;
-                    }
-                    return _entity.id;
+                    entity.ContentTypeAlias = dto.Alias;
+                    entity.ContentTypeIcon = dto.Icon;
+                    entity.ContentTypeThumbnail = dto.Thumbnail;
+                    //entity.??? = dto.IsContainer;
                 }
             }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
+
+            return entity;
         }
 
         #endregion

@@ -20,15 +20,9 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
-        //[Column("nodeId")]
-        //[ForeignKey(typeof(NodeDto))]
-        //[Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,versionId,propertyTypeId,languageId,segment,published")]
-        //public int NodeId { get; set; }
-
         [Column("versionId")]
         [ForeignKey(typeof(ContentVersionDto))]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,propertyTypeId,languageId,segment")]
-        //[Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionId")]
         public int VersionId { get; set; }
 
         [Column("propertyTypeId")]
@@ -47,10 +41,6 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(SegmentLength)]
         public string Segment { get; set; }
-
-        //[Column("published")]
-        //[Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
-        //public bool Published { get; set; }
 
         [Column("intValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -104,6 +94,23 @@ namespace Umbraco.Core.Models.Rdbms
 
                 return null;
             }
+        }
+
+        public PropertyDataDto Clone(int versionId)
+        {
+            return new PropertyDataDto
+            {
+                VersionId = versionId,
+                PropertyTypeId = PropertyTypeId,
+                LanguageId = LanguageId,
+                Segment = Segment,
+                IntegerValue = IntegerValue,
+                DecimalValue = DecimalValue,
+                DateValue = DateValue,
+                VarcharValue = VarcharValue,
+                TextValue = TextValue,
+                PropertyTypeDto = PropertyTypeDto
+            };
         }
 
         protected bool Equals(PropertyDataDto other)

@@ -1074,31 +1074,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void OnContentRefreshedEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
         {
             var db = args.UnitOfWork.Database;
-            var content = args.Entity;
+            var content = (Content) args.Entity;
 
+            // always refresh the edited data
             OnRepositoryRefreshed(db, content, false);
 
-            // if unpublishing, remove from table
-            if (((Content) content).PublishedState == PublishedState.Unpublishing)
-            {
+            // if unpublishing, remove published data from table
+            if (content.PublishedState == PublishedState.Unpublishing)
                 db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
-                return;
-            }
 
-            // need to update the published data if we're saving the published version,
-            // or having an impact on that version - we update the published data even when masked
-
-            IContent pc = null;
-            if (content.Published)
-            {
-                // saving the published version = update data
-                pc = content;
-            }
-
-            if (pc == null)
-                return;
-
-            OnRepositoryRefreshed(db, pc, true);
+            // if publishing, refresh the published data
+            else if (content.PublishedState == PublishedState.Publishing)
+                OnRepositoryRefreshed(db, content, true);
         }
 
         private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.UnitOfWorkEntityEventArgs args)
@@ -1106,12 +1093,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var db = args.UnitOfWork.Database;
             var media = args.Entity;
 
-            // for whatever reason we delete some data when the media is trashed
-            // at least that's what the MediaService implementation did
-            if (media.Trashed)
-                db.Execute("DELETE FROM cmsContentXml WHERE nodeId=@id", new { id = media.Id });
-
-            OnRepositoryRefreshed(db, media, true);
+            // refresh the edited data
+            OnRepositoryRefreshed(db, media, false);
         }
 
         private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.UnitOfWorkEntityEventArgs args)
@@ -1119,6 +1102,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var db = args.UnitOfWork.Database;
             var member = args.Entity;
 
+            // refresh the edited data
             OnRepositoryRefreshed(db, member, true);
         }
 
@@ -1175,7 +1159,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var data = new Dictionary<string, object>();
             foreach (var prop in content.Properties)
             {
-                var value = prop.GetValue();
+                var value = prop.GetValue(published);
                 //if (value != null)
                 //{
                 //    var e = propertyEditorResolver.GetByAlias(prop.PropertyType.PropertyEditorAlias);

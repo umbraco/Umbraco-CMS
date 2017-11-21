@@ -139,16 +139,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Flush();
                 versions.Add(content1.Version); // the first version
 
-                // publish = no new version (was not published)
+                // publish = new edit version
                 content1.SetValue("title", "title");
                 ((Content) content1).PublishValues();
                 ((Content) content1).PublishedState = PublishedState.Publishing;
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version); // the same version
+                versions.Add(content1.Version); // NEW VERSION
 
-                // no new version has been created
-                Assert.AreEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
+                // new edit version has been created
+                Assert.AreNotEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
                 Assert.IsTrue(content1.Published);
                 Assert.AreEqual(PublishedState.Published, ((Content) content1).PublishedState);
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).Version);
@@ -174,14 +174,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
                 Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
-                // unpublish = should create a new version
+                // unpublish = no impact on versions
                 ((Content) content1).PublishedState = PublishedState.Unpublishing;
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version); // the new version
+                versions.Add(content1.Version); // the same version
 
-                // a new version has been created
-                Assert.AreNotEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
+                // no new version has been created
+                Assert.AreEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
                 Assert.IsFalse(content1.Published);
                 Assert.AreEqual(PublishedState.Unpublished, ((Content) content1).PublishedState);
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).Version);
@@ -206,15 +206,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(false, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
                 Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
-                // publish = no new version (was not published)
+                // publish = version
                 ((Content) content1).PublishValues();
                 ((Content) content1).PublishedState = PublishedState.Publishing;
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version); // the same version
+                versions.Add(content1.Version); // NEW VERSION
 
-                // no new version has been created
-                Assert.AreEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
+                // new version has been created
+                Assert.AreNotEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
                 Assert.IsTrue(content1.Published);
                 Assert.AreEqual(PublishedState.Published, ((Content) content1).PublishedState);
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).Version);
@@ -227,7 +227,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // save = update the current (draft) version
                 content1.Name = "name-3";
                 content1.SetValue("title", "title-3");
+
                 //Thread.Sleep(2000); // force date change
+
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.Version); // the same version
@@ -240,14 +242,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
                 Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
-                // publish = new version (was published)
+                // publish = new version
                 content1.Name = "name-4";
                 content1.SetValue("title", "title-4");
                 ((Content) content1).PublishValues();
                 ((Content) content1).PublishedState = PublishedState.Publishing;
                 repository.AddOrUpdate(content1);
                 unitOfWork.Flush();
-                versions.Add(content1.Version); // new version
+                versions.Add(content1.Version); // NEW VERSION
 
                 // a new version has been created
                 Assert.AreNotEqual(versions[versions.Count - 2], versions[versions.Count - 1]);
@@ -259,17 +261,29 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
                 Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
+                // all versions
+                var allVersions = repository.GetAllVersions(content1.Id).ToArray();
+                Console.WriteLine();
+                foreach (var v in versions)
+                    Console.WriteLine(v);
+                Console.WriteLine();
+                foreach (var v in allVersions)
+                {
+                    var c = (Content) v;
+                    Console.WriteLine($"{c.Id} {c.Version} {(c.Published ? "+" : "-")}pub pk={c.VersionPk} ppk={c.PublishedVersionPk} name=\"{c.Name}\" pname=\"{c.PublishName}\"");
+                }
+
                 // get older version
-                var content = repository.GetByVersion(versions[versions.Count - 2]);
+                var content = repository.GetByVersion(versions[versions.Count - 4]);
                 Assert.IsNotNull(content.Version);
-                Assert.AreEqual(versions[versions.Count - 2], content.Version);
+                Assert.AreEqual(versions[versions.Count - 4], content.Version);
                 Assert.AreEqual("name-4", content1.Name);
                 Assert.AreEqual("title-4", content1.GetValue("title"));
-                Assert.AreEqual("name-3", content.Name);
-                Assert.AreEqual("title-3", content.GetValue("title"));
+                Assert.AreEqual("name-2", content.Name);
+                Assert.AreEqual("title-2", content.GetValue("title"));
 
                 // get all versions - most recent first
-                var allVersions = repository.GetAllVersions(content1.Id).ToArray();
+                allVersions = repository.GetAllVersions(content1.Id).ToArray();
                 var expVersions = versions.Distinct().Reverse().ToArray();
                 Assert.AreEqual(expVersions.Length, allVersions.Length);
                 for (var i = 0; i < expVersions.Length; i++)

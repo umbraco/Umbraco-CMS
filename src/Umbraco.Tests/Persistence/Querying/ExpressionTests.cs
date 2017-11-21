@@ -208,5 +208,66 @@ namespace Umbraco.Tests.Persistence.Querying
             Assert.AreEqual("hello@world.com", modelToSqlExpressionHelper.GetSqlParameters()[1]);
             Assert.AreEqual("blah@blah.com", modelToSqlExpressionHelper.GetSqlParameters()[2]);
         }
+
+        private string GetSomeValue(string s)
+        {
+            return "xx" + s + "xx";
+        }
+
+        private class Foo
+        {
+            public string Value { get; set; }
+        }
+
+        [Test]
+        public void StartsWith()
+        {
+            Expression<Func<UserDto, object>> predicate = user => user.Login.StartsWith("aaaaa");
+            var modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine(result);
+            Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+
+            predicate = user => user.Login.StartsWith(GetSomeValue("aaaaa"));
+            modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
+            result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine(result);
+            Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+
+            predicate = user => user.Login.StartsWith(GetSomeValue("aaaaa"));
+            modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
+            result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine(result);
+            Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+
+            var foo = new Foo { Value = "aaaaa" };
+            predicate = user => user.Login.StartsWith(foo.Value);
+            modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
+            result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine(result);
+            Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
+
+            // below does not work, we want to output
+            // LIKE concat([group].[name], ',%')
+            // and how would we get the comma there? we'd have to parse .StartsWith(group.Name + ',')
+            // which is going to be quite complicated => no
+
+            //// how can we do user.Login.StartsWith(other.Value) ?? to use in WHERE or JOIN.ON clauses ??
+            //Expression<Func<UserDto, UserGroupDto, object>> predicate2 = (user, group) => user.Login.StartsWith(group.Name);
+            //var modelToSqlExpressionHelper2 = new PocoToSqlExpressionVisitor<UserDto, UserGroupDto>(SqlContext, null, null);
+            //var result2 = modelToSqlExpressionHelper2.Visit(predicate2); // fails, for now
+
+            //Console.WriteLine(result2);
+
+            Expression<Func<UserDto, UserGroupDto, object>> predicate3 = (user, group) => NPocoSqlExtensions.Statics.SqlText<bool>(user.Login, group.Name, (n1, n2) => $"({n1} LIKE concat({n2}, ',%'))");
+            var modelToSqlExpressionHelper3 = new PocoToSqlExpressionVisitor<UserDto, UserGroupDto>(SqlContext, null, null);
+            var result3 = modelToSqlExpressionHelper3.Visit(predicate3);
+
+            Console.WriteLine(result3);
+        }
     }
 }

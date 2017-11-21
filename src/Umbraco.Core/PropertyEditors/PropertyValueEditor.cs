@@ -326,7 +326,7 @@ namespace Umbraco.Core.PropertyEditors
 
             foreach (var pvalue in property.Values)
             {
-                var value = published ? pvalue.PublishedValue : pvalue.EditValue;
+                var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                 if (value == null || value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
                     continue;
 

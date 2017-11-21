@@ -1,202 +1,293 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+    // fixme - use SqlTemplate for these queries else it's going to be horribly slow!
+
     // provides efficient database access for NuCache
     internal class Database
     {
+        private Sql<ISqlContext> SelectContentSources(IScopeUnitOfWork uow)
+        {
+            return uow.SqlContext.Sql()
+
+                .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+                    x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
+                    x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
+                .AndSelect<DocumentDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
+
+                .AndSelect<ContentVersionDto>(x => Alias(x.VersionId, "Version"))
+                .AndSelect<ContentVersionDto>(x => Alias(x.Text, "DraftName"), x => Alias(x.VersionDate, "DraftVersionDate"), x => Alias(x.UserId, "DraftWriterId"))
+                .AndSelect<DocumentVersionDto>(x => Alias(x.TemplateId, "DraftTemplateId"))
+
+                .AndSelect<ContentVersionDto>("pcver", x => Alias(x.Text, "PubName"), x => Alias(x.VersionDate, "PubVersionDate"), x => Alias(x.UserId, "PubWriterId"))
+                .AndSelect<DocumentVersionDto>("pdver", x => Alias(x.TemplateId, "PubTemplateId"))
+
+                .AndSelect<ContentNuDto>("nuDraft", x => Alias(x.Data, "DraftData"))
+                .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"));
+        }
+
+        private Sql<ISqlContext> SelectMediaSources(IScopeUnitOfWork uow)
+        {
+            return uow.SqlContext.Sql()
+
+                .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+                    x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
+                    x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
+                .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
+                //.AndSelect<DocumentDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
+
+                .AndSelect<ContentVersionDto>(x => Alias(x.VersionId, "Version"))
+                .AndSelect<ContentVersionDto>(x => Alias(x.Text, "PubName"), x => Alias(x.VersionDate, "PubVersionDate"), x => Alias(x.UserId, "PubWriterId"))
+                .AndSelect<DocumentVersionDto>(x => Alias(x.TemplateId, "PubTemplateId"))
+
+                //.AndSelect<ContentVersionDto>("pcver", x => Alias(x.Text, "PubName"), x => Alias(x.VersionDate, "PubVersionDate"), x => Alias(x.UserId, "PubWriterId"))
+                //.AndSelect<DocumentVersionDto>("pdver", x => Alias(x.TemplateId, "PubTemplateId"))
+
+                .AndSelect<ContentNuDto>("nuDraft", x => Alias(x.Data, "PubData"));
+                //.AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"));
+        }
+
         public ContentNodeKit GetContentSource(IScopeUnitOfWork uow, int id)
         {
-            // fixme - missing things
-            //
-            // new: documentDto.publishDate
-            // new: documentDto.publishUserId
-            // new: documentDto.templateId - the published one
-            // fixme still, we have an issue with names
-            //
-            // node.text == contentVersion.text (and we use contentVersion.text to keep track of things)
-            // !! when creating a new version, the old version versionDate = publishDate, what else?
-            //
-            // new: documentDto.publishName === THE ONE WE USE FOR URLS !!
-            //
-            var dto = uow.Database.Fetch<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId, cver.versionId Version,
-n.createDate CreateDate, n.nodeUser CreatorId,
-cver.text DraftName, c.updateDate DraftVersionDate, c.writerUserId DraftWriterId, dver.templateId DraftTemplateId, doc.edited Edited,
-nuDraft.data DraftData,
-docPub.text PubName, doc.publishDate PubVersionDate, doc.publishUserId PubWriterId, doc.templateId PubTemplateId, doc.published Published,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN uContent c ON (c.nodeId=n.id)
-LEFT JOIN uDocument doc ON (doc.nodeId=n.id)
-LEFT JOIN uContentVersion cver ON (n.id=cver.nodeId AND cver.current=1)
-LEFT JOIN uDocumentVersion dver ON (cver.id=dver.id)
-LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND n.id=@id
-", new { objType = Constants.ObjectTypes.Document, /*id =*/ id })).FirstOrDefault();
+            var sql = SelectContentSources(uow)
+
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                    .LeftJoin<ContentVersionDto>(j =>
+                        j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                    .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id)
+
+                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            var dto = uow.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
         }
 
         public ContentNodeKit GetMediaSource(IScopeUnitOfWork uow, int id)
         {
-            // should be only 1 version for medias
+            var sql = SelectMediaSources(uow)
 
-            var dto = uow.Database.Fetch<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN uContent ON (uContent.nodeId=n.id)
-JOIN uContentVersion ver ON (ver.contentId=n.id)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND n.id=@id
-", new { objType = Constants.ObjectTypes.Media, /*id =*/ id })).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                    //.LeftJoin<ContentVersionDto>(j =>
+                    //    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id, "pcver", "pdver"), "pcver")
+                    //.On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                    //.LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id)
+
+                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            var dto = uow.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+            return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
         }
 
         // we want arrays, we want them all loaded, not an enumerable
 
         public IEnumerable<ContentNodeKit> GetAllContentSources(IScopeUnitOfWork uow)
         {
-            return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
-nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN uContent ON (uContent.nodeId=n.id)
-LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
-LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
-LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType
-ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.Document })).Select(CreateContentNodeKit);
+            var sql = SelectContentSources(uow)
+
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                    .LeftJoin<ContentVersionDto>(j =>
+                        j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                    .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+
+                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScopeUnitOfWork uow)
         {
-            // should be only 1 version for medias
+            var sql = SelectMediaSources(uow)
 
-            return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN uContent ON (uContent.nodeId=n.id)
-JOIN uContentVersion ver ON (ver.contentId=n.id)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType
-ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.Media })).Select(CreateMediaNodeKit);
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                    //.LeftJoin<ContentVersionDto>(j =>
+                    //    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id, "pcver", "pdver"), "pcver")
+                    //.On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                    //.LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+
+                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(IScopeUnitOfWork uow, int id)
         {
-            return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
-nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
-JOIN uContent ON (uContent.nodeId=n.id)
-LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
-LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
-LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND x.id=@id
-ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.Document, /*id =*/ id })).Select(CreateContentNodeKit);
+            var syntax = uow.SqlContext.SqlSyntax;
+            var sql = SelectContentSources(uow)
+
+                .From<NodeDto>()
+                .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x")
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                .LeftJoin<ContentVersionDto>(j =>
+                        j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                .Where<NodeDto>(x => x.NodeId == id, "x")
+
+                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScopeUnitOfWork uow, int id)
         {
-            // should be only 1 version for medias
+            var syntax = uow.SqlContext.SqlSyntax;
+            var sql = SelectMediaSources(uow)
 
-            return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN umbracoNode x ON (n.id=x.id OR n.path LIKE " + uow.SqlContext.SqlSyntax.GetConcat("x.path", "',%'") + @")
-JOIN uContent ON (uContent.nodeId=n.id)
-JOIN uContentVersion ver ON (ver.contentId=n.id)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND x.id=@id
-ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.Media, /*id =*/ id })).Select(CreateMediaNodeKit);
+                    .From<NodeDto>()
+                    .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x")
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                    //.LeftJoin<ContentVersionDto>(j =>
+                    //    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id, "pcver", "pdver"), "pcver")
+                    //.On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                    //.LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                    .Where<NodeDto>(x => x.NodeId == id, "x")
+
+                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
         {
-            return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-docDraft.text DraftName, docDraft.versionId DraftVersion, docDraft.updateDate DraftVersionDate, docDraft.writerUserId DraftWriterId, docDraft.templateId DraftTemplateId,
-nuDraft.data DraftData,
-docPub.text PubName, docPub.versionId PubVersion, docPub.updateDate PubVersionDate, docPub.writerUserId PubWriterId, docPub.templateId PubTemplateId,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN uContent ON (uContent.nodeId=n.id)
-LEFT JOIN cmsDocument docDraft ON (docDraft.nodeId=n.id AND docDraft.newest=1 AND docDraft.published=0)
-LEFT JOIN cmsDocument docPub ON (docPub.nodeId=n.id AND docPub.published=1)
-LEFT JOIN cmsContentNu nuDraft ON (nuDraft.nodeId=n.id AND nuDraft.published=0)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND uContent.contentTypeId IN (@ids)
-ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.Document, /*id =*/ ids })).Select(CreateContentNodeKit);
+            var sql = SelectContentSources(uow)
+
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                .LeftJoin<ContentVersionDto>(j =>
+                        j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
+
+                .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
         {
-            // should be only 1 version for medias
+            var sql = SelectMediaSources(uow)
 
-            return uow.Database.Query<ContentSourceDto>(new Sql(@"SELECT
-n.id Id, n.uniqueId Uid,
-uContent.contentTypeId ContentTypeId,
-n.level Level, n.path Path, n.sortOrder SortOrder, n.parentId ParentId,
-n.createDate CreateDate, n.nodeUser CreatorId,
-n.text PubName, ver.versionId PubVersion, ver.versionDate PubVersionDate,
-nuPub.data PubData
-FROM umbracoNode n
-JOIN uContent ON (uContent.nodeId=n.id)
-JOIN uContentVersion ver ON (ver.contentId=n.id)
-LEFT JOIN cmsContentNu nuPub ON (nuPub.nodeId=n.id AND nuPub.published=1)
-WHERE n.nodeObjectType=@objType AND uContent.contentTypeId IN (@ids)
-ORDER BY n.level, n.sortOrder
-", new { objType = Constants.ObjectTypes.Media, /*id =*/ ids })).Select(CreateMediaNodeKit);
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                    .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+
+                    //.LeftJoin<ContentVersionDto>(j =>
+                    //    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id, "pcver", "pdver"), "pcver")
+                    //.On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+
+                    .LeftJoin<ContentNuDto>("nuDraft").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuDraft")
+                    //.LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub")
+
+                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                    .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
+
+                    .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder)
+
+                ;
+
+            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
         private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
@@ -208,8 +299,9 @@ ORDER BY n.level, n.sortOrder
             {
                 if (dto.DraftData == null)
                 {
-                    //throw new Exception("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<Database>("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
+                    if (Debugger.IsAttached)
+                        throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<Database>("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
                 }
                 else
                 {
@@ -230,8 +322,9 @@ ORDER BY n.level, n.sortOrder
             {
                 if (dto.PubData == null)
                 {
-                    //throw new Exception("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<Database>("Missing cmsContentNu content for node " + dto.Id + ", consider rebuilding.");
+                    if (Debugger.IsAttached)
+                        throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<Database>("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
                 }
                 else
                 {

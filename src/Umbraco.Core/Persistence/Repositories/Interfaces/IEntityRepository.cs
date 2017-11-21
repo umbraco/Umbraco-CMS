@@ -13,22 +13,22 @@ namespace Umbraco.Core.Persistence.Repositories
         IUmbracoEntity GetByKey(Guid key, Guid objectTypeId);
         IUmbracoEntity Get(int id);
         IUmbracoEntity Get(int id, Guid objectTypeId);
-        IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids);
-        IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys);
+        IEnumerable<IUmbracoEntity> GetAll(Guid objectType, params int[] ids);
+        IEnumerable<IUmbracoEntity> GetAll(Guid objectType, params Guid[] keys);
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query);
-        IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId);
+        IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType);
 
         UmbracoObjectTypes GetObjectType(int id);
         UmbracoObjectTypes GetObjectType(Guid key);
 
-        IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params int[] ids);
-        IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params Guid[] keys);
+        IEnumerable<EntityPath> GetAllPaths(Guid objectType, params int[] ids);
+        IEnumerable<EntityPath> GetAllPaths(Guid objectType, params Guid[] keys);
 
         /// <summary>
         /// Gets paged results
         /// </summary>
         /// <param name="query">Query to excute</param>
-        /// <param name="objectTypeId"></param>
+        /// <param name="objectType"></param>
         /// <param name="pageIndex">Page number</param>
         /// <param name="pageSize">Page size</param>
         /// <param name="totalRecords">Total records query would return without paging</param>
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,
+        IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null);
 
         /// <summary>

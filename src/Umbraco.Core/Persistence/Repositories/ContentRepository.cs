@@ -1,6 +1,7 @@
 ﻿using NPoco;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -122,16 +123,24 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
 
-                // inner join on mandatory current version
+                // inner join on mandatory edited version
                 .InnerJoin<ContentVersionDto>().On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
 
                 // left join on optional published version
                 .LeftJoin<ContentVersionDto>(nested =>
                         nested.InnerJoin<DocumentVersionDto>("pdv").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
-                    .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv");                
+                    .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv");
 
-            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            sql
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
+            // this would ensure we don't get the published version - keep for reference
+            //sql
+            //    .WhereAny(
+            //        x => x.Where<ContentVersionDto, ContentVersionDto>((x1, x2) => x1.Id != x2.Id, alias2: "pcv"),
+            //        x => x.WhereNull<ContentVersionDto>(x1 => x1.Id, "pcv")
+            //    );
 
             if (current)
                 sql.Where<ContentVersionDto>(x => x.Current); // always get the current version
@@ -222,6 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var content = (Content) entity;
 
             content.AddingEntity();
+            var publishing = content.PublishedState == PublishedState.Publishing;
 
             // ensure that the default template is assigned
             if (entity.Template == null)
@@ -276,25 +286,29 @@ namespace Umbraco.Core.Persistence.Repositories
             // persist the content version dto
             var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
-            contentVersionDto.Current = true;
+            contentVersionDto.Current = !publishing;
             Database.Insert(contentVersionDto);
             content.VersionPk = contentVersionDto.Id;
 
             // persist the document version dto
             var documentVersionDto = dto.DocumentVersionDto;
             documentVersionDto.Id = content.VersionPk;
+            if (publishing)
+                documentVersionDto.Published = true;
             Database.Insert(documentVersionDto);
 
             // and again in case we're publishing immediately
-            if (content.PublishedState == PublishedState.Publishing)
+            if (publishing)
             {
                 content.PublishedVersionPk = content.VersionPk;
                 content.Version = contentVersionDto.VersionId = Guid.NewGuid();
                 contentVersionDto.Id = 0;
+                contentVersionDto.Current = true;
                 Database.Insert(contentVersionDto);
                 content.VersionPk = contentVersionDto.Id;
 
                 documentVersionDto.Id = content.VersionPk;
+                documentVersionDto.Published = false;
                 Database.Insert(documentVersionDto);
             }
 
@@ -312,7 +326,7 @@ namespace Umbraco.Core.Persistence.Repositories
             content.Edited = dto.Edited = edited;
             Database.Insert(dto);
 
-            // fixme - here or at the very end?
+            // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
 
             // flip the entity's published property
@@ -339,6 +353,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 UpdateEntityTags(entity, _tagRepository);
 
             entity.ResetDirtyProperties();
+
+            // troubleshooting
+            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE published=1 AND nodeId=" + content.Id) > 1)
+            //{
+            //    Debugger.Break();
+            //    throw new Exception("oops");
+            //}
+            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
+            //{
+            //    Debugger.Break();
+            //    throw new Exception("oops");
+            //}
         }
 
         protected override void PersistUpdatedItem(IContent entity)
@@ -357,17 +383,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // update
             content.UpdatingEntity();
+            var publishing = content.PublishedState == PublishedState.Publishing;
 
             // check if we need to create a new version
-            var publishing = content.PublishedState == PublishedState.Publishing;
-            if (publishing)
+            if (publishing && content.PublishedVersionPk > 0)
             {
                 // published version is not published anymore
                 Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionPk));
-
-                // current version is now published, but not current anymore
-                Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, true)).Where<DocumentVersionDto>(x => x.Id == content.VersionPk));
-                Database.Execute(Sql().Update<ContentVersionDto>(u => u.Set(x => x.Current, false)).Where<ContentVersionDto>(x => x.Id == content.VersionPk));
             }
 
             // ensure unique name on the same level
@@ -400,6 +422,11 @@ namespace Umbraco.Core.Persistence.Repositories
             // update the content & document version dtos
             var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             var documentVersionDto = dto.DocumentVersionDto;
+            if (publishing)
+            {
+                documentVersionDto.Published = true; // now published
+                contentVersionDto.Current = false; // no more current
+            }
             Database.Update(contentVersionDto);
             Database.Update(documentVersionDto);
 
@@ -409,10 +436,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 content.PublishedVersionPk = content.VersionPk;
 
                 contentVersionDto.Id = 0; // want a new id
+                contentVersionDto.Current = true; // current version
                 content.Version = contentVersionDto.VersionId = Guid.NewGuid(); // for that new guid
                 Database.Insert(contentVersionDto);
                 content.VersionPk = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
+                documentVersionDto.Published = false; // non-published version
                 Database.Insert(documentVersionDto);
             }
 
@@ -440,7 +469,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (content.PublishedState == PublishedState.Publishing)
                 UpdateEntityTags(entity, _tagRepository);
 
-            // fixme - here or at the very end?
+            // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
 
             // flip the entity's published property
@@ -463,6 +492,18 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             entity.ResetDirtyProperties();
+
+            // troubleshooting
+            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE published=1 AND nodeId=" + content.Id) > 1)
+            //{
+            //    Debugger.Break();
+            //    throw new Exception("oops");
+            //}
+            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
+            //{
+            //    Debugger.Break();
+            //    throw new Exception("oops");
+            //}
         }
 
         protected override void PersistDeletedItem(IContent entity)

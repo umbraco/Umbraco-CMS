@@ -190,6 +190,7 @@ namespace Umbraco.Tests.Publishing
             ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(contentType);
             var mandatoryType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            //ServiceContext.FileService.SaveTemplate(mandatoryType.DefaultTemplate); // else, FK violation on contentType!
             ServiceContext.ContentTypeService.Save(mandatoryType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046

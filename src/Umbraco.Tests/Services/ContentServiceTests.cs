@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -252,7 +253,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             var allVersions = contentService.GetVersionIds(content.Id, int.MaxValue);
-            Assert.AreEqual(20, allVersions.Count());
+            Assert.AreEqual(21, allVersions.Count());
 
             var topVersions = contentService.GetVersionIds(content.Id, 4);
             Assert.AreEqual(4, topVersions.Count());
@@ -1036,27 +1037,60 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(1, versions.Count);
 
             var version1 = content.Version;
+            Console.WriteLine($"1 e={((Content)content).VersionPk} p={((Content)content).PublishedVersionPk}");
 
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Jane Doe");
-            contentService.SaveAndPublishWithStatus(content); // publishes the current version
+            contentService.SaveAndPublishWithStatus(content); // publishes the current version, creates a version
+
+            var version2 = content.Version;
+            Console.WriteLine($"2 e={((Content) content).VersionPk} p={((Content) content).PublishedVersionPk}");
 
             content.Name = "Text Page 2 ReUpdated";
             content.SetValue("author", "Bob Hope");
             contentService.SaveAndPublishWithStatus(content); // publishes again, creates a version
 
-            var version2 = content.Version;
+            var version3 = content.Version;
+            Console.WriteLine($"3 e={((Content) content).VersionPk} p={((Content) content).PublishedVersionPk}");
+
+            var content1 = contentService.GetById(content.Id);
+            Assert.AreEqual("Bob Hope", content1.GetValue("author"));
+            Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
+
+            content.Name = "Text Page 2 ReReUpdated";
+            content.SetValue("author", "John Farr");
+            contentService.Save(content); // no new version
+
+            content1 = contentService.GetById(content.Id);
+            Assert.AreEqual("John Farr", content1.GetValue("author"));
+            Assert.AreEqual("Bob Hope", content1.GetValue("author", published: true));
 
             versions = contentService.GetVersions(NodeDto.NodeIdSeed + 4).ToList();
-            Assert.AreEqual(2, versions.Count);
+            Assert.AreEqual(3, versions.Count);
 
             // versions come with most recent first
-            Assert.AreEqual(version2, versions[0].Version);
-            Assert.AreEqual(version1, versions[1].Version);
+            Assert.AreEqual(version3, versions[0].Version); // the edited version
+            Assert.AreEqual(version2, versions[1].Version); // the published version
+            Assert.AreEqual(version1, versions[2].Version); // the previously published version
+
+            // p is always the same, published version
+            // e is changing, actual version we're loading
+            Console.WriteLine();
+            foreach (var version in ((IEnumerable<IContent>) versions).Reverse())
+                Console.WriteLine($"+ e={((Content) version).VersionPk} p={((Content) version).PublishedVersionPk}");
 
             // and proper values
-            Assert.AreEqual("Bob Hope", versions[0].GetValue("author"));
-            Assert.AreEqual("Jane Doe", versions[1].GetValue("author", published: true));
+            // first, the current (edited) version, with edited and published versions
+            Assert.AreEqual("John Farr", versions[0].GetValue("author")); // current version has the edited value
+            Assert.AreEqual("Bob Hope", versions[0].GetValue("author", published: true)); // and the published published value
+
+            // then, the current (published) version, with edited == published
+            Assert.AreEqual("Bob Hope", versions[1].GetValue("author")); // own edited version
+            Assert.AreEqual("Bob Hope", versions[1].GetValue("author", published: true)); // and published
+
+            // then, the first published version - with values as 'edited'
+            Assert.AreEqual("Jane Doe", versions[2].GetValue("author")); // own edited version
+            Assert.AreEqual("Bob Hope", versions[2].GetValue("author", published: true)); // and published
         }
 
         [Test]
@@ -1872,22 +1906,24 @@ namespace Umbraco.Tests.Services
             var versions = contentService.GetVersions(NodeDto.NodeIdSeed + 4).ToList();
             Assert.AreEqual(1, versions.Count);
 
+            var version1 = content.Version;
+
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Francis Doe");
 
             // non published = edited
             Assert.IsTrue(content.Edited);
 
-            contentService.SaveAndPublishWithStatus(content); // current version becomes 'published'
+            contentService.SaveAndPublishWithStatus(content); // new version
+            var version2 = content.Version;
+            Assert.AreNotEqual(version1, version2);
 
             Assert.IsTrue(content.Published);
             Assert.IsFalse(content.Edited);
-            Assert.AreEqual("Francis Doe", contentService.GetById(content.Id).GetValue<string>("author")); // version1 author is Francis
+            Assert.AreEqual("Francis Doe", contentService.GetById(content.Id).GetValue<string>("author")); // version2 author is Francis
 
             Assert.AreEqual("Text Page 2 Updated", content.Name);
             Assert.AreEqual("Text Page 2 Updated", content.PublishName);
-
-            var version1 = content.Version;
 
             content.Name = "Text Page 2 ReUpdated";
             content.SetValue("author", "Jane Doe");
@@ -1902,17 +1938,21 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 ReReUpdated";
 
-            contentService.SaveAndPublishWithStatus(content); // saves a version
+            contentService.SaveAndPublishWithStatus(content); // new version
+            var version3 = content.Version;
+            Assert.AreNotEqual(version2, version3);
 
             Assert.IsTrue(content.Published);
             Assert.IsFalse(content.Edited);
-            Assert.AreEqual("Jane Doe", contentService.GetById(content.Id).GetValue<string>("author")); // version2 author is Jane
+            Assert.AreEqual("Jane Doe", contentService.GetById(content.Id).GetValue<string>("author")); // version3 author is Jane
 
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.PublishName);
 
-            var version2 = content.Version;
-            Assert.AreNotEqual(version1, version2);
+            // here we have
+            // version1, first published version
+            // version2, second published version
+            // version3, third and current published version
 
             // rollback all values to version1
             var rollback = contentService.Rollback(NodeDto.NodeIdSeed + 4, version1);
@@ -1920,30 +1960,41 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(rollback);
             Assert.IsTrue(rollback.Published);
             Assert.IsTrue(rollback.Edited);
-            Assert.AreEqual("Francis Doe", contentService.GetById(content.Id).GetValue<string>("author")); // version2 author is now Francis again
+            Assert.AreEqual("Francis Doe", contentService.GetById(content.Id).GetValue<string>("author")); // author is now Francis again
+            Assert.AreEqual(version3, rollback.Version); // same version but with edits
 
-            Assert.AreEqual(version2, rollback.Version); // same version but with edits
+            // props and name have rolled back
             Assert.AreEqual("Francis Doe", rollback.GetValue<string>("author"));
-            Assert.AreEqual("Text Page 2 Updated", rollback.Name); // and the name has rolled back too
+            Assert.AreEqual("Text Page 2 Updated", rollback.Name);
 
-            // can rollback to current too (clears changes)
-            var rollback2 = contentService.Rollback(NodeDto.NodeIdSeed + 4, version2);
+            // published props and name are still there
+            Assert.AreEqual("Jane Doe", rollback.GetValue<string>("author", true));
+            Assert.AreEqual("Text Page 2 ReReUpdated", rollback.PublishName);
 
-            Assert.IsTrue(rollback2.Published); // because current was published
+            // rollback all values to current version
+            // special because... current has edits... this really is equivalent to rolling back to version2
+            var rollback2 = contentService.Rollback(NodeDto.NodeIdSeed + 4, version3);
+
+            Assert.IsTrue(rollback2.Published);
             Assert.IsFalse(rollback2.Edited); // all changes cleared!
 
-            // fixme - also test name here
+            Assert.AreEqual("Jane Doe", rollback2.GetValue<string>("author"));
+            Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
 
+            // test rollback to self, again
             content = contentService.GetById(content.Id);
-            Assert.AreEqual("Jane Doe", content.GetValue<string>("author")); // Francis was not published, so back to Jane
+            Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
+            Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
             contentService.SaveAndPublishWithStatus(content);
             Assert.IsFalse(content.Edited);
-            content.SetValue("author", "Bob Doe"); // changed to Bob
+            content.Name = "Xxx";
+            content.SetValue("author", "Bob Doe");
             contentService.Save(content);
             Assert.IsTrue(content.Edited);
             content = contentService.Rollback(content.Id, content.Version);
             Assert.IsFalse(content.Edited);
-            Assert.AreEqual("Jane Doe", content.GetValue("author")); // back to Jane
+            Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
+            Assert.AreEqual("Jane Doe", content.GetValue("author"));
         }
 
         [Test]

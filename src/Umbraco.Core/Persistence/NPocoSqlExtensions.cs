@@ -6,7 +6,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using NPoco;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -18,9 +17,48 @@ namespace Umbraco.Core.Persistence
         // when doing "sql = sql.Where(...)" actually append to, and return, the original Sql, not
         // a new one.
 
-        #region Alias
+        #region Special extensions
 
-        // would love to implement per-column alias in select, where, etc...
+        /// <summary>
+        /// Provides a mean to express aliases in SELECT Sql statements.
+        /// </summary>
+        /// <remarks>
+        /// <para>First register with <c>using static Umbraco.Core.Persistence.NPocoSqlExtensions.Aliaser</c>,
+        /// then use eg <c>Sql{Foo}(x => Alias(x.Id, "id"))</c>.</para>
+        /// </remarks>
+        public static class Statics
+        {
+            /// <summary>
+            /// Aliases a field.
+            /// </summary>
+            /// <param name="field">The field to alias.</param>
+            /// <param name="alias">The alias.</param>
+            public static object Alias(object field, string alias) => field;
+
+            /// <summary>
+            /// Produces Sql text.
+            /// </summary>
+            /// <param name="field">The name of the field.</param>
+            /// <param name="expr">A function producing Sql text.</param>
+            public static T SqlText<T>(string field,  Func<string, string> expr) => default;
+
+            /// <summary>
+            /// Produces Sql text.
+            /// </summary>
+            /// <param name="field1">The name of the first field.</param>
+            /// <param name="field2">The name of the second field.</param>
+            /// <param name="expr">A function producing Sql text.</param>
+            public static T SqlText<T>(string field1, string field2, Func<string, string, string> expr) => default;
+
+            /// <summary>
+            /// Produces Sql text.
+            /// </summary>
+            /// <param name="field1">The name of the first field.</param>
+            /// <param name="field2">The name of the second field.</param>
+            /// <param name="field3">The name of the third field.</param>
+            /// <param name="expr">A function producing Sql text.</param>
+            public static T SqlText<T>(string field1, string field2, string field3, Func<string, string, string, string> expr) => default;
+        }
 
         #endregion
 
@@ -32,6 +70,7 @@ namespace Umbraco.Core.Persistence
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
         /// <param name="predicate">A predicate to transform and append to the Sql statement.</param>
+        /// <param name="alias">An optional alias for the table.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Where<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, bool>> predicate, string alias = null)
         {
@@ -146,6 +185,58 @@ namespace Umbraco.Core.Persistence
             return sql;
         }
 
+        /// <summary>
+        /// Appends multiple OR WHERE clauses to the Sql statement.
+        /// </summary>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="predicates">The WHERE predicates.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereAny(this Sql<ISqlContext> sql, params Func<Sql<ISqlContext>, Sql<ISqlContext>>[] predicates)
+        {
+            var wsql = new Sql<ISqlContext>(sql.SqlContext);
+
+            wsql.Append("(");
+            for (var i = 0; i < predicates.Length; i++)
+            {
+                if (i > 0)
+                    wsql.Append(") OR (");
+                var temp = new Sql<ISqlContext>(sql.SqlContext);
+                temp = predicates[i](temp);
+                wsql.Append(temp.SQL.TrimStart("WHERE "), temp.Arguments);
+            }
+            wsql.Append(")");
+
+            return sql.Where(wsql.SQL, wsql.Arguments);
+        }
+
+        /// <summary>
+        /// Appends a WHERE NOT NULL clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">Expression specifying the field.</param>
+        /// <param name="tableAlias">An optional alias for the table.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereNotNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string tableAlias = null)
+        {
+            return sql.WhereNull(field, tableAlias, true);
+        }
+
+        /// <summary>
+        /// Appends a WHERE [NOT] NULL clause to the Sql statement.
+        /// </summary>
+        /// <typeparam name="TDto">The type of the Dto.</typeparam>
+        /// <param name="sql">The Sql statement.</param>
+        /// <param name="field">Expression specifying the field.</param>
+        /// <param name="tableAlias">An optional alias for the table.</param>
+        /// <param name="not">A value indicating whether to NOT NULL.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> WhereNull<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string tableAlias = null, bool not = false)
+        {
+            var column = sql.GetColumns(columnExpressions: new[] { field }, tableAlias: tableAlias, withAlias: false).First();
+            return sql.Where("(" + column + " IS " + (not ? "NOT " : "") + "NULL)");
+        }
+
         #endregion
 
         #region From
@@ -183,7 +274,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.OrderBy("(" + GetFieldName(field, sql.SqlContext.SqlSyntax) + ")"); // fixme - explain (...)
+            return sql.OrderBy("(" + GetFieldName(field, sql.SqlContext.SqlSyntax) + ")");
         }
 
         /// <summary>
@@ -210,7 +301,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> OrderByDescending<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field)
         {
-            return sql.OrderBy("(" + GetFieldName(field, sql.SqlContext.SqlSyntax) + ") DESC"); // fixme - explain (...)
+            return sql.OrderBy("(" + GetFieldName(field, sql.SqlContext.SqlSyntax) + ") DESC");
         }
 
         /// <summary>
@@ -510,16 +601,19 @@ namespace Umbraco.Core.Persistence
         }
 
         /// <summary>
-        /// Creates a SELECT Sql statement for an aliased column.
+        /// Creates a SELECT Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
         /// <param name="sql">The origin sql.</param>
-        /// <param name="field">Expression indicating the column to select.</param>
-        /// <param name="alias">The column alias</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> SelectAs<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string alias)
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> Select<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object>>[] fields)
         {
-            return sql.Select(string.Join(", ", sql.GetColumns(columnExpressions: new[] { field }, withAlias: false)) + " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias));
+            return sql.Select(sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields));
         }
 
         /// <summary>
@@ -537,17 +631,21 @@ namespace Umbraco.Core.Persistence
             return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields)));
         }
 
+
         /// <summary>
-        /// Adds an aliased column to a SELECT Sql statement.
+        /// Adds columns to a SELECT Sql statement.
         /// </summary>
         /// <typeparam name="TDto">The type of the DTO to select.</typeparam>
         /// <param name="sql">The origin sql.</param>
-        /// <param name="field">Expression indicating the column to select.</param>
-        /// <param name="alias">The column alias</param>
+        /// <param name="tableAlias">A table alias.</param>
+        /// <param name="fields">Expressions indicating the columns to select.</param>
         /// <returns>The Sql statement.</returns>
-        public static Sql<ISqlContext> AndSelectAs<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string alias)
+        /// <remarks>
+        /// <para>If <paramref name="fields"/> is empty, all columns are selected.</para>
+        /// </remarks>
+        public static Sql<ISqlContext> AndSelect<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object>>[] fields)
         {
-            return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: new[] { field }, withAlias: false)) + " AS " + sql.SqlContext.SqlSyntax.GetQuotedColumnName(alias));
+            return sql.Append(", " + string.Join(", ", sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields)));
         }
 
         /// <summary>
@@ -632,7 +730,7 @@ namespace Umbraco.Core.Persistence
             /// <returns>A SqlRef statement.</returns>
             public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>> field, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> reference = null)
             {
-                var property = field == null ? null : ExpressionHelper.FindProperty(field) as PropertyInfo;
+                var property = field == null ? null : ExpressionHelper.FindProperty(field).Item1 as PropertyInfo;
                 return Select(property, tableAlias, reference);
             }
 
@@ -662,7 +760,7 @@ namespace Umbraco.Core.Persistence
             /// </remarks>
             public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> field, string tableAlias, Func<SqlRef<TRefDto>, SqlRef<TRefDto>> reference = null)
             {
-                var property = field == null ? null : ExpressionHelper.FindProperty(field) as PropertyInfo;
+                var property = field == null ? null : ExpressionHelper.FindProperty(field).Item1 as PropertyInfo;
                 return Select(property, tableAlias, reference);
             }
 
@@ -796,21 +894,38 @@ namespace Umbraco.Core.Persistence
             var tableName = tableAlias ?? pd.TableInfo.TableName;
             var queryColumns = pd.QueryColumns;
 
+            Dictionary<string, string> aliases = null;
+
             if (columnExpressions != null && columnExpressions.Length > 0)
             {
                 var names = columnExpressions.Select(x =>
                 {
-                    var field = ExpressionHelper.FindProperty(x) as PropertyInfo;
+                    (var member, var alias) = ExpressionHelper.FindProperty(x);
+                    var field = member as PropertyInfo;
                     var fieldName = field.GetColumnName();
+                    if (alias != null)
+                    {
+                        if (aliases == null)
+                            aliases = new Dictionary<string, string>();
+                        aliases[fieldName] = alias;
+                    }
                     return fieldName;
                 }).ToArray();
 
                 queryColumns = queryColumns.Where(x => names.Contains(x.Key)).ToArray();
             }
 
+            string GetAlias(PocoColumn column)
+            {
+                if (aliases != null && aliases.TryGetValue(column.ColumnName, out var alias))
+                    return alias;
+
+                return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
+            }
+
             return queryColumns.Select(x => (object) GetColumn(sql.SqlContext.DatabaseType,
                 tableName, x.Value.ColumnName,
-                withAlias ? (string.IsNullOrEmpty(x.Value.ColumnAlias) ? x.Value.MemberInfoKey : x.Value.ColumnAlias) : null,
+                GetAlias(x.Value),
                 referenceName)).ToArray();
         }
 
@@ -844,7 +959,7 @@ namespace Umbraco.Core.Persistence
 
         private static string GetFieldName<TDto>(Expression<Func<TDto, object>> fieldSelector, ISqlSyntaxProvider sqlSyntax)
         {
-            var field = ExpressionHelper.FindProperty(fieldSelector) as PropertyInfo;
+            var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
             var fieldName = field.GetColumnName();
 
             var type = typeof (TDto);

@@ -105,15 +105,15 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyDataDtos.Add(BuildDto(publishedVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.PublishedValue));
 
                         // deal with edit value
-                        if (propertyValue.EditValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditValue));
+                        if (propertyValue.EditedValue != null)
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditedValue));
 
                         // deal with missing edit value (fix inconsistencies)
                         else if (propertyValue.PublishedValue != null)
                             propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.PublishedValue));
 
                         // use explicit equals here, else object comparison fails at comparing eg strings
-                        var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditValue);
+                        var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
                         edited |= !sameValues;
                     }
                 }
@@ -122,8 +122,8 @@ namespace Umbraco.Core.Persistence.Factories
                     foreach (var propertyValue in property.Values)
                     {
                         // not publishing = only deal with edit values
-                        if (propertyValue.EditValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditValue));
+                        if (propertyValue.EditedValue != null)
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditedValue));
                     }
                     edited = true;
                 }

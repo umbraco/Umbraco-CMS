@@ -349,6 +349,64 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 .Where(clause => string.IsNullOrEmpty(clause) == false));
         }
 
+        public virtual string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls)
+        {
+            var sql = new StringBuilder();
+            sql.Append(FormatString(column));
+            sql.Append(" ");
+            sql.Append(FormatType(column));
+            sql.Append(" ");
+            sql.Append("NULL"); // always nullable
+            sql.Append(" ");
+            sql.Append(FormatConstraint(column));
+            sql.Append(" ");
+            sql.Append(FormatDefaultValue(column));
+            sql.Append(" ");
+            sql.Append(FormatPrimaryKey(column));
+            sql.Append(" ");
+            sql.Append(FormatIdentity(column));
+
+            var isNullable = column.IsNullable;
+
+            //var constraint = FormatConstraint(column)?.TrimStart("CONSTRAINT ");
+            //var hasConstraint = !string.IsNullOrWhiteSpace(constraint);
+
+            //var defaultValue = FormatDefaultValue(column);
+            //var hasDefaultValue = !string.IsNullOrWhiteSpace(defaultValue);
+
+            if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
+            {
+                sqls = Enumerable.Empty<string>();
+                return sql.ToString();
+            }
+
+            var msql = new List<string>();
+            sqls = msql;
+
+            var alterSql = new StringBuilder();
+            alterSql.Append(FormatString(column));
+            alterSql.Append(" ");
+            alterSql.Append(FormatType(column));
+            alterSql.Append(" ");
+            alterSql.Append(FormatNullable(column));
+            //alterSql.Append(" ");
+            //alterSql.Append(FormatPrimaryKey(column));
+            //alterSql.Append(" ");
+            //alterSql.Append(FormatIdentity(column));
+            msql.Add(string.Format(AlterColumn, tableName, alterSql));
+
+            //if (hasConstraint)
+            //{
+            //    var dropConstraintSql = string.Format(DeleteConstraint, tableName, constraint);
+            //    msql.Add(dropConstraintSql);
+            //    var constraintType = hasDefaultValue ? defaultValue : "";
+            //    var createConstraintSql = string.Format(CreateConstraint, tableName, constraint, constraintType, FormatString(column));
+            //    msql.Add(createConstraintSql);
+            //}
+
+            return sql.ToString();
+        }
+
         public virtual string FormatPrimaryKey(TableDefinition table)
         {
             var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);

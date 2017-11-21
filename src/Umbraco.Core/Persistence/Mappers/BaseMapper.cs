@@ -46,14 +46,14 @@ namespace Umbraco.Core.Persistence.Mappers
         internal DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
         {
             var source = ExpressionHelper.FindProperty(sourceMember);
-            var destination = (PropertyInfo)ExpressionHelper.FindProperty(destinationMember);
+            var destination = (PropertyInfo) ExpressionHelper.FindProperty(destinationMember).Item1;
 
             if (destination == null)
             {
                 throw new InvalidOperationException("The 'destination' returned was null, cannot resolve the mapping");
             }
 
-            return new DtoMapModel(typeof(TDestination), destination, source.Name);
+            return new DtoMapModel(typeof(TDestination), destination, source.Item1.Name);
         }
 
         internal virtual string GetColumnName(ISqlSyntaxProvider sqlSyntax, Type dtoType, PropertyInfo dtoProperty)

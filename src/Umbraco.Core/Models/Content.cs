@@ -265,7 +265,7 @@ namespace Umbraco.Core.Models
             _publishedState = PublishedState.Publishing;
         }
 
-        internal virtual void RollbackValues(IContentBase other)
+        internal virtual void CopyValues(IContentBase other, bool published = false)
         {
             // clear all existing properties
             ClearEditValues(null, null);
@@ -275,15 +275,15 @@ namespace Umbraco.Core.Models
             foreach (var otherProperty in otherProperties)
             {
                 var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, otherProperty.GetValue(true));
+                SetValue(alias, otherProperty.GetValue(published));
             }
         }
 
-        internal virtual void RollbackValues(IContentBase other, int? nLanguageId)
+        internal virtual void CopyValues(IContentBase other, int? nLanguageId, bool published = false)
         {
             if (!nLanguageId.HasValue)
             {
-                RollbackValues(other);
+                CopyValues(other);
                 return;
             }
 
@@ -297,15 +297,15 @@ namespace Umbraco.Core.Models
             foreach (var otherProperty in otherProperties)
             {
                 var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, languageId, otherProperty.GetValue(languageId, true));
+                SetValue(alias, languageId, otherProperty.GetValue(languageId, published));
             }
         }
 
-        internal virtual void RollbackValues(IContentBase other, int? nLanguageId, string segment)
+        internal virtual void CopyValues(IContentBase other, int? nLanguageId, string segment, bool published = false)
         {
             if (segment == null)
             {
-                RollbackValues(other, nLanguageId);
+                CopyValues(other, nLanguageId, published);
                 return;
             }
 
@@ -322,7 +322,7 @@ namespace Umbraco.Core.Models
             foreach (var otherProperty in otherProperties)
             {
                 var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, languageId, segment, otherProperty.GetValue(languageId, segment, true));
+                SetValue(alias, languageId, segment, otherProperty.GetValue(languageId, segment, published));
             }
         }
 
@@ -345,7 +345,7 @@ namespace Umbraco.Core.Models
                         property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
         }
 
-        internal virtual void RollbackAllValues(IContentBase other)
+        internal virtual void CopyAllValues(IContentBase other, bool published = false)
         {
             // clear all existing properties
             ClearEditValues();
@@ -358,12 +358,13 @@ namespace Umbraco.Core.Models
                 foreach (var pvalue in otherProperty.Values)
                 {
                     // fixme can we update SetValue to accept null lang/segment and fallback?
+                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                     if (!pvalue.LanguageId.HasValue)
-                        SetValue(alias, pvalue.PublishedValue);
+                        SetValue(alias, value);
                     else if (pvalue.Segment == null)
-                        SetValue(alias, pvalue.LanguageId.Value, pvalue.PublishedValue);
+                        SetValue(alias, pvalue.LanguageId.Value, value);
                     else
-                        SetValue(alias, pvalue.LanguageId.Value, pvalue.Segment, pvalue.PublishedValue);
+                        SetValue(alias, pvalue.LanguageId.Value, pvalue.Segment, value);
                 }
             }
         }
@@ -430,6 +431,7 @@ namespace Umbraco.Core.Models
             var clone = (Content)DeepClone();
             clone.Key = Guid.Empty;
             clone.Version = Guid.NewGuid();
+            clone.VersionPk = clone.PublishedVersionPk = 0;
             clone.ResetIdentity();
 
             foreach (var property in clone.Properties)
