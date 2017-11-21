@@ -11,7 +11,6 @@
   margin: 50px 0 0 0;
   border: 2px solid @gray-7;
   border-radius: 0 10px 10px 10px;
-  position: relative;
   padding: 10px 10px 5px 10px;
   box-sizing: border-box;
 }
@@ -34,6 +33,7 @@
   border: 1px dashed @gray-8;
   color: @turquoise-d1;
   font-weight: bold;
+  position: relative;
 }
 
 .umb-group-builder__group.-sortable {
@@ -67,16 +67,18 @@
 }
 
 .umb-group-builder__group-title-wrapper {
-  position: absolute;
-  left: -2px;
-  top: -45px;
   display: flex;
   align-items: center;
+  margin-left: -12px;
+  margin-top: -55px;
 }
 
 .umb-group-builder__group-title-wrapper.-placeholder {
+  position: absolute;
   left: -1px;
   top: -44px;
+  margin-left: 0;
+  margin-top: 0;
 }
 
 .umb-group-builder__group-title {
