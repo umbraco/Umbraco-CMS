@@ -32,7 +32,7 @@
                 "content": "<p>This is the <b>Tree</b> and is the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b> and here you can navigate the content of your website.</p>"
             },
             {
-                "element": "[data-element='editor-content']",
+                "element": "[data-element='editor-container']",
                 "elementPreventClick": true,
                 "title": "Dashboards",
                 "content": "<p>A dashboard is the main view you are presented with when entering a section within the backoffice, and can be used to show valuable information to the users of the system.</p><p>Notice that some sections have multiple dashboards.</p>"
@@ -410,7 +410,7 @@
                 content: "...and information about when the media item has been created and edited."
             },
             {
-                element: "[data-element='editor-content']",
+                element: "[data-element='editor-container']",
                 title: "Using media items",
                 content: "You can reference a media item directly in a template by using the path or try adding a Media Picker to a document type property so you can select media items from the content section."
             }
