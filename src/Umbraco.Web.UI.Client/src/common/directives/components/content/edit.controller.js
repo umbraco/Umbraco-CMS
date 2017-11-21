@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
 
     var evts = [];
 
@@ -16,7 +16,7 @@
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
-    $scope.page.buttonGroupState = "init";
+    $scope.page.buttonGroupState = "init";    
     $scope.allowOpen = true;
 
 
@@ -251,6 +251,77 @@
       }
 
     };
+
+    $scope.restore = function (content) {
+
+      $scope.page.buttonRestore = "busy";
+
+      relationResource.getByChildId(content.id, "relateParentDocumentOnDelete").then(function (data) {
+
+        var relation = null;
+        var target = null;
+        var error = { headline: "Cannot automatically restore this item", content: "Use the Move menu item to move it manually"};
+
+        if (data.length == 0) {
+          notificationsService.error(error.headline, "There is no 'restore' relation found for this node. Use the Move menu item to move it manually.");
+          $scope.page.buttonRestore = "error";
+          return;
+        }
+
+        relation = data[0];
+
+        if (relation.parentId == -1) {
+          target = { id: -1, name: "Root" };
+          moveNode(content, target);
+        } else {
+          contentResource.getById(relation.parentId).then(function (data) {
+            target = data;
+
+            // make sure the target item isn't in the recycle bin
+            if(target.path.indexOf("-20") !== -1) {
+              notificationsService.error(error.headline, "The item you want to restore it under (" + target.name + ") is in the recycle bin. Use the Move menu item to move the item manually.");
+              $scope.page.buttonRestore = "error";              
+              return;
+            }
+
+            moveNode(content, target);
+
+          }, function (err) {
+            $scope.page.buttonRestore = "error";
+            notificationsService.error(error.headline, error.content);
+          });
+        }
+
+      }, function (err) {
+        $scope.page.buttonRestore = "error";
+        notificationsService.error(error.headline, error.content);
+      });
+
+
+    };
+
+    function moveNode(node, target) {
+
+      contentResource.move({ "parentId": target.id, "id": node.id })
+        .then(function (path) {
+
+          // remove the node that we're working on
+          if($scope.page.menu.currentNode) {
+            treeService.removeNode($scope.page.menu.currentNode);
+          }
+
+          // sync the destination node
+          navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+
+          $scope.page.buttonRestore = "success";
+          notificationsService.success("Successfully restored " + node.name + " to " + target.name);
+
+        }, function (err) {
+          $scope.page.buttonRestore = "error";
+          notificationsService.error("Cannot automatically restore this item", err);
+        });
+
+    }
 
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {

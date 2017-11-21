@@ -61,7 +61,7 @@
             <umb-editor-footer-content-right>
                 
                 <umb-button
-                  alias="returnToListView"
+                    alias="returnToListView"
                     ng-if="page.listViewPath"
                     type="link"
                     href="#{{page.listViewPath}}"
@@ -70,7 +70,7 @@
                 </umb-button>
 
                 <umb-button
-                  alias="preview"
+                    alias="preview"
                     ng-if="!page.isNew && content.allowPreview"
                     type="button"
                     button-style="info"
@@ -80,13 +80,23 @@
                 </umb-button>
 
                 <umb-button-group
-                    ng-if="defaultButton"
+                    ng-if="defaultButton && !content.trashed"
                     default-button="defaultButton"
                     sub-buttons="subButtons"
                     state="page.buttonGroupState"
                     direction="up"
                     float="right">
                 </umb-button-group>
+
+                <umb-button
+                    alias="restore"
+                    ng-if="content.trashed"
+                    type="button"
+                    button-style="primary"
+                    action="restore(content)"
+                    state="page.buttonRestore"
+                    label="Restore">
+                </umb-button>
 
             </umb-editor-footer-content-right>
 
