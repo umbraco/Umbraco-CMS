@@ -34,7 +34,7 @@
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
-        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{$index}}">
+        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
             <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
@@ -110,7 +110,7 @@
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
 
-                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
+                    <li data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
                         <a href=""

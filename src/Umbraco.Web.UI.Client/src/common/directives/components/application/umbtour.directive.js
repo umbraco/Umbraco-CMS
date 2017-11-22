@@ -135,11 +135,12 @@
                     }
 
                     var scrollParent = element.scrollParent();
+                    var scrollToCenterOfContainer = element[0].offsetTop - (scrollParent[0].clientHeight / 2 ) + (element[0].clientHeight / 2);
 
                     // Detect if scroll is needed
                     if (element[0].offsetTop > scrollParent[0].clientHeight) {
                         scrollParent.animate({
-                            scrollTop: element[0].offsetTop
+                            scrollTop: scrollToCenterOfContainer
                         }, function () {
                             // Animation complete.
                             setPopoverPosition(element);
