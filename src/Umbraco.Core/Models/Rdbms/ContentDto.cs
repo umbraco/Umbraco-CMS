@@ -21,13 +21,6 @@ namespace Umbraco.Core.Models.Rdbms
         [ForeignKey(typeof(ContentTypeDto), Column = "NodeId")]
         public int ContentTypeId { get; set; }
 
-        [Column("writerUserId")]
-        public int WriterUserId { get; set; }
-
-        [Column("updateDate")]
-        [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime UpdateDate { get; set; }
-
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }

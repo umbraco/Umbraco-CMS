@@ -7,12 +7,14 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a Language
+    /// Represents a Language.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     public class Language : Entity, ILanguage
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
         private string _isoCode;
         private string _cultureName;
 
@@ -21,8 +23,7 @@ namespace Umbraco.Core.Models
             IsoCode = isoCode;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo IsoCodeSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.IsoCode);
@@ -35,8 +36,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string IsoCode
         {
-            get { return _isoCode; }
-            set { SetPropertyValueAndDetectChanges(value, ref _isoCode, Ps.Value.IsoCodeSelector); }
+            get => _isoCode;
+            set => SetPropertyValueAndDetectChanges(value, ref _isoCode, Ps.Value.IsoCodeSelector);
         }
 
         /// <summary>
@@ -45,17 +46,14 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string CultureName
         {
-            get { return _cultureName; }
-            set { SetPropertyValueAndDetectChanges(value, ref _cultureName, Ps.Value.CultureNameSelector); }
+            get => _cultureName;
+            set => SetPropertyValueAndDetectChanges(value, ref _cultureName, Ps.Value.CultureNameSelector);
         }
 
         /// <summary>
         /// Returns a <see cref="CultureInfo"/> object for the current Language
         /// </summary>
         [IgnoreDataMember]
-        public CultureInfo CultureInfo
-        {
-            get { return CultureInfo.GetCultureInfo(IsoCode); }
-        }
+        public CultureInfo CultureInfo => CultureInfo.GetCultureInfo(IsoCode);
     }
 }

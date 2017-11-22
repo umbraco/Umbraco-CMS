@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -28,6 +29,30 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             MigratePropertyData();
             MigrateContent();
             MigrateVersions();
+
+            Execute.Code(context =>
+            {
+                if (context.Database.Fetch<dynamic>(@"SELECT uContentVersion.nodeId, COUNT(uContentVersion.id)
+FROM uContentVersion
+JOIN uDocumentVersion ON uContentVersion.id=uDocumentVersion.id
+WHERE uDocumentVersion.published=1
+GROUP BY uContentVersion.nodeId
+HAVING COUNT(uContentVersion.id) > 1").Any())
+                {
+                    Debugger.Break();
+                    throw new Exception("Migration failed: duplicate 'published' document versions.");
+                }
+                if (context.Database.Fetch<dynamic>(@"SELECT v1.nodeId, v1.id, COUNT(v2.id)
+FROM uContentVersion v1
+LEFT JOIN uContentVersion v2 ON v1.nodeId=v2.nodeId AND v2.[current]=1
+GROUP BY v1.nodeId, v1.id
+HAVING COUNT(v2.id) <> 1").Any())
+                {
+                    Debugger.Break();
+                    throw new Exception("Migration failed: missing or duplicate 'current' content versions.");
+                }
+                return string.Empty;
+            });
 
             // re-create *all* keys and indexes
             //Create.KeysAndIndexes<PropertyDataDto>();
@@ -92,32 +117,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             // rename columns
             if (ColumnExists(PreTables.Content, "contentType"))
                 ReplaceColumn<ContentDto>(PreTables.Content, "contentType", "contentTypeId");
-
-            // add columns
-            // fixme - why? why cannot we do it with the current version? we don't need those two columns!
-            if (!ColumnExists(PreTables.Content, "writerUserId"))
-            {
-                AddColumn<ContentDto>(PreTables.Content, "writerUserId", out var sqls);
-                Execute.Sql($"UPDATE {PreTables.Content} SET writerUserId=0");
-                foreach (var sql in sqls) Execute.Sql(sql);
-            }
-            if (!ColumnExists(PreTables.Content, "updateDate"))
-            {
-                AddColumn<ContentDto>(PreTables.Content, "updateDate", out var sqls);
-                var getDate = Context.SqlContext.DatabaseType.IsMySql() ? "CURRENT_TIMESTAMP" : "GETDATE()"; // sqlSyntax should do it!
-                Execute.Sql($"UPDATE {PreTables.Content} SET updateDate=" + getDate);
-                foreach (var sql in sqls) Execute.Sql(sql);
-            }
-
-            // copy data for added columns
-            Execute.Code(context =>
-            {
-                // SQLCE does not support UPDATE...FROM
-                var temp = context.Database.Fetch<dynamic>($"SELECT nodeId, documentUser, updateDate FROM {PreTables.Document} WHERE newest=1");
-                foreach (var t in temp)
-                    context.Database.Execute($@"UPDATE {PreTables.Content} SET writerUserId=@userId, updateDate=@updateDate", new { userId = t.documentUser, updateDate = t.updateDate });
-                return string.Empty;
-            });
 
             // drop columns
             if (ColumnExists(PreTables.Content, "pk"))
@@ -196,32 +195,43 @@ WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName
             Execute.Sql($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
 SELECT cver.id, doc.templateId, doc.published
 FROM {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
-JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.versionId=cver.versionId");
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId");
 
             // need to add extra rows for where published=newest
             // 'cos INSERT above has inserted the 'published' document version
             // and v8 always has a 'edited' document version too
             Execute.Code(context =>
             {
-                var temp = context.Database.Fetch<dynamic>($@"SELECT doc.nodeId, doc.versionId, doc.updateDate, doc.documentUser, doc.text, doc.templateId
+                var temp = context.Database.Fetch<dynamic>($@"SELECT doc.nodeId, doc.updateDate, doc.documentUser, doc.text, doc.templateId, cver.id versionId
 FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
+JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId
 WHERE doc.newest=1 AND doc.published=1");
+                var getIdentity = context.SqlContext.DatabaseType.IsMySql()
+                    ? "LAST_INSERT_ID()"
+                    : "@@@@IDENTITY";
                 foreach (var t in temp)
                 {
                     context.Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} (nodeId, versionId, versionDate, userId, {SqlSyntax.GetQuotedColumnName("current")}, text)
-VALUES (@nodeId, @versionId, @versionDate, @userId, 1, @text)", new { nodeId=t.nodeId, versionId= Guid.NewGuid(), versionDate=t.updateDate, userId=t.documentUser, text=t.text });
-                    var id = context.Database.ExecuteScalar<int>($@"SELECT @@@@IDENTITY"); // fixme mysql
+VALUES (@nodeId, @versionId, @versionDate, @userId, 1, @text)", new { nodeId=t.nodeId, versionId=Guid.NewGuid(), versionDate=t.updateDate, userId=t.documentUser, text=t.text });
+                    var id = context.Database.ExecuteScalar<int>("SELECT " + getIdentity);
+                    context.Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} SET {SqlSyntax.GetQuotedColumnName("current")}=0 WHERE nodeId=@0 AND id<>@1", (int) t.nodeId, id);
                     context.Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
-VALUES (@id, @templateId, 1)", new { id=id, templateId=t.templateId });
+VALUES (@id, @templateId, 0)", new { id=id, templateId=t.templateId });
+
+                    var versionId = (int) t.versionId;
+                    var pdatas = context.Database.Fetch<PropertyDataDto>(Sql().Select<PropertyDataDto>().From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId));
+                    foreach (var pdata in pdatas)
+                    {
+                        pdata.VersionId = id;
+                        context.Database.Insert(pdata);
+                    }
                 }
                 return string.Empty;
             });
 
-            // fixme these extra rows need propertydata too!
-
             // reduce document to 1 row per content
             Execute.Sql($@"DELETE FROM {PreTables.Document}
-WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE {SqlSyntax.GetQuotedColumnName("current")} = 1)");
+WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE {SqlSyntax.GetQuotedColumnName("current")} = 1) AND (published<>1 OR newest<>1)");
 
             // drop some document columns
             Delete.Column("text").FromTable(PreTables.Document);

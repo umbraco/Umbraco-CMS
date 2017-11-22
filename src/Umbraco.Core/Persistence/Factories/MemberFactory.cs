@@ -34,9 +34,9 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Trashed = nodeDto.Trashed;
 
                 content.CreatorId = nodeDto.UserId ?? 0;
-                content.WriterId = dto.ContentDto.WriterUserId;
+                content.WriterId = contentVersionDto.UserId;
                 content.CreateDate = nodeDto.CreateDate;
-                content.UpdateDate = dto.ContentDto.UpdateDate;
+                content.UpdateDate = contentVersionDto.VersionDate;
 
                 content.ProviderUserKey = content.Key; // fixme explain
 
@@ -76,8 +76,6 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 ContentTypeId = entity.ContentTypeId,
-                WriterUserId = entity.WriterId,
-                UpdateDate = entity.UpdateDate,
 
                 NodeDto = BuildNodeDto(entity, objectType)
             };

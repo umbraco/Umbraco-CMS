@@ -740,7 +740,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 case "UPDATER":
                     // fixme orders by id not letter = bad
-                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "writerUserId");
+                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.ContentVersion, "userId");
                 case "PUBLISHED":
                     // fixme kill
                     return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "published");

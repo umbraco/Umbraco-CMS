@@ -34,9 +34,9 @@ namespace Umbraco.Core.Persistence.Factories
                 content.Trashed = nodeDto.Trashed;
 
                 content.CreatorId = nodeDto.UserId ?? 0;
-                content.WriterId = dto.WriterUserId;
+                content.WriterId = contentVersionDto.UserId;
                 content.CreateDate = nodeDto.CreateDate;
-                content.UpdateDate = dto.UpdateDate;
+                content.UpdateDate = contentVersionDto.VersionDate;
 
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
@@ -64,8 +64,6 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 NodeId = entity.Id,
                 ContentTypeId = entity.ContentTypeId,
-                WriterUserId = entity.WriterId,
-                UpdateDate = entity.UpdateDate,
 
                 NodeDto = BuildNodeDto(entity, objectType)
             };
