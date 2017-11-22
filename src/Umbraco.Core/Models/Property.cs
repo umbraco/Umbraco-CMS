@@ -20,8 +20,7 @@ namespace Umbraco.Core.Models
 
         private List<PropertyValue> _values = new List<PropertyValue>();
         private PropertyValue _pvalue;
-        private Dictionary<int, PropertyValue> _lvalues;
-        private Dictionary<int, Dictionary<string, PropertyValue>> _svalues;
+        private Dictionary<(int?, string), PropertyValue> _vvalues;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -95,12 +94,7 @@ namespace Umbraco.Core.Models
 
                 _pvalue = value.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
 
-                _lvalues = value.Where(x => x.LanguageId.HasValue && x.Segment == null)
-                    .ToDictionary(x => x.LanguageId.Value, x => x);
-
-                _svalues = value.Where(x => x.LanguageId.HasValue && x.Segment != null)
-                    .GroupBy(x => x.LanguageId.Value)
-                    .ToDictionary(x => x.Key, x => x.ToDictionary(y => y.Segment, y => y));
+                _vvalues = value.ToDictionary(x => (x.LanguageId, x.Segment), x => x);
             }
         }
 
@@ -146,22 +140,34 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the culture value.
         /// </summary>
-        public object GetValue(int languageId, bool published = false)
+        public object GetValue(int? languageId, bool published = false)
         {
-            if (_lvalues == null) return null;
-            if (!_lvalues.TryGetValue(languageId, out var pvalue)) return null;
-            return GetPropertyValue(pvalue, published);
+            if (_vvalues == null) return null;
+            return _vvalues.TryGetValue((languageId, null), out var pvalue)
+                ? GetPropertyValue(pvalue, published)
+                : null;
         }
 
         /// <summary>
         /// Gets the segment value.
         /// </summary>
-        public object GetValue(int languageId, string segment, bool published = false)
+        public object GetValue(string segment, bool published = false)
         {
-            if (_svalues == null) return null;
-            if (!_svalues.TryGetValue(languageId, out var svalues)) return null;
-            if (!svalues.TryGetValue(segment, out var pvalue)) return null;
-            return GetPropertyValue(pvalue, published);
+            if (_vvalues == null) return null;
+            return _vvalues.TryGetValue((null, segment), out var pvalue)
+                ? GetPropertyValue(pvalue, published)
+                : null;
+        }
+
+        /// <summary>
+        /// Gets the culture+segment value.
+        /// </summary>
+        public object GetValue(int? languageId, string segment, bool published = false)
+        {
+            if (_vvalues == null) return null;
+            return _vvalues.TryGetValue((languageId, segment), out var pvalue)
+                ? GetPropertyValue(pvalue, published)
+                : null;
         }
 
         private object GetPropertyValue(PropertyValue pvalue, bool published)
@@ -171,42 +177,9 @@ namespace Umbraco.Core.Models
                 : pvalue.EditedValue;
         }
 
-        internal void PublishValues()
+        internal void PublishValues(int? languageId, string segment)
         {
-            (var pvalue, _) = GetPropertyValue(false);
-            if (pvalue == null) return;
-            PublishPropertyValue(pvalue);
-        }
-
-        internal void PublishValues(int? nLanguageId)
-        {
-            if (nLanguageId == null)
-            {
-                PublishValues();
-                return;
-            }
-
-            var languageId = nLanguageId.Value;
-
-            (var pvalue, _) = GetPropertyValue(languageId, false);
-            if (pvalue == null) return;
-            PublishPropertyValue(pvalue);
-        }
-
-        internal void PublishValues(int? nLanguageId, string segment)
-        {
-            if (segment == null)
-            {
-                PublishValues(nLanguageId);
-                return;
-            }
-
-            if (!nLanguageId.HasValue)
-                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
-
-            var languageId = nLanguageId.Value;
-
-            (var pvalue, _) = GetPropertyValue(languageId, segment, false);
+            (var pvalue, _) = GetPValue(languageId, segment, false);
             if (pvalue == null) return;
             PublishPropertyValue(pvalue);
         }
@@ -227,47 +200,38 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets a (edit) neutral value.
+        /// Sets a (edited) neutral value.
         /// </summary>
         public void SetValue(object value)
         {
-            (var pvalue, var change) = GetPropertyValue(true);
+            (var pvalue, var change) = GetPValue(true);
             SetPropertyValue(pvalue, value, change);
         }
 
         /// <summary>
-        /// Sets a (edit) culture value.
+        /// Sets a (edited) culture value.
         /// </summary>
-        public void SetValue(int? nLanguageId, object value)
+        public void SetValue(int? languageId, object value)
         {
-            if (nLanguageId == null)
-            {
-                SetValue(value);
-                return;
-            }
-
-            var languageId = nLanguageId.Value;
-
-            (var pvalue, var change) = GetPropertyValue(languageId, true);
+            (var pvalue, var change) = GetPValue(languageId, null, true);
             SetPropertyValue(pvalue, value, change);
         }
 
         /// <summary>
-        /// Sets a (edit) segment value.
+        /// Sets a (edited) culture value.
         /// </summary>
-        public void SetValue(int? nLanguageId, string segment, object value)
+        public void SetValue(string segment, object value)
         {
-            if (segment == null)
-            {
-                SetValue(nLanguageId, value);
-                return;
-            }
+            (var pvalue, var change) = GetPValue(null, segment, true);
+            SetPropertyValue(pvalue, value, change);
+        }
 
-            if (!nLanguageId.HasValue)
-                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
-            var languageId = nLanguageId.Value;
-
-            (var pvalue, var change) = GetPropertyValue(languageId, segment, true);
+        /// <summary>
+        /// Sets a (edited) culture+segment value.
+        /// </summary>
+        public void SetValue(int? languageId, string segment, object value)
+        {
+            (var pvalue, var change) = GetPValue(languageId, segment, true);
             SetPropertyValue(pvalue, value, change);
         }
 
@@ -281,39 +245,10 @@ namespace Umbraco.Core.Models
             DetectChanges(setValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
         }
 
-        private void FactorySetValue(bool published, object value)
-        {
-            (var pvalue, _) = GetPropertyValue(true);
-            FactorySetPropertyValue(pvalue, published, value);
-        }
-
-        private void FactorySetValue(int? nLanguageId, bool published, object value)
-        {
-            if (nLanguageId == null)
-            {
-                FactorySetValue(published, value);
-                return;
-            }
-
-            var languageId = nLanguageId.Value;
-            (var pvalue, _) = GetPropertyValue(languageId, true);
-            FactorySetPropertyValue(pvalue, published, value);
-        }
-
         // bypasses all changes detection and is the *only* to set the published value
-        internal void FactorySetValue(int? nLanguageId, string segment, bool published, object value)
+        internal void FactorySetValue(int? languageId, string segment, bool published, object value)
         {
-            if (segment == null)
-            {
-                FactorySetValue(nLanguageId, published, value);
-                return;
-            }
-
-            if (!nLanguageId.HasValue)
-                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
-            var languageId = nLanguageId.Value;
-
-            (var pvalue, _) = GetPropertyValue(languageId, segment, true);
+            (var pvalue, _) = GetPValue(languageId, segment, true);
             FactorySetPropertyValue(pvalue, published, value);
         }
 
@@ -325,7 +260,7 @@ namespace Umbraco.Core.Models
                 pvalue.EditedValue = value;
         }
 
-        private (PropertyValue, bool) GetPropertyValue(bool create)
+        private (PropertyValue, bool) GetPValue(bool create)
         {
             var change = false;
             if (_pvalue == null)
@@ -338,45 +273,22 @@ namespace Umbraco.Core.Models
             return (_pvalue, change);
         }
 
-        private (PropertyValue, bool) GetPropertyValue(int languageId, bool create)
+        private (PropertyValue, bool) GetPValue(int? languageId, string segment, bool create)
         {
-            var change = false;
-            if (_lvalues == null)
-            {
-                if (!create) return (null, false);
-                _lvalues = new Dictionary<int, PropertyValue>();
-                change = true;
-            }
-            if (!_lvalues.TryGetValue(languageId, out var pvalue))
-            {
-                if (!create) return (null, false);
-                pvalue = _lvalues[languageId] = new PropertyValue();
-                pvalue.LanguageId = languageId;
-                _values.Add(pvalue);
-                change = true;
-            }
-            return (pvalue, change);
-        }
+            if (!languageId.HasValue && segment == null)
+                return GetPValue(create);
 
-        private (PropertyValue, bool) GetPropertyValue(int languageId, string segment, bool create)
-        {
             var change = false;
-            if (_svalues == null)
+            if (_vvalues == null)
             {
                 if (!create) return (null, false);
-                _svalues = new Dictionary<int, Dictionary<string, PropertyValue>>();
+                _vvalues = new Dictionary<(int?, string), PropertyValue>();
                 change = true;
             }
-            if (!_svalues.TryGetValue(languageId, out var svalue))
+            if (_vvalues.TryGetValue((languageId, segment), out var pvalue))
             {
                 if (!create) return (null, false);
-                svalue = _svalues[languageId] = new Dictionary<string, PropertyValue>();
-                change = true;
-            }
-            if (!svalue.TryGetValue(segment, out var pvalue))
-            {
-                if (!create) return (null, false);
-                pvalue = svalue[segment] = new PropertyValue();
+                pvalue = _vvalues[(languageId, segment)] = new PropertyValue();
                 pvalue.LanguageId = languageId;
                 pvalue.Segment = segment;
                 _values.Add(pvalue);

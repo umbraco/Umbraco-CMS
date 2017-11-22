@@ -1253,13 +1253,12 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                // .GetPagedResultsByQuery implicitely adds (cmsDocument.newest = 1)
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = new List<ContentNuDto>();
-                var guids = new List<Guid>();
+                //var guids = new List<Guid>(); // fixme wtf?
                 foreach (var c in descendants)
                     items.Add(GetDto(c, c.Published));
-                items.AddRange(guids.Select(x => GetDto(repository.GetByVersion(x), true)));
+                //items.AddRange(guids.Select(x => GetDto(repository.GetByVersion(x), true)));
 
                 db.BulkInsertRecords(items);
                 processed += items.Count;
@@ -1410,8 +1409,8 @@ WHERE cmsContentNu.nodeId IN (
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN cmsDocument ON (umbracoNode.id=cmsDocument.nodeId AND (cmsDocument.newest=1 OR cmsDocument.published=1))
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=cmsDocument.published)
+JOIN uDocument ON umbracoNode.id=uDocument.nodeId
+LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=uDocument.published)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL;"
                 , new { objType = contentObjectType });
@@ -1440,7 +1439,6 @@ AND cmsContentNu.nodeId IS NULL;"
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN cmsDocument ON (umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=1)
 LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=1)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL

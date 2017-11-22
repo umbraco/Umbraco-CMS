@@ -231,7 +231,7 @@ namespace Umbraco.Core.Models
         internal virtual void PublishValues()
         {
             foreach (var property in Properties)
-                property.PublishValues();
+                property.PublishValues(null, null);
             _publishedState = PublishedState.Publishing;
         }
 
@@ -241,12 +241,22 @@ namespace Umbraco.Core.Models
         internal virtual void PublishValues(int? nLanguageId)
         {
             foreach (var property in Properties)
-                property.PublishValues(nLanguageId);
+                property.PublishValues(nLanguageId, null);
             _publishedState = PublishedState.Publishing;
         }
 
         /// <summary>
         /// Publish the segment value.
+        /// </summary>
+        internal virtual void PublishValues(string segment)
+        {
+            foreach (var property in Properties)
+                property.PublishValues(null, segment);
+            _publishedState = PublishedState.Publishing;
+        }
+
+        /// <summary>
+        /// Publish the culture+segment value.
         /// </summary>
         internal virtual void PublishValues(int? nLanguageId, string segment)
         {

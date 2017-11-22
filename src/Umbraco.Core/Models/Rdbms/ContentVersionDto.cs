@@ -35,6 +35,13 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("current")]
         public bool Current { get; set; }
 
+        // about current:
+        // there is nothing in the DB that guarantees that there will be one, and exactly one, current version per content item.
+        // that would require circular FKs that are impossible (well, it is possible to create them, but not to insert).
+        // we could use a content.currentVersionId FK that would need to be nullable, or (better?) an additional table
+        // linking a content itemt to its current version (nodeId, versionId) - that would guarantee uniqueness BUT it would
+        // not guarantee existence - so, really... we are trusting our code to manage 'current' correctly.
+
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Text { get; set; }
