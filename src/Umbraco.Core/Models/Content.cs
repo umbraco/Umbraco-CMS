@@ -275,57 +275,14 @@ namespace Umbraco.Core.Models
             _publishedState = PublishedState.Publishing;
         }
 
-        internal virtual void CopyValues(IContentBase other, bool published = false)
+        internal virtual void CopyValues(IContentBase other, int? languageId, string segment, bool published = false)
         {
             // clear all existing properties
-            ClearEditValues(null, null);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, otherProperty.GetValue(published));
-            }
-        }
-
-        internal virtual void CopyValues(IContentBase other, int? nLanguageId, bool published = false)
-        {
-            if (!nLanguageId.HasValue)
-            {
-                CopyValues(other);
-                return;
-            }
-
-            var languageId = nLanguageId.Value;
-
-            // clear all existing properties
-            ClearEditValues(nLanguageId, null);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, languageId, otherProperty.GetValue(languageId, published));
-            }
-        }
-
-        internal virtual void CopyValues(IContentBase other, int? nLanguageId, string segment, bool published = false)
-        {
-            if (segment == null)
-            {
-                CopyValues(other, nLanguageId, published);
-                return;
-            }
-
-            if (!nLanguageId.HasValue)
-                throw new ArgumentException("Cannot be null when segment is not null.", nameof(nLanguageId));
-
-            var languageId = nLanguageId.Value;
-
-            // clear all existing properties
-            ClearEditValues(nLanguageId, segment);
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+            foreach (var property in Properties)
+            foreach (var pvalue in property.Values)
+                if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
+                    property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
 
             // copy other properties
             var otherProperties = other.Properties;
@@ -336,29 +293,13 @@ namespace Umbraco.Core.Models
             }
         }
 
-        private void ClearEditValues()
-        {
-            // clear all existing properties
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-            foreach (var property in Properties)
-                foreach (var pvalue in property.Values)
-                    property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
-        }
-
-        private void ClearEditValues(int? nLanguageId, string segment)
-        {
-            // clear all existing properties
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-            foreach (var property in Properties)
-                foreach (var pvalue in property.Values)
-                    if (pvalue.LanguageId == nLanguageId && pvalue.Segment == segment)
-                        property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
-        }
-
         internal virtual void CopyAllValues(IContentBase other, bool published = false)
         {
             // clear all existing properties
-            ClearEditValues();
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+            foreach (var property in Properties)
+            foreach (var pvalue in property.Values)
+                property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
 
             // copy other properties
             var otherProperties = other.Properties;
@@ -367,14 +308,8 @@ namespace Umbraco.Core.Models
                 var alias = otherProperty.PropertyType.Alias;
                 foreach (var pvalue in otherProperty.Values)
                 {
-                    // fixme can we update SetValue to accept null lang/segment and fallback?
                     var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                    if (!pvalue.LanguageId.HasValue)
-                        SetValue(alias, value);
-                    else if (pvalue.Segment == null)
-                        SetValue(alias, pvalue.LanguageId.Value, value);
-                    else
-                        SetValue(alias, pvalue.LanguageId.Value, pvalue.Segment, value);
+                    SetValue(alias, pvalue.LanguageId, pvalue.Segment, value);
                 }
             }
         }

@@ -156,6 +156,12 @@ namespace Umbraco.Core.Models
             }
         }
 
+        public bool TryGetValue(string propertyTypeAlias, out Property property)
+        {
+            property = this[propertyTypeAlias];
+            return property != null;
+        }
+
         /// <summary>
         /// Occurs when the collection changes.
         /// </summary>

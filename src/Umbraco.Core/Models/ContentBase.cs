@@ -275,23 +275,39 @@ namespace Umbraco.Core.Models
         /// </summary>
         public virtual object GetValue(string propertyTypeAlias, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].GetValue(published) : null;
+            return Properties.TryGetValue(propertyTypeAlias, out var property)
+                ? property.GetValue(published)
+                : null;
         }
 
         /// <summary>
         /// Gets the culture value of a property.
         /// </summary>
-        public virtual object GetValue(string propertyTypeAlias, int languageId, bool published = false)
+        public virtual object GetValue(string propertyTypeAlias, int? languageId, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].GetValue(languageId, published) : null;
+            return Properties.TryGetValue(propertyTypeAlias, out var property)
+                ? property.GetValue(languageId, null, published)
+                : null;
         }
 
         /// <summary>
         /// Gets the segment value of a property.
         /// </summary>
-        public virtual object GetValue(string propertyTypeAlias, int languageId, string segment, bool published = false)
+        public virtual object GetValue(string propertyTypeAlias, string segment, bool published = false)
         {
-            return Properties.Contains(propertyTypeAlias) ? Properties[propertyTypeAlias].GetValue(languageId, segment, published) : null;
+            return Properties.TryGetValue(propertyTypeAlias, out var property)
+                ? property.GetValue(null, segment, published)
+                : null;
+        }
+
+        /// <summary>
+        /// Gets the culture+segment value of a property.
+        /// </summary>
+        public virtual object GetValue(string propertyTypeAlias, int? languageId, string segment, bool published = false)
+        {
+            return Properties.TryGetValue(propertyTypeAlias, out var property)
+                ? property.GetValue(languageId, segment, published)
+                : null;
         }
 
         /// <summary>
@@ -299,34 +315,46 @@ namespace Umbraco.Core.Models
         /// </summary>
         public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, bool published = false)
         {
-            if (Properties.Contains(propertyTypeAlias) == false)
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
 
-            var convertAttempt = Properties[propertyTypeAlias].GetValue(published).TryConvertTo<TPropertyValue>();
+            var convertAttempt = property.GetValue(published).TryConvertTo<TPropertyValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
         /// <summary>
         /// Gets the typed culture value of a property.
         /// </summary>
-        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int languageId, bool published = false)
+        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int? languageId, bool published = false)
         {
-            if (Properties.Contains(propertyTypeAlias) == false)
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
 
-            var convertAttempt = Properties[propertyTypeAlias].GetValue(languageId, published).TryConvertTo<TPropertyValue>();
+            var convertAttempt = property.GetValue(languageId, null, published).TryConvertTo<TPropertyValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
         /// <summary>
         /// Gets the typed segment value of a property.
         /// </summary>
-        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int languageId, string segment, bool published = false)
+        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, string segment, bool published = false)
         {
-            if (Properties.Contains(propertyTypeAlias) == false)
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
 
-            var convertAttempt = Properties[propertyTypeAlias].GetValue(languageId, segment, published).TryConvertTo<TPropertyValue>();
+            var convertAttempt = property.GetValue(null, segment, published).TryConvertTo<TPropertyValue>();
+            return convertAttempt.Success ? convertAttempt.Result : default;
+        }
+
+        /// <summary>
+        /// Gets the typed culture+segment value of a property.
+        /// </summary>
+        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int? languageId, string segment, bool published = false)
+        {
+            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
+                return default;
+
+            var convertAttempt = property.GetValue(languageId, segment, published).TryConvertTo<TPropertyValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
@@ -348,11 +376,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets the culture (draft) value of a property.
         /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, int languageId, object value)
+        public virtual void SetValue(string propertyTypeAlias, int? languageId, object value)
         {
             if (value == null)
             {
-                SetValueOnProperty(propertyTypeAlias, languageId, null);
+                SetValueOnProperty(propertyTypeAlias, languageId, null, null);
                 return;
             }
 
@@ -361,9 +389,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets the segment (draft) value of a property.
+        /// Sets the culture+segment (draft) value of a property.
         /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, int languageId, string segment, object value)
+        public virtual void SetValue(string propertyTypeAlias, string segment, object value)
+        {
+            if (value == null)
+            {
+                SetValueOnProperty(propertyTypeAlias, null, segment, null);
+                return;
+            }
+
+            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
+            ((dynamic) this).SetPropertyValue(propertyTypeAlias, null, segment, (dynamic) value);
+        }
+
+        /// <summary>
+        /// Sets the culture+segment (draft) value of a property.
+        /// </summary>
+        public virtual void SetValue(string propertyTypeAlias, int? languageId, string segment, object value)
         {
             if (value == null)
             {
@@ -374,6 +417,16 @@ namespace Umbraco.Core.Models
             // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
             ((dynamic) this).SetPropertyValue(propertyTypeAlias, languageId, segment, (dynamic) value);
         }
+
+
+
+
+
+        // FIXME fix everything below
+
+
+
+
 
         /// <summary>
         /// Sets the neutral (draft) string value of a Property
@@ -596,29 +649,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets the culture (draft) value of a property.
-        /// </summary>
-        private void SetValueOnProperty(string propertyTypeAlias, int languageId, object value)
-        {
-            if (Properties.Contains(propertyTypeAlias))
-            {
-                Properties[propertyTypeAlias].SetValue(languageId, value);
-                return;
-            }
-
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null)
-                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
-
-            var property = propertyType.CreateProperty();
-            property.SetValue(languageId, value);
-            Properties.Add(property);
-        }
-
-        /// <summary>
         /// Sets the segment (draft) value of a property.
         /// </summary>
-        private void SetValueOnProperty(string propertyTypeAlias, int languageId, string segment, object value)
+        private void SetValueOnProperty(string propertyTypeAlias, int? languageId, string segment, object value)
         {
             if (Properties.Contains(propertyTypeAlias))
             {
@@ -649,11 +682,16 @@ namespace Umbraco.Core.Models
             return _invalidProperties.Any() == false;
         }
 
+        public virtual bool Validate(int? languageId, string segment, out IEnumerable<Property> invalidProperties)
+        {
+            // fixme etc
+        }
+
         /// <summary>
         /// Gets the properties marked as invalid during the last validation.
         /// </summary>
         [IgnoreDataMember]
-        internal IEnumerable<Property> InvalidProperties => _invalidProperties;
+        internal IEnumerable<Property> InvalidProperties => _invalidProperties; // fixme return it, don't keep it here!
 
         #endregion
 

@@ -91,9 +91,7 @@ namespace Umbraco.Core.Models
             set
             {
                 _values = value;
-
                 _pvalue = value.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
-
                 _vvalues = value.ToDictionary(x => (x.LanguageId, x.Segment), x => x);
             }
         }
@@ -349,7 +347,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (edit) neutral value is valid.
+        /// Gets a value indicating whether the (edited) neutral value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid()
@@ -358,21 +356,39 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (edit) culture value is valid.
+        /// Gets a value indicating whether the (edited) culture value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValid(int languageId)
+        public bool IsValid(int? languageId)
         {
             return IsValid(GetValue(languageId));
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (edit) segment value is valid.
+        /// Gets a value indicating whether the (edited) segment value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValue(int languageId, string segment)
+        public bool IsValue(string segment)
+        {
+            return IsValid(GetValue(segment));
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the (edited) culture+segment value is valid.
+        /// </summary>
+        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        public bool IsValue(int? languageId, string segment)
         {
             return IsValid(GetValue(languageId, segment));
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all (edited) values are valid.
+        /// </summary>
+        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        public bool IsAllValid()
+        {
+            return _values.All(x => IsValid(x.EditedValue));
         }
 
         /// <summary>
