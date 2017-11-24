@@ -1,9 +1,13 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService) {
 
         function link(scope, element, attrs, ctrl) {
+
+            var evts = [];
+            var isInfoTab = false;
+            scope.publishStatus = {};
             
             function onInit() {
 
@@ -32,15 +36,10 @@
                 // get document type details
                 scope.documentType = scope.node.documentType;
 
-                // load audit trail when on the info tab
-                eventsService.on("app.tabChange", function (event, args) {
-                    if (args.id === -1) {
-                        loadAuditTrail();
-                    }
-                });
-
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
+
+                setNodePublishStatus(scope.node);
                 
             }
 
@@ -118,6 +117,34 @@
                             item.logTypeColor = "gray";
                     }
                 });
+            }
+
+            function setNodePublishStatus(node) {
+                
+                // deleted node
+                if(node.trashed === true) {
+                    scope.publishStatus.label = localizationService.localize("general_deleted");
+                    scope.publishStatus.color = "danger";
+                }
+
+                // unpublished node
+                if(node.published === false && node.trashed === false) {
+                    scope.publishStatus.label = localizationService.localize("content_unpublished");
+                    scope.publishStatus.color = "gray";
+                }
+
+                // published node
+                if(node.hasPublishedVersion === true && node.publishDate && node.published === true) {
+                    scope.publishStatus.label = localizationService.localize("content_published");
+                    scope.publishStatus.color = "success";
+                }
+
+                // published node with pending changes
+                if(node.hasPublishedVersion === true && node.publishDate && node.published === false) {
+                    scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
+                    scope.publishStatus.color = "success"
+                }
+
             }
 
             function setPublishDate(date) {
@@ -199,6 +226,38 @@
                     scope.node.removeDateDay = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
                 });
             }
+
+            // load audit trail when on the info tab
+            evts.push(eventsService.on("app.tabChange", function (event, args) {
+                $timeout(function(){
+                    if (args.id === -1) {
+                        isInfoTab = true;
+                        loadAuditTrail();
+                    } else {
+                        isInfoTab = false;
+                    }
+                });
+            }));
+
+            // watch for content updates - reload content when node is saved, published etc.
+            scope.$watch('node.updateDate', function(newValue, oldValue){
+
+                if(!newValue) { return; }
+                if(newValue === oldValue) { return; }             
+                
+                if(isInfoTab) {
+                    loadAuditTrail();
+                    formatDatesToLocal();
+                    setNodePublishStatus(scope.node);
+                }
+            });
+
+            //ensure to unregister from all events!
+            scope.$on('$destroy', function () {
+                for (var e in evts) {
+                    eventsService.unsubscribe(evts[e]);
+                }
+            });
 
             onInit();
 
