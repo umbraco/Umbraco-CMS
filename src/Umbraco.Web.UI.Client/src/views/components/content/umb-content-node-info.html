@@ -165,6 +165,12 @@
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
+
+                <umb-control-group data-element="node-info-status" label="@general_status">
+                    <umb-badge size="xs" color="{{publishStatus.color}}">
+                        {{publishStatus.label}}
+                    </umb-badge>
+                </umb-control-group>
                 
                 <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
                     {{node.createDateFormatted}} <localize key="general_by">by</localize> {{ node.owner.name }}
