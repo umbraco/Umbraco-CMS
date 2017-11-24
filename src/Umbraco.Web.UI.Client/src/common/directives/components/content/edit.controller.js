@@ -49,6 +49,40 @@
 
     }
 
+    function getNode() {
+
+      $scope.page.loading = true;
+
+      //we are editing so get the content item from the server
+      $scope.getMethod()($scope.contentId)
+        .then(function (data) {
+
+          $scope.content = data;
+
+          if (data.isChildOfListView && data.trashed === false) {
+            $scope.page.listViewPath = ($routeParams.page) ?
+              "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page :
+              "/content/content/edit/" + data.parentId;
+          }
+
+          init($scope.content);
+
+          //in one particular special case, after we've created a new item we redirect back to the edit
+          // route but there might be server validation errors in the collection which we need to display
+          // after the redirect, so we will bind all subscriptions which will show the server validation errors
+          // if there are any and then clear them so the collection no longer persists them.
+          serverValidationManager.executeAndClearAllSubscriptions();
+
+          syncTreeNode($scope.content, data.path, true);
+
+          resetLastListPageNumber($scope.content);
+
+          $scope.page.loading = false;
+
+        });
+
+    }
+
     function createButtons(content) {
       var buttons = contentEditingHelper.configureContentEditorButtons({
         create: $scope.page.isNew,
@@ -152,35 +186,8 @@
     }
     else {
 
-      $scope.page.loading = true;
+      getNode();
 
-      //we are editing so get the content item from the server
-      $scope.getMethod()($scope.contentId)
-        .then(function (data) {
-
-          $scope.content = data;
-
-          if (data.isChildOfListView && data.trashed === false) {
-            $scope.page.listViewPath = ($routeParams.page) ?
-              "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page :
-              "/content/content/edit/" + data.parentId;
-          }
-
-          init($scope.content);
-
-          //in one particular special case, after we've created a new item we redirect back to the edit
-          // route but there might be server validation errors in the collection which we need to display
-          // after the redirect, so we will bind all subscriptions which will show the server validation errors
-          // if there are any and then clear them so the collection no longer persists them.
-          serverValidationManager.executeAndClearAllSubscriptions();
-
-          syncTreeNode($scope.content, data.path, true);
-
-          resetLastListPageNumber($scope.content);
-
-          $scope.page.loading = false;
-
-        });
     }
 
 
@@ -315,6 +322,9 @@
 
           $scope.page.buttonRestore = "success";
           notificationsService.success("Successfully restored " + node.name + " to " + target.name);
+
+          // reload the node
+          getNode();
 
         }, function (err) {
           $scope.page.buttonRestore = "error";
