@@ -9,7 +9,6 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
-
     /// <summary>
     /// Defines the type of a <see cref="Property"/> object
     /// </summary>
@@ -32,6 +31,7 @@ namespace Umbraco.Core.Models
         private string _helpText;
         private int _sortOrder;
         private string _validationRegExp;
+        private ContentVariation _variations;
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
@@ -100,6 +100,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
             public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
             public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
+            public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<PropertyType, ContentVariation>(x => x.Variations);
         }
 
         public bool IsPublishing { get; internal set; }
@@ -232,6 +233,41 @@ namespace Umbraco.Core.Models
         {
             get => _validationRegExp;
             set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector);
+        }
+
+        /// <summary>
+        /// Gets or sets the content variation of the property type.
+        /// </summary>
+        public ContentVariation Variations
+        {
+            get => _variations;
+            internal set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
+        }
+
+        public bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid)
+        {
+            ContentVariation variation;
+            if (languageId.HasValue)
+            {
+                variation = segment != null
+                    ? ContentVariation.CultureSegment
+                    : ContentVariation.CultureNeutral;
+            }
+            else if (segment != null)
+            {
+                variation = ContentVariation.InvariantSegment;
+            }
+            else
+            {
+                variation = ContentVariation.InvariantNeutral;
+            }
+            if ((Variations & variation) == 0)
+            {
+                if (throwIfInvalid)
+                    throw new InvalidOperationException($"Variation {variation} is invalid for property type \"{Alias}\".");
+                return false;
+            }
+            return true;
         }
 
         private static string GetAlias(string value)

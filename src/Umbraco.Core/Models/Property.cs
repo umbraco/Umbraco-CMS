@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -90,9 +91,13 @@ namespace Umbraco.Core.Models
             get => _values;
             set
             {
-                _values = value;
-                _pvalue = value.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
-                _vvalues = value.ToDictionary(x => (x.LanguageId, x.Segment), x => x);
+                // make sure we filter out invalid variations
+                // make sure we leave _vvalues null if possible
+                _values = value.Where(x => _propertyType.ValidateVariation(x.LanguageId, x.Segment, false)).ToList();
+                _pvalue = _values.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
+                _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
+                    ? _values.Where(x => x != _pvalue).ToDictionary(x => (x.LanguageId, x.Segment), x => x)
+                    : null;
             }
         }
 
@@ -132,6 +137,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public object GetValue(bool published = false)
         {
+            if (!_propertyType.ValidateVariation(null, null, false)) return null;
             return _pvalue == null ? null : GetPropertyValue(_pvalue, published);
         }
 
@@ -140,6 +146,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public object GetValue(int? languageId, bool published = false)
         {
+            if (!_propertyType.ValidateVariation(languageId, null, false)) return null;
             if (_vvalues == null) return null;
             return _vvalues.TryGetValue((languageId, null), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
@@ -151,6 +158,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public object GetValue(string segment, bool published = false)
         {
+            if (!_propertyType.ValidateVariation(null, segment, false)) return null;
             if (_vvalues == null) return null;
             return _vvalues.TryGetValue((null, segment), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
@@ -162,6 +170,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public object GetValue(int? languageId, string segment, bool published = false)
         {
+            if (!_propertyType.ValidateVariation(languageId, segment, false)) return null;
             if (_vvalues == null) return null;
             return _vvalues.TryGetValue((languageId, segment), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
@@ -177,6 +186,7 @@ namespace Umbraco.Core.Models
 
         internal void PublishValues(int? languageId, string segment)
         {
+            _propertyType.ValidateVariation(languageId, segment, true);
             (var pvalue, _) = GetPValue(languageId, segment, false);
             if (pvalue == null) return;
             PublishPropertyValue(pvalue);
@@ -202,6 +212,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(object value)
         {
+            _propertyType.ValidateVariation(null, null, true);
             (var pvalue, var change) = GetPValue(true);
             SetPropertyValue(pvalue, value, change);
         }
@@ -211,6 +222,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(int? languageId, object value)
         {
+            _propertyType.ValidateVariation(languageId, null, true);
             (var pvalue, var change) = GetPValue(languageId, null, true);
             SetPropertyValue(pvalue, value, change);
         }
@@ -220,6 +232,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(string segment, object value)
         {
+            _propertyType.ValidateVariation(null, segment, true);
             (var pvalue, var change) = GetPValue(null, segment, true);
             SetPropertyValue(pvalue, value, change);
         }
@@ -229,6 +242,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(int? languageId, string segment, object value)
         {
+            _propertyType.ValidateVariation(languageId, segment, true);
             (var pvalue, var change) = GetPValue(languageId, segment, true);
             SetPropertyValue(pvalue, value, change);
         }
@@ -352,7 +366,7 @@ namespace Umbraco.Core.Models
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid()
         {
-            return IsValid(GetValue());
+            return IsValidValue(GetValue());
         }
 
         /// <summary>
@@ -361,25 +375,25 @@ namespace Umbraco.Core.Models
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid(int? languageId)
         {
-            return IsValid(GetValue(languageId));
+            return IsValidValue(GetValue(languageId));
         }
 
         /// <summary>
         /// Gets a value indicating whether the (edited) segment value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValue(string segment)
+        public bool IsValid(string segment)
         {
-            return IsValid(GetValue(segment));
+            return IsValidValue(GetValue(segment));
         }
 
         /// <summary>
         /// Gets a value indicating whether the (edited) culture+segment value is valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValue(int? languageId, string segment)
+        public bool IsValid(int? languageId, string segment)
         {
-            return IsValid(GetValue(languageId, segment));
+            return IsValidValue(GetValue(languageId, segment));
         }
 
         /// <summary>
@@ -388,7 +402,8 @@ namespace Umbraco.Core.Models
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsAllValid()
         {
-            return _values.All(x => IsValid(x.EditedValue));
+            // fixme - what about missing, required values?
+            return _values.All(x => IsValidValue(x.EditedValue));
         }
 
         /// <summary>
@@ -396,7 +411,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="value"></param>
         /// <returns>True is property value is valid, otherwise false</returns>
-        private bool IsValid(object value)
+        private bool IsValidValue(object value)
         {
             return _propertyType.IsValidPropertyValue(value);
         }

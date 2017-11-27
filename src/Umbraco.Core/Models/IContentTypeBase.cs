@@ -44,6 +44,11 @@ namespace Umbraco.Core.Models
         bool IsContainer { get; set; }
 
         /// <summary>
+        /// Gets or sets the content variation of the content type.
+        /// </summary>
+        ContentVariation Variations { get; set; }
+
+        /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }

@@ -108,6 +108,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
             entity.Trashed = dto.NodeDto.Trashed;
+            entity.Variations = (ContentVariation) dto.Variations;
         }
 
         public ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
@@ -131,6 +132,7 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 AllowAtRoot = entity.AllowedAsRoot,
                 IsContainer = entity.IsContainer,
+                Variations = (byte) entity.Variations,
                 NodeDto = BuildNodeDto(entity, nodeObjectType)
             };
             return contentTypeDto;

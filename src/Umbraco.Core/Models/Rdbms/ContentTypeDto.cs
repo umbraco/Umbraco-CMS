@@ -43,6 +43,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool AllowAtRoot { get; set; }
 
+        [Column("variations")]
+        [Constraint(Default = "0")]
+        public byte Variations { get; set; }
+
         [ResultColumn]
         public NodeDto NodeDto { get; set; }
     }

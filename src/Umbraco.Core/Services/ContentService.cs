@@ -2350,12 +2350,13 @@ namespace Umbraco.Core.Services
             }
 
             // check if the content is valid
-            if (content.Validate() == false)
+            var invalidProperties = content.Validate();
+            if (invalidProperties.Any())
             {
                 Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because of invalid properties.");
                 return Attempt.Fail(new PublishStatus(PublishStatusType.FailedContentInvalid, evtMsgs, content)
                 {
-                    InvalidProperties = ((ContentBase)content).InvalidProperties
+                    InvalidProperties = invalidProperties
                 });
             }
 

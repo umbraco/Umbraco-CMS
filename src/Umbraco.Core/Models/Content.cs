@@ -277,17 +277,30 @@ namespace Umbraco.Core.Models
 
         internal virtual void CopyValues(IContentBase other, int? languageId, string segment, bool published = false)
         {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
             // clear all existing properties
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
             foreach (var property in Properties)
-            foreach (var pvalue in property.Values)
-                if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
-                    property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
+            {
+                // skip properties that don't support the specified variation
+                if (!property.PropertyType.ValidateVariation(languageId, segment, false))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
+                        property.SetValue(pvalue.LanguageId, pvalue.Segment, null);                
+            }
 
             // copy other properties
             var otherProperties = other.Properties;
             foreach (var otherProperty in otherProperties)
             {
+                // skip properties that don't support the specified variation
+                if (!otherProperty.PropertyType.ValidateVariation(languageId, segment, false))
+                    continue;
+
                 var alias = otherProperty.PropertyType.Alias;
                 SetValue(alias, languageId, segment, otherProperty.GetValue(languageId, segment, published));
             }
@@ -295,6 +308,9 @@ namespace Umbraco.Core.Models
 
         internal virtual void CopyAllValues(IContentBase other, bool published = false)
         {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
             // clear all existing properties
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
             foreach (var property in Properties)

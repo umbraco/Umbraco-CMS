@@ -38,6 +38,7 @@ namespace Umbraco.Core.Models
         private PropertyTypeCollection _propertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
         private bool _hasPropertyTypeBeenRemoved;
+        private ContentVariation _variations;
 
         protected ContentTypeBase(int parentId)
         {
@@ -107,6 +108,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
             public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
             public readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
+            public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<ContentTypeBase, ContentVariation>(x => x.Variations);
 
             //Custom comparer for enumerable
             public readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> ContentTypeSortComparer =
@@ -291,6 +293,15 @@ namespace Umbraco.Core.Models
             get => _allowedContentTypes;
             set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
                 Ps.Value.ContentTypeSortComparer);
+        }
+
+        /// <summary>
+        /// Gets or sets the content variation of the content type.
+        /// </summary>
+        public ContentVariation Variations
+        {
+            get => _variations;
+            set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
         }
 
         /// <summary>

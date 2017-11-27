@@ -281,50 +281,13 @@ namespace Umbraco.Core.Models
                                                           .Contains(property.PropertyTypeId));
         }
 
-        /// <summary>
-        /// Set property values by alias with an annonymous object
-        /// </summary>
-        public static void PropertyValues(this IContentBase content, object value) // fixme kill that one! won't work with variants
-        {
-            if (value == null)
-                throw new Exception("No properties has been passed in");
-
-            var propertyInfos = value.GetType().GetProperties();
-            foreach (var propertyInfo in propertyInfos)
-            {
-                //Check if a PropertyType with alias exists thus being a valid property
-                var propertyType = content.PropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
-                if (propertyType == null)
-                    throw new Exception($"The property alias {propertyInfo.Name} is not valid, because no PropertyType with this alias exists");
-
-                //Check if a Property with the alias already exists in the collection thus being updated or inserted
-                var item = content.Properties.FirstOrDefault(x => x.Alias == propertyInfo.Name);
-                if (item != null)
-                {
-                    item.SetValue(propertyInfo.GetValue(value, null));
-                    //Update item with newly added value
-                    content.Properties.Add(item);
-                }
-                else
-                {
-                    //Create new Property to add to collection
-                    var property = propertyType.CreateProperty();
-                    property.SetValue(propertyInfo.GetValue(value, null));
-                    content.Properties.Add(property);
-                }
-            }
-        }
-
         public static IContentTypeComposition GetContentType(this IContentBase contentBase)
         {
-            if (contentBase == null) throw new ArgumentNullException("contentBase");
+            if (contentBase == null) throw new ArgumentNullException(nameof(contentBase));
 
-            var content = contentBase as IContent;
-            if (content != null) return content.ContentType;
-            var media = contentBase as IMedia;
-            if (media != null) return media.ContentType;
-            var member = contentBase as IMember;
-            if (member != null) return member.ContentType;
+            if (contentBase is IContent content) return content.ContentType;
+            if (contentBase is IMedia media) return media.ContentType;
+            if (contentBase is IMember member) return member.ContentType;
             throw new NotSupportedException("Unsupported IContentBase implementation: " + contentBase.GetType().FullName + ".");
         }
 
@@ -356,30 +319,6 @@ namespace Umbraco.Core.Models
             filename = filename.ToLower(); // fixme - er... why?
 
             MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream);
-        }
-
-        /// <summary>
-        /// Stores and sets an uploaded HttpPostedFile as a property value.
-        /// </summary>
-        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
-        /// <param name="propertyTypeAlias">The property alias.</param>
-        /// <param name="value">The uploaded <see cref="HttpPostedFile"/>.</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
-        {
-            SetValue(content, propertyTypeAlias, (HttpPostedFileBase) new HttpPostedFileWrapper(value));
-        }
-
-        /// <summary>
-        /// Stores and sets an uploaded HttpPostedFileWrapper as a property value.
-        /// </summary>
-        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
-        /// <param name="propertyTypeAlias">The property alias.</param>
-        /// <param name="value">The uploaded <see cref="HttpPostedFileWrapper"/>.</param>
-        [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
-        {
-            SetValue(content, propertyTypeAlias, (HttpPostedFileBase) value);
         }
 
         /// <summary>

@@ -51,6 +51,10 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(2000)]
         public string Description { get; set; }
 
+        [Column("variations")]
+        [Constraint(Default = "0")]
+        public byte Variations { get; set; }
+
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
         public DataTypeDto DataTypeDto { get; set; }

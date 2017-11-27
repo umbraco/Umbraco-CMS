@@ -111,28 +111,23 @@ namespace Umbraco.Core.Models
         void SetValue(string propertyTypeAlias, int? languageId, string segment, object value);
 
         /// <summary>
-        /// Gets a value indicating whether the content and its neutral properties values are valid.
+        /// Gets a value indicating whether the content and its invariant+neutral properties values are valid.
         /// </summary>
-        bool Validate();
+        Property[] Validate();
 
         /// <summary>
-        /// Gets a value indicating whether the content and its culture properties values are valid.
+        /// Gets a value indicating whether the content and its culture+neutral properties values are valid for the specified culture.
         /// </summary>
-        bool Validate(int? languageId);
+        Property[] Validate(int? languageId);
 
         /// <summary>
-        /// Gets a value indicating whether the content and its segment properties values are valid.
+        /// Gets a value indicating whether the content and its invariant+segment values are valid for the specified segment.
         /// </summary>
-        bool Validate(string segment);
+        Property[] Validate(string segment);
 
         /// <summary>
         /// Gets a value indicating whether the content and its culture+segment properties values are valid.
         /// </summary>
-        bool Validate(int? languageId, string segment);
-
-        /// <summary>
-        /// Gets a value indicating whether the content and all its properties values are valid.
-        /// </summary>
-        bool ValidateAll();
+        Property[] Validate(int? languageId, string segment);
     }
 }

@@ -265,8 +265,9 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets a value indicating whether the content entity has a property with the supplied alias.
-        /// fixme with a value, or just the property?
         /// </summary>
+        /// <remarks>Indicates that the content entity has a property with the supplied alias, but
+        /// not necessarily that the content has a value for that property. Could be missing.</remarks>
         public virtual bool HasProperty(string propertyTypeAlias)
             => Properties.Contains(propertyTypeAlias);
 
@@ -363,14 +364,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public virtual void SetValue(string propertyTypeAlias, object value)
         {
-            if (value == null)
-            {
-                SetValueOnProperty(propertyTypeAlias, null);
-                return;
-            }
-
-            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
-            ((dynamic) this).SetPropertyValue(propertyTypeAlias, (dynamic) value);
+            SetValueOnProperty(propertyTypeAlias, null, null, value);
         }
 
         /// <summary>
@@ -378,14 +372,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public virtual void SetValue(string propertyTypeAlias, int? languageId, object value)
         {
-            if (value == null)
-            {
-                SetValueOnProperty(propertyTypeAlias, languageId, null, null);
-                return;
-            }
-
-            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
-            ((dynamic) this).SetPropertyValue(propertyTypeAlias, languageId, (dynamic) value);
+            SetValueOnProperty(propertyTypeAlias, languageId, null, value);
         }
 
         /// <summary>
@@ -393,14 +380,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public virtual void SetValue(string propertyTypeAlias, string segment, object value)
         {
-            if (value == null)
-            {
-                SetValueOnProperty(propertyTypeAlias, null, segment, null);
-                return;
-            }
-
-            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
-            ((dynamic) this).SetPropertyValue(propertyTypeAlias, null, segment, (dynamic) value);
+            SetValueOnProperty(propertyTypeAlias, null, segment, value);
         }
 
         /// <summary>
@@ -408,205 +388,21 @@ namespace Umbraco.Core.Models
         /// </summary>
         public virtual void SetValue(string propertyTypeAlias, int? languageId, string segment, object value)
         {
-            if (value == null)
-            {
-                SetValueOnProperty(propertyTypeAlias, languageId, segment, null);
-                return;
-            }
-
-            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature
-            ((dynamic) this).SetPropertyValue(propertyTypeAlias, languageId, segment, (dynamic) value);
-        }
-
-
-
-
-
-        // FIXME fix everything below
-
-
-
-
-
-        /// <summary>
-        /// Sets the neutral (draft) string value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, string value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) string value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, value);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) string value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, string value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) int value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) int value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, int value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, value);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) int value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, int value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) long value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, long value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) long value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, long value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, value);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) long value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, long value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) decimal value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, decimal value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) decimal value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, decimal value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, value);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) decimal value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, decimal value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) double value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, double value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) double value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, double value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, value);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) double value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, double value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) boolean value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, bool value)
-        {
-            var val = Convert.ToInt32(value);
-            SetValueOnProperty(propertyTypeAlias, val);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) boolean value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, bool value)
-        {
-            var val = Convert.ToInt32(value);
-            SetValueOnProperty(propertyTypeAlias, languageId, val);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) boolean value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, bool value)
-        {
-            var val = Convert.ToInt32(value);
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, val);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) DateTime value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, DateTime value)
-        {
-            SetValueOnProperty(propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) DateTime value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, DateTime value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, value);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) DateTime value of a Property
-        /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, int languageId, string segment, DateTime value)
-        {
             SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
         }
 
         // fixme - these three use an extension method that needs to be adapted too
 
+        // HttpPostedFileBase is the base class that can be mocked
+        // HttpPostedFile is what we get in ASP.NET
+        // HttpPostedFileWrapper wraps sealed HttpPostedFile as HttpPostedFileBase
+
         /// <summary>
         /// Sets the posted file value of a Property
         /// </summary>
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
+        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value)
         {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value));
         }
 
         /// <summary>
@@ -614,42 +410,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value)
+        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value)
         {
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
         }
 
         /// <summary>
-        /// Sets the posted file wrapper value of a Property
-        /// </summary>
-        [Obsolete("There is no reason for this overload since HttpPostedFileWrapper inherits from HttpPostedFileBase")]
-        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileWrapper value)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value);
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) value of a property.
-        /// </summary>
-        private void SetValueOnProperty(string propertyTypeAlias, object value)
-        {
-            if (Properties.Contains(propertyTypeAlias))
-            {
-                Properties[propertyTypeAlias].SetValue(value);
-                return;
-            }
-
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null)
-                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
-
-            var property = propertyType.CreateProperty();
-            property.SetValue(value);
-            Properties.Add(property);
-        }
-
-        /// <summary>
-        /// Sets the segment (draft) value of a property.
+        /// Sets the (edited) value of a property.
         /// </summary>
         private void SetValueOnProperty(string propertyTypeAlias, int? languageId, string segment, object value)
         {
@@ -672,26 +439,25 @@ namespace Umbraco.Core.Models
 
         #region Validation
 
-        /// <summary>
-        /// Gets a value indicating whether the content and its properties are valid.
-        /// </summary>
-        public virtual bool Validate() // fixme would it depends on the property varyBy? or would we validate for a given culture/segment?
+        public virtual Property[] Validate()
         {
-            _invalidProperties.Clear();
-            _invalidProperties.AddRange(Properties.Where(property => property.IsValid() == false));
-            return _invalidProperties.Any() == false;
+            return Properties.Where(x => !x.IsValid()).ToArray();
         }
 
-        public virtual bool Validate(int? languageId, string segment, out IEnumerable<Property> invalidProperties)
+        public virtual Property[] Validate(int? languageId)
         {
-            // fixme etc
+            return Properties.Where(x => !x.IsValid(languageId)).ToArray();
         }
 
-        /// <summary>
-        /// Gets the properties marked as invalid during the last validation.
-        /// </summary>
-        [IgnoreDataMember]
-        internal IEnumerable<Property> InvalidProperties => _invalidProperties; // fixme return it, don't keep it here!
+        public virtual Property[] Validate(string segment)
+        {
+            return Properties.Where(x => !x.IsValid(segment)).ToArray();
+        }
+
+        public virtual Property[] Validate(int? languageId, string segment)
+        {
+            return Properties.Where(x => !x.IsValid(languageId, segment)).ToArray();
+        }
 
         #endregion
 

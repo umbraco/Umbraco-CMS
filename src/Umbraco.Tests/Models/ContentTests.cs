@@ -13,7 +13,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-
 using Umbraco.Core.Serialization;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -721,7 +720,7 @@ namespace Umbraco.Tests.Models
             content.ResetDirtyProperties();
 
             // Act
-            content.SetPropertyValue("title", "new title");
+            content.SetValue("title", "new title");
             Assert.That(content.IsEntityDirty(), Is.False);
             Assert.That(content.IsDirty(), Is.True);
             Assert.That(content.IsPropertyDirty("title"), Is.True);

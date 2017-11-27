@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {

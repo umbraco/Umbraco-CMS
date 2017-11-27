@@ -78,6 +78,7 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
                             propertyType.CreateDate = _createDate;
                             propertyType.UpdateDate = _updateDate;
+                            propertyType.Variations = (ContentVariation) typeDto.Variations;
 
                             // reset dirty initial properties (U4-1946)
                             propertyType.ResetDirtyProperties(false);
@@ -139,7 +140,8 @@ namespace Umbraco.Core.Persistence.Factories
                 Name = propertyType.Name,
                 SortOrder = propertyType.SortOrder,
                 ValidationRegExp = propertyType.ValidationRegExp,
-                UniqueId = propertyType.Key
+                UniqueId = propertyType.Key,
+                Variations = (byte) propertyType.Variations
             };
 
             if (tabId != default)
