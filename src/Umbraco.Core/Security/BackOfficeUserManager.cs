@@ -152,7 +152,6 @@ namespace Umbraco.Core.Security
             //NOTE: This method is mostly here for backwards compat
             base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider, contentSectionConfig);
         }
-       
     }
 
     /// <summary>
@@ -169,7 +168,7 @@ namespace Umbraco.Core.Security
 
         #region What we support do not currently
 
-        //NOTE: Not sure if we really want/need to ever support this 
+        //TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
         public override bool SupportsUserClaim
         {
             get { return false; }
@@ -269,6 +268,22 @@ namespace Umbraco.Core.Security
             //});
 
             //manager.SmsService = new SmsService();            
+        }
+
+        /// <summary>
+        /// Used to validate a user's session
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> ValidateSessionIdAsync(int userId, string sessionId)
+        {
+            var userSessionStore = Store as IUserSessionStore<BackOfficeIdentityUser, int>;
+            //if this is not set, for backwards compat (which would be super rare), we'll just approve it
+            if (userSessionStore == null)
+                return true;
+
+            return await userSessionStore.ValidateSessionIdAsync(userId, sessionId);
         }
 
         /// <summary>
@@ -674,4 +689,5 @@ namespace Umbraco.Core.Security
             return httpContext.GetCurrentRequestIpAddress();
         }
     }
+
 }

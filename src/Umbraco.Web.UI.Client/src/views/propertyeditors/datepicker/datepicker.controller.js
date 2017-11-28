@@ -114,8 +114,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
         assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css').then(function() {
 
-        var filesToLoad = ["lib/moment/moment-with-locales.js",
-						   "lib/datetimepicker/bootstrap-datetimepicker.js"];
+        var filesToLoad = ["lib/datetimepicker/bootstrap-datetimepicker.js"];
 
             
 		$scope.model.config.language = user.locale;

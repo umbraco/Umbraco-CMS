@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
@@ -14,6 +13,7 @@ using Umbraco.Core.Packaging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using System.Diagnostics;
+using System.IO.Compression;
 using umbraco.cms.businesslogic.template;
 using umbraco.interfaces;
 using Umbraco.Core.Events;
@@ -520,7 +520,7 @@ namespace umbraco.cms.businesslogic.packager
         /// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
-            
+
             if (Directory.Exists(tempDir))
             {
                 Directory.Delete(tempDir, true);
@@ -751,8 +751,6 @@ namespace umbraco.cms.businesslogic.packager
 
         private static string UnPack(string zipName, bool deleteFile)
         {
-            // Unzip
-
             //the temp directory will be the package GUID - this keeps it consistent!
             //the zipName is always the package Guid.umb
 
@@ -765,48 +763,14 @@ namespace umbraco.cms.businesslogic.packager
             if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
             Directory.CreateDirectory(tempDir);
 
-            var s = new ZipInputStream(File.OpenRead(zipName));
-
-            ZipEntry theEntry;
-            while ((theEntry = s.GetNextEntry()) != null)
-            {
-                string fileName = Path.GetFileName(theEntry.Name);
-
-                if (fileName != String.Empty)
-                {
-                    FileStream streamWriter = File.Create(tempDir + Path.DirectorySeparatorChar + fileName);
-
-                    int size = 2048;
-                    byte[] data = new byte[2048];
-                    while (true)
-                    {
-                        size = s.Read(data, 0, data.Length);
-                        if (size > 0)
-                        {
-                            streamWriter.Write(data, 0, size);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    streamWriter.Close();
-
-                }
-            }
-
-            // Clean up
-            s.Close();
+            ZipFile.ExtractToDirectory(zipName, tempDir);
 
             if (deleteFile)
             {
                 File.Delete(zipName);
             }
 
-
             return tempDir;
-
         }
 
         #endregion

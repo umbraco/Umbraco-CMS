@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService) {
 
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
@@ -134,6 +134,40 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             error: error,
             show: true
         };
+    }));
+
+    // manage the help dialog by subscribing to the showHelp appState
+    $scope.drawer = {};
+    evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
+        // set view
+        if (args.key === "view") {
+            $scope.drawer.view = args.value;
+        }
+        // set custom model
+        if (args.key === "model") {
+            $scope.drawer.model = args.value;
+        }
+        // show / hide drawer
+        if (args.key === "showDrawer") {
+            $scope.drawer.show = args.value;
+        }
+    }));
+
+    evts.push(eventsService.on("appState.tour.start", function (name, args) {
+        $scope.tour = args;
+        $scope.tour.show = true;
+    }));
+
+    evts.push(eventsService.on("appState.tour.end", function () {
+        $scope.tour = null;
+    }));
+
+    evts.push(eventsService.on("appState.tour.complete", function () {
+        $scope.tour = null;
+    }));
+
+    evts.push(eventsService.on("appState.backdrop", function (name, args) {
+        $scope.backdrop = args;
     }));
 
     //ensure to unregister from all events!

@@ -92,6 +92,11 @@ namespace Umbraco.Core.Persistence.Repositories
         IProfile GetProfile(string username);
         IProfile GetProfile(int id);
         IDictionary<UserState, int> GetUserStates();
-        
+
+        Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true);
+        bool ValidateLoginSession(int userId, Guid sessionId);
+        int ClearLoginSessions(int userId);
+        int ClearLoginSessions(TimeSpan timespan);
+        void ClearLoginSession(Guid sessionId);
     }
 }

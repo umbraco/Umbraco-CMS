@@ -558,6 +558,47 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Guid CreateLoginSession(int userId, string requestingIpAddress)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                var session = repository.CreateLoginSession(userId, requestingIpAddress);
+                uow.Commit();
+                return session;
+            }
+        }
+
+        public int ClearLoginSessions(int userId)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                var count = repository.ClearLoginSessions(userId);
+                uow.Commit();
+                return count;
+            }
+        }
+
+        public void ClearLoginSession(Guid sessionId)
+        {
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                repository.ClearLoginSession(sessionId);
+                uow.Commit();
+            }
+        }
+
+        public bool ValidateLoginSession(int userId, Guid sessionId)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateUserRepository(uow);
+                return repository.ValidateLoginSession(userId, sessionId);
+            }
+        }
+
         public IDictionary<UserState, int> GetUserStates()
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
