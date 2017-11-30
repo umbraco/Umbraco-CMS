@@ -27,6 +27,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight
             Execute.DropKeysAndIndexes();
 
             MigratePropertyData();
+            MigrateContentAndPropertyTypes();
             MigrateContent();
             MigrateVersions();
 
@@ -106,6 +107,14 @@ HAVING COUNT(v2.id) <> 1").Any())
 
             // rename table
             Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData);
+        }
+
+        private void MigrateContentAndPropertyTypes()
+        {
+            if (!ColumnExists(PreTables.ContentType, "variations"))
+                AddColumn<ContentTypeDto>(PreTables.ContentType, "variations");
+            if (!ColumnExists(PreTables.PropertyType, "variations"))
+                AddColumn<PropertyTypeDto>(PreTables.PropertyType, "variations");
         }
 
         private void MigrateContent()

@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
             // we are only selecting the top 2 rows since that is all we need
             var allVersions = _contentService.GetVersionIds(contentId, 2).ToList();
             var prevVersionIndex = allVersions.Count > 1 ? 1 : 0;
-            return _contentService.GetByVersion(allVersions[prevVersionIndex]);
+            return _contentService.GetVersion(allVersions[prevVersionIndex]);
         }
 
         /// <summary>

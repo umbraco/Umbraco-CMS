@@ -122,9 +122,11 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublishWithStatus(item); // should create an xml clone
+                item.PublishValues();
+                Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                Current.Services.ContentService.SaveAndPublishWithStatus(item); // should re-use the xml clone
+                item.PublishValues();
+                Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
                 Assert.AreEqual(beforeOuterXml, beforeXml.OuterXml);
@@ -145,7 +147,7 @@ namespace Umbraco.Tests.Scoping
 
                 // note
                 // this means that, as long as ppl don't create scopes, they'll see their
-                // changes right after SaveAndPublishWithStatus, but if they create scopes,
+                // changes right after SaveAndPublish, but if they create scopes,
                 // they will have to wail until the scope is completed, ie wait until the
                 // events trigger, to use eg GetUrl etc
 
@@ -227,12 +229,14 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Current.Services.ContentService.SaveAndPublishWithStatus(item);
+                item.PublishValues();
+                Current.Services.ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    Current.Services.ContentService.SaveAndPublishWithStatus(temp);
+                    temp.PublishValues();
+                    Current.Services.ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }
 

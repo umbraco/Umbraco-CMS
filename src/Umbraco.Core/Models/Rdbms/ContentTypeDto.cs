@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models.Rdbms
         public bool AllowAtRoot { get; set; }
 
         [Column("variations")]
-        [Constraint(Default = "0")]
+        [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]
         public byte Variations { get; set; }
 
         [ResultColumn]

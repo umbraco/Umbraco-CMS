@@ -185,6 +185,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
                 .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
 
+                .ForMember(dto => dto.Variations, opt => opt.Ignore()) // fixme - change when UI supports it!
+
                 //only map if it is actually set
                 .ForMember(dest => dest.Id, opt => opt.Condition(source => source.Id > 0))
                 //only map if it is actually set, if it's  not set, it needs to be handled differently and will be taken care of in the

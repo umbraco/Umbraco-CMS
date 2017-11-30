@@ -178,14 +178,17 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
-            Assert.IsTrue(contentService.PublishWithStatus(root).Success);
-            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
-            Assert.IsTrue(contentService.PublishWithStatus(content).Success);
+            root.PublishValues();
+            Assert.IsTrue(contentService.SaveAndPublish(root).Success);
+            var content = contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
+            content.PublishValues();
+            Assert.IsTrue(contentService.SaveAndPublish(content).Success);
             var hierarchy = CreateContentHierarchy().OrderBy(x => x.Level).ToArray();
             contentService.Save(hierarchy, 0);
             foreach (var c in hierarchy)
             {
-                Assert.IsTrue(contentService.PublishWithStatus(c).Success);
+                c.PublishValues();
+                Assert.IsTrue(contentService.SaveAndPublish(c).Success);
             }
 
             //now make the data corrupted :/
@@ -200,7 +203,7 @@ namespace Umbraco.Tests.Services
 
             // here we get all descendants by the path of the node being moved to bin, and unpublish all of them.
             // since the path is invalid, there's logic in here to fix that if it's possible and re-persist the entity.
-            var moveResult = ServiceContext.ContentService.WithResult().MoveToRecycleBin(content);
+            var moveResult = ServiceContext.ContentService.MoveToRecycleBin(content);
 
             Assert.IsTrue(moveResult.Success);
 
@@ -223,7 +226,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+            var content = contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
 
             content.ReleaseDate = DateTime.Now.AddHours(2);
             contentService.Save(content, 0);
@@ -234,7 +237,8 @@ namespace Umbraco.Tests.Services
 
 
             // Assert
-            Assert.IsTrue(contentService.PublishWithStatus(content).Success);
+            content.PublishValues();
+            Assert.IsTrue(contentService.SaveAndPublish(content).Success);
         }
 
         [Test]
@@ -244,11 +248,12 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+            var content = contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
             for (var i = 0; i < 20; i++)
             {
                 content.SetValue("bodyText", "hello world " + Guid.NewGuid());
-                contentService.SaveAndPublishWithStatus(content);
+                content.PublishValues();
+                contentService.SaveAndPublish(content);
             }
 
             // Assert
@@ -269,7 +274,7 @@ namespace Umbraco.Tests.Services
             var results = new List<IContent>();
             for (var i = 0; i < 20; i++)
             {
-                results.Add(contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0));
+                results.Add(contentService.CreateAndSave("Test", -1, "umbTextpage", 0));
             }
 
             var sortedGet = contentService.GetByIds(new[] {results[10].Id, results[5].Id, results[12].Id}).ToArray();
@@ -289,7 +294,7 @@ namespace Umbraco.Tests.Services
             // Act
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+                contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
             }
 
             // Assert
@@ -308,11 +313,11 @@ namespace Umbraco.Tests.Services
             // Act
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+                contentService.CreateAndSave("Test", -1, "umbBlah", 0);
             }
 
             // Assert
-            Assert.AreEqual(20, contentService.Count(contentTypeAlias: "umbBlah"));
+            Assert.AreEqual(20, contentService.Count(documentTypeAlias: "umbBlah"));
         }
 
         [Test]
@@ -323,12 +328,12 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
             contentTypeService.Save(contentType);
-            var parent = contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+            var parent = contentService.CreateAndSave("Test", -1, "umbBlah", 0);
 
             // Act
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", parent, "umbBlah");
+                contentService.CreateAndSave("Test", parent, "umbBlah");
             }
 
             // Assert
@@ -343,13 +348,13 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbBlah", "test Doc Type");
             contentTypeService.Save(contentType);
-            var parent = contentService.CreateContentWithIdentity("Test", -1, "umbBlah", 0);
+            var parent = contentService.CreateAndSave("Test", -1, "umbBlah", 0);
 
             // Act
             IContent current = parent;
             for (int i = 0; i < 20; i++)
             {
-                current = contentService.CreateContentWithIdentity("Test", current, "umbBlah");
+                current = contentService.CreateAndSave("Test", current, "umbBlah");
             }
 
             // Assert
@@ -386,11 +391,13 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
             // verify
             var tags = tagService.GetTagsForEntity(content1.Id);
@@ -425,7 +432,8 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(4, allTags.Count());
 
-            contentService.PublishWithStatus(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
 
@@ -454,11 +462,13 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "bam" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
             // verify
             var tags = tagService.GetTagsForEntity(content1.Id);
@@ -466,8 +476,8 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(5, allTags.Count());
 
-            contentService.UnPublish(content1);
-            contentService.UnPublish(content2);
+            contentService.Unpublish(content1);
+            contentService.Unpublish(content2);
 
             // fixme - killing the rest of this test
             // this is not working consistently even in 7 when unpublishing a branch
@@ -493,8 +503,10 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            contentService.PublishWithStatus(content1);
-            contentService.PublishWithStatus(content2);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
             // tags are back
             tags = tagService.GetTagsForEntity(content1.Id);
@@ -522,11 +534,13 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
             // verify
             var tags = tagService.GetTagsForEntity(content1.Id);
@@ -560,7 +574,8 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            contentService.PublishWithStatus(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
 
@@ -597,14 +612,16 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "bam" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
-            contentService.UnPublish(content1);
-            contentService.UnPublish(content2);
+            contentService.Unpublish(content1);
+            contentService.Unpublish(content2);
 
             // fixme - killing the rest of this test
             // this is not working consistently even in 7 when unpublishing a branch
@@ -616,7 +633,8 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
             tags = tagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(4, tags.Count());
@@ -641,13 +659,15 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "bam" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1);
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
-            contentService.UnPublish(content1);
+            contentService.Unpublish(content1);
 
             var tags = tagService.GetTagsForEntity(content1.Id);
             Assert.AreEqual(0, tags.Count());
@@ -660,7 +680,8 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             tags = tagService.GetTagsForEntity(content2.Id);
             Assert.AreEqual(4, tags.Count());
@@ -703,7 +724,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(child2);
 
             // Act
-            contentService.PublishWithChildrenWithStatus(content, includeUnpublished: true);
+            contentService.PublishWithChildren(content, includeUnpublished: true);
 
             // Assert
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
@@ -740,7 +761,8 @@ namespace Umbraco.Tests.Services
             // create a content with tags and publish
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // edit tags and save
             content.SetTags("tags", new[] { "another", "world" }, false);
@@ -779,7 +801,8 @@ namespace Umbraco.Tests.Services
 
             // Act
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // Assert
             Assert.AreEqual(4, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -809,11 +832,13 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.PublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // Act
             content.SetTags("tags", new[] { "another", "world" }, false);
-            contentService.PublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // Assert
             Assert.AreEqual(5, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -843,11 +868,13 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.PublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // Act
             content.RemoveTags("tags", new[] { "some", "world" });
-            contentService.PublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // Assert
             Assert.AreEqual(2, content.Properties["tags"].GetValue().ToString().Split(',').Distinct().Count());
@@ -869,7 +896,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContent("Test", -1, "umbTextpage", 0);
+            var content = contentService.Create("Test", -1, "umbTextpage", 0);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -883,7 +910,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContent("Test", -1, "umbTextpage", 0);
+            var content = contentService.Create("Test", -1, "umbTextpage", 0);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -897,7 +924,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContent("Test", -1, "umbTextpage");
+            var content = contentService.Create("Test", -1, "umbTextpage");
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -933,7 +960,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act & Assert
-            Assert.Throws<Exception>(() => contentService.CreateContent("Test", -1, "umbAliasDoesntExist"));
+            Assert.Throws<Exception>(() => contentService.Create("Test", -1, "umbAliasDoesntExist"));
         }
 
         [Test]
@@ -1029,7 +1056,8 @@ namespace Umbraco.Tests.Services
 
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.IsFalse(parent.Published);
-            ServiceContext.ContentService.Publish(parent); // publishing parent, so Text Page 2 can be updated.
+            parent.PublishValues();
+            ServiceContext.ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             Assert.IsFalse(content.Published);
@@ -1041,14 +1069,16 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Jane Doe");
-            contentService.SaveAndPublishWithStatus(content); // publishes the current version, creates a version
+            content.PublishValues();
+            contentService.SaveAndPublish(content); // publishes the current version, creates a version
 
             var version2 = content.Version;
             Console.WriteLine($"2 e={((Content) content).VersionPk} p={((Content) content).PublishedVersionPk}");
 
             content.Name = "Text Page 2 ReUpdated";
             content.SetValue("author", "Bob Hope");
-            contentService.SaveAndPublishWithStatus(content); // publishes again, creates a version
+            content.PublishValues();
+            contentService.SaveAndPublish(content); // publishes again, creates a version
 
             var version3 = content.Version;
             Console.WriteLine($"3 e={((Content) content).VersionPk} p={((Content) content).PublishedVersionPk}");
@@ -1114,10 +1144,12 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            contentService.SaveAndPublishWithStatus(root);
+            root.PublishValues();
+            contentService.SaveAndPublish(root);
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             content.ExpireDate = DateTime.Now.AddSeconds(1);
-            contentService.SaveAndPublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             // Act
             Thread.Sleep(new TimeSpan(0, 0, 0, 2));
@@ -1166,7 +1198,8 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            bool published = contentService.Publish(content, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var uow = provider.CreateUnitOfWork())
@@ -1175,11 +1208,11 @@ namespace Umbraco.Tests.Services
             }
 
             // Act
-            bool unpublished = contentService.UnPublish(content, 0);
+            var unpublished = contentService.Unpublish(content, 0);
 
             // Assert
-            Assert.That(published, Is.True);
-            Assert.That(unpublished, Is.True);
+            Assert.That(published.Success, Is.True);
+            Assert.That(unpublished.Success, Is.True);
             Assert.That(content.Published, Is.False);
 
             using (var uow = provider.CreateUnitOfWork())
@@ -1196,10 +1229,11 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
 
             // Act
-            bool published = contentService.Publish(content, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
-            Assert.That(published, Is.True);
+            Assert.That(published.Success, Is.True);
             Assert.That(content.Published, Is.True);
         }
 
@@ -1208,14 +1242,15 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var parent = contentService.CreateContent("parent", -1, "umbTextpage");
-            contentService.SaveAndPublishWithStatus(parent);
-            var content = contentService.CreateContent("child", parent, "umbTextpage");
+            var parent = contentService.Create("parent", -1, "umbTextpage");
+            parent.PublishValues();
+            contentService.SaveAndPublish(parent);
+            var content = contentService.Create("child", parent, "umbTextpage");
             contentService.Save(content);
 
-            Assert.IsTrue(contentService.IsPublishable(content));
-            contentService.UnPublish(parent);
-            Assert.IsFalse(contentService.IsPublishable(content));
+            Assert.IsTrue(contentService.IsPathPublishable(content));
+            contentService.Unpublish(parent);
+            Assert.IsFalse(contentService.IsPathPublishable(content));
         }
 
         [Test]
@@ -1234,7 +1269,8 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("Home", content.Name);
 
                 content.Name = "foo";
-                var published = contentService.Publish(content, 0);
+                content.PublishValues();
+                var published = contentService.SaveAndPublish(content, 0);
 
                 Assert.That(published, Is.True);
                 Assert.That(content.Published, Is.True);
@@ -1273,13 +1309,15 @@ namespace Umbraco.Tests.Services
 
             // Act
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            bool parentPublished = contentService.Publish(parent, 0);
-            bool published = contentService.Publish(content, 0);
+            parent.PublishValues();
+            var parentPublished = contentService.SaveAndPublish(parent, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
-            Assert.That(parentPublished, Is.True);
-            Assert.That(published, Is.False);
-            Assert.That(content.Validate(), Is.False);
+            Assert.That(parentPublished.Success, Is.True);
+            Assert.That(published.Success, Is.False);
+            Assert.IsNotEmpty(content.Validate());
             Assert.That(parent.Published, Is.True);
             Assert.That(content.Published, Is.False);
         }
@@ -1292,11 +1330,11 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
 
             // Act
-            bool published = contentService.PublishWithChildren(content, 0);
+            var published = contentService.PublishWithChildren(content, 0);
             var children = contentService.GetChildren(NodeDto.NodeIdSeed + 2);
 
             // Assert
-            Assert.That(published, Is.True);//Nothing was cancelled, so should be true
+            Assert.That(published.All(x => x.Success), Is.True);//Nothing was cancelled, so should be true
             Assert.That(content.Published, Is.True);//No restrictions, so should be published
             Assert.That(children.First(x => x.Id == NodeDto.NodeIdSeed + 3).Published, Is.True);//Released 5 mins ago, so should be published
         }
@@ -1311,14 +1349,16 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            parent.PublishValues();
+            var parentPublished = contentService.SaveAndPublish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            bool published = contentService.Publish(content, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
-            Assert.That(parentPublished, Is.True);
-            Assert.That(published, Is.False);
+            Assert.That(parentPublished.Success, Is.True);
+            Assert.That(published.Success, Is.False);
             Assert.That(content.Published, Is.False);
         }
 
@@ -1332,14 +1372,16 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, 0);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            parent.PublishValues();
+            var parentPublished = contentService.SaveAndPublish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            bool published = contentService.Publish(content, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
-            Assert.That(parentPublished, Is.True);
-            Assert.That(published, Is.False);
+            Assert.That(parentPublished.Success, Is.True);
+            Assert.That(published.Success, Is.False);
             Assert.That(content.Published, Is.False);
         }
 
@@ -1348,14 +1390,14 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Subpage with Unpublisehed Parent", NodeDto.NodeIdSeed + 2, "umbTextpage", 0);
+            var content = contentService.Create("Subpage with Unpublisehed Parent", NodeDto.NodeIdSeed + 2, "umbTextpage", 0);
             contentService.Save(content, 0);
 
             // Act
-            bool published = contentService.PublishWithChildren(content, 0);
+            var published = contentService.PublishWithChildren(content, 0);
 
             // Assert
-            Assert.That(published, Is.False);
+            Assert.That(published.All(x => x.Success), Is.False);
             Assert.That(content.Published, Is.False);
         }
 
@@ -1367,10 +1409,11 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
 
             // Act
-            bool published = contentService.Publish(content, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
-            Assert.That(published, Is.False);
+            Assert.That(published.Success, Is.False);
             Assert.That(content.Published, Is.False);
             Assert.That(content.Trashed, Is.True);
         }
@@ -1380,16 +1423,17 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", - 1, "umbTextpage", 0);
+            var content = contentService.Create("Home US", - 1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act
-            bool published = contentService.SaveAndPublish(content, 0);
+            content.PublishValues();
+            var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
             Assert.That(content.Published, Is.True);
-            Assert.That(published, Is.True);
+            Assert.IsTrue(published.Success);
         }
 
         /// <summary>
@@ -1404,16 +1448,18 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            var content = contentService.Create("Home US", -1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act
+            content.PublishValues();
             var published = contentService.SaveAndPublish(content, 0);
-            var childContent = contentService.CreateContent("Child", content.Id, "umbTextpage", 0);
+            var childContent = contentService.Create("Child", content.Id, "umbTextpage", 0);
             // Reset all identity properties
             childContent.Id = 0;
             childContent.Path = null;
             ((Content)childContent).ResetIdentity();
+            childContent.PublishValues();
             var childPublished = contentService.SaveAndPublish(childContent, 0);
 
             // Assert
@@ -1432,10 +1478,12 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            var rootPublished = contentService.Publish(root);
+            root.PublishValues();
+            var rootPublished = contentService.SaveAndPublish(root);
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
+            content.PublishValues();
             var contentPublished = contentService.SaveAndPublish(content);
             var publishedVersion = content.Version;
 
@@ -1448,8 +1496,8 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(0, publishedDescendants.Count);
 
             // Assert
-            Assert.IsTrue(rootPublished);
-            Assert.IsTrue(contentPublished);
+            Assert.IsTrue(rootPublished.Success);
+            Assert.IsTrue(contentPublished.Success);
 
             //Console.WriteLine(publishedVersion);
             //foreach (var d in publishedDescendants) Console.WriteLine(d.Version);
@@ -1458,7 +1506,7 @@ namespace Umbraco.Tests.Services
             //Ensure that the published content version has the correct property value and is marked as published
             var publishedContentVersion = publishedDescendants.First(x => x.Version == publishedVersion);
             Assert.That(publishedContentVersion.Published, Is.True);
-            Assert.That(publishedContentVersion.Properties["title"].GetValue(true), Contains.Substring("Published"));
+            Assert.That(publishedContentVersion.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
 
             // and has the correct draft properties
             Assert.That(publishedContentVersion.Properties["title"].GetValue(), Contains.Substring("Saved"));
@@ -1466,7 +1514,7 @@ namespace Umbraco.Tests.Services
             //Ensure that the latest version of the content is ok
             var currentContent = contentService.GetById(NodeDto.NodeIdSeed + 4);
             Assert.That(currentContent.Published, Is.True);
-            Assert.That(currentContent.Properties["title"].GetValue(true), Contains.Substring("Published"));
+            Assert.That(currentContent.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
             Assert.That(currentContent.Properties["title"].GetValue(), Contains.Substring("Saved"));
             Assert.That(currentContent.Version, Is.EqualTo(publishedContentVersion.Version));
         }
@@ -1476,7 +1524,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", - 1, "umbTextpage", 0);
+            var content = contentService.Create("Home US", - 1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act
@@ -1531,9 +1579,9 @@ namespace Umbraco.Tests.Services
             var contentType = contentTypeService.Get("umbTextpage");
 
             // Act
-            contentService.DeleteContentOfType(contentType.Id);
+            contentService.DeleteOfType(contentType.Id);
             var rootContent = contentService.GetRootContent();
-            var contents = contentService.GetContentOfContentType(contentType.Id);
+            var contents = contentService.GetByType(contentType.Id);
 
             // Assert
             Assert.That(rootContent.Any(), Is.False);
@@ -1636,7 +1684,7 @@ namespace Umbraco.Tests.Services
             var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
             ServiceContext.ContentService.Save(childPage);
             //assign explicit permissions to the child
-            ServiceContext.ContentService.AssignContentPermission(childPage, 'A', new[] { userGroup.Id });
+            ServiceContext.ContentService.SetPermission(childPage, 'A', new[] { userGroup.Id });
 
             //Ok, now copy, what should happen is the childPage will retain it's own permissions
             var parentPage2 = MockedContent.CreateSimpleContent(contentType);
@@ -1668,7 +1716,7 @@ namespace Umbraco.Tests.Services
 
             var parentPage = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(parentPage);
-            ServiceContext.ContentService.AssignContentPermission(parentPage, 'A', new[] { userGroup.Id });
+            ServiceContext.ContentService.SetPermission(parentPage, 'A', new[] { userGroup.Id });
 
             var childPage1 = MockedContent.CreateSimpleContent(contentType, "child1", parentPage);
             ServiceContext.ContentService.Save(childPage1);
@@ -1692,7 +1740,7 @@ namespace Umbraco.Tests.Services
             //create a new parent with a new permission structure
             var parentPage2 = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(parentPage2);
-            ServiceContext.ContentService.AssignContentPermission(parentPage2, 'B', new[] { userGroup.Id });
+            ServiceContext.ContentService.SetPermission(parentPage2, 'B', new[] { userGroup.Id });
 
             //Now copy, what should happen is the child pages will now have permissions inherited from the new parent
             var copy = ServiceContext.ContentService.Copy(childPage1, parentPage2.Id, false, true);
@@ -1735,12 +1783,14 @@ namespace Umbraco.Tests.Services
             content1.PropertyValues(obj);
             content1.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content1, 0);
-            Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content1, 0).Success);
+            content1.PublishValues();
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content1, 0).Success);
             var content2 = MockedContent.CreateBasicContent(contentType);
             content2.PropertyValues(obj);
             content2.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content2, 0);
-            Assert.IsTrue(ServiceContext.ContentService.PublishWithStatus(content2, 0).Success);
+            content2.PublishValues();
+            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, 0).Success);
 
             var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
             editorGroup.StartContentId = content1.Id;
@@ -1767,7 +1817,7 @@ namespace Umbraco.Tests.Services
             var userGroup = ServiceContext.UserService.GetUserGroupByAlias(user.Groups.First().Alias);
             Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(user, content1, "X"));
 
-            ServiceContext.ContentService.AssignContentPermission(content1, 'A', new[] { userGroup.Id });
+            ServiceContext.ContentService.SetPermission(content1, 'A', new[] { userGroup.Id });
 
             Assert.IsTrue(ServiceContext.DomainService.Save(new UmbracoDomain("www.test.com", "en-AU")
             {
@@ -1876,13 +1926,15 @@ namespace Umbraco.Tests.Services
             var content = MockedContent.CreateSimpleContent(contentType, "Simple Text Page", -1);
             var prop = content.Properties.First();
             content.SetTags(prop.Alias, new[] {"hello", "world"}, true);
-            contentService.PublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             var copy = contentService.Copy(content, content.ParentId, false, 0);
             var copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
             Assert.AreEqual(0, copiedTags.Length);
 
-            contentService.PublishWithStatus(copy);
+            copy.PublishValues();
+            contentService.SaveAndPublish(copy);
             copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
 
             Assert.AreEqual(2, copiedTags.Length);
@@ -1898,7 +1950,8 @@ namespace Umbraco.Tests.Services
 
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.IsFalse(parent.Published);
-            ServiceContext.ContentService.Publish(parent); // publishing parent, so Text Page 2 can be updated.
+            parent.PublishValues();
+            ServiceContext.ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             Assert.IsFalse(content.Published);
@@ -1914,7 +1967,8 @@ namespace Umbraco.Tests.Services
             // non published = edited
             Assert.IsTrue(content.Edited);
 
-            contentService.SaveAndPublishWithStatus(content); // new version
+            content.PublishValues();
+            contentService.SaveAndPublish(content); // new version
             var version2 = content.Version;
             Assert.AreNotEqual(version1, version2);
 
@@ -1938,7 +1992,8 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 ReReUpdated";
 
-            contentService.SaveAndPublishWithStatus(content); // new version
+            content.PublishValues();
+            contentService.SaveAndPublish(content); // new version
             var version3 = content.Version;
             Assert.AreNotEqual(version2, version3);
 
@@ -1968,7 +2023,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Text Page 2 Updated", rollback.Name);
 
             // published props and name are still there
-            Assert.AreEqual("Jane Doe", rollback.GetValue<string>("author", true));
+            Assert.AreEqual("Jane Doe", rollback.GetValue<string>("author", published: true));
             Assert.AreEqual("Text Page 2 ReReUpdated", rollback.PublishName);
 
             // rollback all values to current version
@@ -1985,7 +2040,8 @@ namespace Umbraco.Tests.Services
             content = contentService.GetById(content.Id);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
-            contentService.SaveAndPublishWithStatus(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
             Assert.IsFalse(content.Edited);
             content.Name = "Xxx";
             content.SetValue("author", "Bob Doe");
@@ -2092,7 +2148,7 @@ namespace Umbraco.Tests.Services
         public void Ensure_Content_Xml_Created()
         {
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            var content = contentService.Create("Home US", -1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             contentService.Save(content);
@@ -2102,7 +2158,8 @@ namespace Umbraco.Tests.Services
                 Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
 
-            contentService.Publish(content);
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
 
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -2114,7 +2171,7 @@ namespace Umbraco.Tests.Services
         public void Ensure_Preview_Xml_Created()
         {
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent("Home US", -1, "umbTextpage", 0);
+            var content = contentService.Create("Home US", -1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             contentService.Save(content);
@@ -2191,6 +2248,137 @@ namespace Umbraco.Tests.Services
             entities = service.GetPagedChildren(willHaveChildren.Id, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
             Assert.That(total, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void PublishingTest()
+        {
+            var contentType = new ContentType(-1)
+            {
+                Alias = "foo",
+                Name = "Foo"
+            };
+
+            var properties = new PropertyTypeCollection(true)
+            {
+                new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Mandatory = false, DataTypeDefinitionId = -88 },
+            };
+
+            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "content" });
+
+            contentType.SetDefaultTemplate(new Template("Textpage", "textpage"));
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.Create("foo", -1, "foo");
+            contentService.Save(content);
+
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.Edited);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.Edited);
+
+            content.SetValue("title", "foo");
+            Assert.IsTrue(content.Edited);
+
+            contentService.Save(content);
+
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.Edited);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.Edited);
+
+            var versions = contentService.GetVersions(content.Id);
+            Assert.AreEqual(1, versions.Count());
+
+            // publish content
+            // becomes Published, !Edited
+            // creates a new version
+            // can get published property values
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
+
+            Assert.IsTrue(content.Published);
+            Assert.IsFalse(content.Edited);
+
+            content = contentService.GetById(content.Id);
+            Assert.IsTrue(content.Published);
+            Assert.IsFalse(content.Edited);
+
+            versions = contentService.GetVersions(content.Id);
+            Assert.AreEqual(2, versions.Count());
+
+            Assert.AreEqual("foo", content.GetValue("title", published: true));
+            Assert.AreEqual("foo", content.GetValue("title"));
+
+            // unpublish content
+            // becomes !Published, Edited
+            contentService.Unpublish(content);
+
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.Edited);
+
+            Assert.AreEqual("foo", content.GetValue("title", published: true));
+            Assert.AreEqual("foo", content.GetValue("title"));
+
+            var vpk = ((Content) content).VersionPk;
+            var ppk = ((Content) content).PublishedVersionPk;
+
+            content = contentService.GetById(content.Id);
+            Assert.IsFalse(content.Published);
+            Assert.IsTrue(content.Edited);
+
+            // fixme - depending on 1 line in ContentBaseFactory.BuildEntity
+            // the published infos can be gone or not
+            // if gone, it's not consistent with above
+            Assert.AreEqual(vpk, ((Content) content).VersionPk);
+            Assert.AreEqual(ppk, ((Content) content).PublishedVersionPk); // still there
+
+            // fixme - depending on 1 line in ContentRepository.MapDtoToContent
+            // the published values can be null or not
+            // if null, it's not consistent with above
+            //Assert.IsNull(content.GetValue("title", published:  true));
+            Assert.AreEqual("foo", content.GetValue("title", published: true)); // still there
+            Assert.AreEqual("foo", content.GetValue("title"));
+
+            versions = contentService.GetVersions(content.Id);
+            Assert.AreEqual(2, versions.Count());
+
+            // ah - we have a problem here - since we're not published we don't have published values
+            // and therefore we cannot "just" republish the content - we need to publish some values
+            // so... that's not really an option
+            //
+            //contentService.SaveAndPublish(content);
+
+            // fixme - what shall we do of all this?
+            /*
+            // this basically republishes a content
+            // what if it never was published?
+            // what if it has changes?
+            // do we want to "publish" only some variants, or the entire content?
+            contentService.Publish(content);
+
+            Assert.IsTrue(content.Published);
+            Assert.IsFalse(content.Edited);
+
+            // fixme - should it be 2 or 3
+            versions = contentService.GetVersions(content.Id);
+            Assert.AreEqual(2, versions.Count());
+
+            // fixme - now test rollbacks
+            var version = contentService.GetByVersion(content.Id); // test that it gets a version - should be GetVersion
+            var previousVersion = contentService.GetVersions(content.Id).Skip(1).FirstOrDefault(); // need an optimized way to do this
+            content.CopyValues(version); // copies the edited value - always
+            content.Template = version.Template;
+            content.Name = version.Name;
+            contentService.Save(content); // this is effectively a rollback?
+            contentService.Rollback(content); // just kill the method and offer options on values + template + name...
+            */
         }
 
         private IEnumerable<IContent> CreateContentHierarchy()

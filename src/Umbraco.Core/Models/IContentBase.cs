@@ -44,90 +44,40 @@ namespace Umbraco.Core.Models
         IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the content object has a property with the supplied alias.
+        /// Gets a value indicating whether the content entity has a property with the supplied alias.
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns>True if Property with given alias exists, otherwise False</returns>
-        bool HasProperty(string propertyTypeAlias); // fixme - what does this mean????
+        /// <remarks>Indicates that the content entity has a property with the supplied alias, but
+        /// not necessarily that the content has a value for that property. Could be missing.</remarks>
+        bool HasProperty(string propertyTypeAlias);
 
         /// <summary>
-        /// Gets the neutral value of a Property
+        /// Gets the value of a Property
         /// </summary>
-        object GetValue(string propertyTypeAlias, bool published = false);
+        object GetValue(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false);
 
         /// <summary>
-        /// Gets the culture value of a Property
+        /// Gets the typed value of a Property
         /// </summary>
-        object GetValue(string propertyTypeAlias, int? languageId, bool published = false);
+        TValue GetValue<TValue>(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false);
 
         /// <summary>
-        /// Gets the segment value of a Property
+        /// Sets the (edited) value of a Property
         /// </summary>
-        object GetValue(string propertyTypeAlias, string segment, bool published = false);
+        void SetValue(string propertyTypeAlias, object value, int? languageId = null, string segment = null);
 
         /// <summary>
-        /// Gets the culture+segment value of a Property
+        /// Gets a value indicating whether the content and all its properties values are valid.
         /// </summary>
-        object GetValue(string propertyTypeAlias, int? languageId, string segment, bool published = false);
+        Property[] ValidateAll();
 
         /// <summary>
-        /// Gets the typed neutral value of a Property
+        /// Gets a value indicating whether the content and its properties values are valid.
         /// </summary>
-        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, bool published = false);
+        Property[] Validate(int? languageId = null, string segment = null);
 
         /// <summary>
-        /// Gets the typed culture value of a Property
+        /// Gets a value indicating whether the content and its culture/any properties values are valid.
         /// </summary>
-        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int? languageId, bool published = false);
-
-        /// <summary>
-        /// Gets the typed segment value of a Property
-        /// </summary>
-        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, string segment, bool published = false);
-
-        /// <summary>
-        /// Gets the typed culture+segment value of a Property
-        /// </summary>
-        TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int? languageId, string segment, bool published = false);
-
-        /// <summary>
-        /// Sets the neutral (edited) value of a Property
-        /// </summary>
-        void SetValue(string propertyTypeAlias, object value);
-
-        /// <summary>
-        /// Sets the culture (edited) value of a Property
-        /// </summary>
-        void SetValue(string propertyTypeAlias, int? languageId, object value);
-
-        /// <summary>
-        /// Sets the segment (edited) value of a Property
-        /// </summary>
-        void SetValue(string propertyTypeAlias, string segment, object value);
-
-        /// <summary>
-        /// Sets the culture+segment (edited) value of a Property
-        /// </summary>
-        void SetValue(string propertyTypeAlias, int? languageId, string segment, object value);
-
-        /// <summary>
-        /// Gets a value indicating whether the content and its invariant+neutral properties values are valid.
-        /// </summary>
-        Property[] Validate();
-
-        /// <summary>
-        /// Gets a value indicating whether the content and its culture+neutral properties values are valid for the specified culture.
-        /// </summary>
-        Property[] Validate(int? languageId);
-
-        /// <summary>
-        /// Gets a value indicating whether the content and its invariant+segment values are valid for the specified segment.
-        /// </summary>
-        Property[] Validate(string segment);
-
-        /// <summary>
-        /// Gets a value indicating whether the content and its culture+segment properties values are valid.
-        /// </summary>
-        Property[] Validate(int? languageId, string segment);
+        Property[] ValidateCulture(int? languageId = null);
     }
 }

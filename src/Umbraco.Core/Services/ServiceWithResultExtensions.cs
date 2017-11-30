@@ -9,10 +9,6 @@
     /// </summary>
     public static class ServiceWithResultExtensions
     {
-        public static IContentServiceOperations WithResult(this IContentService contentService)
-        {
-            return (IContentServiceOperations)contentService;
-        }
         public static IMediaServiceOperations WithResult(this IMediaService mediaService)
         {
             return (IMediaServiceOperations)mediaService;

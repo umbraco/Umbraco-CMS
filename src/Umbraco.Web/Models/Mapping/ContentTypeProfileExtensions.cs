@@ -180,6 +180,8 @@ namespace Umbraco.Web.Models.Mapping
                 // ignore, composition is managed in AfterMapContentTypeSaveToEntity
                 .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore())
 
+                .ForMember(dto => dto.Variations, opt => opt.Ignore()) // fixme - change when UI supports it!
+
                 .ForMember(
                     dest => dest.AllowedContentTypes,
                     opt => opt.MapFrom(src => src.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i))))

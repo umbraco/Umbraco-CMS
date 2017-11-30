@@ -188,9 +188,9 @@ namespace Umbraco.Web.Editors
                                 Logger.Warn<ContentTypeController>(
                                     "Could not create a template for the Content Type: {0}, status: {1}",
                                     () => ctSave.Alias,
-                                    () => tryCreateTemplate.Result.StatusType);
+                                    () => tryCreateTemplate.Result.Result);
                             }
-                            template = tryCreateTemplate.Result.Value;
+                            template = tryCreateTemplate.Result.Entity;
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back

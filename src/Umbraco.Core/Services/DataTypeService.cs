@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
 
         #region Containers
 
-        public Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Services
                     if (uow.Events.DispatchCancelable(SavingContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
                     {
                         uow.Complete();
-                        return OperationStatus.Attempt.Cancel(evtMsgs, container);
+                        return OperationResult.Attempt.Cancel(evtMsgs, container);
                     }
 
                     repo.AddOrUpdate(container);
@@ -50,11 +50,11 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
                     //TODO: Audit trail ?
 
-                    return OperationStatus.Attempt.Succeed(evtMsgs, container);
+                    return OperationResult.Attempt.Succeed(evtMsgs, container);
                 }
                 catch (Exception ex)
                 {
-                    return OperationStatus.Attempt.Fail<EntityContainer>(evtMsgs, ex);
+                    return OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, ex);
                 }
             }
         }
@@ -109,20 +109,20 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
             if (container.ContainedObjectType != Constants.ObjectTypes.DataType)
             {
                 var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.");
-                return OperationStatus.Attempt.Fail(evtMsgs, ex);
+                return OperationResult.Attempt.Fail(evtMsgs, ex);
             }
 
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
             {
                 var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
-                return OperationStatus.Attempt.Fail(evtMsgs, ex);
+                return OperationResult.Attempt.Fail(evtMsgs, ex);
             }
 
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(SavingContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
@@ -141,27 +141,27 @@ namespace Umbraco.Core.Services
             }
 
             //TODO: Audit trail ?
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
                 var container = repo.Get(containerId);
-                if (container == null) return OperationStatus.Attempt.NoOperation(evtMsgs);
+                if (container == null) return OperationResult.Attempt.NoOperation(evtMsgs);
 
                 var erepo = uow.CreateRepository<IEntityRepository>();
                 var entity = erepo.Get(container.Id);
                 if (entity.HasChildren()) // because container.HasChildren() does not work?
-                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCannot, evtMsgs)); // causes rollback
+                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs)); // causes rollback
 
                 if (uow.Events.DispatchCancelable(DeletingContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
                 {
                     uow.Complete();
-                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs));
                 }
 
                 repo.Delete(container);
@@ -171,10 +171,10 @@ namespace Umbraco.Core.Services
             }
 
             //TODO: Audit trail ?
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationStatus<OperationStatusType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.CreateUnitOfWork())
@@ -197,11 +197,11 @@ namespace Umbraco.Core.Services
                     // fixme - triggering SavedContainer with a different name?!
                     uow.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "RenamedContainer");
 
-                    return OperationStatus.Attempt.Succeed(OperationStatusType.Success, evtMsgs, container);
+                    return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
                 }
                 catch (Exception ex)
                 {
-                    return OperationStatus.Attempt.Fail<EntityContainer>(evtMsgs, ex);
+                    return OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, ex);
                 }
             }
         }
@@ -326,7 +326,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId)
+        public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
@@ -338,7 +338,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Moving, this, moveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
+                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
                 }
 
                 var containerRepository = uow.CreateRepository<IDataTypeContainerRepository>();
@@ -363,11 +363,11 @@ namespace Umbraco.Core.Services
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
                     uow.Complete(); // fixme what are we doing here exactly?
-                    return OperationStatus.Attempt.Fail(ex.Operation, evtMsgs);
+                    return OperationResult.Attempt.Fail(ex.Operation, evtMsgs);
                 }
             }
 
-            return OperationStatus.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
         /// <summary>

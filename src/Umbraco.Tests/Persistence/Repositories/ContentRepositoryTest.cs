@@ -155,7 +155,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -172,7 +171,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // unpublish = no impact on versions
                 ((Content) content1).PublishedState = PublishedState.Unpublishing;
@@ -188,7 +186,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(false, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -204,7 +201,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(false, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
                 ((Content) content1).PublishValues();
@@ -221,7 +217,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -240,7 +235,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = new version
                 content1.Name = "name-4";
@@ -259,7 +253,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // misc checks
                 Assert.AreEqual(true, unitOfWork.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
-                Console.WriteLine(unitOfWork.Database.ExecuteScalar<DateTime>("SELECT updateDate FROM uContent WHERE nodeId=@id", new { id = content1.Id }));
 
                 // all versions
                 var allVersions = repository.GetAllVersions(content1.Id).ToArray();
@@ -274,7 +267,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 }
 
                 // get older version
-                var content = repository.GetByVersion(versions[versions.Count - 4]);
+                var content = repository.GetVersion(versions[versions.Count - 4]);
                 Assert.IsNotNull(content.Version);
                 Assert.AreEqual(versions[versions.Count - 4], content.Version);
                 Assert.AreEqual("name-4", content1.Name);
@@ -657,8 +650,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish them all
                 foreach (var content in result)
                 {
-                    ((Content) content).PublishAllValues();
-                    ((Content) content).PublishedState = PublishedState.Publishing;
+                    content.PublishValues();
                     repository.AddOrUpdate(content);
                 }
                 unitOfWork.Flush();

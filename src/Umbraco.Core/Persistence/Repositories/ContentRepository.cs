@@ -202,7 +202,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
         }
 
-        public override IContent GetByVersion(Guid versionId)
+        public override IContent GetVersion(Guid versionId)
         {
             var sql = GetBaseQuery(QueryType.Single, false)
                 .Where<ContentVersionDto>(x => x.VersionId == versionId);
@@ -245,7 +245,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentFactory.BuildDto(entity, NodeObjectTypeId);
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (content.PublishedState == PublishedState.Publishing)
                 dto.Published = true;
             dto.NodeId = nodeDto.NodeId;
-            content.Edited = dto.Edited = edited;
+            content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
 
             // trigger here, before we reset Published etc
@@ -409,7 +409,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // create the dto
-            var dto = ContentFactory.BuildDto(entity, NodeObjectTypeId);
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -461,7 +461,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 dto.Published = true;
             else if (content.PublishedState == PublishedState.Unpublishing)
                 dto.Published = false;
-            content.Edited = dto.Edited = edited;
+            content.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Update(dto);
 
             // if entity is publishing, update tags, else leave tags there
@@ -783,7 +783,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
                     contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
 
-                var c = content[i] = ContentFactory.BuildEntity(dto, contentType);
+                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
                 // need templates
                 var templateId = dto.DocumentVersionDto.TemplateId;
@@ -834,7 +834,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IContent MapDtoToContent(DocumentDto dto)
         {
             var contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            var content = ContentFactory.BuildEntity(dto, contentType);
+            var content = ContentBaseFactory.BuildEntity(dto, contentType);
 
             // get template
             if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
@@ -842,7 +842,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // get properties - indexed by version id
             var versionId = dto.DocumentVersionDto.Id;
-            var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+
+            // fixme - shall we get published properties or not?
+            //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+            var publishedVersionId = dto.PublishedVersionDto != null ? dto.PublishedVersionDto.Id : 0;
+
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
             var properties = GetPropertyCollections(new List<TempContent<Content>> { temp });
             content.Properties = properties[dto.DocumentVersionDto.Id];

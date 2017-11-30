@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
         #region Versions
 
         // gets a specific version
-        public abstract TEntity GetByVersion(Guid versionId);
+        public abstract TEntity GetVersion(Guid versionId);
 
         // gets all versions, current first
         public abstract IEnumerable<TEntity> GetAllVersions(int nodeId);
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
             PerformDeleteVersion(versionDto.NodeId, versionId);
         }
 
-        // deletes all version older than a date
+        //  deletes all versions of an entity, older than a date.
         public virtual void DeleteVersions(int nodeId, DateTime versionDate)
         {
             // fixme test object node type?

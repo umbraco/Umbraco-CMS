@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Attempt<OperationStatus> Delete(IDomain domain)
+        public Attempt<OperationResult> Delete(IDomain domain)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var repository = uow.CreateRepository<IDomainRepository>();
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         public IDomain GetByName(string name)
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Attempt<OperationStatus> Save(IDomain domainEntity)
+        public Attempt<OperationResult> Save(IDomain domainEntity)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var repository = uow.CreateRepository<IDomainRepository>();
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         #region Event Handlers

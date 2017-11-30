@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -225,97 +226,87 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool Blueprint { get; internal set; }
 
-        /// <summary>
-        /// Publish the neutral value.
-        /// </summary>
-        internal virtual void PublishValues()
+        /// <inheritdoc />
+        public virtual void PublishAllValues()
         {
-            foreach (var property in Properties)
-                property.PublishValues(null, null);
-            _publishedState = PublishedState.Publishing;
-        }
+            if (ValidateAll().Any())
+                throw new InvalidOperationException("Values are not valid.");
 
-        /// <summary>
-        /// Publish the culture value.
-        /// </summary>
-        internal virtual void PublishValues(int? nLanguageId)
-        {
-            foreach (var property in Properties)
-                property.PublishValues(nLanguageId, null);
-            _publishedState = PublishedState.Publishing;
-        }
-
-        /// <summary>
-        /// Publish the segment value.
-        /// </summary>
-        internal virtual void PublishValues(string segment)
-        {
-            foreach (var property in Properties)
-                property.PublishValues(null, segment);
-            _publishedState = PublishedState.Publishing;
-        }
-
-        /// <summary>
-        /// Publish the culture+segment value.
-        /// </summary>
-        internal virtual void PublishValues(int? nLanguageId, string segment)
-        {
-            foreach (var property in Properties)
-                property.PublishValues(nLanguageId, segment);
-            _publishedState = PublishedState.Publishing;
-        }
-
-        /// <summary>
-        /// Publish all values.
-        /// </summary>
-        internal virtual void PublishAllValues()
-        {
             foreach (var property in Properties)
                 property.PublishAllValues();
             _publishedState = PublishedState.Publishing;
         }
 
-        internal virtual void CopyValues(IContentBase other, int? languageId, string segment, bool published = false)
+        /// <inheritdoc />
+        public virtual void PublishValues(int? languageId = null, string segment = null)
         {
-            if (other.ContentTypeId != ContentTypeId)
-                throw new InvalidOperationException("Cannot copy values from a different content type.");
+            if (Validate(languageId, segment).Any())
+                throw new InvalidOperationException("Values are not valid.");
 
-            // clear all existing properties
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
             foreach (var property in Properties)
-            {
-                // skip properties that don't support the specified variation
-                if (!property.PropertyType.ValidateVariation(languageId, segment, false))
-                    continue;
-
-                foreach (var pvalue in property.Values)
-                    if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
-                        property.SetValue(pvalue.LanguageId, pvalue.Segment, null);                
-            }
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                // skip properties that don't support the specified variation
-                if (!otherProperty.PropertyType.ValidateVariation(languageId, segment, false))
-                    continue;
-
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, languageId, segment, otherProperty.GetValue(languageId, segment, published));
-            }
+                property.PublishValue(languageId, segment);
+            _publishedState = PublishedState.Publishing;
         }
 
-        internal virtual void CopyAllValues(IContentBase other, bool published = false)
+        /// <inheritdoc />
+        public virtual void PublishCultureValues(int? languageId = null)
+        {
+            if (ValidateCulture(languageId).Any())
+                throw new InvalidOperationException("Values are not valid.");
+
+            foreach (var property in Properties)
+                property.PublishCultureValues(languageId);
+            _publishedState = PublishedState.Publishing;
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearAllPublishedValues()
+        {
+            foreach (var property in Properties)
+                property.ClearPublishedAllValues();
+            _publishedState = PublishedState.Publishing;
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearPublishedValues(int? languageId = null, string segment = null)
+        {
+            foreach (var property in Properties)
+                property.ClearPublishedValue(languageId, segment);
+            _publishedState = PublishedState.Publishing;
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearCulturePublishedValues(int? languageId = null)
+        {
+            foreach (var property in Properties)
+                property.ClearPublishedCultureValues(languageId);
+            _publishedState = PublishedState.Publishing;
+        }
+
+        private bool IsCopyFromSelf(IContent other)
+        {
+            // copying from the same Id and VersionPk
+            return Id == other.Id && VersionPk == ((Content) other).VersionPk;
+        }
+
+        /// <inheritdoc />
+        public virtual void CopyAllValues(IContent other)
         {
             if (other.ContentTypeId != ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
 
-            // clear all existing properties
+            // we could copy from another document entirely,
+            // or from another version of the same document,
+            // in which case there is a special case.
+            var published = IsCopyFromSelf(other);
+
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties
             foreach (var property in Properties)
             foreach (var pvalue in property.Values)
-                property.SetValue(pvalue.LanguageId, pvalue.Segment, null);
+                if (property.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                    property.SetValue(null, pvalue.LanguageId, pvalue.Segment);
 
             // copy other properties
             var otherProperties = other.Properties;
@@ -324,8 +315,74 @@ namespace Umbraco.Core.Models
                 var alias = otherProperty.PropertyType.Alias;
                 foreach (var pvalue in otherProperty.Values)
                 {
+                    if (!otherProperty.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                        continue;
                     var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                    SetValue(alias, pvalue.LanguageId, pvalue.Segment, value);
+                    SetValue(alias, value, pvalue.LanguageId, pvalue.Segment);
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void CopyValues(IContent other, int? languageId = null, string segment = null)
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            var published = VersionPk > PublishedVersionPk;
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties
+            foreach (var property in Properties)
+            {
+                if (!property.PropertyType.ValidateVariation(languageId, segment, false))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
+                        property.SetValue(null, pvalue.LanguageId, pvalue.Segment);                
+            }
+
+            // copy other properties
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                if (!otherProperty.PropertyType.ValidateVariation(languageId, segment, false))
+                    continue;
+
+                var alias = otherProperty.PropertyType.Alias;
+                SetValue(alias, otherProperty.GetValue(languageId, segment, published), languageId, segment);
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void CopyCultureValues(IContent other, int? languageId = null)
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            var published = VersionPk > PublishedVersionPk;
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties
+            foreach (var property in Properties)
+            foreach (var pvalue in property.Values)
+                if (pvalue.LanguageId == languageId && property.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                    property.SetValue(null, pvalue.LanguageId, pvalue.Segment);
+
+            // copy other properties
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (pvalue.LanguageId != languageId || !otherProperty.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                        continue;
+                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                    SetValue(alias, value, pvalue.LanguageId, pvalue.Segment);
                 }
             }
         }
@@ -371,16 +428,6 @@ namespace Umbraco.Core.Models
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
-        }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use DeepCloneWithResetIdentities instead")]
-        public IContent Clone()
-        {
-            return DeepCloneWithResetIdentities();
         }
 
         /// <summary>

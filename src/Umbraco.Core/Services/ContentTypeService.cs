@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
             foreach (var typeId in typeIds)
-                ContentService.DeleteContentOfType(typeId);
+                ContentService.DeleteOfType(typeId);
         }
 
         /// <summary>

@@ -417,13 +417,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        public IMedia GetByVersion(Guid versionId)
+        public IMedia GetVersion(Guid versionId)
         {
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 uow.ReadLock(Constants.Locks.MediaTree);
                 var repository = uow.CreateRepository<IMediaRepository>();
-                return repository.GetByVersion(versionId);
+                return repository.GetVersion(versionId);
             }
         }
 
@@ -791,7 +791,7 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationStatus> IMediaServiceOperations.Save(IMedia media, int userId, bool raiseEvents)
+        Attempt<OperationResult> IMediaServiceOperations.Save(IMedia media, int userId, bool raiseEvents)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -801,7 +801,7 @@ namespace Umbraco.Core.Services
                 if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 // poor man's validation?
@@ -829,7 +829,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
@@ -849,7 +849,7 @@ namespace Umbraco.Core.Services
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationStatus> IMediaServiceOperations.Save(IEnumerable<IMedia> medias, int userId, bool raiseEvents)
+        Attempt<OperationResult> IMediaServiceOperations.Save(IEnumerable<IMedia> medias, int userId, bool raiseEvents)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var mediasA = medias.ToArray();
@@ -860,7 +860,7 @@ namespace Umbraco.Core.Services
                 if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(mediasA, evtMsgs)))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x,
@@ -886,7 +886,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         #endregion
@@ -912,7 +912,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationStatus> IMediaServiceOperations.Delete(IMedia media, int userId)
+        Attempt<OperationResult> IMediaServiceOperations.Delete(IMedia media, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -921,7 +921,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMedia>(media, evtMsgs)))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 uow.WriteLock(Constants.Locks.MediaTree);
@@ -935,7 +935,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         private void DeleteLocked(IScopeUnitOfWork uow, IMediaRepository repository, IMedia media)
@@ -1047,7 +1047,7 @@ namespace Umbraco.Core.Services
                 IMediaRepository repository = null;
                 if (deletePriorVersions)
                 {
-                    var media = GetByVersion(versionId);
+                    var media = GetVersion(versionId);
                     DeleteVersions(uow, ref repository, id, media.UpdateDate, userId);
                 }
 
@@ -1085,7 +1085,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationStatus> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
+        Attempt<OperationResult> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<Tuple<IMedia, string>>();
@@ -1102,7 +1102,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia))))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 PerformMoveLocked(repository, media, Constants.System.RecycleBinMedia, null, userId, moves, true);
@@ -1119,7 +1119,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>

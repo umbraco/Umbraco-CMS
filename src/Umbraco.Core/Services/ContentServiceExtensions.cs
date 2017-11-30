@@ -40,7 +40,7 @@ namespace Umbraco.Core.Services
             if (guidUdi == null)
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) + " which is required by content");
             var parent = contentService.GetById(guidUdi.Guid);
-            return contentService.CreateContent(name, parent, mediaTypeAlias, userId);
+            return contentService.Create(name, parent, mediaTypeAlias, userId);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentId"></param>
         public static void RemoveContentPermissions(this IContentService contentService, int contentId)
         {
-            contentService.ReplaceContentPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
+            contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
         }
 
         /// <summary>

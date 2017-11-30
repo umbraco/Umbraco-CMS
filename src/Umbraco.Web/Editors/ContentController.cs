@@ -91,7 +91,7 @@ namespace Umbraco.Web.Editors
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             //current permissions explicitly assigned to this content item
-            var contentPermissions = Services.ContentService.GetPermissionsForEntity(content)
+            var contentPermissions = Services.ContentService.GetPermissions(content)
                 .ToDictionary(x => x.UserGroupId, x => x);
 
             var allUserGroups = Services.UserService.GetAllUserGroups().ToArray();
@@ -167,7 +167,7 @@ namespace Umbraco.Web.Editors
                 .ToDictionary(x => Convert.ToInt32(x.Id), x => x);
 
             //get the actual assigned permissions
-            var assignedPermissionsByGroup = Services.ContentService.GetPermissionsForEntity(content).ToArray();
+            var assignedPermissionsByGroup = Services.ContentService.GetPermissions(content).ToArray();
 
             //iterate over assigned and update the defaults with the real values
             foreach (var assignedGroupPermission in assignedPermissionsByGroup)
@@ -294,7 +294,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, Security.GetUserId());
+            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId());
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
@@ -501,8 +501,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
-        public ContentItemDisplay PostSaveBlueprint(
-            [ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
                 content =>
@@ -511,7 +510,7 @@ namespace Umbraco.Web.Editors
 
                     Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
-                    return Attempt<OperationStatus>.Succeed(new OperationStatus(OperationStatusType.Success, new EventMessages()));
+                    return OperationResult.Succeed(new EventMessages());
                 });
             SetupBlueprint(contentItemDisplay, contentItemDisplay.PersistedContent);
 
@@ -524,15 +523,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
-        public ContentItemDisplay PostSave(
-                [ModelBinder(typeof(ContentItemBinder))]
-                                ContentItemSave contentItem)
+        public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            return PostSaveInternal(contentItem,
-                content => Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            return PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
         }
 
-        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, Attempt<OperationStatus>> saveMethod)
+        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
             //If we've reached here it means:
             // * Our model has been bound
@@ -573,7 +569,7 @@ namespace Umbraco.Web.Editors
             }
 
             //initialize this to successful
-            var publishStatus = Attempt<PublishStatus>.Succeed();
+            var publishStatus = new PublishResult(null, contentItem.PersistedContent);
             var wasCancelled = false;
 
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
@@ -581,7 +577,7 @@ namespace Umbraco.Web.Editors
                 //save the item
                 var saveResult = saveMethod(contentItem.PersistedContent);
 
-                wasCancelled = saveResult.Success == false && saveResult.Result.StatusType == OperationStatusType.FailedCancelledByEvent;
+                wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
             {
@@ -591,8 +587,9 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, Security.CurrentUser.Id);
-                wasCancelled = publishStatus.Result.StatusType == PublishStatusType.FailedCancelledByEvent;
+                contentItem.PersistedContent.PublishValues(); // fixme variants?
+                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
+                wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
             }
 
             //return the updated model
@@ -632,7 +629,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    ShowMessageForPublishStatus(publishStatus.Result, display);
+                    ShowMessageForPublishStatus(publishStatus, display);
                     break;
             }
 
@@ -671,11 +668,12 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.PublishWithStatus(foundContent, Security.GetUserId());
+            foundContent.PublishValues(); // fixme variants?
+            var publishResult = Services.ContentService.SaveAndPublish(foundContent, Security.GetUserId());
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
-                ShowMessageForPublishStatus(publishResult.Result, notificationModel);
+                ShowMessageForPublishStatus(publishResult, notificationModel);
                 return Request.CreateValidationErrorResponse(notificationModel);
             }
 
@@ -724,8 +722,8 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.Trashed == false)
             {
-                var moveResult = Services.ContentService.WithResult().MoveToRecycleBin(foundContent, Security.GetUserId());
-                if (moveResult == false)
+                var moveResult = Services.ContentService.MoveToRecycleBin(foundContent, Security.GetUserId());
+                if (moveResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
@@ -734,8 +732,8 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.ContentService.WithResult().Delete(foundContent, Security.GetUserId());
-                if (deleteResult == false)
+                var deleteResult = Services.ContentService.Delete(foundContent, Security.GetUserId());
+                if (deleteResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
                     // notification messages are added to the response.
@@ -851,11 +849,11 @@ namespace Umbraco.Web.Editors
             if (foundContent == null)
                 HandleContentNotFound(id);
 
-            var unpublishResult = Services.ContentService.WithResult().UnPublish(foundContent, Security.CurrentUser.Id);
+            var unpublishResult = Services.ContentService.Unpublish(foundContent, Security.CurrentUser.Id);
 
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
 
-            if (unpublishResult == false)
+            if (unpublishResult.Success == false)
             {
                 AddCancelMessage(content);
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
@@ -967,50 +965,50 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display)
+        private void ShowMessageForPublishStatus(PublishResult status, INotificationModel display)
         {
-            switch (status.StatusType)
+            switch (status.Result)
             {
-                case PublishStatusType.Success:
-                case PublishStatusType.SuccessAlreadyPublished:
+                case PublishResultType.Success:
+                case PublishResultType.SuccessAlready:
                     display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
                             Services.TextService.Localize("speechBubbles/editContentPublishedText"));
                     break;
-                case PublishStatusType.FailedPathNotPublished:
+                case PublishResultType.FailedPathNotPublished:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                    new[] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) }).Trim());
+                                    new[] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) }).Trim());
                     break;
-                case PublishStatusType.FailedCancelledByEvent:
+                case PublishResultType.FailedCancelledByEvent:
                     AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
                     break;
-                case PublishStatusType.FailedAwaitingRelease:
+                case PublishResultType.FailedAwaitingRelease:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
-                                    new[] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) }).Trim());
+                                    new[] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) }).Trim());
                     break;
-                case PublishStatusType.FailedHasExpired:
+                case PublishResultType.FailedHasExpired:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedExpired",
                                     new[]
                                     {
-                                                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                                                string.Format("{0} ({1})", status.Content.Name, status.Content.Id),
                                     }).Trim());
                     break;
-                case PublishStatusType.FailedIsTrashed:
+                case PublishResultType.FailedIsTrashed:
                     //TODO: We should add proper error messaging for this!
                     break;
-                case PublishStatusType.FailedContentInvalid:
+                case PublishResultType.FailedContentInvalid:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedInvalid",
                                     new[]
                                     {
-                                                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                                                string.Format("{0} ({1})", status.Content.Name, status.Content.Id),
                                                                 string.Join(",", status.InvalidProperties.Select(x => x.Alias))
                                     }).Trim());
                     break;

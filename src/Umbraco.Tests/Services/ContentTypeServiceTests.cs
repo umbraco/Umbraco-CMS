@@ -85,7 +85,8 @@ namespace Umbraco.Tests.Services
                     var contentType = contentTypes[index];
                     var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                     ServiceContext.ContentService.Save(contentItem);
-                    ServiceContext.ContentService.Publish(contentItem);
+                    contentItem.PublishValues();
+                    ServiceContext.ContentService.SaveAndPublish(contentItem);
                     parentId = contentItem.Id;
 
                     ids.Add(contentItem.Id);
@@ -185,7 +186,8 @@ namespace Umbraco.Tests.Services
                         var contentType = contentTypes[index];
                         var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                         ServiceContext.ContentService.Save(contentItem);
-                        ServiceContext.ContentService.Publish(contentItem);
+                        contentItem.PublishValues();
+                        ServiceContext.ContentService.SaveAndPublish(contentItem);
                         parentId = contentItem.Id;
                     }
                 }
@@ -220,17 +222,20 @@ namespace Umbraco.Tests.Services
 
                 var root = MockedContent.CreateSimpleContent(contentType1, "Root", -1);
                 ServiceContext.ContentService.Save(root);
-                ServiceContext.ContentService.Publish(root);
+                root.PublishValues();
+                ServiceContext.ContentService.SaveAndPublish(root);
 
                 var level1 = MockedContent.CreateSimpleContent(contentType2, "L1", root.Id);
                 ServiceContext.ContentService.Save(level1);
-                ServiceContext.ContentService.Publish(level1);
+                level1.PublishValues();
+                ServiceContext.ContentService.SaveAndPublish(level1);
 
                 for (int i = 0; i < 2; i++)
                 {
                     var level3 = MockedContent.CreateSimpleContent(contentType3, "L2" + i, level1.Id);
                     ServiceContext.ContentService.Save(level3);
-                    ServiceContext.ContentService.Publish(level3);
+                    level3.PublishValues();
+                    ServiceContext.ContentService.SaveAndPublish(level3);
                 }
 
                 ServiceContext.ContentTypeService.Delete(contentType1);
@@ -259,7 +264,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent contentItem = MockedContent.CreateTextpageContent(contentType1, "Testing", -1);
-            ServiceContext.ContentService.SaveAndPublishWithStatus(contentItem);
+            contentItem.PublishValues();
+            ServiceContext.ContentService.SaveAndPublish(contentItem);
             var initProps = contentItem.Properties.Count;
             var initPropTypes = contentItem.PropertyTypes.Count();
 
@@ -287,11 +293,17 @@ namespace Umbraco.Tests.Services
 
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
             foreach (var x in contentItems1)
-                ServiceContext.ContentService.SaveAndPublishWithStatus(x);
+            {
+                x.PublishValues();
+                ServiceContext.ContentService.SaveAndPublish(x);
+            }
 
             var contentItems2 = MockedContent.CreateTextpageContent(contentType2, -1, 5).ToArray();
             foreach (var x in contentItems2)
-                ServiceContext.ContentService.SaveAndPublishWithStatus(x);
+            {
+                x.PublishValues();
+                ServiceContext.ContentService.SaveAndPublish(x);
+            }
 
             // make sure we have everything
             using (var scope = ScopeProvider.CreateScope())
@@ -346,7 +358,10 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType1);
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
             foreach (var x in contentItems1)
-                ServiceContext.ContentService.SaveAndPublishWithStatus(x);
+            {
+                x.PublishValues();
+                ServiceContext.ContentService.SaveAndPublish(x);
+            }
             var alias = contentType1.PropertyTypes.First().Alias;
             var elementToMatch = "<" + alias + ">";
 
@@ -477,8 +492,9 @@ namespace Umbraco.Tests.Services
             cts.Save(ctHomePage);
 
             // Act
-            var homeDoc = cs.CreateContent("Home Page", -1, contentTypeAlias);
-            cs.SaveAndPublishWithStatus(homeDoc);
+            var homeDoc = cs.Create("Home Page", -1, contentTypeAlias);
+            homeDoc.PublishValues();
+            cs.SaveAndPublish(homeDoc);
 
             // Assert
             Assert.That(ctBase.HasIdentity, Is.True);
@@ -552,7 +568,7 @@ namespace Umbraco.Tests.Services
             var childContentType = MockedContentTypes.CreateSimpleContentType("childPage", "Child Page", contentType, true, "Child Content");
             cts.Save(childContentType);
             var cs = ServiceContext.ContentService;
-            var content = cs.CreateContent("Page 1", -1, childContentType.Alias);
+            var content = cs.Create("Page 1", -1, childContentType.Alias);
             cs.Save(content);
 
             cts.Delete(contentType);

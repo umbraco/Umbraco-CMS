@@ -33,15 +33,18 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "cow", "pig", "goat" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.SetTags("tags", new[] { "cow", "pig" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
 
             var content3 = MockedContent.CreateSimpleContent(contentType, "Tagged content 3", -1);
             content3.SetTags("tags", new[] { "cow" }, true);
-            contentService.Publish(content3);
+            content3.PublishValues();
+            contentService.SaveAndPublish(content3);
 
             // Act
             var tags = tagService.GetAllContentTags()

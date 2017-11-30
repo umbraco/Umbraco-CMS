@@ -250,7 +250,7 @@ namespace Umbraco.Web.Editors
         protected HttpResponseMessage PerformMove<TContentType>(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType>>> doMove)
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>>> doMove)
             where TContentType : IContentTypeComposition
         {
             var toMove = getContentType(move.Id);
@@ -267,7 +267,7 @@ namespace Umbraco.Web.Editors
                 return response;
             }
 
-            switch (result.Result.StatusType)
+            switch (result.Result.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -294,7 +294,7 @@ namespace Umbraco.Web.Editors
         protected HttpResponseMessage PerformCopy(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType, TContentType>>> doCopy)
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType, TContentType>>> doCopy)
         {
             var toMove = getContentType(move.Id);
             if (toMove == null)
@@ -305,13 +305,13 @@ namespace Umbraco.Web.Editors
             var result = doCopy(toMove, move.ParentId);
             if (result.Success)
             {
-                var copy = result.Result.Value;
+                var copy = result.Result.Entity;
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 response.Content = new StringContent(copy.Path, Encoding.UTF8, "application/json");
                 return response;
             }
 
-            switch (result.Result.StatusType)
+            switch (result.Result.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return Request.CreateResponse(HttpStatusCode.NotFound);

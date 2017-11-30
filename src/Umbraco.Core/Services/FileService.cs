@@ -321,7 +321,7 @@ namespace Umbraco.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        public Attempt<OperationStatus<OperationStatusType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0)
         {
             var template = new Template(contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
@@ -348,7 +348,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(SavingTemplate, this, saveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Fail<OperationStatusType, ITemplate>(OperationStatusType.FailedCancelledByEvent, evtMsgs, template);
+                    return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(OperationResultType.FailedCancelledByEvent, evtMsgs, template);
                 }
 
                 var repository = uow.CreateRepository<ITemplateRepository>();
@@ -360,7 +360,7 @@ namespace Umbraco.Core.Services
                 uow.Complete();
             }
 
-            return OperationStatus.Attempt.Succeed<OperationStatusType, ITemplate>(OperationStatusType.Success, evtMsgs, template);
+            return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(OperationResultType.Success, evtMsgs, template);
         }
 
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)

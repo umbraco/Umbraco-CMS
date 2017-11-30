@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationStatus> MoveToRecycleBin(IMedia media, int userId = 0);
+        Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationStatus> Delete(IMedia media, int userId = 0);
+        Attempt<OperationResult> Delete(IMedia media, int userId = 0);
 
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationStatus> Save(IMedia media, int userId = 0, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationStatus> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        IMedia GetByVersion(Guid versionId);
+        IMedia GetVersion(Guid versionId);
 
         /// <summary>
         /// Gets a collection of an <see cref="IMedia"/> objects versions by Id

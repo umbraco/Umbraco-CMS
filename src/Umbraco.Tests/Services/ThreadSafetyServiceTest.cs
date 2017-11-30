@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Services
                         Debug.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
 
                         var name1 = "test-" + Guid.NewGuid();
-                        var content1 = contentService.CreateContent(name1, -1, "umbTextpage");
+                        var content1 = contentService.Create(name1, -1, "umbTextpage");
 
                         Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content1);
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Services
                         Thread.Sleep(100); //quick pause for maximum overlap!
 
                         var name2 = "test-" + Guid.NewGuid();
-                        var content2 = contentService.CreateContent(name2, -1, "umbTextpage");
+                        var content2 = contentService.Create(name2, -1, "umbTextpage");
 
                         Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content2);

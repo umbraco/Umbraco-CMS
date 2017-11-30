@@ -161,7 +161,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
                 role);
 
-            if (entry.Success == false && entry.Result.Value == null)
+            if (entry.Success == false && entry.Result.Entity == null)
             {
                 throw new Exception("Document is not protected!");
             }
@@ -176,7 +176,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 Constants.Conventions.PublicAccess.MemberUsernameRuleType,
                 membershipUserName);
 
-            if (entry.Success == false && entry.Result.Value == null)
+            if (entry.Success == false && entry.Result.Entity == null)
             {
                 throw new Exception("Document is not protected!");
             }

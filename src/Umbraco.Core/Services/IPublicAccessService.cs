@@ -50,7 +50,7 @@ namespace Umbraco.Core.Services
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
         /// <returns></returns>
-        Attempt<OperationStatus<OperationStatusType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue);
+        Attempt<OperationResult<OperationResultType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue);
 
         /// <summary>
         /// Removes a rule
@@ -58,19 +58,19 @@ namespace Umbraco.Core.Services
         /// <param name="content"></param>
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
-        Attempt<OperationStatus> RemoveRule(IContent content, string ruleType, string ruleValue);
+        Attempt<OperationResult> RemoveRule(IContent content, string ruleType, string ruleValue);
 
         /// <summary>
         /// Saves the entry
         /// </summary>
         /// <param name="entry"></param>
-        Attempt<OperationStatus> Save(PublicAccessEntry entry);
+        Attempt<OperationResult> Save(PublicAccessEntry entry);
 
         /// <summary>
         /// Deletes the entry and all associated rules
         /// </summary>
         /// <param name="entry"></param>
-        Attempt<OperationStatus> Delete(PublicAccessEntry entry);
+        Attempt<OperationResult> Delete(PublicAccessEntry entry);
 
     }
 }

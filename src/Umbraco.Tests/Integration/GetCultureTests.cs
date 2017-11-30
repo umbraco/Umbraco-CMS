@@ -28,10 +28,10 @@ namespace Umbraco.Tests.Integration
             contentTypeService.Save(contentType);
             var contentService = ServiceContext.ContentService;
 
-            var c1 = contentService.CreateContentWithIdentity("content", -1, "umbBlah");
-            var c2 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c3 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c4 = contentService.CreateContentWithIdentity("content", c3, "umbBlah");
+            var c1 = contentService.CreateAndSave("content", -1, "umbBlah");
+            var c2 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c3 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c4 = contentService.CreateAndSave("content", c3, "umbBlah");
 
             foreach (var l in ServiceContext.LocalizationService.GetAllLanguages().Where(x => x.CultureName != "en-US").ToArray())
                 ServiceContext.LocalizationService.Delete(l);
@@ -76,10 +76,10 @@ namespace Umbraco.Tests.Integration
             contentTypeService.Save(contentType);
             var contentService = ServiceContext.ContentService;
 
-            var c1 = contentService.CreateContentWithIdentity("content", -1, "umbBlah");
-            var c2 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c3 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c4 = contentService.CreateContentWithIdentity("content", c3, "umbBlah");
+            var c1 = contentService.CreateAndSave("content", -1, "umbBlah");
+            var c2 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c3 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c4 = contentService.CreateAndSave("content", c3, "umbBlah");
 
             foreach (var l in ServiceContext.LocalizationService.GetAllLanguages().Where(x => x.CultureName != "en-US").ToArray())
                 ServiceContext.LocalizationService.Delete(l);

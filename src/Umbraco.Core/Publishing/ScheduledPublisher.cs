@@ -28,6 +28,7 @@ namespace Umbraco.Core.Publishing
         /// </returns>
         public int CheckPendingAndProcess()
         {
+            // fixme isn't this done in ContentService already?
             var counter = 0;
             var contentForRelease = _contentService.GetContentForRelease().ToArray();
             if (contentForRelease.Length > 0)
@@ -37,18 +38,12 @@ namespace Umbraco.Core.Publishing
                 try
                 {
                     d.ReleaseDate = null;
-                    var result = _contentService.SaveAndPublishWithStatus(d, d.GetWriterProfile().Id);
-                    _logger.Debug<ContentService>($"Result of publish attempt: {result.Result.StatusType}");
+                    d.PublishValues(); // fixme variants?
+                    var result = _contentService.SaveAndPublish(d, d.GetWriterProfile().Id);
+                    _logger.Debug<ContentService>($"Result of publish attempt: {result.Result}");
                     if (result.Success == false)
                     {
-                        if (result.Exception != null)
-                        {
-                            _logger.Error<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release, status result: " + result.Result.StatusType, result.Exception);
-                        }
-                        else
-                        {
-                            _logger.Warn<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release. Status result: " + result.Result.StatusType);
-                        }
+                        _logger.Error<ScheduledPublisher>($"Error publishing node {d.Id}");
                     }
                     else
                     {
@@ -70,8 +65,8 @@ namespace Umbraco.Core.Publishing
                 try
                 {
                     d.ExpireDate = null;
-                    var result = _contentService.UnPublish(d, d.GetWriterProfile().Id);
-                    if (result)
+                    var result = _contentService.Unpublish(d, d.GetWriterProfile().Id);
+                    if (result.Success)
                     {
                         counter++;
                     }

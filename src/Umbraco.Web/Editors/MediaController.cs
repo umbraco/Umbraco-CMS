@@ -518,7 +518,7 @@ namespace Umbraco.Web.Editors
                         //If the item is new and the operation was cancelled, we need to return a different
                         // status code so the UI can handle it since it won't be able to redirect since there
                         // is no Id to redirect to!
-                        if (saveStatus.Result.StatusType == OperationStatusType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
+                        if (saveStatus.Result.Result == OperationResultType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
                         {
                             throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
                         }

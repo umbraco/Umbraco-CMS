@@ -1159,7 +1159,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var data = new Dictionary<string, object>();
             foreach (var prop in content.Properties)
             {
-                var value = prop.GetValue(published);
+                var value = prop.GetValue(published: published);
                 //if (value != null)
                 //{
                 //    var e = propertyEditorResolver.GetByAlias(prop.PropertyType.PropertyEditorAlias);

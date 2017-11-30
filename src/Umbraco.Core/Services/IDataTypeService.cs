@@ -9,15 +9,15 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
-        Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0);
-        Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
         IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition);
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
-        Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0);
-        Attempt<OperationStatus<OperationStatusType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
+        Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
 
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Services
         /// <returns>PreValue as a string</returns>
         string GetPreValueAsString(int id);
 
-        Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
+        Attempt<OperationResult<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
 
     }
 }

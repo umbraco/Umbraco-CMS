@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -133,44 +132,12 @@ namespace Umbraco.Core.Models
         internal DataTypeDatabaseType DataTypeDatabaseType => _propertyType.DataTypeDatabaseType;
 
         /// <summary>
-        /// Gets the neutral value.
+        /// Gets the value.
         /// </summary>
-        public object GetValue(bool published = false)
-        {
-            if (!_propertyType.ValidateVariation(null, null, false)) return null;
-            return _pvalue == null ? null : GetPropertyValue(_pvalue, published);
-        }
-
-        /// <summary>
-        /// Gets the culture value.
-        /// </summary>
-        public object GetValue(int? languageId, bool published = false)
-        {
-            if (!_propertyType.ValidateVariation(languageId, null, false)) return null;
-            if (_vvalues == null) return null;
-            return _vvalues.TryGetValue((languageId, null), out var pvalue)
-                ? GetPropertyValue(pvalue, published)
-                : null;
-        }
-
-        /// <summary>
-        /// Gets the segment value.
-        /// </summary>
-        public object GetValue(string segment, bool published = false)
-        {
-            if (!_propertyType.ValidateVariation(null, segment, false)) return null;
-            if (_vvalues == null) return null;
-            return _vvalues.TryGetValue((null, segment), out var pvalue)
-                ? GetPropertyValue(pvalue, published)
-                : null;
-        }
-
-        /// <summary>
-        /// Gets the culture+segment value.
-        /// </summary>
-        public object GetValue(int? languageId, string segment, bool published = false)
+        public object GetValue(int? languageId = null, string segment = null, bool published = false)
         {
             if (!_propertyType.ValidateVariation(languageId, segment, false)) return null;
+            if (!languageId.HasValue && segment == null) return GetPropertyValue(_pvalue, published);
             if (_vvalues == null) return null;
             return _vvalues.TryGetValue((languageId, segment), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
@@ -184,18 +151,101 @@ namespace Umbraco.Core.Models
                 : pvalue.EditedValue;
         }
 
-        internal void PublishValues(int? languageId, string segment)
+        // internal - must be invoked by the content item
+        internal void PublishAllValues()
         {
+            // throw if some values are not valid
+            if (!IsAllValid()) throw new InvalidOperationException("Some values are not valid.");
+
+            // if invariant-neutral is supported, publish invariant-neutral
+            if (_propertyType.ValidateVariation(null, null, false))
+                PublishPropertyValue(_pvalue);
+
+            // publish everything not invariant-neutral that is supported
+            if (_vvalues != null)
+            {
+                var pvalues = _vvalues
+                    .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
+                    .Select(x => x.Value);
+                foreach (var pvalue in pvalues)
+                    PublishPropertyValue(pvalue);
+            }
+        }
+
+        // internal - must be invoked by the content item
+        internal void PublishValue(int? languageId = null, string segment = null)
+        {
+            // throw if value is not valid, or if variation is not supported
+            if (!IsValid(languageId, segment)) throw new InvalidOperationException("Value is not valid.");
             _propertyType.ValidateVariation(languageId, segment, true);
+
             (var pvalue, _) = GetPValue(languageId, segment, false);
             if (pvalue == null) return;
             PublishPropertyValue(pvalue);
         }
 
-        internal void PublishAllValues()
+        // internal - must be invoked by the content item
+        internal void PublishCultureValues(int? languageId = null)
         {
-            foreach (var pvalue in Values)
-                PublishPropertyValue(pvalue);
+            // throw if some values are not valid
+            if (!IsCultureValid(languageId)) throw new InvalidOperationException("Some values are not valid.");
+
+            // if invariant and invariant-neutral is supported, publish invariant-neutral
+            if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
+                PublishPropertyValue(_pvalue);
+
+            // publish everything not invariant-neutral that matches the culture and is supported
+            if (_vvalues != null)
+            {
+                var pvalues = _vvalues
+                    .Where(x => x.Value.LanguageId == languageId)
+                    .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
+                    .Select(x => x.Value);
+                foreach (var pvalue in pvalues)
+                    PublishPropertyValue(pvalue);
+            }
+        }
+
+        // internal - must be invoked by the content item
+        internal void ClearPublishedAllValues()
+        {
+            if (_propertyType.ValidateVariation(null, null, false))
+                ClearPublishedPropertyValue(_pvalue);
+
+            if (_vvalues != null)
+            {
+                var pvalues = _vvalues
+                    .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
+                    .Select(x => x.Value);
+                foreach (var pvalue in pvalues)
+                    ClearPublishedPropertyValue(pvalue);
+            }
+        }
+
+        // internal - must be invoked by the content item
+        internal void ClearPublishedValue(int? languageId = null, string segment = null)
+        {
+            _propertyType.ValidateVariation(languageId, segment, true);
+            (var pvalue, _) = GetPValue(languageId, segment, false);
+            if (pvalue == null) return;
+            ClearPublishedPropertyValue(pvalue);
+        }
+
+        // internal - must be invoked by the content item
+        internal void ClearPublishedCultureValues(int? languageId = null)
+        {
+            if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
+                ClearPublishedPropertyValue(_pvalue);
+
+            if (_vvalues != null)
+            {
+                var pvalues = _vvalues
+                    .Where(x => x.Value.LanguageId == languageId)
+                    .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
+                    .Select(x => x.Value);
+                foreach (var pvalue in pvalues)
+                    ClearPublishedPropertyValue(pvalue);
+            }
         }
 
         private void PublishPropertyValue(PropertyValue pvalue)
@@ -207,48 +257,23 @@ namespace Umbraco.Core.Models
             DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
         }
 
-        /// <summary>
-        /// Sets a (edited) neutral value.
-        /// </summary>
-        public void SetValue(object value)
+        private void ClearPublishedPropertyValue(PropertyValue pvalue)
         {
-            _propertyType.ValidateVariation(null, null, true);
-            (var pvalue, var change) = GetPValue(true);
-            SetPropertyValue(pvalue, value, change);
+            if (!_propertyType.IsPublishing)
+                throw new NotSupportedException("Property type does not support publishing.");
+            var origValue = pvalue.PublishedValue;
+            pvalue.PublishedValue = ConvertSetValue(null);
+            DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
         }
 
         /// <summary>
-        /// Sets a (edited) culture value.
+        /// Sets a value.
         /// </summary>
-        public void SetValue(int? languageId, object value)
-        {
-            _propertyType.ValidateVariation(languageId, null, true);
-            (var pvalue, var change) = GetPValue(languageId, null, true);
-            SetPropertyValue(pvalue, value, change);
-        }
-
-        /// <summary>
-        /// Sets a (edited) culture value.
-        /// </summary>
-        public void SetValue(string segment, object value)
-        {
-            _propertyType.ValidateVariation(null, segment, true);
-            (var pvalue, var change) = GetPValue(null, segment, true);
-            SetPropertyValue(pvalue, value, change);
-        }
-
-        /// <summary>
-        /// Sets a (edited) culture+segment value.
-        /// </summary>
-        public void SetValue(int? languageId, string segment, object value)
+        public void SetValue(object value, int? languageId = null, string segment = null)
         {
             _propertyType.ValidateVariation(languageId, segment, true);
             (var pvalue, var change) = GetPValue(languageId, segment, true);
-            SetPropertyValue(pvalue, value, change);
-        }
 
-        private void SetPropertyValue(PropertyValue pvalue, object value, bool change)
-        {
             var origValue = pvalue.EditedValue;
             var setValue = ConvertSetValue(value);
 
@@ -257,15 +282,11 @@ namespace Umbraco.Core.Models
             DetectChanges(setValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, change);
         }
 
-        // bypasses all changes detection and is the *only* to set the published value
+        // bypasses all changes detection and is the *only* way to set the published value
         internal void FactorySetValue(int? languageId, string segment, bool published, object value)
         {
             (var pvalue, _) = GetPValue(languageId, segment, true);
-            FactorySetPropertyValue(pvalue, published, value);
-        }
 
-        private void FactorySetPropertyValue(PropertyValue pvalue, bool published, object value)
-        {
             if (published && _propertyType.IsPublishing)
                 pvalue.PublishedValue = value;
             else
@@ -297,7 +318,7 @@ namespace Umbraco.Core.Models
                 _vvalues = new Dictionary<(int?, string), PropertyValue>();
                 change = true;
             }
-            if (_vvalues.TryGetValue((languageId, segment), out var pvalue))
+            if (!_vvalues.TryGetValue((languageId, segment), out var pvalue))
             {
                 if (!create) return (null, false);
                 pvalue = _vvalues[(languageId, segment)] = new PropertyValue();
@@ -361,49 +382,61 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the (edited) neutral value is valid.
+        /// Gets a value indicating whether everything is valid.
         /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValid()
-        {
-            return IsValidValue(GetValue());
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the (edited) culture value is valid.
-        /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValid(int? languageId)
-        {
-            return IsValidValue(GetValue(languageId));
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the (edited) segment value is valid.
-        /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValid(string segment)
-        {
-            return IsValidValue(GetValue(segment));
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the (edited) culture+segment value is valid.
-        /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValid(int? languageId, string segment)
-        {
-            return IsValidValue(GetValue(languageId, segment));
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether all (edited) values are valid.
-        /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        /// <returns></returns>
         public bool IsAllValid()
         {
-            // fixme - what about missing, required values?
-            return _values.All(x => IsValidValue(x.EditedValue));
+            // if invariant-neutral is supported, validate invariant-neutral
+            if (_propertyType.ValidateVariation(null, null, false))
+                if (!IsValidValue(_pvalue)) return false;
+
+            if (_vvalues == null) return IsValidValue(null);
+
+            // validate everything not invariant-neutral that is supported
+            // fixme - broken - how can we figure out what is mandatory here?
+
+            var pvalues = _vvalues
+                .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
+                .Select(x => x.Value)
+                .ToArray();
+            return pvalues.Length == 0
+                ? IsValidValue(null)
+                : pvalues.All(x => IsValidValue(x.EditedValue));
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the culture/any values are valid.
+        /// </summary>
+        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        public bool IsCultureValid(int? languageId)
+        {
+            // if invariant and invariant-neutral is supported, validate invariant-neutral
+            if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
+                if (!IsValidValue(_pvalue)) return false;
+
+            // validate everything not invariant-neutral that matches the culture and is supported
+            // fixme - broken - how can we figure out what is mandatory here?
+
+            if (_vvalues == null) return IsValidValue(null);
+
+            var pvalues = _vvalues
+                .Where(x => x.Value.LanguageId == languageId)
+                .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
+                .Select(x => x.Value)
+                .ToArray();
+            return pvalues.Length == 0
+                ? IsValidValue(null)
+                : pvalues.All(x => IsValidValue(x.EditedValue));
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the value is valid.
+        /// </summary>
+        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        public bool IsValid(int? languageId = null, string segment = null)
+        {
+            return IsValidValue(GetValue(languageId, segment));
         }
 
         /// <summary>

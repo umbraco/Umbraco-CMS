@@ -74,7 +74,7 @@ namespace Umbraco.Web.WebServices
                 {
                     var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                     response.Content = new StringContent("Saving domain failed");
-                    response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                    response.ReasonPhrase = saveAttempt.Result.Result.ToString();
                     throw new HttpResponseException(response);
                 }
             }
@@ -150,7 +150,7 @@ namespace Umbraco.Web.WebServices
                     {
                         var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                         response.Content = new StringContent("Saving new domain failed");
-                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        response.ReasonPhrase = saveAttempt.Result.Result.ToString();
                         throw new HttpResponseException(response);
                     }
                 }

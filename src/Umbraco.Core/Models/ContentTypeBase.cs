@@ -53,6 +53,8 @@ namespace Umbraco.Core.Models
             // ReSharper disable once VirtualMemberCallInConstructor
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
+
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         protected ContentTypeBase(IContentTypeBase parent)
@@ -73,6 +75,8 @@ namespace Umbraco.Core.Models
             // ReSharper disable once VirtualMemberCallInConstructor
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
+
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         /// <summary>

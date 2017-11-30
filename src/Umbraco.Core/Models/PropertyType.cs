@@ -42,6 +42,7 @@ namespace Umbraco.Core.Models
 
             _propertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDefinition.DatabaseType;
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition, string propertyTypeAlias)
@@ -69,6 +70,7 @@ namespace Umbraco.Core.Models
             _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDatabaseType;
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         /// <summary>
@@ -84,6 +86,7 @@ namespace Umbraco.Core.Models
             _propertyEditorAlias = propertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDatabaseType;
             _alias = GetAlias(propertyTypeAlias);
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -241,7 +244,7 @@ namespace Umbraco.Core.Models
         public ContentVariation Variations
         {
             get => _variations;
-            internal set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
+            set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
         }
 
         public bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid)
@@ -264,7 +267,7 @@ namespace Umbraco.Core.Models
             if ((Variations & variation) == 0)
             {
                 if (throwIfInvalid)
-                    throw new InvalidOperationException($"Variation {variation} is invalid for property type \"{Alias}\".");
+                    throw new NotSupportedException($"Variation {variation} is invalid for property type \"{Alias}\".");
                 return false;
             }
             return true;

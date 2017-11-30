@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Publishing
             var result = ((ContentService)ServiceContext.ContentService).StrategyPublishWithChildren(uow, listToPublish, null, 0, evtMsgs, true);
 
             Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
-            Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
+            Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Content.Id)
                                 .ContainsAll(listToPublish.Where(x => x.Name != "Invalid Content" && x.Name != "Sub Sub Sub").Select(x => x.Id)));
         }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Publishing
             var result = ((ContentService)ServiceContext.ContentService).StrategyPublishWithChildren(uow, listToPublish, null, 0, evtMsgs);
 
             Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
-            Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
+            Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Content.Id)
                                 .ContainsAll(listToPublish.Where(x => x.Name != "Text Page 2" && x.Name != "Text Page 3").Select(x => x.Id)));
         }
 
@@ -113,12 +113,12 @@ namespace Umbraco.Tests.Publishing
             //publish root and nodes at it's children level
             var uow = TestObjects.GetUnitOfWorkMock();
             var result1 = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, _homePage, false, 0, evtMsgs);
-            Assert.IsTrue(result1);
+            Assert.IsTrue(result1.Success);
             Assert.IsTrue(_homePage.Published);
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
                 var r = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, c, false, 0, evtMsgs);
-                Assert.IsTrue(r);
+                Assert.IsTrue(r.Success);
                 Assert.IsTrue(c.Published);
             }
 
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Publishing
             //all of them will be SuccessAlreadyPublished unless the unpublished one gets included, in that case
             //we'll have a 'Success' result which we don't want.
             // NOTE - not true, we'll have Success for _homePage because we DO want to publish it
-            Assert.AreEqual(1, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
+            Assert.AreEqual(1, result.Count(x => x.Result == PublishResultType.Success));
         }
 
         [Test]
@@ -143,14 +143,14 @@ namespace Umbraco.Tests.Publishing
             //publish root and nodes at it's children level
             var uow = TestObjects.GetUnitOfWorkMock();
             var result1 = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, _homePage, false, 0, evtMsgs);
-            Assert.IsTrue(result1);
+            Assert.IsTrue(result1.Success);
             Assert.IsTrue(_homePage.Published);
 
             //NOTE (MCH) This isn't persisted, so not really a good test as it will look like the result should be something else.
             foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
             {
                 var r = ((ContentService)ServiceContext.ContentService).StrategyPublish(uow, c, false, 0, evtMsgs);
-                Assert.IsTrue(r);
+                Assert.IsTrue(r.Success);
                 Assert.IsTrue(c.Published);
             }
 
@@ -168,10 +168,10 @@ namespace Umbraco.Tests.Publishing
                 .Concat(ServiceContext.ContentService.GetDescendants(_homePage));
             var result = ((ContentService)ServiceContext.ContentService).StrategyPublishWithChildren(uow, contents, null, 0, evtMsgs, true);
 
-            Assert.AreEqual(4, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
-            Assert.AreEqual(0, result.Count(x => x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished));
-            Assert.IsTrue(result.First(x => x.Result.StatusType == PublishStatusType.Success).Success);
-            Assert.IsTrue(result.First(x => x.Result.StatusType == PublishStatusType.Success).Result.ContentItem.Published);
+            Assert.AreEqual(4, result.Count(x => x.Result == PublishResultType.Success));
+            Assert.AreEqual(0, result.Count(x => x.Result == PublishResultType.SuccessAlready));
+            Assert.IsTrue(result.First(x => x.Result == PublishResultType.Success).Success);
+            Assert.IsTrue(result.First(x => x.Result == PublishResultType.Success).Content.Published);
         }
 
         [NUnit.Framework.Ignore("fixme - ignored test")]

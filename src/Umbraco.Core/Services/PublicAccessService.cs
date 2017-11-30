@@ -106,7 +106,7 @@ namespace Umbraco.Core.Services
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
         /// <returns></returns>
-        public Attempt<OperationStatus<OperationStatusType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue)
+        public Attempt<OperationResult<OperationResultType, PublicAccessEntry>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
@@ -116,7 +116,7 @@ namespace Umbraco.Core.Services
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    return OperationStatus.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
+                    return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -126,14 +126,14 @@ namespace Umbraco.Core.Services
                 else
                 {
                     //If they are both the same already then there's nothing to update, exit
-                    return OperationStatus.Attempt.Succeed(evtMsgs, entry);
+                    return OperationResult.Attempt.Succeed(evtMsgs, entry);
                 }
 
                 var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
                 if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs, entry);
+                    return OperationResult.Attempt.Cancel(evtMsgs, entry);
                 }
 
                 repo.AddOrUpdate(entry);
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs, entry);
+            return OperationResult.Attempt.Succeed(evtMsgs, entry);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services
         /// <param name="content"></param>
         /// <param name="ruleType"></param>
         /// <param name="ruleValue"></param>
-        public Attempt<OperationStatus> RemoveRule(IContent content, string ruleType, string ruleValue)
+        public Attempt<OperationResult> RemoveRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
@@ -162,10 +162,10 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
                 entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-                if (entry == null) return Attempt<OperationStatus>.Fail(); // causes rollback
+                if (entry == null) return Attempt<OperationResult>.Fail(); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-                if (existingRule == null) return Attempt<OperationStatus>.Fail(); // causes rollback
+                if (existingRule == null) return Attempt<OperationResult>.Fail(); // causes rollback
 
                 entry.RemoveRule(existingRule);
 
@@ -173,7 +173,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 repo.AddOrUpdate(entry);
@@ -183,14 +183,14 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
         /// Saves the entry
         /// </summary>
         /// <param name="entry"></param>
-        public Attempt<OperationStatus> Save(PublicAccessEntry entry)
+        public Attempt<OperationResult> Save(PublicAccessEntry entry)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
@@ -211,14 +211,14 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>
         /// Deletes the entry and all associated rules
         /// </summary>
         /// <param name="entry"></param>
-        public Attempt<OperationStatus> Delete(PublicAccessEntry entry)
+        public Attempt<OperationResult> Delete(PublicAccessEntry entry)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -228,7 +228,7 @@ namespace Umbraco.Core.Services
                 if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Complete();
-                    return OperationStatus.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
@@ -239,7 +239,7 @@ namespace Umbraco.Core.Services
                 uow.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
 
-            return OperationStatus.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
         /// <summary>

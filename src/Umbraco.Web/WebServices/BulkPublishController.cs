@@ -29,31 +29,32 @@ namespace Umbraco.Web.WebServices
 
             if (publishDescendants == false)
             {
-                var result = Services.ContentService.SaveAndPublishWithStatus(content, Security.CurrentUser.Id);
+                content.PublishValues(); // fixme variants?
+                var result = Services.ContentService.SaveAndPublish(content, Security.CurrentUser.Id);
                 return Json(new
                     {
                         success = result.Success,
-                        message = GetMessageForStatus(result.Result)
+                        message = GetMessageForStatus(result)
                     });
             }
             else
             {
                 var result = Services.ContentService
-                    .PublishWithChildrenWithStatus(content, Security.CurrentUser.Id, includeUnpublished)
+                    .PublishWithChildren(content, Security.CurrentUser.Id, includeUnpublished)
                     .ToArray();
 
                 return Json(new
                     {
                         success = result.All(x => x.Success),
-                        message = GetMessageForStatuses(result.Select(x => x.Result).ToArray(), content)
+                        message = GetMessageForStatuses(result.ToArray(), content)
                     });
             }
         }
 
-        private string GetMessageForStatuses(PublishStatus[] statuses, IContent doc)
+        private string GetMessageForStatuses(PublishResult[] statuses, IContent doc)
         {
             //if all are successful then just say it was successful
-            if (statuses.All(x => x.StatusType.IsSuccess()))
+            if (statuses.All(x => x.Success))
             {
                 return Services.TextService.Localize("publish/nodePublishAll", new[] { doc.Name});
             }
@@ -61,7 +62,7 @@ namespace Umbraco.Web.WebServices
             //if they are not all successful the we'll add each error message to the output (one per line)
             var sb = new StringBuilder();
             foreach (var msg in statuses
-                .Where(x => ((int)x.StatusType) >= 10)
+                .Where(x => ((int)x.Result) >= 10)
                 .Select(GetMessageForStatus)
                 .Where(msg => msg.IsNullOrWhiteSpace() == false))
             {
@@ -70,31 +71,31 @@ namespace Umbraco.Web.WebServices
             return sb.ToString();
         }
 
-        private string GetMessageForStatus(PublishStatus status)
+        private string GetMessageForStatus(PublishResult status)
         {
-            switch (status.StatusType)
+            switch (status.Result)
             {
-                case PublishStatusType.Success:
-                case PublishStatusType.SuccessAlreadyPublished:
-                    return Services.TextService.Localize("publish/nodePublish", new[] { status.ContentItem.Name});
-                case PublishStatusType.FailedPathNotPublished:
+                case PublishResultType.Success:
+                case PublishResultType.SuccessAlready:
+                    return Services.TextService.Localize("publish/nodePublish", new[] { status.Content.Name});
+                case PublishResultType.FailedPathNotPublished:
                     return Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                   new [] { string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id) });
-                case PublishStatusType.FailedHasExpired:
-                case PublishStatusType.FailedAwaitingRelease:
-                case PublishStatusType.FailedIsTrashed:
-                    return "Cannot publish document with a status of " + status.StatusType;
-                case PublishStatusType.FailedCancelledByEvent:
+                                   new [] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) });
+                case PublishResultType.FailedHasExpired:
+                case PublishResultType.FailedAwaitingRelease:
+                case PublishResultType.FailedIsTrashed:
+                    return "Cannot publish document with a status of " + status.Result;
+                case PublishResultType.FailedCancelledByEvent:
                     return Services.TextService.Localize("publish/contentPublishedFailedByEvent",
-                                   new [] { string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id) });
-                case PublishStatusType.FailedContentInvalid:
+                                   new [] { string.Format("'{0}' ({1})", status.Content.Name, status.Content.Id) });
+                case PublishResultType.FailedContentInvalid:
                     return Services.TextService.Localize("publish/contentPublishedFailedInvalid",
                                    new []{
-                                       string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                                       string.Format("'{0}' ({1})", status.Content.Name, status.Content.Id),
                                        string.Format("'{0}'", string.Join(", ", status.InvalidProperties.Select(x => x.Alias)))
                                    });
                 default:
-                    return status.StatusType.ToString();
+                    return status.Result.ToString();
             }
         }
     }

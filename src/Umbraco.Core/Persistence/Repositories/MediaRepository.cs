@@ -167,7 +167,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return MapDtosToContent(Database.Fetch<ContentDto>(sql), true);
         }
 
-        public override IMedia GetByVersion(Guid versionId)
+        public override IMedia GetVersion(Guid versionId)
         {
             var sql = GetBaseQuery(QueryType.Single)
                 .Where<ContentVersionDto>(x => x.VersionId == versionId);
@@ -241,7 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = MediaFactory.BuildDto(entity);
+            var dto = ContentBaseFactory.BuildDto(entity);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -332,7 +332,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // create the dto
-            var dto = MediaFactory.BuildDto(entity);
+            var dto = ContentBaseFactory.BuildDto(entity);
 
             // update the node dto
             var nodeDto = dto.NodeDto;
@@ -519,7 +519,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (contentTypes.TryGetValue(contentTypeId, out IMediaType contentType) == false)
                     contentTypes[contentTypeId] = contentType = _mediaTypeRepository.Get(contentTypeId);
 
-                var c = content[i] = MediaFactory.BuildEntity(dto, contentType);
+                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
                 // need properties
                 var versionId = dto.ContentVersionDto.Id;
@@ -544,7 +544,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IMedia MapDtoToContent(ContentDto dto)
         {
             var contentType = _mediaTypeRepository.Get(dto.ContentTypeId);
-            var media = MediaFactory.BuildEntity(dto, contentType);
+            var media = ContentBaseFactory.BuildEntity(dto, contentType);
 
             // get properties - indexed by version id
             var versionId = dto.ContentVersionDto.Id;

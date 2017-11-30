@@ -205,7 +205,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return MapDtosToContent(Database.Fetch<MemberDto>(sql), true);
         }
 
-        public override IMember GetByVersion(Guid versionId)
+        public override IMember GetVersion(Guid versionId)
         {
             var sql = GetBaseQuery(QueryType.Single)
                 .Where<ContentVersionDto>(x => x.VersionId == versionId);
@@ -237,7 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = MemberFactory.BuildDto(entity);
+            var dto = ContentBaseFactory.BuildDto(entity);
 
             // derive path and level from parent
             var parent = GetParentNodeDto(entity.ParentId);
@@ -339,7 +339,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             // create the dto
-            var dto = MemberFactory.BuildDto(entity);
+            var dto = ContentBaseFactory.BuildDto(entity);
 
             // update the node dto
             var nodeDto = dto.ContentDto.NodeDto;
@@ -569,7 +569,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
                     contentTypes[contentTypeId] = contentType = _memberTypeRepository.Get(contentTypeId);
 
-                var c = content[i] = MemberFactory.BuildEntity(dto, contentType);
+                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
                 // need properties
                 var versionId = dto.ContentVersionDto.Id;
@@ -594,7 +594,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IMember MapDtoToContent(MemberDto dto)
         {
             var memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            var member = MemberFactory.BuildEntity(dto, memberType);
+            var member = ContentBaseFactory.BuildEntity(dto, memberType);
 
             // get properties - indexed by version id
             var versionId = dto.ContentVersionDto.Id;

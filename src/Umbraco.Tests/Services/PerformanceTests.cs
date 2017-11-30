@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Services
                 {
 
                     //get all content items that are published of this type
-                    var published = contentSvc.GetContentOfContentType(contentTypeId).Where(content => content.Published);
+                    var published = contentSvc.GetByType(contentTypeId).Where(content => content.Published);
                     Assert.AreEqual(countOfPublished, published.Count(x => x.ContentTypeId == contentTypeId));
                 }
             }
@@ -246,6 +246,7 @@ namespace Umbraco.Tests.Services
             var result = new List<IContent>();
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent lastParent = MockedContent.CreateSimpleContent(contentType1);
+            lastParent.PublishValues();
             ServiceContext.ContentService.SaveAndPublish(lastParent);
             result.Add(lastParent);
             //create 20 deep
@@ -259,6 +260,7 @@ namespace Umbraco.Tests.Services
                     //only publish evens
                     if (j % 2 == 0)
                     {
+                        content.PublishValues();
                         ServiceContext.ContentService.SaveAndPublish(content);
                     }
                     else

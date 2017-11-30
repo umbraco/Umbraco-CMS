@@ -805,7 +805,6 @@
     <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
-    <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />
     <Compile Include="Persistence\Factories\DictionaryItemFactory.cs" />
@@ -813,8 +812,7 @@
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
-    <Compile Include="Persistence\Factories\MediaFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberFactory.cs" />
+    <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
@@ -1377,13 +1375,13 @@
     <Compile Include="Services\MigrationEntryService.cs" />
     <Compile Include="Services\MoveOperationStatusType.cs" />
     <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="Services\OperationStatus.cs" />
-    <Compile Include="Services\OperationStatusType.cs" />
+    <Compile Include="Services\OperationResult.cs" />
+    <Compile Include="Services\OperationResultType.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\PublicAccessService.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
-    <Compile Include="Services\PublishStatus.cs" />
-    <Compile Include="Services\PublishStatusType.cs" />
+    <Compile Include="Services\PublishResult.cs" />
+    <Compile Include="Services\PublishResultType.cs" />
     <Compile Include="Services\RedirectUrlService.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\RepositoryService.cs" />
@@ -1394,8 +1392,6 @@
     <Compile Include="Services\TagExtractor.cs" />
     <Compile Include="Services\TagService.cs" />
     <Compile Include="Services\TaskService.cs" />
-    <Compile Include="Services\UnPublishedStatusType.cs" />
-    <Compile Include="Services\UnPublishStatus.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Settable.cs" />

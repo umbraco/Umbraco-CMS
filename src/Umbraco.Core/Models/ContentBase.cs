@@ -39,7 +39,6 @@ namespace Umbraco.Core.Models
         private string _name;
 
         private PropertyCollection _properties;
-        private readonly List<Property> _invalidProperties = new List<Property>();
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         IDictionary<string, object> IUmbracoEntity.AdditionalData => _lazyAdditionalData.Value;
@@ -263,132 +262,44 @@ namespace Umbraco.Core.Models
 
         #region Has, Get, Set, Publish Property Value
 
-        /// <summary>
-        /// Gets a value indicating whether the content entity has a property with the supplied alias.
-        /// </summary>
-        /// <remarks>Indicates that the content entity has a property with the supplied alias, but
-        /// not necessarily that the content has a value for that property. Could be missing.</remarks>
+        /// <inheritdoc />
         public virtual bool HasProperty(string propertyTypeAlias)
             => Properties.Contains(propertyTypeAlias);
 
-        /// <summary>
-        /// Gets the neutral value of a property.
-        /// </summary>
-        public virtual object GetValue(string propertyTypeAlias, bool published = false)
-        {
-            return Properties.TryGetValue(propertyTypeAlias, out var property)
-                ? property.GetValue(published)
-                : null;
-        }
-
-        /// <summary>
-        /// Gets the culture value of a property.
-        /// </summary>
-        public virtual object GetValue(string propertyTypeAlias, int? languageId, bool published = false)
-        {
-            return Properties.TryGetValue(propertyTypeAlias, out var property)
-                ? property.GetValue(languageId, null, published)
-                : null;
-        }
-
-        /// <summary>
-        /// Gets the segment value of a property.
-        /// </summary>
-        public virtual object GetValue(string propertyTypeAlias, string segment, bool published = false)
-        {
-            return Properties.TryGetValue(propertyTypeAlias, out var property)
-                ? property.GetValue(null, segment, published)
-                : null;
-        }
-
-        /// <summary>
-        /// Gets the culture+segment value of a property.
-        /// </summary>
-        public virtual object GetValue(string propertyTypeAlias, int? languageId, string segment, bool published = false)
+        /// <inheritdoc />
+        public virtual object GetValue(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false)
         {
             return Properties.TryGetValue(propertyTypeAlias, out var property)
                 ? property.GetValue(languageId, segment, published)
                 : null;
         }
 
-        /// <summary>
-        /// Gets the typed neutral value of a property.
-        /// </summary>
-        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, bool published = false)
+        /// <inheritdoc />
+        public virtual TValue GetValue<TValue>(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false)
         {
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
 
-            var convertAttempt = property.GetValue(published).TryConvertTo<TPropertyValue>();
+            var convertAttempt = property.GetValue(languageId, segment, published).TryConvertTo<TValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
-        /// <summary>
-        /// Gets the typed culture value of a property.
-        /// </summary>
-        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int? languageId, bool published = false)
+        /// <inheritdoc />
+        public virtual void SetValue(string propertyTypeAlias, object value, int? languageId = null, string segment = null)
         {
-            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
-                return default;
+            if (Properties.Contains(propertyTypeAlias))
+            {
+                Properties[propertyTypeAlias].SetValue(value, languageId, segment);
+                return;
+            }
 
-            var convertAttempt = property.GetValue(languageId, null, published).TryConvertTo<TPropertyValue>();
-            return convertAttempt.Success ? convertAttempt.Result : default;
-        }
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+            if (propertyType == null)
+                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
-        /// <summary>
-        /// Gets the typed segment value of a property.
-        /// </summary>
-        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, string segment, bool published = false)
-        {
-            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
-                return default;
-
-            var convertAttempt = property.GetValue(null, segment, published).TryConvertTo<TPropertyValue>();
-            return convertAttempt.Success ? convertAttempt.Result : default;
-        }
-
-        /// <summary>
-        /// Gets the typed culture+segment value of a property.
-        /// </summary>
-        public virtual TPropertyValue GetValue<TPropertyValue>(string propertyTypeAlias, int? languageId, string segment, bool published = false)
-        {
-            if (!Properties.TryGetValue(propertyTypeAlias, out var property))
-                return default;
-
-            var convertAttempt = property.GetValue(languageId, segment, published).TryConvertTo<TPropertyValue>();
-            return convertAttempt.Success ? convertAttempt.Result : default;
-        }
-
-        /// <summary>
-        /// Sets the neutral (draft) value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, object value)
-        {
-            SetValueOnProperty(propertyTypeAlias, null, null, value);
-        }
-
-        /// <summary>
-        /// Sets the culture (draft) value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, int? languageId, object value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, null, value);
-        }
-
-        /// <summary>
-        /// Sets the culture+segment (draft) value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, string segment, object value)
-        {
-            SetValueOnProperty(propertyTypeAlias, null, segment, value);
-        }
-
-        /// <summary>
-        /// Sets the culture+segment (draft) value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, int? languageId, string segment, object value)
-        {
-            SetValueOnProperty(propertyTypeAlias, languageId, segment, value);
+            var property = propertyType.CreateProperty();
+            property.SetValue(value, languageId, segment);
+            Properties.Add(property);
         }
 
         // fixme - these three use an extension method that needs to be adapted too
@@ -415,48 +326,23 @@ namespace Umbraco.Core.Models
             ContentExtensions.SetValue(this, propertyTypeAlias, value);
         }
 
-        /// <summary>
-        /// Sets the (edited) value of a property.
-        /// </summary>
-        private void SetValueOnProperty(string propertyTypeAlias, int? languageId, string segment, object value)
-        {
-            if (Properties.Contains(propertyTypeAlias))
-            {
-                Properties[propertyTypeAlias].SetValue(languageId, segment, value);
-                return;
-            }
-
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null)
-                throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
-
-            var property = propertyType.CreateProperty();
-            property.SetValue(languageId, segment, value);
-            Properties.Add(property);
-        }
-
         #endregion
 
         #region Validation
 
-        public virtual Property[] Validate()
+        public virtual Property[] ValidateAll()
         {
-            return Properties.Where(x => !x.IsValid()).ToArray();
+            return Properties.Where(x => !x.IsAllValid()).ToArray();
         }
 
-        public virtual Property[] Validate(int? languageId)
-        {
-            return Properties.Where(x => !x.IsValid(languageId)).ToArray();
-        }
-
-        public virtual Property[] Validate(string segment)
-        {
-            return Properties.Where(x => !x.IsValid(segment)).ToArray();
-        }
-
-        public virtual Property[] Validate(int? languageId, string segment)
+        public virtual Property[] Validate(int? languageId = null, string segment = null)
         {
             return Properties.Where(x => !x.IsValid(languageId, segment)).ToArray();
+        }
+
+        public virtual Property[] ValidateCulture(int? languageId = null)
+        {
+            return Properties.Where(x => !x.IsCultureValid(languageId)).ToArray();
         }
 
         #endregion

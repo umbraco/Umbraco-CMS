@@ -41,18 +41,18 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         bool HasContainerInPath(string contentPath);
 
-        Attempt<OperationStatus<OperationStatusType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = 0);
-        Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = 0);
+        Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
         IEnumerable<EntityContainer> GetContainers(TItem contentType);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
-        Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0);
-        Attempt<OperationStatus<OperationStatusType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
+        Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
 
-        Attempt<OperationStatus<MoveOperationStatusType>> Move(TItem moving, int containerId);
-        Attempt<OperationStatus<MoveOperationStatusType, TItem>> Copy(TItem copying, int containerId);
+        Attempt<OperationResult<MoveOperationStatusType>> Move(TItem moving, int containerId);
+        Attempt<OperationResult<MoveOperationStatusType, TItem>> Copy(TItem copying, int containerId);
         TItem Copy(TItem original, string alias, string name, int parentId = -1);
         TItem Copy(TItem original, string alias, string name, TItem parent);
     }

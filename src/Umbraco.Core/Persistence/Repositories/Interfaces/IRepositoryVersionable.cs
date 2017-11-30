@@ -35,31 +35,29 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<TEntity> GetAllVersions(int nodeId);
 
         /// <summary>
-        /// Gets a list of all version Ids for the given content item
+        /// Gets a list of all version idenfitifers of an entity.
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="maxRows">The maximum number of rows to return</param>
-        /// <returns></returns>
-        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
+        /// <param name="topRows">The maximum number of rows to return</param>
+        IEnumerable<Guid> GetVersionIds(int id, int topRows);
 
         /// <summary>
-        /// Gets a specific version of an <see cref="TEntity"/>.
+        /// Gets a specific version of an entity.
         /// </summary>
-        /// <param name="versionId">Id of the version to retrieve</param>
-        /// <returns>An <see cref="TEntity"/> item</returns>
-        TEntity GetByVersion(Guid versionId);
+        /// <param name="versionId">The identifier of the version.</param>
+        TEntity GetVersion(Guid versionId);
 
         /// <summary>
-        /// Deletes a specific version from an <see cref="TEntity"/> object.
+        /// Deletes a specific version of an entity.
         /// </summary>
-        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="versionId">The identifier of the version to delete.</param>
         void DeleteVersion(Guid versionId);
 
         /// <summary>
-        /// Deletes versions from an <see cref="TEntity"/> object prior to a specific date.
+        /// Deletes all versions of an entity, older than a date.
         /// </summary>
-        /// <param name="nodeId">Id of the <see cref="TEntity"/> object to delete versions from</param>
-        /// <param name="versionDate">Latest version date</param>
+        /// <param name="nodeId">The identifier of the entity.</param>
+        /// <param name="versionDate">The date.</param>
         void DeleteVersions(int nodeId, DateTime versionDate);
 
         /// <summary>

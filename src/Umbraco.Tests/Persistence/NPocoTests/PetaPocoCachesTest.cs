@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             contentService.CountChildren(id3);
 
-            contentService.Count(contentTypeAlias: alias1);
+            contentService.Count(documentTypeAlias: alias1);
 
             contentService.Count();
 
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 Path = "-1," + id1
             });
 
-            contentService.GetByVersion(Guid.NewGuid());
+            contentService.GetVersion(Guid.NewGuid());
         }
 
         private void CreateStuff(out int id1, out int id2, out int id3, out string alias)
@@ -156,26 +156,26 @@ namespace Umbraco.Tests.Persistence.NPocoTests
 
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+                contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
             }
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType(ctAlias, "test Doc Type");
             contentTypeService.Save(contentType);
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", -1, ctAlias, 0);
+                contentService.CreateAndSave("Test", -1, ctAlias, 0);
             }
-            var parent = contentService.CreateContentWithIdentity("Test", -1, ctAlias, 0);
+            var parent = contentService.CreateAndSave("Test", -1, ctAlias, 0);
             id1 = parent.Id;
 
             for (int i = 0; i < 20; i++)
             {
-                contentService.CreateContentWithIdentity("Test", parent, ctAlias);
+                contentService.CreateAndSave("Test", parent, ctAlias);
             }
             IContent current = parent;
             for (int i = 0; i < 20; i++)
             {
-                current = contentService.CreateContentWithIdentity("Test", current, ctAlias);
+                current = contentService.CreateAndSave("Test", current, ctAlias);
             }
             contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory" + Guid.NewGuid().ToString("N"), "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
@@ -186,12 +186,14 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             contentTypeService.Save(contentType);
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content1);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
             id2 = content1.Id;
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content2);
+            content2.PublishValues();
+            contentService.SaveAndPublish(content2);
             id3 = content2.Id;
 
             contentService.MoveToRecycleBin(content1);

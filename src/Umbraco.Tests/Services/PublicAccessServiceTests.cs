@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(OperationStatusType.Success, result.Result.StatusType);
+            Assert.AreEqual(OperationResultType.Success, result.Result.Result);
             Assert.IsTrue(entry.HasIdentity);
             Assert.AreNotEqual(entry.Key, Guid.Empty);
             Assert.AreEqual(c.Id, entry.LoginNodeId);
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsTrue(updated.Success);
-            Assert.AreEqual(OperationStatusType.Success, updated.Result.StatusType);
+            Assert.AreEqual(OperationResultType.Success, updated.Result.Result);
             Assert.AreEqual(2, entry.Rules.Count());
         }
 
@@ -113,8 +113,8 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.IsTrue(updated1.Success);
             Assert.IsTrue(updated2.Success);
-            Assert.AreEqual(OperationStatusType.Success, updated1.Result.StatusType);
-            Assert.AreEqual(OperationStatusType.Success, updated2.Result.StatusType);
+            Assert.AreEqual(OperationResultType.Success, updated1.Result.Result);
+            Assert.AreEqual(OperationResultType.Success, updated2.Result.Result);
             Assert.AreEqual(3, entry.Rules.Count());
         }
 
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.IsTrue(removed.Success);
-            Assert.AreEqual(OperationStatusType.Success, removed.Result.StatusType);
+            Assert.AreEqual(OperationResultType.Success, removed.Result.Result);
             Assert.AreEqual(1, entry.Rules.Count());
             Assert.AreEqual("TestValue2", entry.Rules.ElementAt(0).RuleValue);
         }

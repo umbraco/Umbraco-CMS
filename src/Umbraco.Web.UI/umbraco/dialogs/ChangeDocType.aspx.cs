@@ -250,7 +250,8 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                 // Publish if the content was already published
                 if (wasPublished)
                 {
-                    Services.ContentService.Publish(_content, user.Id);
+                    // no values to publish, really
+                    Services.ContentService.SaveAndPublish(_content, user.Id);
                 }
 
                 // Sync the tree

@@ -31,15 +31,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the template used to render the published version of the content.
         /// </summary>
-        /// <remarks>When editing the content, the template can change, but this will
-        /// not until the content is published.</remarks>
+        /// <remarks>When editing the content, the template can change, but this will not until the content is published.</remarks>
         ITemplate PublishTemplate { get; }
 
         /// <summary>
         /// Gets the name of the published version of the content.
         /// </summary>
-        /// <remarks>When editing the content, the name can change, but this will
-        /// not until the content is published.</remarks>
+        /// <remarks>When editing the content, the name can change, but this will not until the content is published.</remarks>
         string PublishName { get; }
 
         /// <summary>
@@ -98,5 +96,53 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
+
+        /// <summary>
+        /// Publishes all values.
+        /// </summary>
+        /// <remarks>The document must then be published via the content service.</remarks>
+        void PublishAllValues();
+
+        /// <summary>
+        /// Publishes values.
+        /// </summary>
+        /// <remarks>The document must then be published via the content service.</remarks>
+        void PublishValues(int? languageId = null, string segment = null);
+
+        /// <summary>
+        /// Publishes the culture/any values.
+        /// </summary>
+        /// <remarks>The document must then be published via the content service.</remarks>
+        void PublishCultureValues(int? languageId = null);
+
+        /// <summary>
+        /// Clears all published values.
+        /// </summary>
+        void ClearAllPublishedValues();
+
+        /// <summary>
+        /// Clears published values.
+        /// </summary>
+        void ClearPublishedValues(int? languageId = null, string segment = null);
+
+        /// <summary>
+        /// Clears the culture/any published values.
+        /// </summary>
+        void ClearCulturePublishedValues(int? languageId = null);
+
+        /// <summary>
+        /// Copies values from another document.
+        /// </summary>
+        void CopyAllValues(IContent other);
+
+        /// <summary>
+        /// Copies values from another document.
+        /// </summary>
+        void CopyValues(IContent other, int? languageId = null, string segment = null);
+
+        /// <summary>
+        /// Copies culture/any values from another document.
+        /// </summary>
+        void CopyCultureValues(IContent other, int? languageId = null);
     }
 }

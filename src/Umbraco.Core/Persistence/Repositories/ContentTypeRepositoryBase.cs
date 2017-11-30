@@ -749,7 +749,7 @@ AND umbracoNode.id <> @id",
             {
                 if (db == null) throw new ArgumentNullException(nameof(db));
 
-                var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
+                var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc, cmsContentType.variations as ctVariations,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
@@ -854,6 +854,7 @@ AND umbracoNode.id <> @id",
                     NodeId = currCt.ctId,
                     PrimaryKey = currCt.ctPk,
                     Thumbnail = currCt.ctThumb,
+                    Variations = (byte) currCt.ctVariations,
                     //map the underlying node dto
                     NodeDto = new NodeDto
                     {
@@ -889,7 +890,7 @@ AND umbracoNode.id <> @id",
                 if (db == null) throw new ArgumentNullException(nameof(db));
 
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
-                                cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
+                                cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc, cmsContentType.variations as ctVariations,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
                                 ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
@@ -1030,6 +1031,7 @@ AND umbracoNode.id <> @id",
                         NodeId = currCt.ctId,
                         PrimaryKey = currCt.ctPk,
                         Thumbnail = currCt.ctThumb,
+                        Variations = (byte) currCt.ctVariations,
                         //map the underlying node dto
                         NodeDto = new NodeDto
                         {
@@ -1092,7 +1094,7 @@ ORDER BY contentTypeId, id";
     pt.id AS id, pt.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @",
     pt.propertyTypeGroupId AS groupId,
     pt.Alias AS alias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" AS " + sqlSyntax.GetQuotedColumnName("desc") + @", pt.mandatory AS mandatory,
-    pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp,
+    pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp, pt.variations as variations,
     dt.nodeId as dataTypeId, dt.dbType as dbType, dt.propertyEditorAlias as editorAlias
 FROM cmsPropertyType pt
 INNER JOIN cmsDataType as dt ON pt.dataTypeId = dt.nodeId
@@ -1161,7 +1163,8 @@ ORDER BY contentTypeId, groupId, id";
                     Name = prop.name,
                     PropertyGroupId = propertyGroup == null ? null : new Lazy<int>(() => propertyGroup.Id),
                     SortOrder = prop.sortOrder,
-                    ValidationRegExp = prop.regexp
+                    ValidationRegExp = prop.regexp,
+                    Variations = (ContentVariation) prop.variations
                 };
                 propertyTypes.Add(propertyType);
             }
