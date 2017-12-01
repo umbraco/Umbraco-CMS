@@ -1,5 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="../masterpages/umbracoPage.Master" AutoEventWireup="true" CodeBehind="details.aspx.cs" Inherits="umbraco.presentation.umbraco.translation.details" %>
-<%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="ui" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
@@ -7,7 +7,7 @@
 <style type="text/css">
   .fieldsTable tr{
     border-color: #D9D7D7 !Important;
-  }  
+  }
 </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">

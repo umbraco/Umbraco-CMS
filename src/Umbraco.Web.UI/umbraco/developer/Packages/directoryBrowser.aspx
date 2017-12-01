@@ -1,6 +1,6 @@
 <%@ Page Language="C#" AutoEventWireup="True" MasterPageFile="../../masterpages/umbracoDialog.Master" CodeBehind="DirectoryBrowser.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Developer.Packages.DirectoryBrowser" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 <%@ Register TagPrefix="cdf" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">

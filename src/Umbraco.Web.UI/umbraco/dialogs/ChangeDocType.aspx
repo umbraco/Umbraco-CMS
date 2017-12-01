@@ -1,20 +1,20 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master"Codebehind="ChangeDocType.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Dialogs.ChangeDocType" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
   <style type="text/css">
     #propertyMapping thead tr th{border-bottom:1px solid #ccc; padding: 4px; padding-right: 25px;
-                                background-image: url(<%= Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.UmbracoClient) %>/tableSorting/img/bg.gif);     
-                                cursor: pointer; 
-                                font-weight: bold; 
-                                background-repeat: no-repeat; 
-                                background-position: center right; 
+                                background-image: url(<%= Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.UmbracoClient) %>/tableSorting/img/bg.gif);
+                                cursor: pointer;
+                                font-weight: bold;
+                                background-repeat: no-repeat;
+                                background-position: center right;
                                }
-    
+
     #propertyMapping tbody tr td{border-bottom:1px solid #efefef}
-    #propertyMapping td{padding: 4px; ;}  
+    #propertyMapping td{padding: 4px; ;}
     body.umbracoDialog { overflow: auto; }
     .umb-dialog .umb-control-group .umb-el-wrap { overflow: hidden; }
     .umb-dialog .umb-control-group .umb-el-wrap label { float: left; width: 140px; font-weight: bold; }
@@ -29,7 +29,7 @@
 
     <cc1:Pane runat="server" ID="ChangeDocTypePane">
         <p class="help">
-            <%= Services.TextService.Localize("changeDocType/changeDocTypeInstruction") %>            
+            <%= Services.TextService.Localize("changeDocType/changeDocTypeInstruction") %>
         </p>
 
         <cc1:PropertyPanel ID="ContentNamePropertyPanel" runat="server">
@@ -42,7 +42,7 @@
 
         <cc1:PropertyPanel ID="NewTypePropertyPanel" runat="server">
             <asp:DropDownList ID="NewDocumentTypeList" runat="server" AutoPostBack="true" OnSelectedIndexChanged="NewDocumentTypeList_SelectedIndexChanged" />
-            <asp:RequiredFieldValidator ControlToValidate="NewDocumentTypeList" ErrorMessage="*" ID="NewDocumentTypeValidator" runat="server" Display="Dynamic" />          
+            <asp:RequiredFieldValidator ControlToValidate="NewDocumentTypeList" ErrorMessage="*" ID="NewDocumentTypeValidator" runat="server" Display="Dynamic" />
             <br /><small><%=Services.TextService.Localize("changeDocType/validDocTypesNote") %></small>
         </cc1:PropertyPanel>
 
@@ -50,8 +50,8 @@
             <asp:DropDownList ID="NewTemplateList" runat="server" />
         </cc1:PropertyPanel>
 
-        <asp:PlaceHolder ID="NotAvailablePlaceholder" runat="server" Visible="false">        
-            <div class="propertyItem notice" style="padding-top: 10px">     
+        <asp:PlaceHolder ID="NotAvailablePlaceholder" runat="server" Visible="false">
+            <div class="propertyItem notice" style="padding-top: 10px">
                 <p><%=Services.TextService.Localize("changeDocType/docTypeCannotBeChanged") %></p>
             </div>
         </asp:PlaceHolder>
@@ -60,7 +60,7 @@
     <cc1:Pane runat="server" ID="ChangeDocTypePropertyMappingPane">
 
         <p class="help">
-            <%= Services.TextService.Localize("changeDocType/changeDocTypeInstruction2") %>            
+            <%= Services.TextService.Localize("changeDocType/changeDocTypeInstruction2") %>
         </p>
 
         <asp:Repeater ID="PropertyMappingRepeater" runat="server">
@@ -92,18 +92,18 @@
 
     <asp:PlaceHolder ID="SuccessPlaceholder" runat="server" Visible="false">
         <p><%=Services.TextService.Localize("changeDocType/docTypeChanged") %></p>
-        <p>        
+        <p>
             <asp:Literal ID="SuccessMessage" runat="server" />
             <asp:Literal ID="PropertiesMappedMessage" runat="server" />
             <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("defaultdialogs/closeThisWindow") %></a>  
+            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("defaultdialogs/closeThisWindow") %></a>
         </p>
     </asp:PlaceHolder>
 
     <asp:PlaceHolder ID="ValidationPlaceholder" runat="server" Visible="false">
         <br />
-        <div class="notice" style="padding: 10px">        
+        <div class="notice" style="padding: 10px">
             <asp:Literal id="ValidationError" runat="server" />
         </div>
     </asp:PlaceHolder>
@@ -111,11 +111,10 @@
     <div class="btn-toolbar umb-btn-toolbar">
         <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
             <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
-            <asp:PlaceHolder ID="SavePlaceholder" runat="server">        
+            <asp:PlaceHolder ID="SavePlaceholder" runat="server">
                 <asp:Button ID="ValidateAndSave" runat="server" CssClass="btn btn-primary" Text="Create" OnClick="ValidateAndSave_Click"></asp:Button>
             </asp:PlaceHolder>
         </asp:Placeholder>
     </div>
-     
+
 </asp:Content>
-  

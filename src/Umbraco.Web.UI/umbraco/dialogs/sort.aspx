@@ -3,8 +3,8 @@
 <%@ Import Namespace="System.Globalization" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
 <%@ Import Namespace="Umbraco.Web" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Dialogs/SortDialog.css" PathNameAlias="UmbracoClient"></umb:CssInclude>
@@ -23,7 +23,7 @@
                 <div class="notice">
                     <p><%= Services.TextService.Localize("sort/sortPleaseWait") %></p>
                 </div>
-                
+
                 <div class="umb-loader-wrapper">
                     <cc1:ProgressBar ID="prog1" runat="server" Title="sorting.." />
                 </div>

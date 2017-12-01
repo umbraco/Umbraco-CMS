@@ -1,7 +1,5 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.presentation.umbraco.dialogs.protectPage" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         function updateLoginId() {

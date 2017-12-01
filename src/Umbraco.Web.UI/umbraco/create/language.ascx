@@ -1,5 +1,5 @@
 <%@ Control Language="c#" AutoEventWireup="True" Inherits="umbraco.cms.presentation.create.controls.language" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <input type="hidden" name="nodeType"/>
 
@@ -15,4 +15,4 @@
     <asp:Button ID="sbmt" CssClass="btn btn-primary" OnClick="sbmt_Click" runat="server" Text='<%#Services.TextService.Localize("create") %>'></asp:Button>
 </cc1:Pane>
 
-    
+

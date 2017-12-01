@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../../masterpages/umbracoPage.Master" CodeBehind="EditStyleSheetProperty.aspx.cs"
   AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Settings.Stylesheet.Property.EditStyleSheetProperty"
   ValidateRequest="False" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
   <cc1:UmbracoPanel ID="Panel1" runat="server" Text="Edit stylesheet property" Width="432px" Height="176px" hasMenu="true">

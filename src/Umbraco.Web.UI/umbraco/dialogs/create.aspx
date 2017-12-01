@@ -1,21 +1,21 @@
-<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" 
+<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master"
     AutoEventWireup="True" Inherits="umbraco.dialogs.create" %>
 
 <%@ Import Namespace="Umbraco.Web" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
     <script language="javascript" type="text/javascript">
-        
+
         var pageNameHolder = null;
         var pageName = null;
-        
+
         jQuery(document).ready(function() {
             pageNameHolder = jQuery("#<%=PageNameHolder.ClientID%>");
-		    pageName = pageNameHolder.find("p");    
+		    pageName = pageNameHolder.find("p");
         });
-        
+
 		function dialogHandler(id) {
 			document.getElementById("nodeId").value = id;
 			document.getElementById("ok").disabled = false;
@@ -23,20 +23,20 @@
 			if (id > 0) {
 			    umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				}
-			else			
+			else
 				pageName.html("<p><strong><%=Services.TextService.Localize(App)%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %></p>");
 				pageNameHolder.attr("class","success");
 		}
-		
-		function updateName(result) {			  
+
+		function updateName(result) {
 		    pageName.html("<p><strong>" + result + "</strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %></p>");
 			pageNameHolder.attr("class","success");
 		}
-		
+
 		function onNodeSelectionConfirmed() {
 		    document.location.href = 'create.aspx?nodeType=<%=Request.CleanForXss("nodeType")%>&app=<%=App%>&nodeId=' + document.getElementById('nodeId').value
 		}
-	
+
     </script>
 
 </asp:Content>

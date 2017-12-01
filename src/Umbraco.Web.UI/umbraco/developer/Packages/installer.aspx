@@ -3,7 +3,7 @@
     Trace="false" ValidateRequest="false" %>
 <%@ Import Namespace="umbraco" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 

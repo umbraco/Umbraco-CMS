@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master"AutoEventWireup="True" Inherits="umbraco.presentation.dialogs.rollBack" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
@@ -94,5 +94,5 @@
     <div runat="server" id="pl_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
         <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
         <asp:Button ID="Button1" runat="server" visible="false" CssClass="btn btn-primary" OnClick="doRollback_Click"></asp:Button>
-    </div>  
+    </div>
 </asp:Content>

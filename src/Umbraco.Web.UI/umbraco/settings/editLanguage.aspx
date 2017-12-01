@@ -1,7 +1,7 @@
 <%@ Page Language="c#" CodeBehind="editLanguage.aspx.cs" AutoEventWireup="True" MasterPageFile="../masterpages/umbracoPage.Master"
     Inherits="umbraco.settings.editLanguage" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="body" runat="server">
     <cc1:UmbracoPanel ID="Panel1" runat="server" Width="608px" Height="336px" hasMenu="true">
         <cc1:Pane ID="Pane7" runat="server">

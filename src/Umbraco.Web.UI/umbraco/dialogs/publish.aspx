@@ -3,8 +3,8 @@
 <%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Web" %>
 <%@ Import Namespace="Umbraco.Web.Mvc" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
@@ -55,8 +55,8 @@
                     <%=Services.TextService.Localize("publish/includeUnpublished") %>
                 </label>
             </div>
-            
-            
+
+
 
         </div>
 
@@ -90,8 +90,8 @@
              <p>
                  <a href='#' class="btn" data-bind="click: closeDialog"><%=Services.TextService.Localize("closeThisWindow") %></a>
              </p>
-        </div> 
-       
+        </div>
+
 
     </div>
 

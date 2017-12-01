@@ -1,7 +1,7 @@
 <%@ Page Title="Edit XSLT File" MasterPageFile="../../masterpages/umbracoPage.Master"
     ValidateRequest="false" Language="c#" CodeBehind="editXslt.aspx.cs" AutoEventWireup="True"
     Inherits="umbraco.cms.presentation.developer.editXslt" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server">
