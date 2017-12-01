@@ -37,7 +37,8 @@ namespace Umbraco.Web._Legacy.PackageActions
             {
                 if (rootDoc.Name.Trim() == documentName.Trim() && rootDoc != null && rootDoc.ContentType != null)
                 {
-                    Current.Services.ContentService.PublishWithChildren(rootDoc, 0, true);
+                    // fixme variants?
+                    Current.Services.ContentService.SaveAndPublishBranch(rootDoc, true);
                     break;
                 }
             }

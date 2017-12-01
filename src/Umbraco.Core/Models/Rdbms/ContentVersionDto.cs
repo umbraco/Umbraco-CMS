@@ -18,12 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeIdVersionId", ForColumns = "nodeId, versionId")]
         public int NodeId { get; set; }
-
-        [Column("versionId")]
-        [Index(IndexTypes.UniqueNonClustered)]
-        public Guid VersionId { get; set; }
 
         [Column("versionDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]

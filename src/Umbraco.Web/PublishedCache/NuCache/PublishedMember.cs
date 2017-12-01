@@ -28,7 +28,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 Name = member.Name,
                 Published = previewing,
                 TemplateId = -1,
-                Version = member.Version,
                 VersionDate = member.UpdateDate,
                 WriterId = member.CreatorId, // what else?
                 Properties = GetPropertyValues(contentType, member)

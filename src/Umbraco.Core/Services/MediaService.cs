@@ -417,7 +417,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        public IMedia GetVersion(Guid versionId)
+        public IMedia GetVersion(int versionId)
         {
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
@@ -1033,7 +1033,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
-        public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
+        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {

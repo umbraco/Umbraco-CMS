@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(media.ParentId, Is.Not.EqualTo(0));
                 Assert.That(media.Name, Is.EqualTo("Test Image"));
                 Assert.That(media.SortOrder, Is.EqualTo(0));
-                Assert.That(media.Version, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(media.VersionId, Is.Not.EqualTo(0));
                 Assert.That(media.ContentTypeId, Is.EqualTo(1032));
                 Assert.That(media.Path, Is.Not.Empty);
                 Assert.That(media.Properties.Any(), Is.True);

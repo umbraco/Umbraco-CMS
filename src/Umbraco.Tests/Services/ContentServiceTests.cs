@@ -724,7 +724,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(child2);
 
             // Act
-            contentService.PublishWithChildren(content, includeUnpublished: true);
+            contentService.SaveAndPublishBranch(content, true);
 
             // Assert
             var propertyTypeId = contentType.PropertyTypes.Single(x => x.Alias == "tags").Id;
@@ -1064,24 +1064,24 @@ namespace Umbraco.Tests.Services
             var versions = contentService.GetVersions(NodeDto.NodeIdSeed + 4).ToList();
             Assert.AreEqual(1, versions.Count);
 
-            var version1 = content.Version;
-            Console.WriteLine($"1 e={((Content)content).VersionPk} p={((Content)content).PublishedVersionPk}");
+            var version1 = content.VersionId;
+            Console.WriteLine($"1 e={content.VersionId} p={content.PublishedVersionId}");
 
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Jane Doe");
             content.PublishValues();
             contentService.SaveAndPublish(content); // publishes the current version, creates a version
 
-            var version2 = content.Version;
-            Console.WriteLine($"2 e={((Content) content).VersionPk} p={((Content) content).PublishedVersionPk}");
+            var version2 = content.VersionId;
+            Console.WriteLine($"2 e={content.VersionId} p={content.PublishedVersionId}");
 
             content.Name = "Text Page 2 ReUpdated";
             content.SetValue("author", "Bob Hope");
             content.PublishValues();
             contentService.SaveAndPublish(content); // publishes again, creates a version
 
-            var version3 = content.Version;
-            Console.WriteLine($"3 e={((Content) content).VersionPk} p={((Content) content).PublishedVersionPk}");
+            var version3 = content.VersionId;
+            Console.WriteLine($"3 e={content.VersionId} p={content.PublishedVersionId}");
 
             var content1 = contentService.GetById(content.Id);
             Assert.AreEqual("Bob Hope", content1.GetValue("author"));
@@ -1099,15 +1099,15 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(3, versions.Count);
 
             // versions come with most recent first
-            Assert.AreEqual(version3, versions[0].Version); // the edited version
-            Assert.AreEqual(version2, versions[1].Version); // the published version
-            Assert.AreEqual(version1, versions[2].Version); // the previously published version
+            Assert.AreEqual(version3, versions[0].VersionId); // the edited version
+            Assert.AreEqual(version2, versions[1].VersionId); // the published version
+            Assert.AreEqual(version1, versions[2].VersionId); // the previously published version
 
             // p is always the same, published version
             // e is changing, actual version we're loading
             Console.WriteLine();
             foreach (var version in ((IEnumerable<IContent>) versions).Reverse())
-                Console.WriteLine($"+ e={((Content) version).VersionPk} p={((Content) version).PublishedVersionPk}");
+                Console.WriteLine($"+ e={((Content) version).VersionId} p={((Content) version).PublishedVersionId}");
 
             // and proper values
             // first, the current (edited) version, with edited and published versions
@@ -1272,7 +1272,7 @@ namespace Umbraco.Tests.Services
                 content.PublishValues();
                 var published = contentService.SaveAndPublish(content, 0);
 
-                Assert.That(published, Is.True);
+                Assert.That(published.Success, Is.True);
                 Assert.That(content.Published, Is.True);
 
                 var e = ServiceContext.ContentService.GetById(content.Id);
@@ -1297,46 +1297,92 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Publish_Only_Valid_Content()
         {
-            // Arrange
-            var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentTypeService.Save(contentType);
 
-            Content content = MockedContent.CreateSimpleContent(contentType, "Invalid Content", NodeDto.NodeIdSeed + 1);
+            const int parentId = NodeDto.NodeIdSeed + 2;
+
+            var contentService = ServiceContext.ContentService;
+            var content = MockedContent.CreateSimpleContent(contentType, "Invalid Content", parentId);
             content.SetValue("author", string.Empty);
-            contentService.Save(content, 0);
+            contentService.Save(content);
 
-            // Act
-            var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishValues();
-            var parentPublished = contentService.SaveAndPublish(parent, 0);
-            content.PublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            var parent = contentService.GetById(parentId);
 
-            // Assert
-            Assert.That(parentPublished.Success, Is.True);
-            Assert.That(published.Success, Is.False);
+            var parentCanPublishValues = parent.PublishValues();
+            var parentPublished = contentService.SaveAndPublish(parent);
+
+            // parent can publish values
+            // and therefore can be published
+            Assert.IsTrue(parentCanPublishValues);
+            Assert.IsTrue(parentPublished.Success);
+            Assert.IsTrue(parent.Published);
+
+            var contentCanPublishValues = content.PublishValues();
+            var contentPublished = contentService.SaveAndPublish(content);
+
+            // content cannot publish values because they are invalid
+            Assert.IsFalse(contentCanPublishValues);
             Assert.IsNotEmpty(content.Validate());
-            Assert.That(parent.Published, Is.True);
-            Assert.That(content.Published, Is.False);
+
+            // and therefore cannot be published,
+            // because it did not have a published version at all
+            Assert.IsFalse(contentPublished.Success);
+            Assert.AreEqual(PublishResultType.FailedNoPublishedValues, contentPublished.Result);
+            Assert.IsFalse(content.Published);
+        }
+
+        // documents: an enumeration of documents, in tree order
+        // map: applies (if needed) PublishValue, returns a value indicating whether to proceed with the branch
+        private IEnumerable<IContent> MapPublishValues(IEnumerable<IContent> documents, Func<IContent, bool> map)
+        {
+            var exclude = new HashSet<int>();
+            foreach (var document in documents)
+            {
+                if (exclude.Contains(document.ParentId))
+                {
+                    exclude.Add(document.Id);
+                    continue;
+                }
+                if (!map(document))
+                {
+                    exclude.Add(document.Id);
+                    continue;
+                }
+                yield return document;
+            }
         }
 
         [Test]
         public void Can_Publish_Content_Children()
         {
-            // Arrange
+            const int parentId = NodeDto.NodeIdSeed + 2;
+
             var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
+            var parent = contentService.GetById(parentId);
 
-            // Act
-            var published = contentService.PublishWithChildren(content, 0);
-            var children = contentService.GetChildren(NodeDto.NodeIdSeed + 2);
+            Console.WriteLine(" " + parent.Id);
+            foreach (var x in contentService.GetDescendants(parent))
+                Console.WriteLine("          ".Substring(0, x.Level) + x.Id);
+            Console.WriteLine();
 
-            // Assert
-            Assert.That(published.All(x => x.Success), Is.True);//Nothing was cancelled, so should be true
-            Assert.That(content.Published, Is.True);//No restrictions, so should be published
-            Assert.That(children.First(x => x.Id == NodeDto.NodeIdSeed + 3).Published, Is.True);//Released 5 mins ago, so should be published
+            // publish parent & its branch
+            // only those that are not already published
+            // only invariant/neutral values
+            var parentPublished = contentService.SaveAndPublishBranch(parent, true);
+
+            foreach (var result in parentPublished)
+                Console.WriteLine("          ".Substring(0, result.Content.Level) + $"{result.Content.Id}: {result.Result}");
+
+            // everything should be successful
+            Assert.IsTrue(parentPublished.All(x => x.Success));
+            Assert.IsTrue(parent.Published);
+
+            var children = contentService.GetChildren(parentId);
+
+            // children are published including ... that was released 5 mins ago
+            Assert.IsTrue(children.First(x => x.Id == NodeDto.NodeIdSeed + 4).Published);
         }
 
         [Test]
@@ -1394,7 +1440,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, 0);
 
             // Act
-            var published = contentService.PublishWithChildren(content, 0);
+            var published = contentService.SaveAndPublishBranch(content, true);
 
             // Assert
             Assert.That(published.All(x => x.Success), Is.False);
@@ -1467,8 +1513,8 @@ namespace Umbraco.Tests.Services
             Assert.That(content.Published, Is.True);
             Assert.That(childContent.HasIdentity, Is.True);
             Assert.That(childContent.Published, Is.True);
-            Assert.That(published, Is.True);
-            Assert.That(childPublished, Is.True);
+            Assert.That(published.Success, Is.True);
+            Assert.That(childPublished.Success, Is.True);
         }
 
         [Test]
@@ -1485,11 +1531,11 @@ namespace Umbraco.Tests.Services
             content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
             content.PublishValues();
             var contentPublished = contentService.SaveAndPublish(content);
-            var publishedVersion = content.Version;
+            var publishedVersion = content.VersionId;
 
             content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Saved");
             contentService.Save(content);
-            Assert.AreEqual(publishedVersion, content.Version);
+            Assert.AreEqual(publishedVersion, content.VersionId);
 
             // Act
             var publishedDescendants = ((ContentService) contentService).GetPublishedDescendants(root).ToList();
@@ -1501,10 +1547,10 @@ namespace Umbraco.Tests.Services
 
             //Console.WriteLine(publishedVersion);
             //foreach (var d in publishedDescendants) Console.WriteLine(d.Version);
-            Assert.IsTrue(publishedDescendants.Any(x => x.Version == publishedVersion));
+            Assert.IsTrue(publishedDescendants.Any(x => x.VersionId == publishedVersion));
 
             //Ensure that the published content version has the correct property value and is marked as published
-            var publishedContentVersion = publishedDescendants.First(x => x.Version == publishedVersion);
+            var publishedContentVersion = publishedDescendants.First(x => x.VersionId == publishedVersion);
             Assert.That(publishedContentVersion.Published, Is.True);
             Assert.That(publishedContentVersion.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
 
@@ -1516,7 +1562,7 @@ namespace Umbraco.Tests.Services
             Assert.That(currentContent.Published, Is.True);
             Assert.That(currentContent.Properties["title"].GetValue(published: true), Contains.Substring("Published"));
             Assert.That(currentContent.Properties["title"].GetValue(), Contains.Substring("Saved"));
-            Assert.That(currentContent.Version, Is.EqualTo(publishedContentVersion.Version));
+            Assert.That(currentContent.VersionId, Is.EqualTo(publishedContentVersion.VersionId));
         }
 
         [Test]
@@ -1959,7 +2005,7 @@ namespace Umbraco.Tests.Services
             var versions = contentService.GetVersions(NodeDto.NodeIdSeed + 4).ToList();
             Assert.AreEqual(1, versions.Count);
 
-            var version1 = content.Version;
+            var version1 = content.VersionId;
 
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Francis Doe");
@@ -1969,7 +2015,7 @@ namespace Umbraco.Tests.Services
 
             content.PublishValues();
             contentService.SaveAndPublish(content); // new version
-            var version2 = content.Version;
+            var version2 = content.VersionId;
             Assert.AreNotEqual(version1, version2);
 
             Assert.IsTrue(content.Published);
@@ -1994,7 +2040,7 @@ namespace Umbraco.Tests.Services
 
             content.PublishValues();
             contentService.SaveAndPublish(content); // new version
-            var version3 = content.Version;
+            var version3 = content.VersionId;
             Assert.AreNotEqual(version2, version3);
 
             Assert.IsTrue(content.Published);
@@ -2016,7 +2062,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(rollback.Published);
             Assert.IsTrue(rollback.Edited);
             Assert.AreEqual("Francis Doe", contentService.GetById(content.Id).GetValue<string>("author")); // author is now Francis again
-            Assert.AreEqual(version3, rollback.Version); // same version but with edits
+            Assert.AreEqual(version3, rollback.VersionId); // same version but with edits
 
             // props and name have rolled back
             Assert.AreEqual("Francis Doe", rollback.GetValue<string>("author"));
@@ -2047,7 +2093,7 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Bob Doe");
             contentService.Save(content);
             Assert.IsTrue(content.Edited);
-            content = contentService.Rollback(content.Id, content.Version);
+            content = contentService.Rollback(content.Id, content.VersionId);
             Assert.IsFalse(content.Edited);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue("author"));
@@ -2134,14 +2180,14 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
-            var version = content.Version;
+            var version = content.VersionId;
 
             // Act
             contentService.DeleteVersion(NodeDto.NodeIdSeed + 5, version, true, 0);
             var sut = contentService.GetById(NodeDto.NodeIdSeed + 5);
 
             // Assert
-            Assert.That(sut.Version, Is.EqualTo(version));
+            Assert.That(sut.VersionId, Is.EqualTo(version));
         }
 
         [Test]
@@ -2326,8 +2372,8 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("foo", content.GetValue("title", published: true));
             Assert.AreEqual("foo", content.GetValue("title"));
 
-            var vpk = ((Content) content).VersionPk;
-            var ppk = ((Content) content).PublishedVersionPk;
+            var vpk = ((Content) content).VersionId;
+            var ppk = ((Content) content).PublishedVersionId;
 
             content = contentService.GetById(content.Id);
             Assert.IsFalse(content.Published);
@@ -2336,8 +2382,8 @@ namespace Umbraco.Tests.Services
             // fixme - depending on 1 line in ContentBaseFactory.BuildEntity
             // the published infos can be gone or not
             // if gone, it's not consistent with above
-            Assert.AreEqual(vpk, ((Content) content).VersionPk);
-            Assert.AreEqual(ppk, ((Content) content).PublishedVersionPk); // still there
+            Assert.AreEqual(vpk, ((Content) content).VersionId);
+            Assert.AreEqual(ppk, ((Content) content).PublishedVersionId); // still there
 
             // fixme - depending on 1 line in ContentRepository.MapDtoToContent
             // the published values can be null or not

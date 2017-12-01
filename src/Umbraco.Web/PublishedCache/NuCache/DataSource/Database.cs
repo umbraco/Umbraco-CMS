@@ -30,7 +30,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
                 .AndSelect<DocumentDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
 
-                .AndSelect<ContentVersionDto>(x => Alias(x.VersionId, "Version"))
                 .AndSelect<ContentVersionDto>(x => Alias(x.Text, "DraftName"), x => Alias(x.VersionDate, "DraftVersionDate"), x => Alias(x.UserId, "DraftWriterId"))
                 .AndSelect<DocumentVersionDto>(x => Alias(x.TemplateId, "DraftTemplateId"))
 
@@ -51,7 +50,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
                 //.AndSelect<DocumentDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
 
-                .AndSelect<ContentVersionDto>(x => Alias(x.VersionId, "Version"))
                 .AndSelect<ContentVersionDto>(x => Alias(x.Text, "PubName"), x => Alias(x.VersionDate, "PubVersionDate"), x => Alias(x.UserId, "PubWriterId"))
                 .AndSelect<DocumentVersionDto>(x => Alias(x.TemplateId, "PubTemplateId"))
 

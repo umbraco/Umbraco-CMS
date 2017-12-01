@@ -35,7 +35,6 @@ namespace Umbraco.Core.Models.PublishedContent
         string Path { get; }
         DateTime CreateDate { get; }
         DateTime UpdateDate { get; }
-        Guid Version { get; }
         int Level { get; }
         string Url { get; }
 

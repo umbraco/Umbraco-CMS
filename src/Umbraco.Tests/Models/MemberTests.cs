@@ -45,7 +45,6 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();
             ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
 
@@ -56,7 +55,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, member);
             Assert.AreEqual(clone, member);
             Assert.AreEqual(clone.Id, member.Id);
-            Assert.AreEqual(clone.Version, member.Version);
+            Assert.AreEqual(clone.VersionId, member.VersionId);
             Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)member).AdditionalData);
             Assert.AreNotSame(clone.ContentType, member.ContentType);
             Assert.AreEqual(clone.ContentType, member.ContentType);
@@ -90,7 +89,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.LastPasswordChangeDate, member.LastPasswordChangeDate);
             Assert.AreEqual(clone.Trashed, member.Trashed);
             Assert.AreEqual(clone.UpdateDate, member.UpdateDate);
-            Assert.AreEqual(clone.Version, member.Version);
+            Assert.AreEqual(clone.VersionId, member.VersionId);
             Assert.AreEqual(clone.PasswordQuestion, member.PasswordQuestion);
             Assert.AreEqual(clone.ProviderUserKey, member.ProviderUserKey);
             Assert.AreEqual(clone.RawPasswordAnswerValue, member.RawPasswordAnswerValue);
@@ -145,7 +144,6 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();
             ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
 

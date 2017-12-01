@@ -4,7 +4,7 @@ namespace Umbraco.Core.Events
 {
     public class DeleteRevisionsEventArgs : DeleteEventArgs, IEquatable<DeleteRevisionsEventArgs>
     {
-        public DeleteRevisionsEventArgs(int id, bool canCancel, Guid specificVersion = default(Guid), bool deletePriorVersions = false, DateTime dateToRetain = default(DateTime))
+        public DeleteRevisionsEventArgs(int id, bool canCancel, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
             : base(id, canCancel)
         {
             DeletePriorVersions = deletePriorVersions;
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Events
             DateToRetain = dateToRetain;
         }
 
-        public DeleteRevisionsEventArgs(int id, Guid specificVersion = default(Guid), bool deletePriorVersions = false, DateTime dateToRetain = default(DateTime))
+        public DeleteRevisionsEventArgs(int id, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
             : base(id)
         {
             DeletePriorVersions = deletePriorVersions;
@@ -20,17 +20,14 @@ namespace Umbraco.Core.Events
             DateToRetain = dateToRetain;
         }
 
-        public bool DeletePriorVersions { get; private set; }
-        public Guid SpecificVersion { get; private set; }
-        public DateTime DateToRetain { get; private set; }
+        public bool DeletePriorVersions { get; }
+        public int SpecificVersion { get; }
+        public DateTime DateToRetain { get; }
 
         /// <summary>
         /// Returns true if we are deleting a specific revision
         /// </summary>
-        public bool IsDeletingSpecificRevision
-        {
-            get { return SpecificVersion != default(Guid); }
-        }
+        public bool IsDeletingSpecificRevision => SpecificVersion != default;
 
         public bool Equals(DeleteRevisionsEventArgs other)
         {
@@ -43,7 +40,7 @@ namespace Umbraco.Core.Events
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((DeleteRevisionsEventArgs) obj);
         }
 

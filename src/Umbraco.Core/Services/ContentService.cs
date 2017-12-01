@@ -486,7 +486,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IContent"/> item</returns>
-        public IContent GetVersion(Guid versionId)
+        public IContent GetVersion(int versionId)
         {
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
@@ -517,7 +517,7 @@ namespace Umbraco.Core.Services
         /// <param name="id"></param>
         /// <param name="maxRows">The maximum number of rows to return</param>
         /// <returns></returns>
-        public IEnumerable<Guid> GetVersionIds(int id, int maxRows)
+        public IEnumerable<int> GetVersionIds(int id, int maxRows)
         {
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
@@ -1052,7 +1052,81 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public PublishResult SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true)
         {
-            return SaveAndPublishDo(content, userId, raiseEvents);
+            var evtMsgs = EventMessagesFactory.Get();
+            PublishResult result;
+
+            if (((Content) content).PublishedState != PublishedState.Publishing && content.Published)
+            {
+                // already published, and values haven't changed - i.e. not changing anything
+                // nothing to do
+                // fixme - unless we *want* to bump dates?
+                return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content);
+            }
+
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
+                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                {
+                    uow.Complete();
+                    return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
+                }
+
+                var isNew = content.IsNewEntity();
+                var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
+                var previouslyPublished = content.HasIdentity && content.Published;
+
+                uow.WriteLock(Constants.Locks.ContentTree);
+                var repository = uow.CreateRepository<IContentRepository>();
+
+                // ensure that the document can be published, and publish
+                // handling events, business rules, etc
+                result = StrategyCanPublish(uow, content, userId, /*checkPath:*/ true, evtMsgs);
+                if (result.Success)
+                    result = StrategyPublish(uow, content, /*canPublish:*/ true, userId, evtMsgs);
+
+                // save - always, even if not publishing (this is SaveAndPublish)
+                if (content.HasIdentity == false)
+                    content.CreatorId = userId;
+                content.WriterId = userId;
+
+                repository.AddOrUpdate(content);
+
+                if (raiseEvents) // always
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                }
+
+                if (result.Success == false)
+                {
+                    uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    return result;
+                }
+
+                if (isNew == false && previouslyPublished == false)
+                    changeType = TreeChangeTypes.RefreshBranch; // whole branch
+
+                // invalidate the node/branch
+                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+
+                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+
+                // if was not published and now is... descendants that were 'published' (but
+                // had an unpublished ancestor) are 're-published' ie not explicitely published
+                // but back as 'published' nevertheless
+                if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
+                {
+                    var descendants = GetPublishedDescendantsLocked(uow, repository, content).ToArray();
+                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
+                }
+
+                Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+
+                uow.Complete();
+            }
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -1066,7 +1140,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IContentRepository>();
 
                 var newest = GetById(content.Id); // ensure we have the newest version
-                if (content.Version != newest.Version) // but use the original object if it's already the newest version
+                if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
                     content = newest;
                 if (content.Published == false)
                 {
@@ -1076,9 +1150,9 @@ namespace Umbraco.Core.Services
 
                 // strategy
                 // fixme should we still complete the uow? don't want to rollback here!
-                var attempt = StrategyCanUnPublish(uow, content, userId, evtMsgs);
+                var attempt = StrategyCanUnpublish(uow, content, userId, evtMsgs);
                 if (attempt.Success == false) return attempt; // causes rollback
-                attempt = StrategyUnPublish(uow, content, true, userId, evtMsgs);
+                attempt = StrategyUnpublish(uow, content, true, userId, evtMsgs);
                 if (attempt.Success == false) return attempt; // causes rollback
 
                 content.WriterId = userId;
@@ -1140,9 +1214,104 @@ namespace Umbraco.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> PublishWithChildren(IContent content, int userId, bool includeUnpublished)
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0)
         {
-            return PublishWithChildrenDo(content, userId, includeUnpublished);
+            return SaveAndPublishBranch(content, force, new[] { (languageId, segment) }, userId);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force, ValueTuple<int?, string>[] variations, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var results = new List<PublishResult>();
+            var publishedDocuments = new List<IContent>();
+
+            using (var uow = UowProvider.CreateUnitOfWork())
+            {
+                uow.WriteLock(Constants.Locks.ContentTree);
+                var repository = uow.CreateRepository<IContentRepository>();
+
+                // fixme events?!
+
+                if (!document.HasIdentity)
+                    throw new InvalidOperationException("Do not branch-publish a new document.");
+
+                var publishedState = ((Content) document).PublishedState;
+                if (publishedState == PublishedState.Publishing)
+                    throw new InvalidOperationException("Do not publish values when publishing branches.");
+
+                // deal with the branch root - if it fails, abort
+                var result = SaveAndPublishBranchOne(document, repository, uow, variations, true, publishedDocuments, evtMsgs, userId);
+                results.Add(result);
+                if (!result.Success) return results;
+
+                // deal with descendants
+                // if one fails, abort its branch
+                var exclude = new HashSet<int>();
+                foreach (var d in GetDescendants(document))
+                {
+                    // if parent is excluded, exclude document and ignore
+                    // if not forcing, and not publishing, exclude document and ignore
+                    if (exclude.Contains(d.ParentId)  ||  !force && !d.Published)
+                    {
+                        exclude.Add(d.Id);
+                        continue;
+                    }
+
+                    // no need to check path here,
+                    // 1. because we know the parent is path-published (we just published it)
+                    // 2. because it would not work as nothing's been written out to the db until the uow completes
+                    result = SaveAndPublishBranchOne(d, repository, uow, variations, false, publishedDocuments, evtMsgs, userId);
+                    results.Add(result);
+                    if (result.Success) continue;
+
+                    // abort branch
+                    exclude.Add(d.Id);
+                }
+
+                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
+                Audit(uow, AuditType.Publish, "SaveAndPublishBranch performed by user", userId, document.Id);
+
+                uow.Complete();
+            }
+
+            return results;
+        }
+
+        private PublishResult SaveAndPublishBranchOne(IContent document,
+            IContentRepository repository, IScopeUnitOfWork uow,
+            ValueTuple<int?, string>[] variations, bool checkPath,
+            List<IContent> publishedDocuments,
+            EventMessages evtMsgs, int userId)
+        {
+            bool IsEditingContent(IContent content, int? languageId, string segment)
+                => content.Properties.Any(x => x.Values.Where(y => y.LanguageId == languageId && y.Segment == segment).Any(y => y.EditedValue != y.PublishedValue));
+
+            // if already published, and values haven't changed - i.e. not changing anything
+            // nothing to do - fixme - unless we *want* to bump dates?
+            if (document.Published && variations.All(x => !IsEditingContent(document, x.Item1, x.Item2)))
+                return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, document);
+
+            // publish & check if values are valid
+            if (!variations.All(x => document.PublishValues(x.Item1, x.Item2)))
+                return new PublishResult(PublishResultType.FailedContentInvalid, evtMsgs, document);
+
+            // check if we can publish
+            var result = StrategyCanPublish(uow, document, userId, checkPath, evtMsgs);
+            if (!result.Success)
+                return result;
+
+            // publish - should be successful
+            var publishResult = StrategyPublish(uow, document, /*canPublish:*/ true, userId, evtMsgs);
+            if (!publishResult.Success)
+                throw new Exception("oops: failed to publish.");
+
+            // save
+            document.WriterId = userId;
+            repository.AddOrUpdate(document);
+            publishedDocuments.Add(document);
+            return publishResult;
         }
 
         #endregion
@@ -1258,7 +1427,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
+        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -1278,7 +1447,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.ContentTree);
                 var repository = uow.CreateRepository<IContentRepository>();
                 var c = repository.Get(id);
-                if (c.Version != versionId) // don't delete the current version
+                if (c.VersionId != versionId) // don't delete the current version
                     repository.DeleteVersion(versionId);
 
                 uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
@@ -1669,7 +1838,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to rollback to</param>
         /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Rollback(int id, Guid versionId, int userId = 0)
+        public IContent Rollback(int id, int versionId, int userId = 0)
         {
             using (var uow = UowProvider.CreateUnitOfWork())
             {
@@ -1694,7 +1863,7 @@ namespace Umbraco.Core.Services
                 // in that last case, we want to copy the published values
                 // what-if there's no 'published' version for now?
                 // fixme WE DON'T WANT TO DO THIS HERE!
-                var copyPublished = ((Content) origContent).VersionPk > ((Content) origContent).PublishedVersionPk;
+                var copyPublished = origContent.VersionId > origContent.PublishedVersionId;
                 //((Content) currContent).CopyAllValues(origContent, copyPublished);
                 ((Content) currContent).CopyAllValues(origContent);
                 currContent.WriterId = userId;
@@ -1848,145 +2017,6 @@ namespace Umbraco.Core.Services
             repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
         }
 
-        /// <summary>
-        /// Publishes a <see cref="IContent"/> object and all its children
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
-        /// <returns>
-        /// A list of publish statues. If the parent document is not valid or cannot be published because it's parent(s) is not published
-        /// then the list will only contain one status item, otherwise it will contain status items for it and all of it's descendants that
-        /// are to be published.
-        /// </returns>
-        private IEnumerable<PublishResult> PublishWithChildrenDo(IContent content, int userId = 0, bool includeUnpublished = false)
-        {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-
-            var evtMsgs = EventMessagesFactory.Get();
-            var publishedItems = new List<IContent>(); // this is for events
-            PublishResult[] attempts;
-
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-
-                // fail fast + use in alreadyChecked below to avoid duplicate checks
-                var attempt = StrategyCanPublish(uow, content, userId, /*checkPath:*/ true, evtMsgs);
-                if (attempt.Success == false)
-                    return new[] { attempt }; // causes rollback
-
-                var contents = new List<IContent> { content }; //include parent item
-                contents.AddRange(GetDescendants(content));
-
-                // publish using the strategy - for descendants,
-                // - published w/out changes: nothing to do
-                // - published w/changes: publish those changes
-                // - unpublished: publish if includeUnpublished, otherwise ignore
-                var alreadyChecked = new[] { content };
-                attempts = StrategyPublishWithChildren(uow, contents, alreadyChecked, userId, evtMsgs, includeUnpublished).ToArray();
-
-                foreach (var status in attempts.Where(x => x.Success))
-                {
-                    // save them all, even those that are .Success because of (.StatusType == PublishStatusType.SuccessAlreadyPublished)
-                    // so we bump the date etc
-                    var publishedItem = status.Content;
-                    publishedItem.WriterId = userId;
-                    repository.AddOrUpdate(publishedItem);
-                    publishedItems.Add(publishedItem);
-                }
-
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedItems, false, false), "Published");
-                Audit(uow, AuditType.Publish, "Publish with Children performed by user", userId, content.Id);
-
-                uow.Complete();
-            }
-
-            return attempts;
-        }
-
-        /// <summary>
-        /// Saves and Publishes a single <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        private PublishResult SaveAndPublishDo(IContent content, int userId = 0, bool raiseEvents = true)
-        {
-            var evtMsgs = EventMessagesFactory.Get();
-            PublishResult status;
-
-            using (var uow = UowProvider.CreateUnitOfWork())
-            {
-                var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                {
-                    uow.Complete();
-                    return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
-                }
-
-                var isNew = content.IsNewEntity();
-                var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
-                var previouslyPublished = content.HasIdentity && content.Published;
-
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
-
-                status = StrategyCanPublish(uow, content, userId, /*checkPath:*/ true, evtMsgs);
-                if (status.Success)
-                {
-                    // strategy handles events, and various business rules eg release & expire
-                    // dates, trashed status...
-                    status = StrategyPublish(uow, content, true, userId, evtMsgs);
-                }
-
-                // save - always, even if not publishing (this is SaveAndPublish)
-                if (content.HasIdentity == false)
-                    content.CreatorId = userId;
-                content.WriterId = userId;
-
-                repository.AddOrUpdate(content);
-
-                if (raiseEvents) // always
-                {
-                    saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                }
-
-                if (status.Success == false)
-                {
-                    uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                    return status;
-                }
-
-                if (isNew == false && previouslyPublished == false)
-                    changeType = TreeChangeTypes.RefreshBranch; // whole branch
-
-                // invalidate the node/branch
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
-
-                // if was not published and now is... descendants that were 'published' (but
-                // had an unpublished ancestor) are 're-published' ie not explicitely published
-                // but back as 'published' nevertheless
-                if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
-                {
-                    var descendants = GetPublishedDescendantsLocked(uow, repository, content).ToArray();
-                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
-                }
-
-                Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
-
-                uow.Complete();
-            }
-
-            return status;
-        }
-
         #endregion
 
         #region Event Handlers
@@ -2135,211 +2165,113 @@ namespace Umbraco.Core.Services
 
         #region Publishing Strategies
 
-        // prob. want to find nicer names?
-
+        // ensures that a document can be published
         internal PublishResult StrategyCanPublish(IScopeUnitOfWork uow, IContent content, int userId, bool checkPath, EventMessages evtMsgs)
         {
+            // raise Publishing event
             if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' will not be published, the event was cancelled.");
+                Logger.Info<ContentService>($"Document  \"'{content.Name}\" (id={content.Id}) cannot be published: publishing was cancelled.");
                 return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
             }
 
-            // check if the content is valid
-            var invalidProperties = content.Validate();
-            if (invalidProperties.Any())
+            // ensure that the document has published values
+            // either because it is 'publishing' or because it already has a published version
+            if (((Content) content).PublishedState != PublishedState.Publishing && content.PublishedVersionId == 0)
             {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because of invalid properties.");
-                return new PublishResult(PublishResultType.FailedContentInvalid, evtMsgs, content)
-                {
-                    InvalidProperties = invalidProperties
-                };
+                Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be published: document does not have published values.");
+                return new PublishResult(PublishResultType.FailedNoPublishedValues, evtMsgs, content);
             }
 
-            // check if the Content is Expired
-            if (content.Status == ContentStatus.Expired)
+            // ensure that the document status is correct
+            switch (content.Status)
             {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' has expired and could not be published.");
-                return new PublishResult(PublishResultType.FailedHasExpired, evtMsgs, content);
+                case ContentStatus.Expired:
+                    Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be published: document has expired.");
+                    return new PublishResult(PublishResultType.FailedHasExpired, evtMsgs, content);
+
+                case ContentStatus.AwaitingRelease:
+                    Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be published: document is awaiting release.");
+                    return new PublishResult(PublishResultType.FailedAwaitingRelease, evtMsgs, content);
+
+                case ContentStatus.Trashed:
+                    Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be published: document is trashed.");
+                    return new PublishResult(PublishResultType.FailedIsTrashed, evtMsgs, content);
             }
 
-            // check if the Content is Awaiting Release
-            if (content.Status == ContentStatus.AwaitingRelease)
-            {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' is awaiting release and could not be published.");
-                return new PublishResult(PublishResultType.FailedAwaitingRelease, evtMsgs, content);
-            }
-
-            // check if the Content is Trashed
-            if (content.Status == ContentStatus.Trashed)
-            {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' is trashed and could not be published.");
-                return new PublishResult(PublishResultType.FailedIsTrashed, evtMsgs, content);
-            }
+            if (!checkPath) return new PublishResult(evtMsgs, content);
 
             // check if the content can be path-published
-            if (checkPath)
+            // root content can be published
+            // else check ancestors - we know we are not trashed
+            var pathIsOk = content.ParentId == Constants.System.Root || IsPathPublished(GetParent(content));
+            if (pathIsOk == false)
             {
-                // root content can be published
-                var pathIsOk = content.ParentId == Constants.System.Root;
-
-                // else check ancestors - we know we are not trashed
-                if (pathIsOk == false)
-                    pathIsOk = IsPathPublished(content.Parent());
-
-                if (pathIsOk == false)
-                {
-                    Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' could not be published because its parent is not published.");
-                    return new PublishResult(PublishResultType.FailedPathNotPublished, evtMsgs, content);
-                }
+                Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be published: parent is not published.");
+                return new PublishResult(PublishResultType.FailedPathNotPublished, evtMsgs, content);
             }
 
             return new PublishResult(evtMsgs, content);
         }
 
-        internal PublishResult StrategyPublish(IScopeUnitOfWork uow, IContent content, bool alreadyCheckedCanPublish, int userId, EventMessages evtMsgs)
+        // publishes a document
+        internal PublishResult StrategyPublish(IScopeUnitOfWork uow, IContent content, bool canPublish, int userId, EventMessages evtMsgs)
         {
             // note: when used at top-level, StrategyCanPublish with checkPath=true should have run already
             // and alreadyCheckedCanPublish should be true, so not checking again. when used at nested level,
-            // there is no need to check the path again. so, checkPath=false in StrategyCanPublish below is ok
+            // there is no need to check the path again. so, checkPath=false in StrategyCanPublish below
 
-            var attempt = alreadyCheckedCanPublish
+            var result = canPublish
                 ? new PublishResult(evtMsgs, content) // already know we can
                 : StrategyCanPublish(uow, content, userId, /*checkPath:*/ false, evtMsgs); // else check
-            if (attempt.Success == false)
-                return attempt;
+
+            if (result.Success == false)
+                return result;
 
             // change state to publishing
             ((Content) content).PublishedState = PublishedState.Publishing;
 
-            Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' has been published.");
-
-            return attempt;
+            Logger.Info<ContentService>($"Content \"{content.Name}\" (id={content.Id}) has been published.");
+            return result;
         }
 
-        ///  <summary>
-        ///  Publishes a list of content items
-        ///  </summary>
-        ///  <param name="contents">Contents, ordered by level ASC</param>
-        /// <param name="alreadyChecked">Contents for which we've already checked CanPublish</param>
-        /// <param name="userId"></param>
-        /// <param name="evtMsgs"></param>
-        /// <param name="includeUnpublished">Indicates whether to publish content that is completely unpublished (has no published
-        ///  version). If false, will only publish already published content with changes. Also impacts what happens if publishing
-        ///  fails (see remarks).</param>
-        ///  <returns></returns>
-        ///  <remarks>
-        ///  Navigate content & descendants top-down and for each,
-        ///  - if it is published
-        ///    - and unchanged, do nothing
-        ///    - else (has changes), publish those changes
-        ///  - if it is not published
-        ///    - and at top-level, publish
-        ///    - or includeUnpublished is true, publish
-        ///    - else do nothing & skip the underlying branch
-        ///
-        ///  When publishing fails
-        ///  - if content has no published version, skip the underlying branch
-        ///  - else (has published version),
-        ///    - if includeUnpublished is true, process the underlying branch
-        ///    - else, do not process the underlying branch
-        ///  </remarks>
-        internal IEnumerable<PublishResult> StrategyPublishWithChildren(IScopeUnitOfWork uow, IEnumerable<IContent> contents, IEnumerable<IContent> alreadyChecked, int userId, EventMessages evtMsgs, bool includeUnpublished = true)
+        // ensures that a document can be unpublished
+        internal PublishResult StrategyCanUnpublish(IScopeUnitOfWork uow, IContent content, int userId, EventMessages evtMsgs)
         {
-            var statuses = new List<PublishResult>();
-            var alreadyCheckedA = (alreadyChecked ?? Enumerable.Empty<IContent>()).ToArray();
-
-            // list of ids that we exclude because they could not be published
-            var excude = new List<int>();
-
-            var topLevel = -1;
-            foreach (var content in contents)
-            {
-                // initialize - content is ordered by level ASC
-                if (topLevel < 0)
-                    topLevel = content.Level;
-
-                if (excude.Contains(content.ParentId))
-                {
-                    // parent is excluded, so exclude content too
-                    Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' will not be published because it's parent's publishing action failed or was cancelled.");
-                    excude.Add(content.Id);
-                    // status has been reported for an ancestor and that one is excluded => no status
-                    continue;
-                }
-
-                if (content.Published && content.Level > topLevel) // topLevel we DO want to (re)publish
-                {
-                    // newest is published already
-                    statuses.Add(new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content));
-                    continue;
-                }
-
-                if (content.Level == topLevel || includeUnpublished)
-                {
-                    // content has no published version, and we want to publish it, either
-                    // because it is top-level or because we include unpublished.
-                    // if publishing fails, and because content does not have a published
-                    // version at all, ensure we do not process its descendants
-                    var r = StrategyPublish(uow, content, alreadyCheckedA.Contains(content), userId, evtMsgs);
-                    if (r.Success == false)
-                        excude.Add(content.Id);
-
-                    statuses.Add(r);
-                    continue;
-                }
-
-                // content has no published version, and we don't want to publish it
-                excude.Add(content.Id); // ignore everything below it
-                // content is not even considered, really => no status
-            }
-
-            return statuses;
-        }
-
-        internal PublishResult StrategyCanUnPublish(IScopeUnitOfWork uow, IContent content, int userId, EventMessages evtMsgs)
-        {
-            // fire UnPublishing event
+            // raise UnPublishing event
             if (uow.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' will not be unpublished, the event was cancelled.");
+                Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be unpublished: unpublishing was cancelled.");
                 return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
             }
 
             return new PublishResult(evtMsgs, content);
         }
 
-        internal PublishResult StrategyUnPublish(IScopeUnitOfWork uow, IContent content, bool alreadyCheckedCanUnPublish, int userId, EventMessages evtMsgs)
+        // unpublishes a document
+        internal PublishResult StrategyUnpublish(IScopeUnitOfWork uow, IContent content, bool canUnpublish, int userId, EventMessages evtMsgs)
         {
-            // content should (is assumed to) be the newest version, which may not be published,
-            // don't know how to test this, so it's not verified
-
-            var attempt = alreadyCheckedCanUnPublish
+            var attempt = canUnpublish
                 ? new PublishResult(evtMsgs, content) // already know we can
-                : StrategyCanUnPublish(uow, content, userId, evtMsgs);
+                : StrategyCanUnpublish(uow, content, userId, evtMsgs); // else check
+
             if (attempt.Success == false)
                 return attempt;
 
-            // if Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
+            // if the document has a release date set to before now,
+            // it should be removed so it doesn't interrupt an unpublish
             // otherwise it would remain released == published
             if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
             {
                 content.ReleaseDate = null;
-                Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' had its release date removed, because it was unpublished.");
+                Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) had its release date removed, because it was unpublished.");
             }
 
-            // version is published or unpublished, but content is published
             // change state to unpublishing
             ((Content) content).PublishedState = PublishedState.Unpublishing;
 
-            Logger.Info<ContentService>($"Content '{content.Name}' with Id '{content.Id}' has been unpublished.");
-
+            Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) has been unpublished.");
             return attempt;
-        }
-
-        internal IEnumerable<PublishResult> StrategyUnPublish(IScopeUnitOfWork uow, IEnumerable<IContent> content, int userId, EventMessages evtMsgs)
-        {
-            return content.Select(x => StrategyUnPublish(uow, x, false, userId, evtMsgs));
         }
 
         #endregion

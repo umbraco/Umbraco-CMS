@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Models
             var contentType = new ContentType(-1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
 
-            var content = new Content("content", -1, contentType) { Id = 1, VersionPk = 1 };
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             // can set value
             // and get edited value, published is null
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.AreEqual("b", content.GetValue("prop", published: true));
 
-            var other = new Content("other", -1, contentType) { Id = 2, VersionPk = 1 };
+            var other = new Content("other", -1, contentType) { Id = 2, VersionId = 1 };
             other.SetValue("prop", "o");
             other.SetValue("prop", "o1", 1);
 
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Models
             var contentType = new ContentType(-1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
 
-            var content = new Content("content", -1, contentType) { Id = 1, VersionPk = 1 };
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());

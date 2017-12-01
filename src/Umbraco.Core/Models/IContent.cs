@@ -24,6 +24,11 @@ namespace Umbraco.Core.Models
         bool Edited { get; }
 
         /// <summary>
+        /// Gets the published version identifier.
+        /// </summary>
+        int PublishedVersionId { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the content item is a blueprint.
         /// </summary>
         bool Blueprint { get; }
@@ -100,20 +105,32 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Publishes all values.
         /// </summary>
-        /// <remarks>The document must then be published via the content service.</remarks>
-        void PublishAllValues();
+        /// <returns>A value indicating whether the values could be published.</returns>
+        /// <remarks>
+        /// <para>The document must then be published via the content service.</para>
+        /// <para>Values are not published if they are not valie.</para>
+        /// </remarks>
+        bool PublishAllValues();
 
         /// <summary>
         /// Publishes values.
         /// </summary>
-        /// <remarks>The document must then be published via the content service.</remarks>
-        void PublishValues(int? languageId = null, string segment = null);
+        /// <returns>A value indicating whether the values could be published.</returns>
+        /// <remarks>
+        /// <para>The document must then be published via the content service.</para>
+        /// <para>Values are not published if they are not valie.</para>
+        /// </remarks>
+        bool PublishValues(int? languageId = null, string segment = null);
 
         /// <summary>
         /// Publishes the culture/any values.
         /// </summary>
-        /// <remarks>The document must then be published via the content service.</remarks>
-        void PublishCultureValues(int? languageId = null);
+        /// <returns>A value indicating whether the values could be published.</returns>
+        /// <remarks>
+        /// <para>The document must then be published via the content service.</para>
+        /// <para>Values are not published if they are not valie.</para>
+        /// </remarks>
+        bool PublishCultureValues(int? languageId = null);
 
         /// <summary>
         /// Clears all published values.

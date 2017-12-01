@@ -32,7 +32,6 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Member, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
             CacheMap<Member, ContentTypeDto>(src => src.ContentTypeAlias, dto => dto.Alias);
             CacheMap<Member, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
-            CacheMap<Member, ContentVersionDto>(src => src.Version, dto => dto.VersionId);
 
             CacheMap<Member, MemberDto>(src => src.Email, dto => dto.Email);
             CacheMap<Member, MemberDto>(src => src.Username, dto => dto.LoginName);

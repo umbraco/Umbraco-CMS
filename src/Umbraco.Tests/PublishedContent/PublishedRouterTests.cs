@@ -79,9 +79,7 @@ namespace Umbraco.Tests.PublishedContent
             pc.Setup(content => content.CreateDate).Returns(DateTime.Now);
             pc.Setup(content => content.UpdateDate).Returns(DateTime.Now);
             pc.Setup(content => content.Path).Returns("-1,1");
-            pc.Setup(content => content.Version).Returns(Guid.NewGuid);
             pc.Setup(content => content.Parent).Returns(() => null);
-            pc.Setup(content => content.Version).Returns(Guid.NewGuid);
             pc.Setup(content => content.Properties).Returns(new Collection<IPublishedProperty>());
             return pc;
         }

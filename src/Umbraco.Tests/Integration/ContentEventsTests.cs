@@ -758,7 +758,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.Unpublish(content1);
 
             ResetEvents();
-            ServiceContext.ContentService.PublishWithChildren(content1, 0, false);
+            ServiceContext.ContentService.SaveAndPublishBranch(content1, false);
 
             Assert.AreEqual(6, _msgCount);
             Assert.AreEqual(6, _events.Count);
@@ -794,7 +794,7 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.Unpublish(content1);
 
             ResetEvents();
-            ServiceContext.ContentService.PublishWithChildren(content1, 0, true);
+            ServiceContext.ContentService.SaveAndPublishBranch(content1, true);
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
@@ -2152,17 +2152,17 @@ namespace Umbraco.Tests.Integration
             Assert.IsNotNull(content);
             content.PublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
-            var v1 = content.Version;
+            var v1 = content.VersionId;
 
             content.Properties.First().SetValue("changed");
             content.PublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
-            var v2 = content.Version;
+            var v2 = content.VersionId;
 
             content.Properties.First().SetValue("again");
             content.PublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
-            var v3 = content.Version;
+            var v3 = content.VersionId;
 
             Console.WriteLine(v1);
             Console.WriteLine(v2);

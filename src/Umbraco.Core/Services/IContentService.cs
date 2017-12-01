@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -129,12 +128,12 @@ namespace Umbraco.Core.Services
         /// Gets top versions of a document.
         /// </summary>
         /// <remarks>Versions are ordered with current first, then most recent first.</remarks>
-        IEnumerable<Guid> GetVersionIds(int id, int topRows);
+        IEnumerable<int> GetVersionIds(int id, int topRows);
 
         /// <summary>
         /// Gets a version of a document.
         /// </summary>
-        IContent GetVersion(Guid versionId);
+        IContent GetVersion(int versionId);
 
         /// <summary>
         /// Gets root-level documents.
@@ -285,7 +284,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Deletes a version of a document.
         /// </summary>
-        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
+        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0);
 
         #endregion
 
@@ -338,14 +337,19 @@ namespace Umbraco.Core.Services
         PublishResult SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
+        /// Saves and publishes a document branch.
+        /// </summary>
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, ValueTuple<int?, string>[] variations, int userId = 0);
+
+        /// <summary>
+        /// Saves and publishes a document branch.
+        /// </summary>
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0);
+
+        /// <summary>
         /// Unpublishes a document.
         /// </summary>
         PublishResult Unpublish(IContent content, int userId = 0);
-
-        /// <summary>
-        /// Publishes a document and all its children.
-        /// </summary>
-        IEnumerable<PublishResult> PublishWithChildren(IContent content, int userId = 0, bool includeUnpublished = false);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.
@@ -373,7 +377,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Rolls a document back a previous version.
         /// </summary>
-        IContent Rollback(int id, Guid versionId, int userId = 0);
+        IContent Rollback(int id, int versionId, int userId = 0);
 
         #endregion
 

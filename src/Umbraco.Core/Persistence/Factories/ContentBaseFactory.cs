@@ -25,8 +25,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 content.Id = dto.NodeId;
                 content.Key = nodeDto.UniqueId;
-                content.Version = contentVersionDto.VersionId;
-                content.VersionPk = contentVersionDto.Id;
+                content.VersionId = contentVersionDto.Id;
 
                 content.Name = contentVersionDto.Text;
                 content.NodeName = contentVersionDto.Text;
@@ -51,7 +50,7 @@ namespace Umbraco.Core.Persistence.Factories
                 //if (dto.Published)
                 if (publishedVersionDto != null)
                 {
-                    content.PublishedVersionPk = publishedVersionDto.Id;
+                    content.PublishedVersionId = publishedVersionDto.Id;
                     content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
                     content.PublishName = publishedVersionDto.ContentVersionDto.Text;
                     content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
@@ -85,8 +84,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 content.Id = dto.NodeId;
                 content.Key = nodeDto.UniqueId;
-                content.Version = contentVersionDto.VersionId;
-                content.VersionPk = contentVersionDto.Id;
+                content.VersionId = contentVersionDto.Id;
 
                 // fixme missing names?
 
@@ -127,8 +125,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 content.Id = dto.NodeId;
                 content.Key = nodeDto.UniqueId;
-                content.Version = contentVersionDto.VersionId;
-                content.VersionPk = contentVersionDto.Id;
+                content.VersionId = contentVersionDto.Id;
 
                 // fixme missing names?
 
@@ -248,9 +245,8 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new ContentVersionDto
             {
-                Id = entity.VersionPk,
+                Id = entity.VersionId,
                 NodeId = entity.Id,
-                VersionId = entity.Version,
                 VersionDate = entity.UpdateDate,
                 UserId = entity.WriterId,
                 Current = true, // always building the current one
@@ -268,7 +264,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new DocumentVersionDto
             {
-                Id = entity.VersionPk,
+                Id = entity.VersionId,
                 TemplateId = entity.Template?.Id,
                 Published = false, // always building the current, unpublished one
 

@@ -180,8 +180,6 @@ namespace umbraco
             {
                 case "id":
                     return doc.Id.ToString();
-                case "version":
-                    return doc.Version.ToString();
                 case "parentID":
                     return doc.Parent.Id.ToString();
                 case "level":

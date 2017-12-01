@@ -145,8 +145,6 @@ namespace Umbraco.Web.PublishedCache
 
         public override DateTime UpdateDate => _member.UpdateDate;
 
-        public override Guid Version => _member.Version;
-
         public override int Level => _member.Level;
 
         #endregion

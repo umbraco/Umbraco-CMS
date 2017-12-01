@@ -146,6 +146,8 @@ namespace Umbraco.Core.Models
 
         private object GetPropertyValue(PropertyValue pvalue, bool published)
         {
+            if (pvalue == null) return null;
+
             return _propertyType.IsPublishing
                 ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
                 : pvalue.EditedValue;
@@ -250,6 +252,8 @@ namespace Umbraco.Core.Models
 
         private void PublishPropertyValue(PropertyValue pvalue)
         {
+            if (pvalue == null) return;
+
             if (!_propertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
@@ -259,6 +263,8 @@ namespace Umbraco.Core.Models
 
         private void ClearPublishedPropertyValue(PropertyValue pvalue)
         {
+            if (pvalue == null) return;
+
             if (!_propertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;

@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
                 Path = "-1," + id1
             });
 
-            contentService.GetVersion(Guid.NewGuid());
+            contentService.GetVersion(1234);
         }
 
         private void CreateStuff(out int id1, out int id2, out int id3, out string alias)

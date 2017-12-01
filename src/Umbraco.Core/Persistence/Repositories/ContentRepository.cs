@@ -202,24 +202,24 @@ namespace Umbraco.Core.Persistence.Repositories
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true);
         }
 
-        public override IContent GetVersion(Guid versionId)
+        public override IContent GetVersion(int versionId)
         {
             var sql = GetBaseQuery(QueryType.Single, false)
-                .Where<ContentVersionDto>(x => x.VersionId == versionId);
+                .Where<ContentVersionDto>(x => x.Id == versionId);
 
             var dto = Database.Fetch<DocumentDto>(sql).FirstOrDefault();
             return dto == null ? null : MapDtoToContent(dto);
         }
 
-        protected override void PerformDeleteVersion(int id, Guid versionId)
+        protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
             OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
 
             // fixme - syntax + ...
-            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
+            Database.Delete<ContentVersionDto>("WHERE id = @versionId", new { versionId });
+            Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
         }
 
         #endregion
@@ -288,11 +288,11 @@ namespace Umbraco.Core.Persistence.Repositories
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = !publishing;
             Database.Insert(contentVersionDto);
-            content.VersionPk = contentVersionDto.Id;
+            content.VersionId = contentVersionDto.Id;
 
             // persist the document version dto
             var documentVersionDto = dto.DocumentVersionDto;
-            documentVersionDto.Id = content.VersionPk;
+            documentVersionDto.Id = content.VersionId;
             if (publishing)
                 documentVersionDto.Published = true;
             Database.Insert(documentVersionDto);
@@ -300,20 +300,19 @@ namespace Umbraco.Core.Persistence.Repositories
             // and again in case we're publishing immediately
             if (publishing)
             {
-                content.PublishedVersionPk = content.VersionPk;
-                content.Version = contentVersionDto.VersionId = Guid.NewGuid();
+                content.PublishedVersionId = content.VersionId;
                 contentVersionDto.Id = 0;
                 contentVersionDto.Current = true;
                 Database.Insert(contentVersionDto);
-                content.VersionPk = contentVersionDto.Id;
+                content.VersionId = contentVersionDto.Id;
 
-                documentVersionDto.Id = content.VersionPk;
+                documentVersionDto.Id = content.VersionId;
                 documentVersionDto.Published = false;
                 Database.Insert(documentVersionDto);
             }
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionPk, content.PublishedVersionPk, entity.Properties, out var edited);
+            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, content.PublishedVersionId, entity.Properties, out var edited);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -377,7 +376,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // whatever we do, we must check that we are saving the current version
             // fixme maybe we can just fetch Current (bool)
-            var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == content.VersionPk)).FirstOrDefault();
+            var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == content.VersionId)).FirstOrDefault();
             if (version == null || !version.Current )
                 throw new InvalidOperationException("Cannot save a non-current version.");
 
@@ -386,10 +385,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var publishing = content.PublishedState == PublishedState.Publishing;
 
             // check if we need to create a new version
-            if (publishing && content.PublishedVersionPk > 0)
+            if (publishing && content.PublishedVersionId > 0)
             {
                 // published version is not published anymore
-                Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionPk));
+                Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
             }
 
             // ensure unique name on the same level
@@ -433,24 +432,23 @@ namespace Umbraco.Core.Persistence.Repositories
             // and, if publishing, insert new content & document version dtos
             if (publishing)
             {
-                content.PublishedVersionPk = content.VersionPk;
+                content.PublishedVersionId = content.VersionId;
 
                 contentVersionDto.Id = 0; // want a new id
                 contentVersionDto.Current = true; // current version
-                content.Version = contentVersionDto.VersionId = Guid.NewGuid(); // for that new guid
                 Database.Insert(contentVersionDto);
-                content.VersionPk = documentVersionDto.Id = contentVersionDto.Id; // get the new id
+                content.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
                 documentVersionDto.Published = false; // non-published version
                 Database.Insert(documentVersionDto);
             }
 
             // replace the property data
-            var pdataToDelete = publishing ? new[] { content.VersionPk, content.PublishedVersionPk } : new[] { content.VersionPk };
+            var pdataToDelete = publishing ? new[] { content.VersionId, content.PublishedVersionId } : new[] { content.VersionId };
             var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.VersionId, pdataToDelete);
             Database.Execute(deletePropertyDataSql);
 
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionPk, publishing ? content.PublishedVersionPk : 0, entity.Properties, out var edited);
+            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, publishing ? content.PublishedVersionId : 0, entity.Properties, out var edited);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -762,13 +760,12 @@ namespace Umbraco.Core.Persistence.Repositories
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
-                var versionGuid = dto.DocumentVersionDto.ContentVersionDto.VersionId;
 
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
                     var cached = IsolatedCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
-                    if (cached != null && cached.Version == versionGuid)
+                    if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                     {
                         content[i] = (Content) cached;
                         continue;

@@ -39,9 +39,8 @@ namespace Umbraco.Web.WebServices
             }
             else
             {
-                var result = Services.ContentService
-                    .PublishWithChildren(content, Security.CurrentUser.Id, includeUnpublished)
-                    .ToArray();
+                // fixme variants?
+                var result = Services.ContentService.SaveAndPublishBranch(content, includeUnpublished);
 
                 return Json(new
                     {

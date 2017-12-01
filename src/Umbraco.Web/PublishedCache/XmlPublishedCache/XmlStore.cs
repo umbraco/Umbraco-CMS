@@ -1487,7 +1487,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
         }
 
-        private static void OnRemovedVersion(IUmbracoDatabase db, int entityId, Guid versionId)
+        private static void OnRemovedVersion(IUmbracoDatabase db, int entityId, int versionId)
         {
             // we do not version cmsPreviewXml anymore - nothing to do here
         }

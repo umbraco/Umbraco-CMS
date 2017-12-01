@@ -21,6 +21,10 @@ namespace Umbraco.Core.Persistence.Mappers
             if (PropertyInfoCache.IsEmpty == false) return;
 
             CacheMap<Models.Media, NodeDto>(src => src.Id, dto => dto.NodeId);
+            CacheMap<Models.Media, NodeDto>(src => src.Key, dto => dto.UniqueId);
+
+            CacheMap<Content, ContentVersionDto>(src => src.VersionId, dto => dto.Id);
+
             CacheMap<Models.Media, NodeDto>(src => src.CreateDate, dto => dto.CreateDate);
             CacheMap<Models.Media, NodeDto>(src => src.Level, dto => dto.Level);
             CacheMap<Models.Media, NodeDto>(src => src.ParentId, dto => dto.ParentId);
@@ -28,11 +32,9 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Models.Media, NodeDto>(src => src.SortOrder, dto => dto.SortOrder);
             CacheMap<Models.Media, NodeDto>(src => src.Name, dto => dto.Text);
             CacheMap<Models.Media, NodeDto>(src => src.Trashed, dto => dto.Trashed);
-            CacheMap<Models.Media, NodeDto>(src => src.Key, dto => dto.UniqueId);
             CacheMap<Models.Media, NodeDto>(src => src.CreatorId, dto => dto.UserId);
             CacheMap<Models.Media, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
             CacheMap<Models.Media, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
-            CacheMap<Models.Media, ContentVersionDto>(src => src.Version, dto => dto.VersionId);
         }
     }
 }

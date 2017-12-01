@@ -522,7 +522,6 @@
     <Compile Include="Models\Content.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
-    <Compile Include="Models\ContentPreviewEntity.cs" />
     <Compile Include="Models\ContentStatus.cs" />
     <Compile Include="Models\ContentType.cs" />
     <Compile Include="Models\ContentTypeAvailableCompositionsResult.cs" />
@@ -531,7 +530,6 @@
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
     <Compile Include="Models\ContentVariation.cs" />
-    <Compile Include="Models\ContentXmlEntity.cs" />
     <Compile Include="Models\DataTypeDatabaseType.cs" />
     <Compile Include="Models\DataTypeDefinition.cs" />
     <Compile Include="Models\DeepCloneHelper.cs" />

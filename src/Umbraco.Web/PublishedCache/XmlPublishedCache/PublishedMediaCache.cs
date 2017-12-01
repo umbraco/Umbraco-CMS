@@ -768,8 +768,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             public override DateTime UpdateDate => _updateDate;
 
-            public override Guid Version => Guid.Empty;
-
             public override int Level => _level;
 
             public override bool IsDraft => false;

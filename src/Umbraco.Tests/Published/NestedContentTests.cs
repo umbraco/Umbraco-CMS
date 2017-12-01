@@ -271,7 +271,6 @@ namespace Umbraco.Tests.Published
             public override string Path { get; }
             public override DateTime CreateDate { get; }
             public override DateTime UpdateDate { get; }
-            public override Guid Version { get; }
             public override int Level { get; }
             public override Guid Key { get; }
             // ReSharper restore UnassignedGetOnlyAutoProperty

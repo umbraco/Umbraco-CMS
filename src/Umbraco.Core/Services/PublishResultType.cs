@@ -54,6 +54,11 @@
         /// <summary>
         /// The content item could not be published because it contains invalid data (has not passed validation requirements).
         /// </summary>
-        FailedContentInvalid = Failed | 6
+        FailedContentInvalid = Failed | 6,
+
+        /// <summary>
+        /// The document could not be published because it does not have published values.
+        /// </summary>
+        FailedNoPublishedValues = Failed | 7
     }
 }

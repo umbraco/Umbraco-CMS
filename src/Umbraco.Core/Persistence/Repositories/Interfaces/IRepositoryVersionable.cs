@@ -39,19 +39,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <param name="topRows">The maximum number of rows to return</param>
-        IEnumerable<Guid> GetVersionIds(int id, int topRows);
+        IEnumerable<int> GetVersionIds(int id, int topRows);
 
         /// <summary>
         /// Gets a specific version of an entity.
         /// </summary>
         /// <param name="versionId">The identifier of the version.</param>
-        TEntity GetVersion(Guid versionId);
+        TEntity GetVersion(int versionId);
 
         /// <summary>
         /// Deletes a specific version of an entity.
         /// </summary>
         /// <param name="versionId">The identifier of the version to delete.</param>
-        void DeleteVersion(Guid versionId);
+        void DeleteVersion(int versionId);
 
         /// <summary>
         /// Deletes all versions of an entity, older than a date.

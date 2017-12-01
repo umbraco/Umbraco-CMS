@@ -312,7 +312,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IMedia"/> item</returns>
-        IMedia GetVersion(Guid versionId);
+        IMedia GetVersion(int versionId);
 
         /// <summary>
         /// Gets a collection of an <see cref="IMedia"/> objects versions by Id
@@ -343,7 +343,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
+        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object from the path stored in the 'umbracoFile' property.

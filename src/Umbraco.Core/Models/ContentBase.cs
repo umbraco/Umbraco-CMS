@@ -70,7 +70,7 @@ namespace Umbraco.Core.Models
 
             // initially, all new instances have
             Id = 0; // no identity
-            Version = Guid.NewGuid(); // a new unique version id
+            VersionId = 0; // no versions
 
             _name = name;
             _contentTypeId = contentType.Id;
@@ -201,17 +201,8 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _writerId, Ps.Value.WriterSelector);
         }
 
-        /// <summary>
-        /// Gets or sets the identifier of the version.
-        /// </summary>
-        [DataMember]
-        public Guid Version { get; internal set; }
-
         [IgnoreDataMember]
-        internal int VersionPk { get; set; }
-
-        [IgnoreDataMember]
-        internal int PublishedVersionPk { get; set; }
+        public int VersionId { get; internal set; }
 
         /// <summary>
         /// Integer Id of the default ContentType

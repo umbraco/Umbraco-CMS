@@ -46,6 +46,7 @@ namespace Umbraco.Core.Models
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
+            PublishedVersionId = 0;
         }
 
         /// <summary>
@@ -70,6 +71,7 @@ namespace Umbraco.Core.Models
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
+            PublishedVersionId = 0;
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -223,40 +225,46 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public string PublishName { get; internal set; }
 
+        [IgnoreDataMember]
+        public int PublishedVersionId { get; internal set; }
+
         [DataMember]
         public bool Blueprint { get; internal set; }
 
         /// <inheritdoc />
-        public virtual void PublishAllValues()
+        public virtual bool PublishAllValues()
         {
             if (ValidateAll().Any())
-                throw new InvalidOperationException("Values are not valid.");
+                return false;
 
             foreach (var property in Properties)
                 property.PublishAllValues();
             _publishedState = PublishedState.Publishing;
+            return true;
         }
 
         /// <inheritdoc />
-        public virtual void PublishValues(int? languageId = null, string segment = null)
+        public virtual bool PublishValues(int? languageId = null, string segment = null)
         {
             if (Validate(languageId, segment).Any())
-                throw new InvalidOperationException("Values are not valid.");
+                return false;
 
             foreach (var property in Properties)
                 property.PublishValue(languageId, segment);
             _publishedState = PublishedState.Publishing;
+            return true;
         }
 
         /// <inheritdoc />
-        public virtual void PublishCultureValues(int? languageId = null)
+        public virtual bool PublishCultureValues(int? languageId = null)
         {
             if (ValidateCulture(languageId).Any())
-                throw new InvalidOperationException("Values are not valid.");
+                return false;
 
             foreach (var property in Properties)
                 property.PublishCultureValues(languageId);
             _publishedState = PublishedState.Publishing;
+            return true;
         }
 
         /// <inheritdoc />
@@ -286,7 +294,7 @@ namespace Umbraco.Core.Models
         private bool IsCopyFromSelf(IContent other)
         {
             // copying from the same Id and VersionPk
-            return Id == other.Id && VersionPk == ((Content) other).VersionPk;
+            return Id == other.Id && VersionId == other.VersionId;
         }
 
         /// <inheritdoc />
@@ -329,7 +337,7 @@ namespace Umbraco.Core.Models
             if (other.ContentTypeId != ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
 
-            var published = VersionPk > PublishedVersionPk;
+            var published = VersionId > PublishedVersionId;
 
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
 
@@ -341,7 +349,7 @@ namespace Umbraco.Core.Models
 
                 foreach (var pvalue in property.Values)
                     if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
-                        property.SetValue(null, pvalue.LanguageId, pvalue.Segment);                
+                        property.SetValue(null, pvalue.LanguageId, pvalue.Segment);
             }
 
             // copy other properties
@@ -362,7 +370,7 @@ namespace Umbraco.Core.Models
             if (other.ContentTypeId != ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
 
-            var published = VersionPk > PublishedVersionPk;
+            var published = VersionId > PublishedVersionId;
 
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
 
@@ -438,8 +446,7 @@ namespace Umbraco.Core.Models
         {
             var clone = (Content)DeepClone();
             clone.Key = Guid.Empty;
-            clone.Version = Guid.NewGuid();
-            clone.VersionPk = clone.PublishedVersionPk = 0;
+            clone.VersionId = clone.PublishedVersionId = 0;
             clone.ResetIdentity();
 
             foreach (var property in clone.Properties)

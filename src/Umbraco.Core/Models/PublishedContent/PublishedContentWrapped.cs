@@ -76,8 +76,6 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public virtual DateTime UpdateDate => _content.UpdateDate;
 
-        public virtual Guid Version => _content.Version;
-
         public virtual int Level => _content.Level;
 
         public virtual string Url => _content.Url;

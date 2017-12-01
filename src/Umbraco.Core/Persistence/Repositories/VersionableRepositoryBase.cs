@@ -42,32 +42,32 @@ namespace Umbraco.Core.Persistence.Repositories
         #region Versions
 
         // gets a specific version
-        public abstract TEntity GetVersion(Guid versionId);
+        public abstract TEntity GetVersion(int versionId);
 
         // gets all versions, current first
         public abstract IEnumerable<TEntity> GetAllVersions(int nodeId);
 
         // gets all version ids, current first
-        public virtual IEnumerable<Guid> GetVersionIds(int nodeId, int maxRows)
+        public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
-                tsql.Select<ContentVersionDto>(x => x.VersionId)
+                tsql.Select<ContentVersionDto>(x => x.Id)
                     .From<ContentVersionDto>()
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
                     .OrderByDescending<ContentVersionDto>(x => x.Current) // current '1' comes before others '0'
                     .AndByDescending<ContentVersionDto>(x => x.VersionDate) // most recent first
             );
-            return Database.Fetch<Guid>(SqlSyntax.SelectTop(template.Sql(nodeId), maxRows));
+            return Database.Fetch<int>(SqlSyntax.SelectTop(template.Sql(nodeId), maxRows));
         }
 
         // deletes a specific version
-        public virtual void DeleteVersion(Guid versionId)
+        public virtual void DeleteVersion(int versionId)
         {
             // fixme test object node type?
 
             // get the version we want to delete
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
-                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.VersionId == SqlTemplate.Arg<Guid>("versionId"))
+                tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
             );
             var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
 
@@ -93,11 +93,11 @@ namespace Umbraco.Core.Persistence.Repositories
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
             foreach (var versionDto in versionDtos)
-                PerformDeleteVersion(versionDto.NodeId, versionDto.VersionId);
+                PerformDeleteVersion(versionDto.NodeId, versionDto.Id);
         }
 
         // actually deletes a version
-        protected abstract void PerformDeleteVersion(int id, Guid versionId);
+        protected abstract void PerformDeleteVersion(int id, int versionId);
 
         #endregion
 
@@ -552,7 +552,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public class UnitOfWorkVersionEventArgs : EventArgs
         {
-            public UnitOfWorkVersionEventArgs(IScopeUnitOfWork unitOfWork, int entityId, Guid versionId)
+            public UnitOfWorkVersionEventArgs(IScopeUnitOfWork unitOfWork, int entityId, int versionId)
             {
                 UnitOfWork = unitOfWork;
                 EntityId = entityId;
@@ -561,7 +561,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             public IScopeUnitOfWork UnitOfWork { get; }
             public int EntityId { get; }
-            public Guid VersionId { get; }
+            public int VersionId { get; }
         }
 
         public static event TypedEventHandler<TRepository, UnitOfWorkEntityEventArgs> UowRefreshedEntity;

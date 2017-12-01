@@ -290,7 +290,7 @@ namespace Umbraco.Web.Search
 
         private static void ReIndexForContent(IContent content, IContent published)
         {
-            if (published != null && content.Version == published.Version)
+            if (published != null && content.VersionId == published.VersionId)
             {
                 ReIndexForContent(content); // same = both
             }

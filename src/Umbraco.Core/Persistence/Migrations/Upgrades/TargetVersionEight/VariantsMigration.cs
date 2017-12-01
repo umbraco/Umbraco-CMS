@@ -282,6 +282,9 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
                 return string.Empty;
             });
 
+            // drop more columns
+            Delete.Column("versionId").FromTable(PreTables.ContentVersion);
+
             // rename tables
             Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion);
             Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document);

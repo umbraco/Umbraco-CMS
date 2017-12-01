@@ -167,7 +167,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.AreNotSame(clone, content);
             Assert.AreNotSame(clone.Id, content.Id);
-            Assert.AreNotSame(clone.Version, content.Version);
+            Assert.AreNotSame(clone.VersionId, content.VersionId);
             Assert.That(clone.HasIdentity, Is.False);
 
             Assert.AreNotSame(content.Properties, clone.Properties);
@@ -210,7 +210,6 @@ namespace Umbraco.Tests.Models
             };
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
-            content.Version = Guid.NewGuid();
             content.WriterId = 23;
 
             ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
@@ -273,7 +272,6 @@ namespace Umbraco.Tests.Models
             };
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
-            content.Version = Guid.NewGuid();
             content.WriterId = 23;
 
             ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
@@ -286,7 +284,7 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, content);
             Assert.AreEqual(clone, content);
             Assert.AreEqual(clone.Id, content.Id);
-            Assert.AreEqual(clone.Version, content.Version);
+            Assert.AreEqual(clone.VersionId, content.VersionId);
             Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)content).AdditionalData);
             Assert.AreNotSame(clone.ContentType, content.ContentType);
             Assert.AreEqual(clone.ContentType, content.ContentType);
@@ -319,7 +317,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Template, content.Template);
             Assert.AreEqual(clone.Trashed, content.Trashed);
             Assert.AreEqual(clone.UpdateDate, content.UpdateDate);
-            Assert.AreEqual(clone.Version, content.Version);
+            Assert.AreEqual(clone.VersionId, content.VersionId);
             Assert.AreEqual(clone.WriterId, content.WriterId);
             Assert.AreNotSame(clone.Properties, content.Properties);
             Assert.AreEqual(clone.Properties.Count(), content.Properties.Count());
@@ -380,7 +378,6 @@ namespace Umbraco.Tests.Models
             };
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
-            content.Version = Guid.NewGuid();
             content.WriterId = 23;
 
             ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);

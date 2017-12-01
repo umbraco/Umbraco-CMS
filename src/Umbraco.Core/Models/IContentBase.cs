@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -16,14 +15,14 @@ namespace Umbraco.Core.Models
         int ContentTypeId { get; }
 
         /// <summary>
-        /// Gets the Guid identifier of the content's version.
-        /// </summary>
-        Guid Version { get; }
-
-        /// <summary>
         /// Gets the identifier of the writer.
         /// </summary>
         int WriterId { get; set; }
+
+        /// <summary>
+        /// Gets the version identifier.
+        /// </summary>
+        int VersionId { get; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object

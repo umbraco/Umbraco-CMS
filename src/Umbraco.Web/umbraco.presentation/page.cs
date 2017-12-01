@@ -67,7 +67,7 @@ namespace umbraco
             populatePageData(frequest.PublishedContent.Id,
                 frequest.PublishedContent.Name, frequest.PublishedContent.DocumentTypeId, frequest.PublishedContent.DocumentTypeAlias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
-                frequest.PublishedContent.Path, frequest.PublishedContent.Version, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
+                frequest.PublishedContent.Path, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
 
             if (frequest.HasTemplate)
             {
@@ -91,7 +91,7 @@ namespace umbraco
             populatePageData(doc.Id,
                 doc.Name, doc.DocumentTypeId, doc.DocumentTypeAlias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
-                doc.Path, doc.Version, doc.Parent == null ? -1 : doc.Parent.Id);
+                doc.Path, doc.Parent == null ? -1 : doc.Parent.Id);
 
             if (doc.TemplateId > 0)
             {
@@ -119,7 +119,7 @@ namespace umbraco
         void populatePageData(int pageID,
             string pageName, int nodeType, string nodeTypeAlias,
             string writerName, string creatorName, DateTime createDate, DateTime updateDate,
-            string path, Guid pageVersion, int parentId)
+            string path, int parentId)
         {
             this._pageId = pageID;
             this._pageName = pageName;
@@ -132,7 +132,6 @@ namespace umbraco
             this._parentId = parentId;
             this._path = path;
             this._splitpath = path.Split(',');
-            this._pageVersion = pageVersion;
 
             // Update the elements hashtable
             _elements.Add("pageID", pageID);
@@ -146,7 +145,6 @@ namespace umbraco
             _elements.Add("updateDate", updateDate);
             _elements.Add("path", path);
             _elements.Add("splitpath", _splitpath);
-            _elements.Add("pageVersion", pageVersion);
         }
 
         void populatePageData(XmlNode node)
@@ -524,11 +522,6 @@ namespace umbraco
             public DateTime UpdateDate
             {
                 get { return _inner.UpdateDate; }
-            }
-
-            public Guid Version
-            {
-                get { return _inner.Version; }
             }
 
             public int Level

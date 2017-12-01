@@ -205,22 +205,22 @@ namespace Umbraco.Core.Persistence.Repositories
             return MapDtosToContent(Database.Fetch<MemberDto>(sql), true);
         }
 
-        public override IMember GetVersion(Guid versionId)
+        public override IMember GetVersion(int versionId)
         {
             var sql = GetBaseQuery(QueryType.Single)
-                .Where<ContentVersionDto>(x => x.VersionId == versionId);
+                .Where<ContentVersionDto>(x => x.Id == versionId);
 
             var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
             return dto == null ? null : MapDtoToContent(dto);
         }
 
-        protected override void PerformDeleteVersion(int id, Guid versionId)
+        protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
             OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
 
-            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE versionId = @VersionId", new { versionId });
+            Database.Delete<ContentVersionDto>("WHERE versionId = @VersionId", new { versionId });
         }
 
         #endregion
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Persistence.Repositories
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
-            member.VersionPk = contentVersionDto.Id;
+            member.VersionId = contentVersionDto.Id;
 
             // persist the member dto
             dto.NodeId = nodeDto.NodeId;
@@ -306,7 +306,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionPk, 0, entity.Properties, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionId, 0, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -369,9 +369,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(dto, changedCols);
 
             // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionPk);
+            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId);
             Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionPk, 0, entity.Properties, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionId, 0, entity.Properties, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -548,13 +548,12 @@ namespace Umbraco.Core.Persistence.Repositories
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
-                var versionGuid = dto.ContentVersionDto.VersionId;
 
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
                     var cached = IsolatedCache.GetCacheItem<IMember>(GetCacheIdKey<IMember>(dto.NodeId));
-                    if (cached != null && cached.Version == dto.ContentVersionDto.VersionId)
+                    if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
                         content[i] = (Member) cached; // fixme should we just cache Content not IContent?
                         continue;

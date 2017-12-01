@@ -164,7 +164,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override int Level => _contentNode.Level;
         public override string Path => _contentNode.Path;
         public override int SortOrder => _contentNode.SortOrder;
-        public override Guid Version => _contentData.Version;
         public override int TemplateId => _contentData.TemplateId;
 
         public override string UrlName => _urlName;

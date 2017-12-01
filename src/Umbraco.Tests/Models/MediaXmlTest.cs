@@ -62,7 +62,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
             Assert.AreEqual(media.GetCreatorProfile(ServiceContext.UserService).Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));
-            Assert.AreEqual(media.Version.ToString(), (string)element.Attribute("version"));
             Assert.IsNull(element.Attribute("template"));
 
             Assert.AreEqual(media.Properties[Constants.Conventions.Media.File].GetValue().ToString(), element.Elements(Constants.Conventions.Media.File).Single().Value);
