@@ -903,43 +903,8 @@ namespace Umbraco.Core.Services
             if (content.Trashed) return false; // trashed content is never publishable
 
             // not trashed and has a parent: publishable if the parent is path-published
-
-            int[] ids;
-            if (content.HasIdentity)
-            {
-                // get ids from path (we have identity)
-                // skip the first one that has to be -1 - and we don't care
-                // skip the last one that has to be "this" - and it's ok to stop at the parent
-                ids = content.Path.Split(',').Skip(1).SkipLast().Select(int.Parse).ToArray();
-            }
-            else
-            {
-                // no path yet (no identity), have to move up to parent
-                // skip the first one that has to be -1 - and we don't care
-                // don't skip the last one that is "parent"
-                var parent = GetById(content.ParentId);
-                if (parent == null) return false;
-                ids = parent.Path.Split(',').Skip(1).Select(int.Parse).ToArray();
-            }
-            if (ids.Length == 0)
-                return false;
-
-            // if the first one is recycle bin, fail fast
-            if (ids[0] == Constants.System.RecycleBinContent)
-                return false;
-
-            // fixme - move to repository?
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
-            {
-                var sql = uow.SqlContext.Sql(@"
-                    SELECT id
-                    FROM umbracoNode
-                    JOIN uDocument ON umbracoNode.id=uDocument.nodeId AND uDocument.published=@0
-                    WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
-                    true, false, ids);
-                var x = uow.Database.Fetch<int>(sql);
-                return ids.Length == x.Count;
-            }
+            var parent = GetById(content.ParentId);
+            return parent == null || IsPathPublished(parent);
         }
 
         public bool IsPathPublished(IContent content)
