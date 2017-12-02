@@ -339,12 +339,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, ValueTuple<int?, string>[] variations, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = 0);
 
         /// <summary>
         /// Unpublishes a document.

@@ -291,7 +291,7 @@ namespace Umbraco.Core.Models
             _publishedState = PublishedState.Publishing;
         }
 
-        private bool IsCopyFromSelf(IContent other)
+        private bool CopyingFromSelf(IContent other)
         {
             // copying from the same Id and VersionPk
             return Id == other.Id && VersionId == other.VersionId;
@@ -306,7 +306,7 @@ namespace Umbraco.Core.Models
             // we could copy from another document entirely,
             // or from another version of the same document,
             // in which case there is a special case.
-            var published = IsCopyFromSelf(other);
+            var published = CopyingFromSelf(other);
 
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
 

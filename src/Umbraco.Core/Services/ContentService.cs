@@ -1216,11 +1216,15 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0)
         {
-            return SaveAndPublishBranch(content, force, new[] { (languageId, segment) }, userId);
+            bool IsEditing(IContent c, int? l, string s)
+                => c.Properties.Any(x => x.Values.Where(y => y.LanguageId == l && y.Segment == s).Any(y => y.EditedValue != y.PublishedValue));
+
+            return SaveAndPublishBranch(content, force, document => IsEditing(document, languageId, segment), document => document.PublishValues(languageId, segment), userId);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force, ValueTuple<int?, string>[] variations, int userId = 0)
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
+            Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var results = new List<PublishResult>();
@@ -1241,7 +1245,7 @@ namespace Umbraco.Core.Services
                     throw new InvalidOperationException("Do not publish values when publishing branches.");
 
                 // deal with the branch root - if it fails, abort
-                var result = SaveAndPublishBranchOne(document, repository, uow, variations, true, publishedDocuments, evtMsgs, userId);
+                var result = SaveAndPublishBranchOne(document, repository, uow, editing, publishValues, true, publishedDocuments, evtMsgs, userId);
                 results.Add(result);
                 if (!result.Success) return results;
 
@@ -1261,7 +1265,7 @@ namespace Umbraco.Core.Services
                     // no need to check path here,
                     // 1. because we know the parent is path-published (we just published it)
                     // 2. because it would not work as nothing's been written out to the db until the uow completes
-                    result = SaveAndPublishBranchOne(d, repository, uow, variations, false, publishedDocuments, evtMsgs, userId);
+                    result = SaveAndPublishBranchOne(d, repository, uow, editing, publishValues, false, publishedDocuments, evtMsgs, userId);
                     results.Add(result);
                     if (result.Success) continue;
 
@@ -1281,20 +1285,18 @@ namespace Umbraco.Core.Services
 
         private PublishResult SaveAndPublishBranchOne(IContent document,
             IContentRepository repository, IScopeUnitOfWork uow,
-            ValueTuple<int?, string>[] variations, bool checkPath,
+            Func<IContent, bool> editing, Func<IContent, bool> publishValues,
+            bool checkPath,
             List<IContent> publishedDocuments,
             EventMessages evtMsgs, int userId)
         {
-            bool IsEditingContent(IContent content, int? languageId, string segment)
-                => content.Properties.Any(x => x.Values.Where(y => y.LanguageId == languageId && y.Segment == segment).Any(y => y.EditedValue != y.PublishedValue));
-
             // if already published, and values haven't changed - i.e. not changing anything
             // nothing to do - fixme - unless we *want* to bump dates?
-            if (document.Published && variations.All(x => !IsEditingContent(document, x.Item1, x.Item2)))
+            if (document.Published && (editing == null || !editing(document)))
                 return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, document);
 
             // publish & check if values are valid
-            if (!variations.All(x => document.PublishValues(x.Item1, x.Item2)))
+            if (publishValues != null && !publishValues(document))
                 return new PublishResult(PublishResultType.FailedContentInvalid, evtMsgs, document);
 
             // check if we can publish

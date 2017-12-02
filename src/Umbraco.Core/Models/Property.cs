@@ -154,11 +154,9 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
+        // does *not* validate the value - content item must validate first
         internal void PublishAllValues()
         {
-            // throw if some values are not valid
-            if (!IsAllValid()) throw new InvalidOperationException("Some values are not valid.");
-
             // if invariant-neutral is supported, publish invariant-neutral
             if (_propertyType.ValidateVariation(null, null, false))
                 PublishPropertyValue(_pvalue);
@@ -175,10 +173,9 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
+        // does *not* validate the value - content item must validate first
         internal void PublishValue(int? languageId = null, string segment = null)
         {
-            // throw if value is not valid, or if variation is not supported
-            if (!IsValid(languageId, segment)) throw new InvalidOperationException("Value is not valid.");
             _propertyType.ValidateVariation(languageId, segment, true);
 
             (var pvalue, _) = GetPValue(languageId, segment, false);
@@ -187,11 +184,9 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
+        // does *not* validate the value - content item must validate first
         internal void PublishCultureValues(int? languageId = null)
         {
-            // throw if some values are not valid
-            if (!IsCultureValid(languageId)) throw new InvalidOperationException("Some values are not valid.");
-
             // if invariant and invariant-neutral is supported, publish invariant-neutral
             if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
                 PublishPropertyValue(_pvalue);
@@ -393,22 +388,22 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool IsAllValid()
         {
-            // if invariant-neutral is supported, validate invariant-neutral
-            if (_propertyType.ValidateVariation(null, null, false))
-                if (!IsValidValue(_pvalue)) return false;
+            // invariant-neutral is supported, validate invariant-neutral
+            // includes mandatory validation
+            if (_propertyType.ValidateVariation(null, null, false) && !IsValidValue(_pvalue)) return false;
 
-            if (_vvalues == null) return IsValidValue(null);
+            // either invariant-neutral is not supported, or it is valid
+            // for anything else, validate the existing values (including mandatory),
+            // but we cannot validate mandatory globally (we don't know the possible cultures and segments)
 
-            // validate everything not invariant-neutral that is supported
-            // fixme - broken - how can we figure out what is mandatory here?
+            if (_vvalues == null) return true;
 
             var pvalues = _vvalues
                 .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
                 .Select(x => x.Value)
                 .ToArray();
-            return pvalues.Length == 0
-                ? IsValidValue(null)
-                : pvalues.All(x => IsValidValue(x.EditedValue));
+
+            return pvalues.Length == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
         }
 
         /// <summary>
@@ -417,23 +412,24 @@ namespace Umbraco.Core.Models
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsCultureValid(int? languageId)
         {
-            // if invariant and invariant-neutral is supported, validate invariant-neutral
-            if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
-                if (!IsValidValue(_pvalue)) return false;
+            // culture-neutral is supported, validate culture-neutral
+            // includes mandatory validation
+            if (_propertyType.ValidateVariation(languageId, null, false) && !IsValidValue(GetValue(languageId)))
+                return false;
 
-            // validate everything not invariant-neutral that matches the culture and is supported
-            // fixme - broken - how can we figure out what is mandatory here?
+            // either culture-neutral is not supported, or it is valid
+            // for anything non-neutral, validate the existing values (including mandatory),
+            // but we cannot validate mandatory globally (we don't know the possible segments)
 
-            if (_vvalues == null) return IsValidValue(null);
+            if (_vvalues == null) return true;
 
             var pvalues = _vvalues
                 .Where(x => x.Value.LanguageId == languageId)
                 .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
                 .Select(x => x.Value)
                 .ToArray();
-            return pvalues.Length == 0
-                ? IsValidValue(null)
-                : pvalues.All(x => IsValidValue(x.EditedValue));
+
+            return pvalues.Length == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
         }
 
         /// <summary>
@@ -442,6 +438,7 @@ namespace Umbraco.Core.Models
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
         public bool IsValid(int? languageId = null, string segment = null)
         {
+            // single value -> validates mandatory
             return IsValidValue(GetValue(languageId, segment));
         }
 

@@ -259,8 +259,8 @@ namespace Umbraco.Tests.Models
             prop.SetValue(null);
             Assert.IsFalse(prop.IsValid());
 
-            // cannot publish, because invalid
-            Assert.Throws<InvalidOperationException>(() => prop.PublishValue());
+            // can publish, even though invalid
+            prop.PublishValue();
         }
     }
 }
