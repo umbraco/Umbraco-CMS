@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentServiceTests : TestWithSomeContentBase
     {
@@ -2056,7 +2056,11 @@ namespace Umbraco.Tests.Services
             // version3, third and current published version
 
             // rollback all values to version1
-            var rollback = contentService.Rollback(NodeDto.NodeIdSeed + 4, version1);
+            var rollback = contentService.GetById(NodeDto.NodeIdSeed + 4);
+            var rollto = contentService.GetVersion(version1);
+            rollback.CopyValues(rollto);
+            rollback.Name = rollto.Name; // must do it explicitely
+            contentService.Save(rollback);
 
             Assert.IsNotNull(rollback);
             Assert.IsTrue(rollback.Published);
@@ -2074,7 +2078,11 @@ namespace Umbraco.Tests.Services
 
             // rollback all values to current version
             // special because... current has edits... this really is equivalent to rolling back to version2
-            var rollback2 = contentService.Rollback(NodeDto.NodeIdSeed + 4, version3);
+            var rollback2 = contentService.GetById(NodeDto.NodeIdSeed + 4);
+            var rollto2 = contentService.GetVersion(version3);
+            rollback2.CopyValues(rollto2);
+            rollback2.Name = rollto2.PublishName; // must do it explicitely AND must pick the publish one!
+            contentService.Save(rollback2);
 
             Assert.IsTrue(rollback2.Published);
             Assert.IsFalse(rollback2.Edited); // all changes cleared!
@@ -2093,7 +2101,10 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Bob Doe");
             contentService.Save(content);
             Assert.IsTrue(content.Edited);
-            content = contentService.Rollback(content.Id, content.VersionId);
+            rollto = contentService.GetVersion(content.VersionId);
+            content.CopyValues(rollto);
+            content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
+            contentService.Save(content);
             Assert.IsFalse(content.Edited);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue("author"));

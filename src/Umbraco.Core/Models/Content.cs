@@ -337,7 +337,7 @@ namespace Umbraco.Core.Models
             if (other.ContentTypeId != ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
 
-            var published = VersionId > PublishedVersionId;
+            var published = CopyingFromSelf(other);
 
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
 
@@ -370,7 +370,7 @@ namespace Umbraco.Core.Models
             if (other.ContentTypeId != ContentTypeId)
                 throw new InvalidOperationException("Cannot copy values from a different content type.");
 
-            var published = VersionId > PublishedVersionId;
+            var published = CopyingFromSelf(other);
 
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
 

@@ -373,12 +373,6 @@ namespace Umbraco.Core.Services
         /// </summary>
         IEnumerable<PublishResult> PerformScheduledPublish();
 
-        // fixme missing the differnt type of properties - should we do it manually?
-        /// <summary>
-        /// Rolls a document back a previous version.
-        /// </summary>
-        IContent Rollback(int id, int versionId, int userId = 0);
-
         #endregion
 
         #region Permissions
