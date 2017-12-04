@@ -16,10 +16,26 @@
             </umb-editor-header>
             
             <umb-editor-container class="form-horizontal">
-                <umb-property ng-repeat="translation in vm.content.translations" property="vm.tranformTranslationToProperty(translation)">
+               <umb-property ng-repeat="translation in vm.content.translations" property="translation.property">
                     <textarea ng-model="translation.translation"></textarea>
                 </umb-property>
             </umb-editor-container>
+            
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        type="submit"
+                        button-style="success"                       
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
         </umb-editor-view>
     </form>
 </div>

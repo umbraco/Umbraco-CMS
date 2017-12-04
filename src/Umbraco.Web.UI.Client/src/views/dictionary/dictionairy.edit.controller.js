@@ -24,8 +24,13 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
         //we are editing so get the content item from the server
         dictionaryResource.getById($routeParams.id)
             .then(function (data) {
+
+                // create data for  umb-property displaying
+                for(var i=0; i<data.translations.length;i++) {
+                    data.translations[i].property = createTranslationProperty(data.translations[i]);
+                }
                 
-                //
+                // set content
                 vm.content = data;                
 
                 //share state
@@ -40,15 +45,13 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
             });
     }
 
-    function tranformTranslationToProperty(translation) {
+    function createTranslationProperty(translation) {
         return {
             alias: translation.isoCode,
             label: translation.displayName,
             hideLabel : false
         }
-    }
-
-    vm.tranformTranslationToProperty = tranformTranslationToProperty;
+    }  
 
     function onInit() {
         loadDictionary();
