@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
-
-namespace Umbraco.Web.Editors
+﻿namespace Umbraco.Web.Editors
 {
+    using System;
     using System.Net;
     using System.Net.Http;
     using System.Web.Http;
@@ -18,7 +9,11 @@ namespace Umbraco.Web.Editors
 
     using Umbraco.Core.Models;
     using Umbraco.Web.Models.ContentEditing;
+    using Umbraco.Web.Mvc;
     using Umbraco.Web.WebApi;
+    using Umbraco.Web.WebApi.Filters;
+
+    using Constants = Umbraco.Core.Constants;
 
     /// <summary>
     /// The API controller used for editing dictionary items
@@ -41,15 +36,15 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundDictionary = Services.LocalizationService.GetDictionaryItemById(id);
+            var foundDictionary = this.Services.LocalizationService.GetDictionaryItemById(id);
             if (foundDictionary == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
+            this.Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -124,6 +119,24 @@ namespace Umbraco.Web.Editors
             }
 
             return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
+        }
+
+        /// <summary>
+        /// Saves a dictionary item
+        /// </summary>
+        /// <param name="dictionary">
+        /// The dictionary.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DictionaryDisplay"/>.
+        /// </returns>
+        /// <exception cref="HttpResponseException">
+        /// </exception>
+        public DictionaryDisplay PostSave(DictionarySave dictionary)
+        {
+
+            this.ModelState.AddModelError("Name", "Name error");
+            throw new HttpResponseException(this.Request.CreateValidationErrorResponse(this.ModelState));
         }
     }
 }
