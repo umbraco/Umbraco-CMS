@@ -191,11 +191,11 @@ ORDER BY colName";
 
             return new Dictionary<UserState, int>
             {
-                {UserState.All, result[0].num},
-                {UserState.Active, result[1].num},
-                {UserState.Disabled, result[2].num},
-                {UserState.LockedOut, result[3].num},
-                {UserState.Invited, result[4].num}
+                {UserState.All, (int)result[0].num},
+                {UserState.Active, (int)result[1].num},
+                {UserState.Disabled, (int)result[2].num},
+                {UserState.LockedOut, (int)result[3].num},
+                {UserState.Invited, (int)result[4].num}
             };
         }
 

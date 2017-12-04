@@ -586,7 +586,6 @@
     <key alias="sort">Sortér</key>
     <key alias="status">Status</key>
     <key alias="submit">Indsend</key>
-    <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="up">Op</key>
@@ -612,6 +611,7 @@
     <key alias="saving">Gemmer...</key>
     <key alias="current">nuværende</key>
     <key alias="embed">Indlejring</key>
+    <key alias="retrieve">Hent</key>
     <key alias="selected">valgt</key>
   </area>
 

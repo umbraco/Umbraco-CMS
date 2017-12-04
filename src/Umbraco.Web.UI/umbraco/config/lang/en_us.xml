@@ -637,6 +637,7 @@
         <key alias="saving">Saving...</key>
         <key alias="current">current</key>
         <key alias="embed">Embed</key>
+    <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
     </area>
     <area alias="colors">
