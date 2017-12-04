@@ -6,7 +6,7 @@
  * @description
  * The controller for editing dictionary items
  */
-function DictionaryEditController($scope, dictionaryResource, treeService, navigationService, appState, $routeParams, editorState) {
+function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper) {
   vm = this;
 
     //setup scope vars
@@ -37,7 +37,7 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
                 editorState.set(vm.content);
                
                 navigationService.syncTree({ tree: "dictionary", path: data.path }).then(function (syncArgs) {
-                    vm.page.menu.currentNode = syncArgs.node;
+                   vm.page.menu.currentNode = syncArgs.node;
                 });
 
                 vm.page.loading = false;
@@ -56,6 +56,17 @@ function DictionaryEditController($scope, dictionaryResource, treeService, navig
     function onInit() {
         loadDictionary();
     }
+
+    function saveDictionary() {
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+
+            vm.page.saveButtonState = "busy";
+
+            formHelper.resetForm({ scope: $scope, notifications: [] });
+        }
+    }
+
+    vm.save = saveDictionary;
 
     onInit();
 }

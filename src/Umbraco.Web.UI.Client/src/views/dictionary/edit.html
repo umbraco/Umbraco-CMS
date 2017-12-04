@@ -2,12 +2,12 @@
     <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
     
     <form name="contentForm"
-          ng-submit="save()"
+          ng-submit="vm.save()"
           novalidate
           val-form-manager>
         <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header
-                menu="vm.page.menu"
+                menu="vm.page.menu" 
                 name="vm.content.name"
                 name-locked="vm.page.nameLocked"
                 hide-icon="true"
@@ -17,7 +17,7 @@
             
             <umb-editor-container class="form-horizontal">
                <umb-property ng-repeat="translation in vm.content.translations" property="translation.property">
-                    <textarea ng-model="translation.translation"></textarea>
+                   <textarea ng-model="translation.translation"></textarea>                  
                 </umb-property>
             </umb-editor-container>
             
@@ -27,7 +27,8 @@
 
                     <umb-button
                         type="submit"
-                        button-style="success"                       
+                        button-style="success"
+                        state="vm.page.saveButtonState"                  
                         shortcut="ctrl+s"
                         label="Save"
                         label-key="buttons_save">
