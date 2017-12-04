@@ -1,0 +1,32 @@
+﻿namespace Umbraco.Web.Models.ContentEditing
+{
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
+
+    /// <summary>
+    /// Dictionary Save model
+    /// </summary>
+    [DataContract(Name = "dictionary", Namespace = "")]
+    public class DictionarySave : EntityBasic
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DictionarySave"/> class.
+        /// </summary>
+        public DictionarySave()
+        {            
+            this.Translations = new List<DictionarySave>();
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether name is dirty.
+        /// </summary>
+        [DataMember(Name = "nameIsDirty")]
+        public bool NameIsDirty { get; set; }
+
+        /// <summary>
+        /// Gets the translations.
+        /// </summary>
+        [DataMember(Name = "translations")]
+        public List<DictionarySave> Translations { get; private set; }
+    }
+}
