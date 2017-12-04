@@ -46,9 +46,15 @@
 
                                 ids.Add(-1);
 
-                                this.GetParentId(src.ParentId.Value, lazyDictionaryService.Value, ids);
+                                var parentIds = new List<int>();
 
-                                ids.Add(src.Id);
+                                this.GetParentId(src.ParentId.Value, lazyDictionaryService.Value, parentIds);
+
+                                parentIds.Reverse();
+
+                                ids.AddRange(parentIds);
+
+                                ids.Add(src.Id);                               
 
                                 dest.Path = string.Join(",", ids);
                             }
