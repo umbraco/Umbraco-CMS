@@ -99,6 +99,26 @@
                 return saveModel;
             },
 
+            /** formats the display model used to display the dictionary to the model used to save the dictionary */
+            formatDictionaryPostData : function(dictionary, nameIsDirty) {
+                var saveModel = {
+                    parentId: dictionary.parentId,
+                    id: dictionary.id,
+                    name: dictionary.name,
+                    nameIsDirty: nameIsDirty,
+                    translations: []
+                };
+
+                for(var i = 0; i < dictionary.translations.length; i++) {
+                    saveModel.translations.push({
+                        isoCode: dictionary.translations[i].isoCode,
+                        translation: dictionary.translations[i].translation
+                    });
+                }
+
+                return saveModel;
+            },
+
             /** formats the display model used to display the user to the model used to save the user */
             formatUserPostData: function (displayModel) {
 

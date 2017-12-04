@@ -3,7 +3,7 @@
     * @name umbraco.resources.dictionaryResource
     * @description Loads in data for dictionary items
 **/
-function dictionaryResource($q, $http, umbRequestHelper) {
+function dictionaryResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
   /**
          * @ngdoc method
@@ -104,14 +104,17 @@ function dictionaryResource($q, $http, umbRequestHelper) {
         * @description
         * Updates a dictionary
         *
-        * @param {Object} dictionary  dictionary object to update       
+        * @param {Object} dictionary  dictionary object to update     
+        * @param {Bool} nameIsDirty set to true if the name has been changed
         * @returns {Promise} resourcePromise object.
         *
         */
-    function save(dictionary) {
+    function save(dictionary, nameIsDirty) {
+
+        var saveModel = umbDataFormatter.formatDictionaryPostData(dictionary, nameIsDirty);
 
        return umbRequestHelper.resourcePromise(
-            $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "PostSave"), dictionary),
+            $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "PostSave"), saveModel),
             "Failed to save data for dictionary id " + dictionary.id);
     }
 

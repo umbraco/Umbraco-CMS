@@ -62,7 +62,19 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
 
             vm.page.saveButtonState = "busy";
 
-            formHelper.resetForm({ scope: $scope, notifications: [] });
+            dictionaryResource.save(vm.content, false)
+                .then(function(data) {
+                        
+                        vm.page.saveButtonState = "success";
+                    },
+                    function (err) {
+                        contentEditingHelper.handleSaveError({
+                            redirectOnFailure: false,
+                            err: err
+                        });
+
+                        vm.page.saveButtonState = "error";
+                    });
         }
     }
 

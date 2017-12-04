@@ -5,6 +5,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// The dictionary translation save model
     /// </summary>
+    [DataContract(Name = "dictionaryTranslation", Namespace = "")]
     public class DictionaryTranslationSave
     {
         /// <summary>

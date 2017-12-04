@@ -1,5 +1,6 @@
 ﻿namespace Umbraco.Web.Models.ContentEditing
 {
+    using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
@@ -14,7 +15,7 @@
         /// </summary>
         public DictionarySave()
         {            
-            this.Translations = new List<DictionarySave>();
+            this.Translations = new List<DictionaryTranslationSave>();
         }
 
         /// <summary>
@@ -27,6 +28,12 @@
         /// Gets the translations.
         /// </summary>
         [DataMember(Name = "translations")]
-        public List<DictionarySave> Translations { get; private set; }
+        public List<DictionaryTranslationSave> Translations { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the parent id.
+        /// </summary>
+        [DataMember(Name = "parentId")]
+        public new Guid ParentId { get; set; }
     }
 }
