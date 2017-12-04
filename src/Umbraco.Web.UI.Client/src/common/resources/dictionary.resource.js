@@ -96,10 +96,30 @@ function dictionaryResource($q, $http, umbRequestHelper) {
             "Failed to get item " + id);
     }
 
+    /**
+        * @ngdoc method
+        * @name umbraco.resources.dictionaryResource#save
+        * @methodOf umbraco.resources.dictionaryResource
+        *
+        * @description
+        * Updates a dictionary
+        *
+        * @param {Object} dictionary  dictionary object to update       
+        * @returns {Promise} resourcePromise object.
+        *
+        */
+    function save(dictionary) {
+
+       return umbRequestHelper.resourcePromise(
+            $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "PostSave"), dictionary),
+            "Failed to save data for dictionary id " + dictionary.id);
+    }
+
   var resource = {
     deleteById: deleteById,
     create: create,
-    getById: getById
+    getById: getById,
+    save : save
   };
 
   return resource;
