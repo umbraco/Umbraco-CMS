@@ -7,9 +7,10 @@
  * The controller for editing dictionary items
  */
 function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper) {
-  vm = this;
+    vm = this;
 
     //setup scope vars
+    vm.nameDirty = false;
     vm.page = {};
     vm.page.loading = false;
     vm.page.nameLocked = false;
@@ -40,8 +41,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
                    vm.page.menu.currentNode = syncArgs.node;
                 });
 
-                vm.page.loading = false;
-
+                vm.page.loading = false;               
             });
     }
 
@@ -62,7 +62,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
 
             vm.page.saveButtonState = "busy";
 
-            dictionaryResource.save(vm.content, false)
+            dictionaryResource.save(vm.content, vm.nameDirty)
                 .then(function(data) {
                         
                         vm.page.saveButtonState = "success";
@@ -79,6 +79,13 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
     }
 
     vm.save = saveDictionary;
+
+    $scope.$watch("vm.content.name", function (newVal, oldVal) {
+        //when the value changes, we need to set the name dirty
+        if (newVal && (newVal !== oldVal) && typeof(oldVal) !== 'undefined') {
+            vm.nameDirty = true;           
+        }
+    });
 
     onInit();
 }
