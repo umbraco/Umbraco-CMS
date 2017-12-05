@@ -129,14 +129,40 @@
         /// </param>
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>.
-        /// </returns>
-        /// <exception cref="HttpResponseException">
-        /// </exception>
+        /// </returns>      
         public DictionaryDisplay PostSave(DictionarySave dictionary)
         {
+            var dictionaryItem =
+                this.Services.LocalizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()));
 
-            this.ModelState.AddModelError("Name", "Name error");
-            throw new HttpResponseException(this.Request.CreateValidationErrorResponse(this.ModelState));
+            if (dictionaryItem != null)
+            {
+                if (dictionary.NameIsDirty)
+                {
+                    // if the name (key) has changed, we need to check if the new key does not exist
+                    this.ModelState.AddModelError("Name", "Key already exits");
+                    throw new HttpResponseException(this.Request.CreateValidationErrorResponse(ModelState));
+                }
+
+                foreach (var translation in dictionary.Translations)
+                {
+                    this.Services.LocalizationService.AddOrUpdateDictionaryValue(dictionaryItem, this.Services.LocalizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+                }
+
+                try
+                {
+                    this.Services.LocalizationService.Save(dictionaryItem);
+
+                    return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
+                }
+                catch (Exception e)
+                {
+                    this.Logger.Error(this.GetType(), "Error saving dictionary", e);
+                    throw new HttpResponseException(this.Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
+                }
+            }
+
+            throw new HttpResponseException(this.Request.CreateNotificationValidationErrorResponse("Dictionary item does not exist"));
         }
     }
 }
