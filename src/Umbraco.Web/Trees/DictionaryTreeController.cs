@@ -20,6 +20,20 @@
     public class DictionaryTreeController : TreeController
     {
         /// <summary>
+        /// Helper method to create a root model for a tree
+        /// </summary>
+        /// <returns></returns>
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+
+            // this will load in a custom UI instead of the dashboard for the root node
+            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.Dictionary, "list");
+
+            return root;
+        }
+
+        /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
         /// <param name="id">The id of the tree item</param>
