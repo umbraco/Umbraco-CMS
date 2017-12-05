@@ -106,7 +106,8 @@
                     id: dictionary.id,
                     name: dictionary.name,
                     nameIsDirty: nameIsDirty,
-                    translations: []
+                    translations: [],
+                    key : dictionary.key
                 };
 
                 for(var i = 0; i < dictionary.translations.length; i++) {
