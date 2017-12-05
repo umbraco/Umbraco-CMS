@@ -1,6 +1,7 @@
 ﻿namespace Umbraco.Web.Editors
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Web.Http;
@@ -65,13 +66,18 @@
         {
             if (string.IsNullOrEmpty(key))
             {
+                
                 return this.Request
                     .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
             }
 
             if (this.Services.LocalizationService.DictionaryItemExists(key))
             {
-                return this.Request.CreateNotificationValidationErrorResponse("Key already exists"); // TODO translate
+               var message = this.Services.TextService.Localize(
+                    "dictionaryItem/changeKeyError",
+                    this.Security.CurrentUser.GetUserCulture(this.Services.TextService),
+                    new Dictionary<string, string> { { "0", key } });
+                return this.Request.CreateNotificationValidationErrorResponse(message);
             }
 
             try
@@ -145,7 +151,11 @@
 
                     if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
                     {
-                        this.ModelState.AddModelError("Name", "Key already exits");
+                        var message = this.Services.TextService.Localize(
+                            "dictionaryItem/changeKeyError",
+                            this.Security.CurrentUser.GetUserCulture(this.Services.TextService),
+                            new Dictionary<string, string> { { "0", dictionary.Name } });
+                        this.ModelState.AddModelError("Name", message);
                         throw new HttpResponseException(this.Request.CreateValidationErrorResponse(ModelState));
                     }
 
