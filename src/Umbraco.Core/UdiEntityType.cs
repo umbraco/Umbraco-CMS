@@ -117,6 +117,8 @@ namespace Umbraco.Core
                 {
                     case UmbracoObjectTypes.Document:
                         return Document;
+                    case UmbracoObjectTypes.DocumentBlueprint:
+                        return DocumentBluePrint;
                     case UmbracoObjectTypes.Media:
                         return Media;
                     case UmbracoObjectTypes.Member:
@@ -161,6 +163,8 @@ namespace Umbraco.Core
                 {
                     case Document:
                         return UmbracoObjectTypes.Document;
+                    case DocumentBluePrint:
+                        return UmbracoObjectTypes.DocumentBlueprint;
                     case Media:
                         return UmbracoObjectTypes.Media;
                     case Member:
