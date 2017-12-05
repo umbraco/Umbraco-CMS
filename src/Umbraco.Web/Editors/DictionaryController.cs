@@ -141,8 +141,15 @@
                 if (dictionary.NameIsDirty)
                 {
                     // if the name (key) has changed, we need to check if the new key does not exist
-                    this.ModelState.AddModelError("Name", "Key already exits");
-                    throw new HttpResponseException(this.Request.CreateValidationErrorResponse(ModelState));
+                    var dictionaryByKey = this.Services.LocalizationService.GetDictionaryItemByKey(dictionary.Name);
+
+                    if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
+                    {
+                        this.ModelState.AddModelError("Name", "Key already exits");
+                        throw new HttpResponseException(this.Request.CreateValidationErrorResponse(ModelState));
+                    }
+
+                    dictionaryItem.ItemKey = dictionary.Name;
                 }
 
                 foreach (var translation in dictionary.Translations)
