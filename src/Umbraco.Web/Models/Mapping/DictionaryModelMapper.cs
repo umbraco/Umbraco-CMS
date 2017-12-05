@@ -77,21 +77,7 @@
                                                               LanguageId = lang.Id
                                                           });
                             }
-                        });
-
-            config.CreateMap<DictionarySave, IDictionaryItem>()
-                .ForMember(x => x.Translations, expression => expression.Ignore())
-                .ForMember(x => x.ItemKey, expression => expression.MapFrom(src => src.Name))
-                .ForMember(x => x.ParentId, expression => expression.Ignore())
-                .ForMember(x => x.Key, expression => expression.MapFrom(src => src.Key))
-                .ForMember(x => x.Id, expression => expression.MapFrom(src => src.Id)).ForMember(
-                    x => x.ParentId,
-                    expression => expression.MapFrom(src => src.ParentId))
-                 .AfterMap(
-                    (src, dest) =>
-                        {
-                            dest.Translations = src.Translations.Select(translation => new DictionaryTranslation(translation.LanguageId, translation.Translation)).ToList();
-                        });
+                        });            
         }
 
 
