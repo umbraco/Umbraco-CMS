@@ -63,16 +63,40 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
             vm.page.saveButtonState = "busy";
 
             dictionaryResource.save(vm.content, vm.nameDirty)
-                .then(function(data) {
+                .then(function (data) {
+
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                        // create data for  umb-property displaying
+                        for (var i = 0; i < data.translations.length; i++) {
+                            data.translations[i].property = createTranslationProperty(data.translations[i]);
+                        }
+
+                        contentEditingHelper.handleSuccessfulSave({
+                            scope: $scope,
+                            savedContent: data                            
+                        });
+
+                        // set content
+                        vm.content = data;
+
+                        //share state
+                        editorState.set(vm.content);
                         
+                        navigationService.syncTree({ tree: "dictionary", path: data.path }).then(function (syncArgs) {
+                            vm.page.menu.currentNode = syncArgs.node;
+                        });
+                       
+
                         vm.page.saveButtonState = "success";
                     },
                     function (err) {
+
                         contentEditingHelper.handleSaveError({
                             redirectOnFailure: false,
                             err: err
                         });
-
+                        
                         notificationsService.error(err.data.message);
 
                         vm.page.saveButtonState = "error";
