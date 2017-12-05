@@ -6,7 +6,7 @@
  * @description
  * The controller for editing dictionary items
  */
-function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService) {
+function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService, localizationService) {
     vm = this;
 
     //setup scope vars
@@ -17,6 +17,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
     vm.page.menu = {};
     vm.page.menu.currentSection = appState.getSectionState("currentSection");
     vm.page.menu.currentNode = null;
+    vm.description = '';
   
     function loadDictionary() {
 
@@ -26,20 +27,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
         dictionaryResource.getById($routeParams.id)
             .then(function (data) {
 
-                // create data for  umb-property displaying
-                for(var i=0; i<data.translations.length;i++) {
-                    data.translations[i].property = createTranslationProperty(data.translations[i]);
-                }
-                
-                // set content
-                vm.content = data;                
-
-                //share state
-                editorState.set(vm.content);
-               
-                navigationService.syncTree({ tree: "dictionary", path: data.path }).then(function (syncArgs) {
-                   vm.page.menu.currentNode = syncArgs.node;
-                });
+                bindDictionary(data);
 
                 vm.page.loading = false;               
             });
@@ -51,7 +39,33 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
             label: translation.displayName,
             hideLabel : false
         }
-    }  
+    }
+
+    function bindDictionary(data) {
+        localizationService.localize('dictionaryItem_description').then(function (value) {
+            vm.description = value.replace('%0%', data.name);
+        });
+
+        // create data for  umb-property displaying
+        for (var i = 0; i < data.translations.length; i++) {
+            data.translations[i].property = createTranslationProperty(data.translations[i]);
+        }
+
+        contentEditingHelper.handleSuccessfulSave({
+            scope: $scope,
+            savedContent: data
+        });
+
+        // set content
+        vm.content = data;
+
+        //share state
+        editorState.set(vm.content);
+
+        navigationService.syncTree({ tree: "dictionary", path: data.path, forceReload: true }).then(function (syncArgs) {
+            vm.page.menu.currentNode = syncArgs.node;
+        });
+    }
 
     function onInit() {
         loadDictionary();
@@ -67,25 +81,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
 
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-                        // create data for  umb-property displaying
-                        for (var i = 0; i < data.translations.length; i++) {
-                            data.translations[i].property = createTranslationProperty(data.translations[i]);
-                        }
-
-                        contentEditingHelper.handleSuccessfulSave({
-                            scope: $scope,
-                            savedContent: data                            
-                        });
-
-                        // set content
-                        vm.content = data;
-
-                        //share state
-                        editorState.set(vm.content);
-                        
-                        navigationService.syncTree({ tree: "dictionary", path: data.path, forceReload : true }).then(function (syncArgs) {
-                            vm.page.menu.currentNode = syncArgs.node;
-                        });
+                        bindDictionary(data);       
                        
 
                         vm.page.saveButtonState = "success";
