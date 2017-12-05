@@ -112,6 +112,7 @@
                 for(var i = 0; i < dictionary.translations.length; i++) {
                     saveModel.translations.push({
                         isoCode: dictionary.translations[i].isoCode,
+                        languageId: dictionary.translations[i].languageId,
                         translation: dictionary.translations[i].translation
                     });
                 }

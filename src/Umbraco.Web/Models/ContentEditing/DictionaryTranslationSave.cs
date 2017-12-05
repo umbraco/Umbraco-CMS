@@ -19,5 +19,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "translation")]
         public string Translation { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the language id.
+        /// </summary>
+        [DataMember(Name = "languageId")]
+        public int LanguageId { get; set; }
     }
 }

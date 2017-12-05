@@ -73,12 +73,14 @@
                                                           {
                                                               IsoCode = lang.IsoCode,
                                                               DisplayName = lang.CultureInfo.DisplayName,
-                                                              Translation = (translation != null) ? translation.Value : string.Empty
+                                                              Translation = (translation != null) ? translation.Value : string.Empty,
+                                                              LanguageId = lang.Id
                                                           });
                             }
-                        });
-                
+                        });                
         }
+
+
 
         /// <summary>
         /// Goes up the dictoinary tree to get all parent ids
