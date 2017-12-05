@@ -1,8 +1,17 @@
 ﻿<div ng-controller="Umbraco.Editors.Dictionary.OverviewController as vm">
     <umb-load-indicator ng-if="vm.loading">
     </umb-load-indicator>
-    
+
     <umb-editor-view ng-if="!vm.loading">
-        
+        <umb-editor-header 
+            name="vm.title"
+            hide-alias="true"
+            hide-description="true"
+            hide-icon="true"
+            name-locked="true">
+        </umb-editor-header>
+        <umb-editor-container>
+            
+        </umb-editor-container>
     </umb-editor-view>
 </div>

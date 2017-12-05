@@ -8,8 +8,8 @@
  */
 function DictionaryOverviewController($scope, $location, dictionaryResource) {
     vm = this;
-
-    vm.loading = true;
+    vm.title = "TODO dictoinary item"
+    vm.loading = false;
 }
 
 
