@@ -6,7 +6,7 @@
  * @description
  * The controller for editing dictionary items
  */
-function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper) {
+function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService) {
     vm = this;
 
     //setup scope vars
@@ -72,6 +72,8 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
                             redirectOnFailure: false,
                             err: err
                         });
+
+                        notificationsService.error(err.data.message);
 
                         vm.page.saveButtonState = "error";
                     });
