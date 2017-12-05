@@ -3,7 +3,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenSeven
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZero
 {
     [Migration("7.8.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddRelationTypeForMediaFolderOnDelete : MigrationBase
