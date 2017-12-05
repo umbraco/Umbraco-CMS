@@ -26,7 +26,7 @@ namespace Umbraco.Core
 
                     { AnyGuid, UdiType.GuidUdi },
                     { Document, UdiType.GuidUdi },
-                    { DocumentBluePrint, UdiType.GuidUdi },
+                    { DocumentBlueprint, UdiType.GuidUdi },
                     { Media, UdiType.GuidUdi },
                     { Member, UdiType.GuidUdi },
                     { DictionaryItem, UdiType.GuidUdi },
@@ -68,7 +68,7 @@ namespace Umbraco.Core
 
             public const string Document = "document";
 
-            public const string DocumentBluePrint = "document-blueprint";
+            public const string DocumentBlueprint = "document-blueprint";
 
             public const string Media = "media";
             public const string Member = "member";
@@ -117,6 +117,8 @@ namespace Umbraco.Core
                 {
                     case UmbracoObjectTypes.Document:
                         return Document;
+                    case UmbracoObjectTypes.DocumentBlueprint:
+                        return DocumentBlueprint;
                     case UmbracoObjectTypes.Media:
                         return Media;
                     case UmbracoObjectTypes.Member:
@@ -161,6 +163,8 @@ namespace Umbraco.Core
                 {
                     case Document:
                         return UmbracoObjectTypes.Document;
+                    case DocumentBlueprint:
+                        return UmbracoObjectTypes.DocumentBlueprint;
                     case Media:
                         return UmbracoObjectTypes.Media;
                     case Member:
