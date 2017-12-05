@@ -5,7 +5,7 @@ using umbraco.BasePages;
 namespace umbraco.BusinessLogic.Actions
 {
     /// <summary>
-    /// This action is invoked when the content item is to be restored from the recycle bin
+    /// This action is invoked when the content/media item is to be restored from the recycle bin
     /// </summary>
     public class ActionRestore : IAction
     {
