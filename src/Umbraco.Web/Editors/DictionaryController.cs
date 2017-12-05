@@ -10,6 +10,7 @@
     using Umbraco.Core.Models;
     using Umbraco.Web.Models.ContentEditing;
     using Umbraco.Web.Mvc;
+    using Umbraco.Web.UI;
     using Umbraco.Web.WebApi;
     using Umbraco.Web.WebApi.Filters;
 
@@ -153,7 +154,11 @@
                 {
                     this.Services.LocalizationService.Save(dictionaryItem);
 
-                    return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
+                    var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
+
+                    model.Notifications.Add(new Models.ContentEditing.Notification("Saved","Item saved", SpeechBubbleIcon.Success));
+
+                    return model;
                 }
                 catch (Exception e)
                 {
