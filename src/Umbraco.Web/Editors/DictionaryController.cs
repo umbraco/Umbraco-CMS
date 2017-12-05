@@ -144,6 +144,8 @@
 
             if (dictionaryItem != null)
             {
+                var userCulture = this.Security.CurrentUser.GetUserCulture(this.Services.TextService);
+
                 if (dictionary.NameIsDirty)
                 {
                     // if the name (key) has changed, we need to check if the new key does not exist
@@ -151,9 +153,10 @@
 
                     if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
                     {
+                       
                         var message = this.Services.TextService.Localize(
                             "dictionaryItem/changeKeyError",
-                            this.Security.CurrentUser.GetUserCulture(this.Services.TextService),
+                            userCulture,
                             new Dictionary<string, string> { { "0", dictionary.Name } });
                         this.ModelState.AddModelError("Name", message);
                         throw new HttpResponseException(this.Request.CreateValidationErrorResponse(ModelState));
@@ -173,7 +176,7 @@
 
                     var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
-                    model.Notifications.Add(new Models.ContentEditing.Notification("Saved","Item saved", SpeechBubbleIcon.Success));
+                    model.Notifications.Add(new Models.ContentEditing.Notification(this.Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty, SpeechBubbleIcon.Success));
 
                     return model;
                 }
