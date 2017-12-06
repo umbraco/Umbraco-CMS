@@ -10,7 +10,7 @@
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && currentNodePermissions.canCreate">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && (currentNodePermissions == null || currentNodePermissions.canCreate)">
                    <div class="btn-group" ng-show="listViewAllowedTypes.length > 1">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <localize key="actions_create">Create</localize>
