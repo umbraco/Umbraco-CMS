@@ -68,7 +68,11 @@ namespace Umbraco.Web
                     ExamineManager.Instance.Stop(true);
                 }
             });
-            if (examineShutdownRegistered == false)
+            if (examineShutdownRegistered)
+            {
+                _profilingLogger.Logger.Debug<ExamineStartup>("Examine shutdown registered with MainDom");
+            }
+            else
             {
                 _profilingLogger.Logger.Debug<ExamineStartup>("Examine shutdown not registered, this appdomain is not the MainDom");
 
