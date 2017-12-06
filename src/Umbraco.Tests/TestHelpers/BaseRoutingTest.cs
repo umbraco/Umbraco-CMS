@@ -41,7 +41,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var urlProvider = new UrlProvider(umbracoContext, umbracoSettings.WebRouting, new IUrlProvider[]
             {
-                new DefaultUrlProvider(umbracoSettings.RequestHandler)
+                new DefaultUrlProvider(umbracoSettings.RequestHandler, new SecureRequest())
             });
 			var routingContext = new RoutingContext(
 				umbracoContext,

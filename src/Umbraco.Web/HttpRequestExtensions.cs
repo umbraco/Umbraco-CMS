@@ -13,6 +13,9 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HttpRequestExtensions
 	{
+        //TODO: We should be able to replace this service
+        private static readonly ISecureRequest SecureRequest = new SecureRequest();
+
         /// <summary>
         /// Gets the left part of a URL
         /// </summary>
@@ -44,44 +47,11 @@ namespace Umbraco.Web
 
 	        var left = uri.GetLeftPart(leftPart);
 	        var withoutScheme = left.Substring(uri.Scheme.Length);
-
-	        //TODO: This should call into a service/resolve (i.e. ISecureRequest)
-	        var scheme = request.GetScheme();
-
-	        return scheme + withoutScheme;
+	        
+	        var scheme = SecureRequest.IsSecure(request) ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
+            
+            return scheme + withoutScheme;
 	    }
-
-        /// <summary>
-        /// Returns either https or http depending on the information in the request
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static string GetScheme(this HttpRequestBase request)
-	    {            
-	        return GetScheme(request, DefaultUrlProvider.KnownForwardedHttpsHeaders);
-	    }
-
-        /// <summary>
-        /// Returns either https or http depending on the information in the request
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="knownForwardedHttpsHeaders"></param>
-        /// <returns></returns>
-        public static string GetScheme(this HttpRequestBase request, string[] knownForwardedHttpsHeaders)
-	    {
-	        var httpsForwardHeaderExists = false;
-	        if (request.Headers != null)
-	        {
-	            foreach (var header in knownForwardedHttpsHeaders)
-	            {
-	                httpsForwardHeaderExists = request.Headers.ContainsKey(header);
-	                if (httpsForwardHeaderExists) break;
-	            }
-            }
-
-	        return httpsForwardHeaderExists || request.IsSecureConnection ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
-	    }
-
 
         /// <summary>
         /// Extracts the value from the query string and cleans it to prevent xss attacks.

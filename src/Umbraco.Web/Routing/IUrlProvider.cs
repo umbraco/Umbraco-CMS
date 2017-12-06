@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using Microsoft.Owin;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing

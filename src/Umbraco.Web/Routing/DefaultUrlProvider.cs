@@ -18,16 +18,18 @@ namespace Umbraco.Web.Routing
     public class DefaultUrlProvider : IUrlProvider
     {
         private readonly IRequestHandlerSection _requestSettings;
+        private readonly ISecureRequest _secureRequest;
 
         [Obsolete("Use the ctor that specifies the IRequestHandlerSection")]
         public DefaultUrlProvider()
-            : this(UmbracoConfig.For.UmbracoSettings().RequestHandler)
+            : this(UmbracoConfig.For.UmbracoSettings().RequestHandler, new SecureRequest())
         {            
         }
 
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ISecureRequest secureRequest)
         {
             _requestSettings = requestSettings;
+            _secureRequest = secureRequest;
         }
 
         #region GetUrl
@@ -129,7 +131,7 @@ namespace Umbraco.Web.Routing
 
             // ignore vdir at that point, UriFromUmbraco will do it
 
-            var scheme = httpRequest.GetScheme();
+            var scheme = _secureRequest.GetScheme(httpRequest);
 
             if (mode == UrlProviderMode.AutoLegacy)
             {
@@ -209,11 +211,6 @@ namespace Umbraco.Web.Routing
 
 
         #endregion
-
-        /// <summary>
-        /// Get/set the https headers to check against
-        /// </summary>
-        //TODO: Make this configurable via IWebRoutingSection?
-        public static string[] KnownForwardedHttpsHeaders = new[] { "HTTP_X_FORWARDED_PROTO" };
+        
     }
 }
