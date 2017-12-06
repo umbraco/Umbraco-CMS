@@ -48,13 +48,6 @@ namespace Umbraco.Core.Models
             return contentService.GetAncestors(content);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IEnumerable<IContent> Ancestors(this IContent content)
-        {
-            return Current.Services.ContentService.GetAncestors(content);
-        }
-
         /// <summary>
         /// Returns a list of the current contents children.
         /// </summary>
@@ -64,13 +57,6 @@ namespace Umbraco.Core.Models
         public static IEnumerable<IContent> Children(this IContent content, IContentService contentService)
         {
             return contentService.GetChildren(content.Id);
-        }
-
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IEnumerable<IContent> Children(this IContent content)
-        {
-            return Current.Services.ContentService.GetChildren(content.Id);
         }
 
         /// <summary>
@@ -84,13 +70,6 @@ namespace Umbraco.Core.Models
             return contentService.GetDescendants(content);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IEnumerable<IContent> Descendants(this IContent content)
-        {
-            return Current.Services.ContentService.GetDescendants(content);
-        }
-
         /// <summary>
         /// Returns the parent of the current content.
         /// </summary>
@@ -102,12 +81,6 @@ namespace Umbraco.Core.Models
             return contentService.GetById(content.ParentId);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IContent Parent(this IContent content)
-        {
-            return Current.Services.ContentService.GetById(content.ParentId);
-        }
         #endregion
 
         #region IMedia
