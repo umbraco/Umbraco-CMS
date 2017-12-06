@@ -27,31 +27,28 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <summary>
         /// Gets the raw value of the property.
         /// </summary>
-        public override object SourceValue => _sourceValue;
+        public override object GetSourceValue(int? languageId = null, string segment = null) => _sourceValue;
 
         // in the Xml cache, everything is a string, and to have a value
         // you want to have a non-null, non-empty string.
-        public override bool HasValue => _sourceValue.Trim().Length > 0;
+        public override bool HasValue(int? languageId = null, string segment = null) => _sourceValue.Trim().Length > 0;
 
-        public override object Value
+        public override object GetValue(int? languageId = null, string segment = null)
         {
-            get
-            {
-                // NOT caching the source (intermediate) value since we'll never need it
-                // everything in Xml cache is per-request anyways
-                // also, properties should not be shared between requests and therefore
-                // are single threaded, so the following code should be safe & fast
+            // NOT caching the source (intermediate) value since we'll never need it
+            // everything in Xml cache is per-request anyways
+            // also, properties should not be shared between requests and therefore
+            // are single threaded, so the following code should be safe & fast
 
-                if (_objectValueComputed) return _objectValue;
-                var inter = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
-                // initial reference cache level always is .Content
-                _objectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, inter, _isPreviewing);
-                _objectValueComputed = true;
-                return _objectValue;
-            }
+            if (_objectValueComputed) return _objectValue;
+            var inter = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
+            // initial reference cache level always is .Content
+            _objectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, inter, _isPreviewing);
+            _objectValueComputed = true;
+            return _objectValue;
         }
 
-        public override object XPathValue { get { throw new NotImplementedException(); } }
+        public override object GetXPathValue(int? languageId = null, string segment = null) { throw new NotImplementedException(); }
 
         public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, XmlNode propertyXmlData)
             : this(propertyType, content, isPreviewing)

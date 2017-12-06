@@ -205,35 +205,37 @@ namespace Umbraco.Tests.Published
         class TestPublishedProperty : PublishedPropertyBase
         {
             private readonly bool _preview;
+            private readonly object _sourceValue;
+            private readonly bool _hasValue;
             private IPublishedElement _owner;
 
             public TestPublishedProperty(PublishedPropertyType propertyType, object source)
                 : base(propertyType, PropertyCacheLevel.Element) // initial reference cache level always is .Content
             {
-                SourceValue = source;
-                HasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
+                _sourceValue = source;
+                _hasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
             }
 
             public TestPublishedProperty(PublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
                 : base(propertyType, referenceCacheLevel)
             {
-                SourceValue = source;
-                HasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
+                _sourceValue = source;
+                _hasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
                 _owner = element;
                 _preview = preview;
             }
 
-            private object InterValue => PropertyType.ConvertSourceToInter(null, SourceValue, false);
+            private object InterValue => PropertyType.ConvertSourceToInter(null, _sourceValue, false);
 
             internal void SetOwner(IPublishedElement owner)
             {
                 _owner = owner;
             }
 
-            public override bool HasValue { get; }
-            public override object SourceValue { get; }
-            public override object Value => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
-            public override object XPathValue => throw new WontImplementException();
+            public override bool HasValue(int? languageId = null, string segment = null) => _hasValue;
+            public override object GetSourceValue(int? languageId = null, string segment = null) => _sourceValue;
+            public override object GetValue(int? languageId = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+            public override object GetXPathValue(int? languageId = null, string segment = null) => throw new WontImplementException();
         }
 
         class TestPublishedContent : PublishedContentBase

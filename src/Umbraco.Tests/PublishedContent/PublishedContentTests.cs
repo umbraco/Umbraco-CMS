@@ -556,8 +556,8 @@ namespace Umbraco.Tests.PublishedContent
             var pt = factory.CreatePropertyType("detached", 0, Constants.PropertyEditors.IntegerAlias);
             var ct = factory.CreateContentType(0, "alias", new[] { pt });
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
-            Assert.IsInstanceOf<int>(prop.Value);
-            Assert.AreEqual(5548, prop.Value);
+            Assert.IsInstanceOf<int>(prop.GetValue());
+            Assert.AreEqual(5548, prop.GetValue());
         }
 
         public void Fragment1()

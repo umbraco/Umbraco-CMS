@@ -54,7 +54,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
         }
 
-        public override bool HasValue => _sourceValue != null
+        public override bool HasValue(int? languageId = null, string segment = null) => _sourceValue != null
             && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
 
         private class CacheValues
@@ -129,39 +129,33 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return _interValue;
         }
 
-        public override object SourceValue => _sourceValue;
+        public override object GetSourceValue(int? languageId = null, string segment = null) => _sourceValue;
 
-        public override object Value
+        public override object GetValue(int? languageId = null, string segment = null)
         {
-            get
+            lock (_locko)
             {
-                lock (_locko)
-                {
-                    var cacheValues = GetCacheValues(PropertyType.CacheLevel);
-                    if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel);
+                if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
 
-                    // initial reference cache level always is .Content
-                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
-                    cacheValues.ObjectInitialized = true;
-                    return cacheValues.ObjectValue;
-                }
+                // initial reference cache level always is .Content
+                cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
+                cacheValues.ObjectInitialized = true;
+                return cacheValues.ObjectValue;
             }
         }
 
-        public override object XPathValue
+        public override object GetXPathValue(int? languageId = null, string segment = null)
         {
-            get
+            lock (_locko)
             {
-                lock (_locko)
-                {
-                    var cacheValues = GetCacheValues(PropertyType.CacheLevel);
-                    if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel);
+                if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
 
-                    // initial reference cache level always is .Content
-                    cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
-                    cacheValues.XPathInitialized = true;
-                    return cacheValues.XPathValue;
-                }
+                // initial reference cache level always is .Content
+                cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
+                cacheValues.XPathInitialized = true;
+                return cacheValues.XPathValue;
             }
         }
     }

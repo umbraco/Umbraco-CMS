@@ -224,7 +224,7 @@ namespace Umbraco.Tests.PublishedContent
             if (recurse == false) return property;
 
             IPublishedContent content = this;
-            while (content != null && (property == null || property.HasValue == false))
+            while (content != null && (property == null || property.HasValue() == false))
             {
                 content = content.Parent;
                 property = content == null ? null : content.GetProperty(alias);
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.PublishedContent
             get
             {
                 var property = GetProperty(alias);
-                return property == null || property.HasValue == false ? null : property.Value;
+                return property == null || property.HasValue() == false ? null : property.GetValue();
             }
         }
 
@@ -247,16 +247,16 @@ namespace Umbraco.Tests.PublishedContent
 
     class SolidPublishedProperty : IPublishedProperty
     {
-        public SolidPublishedProperty()
-        {
-            // initialize boring stuff
-        }
-
         public string PropertyTypeAlias { get; set; }
-        public object SourceValue { get; set; }
-        public object Value { get; set; }
-        public bool HasValue { get; set; }
-        public object XPathValue { get; set; }
+        public object SolidSourceValue { get; set; }
+        public object SolidValue { get; set; }
+        public bool SolidHasValue { get; set; }
+        public object SolidXPathValue { get; set; }
+
+        public object GetSourceValue(int? languageId = null, string segment = null) => SolidSourceValue;
+        public object GetValue(int? languageId = null, string segment = null) => SolidValue;
+        public object GetXPathValue(int? languageId = null, string segment = null) => SolidXPathValue;
+        public bool HasValue(int? languageId = null, string segment = null) => SolidHasValue;
     }
 
     [PublishedModel("ContentType2")]

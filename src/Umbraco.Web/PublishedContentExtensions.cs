@@ -97,7 +97,7 @@ namespace Umbraco.Web
         public static bool HasValue(this IPublishedContent content, string alias, bool recurse)
         {
             var prop = content.GetProperty(alias, recurse);
-            return prop != null && prop.HasValue;
+            return prop != null && prop.HasValue();
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Umbraco.Web
         public static object Value(this IPublishedContent content, string alias, bool recurse)
         {
             var property = content.GetProperty(alias, recurse);
-            return property?.Value;
+            return property?.GetValue();
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Umbraco.Web
         public static object Value(this IPublishedContent content, string alias, bool recurse, object defaultValue)
         {
             var property = content.GetProperty(alias, recurse);
-            return property == null || property.HasValue == false ? defaultValue : property.Value;
+            return property == null || property.HasValue() == false ? defaultValue : property.GetValue();
         }
 
         #endregion
@@ -1137,10 +1137,10 @@ namespace Umbraco.Web
                                 };
 
                         var userVals = new Dictionary<string, object>();
-                        foreach (var p in from IPublishedProperty p in n.Properties where p.SourceValue != null select p)
+                        foreach (var p in from IPublishedProperty p in n.Properties where p.GetSourceValue() != null select p)
                         {
                             // probably want the "object value" of the property here...
-                            userVals[p.PropertyTypeAlias] = p.Value;
+                            userVals[p.PropertyTypeAlias] = p.GetValue();
                         }
                         //add the row data
                         Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);

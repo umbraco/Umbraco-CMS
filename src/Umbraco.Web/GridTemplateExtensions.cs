@@ -21,11 +21,11 @@ namespace Umbraco.Web
     {
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
         {
-            var asString = property.Value as string;
+            var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var view = "Grid/" + framework;
-            return html.Partial(view, property.Value);
+            return html.Partial(view, property.GetValue());
         }
 
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedContent contentItem)
@@ -47,7 +47,7 @@ namespace Umbraco.Web
             var view = "Grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias);
-            var model = prop.Value;
+            var model = prop.GetValue();
 
             var asString = model as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
@@ -57,11 +57,11 @@ namespace Umbraco.Web
 
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, HtmlHelper html, string framework = "bootstrap3")
         {
-            var asString = property.Value as string;
+            var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var view = "Grid/" + framework;
-            return html.Partial(view, property.Value);
+            return html.Partial(view, property.GetValue());
         }
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, HtmlHelper html)
         {
@@ -80,7 +80,7 @@ namespace Umbraco.Web
             var view = "Grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias);
-            var model = prop.Value;
+            var model = prop.GetValue();
 
             var asString = model as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
@@ -92,10 +92,10 @@ namespace Umbraco.Web
         [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
         {
-            var asString = property.Value as string;
+            var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
-            var htmlHelper = CreateHtmlHelper(property.Value);
+            var htmlHelper = CreateHtmlHelper(property.GetValue());
             return htmlHelper.GetGridHtml(property, framework);
         }
 
@@ -120,7 +120,7 @@ namespace Umbraco.Web
 
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new NullReferenceException("No property type found with alias " + propertyAlias);
-            var model = prop.Value;
+            var model = prop.GetValue();
 
             var asString = model as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);

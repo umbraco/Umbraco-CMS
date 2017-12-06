@@ -213,7 +213,7 @@ namespace umbraco
             //
             // so, use Value.ToString() here.
             var prop = doc.GetProperty(alias);
-            return prop == null ? string.Empty : prop.Value.ToString();
+            return prop == null ? string.Empty : prop.GetValue().ToString();
         }
 
         /// <summary>

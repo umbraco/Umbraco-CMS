@@ -557,12 +557,12 @@ namespace Umbraco.Web.Routing
             if (valid == false)
             {
                 // bad redirect - log and display the current page (legacy behavior)
-                _logger.Debug<PublishedRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).SourceValue}: value is not an int nor a GuidUdi.");
+                _logger.Debug<PublishedRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue()}: value is not an int nor a GuidUdi.");
             }
 
             if (internalRedirectNode == null)
             {
-                _logger.Debug<PublishedRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).SourceValue}: no such published document.");
+                _logger.Debug<PublishedRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue()}: no such published document.");
             }
             else if (internalRedirectId == request.PublishedContent.Id)
             {

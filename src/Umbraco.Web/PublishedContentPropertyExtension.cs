@@ -1,7 +1,5 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web
 {
@@ -12,24 +10,24 @@ namespace Umbraco.Web
     {
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property)
+        public static T Value<T>(this IPublishedProperty property, int? languageId = null, string segment = null)
         {
-            return property.Value(false, default(T));
+            return property.Value(false, default(T), languageId, segment);
         }
 
-        public static T Value<T>(this IPublishedProperty property, T defaultValue)
+        public static T Value<T>(this IPublishedProperty property, T defaultValue, int? languageId = null, string segment = null)
         {
-            return property.Value(true, defaultValue);
+            return property.Value(true, defaultValue, languageId, segment);
         }
 
-        internal static T Value<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue)
+        internal static T Value<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue, int? languageId = null, string segment = null)
         {
-            if (property.HasValue == false && withDefaultValue) return defaultValue;
+            if (property.HasValue(languageId, segment) == false && withDefaultValue) return defaultValue;
 
             // else we use .Value so we give the converter a chance to handle the default value differently
             // eg for IEnumerable<T> it may return Enumerable<T>.Empty instead of null
 
-            var value = property.Value;
+            var value = property.GetValue(languageId, segment);
 
             // if value is null (strange but why not) it still is OK to call TryConvertTo
             // because it's an extension method (hence no NullRef) which will return a

@@ -15,13 +15,13 @@ namespace Umbraco.Core.Models.PublishedContent
         private readonly Lazy<object> _objectValue;
         private readonly Lazy<object> _xpathValue;
 
-        public override object SourceValue => _propertyData;
+        public override object GetSourceValue(int? languageId = null, string segment = null) => _propertyData;
 
-        public override bool HasValue => _propertyData is string s ? !string.IsNullOrWhiteSpace(s) : _propertyData != null;
+        public override bool HasValue(int? languageId = null, string segment = null) => _propertyData is string s ? !string.IsNullOrWhiteSpace(s) : _propertyData != null;
 
-        public override object Value => _objectValue.Value;
+        public override object GetValue(int? languageId = null, string segment = null) => _objectValue.Value;
 
-        public override object XPathValue => _xpathValue.Value;
+        public override object GetXPathValue(int? languageId = null, string segment = null) => _xpathValue.Value;
 
         public RawValueProperty(PublishedPropertyType propertyType, IPublishedElement content, object propertyData, bool isPreviewing = false)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored

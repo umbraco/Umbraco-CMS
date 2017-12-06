@@ -50,7 +50,7 @@ namespace Umbraco.Web.Models
                         break;
                     case PublishedItemType.Media:
                         var prop = GetProperty(Constants.Conventions.Media.File);
-                        if (prop == null || prop.Value == null)
+                        if (prop == null || prop.GetValue() == null)
                         {
                             _url = string.Empty;
                             return _url;
@@ -63,26 +63,26 @@ namespace Umbraco.Web.Models
                         switch (propType.PropertyEditorAlias)
                         {
                             case Constants.PropertyEditors.UploadFieldAlias:
-                                _url = prop.Value.ToString();
+                                _url = prop.GetValue().ToString();
                                 break;
                             case Constants.PropertyEditors.ImageCropperAlias:
                                 //get the url from the json format
 
-                                var stronglyTyped = prop.Value as ImageCropDataSet;
+                                var stronglyTyped = prop.GetValue() as ImageCropDataSet;
                                 if (stronglyTyped != null)
                                 {
                                     _url = stronglyTyped.Src;
                                     break;
                                 }
 
-                                var json = prop.Value as JObject;
+                                var json = prop.GetValue() as JObject;
                                 if (json != null)
                                 {
                                     _url = json.ToObject<ImageCropDataSet>(new JsonSerializer { Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal }).Src;
                                     break;
                                 }
 
-                                _url = prop.Value.ToString();
+                                _url = prop.GetValue().ToString();
                                 break;
                         }
                         break;
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Models
 
             IPublishedContent content = this;
             var firstNonNullProperty = property;
-            while (content != null && (property == null || property.HasValue == false))
+            while (content != null && (property == null || property.HasValue() == false))
             {
                 content = content.Parent;
                 property = content?.GetProperty(alias);
@@ -187,7 +187,7 @@ namespace Umbraco.Web.Models
             // if we find a content with the property without a value, return that property
             //   have to save that first property while we look further up, hence firstNonNullProperty
 
-            return property != null && property.HasValue ? property : firstNonNullProperty;
+            return property != null && property.HasValue() ? property : firstNonNullProperty;
         }
 
         #endregion

@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Published
 
                 IPublishedContent content = this;
                 var firstNonNullProperty = property;
-                while (content != null && (property == null || property.HasValue == false))
+                while (content != null && (property == null || property.HasValue() == false))
                 {
                     content = content.Parent;
                     property = content?.GetProperty(alias);
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Published
                 // if we find a content with the property without a value, return that property
                 //   have to save that first property while we look further up, hence firstNonNullProperty
 
-                return property != null && property.HasValue ? property : firstNonNullProperty;
+                return property != null && property.HasValue() ? property : firstNonNullProperty;
             }
         }
 

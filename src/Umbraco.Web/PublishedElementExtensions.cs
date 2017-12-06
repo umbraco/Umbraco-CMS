@@ -47,14 +47,11 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets a value indicating whether the content has a value for a property identified by its alias.
         /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
         /// <remarks>Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedElement content, string alias)
+        public static bool HasValue(this IPublishedElement content, string alias, int? languageId = null, string segment = null)
         {
             var prop = content.GetProperty(alias);
-            return prop != null && prop.HasValue;
+            return prop != null && prop.HasValue(languageId, segment);
         }
 
         /// <summary>
@@ -83,6 +80,8 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
+        /// <param name="languageId">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <returns>The value of the content's property identified by the alias.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -90,10 +89,10 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias)
+        public static object Value(this IPublishedElement content, string alias, int? languageId = null, string segment = null)
         {
             var property = content.GetProperty(alias);
-            return property?.Value;
+            return property?.GetValue(languageId, segment);
         }
 
         /// <summary>
@@ -102,6 +101,8 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="languageId">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -109,10 +110,10 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, string defaultValue) // fixme - kill
+        public static object Value(this IPublishedElement content, string alias, string defaultValue, int? languageId = null, string segment = null) // fixme - kill
         {
             var property = content.GetProperty(alias);
-            return property == null || property.HasValue == false ? defaultValue : property.Value;
+            return property == null || property.HasValue(languageId, segment) == false ? defaultValue : property.GetValue(languageId, segment);
         }
 
         /// <summary>
@@ -121,6 +122,8 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="languageId">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -128,10 +131,10 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, object defaultValue)
+        public static object Value(this IPublishedElement content, string alias, object defaultValue, int? languageId = null, string segment = null)
         {
             var property = content.GetProperty(alias);
-            return property == null || property.HasValue == false ? defaultValue : property.Value;
+            return property == null || property.HasValue(languageId, segment) == false ? defaultValue : property.GetValue(languageId, segment);
         }
 
         #endregion
@@ -144,6 +147,8 @@ namespace Umbraco.Web
         /// <typeparam name="T">The target property type.</typeparam>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
+        /// <param name="languageId">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -151,9 +156,9 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias)
+        public static T Value<T>(this IPublishedElement content, string alias, int? languageId = null, string segment = null)
         {
-            return content.Value(alias, false, default(T));
+            return content.Value(alias, false, default(T), languageId, segment);
         }
 
         /// <summary>
@@ -163,6 +168,8 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="languageId">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type, if it exists, otherwise a default value.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -170,22 +177,22 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias, T defaultValue)
+        public static T Value<T>(this IPublishedElement content, string alias, T defaultValue, int? languageId = null, string segment = null)
         {
-            return content.Value(alias, true, defaultValue);
+            return content.Value(alias, true, defaultValue, languageId, segment);
         }
 
-        internal static T Value<T>(this IPublishedElement content, string alias, bool withDefaultValue, T defaultValue) // fixme uh?
+        internal static T Value<T>(this IPublishedElement content, string alias, bool withDefaultValue, T defaultValue, int? languageId = null, string segment = null) // fixme uh?
         {
             var property = content.GetProperty(alias);
             if (property == null) return defaultValue;
 
-            return property.Value(withDefaultValue, defaultValue);
+            return property.Value(withDefaultValue, defaultValue, languageId, segment);
         }
 
         #endregion
 
-        #region Value
+        #region Value or Umbraco.Field - WORK IN PROGRESS
 
         // trying to reproduce Umbraco.Field so we can get rid of it
         //

@@ -213,7 +213,7 @@ namespace umbraco
                     // to properly fix this, we'd need to turn the elements collection into some
                     // sort of collection of lazy values.
 
-                    _elements[p.PropertyTypeAlias] = p.SourceValue;
+                    _elements[p.PropertyTypeAlias] = p.GetSourceValue();
                 }
             }
         }
@@ -374,30 +374,27 @@ namespace umbraco
                 _content = content;
             }
 
-            public override bool HasValue
+            public override bool HasValue(int? languageId = null, string segment = null)
             {
-                get { return _sourceValue != null && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false); }
+                return _sourceValue != null && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false);
             }
 
-            public override object SourceValue
+            public override object GetSourceValue(int? languageId = null, string segment = null)
             {
-                get { return _sourceValue; }
+                return _sourceValue;
             }
 
-            public override object Value
+            public override object GetValue(int? languageId = null, string segment = null)
             {
-                get
-                {
-                    // isPreviewing is true here since we want to preview anyway...
-                    const bool isPreviewing = true;
-                    var source = PropertyType.ConvertSourceToInter(_content, _sourceValue, isPreviewing);
-                    return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Unknown, source, isPreviewing);
-                }
+                // isPreviewing is true here since we want to preview anyway...
+                const bool isPreviewing = true;
+                var source = PropertyType.ConvertSourceToInter(_content, _sourceValue, isPreviewing);
+                return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Unknown, source, isPreviewing);
             }
 
-            public override object XPathValue
+            public override object GetXPathValue(int? languageId = null, string segment = null)
             {
-                get { throw new NotImplementedException(); }
+                throw new NotImplementedException();
             }
         }
 

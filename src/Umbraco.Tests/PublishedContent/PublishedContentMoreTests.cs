@@ -220,9 +220,9 @@ namespace Umbraco.Tests.PublishedContent
                         new SolidPublishedProperty
                         {
                             PropertyTypeAlias = "prop1",
-                            HasValue = true,
-                            Value = 1234,
-                            SourceValue = "1234"
+                            SolidHasValue = true,
+                            SolidValue = 1234,
+                            SolidSourceValue = "1234"
                         }
                     }
                 });
@@ -243,9 +243,9 @@ namespace Umbraco.Tests.PublishedContent
                         new SolidPublishedProperty
                         {
                             PropertyTypeAlias = "prop1",
-                            HasValue = true,
-                            Value = 1234,
-                            SourceValue = "1234"
+                            SolidHasValue = true,
+                            SolidValue = 1234,
+                            SolidSourceValue = "1234"
                         }
                     }
                 });
@@ -266,9 +266,9 @@ namespace Umbraco.Tests.PublishedContent
                     new SolidPublishedProperty
                     {
                         PropertyTypeAlias = "prop1",
-                        HasValue = true,
-                        Value = 1234,
-                        SourceValue = "1234"
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
                     }
                 }
             });

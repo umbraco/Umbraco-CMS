@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             // custom property, ie element
-            return properties[index].XPathValue;
+            return properties[index].GetXPathValue();
         }
 
         #endregion

@@ -225,7 +225,7 @@ namespace Umbraco.Tests.PublishedContent
                 if (recurse == false) return property;
 
                 IPublishedContent content = this;
-                while (content != null && (property == null || property.HasValue == false))
+                while (content != null && (property == null || property.HasValue() == false))
                 {
                     content = content.Parent;
                     property = content == null ? null : content.GetProperty(alias);
