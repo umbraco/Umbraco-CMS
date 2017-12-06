@@ -148,7 +148,6 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Auto-fill properties (or clear).
         /// </summary>
-        /// <param name="model">The content.</param>
         private void AutoFillProperties(IContentBase model)
         {
             var properties = model.Properties.Where(x => IsUploadField(x, false));
@@ -158,11 +157,14 @@ namespace Umbraco.Web.PropertyEditors
                 var autoFillConfig = _mediaFileSystem.UploadAutoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
-                var svalue = property.GetValue() as string;
-                if (string.IsNullOrWhiteSpace(svalue))
-                    _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig);
-                else
-                    _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue));
+                foreach (var pvalue in property.Values)
+                {
+                    var svalue = property.GetValue(pvalue.LanguageId, pvalue.Segment) as string;
+                    if (string.IsNullOrWhiteSpace(svalue))
+                        _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
+                    else
+                        _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.LanguageId, pvalue.Segment);
+                }
             }
         }
 
@@ -232,22 +234,20 @@ namespace Umbraco.Web.PropertyEditors
             {
                 public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
                 {
-                    var json = value as JArray;
-                    if (json == null) yield break;
+                    if (!(value is JArray json)) yield break;
 
                     //validate each item which is a json object
                     for (var index = 0; index < json.Count; index++)
                     {
                         var i = json[index];
                         var jItem = i as JObject;
-                        if (jItem == null || jItem["value"] == null) continue;
+                        if (jItem?["value"] == null) continue;
 
                         //NOTE: we will be removing empty values when persisting so no need to validate
                         var asString = jItem["value"].ToString();
                         if (asString.IsNullOrWhiteSpace()) continue;
 
-                        int parsed;
-                        if (int.TryParse(asString, out parsed) == false)
+                        if (int.TryParse(asString, out _) == false)
                         {
                             yield return new ValidationResult("The value " + asString + " is not a valid number", new[]
                             {

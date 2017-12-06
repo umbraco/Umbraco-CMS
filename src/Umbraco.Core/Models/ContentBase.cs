@@ -293,28 +293,24 @@ namespace Umbraco.Core.Models
             Properties.Add(property);
         }
 
-        // fixme - these three use an extension method that needs to be adapted too
-
         // HttpPostedFileBase is the base class that can be mocked
         // HttpPostedFile is what we get in ASP.NET
         // HttpPostedFileWrapper wraps sealed HttpPostedFile as HttpPostedFileBase
 
         /// <summary>
-        /// Sets the posted file value of a Property
+        /// Sets the posted file value of a property.
         /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value)
+        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value, int? languageId = null, string segment = null)
         {
-            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value));
+            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value), languageId, segment);
         }
 
         /// <summary>
-        /// Sets the posted file base value of a Property
+        /// Sets the posted file value of a property.
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value)
+        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value, int? languageId = null, string segment = null)
         {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+            ContentExtensions.SetValue(this, propertyTypeAlias, value, languageId, segment);
         }
 
         #endregion

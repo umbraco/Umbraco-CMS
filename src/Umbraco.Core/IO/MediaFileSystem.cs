@@ -341,36 +341,35 @@ namespace Umbraco.Core.IO
 
         // fixme - what's below belongs to the upload property editor, not the media filesystem!
 
-        public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filename, Stream filestream)
+        public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filename, Stream filestream, int? languageId = null, string segment = null)
         {
             var property = GetProperty(content, propertyTypeAlias);
-            var svalue = property.GetValue() as string;
-            var oldpath = svalue == null ? null : GetRelativePath(svalue);
+            var oldpath = property.GetValue(languageId, segment) is string svalue ? GetRelativePath(svalue) : null;
             var filepath = StoreFile(content, property.PropertyType, filename, filestream, oldpath);
-            property.SetValue(GetUrl(filepath));
-            SetUploadFile(content, property, filepath, filestream);
+            property.SetValue(GetUrl(filepath), languageId, segment);
+            SetUploadFile(content, property, filepath, filestream, languageId, segment);
         }
 
-        public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filepath)
+        public void SetUploadFile(IContentBase content, string propertyTypeAlias, string filepath, int? languageId = null, string segment = null)
         {
             var property = GetProperty(content, propertyTypeAlias);
-            var svalue = property.GetValue() as string;
-            var oldpath = svalue == null ? null : GetRelativePath(svalue); // FIXME DELETE?
+            // fixme delete?
+            var oldpath = property.GetValue(languageId, segment) is string svalue ? GetRelativePath(svalue) : null;
             if (string.IsNullOrWhiteSpace(oldpath) == false && oldpath != filepath)
                 DeleteFile(oldpath);
-            property.SetValue(GetUrl(filepath));
+            property.SetValue(GetUrl(filepath), languageId, segment);
             using (var filestream = OpenFile(filepath))
             {
-                SetUploadFile(content, property, filepath, filestream);
+                SetUploadFile(content, property, filepath, filestream, languageId, segment);
             }
         }
 
         // sets a file for the FileUpload property editor
         // ie generates thumbnails and populates autofill properties
-        private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream)
+        private void SetUploadFile(IContentBase content, Property property, string filepath, Stream filestream, int? languageId = null, string segment = null)
         {
             // will use filepath for extension, and filestream for length
-            UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream);
+            UploadAutoFillProperties.Populate(content, property.Alias, filepath, filestream, languageId, segment);
         }
 
         #endregion

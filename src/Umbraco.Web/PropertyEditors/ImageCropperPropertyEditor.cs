@@ -18,7 +18,6 @@ namespace Umbraco.Web.PropertyEditors
     public class ImageCropperPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
-        private readonly IContentSection _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly UploadAutoFillProperties _autoFillProperties;
         private IDictionary<string, object> _internalPreValues; // preValues
@@ -29,13 +28,9 @@ namespace Umbraco.Web.PropertyEditors
         public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService)
             : base(logger)
         {
-            if (mediaFileSystem == null) throw new ArgumentNullException(nameof(mediaFileSystem));
-            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings));
-            if (dataTypeService == null) throw new ArgumentNullException(nameof(dataTypeService));
-
-            _mediaFileSystem = mediaFileSystem;
-            _contentSettings = contentSettings;
-            _dataTypeService = dataTypeService;
+            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            var contentSettings1 = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
 
             _internalPreValues = new Dictionary<string, object>
                 {
@@ -43,13 +38,13 @@ namespace Umbraco.Web.PropertyEditors
                     {"src", ""}
                 };
 
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, _contentSettings);
+            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, contentSettings1);
         }
 
         public override IDictionary<string, object> DefaultPreValues
         {
-            get { return _internalPreValues; }
-            set { _internalPreValues = value; }
+            get => _internalPreValues;
+            set => _internalPreValues = value;
         }
 
         /// <summary>
@@ -157,9 +152,8 @@ namespace Umbraco.Web.PropertyEditors
             foreach (var property in properties)
             {
                 var jo = GetJObject((string) property.GetValue(), true);
-                if (jo == null || jo["src"] == null) continue;
 
-                var src = jo["src"].Value<string>();
+                var src = jo?["src"]?.Value<string>();
                 if (string.IsNullOrWhiteSpace(src)) continue;
 
                 var sourcePath = _mediaFileSystem.GetRelativePath(src);
@@ -208,7 +202,6 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Auto-fill properties (or clear).
         /// </summary>
-        /// <param name="model">The content.</param>
         private void AutoFillProperties(IContentBase model)
         {
             var properties = model.Properties.Where(x => IsCropperField(x, false));
@@ -218,37 +211,40 @@ namespace Umbraco.Web.PropertyEditors
                 var autoFillConfig = _autoFillProperties.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
-                var svalue = property.GetValue() as string;
-                if (string.IsNullOrWhiteSpace(svalue))
+                foreach (var pvalue in property.Values)
                 {
-                    _autoFillProperties.Reset(model, autoFillConfig);
-                    continue;
-                }
+                    var svalue = property.GetValue(pvalue.LanguageId, pvalue.Segment) as string;
+                    if (string.IsNullOrWhiteSpace(svalue))
+                    {
+                        _autoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
+                        continue;
+                    }
 
-                var jo = GetJObject(svalue, false);
-                string src;
-                if (jo == null)
-                {
-                    // so we have a non-empty string value that cannot be parsed into a json object
-                    // see http://issues.umbraco.org/issue/U4-4756
-                    // it can happen when an image is uploaded via the folder browser, in which case
-                    // the property value will be the file source eg '/media/23454/hello.jpg' and we
-                    // are fixing that anomaly here - does not make any sense at all but... bah...
-                    var config = _dataTypeService
-                        .GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId).FirstOrDefault();
-                    var crops = string.IsNullOrWhiteSpace(config) ? "[]" : config;
-                    src = svalue;
-                    property.SetValue("{\"src\": \"" + svalue + "\", \"crops\": " + crops + "}");
-                }
-                else
-                {
-                    src = jo["src"]?.Value<string>();
-                }
+                    var jo = GetJObject(svalue, false);
+                    string src;
+                    if (jo == null)
+                    {
+                        // so we have a non-empty string value that cannot be parsed into a json object
+                        // see http://issues.umbraco.org/issue/U4-4756
+                        // it can happen when an image is uploaded via the folder browser, in which case
+                        // the property value will be the file source eg '/media/23454/hello.jpg' and we
+                        // are fixing that anomaly here - does not make any sense at all but... bah...
+                        var config = _dataTypeService
+                            .GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId).FirstOrDefault();
+                        var crops = string.IsNullOrWhiteSpace(config) ? "[]" : config;
+                        src = svalue;
+                        property.SetValue("{\"src\": \"" + svalue + "\", \"crops\": " + crops + "}");
+                    }
+                    else
+                    {
+                        src = jo["src"]?.Value<string>();
+                    }
 
-                if (src == null)
-                    _autoFillProperties.Reset(model, autoFillConfig);
-                else
-                    _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src));
+                    if (src == null)
+                        _autoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
+                    else
+                        _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src), pvalue.LanguageId, pvalue.Segment);
+                }
             }
         }
 

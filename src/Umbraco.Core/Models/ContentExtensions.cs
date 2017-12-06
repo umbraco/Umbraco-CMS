@@ -267,12 +267,9 @@ namespace Umbraco.Core.Models
         #region SetValue for setting file contents
 
         /// <summary>
-        /// Stores and sets an uploaded HttpPostedFileBase as a property value.
+        /// Sets the posted file value of a property.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
-        /// <param name="propertyTypeAlias">The property alias.</param>
-        /// <param name="value">The uploaded <see cref="HttpPostedFileBase"/>.</param>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value, int? languageId = null, string segment = null)
         {
             // ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
@@ -291,20 +288,16 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
 
-            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream);
+            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream, languageId, segment);
         }
 
         /// <summary>
-        /// Stores and sets a file as a property value.
+        /// Sets the posted file value of a property.
         /// </summary>
-        /// <param name="content"><see cref="IContentBase"/>A content item.</param>
-        /// <param name="propertyTypeAlias">The property alias.</param>
-        /// <param name="filename">The name of the file.</param>
-        /// <param name="filestream">A stream containing the file data.</param>
         /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
         /// you need to store the file by yourself using Store and then figure out
         /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, int? languageId = null, string segment = null)
         {
             if (filename == null || filestream == null) return;
 
@@ -313,7 +306,7 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
 
-            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream);
+            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream, languageId, segment);
         }
 
         /// <summary>
