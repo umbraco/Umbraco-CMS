@@ -211,7 +211,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             // use the converter if any, else just return the source value
             return _converter != null
-                ? _converter.ConvertSourceToInter(owner, this, source, preview)
+                ? _converter.ConvertSourceToIntermediate(owner, this, source, preview)
                 : source;
         }
 
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             // use the converter if any, else just return the inter value
             return _converter != null
-                ? _converter.ConvertInterToObject(owner, this, referenceCacheLevel, inter, preview)
+                ? _converter.ConvertIntermediateToObject(owner, this, referenceCacheLevel, inter, preview)
                 : inter;
         }
 
@@ -250,7 +250,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             // use the converter if any
             if (_converter != null)
-                return _converter.ConvertInterToXPath(owner, this, referenceCacheLevel, inter, preview);
+                return _converter.ConvertIntermediateToXPath(owner, this, referenceCacheLevel, inter, preview);
 
             // else just return the inter value as a string or an XPathNavigator
             if (inter == null) return null;

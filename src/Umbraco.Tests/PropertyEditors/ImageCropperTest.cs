@@ -72,7 +72,7 @@ namespace Umbraco.Tests.PropertyEditors
 
                 var converter = new Umbraco.Web.PropertyEditors.ValueConverters.ImageCropperValueConverter(dataTypeService.Object);
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
-                var result = converter.ConvertSourceToInter(null, factory.CreatePropertyType("test", 0, "test"), val1, false); // does not use type for conversion
+                var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 0, "test"), val1, false); // does not use type for conversion
 
                 var resultShouldMatch = val2.SerializeToCropDataSet();
                 if (expected)

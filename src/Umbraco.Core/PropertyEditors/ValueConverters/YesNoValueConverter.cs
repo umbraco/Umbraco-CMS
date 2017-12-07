@@ -15,7 +15,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // in xml a boolean is: string
             // in the database a boolean is: string "1" or "0" or empty
@@ -45,7 +45,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         // default ConvertSourceToObject just returns source ie a boolean value
 
-        public override object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             // source should come from ConvertSource and be a boolean already
             return (bool)inter ? "1" : "0";

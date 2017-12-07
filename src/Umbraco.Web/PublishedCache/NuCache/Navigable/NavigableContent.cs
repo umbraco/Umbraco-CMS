@@ -7,32 +7,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 {
     internal class NavigableContent : INavigableContent
     {
-        private readonly IPublishedContent _icontent;
         private readonly PublishedContent _content;
-        //private readonly object[] _builtInValues1;
         private readonly string[] _builtInValues;
 
         public NavigableContent(IPublishedContent content)
         {
-            _icontent = content;
-            _content = PublishedContent.UnwrapIPublishedContent(_icontent);
-
-            // built-in properties (attributes)
-            //_builtInValues1 = new object[]
-            //    {
-            //        _content.Name,
-            //        _content.ParentId,
-            //        _content.CreateDate,
-            //        _content.UpdateDate,
-            //        true, // isDoc
-            //        _content.SortOrder,
-            //        _content.Level,
-            //        _content.TemplateId,
-            //        _content.WriterId,
-            //        _content.CreatorId,
-            //        _content.UrlName,
-            //        _content.IsDraft
-            //    };
+            InnerContent = content;
+            _content = PublishedContent.UnwrapIPublishedContent(InnerContent);
 
             var i = 0;
             _builtInValues = new []
@@ -60,7 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 
         #region INavigableContent
 
-        public IPublishedContent InnerContent => _icontent;
+        public IPublishedContent InnerContent { get; }
 
         public int Id => _content.Id;
 

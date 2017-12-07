@@ -40,12 +40,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return new PublishedMember(member, n, d, publishedSnapshotAccessor).CreateModel();
         }
 
-        private static Dictionary<string, object> GetPropertyValues(PublishedContentType contentType, IMember member)
+        private static Dictionary<string, PropertyData[]> GetPropertyValues(PublishedContentType contentType, IMember member)
         {
             // see node in PublishedSnapshotService
             // we do not (want to) support ConvertDbToXml/String
 
             //var propertyEditorResolver = PropertyEditorResolver.Current;
+
+            // see note in MemberType.Variations
+            // we don't want to support variations on members
 
             var properties = member
                 .Properties
@@ -58,7 +61,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 //    return new KeyValuePair<string, object>(property.Alias, v);
                 //})
                 //.ToDictionary(x => x.Key, x => x.Value);
-                .ToDictionary(x => x.Alias, x => x.GetValue(), StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(x => x.Alias, x => new[] { new PropertyData { Value = x.GetValue() } }, StringComparer.OrdinalIgnoreCase);
 
             // see also PublishedContentType
             AddIf(contentType, properties, "Email", member.Email);
@@ -75,11 +78,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return properties;
         }
 
-        private static void AddIf(PublishedContentType contentType, IDictionary<string, object> properties, string alias, object value)
+        private static void AddIf(PublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
         {
             var propertyType = contentType.GetPropertyType(alias);
             if (propertyType == null || propertyType.IsUmbraco == false) return;
-            properties[alias] = value;
+            properties[alias] = new[] { new PropertyData { Value = value } };
         }
 
         #region IPublishedMember

@@ -1156,29 +1156,38 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //var propertyEditorResolver = PropertyEditorResolver.Current;
             //var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
-            var data = new Dictionary<string, object>();
+            var data = new Dictionary<string, PropertyData[]>();
             foreach (var prop in content.Properties)
             {
-                var value = prop.GetValue(published: published);
-                //if (value != null)
-                //{
-                //    var e = propertyEditorResolver.GetByAlias(prop.PropertyType.PropertyEditorAlias);
+                var pdatas = new List<PropertyData>();
+                foreach (var pvalue in prop.Values)
+                {
+                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                    if (value != null)
+                        pdatas.Add(new PropertyData { LanguageId = pvalue.LanguageId, Segment = pvalue.Segment, Value = value });
 
-                //    // We are converting to string, even for database values which are integer or
-                //    // DateTime, which is not optimum. Doing differently would require that we have a way to tell
-                //    // whether the conversion to XML string changes something or not... which we don't, and we
-                //    // don't want to implement it as PropertyValueEditor.ConvertDbToXml/String should die anyway.
+                    //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>($"{content.Id} {prop.Alias} [{pvalue.LanguageId},{pvalue.Segment}] {value} {(published?"pub":"edit")}");
 
-                //    // Don't think about improving the situation here: this is a corner case and the real
-                //    // thing to do is to get rig of PropertyValueEditor.ConvertDbToXml/String.
+                    //if (value != null)
+                    //{
+                    //    var e = propertyEditorResolver.GetByAlias(prop.PropertyType.PropertyEditorAlias);
 
-                //    // Use ConvertDbToString to keep it simple, although everywhere we use ConvertDbToXml and
-                //    // nothing ensures that the two methods are consistent.
+                    //    // We are converting to string, even for database values which are integer or
+                    //    // DateTime, which is not optimum. Doing differently would require that we have a way to tell
+                    //    // whether the conversion to XML string changes something or not... which we don't, and we
+                    //    // don't want to implement it as PropertyValueEditor.ConvertDbToXml/String should die anyway.
 
-                //    if (e != null)
-                //        value = e.ValueEditor.ConvertDbToString(prop, prop.PropertyType, dataTypeService);
-                //}
-                data[prop.Alias] = value;
+                    //    // Don't think about improving the situation here: this is a corner case and the real
+                    //    // thing to do is to get rig of PropertyValueEditor.ConvertDbToXml/String.
+
+                    //    // Use ConvertDbToString to keep it simple, although everywhere we use ConvertDbToXml and
+                    //    // nothing ensures that the two methods are consistent.
+
+                    //    if (e != null)
+                    //        value = e.ValueEditor.ConvertDbToString(prop, prop.PropertyType, dataTypeService);
+                    //}
+                }
+                data[prop.Alias] = pdatas.ToArray();
             }
 
             var dto = new ContentNuDto
@@ -1191,6 +1200,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 Data = JsonConvert.SerializeObject(data)
             };
+
+            //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);
 
             return dto;
         }
@@ -1255,10 +1266,14 @@ WHERE cmsContentNu.nodeId IN (
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = new List<ContentNuDto>();
-                //var guids = new List<Guid>(); // fixme wtf?
                 foreach (var c in descendants)
-                    items.Add(GetDto(c, c.Published));
-                //items.AddRange(guids.Select(x => GetDto(repository.GetByVersion(x), true)));
+                {
+                    // always the edited version
+                    items.Add(GetDto(c, false));
+                    // and also the published version if it makes any sense
+                    if (c.Published)
+                        items.Add(GetDto(c, true));
+                }
 
                 db.BulkInsertRecords(items);
                 processed += items.Count;
@@ -1320,7 +1335,7 @@ WHERE cmsContentNu.nodeId IN (
             do
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
-                var items = descendants.Select(m => GetDto(m, true)).ToArray();
+                var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1381,7 +1396,7 @@ WHERE cmsContentNu.nodeId IN (
             do
             {
                 var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
-                var items = descendants.Select(m => GetDto(m, true)).ToArray();
+                var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -1401,8 +1416,8 @@ WHERE cmsContentNu.nodeId IN (
         // assumes content tree lock
         private bool VerifyContentDbCacheLocked(IScopeUnitOfWork uow)
         {
-            // every published content item should have a corresponding row in cmsContentXml
-            // every content item should have a corresponding row in cmsPreviewXml
+            // every document should have a corresponding row for edited properties
+            // and if published, may have a corresponding row for published properties
 
             var contentObjectType = Constants.ObjectTypes.Document;
             var db = uow.Database;
@@ -1410,9 +1425,10 @@ WHERE cmsContentNu.nodeId IN (
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
 JOIN uDocument ON umbracoNode.id=uDocument.nodeId
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=uDocument.published)
+LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.published=0)
+LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=1)
 WHERE umbracoNode.nodeObjectType=@objType
-AND cmsContentNu.nodeId IS NULL;"
+AND nuEdited.nodeId IS NULL OR (uDocument.published=1 AND nuPublished.nodeId IS NULL);"
                 , new { objType = contentObjectType });
 
             return count == 0;
@@ -1432,14 +1448,14 @@ AND cmsContentNu.nodeId IS NULL;"
         // assumes media tree lock
         public bool VerifyMediaDbCacheLocked(IScopeUnitOfWork uow)
         {
-            // every non-trashed media item should have a corresponding row in cmsContentXml
+            // every media item should have a corresponding row for edited properties
 
             var mediaObjectType = Constants.ObjectTypes.Media;
             var db = uow.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=1)
+LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL
 ", new { objType = mediaObjectType });
@@ -1461,14 +1477,14 @@ AND cmsContentNu.nodeId IS NULL
         // assumes member tree lock
         public bool VerifyMemberDbCacheLocked(IScopeUnitOfWork uow)
         {
-            // every member item should have a corresponding row in cmsContentXml
+            // every member item should have a corresponding row for edited properties
 
             var memberObjectType = Constants.ObjectTypes.Member;
             var db = uow.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
-LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=1)
+LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL
 ", new { objType = memberObjectType });

@@ -28,9 +28,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (ImageCropDataSet);
 
-        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            var baseVal = base.ConvertSourceToInter(owner, propertyType, source, preview);
+            var baseVal = base.ConvertSourceToIntermediate(owner, propertyType, source, preview);
             var json = baseVal as JObject;
             if (json == null) return baseVal;
 

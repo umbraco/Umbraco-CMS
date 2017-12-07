@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IPublishedContent);
 
-        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             if (source == null)
                 return null;

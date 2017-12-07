@@ -206,19 +206,19 @@ namespace Umbraco.Tests.Published
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => _cacheLevel;
 
-            public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
             {
                 SourceConverts++;
                 return int.TryParse(source as string, out int i) ? i : 0;
             }
 
-            public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
                 InterConverts++;
                 return (int) inter;
             }
 
-            public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
     }

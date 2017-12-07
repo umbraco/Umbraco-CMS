@@ -48,13 +48,13 @@ namespace Umbraco.Tests.Published
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => PropertyCacheLevel.Element;
 
-            public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
                 => int.TryParse(source as string, out int i) ? i : 0;
 
-            public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => (int) inter;
 
-            public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
 
@@ -118,13 +118,13 @@ namespace Umbraco.Tests.Published
             public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => _cacheLevel;
 
-            public object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+            public object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
                 => int.TryParse(source as string, out int i) ? i : -1;
 
-            public object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById((int) inter);
 
-            public object ConvertInterToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int) inter).ToString();
         }
 
@@ -249,13 +249,13 @@ namespace Umbraco.Tests.Published
             public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
                 => PropertyCacheLevel.Elements;
 
-            public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+            public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
             {
                 var s = source as string;
                 return s?.Split(',').Select(int.Parse).ToArray() ?? Array.Empty<int>();
             }
 
-            public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+            public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
                 return ((int[]) inter).Select(x => (PublishedSnapshotTestObjects.TestContentModel1) _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(x)).ToArray();
             }

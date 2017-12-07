@@ -32,14 +32,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IPublishedContent GetById(bool preview, int contentId)
         {
+            // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
-            return n?.Published;
+            return n?.Draft;
         }
 
         public override IPublishedContent GetById(bool preview, Guid contentId)
         {
+            // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
-            return n?.Published;
+            return n?.Draft;
         }
 
         public override bool HasById(bool preview, int contentId)
@@ -51,30 +53,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override IEnumerable<IPublishedContent> GetAtRoot(bool preview)
         {
             if (PublishedSnapshotService.CacheContentCacheRoots == false)
-                return GetAtRootNoCache(preview);
+                return GetAtRootNoCache();
 
             var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
                 ? _elementsCache
                 : _snapshotCache;
 
             if (cache == null)
-                return GetAtRootNoCache(preview);
+                return GetAtRootNoCache();
 
             // note: ToArray is important here, we want to cache the result, not the function!
             return (IEnumerable<IPublishedContent>)cache.GetCacheItem(
-                CacheKeys.MediaCacheRoots(preview),
-                () => GetAtRootNoCache(preview).ToArray());
+                CacheKeys.MediaCacheRoots(false), // ignore preview, only 1 key!
+                () => GetAtRootNoCache().ToArray());
         }
 
-        private IEnumerable<IPublishedContent> GetAtRootNoCache(bool preview)
+        private IEnumerable<IPublishedContent> GetAtRootNoCache()
         {
             var c = _snapshot.GetAtRoot();
 
-            // there's no .Draft for medias, only non-null .Published
-            // but we may want published as previewing, still
-            return c.Select(n => preview
-                ? ContentCache.GetPublishedContentAsPreviewing(n.Published)
-                : n.Published);
+            // ignore preview, there's only draft for media
+            return c.Select(n => n.Draft);
         }
 
         public override bool HasContent(bool preview)

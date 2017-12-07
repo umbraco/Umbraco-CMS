@@ -36,6 +36,17 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public override bool IsPublishing => IsPublishingConst;
 
+        public override ContentVariation Variations
+        {
+            // note: although technically possible, variations on members don't make much sense
+            // and therefore are disabled - they are fully supported at service level, though,
+            // but not at published snapshot level.
+
+            get => base.Variations;
+            set => throw new NotSupportedException("Variations are not supported on members.");
+        }
+
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
@@ -47,7 +58,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public override string Alias
         {
-            get { return _alias; }
+            get => _alias;
             set
             {
                 //NOTE: WE are overriding this because we don't want to do a ToSafeAlias when the alias is the special case of
@@ -80,12 +91,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanEditProperty(string propertyTypeAlias)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
-            {
-                return MemberTypePropertyTypes[propertyTypeAlias].IsEditable;
-            }
-
-            return false;
+            return MemberTypePropertyTypes.ContainsKey(propertyTypeAlias) && MemberTypePropertyTypes[propertyTypeAlias].IsEditable;
         }
 
         /// <summary>
@@ -95,12 +101,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanViewProperty(string propertyTypeAlias)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
-            {
-                return MemberTypePropertyTypes[propertyTypeAlias].IsVisible;
-            }
-
-            return false;
+            return MemberTypePropertyTypes.ContainsKey(propertyTypeAlias) && MemberTypePropertyTypes[propertyTypeAlias].IsVisible;
         }
 
         /// <summary>

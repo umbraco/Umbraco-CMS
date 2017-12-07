@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 ? typeof (IEnumerable<IPublishedContent>)
                 : typeof (IPublishedContent);
 
-        public override object ConvertSourceToInter(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
             {
@@ -79,7 +79,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return null;
         }
 
-        public override object ConvertInterToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object source, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object source, bool preview)
         {
             if (source == null)
             {

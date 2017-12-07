@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -11,7 +14,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
     internal class Property : PublishedPropertyBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly object _sourceValue;
         private readonly Guid _contentUid;
         private readonly bool _isPreviewing;
         private readonly bool _isMember;
@@ -19,9 +21,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private readonly object _locko = new object();
 
+        private readonly object _sourceValue;
         private bool _interInitialized;
         private object _interValue;
+
+        private List<PropertyValue> _sourceVValues;
+
         private CacheValues _cacheValues;
+
         private string _valuesCacheKey;
         private string _recurseCacheKey;
 
@@ -31,10 +38,26 @@ namespace Umbraco.Web.PublishedCache.NuCache
         { }
 
         // initializes a published content property with a value
-        public Property(PublishedPropertyType propertyType, PublishedContent content, object sourceValue, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        public Property(PublishedPropertyType propertyType, PublishedContent content, PropertyData[] sourceValues, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
             : base(propertyType, referenceCacheLevel)
         {
-            _sourceValue = sourceValue;
+            if (sourceValues != null)
+            {
+                foreach (var sourceValue in sourceValues)
+                {
+                    if (sourceValue.LanguageId == null && sourceValue.Segment == null)
+                    {
+                        _sourceValue = sourceValue.Value;
+                    }
+                    else
+                    {
+                        if (_sourceVValues == null)
+                            _sourceVValues = new List<PropertyValue>();
+                        _sourceVValues.Add(new PropertyValue { LanguageId = sourceValue.LanguageId, Segment = sourceValue.Segment, SourceValue = sourceValue.Value });
+                    }
+                }
+            }
+
             _contentUid = content.Key;
             _content = content;
             _isPreviewing = content.IsPreviewing;
@@ -47,6 +70,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             : base(origin.PropertyType, origin.ReferenceCacheLevel)
         {
             _sourceValue = origin._sourceValue;
+            _sourceVValues = origin._sourceVValues;
+
             _contentUid = origin._contentUid;
             _content = content;
             _isPreviewing = true;
@@ -56,14 +81,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override bool HasValue(int? languageId = null, string segment = null) => _sourceValue != null
             && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
-
-        private class CacheValues
-        {
-            public bool ObjectInitialized;
-            public object ObjectValue;
-            public bool XPathInitialized;
-            public object XPathValue;
-        }
 
         // used to cache the recursive *property* for this property
         internal string RecurseCacheKey => _recurseCacheKey
@@ -120,26 +137,56 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return (CacheValues) cache.GetCacheItem(ValuesCacheKey, () => new CacheValues());
         }
 
-        private object GetInterValue()
+        // this is always invoked from within a lock, so does not require its own lock
+        private object GetInterValue(int? languageId, string segment)
         {
-            if (_interInitialized) return _interValue;
+            if (languageId == null && segment == null)
+            {
+                if (_interInitialized) return _interValue;
 
-            _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
-            _interInitialized = true;
-            return _interValue;
+                _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
+                _interInitialized = true;
+                return _interValue;
+            }
+
+            if (_sourceVValues == null)
+                _sourceVValues = new List<PropertyValue>();
+
+            var vvalue = _sourceVValues.FirstOrDefault(x => x.LanguageId == languageId && x.Segment == segment);
+
+            if (vvalue == null)
+                _sourceVValues.Add(vvalue = new PropertyValue { LanguageId = languageId, Segment = segment });
+
+            if (vvalue.InterInitialized) return vvalue.InterValue;
+
+            vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);
+            vvalue.InterInitialized = true;
+            return vvalue.InterValue;
         }
 
-        public override object GetSourceValue(int? languageId = null, string segment = null) => _sourceValue;
+        public override object GetSourceValue(int? languageId = null, string segment = null)
+        {
+            if (languageId == null && segment == null)
+                return _sourceValue;
+
+            List<PropertyValue> vvalues;
+            lock (_locko)
+            {
+                vvalues = _sourceVValues;
+            }
+
+            return vvalues?.FirstOrDefault(x => x.LanguageId == languageId && x.Segment == segment);
+        }
 
         public override object GetValue(int? languageId = null, string segment = null)
         {
             lock (_locko)
             {
-                var cacheValues = GetCacheValues(PropertyType.CacheLevel);
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(languageId, segment);
                 if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
 
                 // initial reference cache level always is .Content
-                cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
+                cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Element, GetInterValue(languageId, segment), _isPreviewing);
                 cacheValues.ObjectInitialized = true;
                 return cacheValues.ObjectValue;
             }
@@ -149,14 +196,57 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             lock (_locko)
             {
-                var cacheValues = GetCacheValues(PropertyType.CacheLevel);
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(languageId, segment);
                 if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
 
                 // initial reference cache level always is .Content
-                cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Element, GetInterValue(), _isPreviewing);
+                cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, PropertyCacheLevel.Element, GetInterValue(languageId, segment), _isPreviewing);
                 cacheValues.XPathInitialized = true;
                 return cacheValues.XPathValue;
             }
         }
+
+        #region Classes
+
+        private class CacheValues
+        {
+            private int? _languageId;
+            private string _segment;
+
+            public bool ObjectInitialized;
+            public object ObjectValue;
+            public bool XPathInitialized;
+            public object XPathValue;
+
+            private List<CacheValues> _values;
+
+            // this is always invoked from within a lock, so does not require its own lock
+            public CacheValues For(int? languageId, string segment)
+            {
+                if (languageId == null && segment == null)
+                    return this;
+
+                if (_values == null)
+                    _values = new List<CacheValues>();
+
+                var values = _values.FirstOrDefault(x => x._languageId == languageId && x._segment == segment);
+
+                if (values == null)
+                    _values.Add(values = new CacheValues { _languageId = languageId, _segment = segment });
+
+                return values;
+            }
+        }
+
+        private class PropertyValue
+        {
+            public int? LanguageId { get; set; }
+            public string Segment { get; set; }
+            public object SourceValue { get; set; }
+            public bool InterInitialized { get; set; }
+            public object InterValue { get; set; }
+        }
+
+        #endregion
     }
 }

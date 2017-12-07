@@ -302,7 +302,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the content variation of the content type.
         /// </summary>
-        public ContentVariation Variations
+        public virtual ContentVariation Variations
         {
             get => _variations;
             set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);

@@ -82,7 +82,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
         class ContentDataSerializer : ISerializer<ContentData>
         {
-            private static readonly DictionaryOfValuesSerializer PropertiesSerializer = new DictionaryOfValuesSerializer();
+            private static readonly DictionaryOfPropertyDataSerializer PropertiesSerializer = new DictionaryOfPropertyDataSerializer();
 
             public ContentData ReadFrom(Stream stream)
             {
@@ -90,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     Published = PrimitiveSerializer.Boolean.ReadFrom(stream),
                     Name = PrimitiveSerializer.String.ReadFrom(stream),
-                    Version = PrimitiveSerializer.Guid.ReadFrom(stream),
+                    VersionId = PrimitiveSerializer.Int32.ReadFrom(stream),
                     VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
                     WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
                     TemplateId = PrimitiveSerializer.Int32.ReadFrom(stream),
@@ -102,7 +102,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 PrimitiveSerializer.Boolean.WriteTo(value.Published, stream);
                 PrimitiveSerializer.String.WriteTo(value.Name, stream);
-                PrimitiveSerializer.Guid.WriteTo(value.Version, stream);
+                PrimitiveSerializer.Int32.WriteTo(value.VersionId, stream);
                 PrimitiveSerializer.DateTime.WriteTo(value.VersionDate, stream);
                 PrimitiveSerializer.Int32.WriteTo(value.WriterId, stream);
                 PrimitiveSerializer.Int32.WriteTo(value.TemplateId, stream);
@@ -131,73 +131,131 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         }
         */
 
-        private class DictionaryOfValuesSerializer : ISerializer<IDictionary<string, object>>
+        private class DictionaryOfPropertyDataSerializer : ISerializer<IDictionary<string, PropertyData[]>>
         {
-            public IDictionary<string, object> ReadFrom(Stream stream)
+            public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
             {
-                var dict = new Dictionary<string, object>();
-                var count = PrimitiveSerializer.Int32.ReadFrom(stream);
-                for (var i = 0; i < count; i++)
+                var dict = new Dictionary<string, PropertyData[]>();
+
+                // read properties count
+                var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+
+                // read each property
+                for (var i = 0; i < pcount; i++)
                 {
+                    // read property alias
                     var key = PrimitiveSerializer.String.ReadFrom(stream);
-                    var type = PrimitiveSerializer.Char.ReadFrom(stream);
-                    switch (type)
+
+                    // read values count
+                    var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+
+                    // create pdata and add to the dictionary
+                    var pdatas = new List<PropertyData>();
+
+                    // for each value, read and add to pdata
+                    for (var j = 0; j < vcount; j++)
                     {
-                        case 'N':
-                            dict.Add(key, null);
-                            break;
-                        case 'S':
-                            dict.Add(key, PrimitiveSerializer.String.ReadFrom(stream));
-                            break;
-                        case 'I':
-                            dict.Add(key, PrimitiveSerializer.Int32.ReadFrom(stream));
-                            break;
-                        case 'L':
-                            dict.Add(key, PrimitiveSerializer.Int64.ReadFrom(stream));
-                            break;
-                        case 'D':
-                            dict.Add(key, PrimitiveSerializer.DateTime.ReadFrom(stream));
-                            break;
-                        default:
-                            throw new NotSupportedException("Cannot deserialize '" + type + "' value.");
+                        var pdata = new PropertyData();
+                        pdatas.Add(pdata);
+
+                        var type = PrimitiveSerializer.Char.ReadFrom(stream);
+                        pdata.LanguageId = (int?) ReadObject(type, stream);
+                        type = PrimitiveSerializer.Char.ReadFrom(stream);
+                        pdata.Segment = (string) ReadObject(type, stream);
+                        type = PrimitiveSerializer.Char.ReadFrom(stream);
+                        pdata.Value = ReadObject(type, stream);
                     }
+
+                    dict[key] = pdatas.ToArray();
                 }
                 return dict;
             }
 
-            public void WriteTo(IDictionary<string, object> value, Stream stream)
+            private object ReadObject(char type, Stream stream)
             {
+                switch (type)
+                {
+                    case 'N':
+                        return null;
+                    case 'S':
+                        return PrimitiveSerializer.String.ReadFrom(stream);
+                    case 'I':
+                        return PrimitiveSerializer.Int32.ReadFrom(stream);
+                    case 'L':
+                        return PrimitiveSerializer.Int64.ReadFrom(stream);
+                    case 'F':
+                        return PrimitiveSerializer.Float.ReadFrom(stream);
+                    case 'B':
+                        return PrimitiveSerializer.Double.ReadFrom(stream);
+                    case 'D':
+                        return PrimitiveSerializer.DateTime.ReadFrom(stream);
+                    default:
+                        throw new NotSupportedException("Cannot deserialize '" + type + "' value.");
+                }
+            }
+
+            public void WriteTo(IDictionary<string, PropertyData[]> value, Stream stream)
+            {
+                // write properties count
                 PrimitiveSerializer.Int32.WriteTo(value.Count, stream);
+
+                // write each property
                 foreach (var kvp in value)
                 {
+                    // write alias
                     PrimitiveSerializer.String.WriteTo(kvp.Key, stream);
-                    if (kvp.Value == null)
+
+                    // write values count
+                    PrimitiveSerializer.Int32.WriteTo(kvp.Value.Length, stream);
+
+                    // write each value
+                    foreach (var pdata in kvp.Value)
                     {
-                        PrimitiveSerializer.Char.WriteTo('N', stream);
+                        WriteObject(pdata.LanguageId, stream);
+                        WriteObject(pdata.Segment, stream);
+                        WriteObject(pdata.Value, stream);
                     }
-                    else if (kvp.Value is string)
-                    {
-                        PrimitiveSerializer.Char.WriteTo('S', stream);
-                        PrimitiveSerializer.String.WriteTo((string) kvp.Value, stream);
-                    }
-                    else if (kvp.Value is int)
-                    {
-                        PrimitiveSerializer.Char.WriteTo('I', stream);
-                        PrimitiveSerializer.Int32.WriteTo((int) kvp.Value, stream);
-                    }
-                    else if (kvp.Value is long)
-                    {
-                        PrimitiveSerializer.Char.WriteTo('L', stream);
-                        PrimitiveSerializer.Int64.WriteTo((long) kvp.Value, stream);
-                    }
-                    else if (kvp.Value is DateTime)
-                    {
-                        PrimitiveSerializer.Char.WriteTo('D', stream);
-                        PrimitiveSerializer.DateTime.WriteTo((DateTime) kvp.Value, stream);
-                    }
-                    else
-                        throw new NotSupportedException("Value type " + kvp.Value.GetType().FullName + " cannot be serialized.");
                 }
+            }
+
+            private void WriteObject(object value, Stream stream)
+            {
+                if (value == null)
+                {
+                    PrimitiveSerializer.Char.WriteTo('N', stream);
+                }
+                else if (value is string stringValue)
+                {
+                    PrimitiveSerializer.Char.WriteTo('S', stream);
+                    PrimitiveSerializer.String.WriteTo(stringValue, stream);
+                }
+                else if (value is int intValue)
+                {
+                    PrimitiveSerializer.Char.WriteTo('I', stream);
+                    PrimitiveSerializer.Int32.WriteTo(intValue, stream);
+                }
+                else if (value is long longValue)
+                {
+                    PrimitiveSerializer.Char.WriteTo('L', stream);
+                    PrimitiveSerializer.Int64.WriteTo(longValue, stream);
+                }
+                else if (value is float floatValue)
+                {
+                    PrimitiveSerializer.Char.WriteTo('F', stream);
+                    PrimitiveSerializer.Float.WriteTo(floatValue, stream);
+                }
+                else if (value is double doubleValue)
+                {
+                    PrimitiveSerializer.Char.WriteTo('B', stream);
+                    PrimitiveSerializer.Double.WriteTo(doubleValue, stream);
+                }
+                else if (value is DateTime dateValue)
+                {
+                    PrimitiveSerializer.Char.WriteTo('D', stream);
+                    PrimitiveSerializer.DateTime.WriteTo(dateValue, stream);
+                }
+                else
+                    throw new NotSupportedException("Value type " + value.GetType().FullName + " cannot be serialized.");
             }
         }
     }

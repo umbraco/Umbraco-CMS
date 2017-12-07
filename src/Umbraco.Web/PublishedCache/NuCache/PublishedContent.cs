@@ -30,17 +30,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _urlName = _contentData.Name.ToUrlSegment();
             IsPreviewing = _contentData.Published == false;
 
-            var values = contentData.Properties;
-            PropertiesArray = _contentNode.ContentType
-                .PropertyTypes
-                .Select(propertyType =>
-                {
-                    object value;
-                    return values.TryGetValue(propertyType.PropertyTypeAlias, out value) && value != null
-                        ? new Property(propertyType, this, value, _publishedSnapshotAccessor) as IPublishedProperty
-                        : new Property(propertyType, this, _publishedSnapshotAccessor) as IPublishedProperty;
-                })
-                .ToArray();
+            var properties = new List<IPublishedProperty>();
+            foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
+            {
+                if (contentData.Properties.TryGetValue(propertyType.PropertyTypeAlias, out var pdatas))
+                    properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
+            }
+            PropertiesArray = properties.ToArray();
         }
 
         private string GetProfileNameById(int id)
