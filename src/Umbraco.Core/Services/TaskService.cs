@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                return repo.GetByQuery(Query<TaskType>().Where(x => x.Alias == taskTypeAlias)).FirstOrDefault();
+                return repo.Get(Query<TaskType>().Where(x => x.Alias == taskTypeAlias)).FirstOrDefault();
             }
         }
 
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                repo.AddOrUpdate(taskType);
+                repo.Save(taskType);
                 uow.Complete();
             }
         }
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<ITaskTypeRepository>();
-                return repo.GetAll();
+                return repo.GetMany();
             }
         }
 
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<ITaskRepository>();
-                repo.AddOrUpdate(task);
+                repo.Save(task);
                 uow.Complete();
             }
         }

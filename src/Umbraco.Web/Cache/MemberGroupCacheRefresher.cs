@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Cache
             foreach (var payload in payloads.WhereNotNull())
             {
                 memberGroupCache.Result.ClearCacheByKeySearch($"{typeof(IMemberGroup).FullName}.{payload.Name}");
-                memberGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMemberGroup>(payload.Id));
+                memberGroupCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMemberGroup>(payload.Id));
             }
         }
 

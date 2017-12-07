@@ -26,7 +26,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 return repo
-                    .GetByQuery(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
+                    .Get(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
                     .ToList(); // ToList is important here, must evaluate within uow!
             }
         }
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IExternalLoginRepository>();
                 return repo
-                    .GetByQuery(Query<IIdentityUserLogin>().Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
+                    .Get(Query<IIdentityUserLogin>().Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
                     .ToList(); // ToList is important here, must evaluate within uow!
             }
         }

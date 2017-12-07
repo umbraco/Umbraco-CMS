@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
@@ -34,17 +35,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             CreateTestData();
 
-            VersionableRepositoryBase.ThrowOnWarning = true;
+            ContentRepositoryBase.ThrowOnWarning = true;
         }
 
         public override void TearDown()
         {
-            VersionableRepositoryBase.ThrowOnWarning = false;
+            ContentRepositoryBase.ThrowOnWarning = false;
 
             base.TearDown();
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository, CacheHelper cacheHelper = null)
         {
             cacheHelper = cacheHelper ?? CacheHelper;
 
@@ -54,20 +55,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             return ctRepository;
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, CacheHelper cacheHelper = null)
         {
             TemplateRepository tr;
             return CreateRepository(unitOfWork, out contentTypeRepository, out tr, cacheHelper);
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, CacheHelper cacheHelper = null)
         {
             cacheHelper = cacheHelper ?? CacheHelper;
 
             templateRepository = new TemplateRepository(unitOfWork, cacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, cacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, cacheHelper, Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(unitOfWork, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
@@ -91,9 +92,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 var content = MockedContent.CreateSimpleContent(contentType);
-                repository.AddOrUpdate(content);
+                repository.Save(content);
                 unitOfWork.Complete();
 
                 udb.EnableSqlCount = true;
@@ -134,8 +135,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 IContent content1 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
                 // save = create the initial version
-                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
-                repository.AddOrUpdate(content1);
+                contentTypeRepository.Save(hasPropertiesContentType);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // the first version
 
@@ -143,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 content1.SetValue("title", "title");
                 ((Content) content1).PublishValues();
                 ((Content) content1).PublishedState = PublishedState.Publishing;
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // NEW VERSION
 
@@ -160,7 +161,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // save = update the current (draft) version
                 content1.Name = "name-1";
                 content1.SetValue("title", "title-1");
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // the same version
 
@@ -174,7 +175,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // unpublish = no impact on versions
                 ((Content) content1).PublishedState = PublishedState.Unpublishing;
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // the same version
 
@@ -191,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // save = update the current (draft) version
                 content1.Name = "name-2";
                 content1.SetValue("title", "title-2");
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // the same version
 
@@ -205,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // publish = version
                 ((Content) content1).PublishValues();
                 ((Content) content1).PublishedState = PublishedState.Publishing;
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // NEW VERSION
 
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //Thread.Sleep(2000); // force date change
 
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // the same version
 
@@ -241,7 +242,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 content1.SetValue("title", "title-4");
                 ((Content) content1).PublishValues();
                 ((Content) content1).PublishedState = PublishedState.Publishing;
-                repository.AddOrUpdate(content1);
+                repository.Save(content1);
                 unitOfWork.Flush();
                 versions.Add(content1.VersionId); // NEW VERSION
 
@@ -307,16 +308,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content2 = MockedContent.CreateBasicContent(emptyContentType);
                 var content3 = MockedContent.CreateSimpleContent(hasPropertiesContentType);
 
-                contentTypeRepository.AddOrUpdate(emptyContentType);
-                contentTypeRepository.AddOrUpdate(hasPropertiesContentType);
-                repository.AddOrUpdate(content1);
-                repository.AddOrUpdate(content2);
-                repository.AddOrUpdate(content3);
+                contentTypeRepository.Save(emptyContentType);
+                contentTypeRepository.Save(hasPropertiesContentType);
+                repository.Save(content1);
+                repository.Save(content2);
+                repository.Save(content3);
                 unitOfWork.Flush();
 
                 // this will cause the GetPropertyCollection to execute and we need to ensure that
                 // all of the properties and property types are all correct
-                var result = repository.GetAll(content1.Id, content2.Id, content3.Id).ToArray();
+                var result = repository.GetMany(content1.Id, content2.Id, content3.Id).ToArray();
                 var n1 = result[0];
                 var n2 = result[1];
                 var n3 = result[2];
@@ -351,7 +352,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out var contentTypeRepository, out DataTypeDefinitionRepository dataTypeDefinitionRepository);
 
                 var dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.DecimalAlias) { Name = "test", DatabaseType = DataTypeDatabaseType.Decimal };
-                dataTypeDefinitionRepository.AddOrUpdate(dtd);
+                dataTypeDefinitionRepository.Save(dtd);
                 unitOfWork.Complete();
 
                 const string decimalPropertyAlias = "decimalProperty";
@@ -367,13 +368,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                         MockedPropertyTypes.CreateDateTimeProperty(dateTimePropertyAlias, "DateTime property")
                     });
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage", propertyTypeCollection);
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Complete();
 
                 // int and decimal values are passed in as strings as they would be from the backoffice UI
                 var textpage = MockedContent.CreateSimpleContentWithSpecialDatabaseTypes(contentType, "test@umbraco.org", -1, "100", "150", dateValue);
 
-                repository.AddOrUpdate(textpage);
+                repository.Save(textpage);
                 unitOfWork.Complete();
 
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -401,8 +402,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 IContent textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.AddOrUpdate(contentType);
-                repository.AddOrUpdate(textpage);
+                contentTypeRepository.Save(contentType);
+                repository.Save(textpage);
                 unitOfWork.Complete();
 
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -419,7 +420,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out var contentTypeRepository, out TemplateRepository templateRepository);
 
                 var template = new Template("hello", "hello");
-                templateRepository.AddOrUpdate(template);
+                templateRepository.Save(template);
                 unitOfWork.Flush();
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
@@ -427,8 +428,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentType.SetDefaultTemplate(template);
                 var textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.AddOrUpdate(contentType);
-                repository.AddOrUpdate(textpage);
+                contentTypeRepository.Save(contentType);
+                repository.Save(textpage);
                 unitOfWork.Flush();
 
                 var fetched = repository.Get(textpage.Id);
@@ -453,14 +454,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out var contentTypeRepository);
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
 
                 var textpage = MockedContent.CreateSimpleContent(contentType, "test@umbraco.org");
                 var anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants");
 
-                repository.AddOrUpdate(textpage);
-                repository.AddOrUpdate(anotherTextpage);
+                repository.Save(textpage);
+                repository.Save(anotherTextpage);
                 unitOfWork.Flush();
 
 
@@ -488,12 +489,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 var textpage = MockedContent.CreateSimpleContent(contentType);
 
-                contentTypeRepository.AddOrUpdate(contentType);
-                repository.AddOrUpdate(textpage);
+                contentTypeRepository.Save(contentType);
+                repository.Save(textpage);
                 unitOfWork.Flush();
 
                 var subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-                repository.AddOrUpdate(subpage);
+                repository.Save(subpage);
                 unitOfWork.Flush();
 
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -530,7 +531,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Name = "About 2";
-                repository.AddOrUpdate(content);
+                repository.Save(content);
                 unitOfWork.Flush();
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
@@ -540,7 +541,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreEqual(content.GetValue("title"), "Welcome to our Home page");
                 content.SetValue("title", "toot");
-                repository.AddOrUpdate(content);
+                repository.Save(content);
                 unitOfWork.Flush();
                 updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
@@ -559,7 +560,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Template = null;
-                repository.AddOrUpdate(content);
+                repository.Save(content);
                 unitOfWork.Flush();
                 var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
@@ -580,7 +581,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 content.CreatorId = 0;
                 content.WriterId = 0;
 
-                repository.AddOrUpdate(content);
+                repository.Save(content);
                 unitOfWork.Flush();
                 var id = content.Id;
 
@@ -622,7 +623,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out _);
 
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 Assert.GreaterOrEqual(2, result.Count());
             }
@@ -637,13 +638,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, out _);
-                result = repository.GetAll().ToArray();
+                result = repository.GetMany().ToArray();
 
                 // save them all
                 foreach (var content in result)
                 {
                     content.SetValue("title", content.GetValue<string>("title") + "x");
-                    repository.AddOrUpdate(content);
+                    repository.Save(content);
                 }
                 unitOfWork.Flush();
 
@@ -651,7 +652,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 foreach (var content in result)
                 {
                     content.PublishValues();
-                    repository.AddOrUpdate(content);
+                    repository.Save(content);
                 }
                 unitOfWork.Flush();
 
@@ -662,7 +663,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork, out _);
-                var result2 = repository.GetAll().ToArray();
+                var result2 = repository.GetMany().ToArray();
 
                 Assert.AreEqual(result.Length, result2.Length);
             }
@@ -697,12 +698,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                     unitOfWork.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     unitOfWork.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPagedResultsByQuery(query, 0, 2, out var totalRecords, "title", Direction.Ascending, false);
+                    var result = repository.GetPage(query, 0, 2, out var totalRecords, "title", Direction.Ascending, false);
 
                     Assert.AreEqual(3, totalRecords);
                     Assert.AreEqual(2, result.Count());
 
-                    result = repository.GetPagedResultsByQuery(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
+                    result = repository.GetPage(query, 1, 2, out totalRecords, "title", Direction.Ascending, false);
 
                     Assert.AreEqual(1, result.Count());
                 }
@@ -729,7 +730,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     unitOfWork.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                     unitOfWork.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                    var result = repository.GetPagedResultsByQuery(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true);
+                    var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true);
 
                     Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                     Assert.That(result.Count(), Is.EqualTo(1));
@@ -752,7 +753,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out _);
 
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPagedResultsByQuery(query, 1, 1, out var totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 1, 1, out var totalRecords, "Name", Direction.Ascending, true);
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -769,7 +770,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out _);
 
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPagedResultsByQuery(query, 0, 2, out var totalRecords, "Name", Direction.Ascending, true);
+                var result = repository.GetPage(query, 0, 2, out var totalRecords, "Name", Direction.Ascending, true);
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(2));
@@ -786,7 +787,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out _);
 
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out var totalRecords, "Name", Direction.Descending, true);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Descending, true);
 
                 Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -805,7 +806,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Name.Contains("Page 2"));
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 Assert.That(totalRecords, Is.EqualTo(1));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -824,7 +825,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Level == 2);
 
                 var filterQuery = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Name.Contains("text"));
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
+                var result = repository.GetPage(query, 0, 1, out var totalRecords, "Name", Direction.Ascending, true, filterQuery);
 
                 Assert.That(totalRecords, Is.EqualTo(2));
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -840,7 +841,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(unitOfWork, out _);
 
-                var contents = repository.GetAll(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3);
+                var contents = repository.GetMany(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3);
 
 
                 Assert.That(contents, Is.Not.Null);
@@ -857,18 +858,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(unitOfWork, out _);
 
-                var contents = repository.GetAll();
+                var contents = repository.GetMany();
 
                 Assert.That(contents, Is.Not.Null);
                 Assert.That(contents.Any(), Is.True);
                 Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
 
-                contents = repository.GetAll(contents.Select(x => x.Id).ToArray());
+                contents = repository.GetMany(contents.Select(x => x.Id).ToArray());
                 Assert.That(contents, Is.Not.Null);
                 Assert.That(contents.Any(), Is.True);
                 Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
 
-                contents = ((IReadRepository<Guid, IContent>)repository).GetAll(contents.Select(x => x.Key).ToArray());
+                contents = ((IReadRepository<Guid, IContent>)repository).GetMany(contents.Select(x => x.Key).ToArray());
                 Assert.That(contents, Is.Not.Null);
                 Assert.That(contents.Any(), Is.True);
                 Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
@@ -913,7 +914,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out _);
 
                 var query = unitOfWork.SqlContext.Query<IContent>().Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
-                var content = repository.GetByQuery(query).SingleOrDefault();
+                var content = repository.Get(query).SingleOrDefault();
 
                 Assert.IsNotNull(content);
                 Assert.AreEqual(NodeDto.NodeIdSeed + 2, content.Id);

@@ -6,6 +6,7 @@ using umbraco;
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Web.Cache
 {
@@ -55,7 +56,7 @@ namespace Umbraco.Web.Cache
                 var macroRepoCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMacro>();
                 if (macroRepoCache)
                 {
-                    macroRepoCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMacro>(payload.Id));
+                    macroRepoCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
                 }
             });
 

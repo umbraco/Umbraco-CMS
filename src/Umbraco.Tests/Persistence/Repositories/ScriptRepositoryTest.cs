@@ -8,6 +8,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var script = new Script("test-add-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
 
                 //Assert
@@ -85,11 +86,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var script = new Script("test-updated-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
 
                 script.Content = "/// <reference name=\"MicrosoftAjax-Updated.js\"/>";
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
 
                 var scriptUpdated = repository.Get("test-updated-script.js");
@@ -149,15 +150,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
                 var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 var script2 = new Script("test-script2.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script2);
+                repository.Save(script2);
                 var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script3);
+                repository.Save(script3);
                 unitOfWork.Flush();
 
                 // Act
-                var scripts = repository.GetAll();
+                var scripts = repository.GetMany();
 
                 // Assert
                 Assert.That(scripts, Is.Not.Null);
@@ -177,15 +178,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
                 var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 var script2 = new Script("test-script2.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script2);
+                repository.Save(script2);
                 var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
-                repository.AddOrUpdate(script3);
+                repository.Save(script3);
                 unitOfWork.Flush();
 
                 // Act
-                var scripts = repository.GetAll("test-script1.js", "test-script2.js");
+                var scripts = repository.GetMany("test-script1.js", "test-script2.js");
 
                 // Assert
                 Assert.That(scripts, Is.Not.Null);
@@ -224,13 +225,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
                 var script = new Script("test-move-script.js") { Content = content };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
 
                 // Act
                 script = repository.Get("test-move-script.js");
                 script.Path = "moved/test-move-script.js";
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
 
                 var existsOld = repository.Exists("test-move-script.js");
@@ -257,7 +258,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
                 var script = new Script("test-path-1.js") { Content = "// script" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
                 Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));
                 Assert.AreEqual("test-path-1.js", script.Path);
@@ -265,14 +266,14 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //ensure you can prefix the same path as the root path name
                 script = new Script("scripts/path-2/test-path-2.js") { Content = "// script" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
                 Assert.IsTrue(_fileSystem.FileExists("scripts/path-2/test-path-2.js"));
                 Assert.AreEqual("scripts\\path-2\\test-path-2.js", script.Path);
                 Assert.AreEqual("/scripts/scripts/path-2/test-path-2.js", script.VirtualPath);
 
                 script = new Script("path-2/test-path-2.js") { Content = "// script" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.js"));
                 Assert.AreEqual("path-2\\test-path-2.js", script.Path); // fixed in 7.3 - 7.2.8 does not update the path
@@ -284,7 +285,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
 
                 script = new Script("path-2\\test-path-3.js") { Content = "// script" };
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 unitOfWork.Flush();
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.js"));
                 Assert.AreEqual("path-2\\test-path-3.js", script.Path);
@@ -303,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 script = new Script("\\test-path-4.js") { Content = "// script" };
                 Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
                 {
-                    repository.AddOrUpdate(script);
+                    repository.Save(script);
                 });
 
                 script = repository.Get("missing.js");

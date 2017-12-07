@@ -57,9 +57,9 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         #endregion
 
-        public override TRepository CreateRepository<TRepository>(string name = null)
+        public override TRepository CreateRepository<TRepository>()
         {
-            return RepositoryFactory.CreateRepository<TRepository>(this, name);
+            return RepositoryFactory.CreateRepository<TRepository>(this);
         }
 
         public override void Begin()

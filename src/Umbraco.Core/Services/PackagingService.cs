@@ -788,7 +788,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-                var contentType = repository.GetByQuery(query).FirstOrDefault();
+                var contentType = repository.Get(query).FirstOrDefault();
 
                 if (contentType == null)
                     throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
@@ -1517,7 +1517,7 @@ namespace Umbraco.Core.Services
         private static void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var auditRepo = uow.CreateRepository<IAuditRepository>();
-            auditRepo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            auditRepo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #endregion

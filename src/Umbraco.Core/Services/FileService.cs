@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -37,7 +38,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IStylesheetRepository>();
-                return repository.GetAll(names);
+                return repository.GetMany(names);
             }
         }
 
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IStylesheetRepository>();
-                repository.AddOrUpdate(stylesheet);
+                repository.Save(stylesheet);
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(SavedStylesheet, this, saveEventArgs);
 
@@ -169,7 +170,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IScriptRepository>();
-                return repository.GetAll(names);
+                return repository.GetMany(names);
             }
         }
 
@@ -204,7 +205,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IScriptRepository>();
-                repository.AddOrUpdate(script);
+                repository.Save(script);
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(SavedScript, this, saveEventArgs);
 
@@ -352,7 +353,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<ITemplateRepository>();
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(SavedTemplate, this, saveEventArgs);
 
@@ -442,7 +443,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<ITemplateRepository>();
                 var query = Query<ITemplate>().Where(x => x.Key == id);
-                return repository.GetByQuery(query).SingleOrDefault();
+                return repository.Get(query).SingleOrDefault();
             }
         }
 
@@ -546,7 +547,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<ITemplateRepository>();
-                repository.AddOrUpdate(template);
+                repository.Save(template);
 
                 uow.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(template, false));
 
@@ -573,7 +574,7 @@ namespace Umbraco.Core.Services
 
                 var repository = uow.CreateRepository<ITemplateRepository>();
                 foreach (var template in templatesA)
-                    repository.AddOrUpdate(template);
+                    repository.Save(template);
 
                 uow.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(templatesA, false));
 
@@ -743,7 +744,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IPartialViewMacroRepository>();
-                return repository.GetAll(names).OrderBy(x => x.Name);
+                return repository.GetMany(names).OrderBy(x => x.Name);
             }
         }
 
@@ -761,7 +762,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IXsltFileRepository>();
-                return repository.GetAll(names).OrderBy(x => x.Name);
+                return repository.GetMany(names).OrderBy(x => x.Name);
             }
         }
 
@@ -822,7 +823,7 @@ namespace Umbraco.Core.Services
 
                 var repository = uow.CreatePartialViewRepository(partialViewType);
                 if (partialViewContent != null) partialView.Content = partialViewContent;
-                repository.AddOrUpdate(partialView);
+                repository.Save(partialView);
 
                 newEventArgs.CanCancel = false;
                 uow.Events.Dispatch(CreatedPartialView, this, newEventArgs);
@@ -897,7 +898,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreatePartialViewRepository(partialViewType);
-                repository.AddOrUpdate(partialView);
+                repository.Save(partialView);
                 saveEventArgs.CanCancel = false;
                 Audit(uow, AuditType.Save, $"Save {partialViewType} performed by user", userId, -1);
                 uow.Events.Dispatch(SavedPartialView, this, saveEventArgs);
@@ -1109,7 +1110,7 @@ namespace Umbraco.Core.Services
         private void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var repo = uow.CreateRepository<IAuditRepository>();
-            repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            repo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         //TODO Method to change name and/or alias of view/masterpage template

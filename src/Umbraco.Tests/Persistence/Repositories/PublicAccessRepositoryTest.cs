@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName"
                     },
                 });
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 unitOfWork.Flush();
 
                 repo.Delete(entry);
@@ -68,10 +69,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName"
                     },
                 });
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 unitOfWork.Flush();
 
-                var found = repo.GetAll().ToArray();
+                var found = repo.GetMany().ToArray();
 
                 Assert.AreEqual(1, found.Length);
                 Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
@@ -113,10 +114,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName2"
                     },
                 });
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 unitOfWork.Flush();
 
-                var found = repo.GetAll().ToArray();
+                var found = repo.GetMany().ToArray();
 
                 Assert.AreEqual(1, found.Length);
                 Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
@@ -153,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName"
                     },
                 });
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 unitOfWork.Flush();
 
                 //re-get
@@ -161,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 entry.Rules.First().RuleValue = "blah";
                 entry.Rules.First().RuleType = "asdf";
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
 
                 unitOfWork.Flush();
 
@@ -191,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName"
                     },
                 });
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 unitOfWork.Flush();
 
                 //re-get
@@ -224,7 +225,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         });
                     }
                     var entry1 = new PublicAccessEntry(content[i], content[i + 1], content[i + 2], rules);
-                    repo.AddOrUpdate(entry1);
+                    repo.Save(entry1);
                     unitOfWork.Flush();
                     allEntries.Add(entry1);
                 }
@@ -247,12 +248,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                             }
                         }
                         allEntries[i].AddRule("newrule" + i, "newrule" + i);
-                        repo.AddOrUpdate(allEntries[i]);
+                        repo.Save(allEntries[i]);
                         unitOfWork.Flush();
                     }
                 }
 
-                var found = repo.GetAll().ToArray();
+                var found = repo.GetMany().ToArray();
                 Assert.AreEqual(10, found.Length);
 
                 foreach (var publicAccessEntry in found)
@@ -283,7 +284,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName"
                     },
                 });
-                repo.AddOrUpdate(entry1);
+                repo.Save(entry1);
 
                 var entry2 = new PublicAccessEntry(content[1], content[0], content[2], new[]
                 {
@@ -293,22 +294,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RuleType = "RoleName"
                     },
                 });
-                repo.AddOrUpdate(entry2);
+                repo.Save(entry2);
 
                 unitOfWork.Flush();
 
-                var found = repo.GetAll(entry1.Key).ToArray();
+                var found = repo.GetMany(entry1.Key).ToArray();
                 Assert.AreEqual(1, found.Count());
             }
         }
 
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
@@ -321,13 +322,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repo = CreateRepository(unitOfWork, out ctRepo);
 
                 var ct = MockedContentTypes.CreateBasicContentType("testing");
-                ctRepo.AddOrUpdate(ct);
+                ctRepo.Save(ct);
                 unitOfWork.Flush();
                 var result = new List<IContent>();
                 for (int i = 0; i < count; i++)
                 {
                     var c = new Content("test" + i, -1, ct);
-                    repo.AddOrUpdate(c);
+                    repo.Save(c);
                     result.Add(c);
                 }
                 unitOfWork.Complete();

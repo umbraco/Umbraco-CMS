@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Core.Services
 {
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Services
                         return OperationResult.Attempt.Cancel(evtMsgs, container);
                     }
 
-                    repo.AddOrUpdate(container);
+                    repo.Save(container);
                     uow.Complete();
 
                     uow.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
@@ -105,7 +106,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
-                return repo.GetAll(containerIds);
+                return repo.GetMany(containerIds);
             }
         }
 
@@ -134,7 +135,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repo = uow.CreateRepository<IDataTypeContainerRepository>();
-                repo.AddOrUpdate(container);
+                repo.Save(container);
 
                 uow.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
                 uow.Complete();
@@ -191,7 +192,7 @@ namespace Umbraco.Core.Services
 
                     container.Name = name;
 
-                    repository.AddOrUpdate(container);
+                    repository.Save(container);
                     uow.Complete();
 
                     // fixme - triggering SavedContainer with a different name?!
@@ -218,7 +219,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.GetByQuery(Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
+                return repository.Get(Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
             }
         }
 
@@ -247,7 +248,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var query = Query<IDataTypeDefinition>().Where(x => x.Key == id);
-                return repository.GetByQuery(query).FirstOrDefault();
+                return repository.Get(query).FirstOrDefault();
             }
         }
 
@@ -262,7 +263,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
                 var query = Query<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == propertyEditorAlias);
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -276,7 +277,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                return repository.GetAll(ids);
+                return repository.GetMany(ids);
             }
         }
 
@@ -394,7 +395,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                repository.AddOrUpdate(dataTypeDefinition);
+                repository.Save(dataTypeDefinition);
 
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
@@ -436,7 +437,7 @@ namespace Umbraco.Core.Services
                 foreach (var dataTypeDefinition in dataTypeDefinitionsA)
                 {
                     dataTypeDefinition.CreatorId = userId;
-                    repository.AddOrUpdate(dataTypeDefinition);
+                    repository.Save(dataTypeDefinition);
                 }
 
                 if (raiseEvents)
@@ -542,7 +543,7 @@ namespace Umbraco.Core.Services
                 dataTypeDefinition.CreatorId = userId;
 
                 var repository = uow.CreateRepository<IDataTypeDefinitionRepository>();
-                repository.AddOrUpdate(dataTypeDefinition); // definition
+                repository.Save(dataTypeDefinition); // definition
                 repository.AddOrUpdatePreValues(dataTypeDefinition, values); //prevalues
 
                 saveEventArgs.CanCancel = false;
@@ -587,7 +588,7 @@ namespace Umbraco.Core.Services
         private void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var repo = uow.CreateRepository<IAuditRepository>();
-            repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            repo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #region Event Handlers

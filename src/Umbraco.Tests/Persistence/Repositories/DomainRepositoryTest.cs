@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -18,12 +19,12 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DomainRepositoryTest : TestWithDatabaseBase
     {
-        private DomainRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out ContentRepository contentRepository, out LanguageRepository languageRepository)
+        private DomainRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out DocumentRepository documentRepository, out LanguageRepository languageRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-            contentRepository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            documentRepository = new DocumentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             languageRepository = new LanguageRepository(unitOfWork, DisabledCache, Logger);
             var domainRepository = new DomainRepository(unitOfWork, DisabledCache, Logger);
             return domainRepository;
@@ -34,19 +35,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = new Language(isoName);
-                langRepo.AddOrUpdate(lang);
+                langRepo.Save(lang);
 
                 ct = MockedContentTypes.CreateBasicContentType("test", "Test");
-                contentTypeRepo.AddOrUpdate(ct);
+                contentTypeRepo.Save(ct);
                 var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
-                contentRepo.AddOrUpdate(content);
+                documentRepo.Save(content);
                 unitOfWork.Complete();
                 return content.Id;
             }
@@ -61,17 +62,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
-                repo.AddOrUpdate(domain);
+                repo.Save(domain);
                 unitOfWork.Flush();
 
                 //re-get
@@ -96,16 +97,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id };
-                repo.AddOrUpdate(domain);
+                repo.Save(domain);
                 unitOfWork.Flush();
 
                 //re-get
@@ -129,21 +130,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 var domain1 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
-                repo.AddOrUpdate(domain1);
+                repo.Save(domain1);
                 unitOfWork.Flush();
 
                 var domain2 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
-                repo.AddOrUpdate(domain2);
+                repo.Save(domain2);
 
                 Assert.Throws<DuplicateNameException>(unitOfWork.Flush);
             }
@@ -158,17 +159,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
-                repo.AddOrUpdate(domain);
+                repo.Save(domain);
                 unitOfWork.Flush();
 
                 repo.Delete(domain);
@@ -191,25 +192,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
-                var content1 = contentRepo.Get(contentId1);
+                var content1 = documentRepo.Get(contentId1);
 
                 //more test data
                 var lang1 = langRepo.GetByIsoCode("en-AU");
                 var lang2 = new Language("es");
-                langRepo.AddOrUpdate(lang2);
+                langRepo.Save(lang2);
                 var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
-                contentRepo.AddOrUpdate(content2);
+                documentRepo.Save(content2);
                 unitOfWork.Flush();
 
 
                 var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content1.Id, LanguageId = lang1.Id };
-                repo.AddOrUpdate(domain);
+                repo.Save(domain);
                 unitOfWork.Flush();
 
                 //re-get
@@ -218,7 +219,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 domain.DomainName = "blah.com";
                 domain.RootContentId = content2.Id;
                 domain.LanguageId = lang2.Id;
-                repo.AddOrUpdate(domain);
+                repo.Save(domain);
                 unitOfWork.Flush();
 
                 //re-get
@@ -241,19 +242,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 for (int i = 0; i < 10; i++)
                 {
                     var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                 }
 
@@ -272,19 +273,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 for (int i = 0; i < 10; i++)
                 {
                     var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                 }
 
@@ -303,23 +304,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 for (int i = 0; i < 10; i++)
                 {
                     var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                 }
 
-                var all = repo.GetAll();
+                var all = repo.GetMany();
 
                 Assert.AreEqual(10, all.Count());
             }
@@ -334,25 +335,25 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 var ids = new List<int>();
                 for (int i = 0; i < 10; i++)
                 {
                     var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                     ids.Add(domain.Id);
                 }
 
-                var all = repo.GetAll(ids.Take(8).ToArray());
+                var all = repo.GetMany(ids.Take(8).ToArray());
 
                 Assert.AreEqual(8, all.Count());
             }
@@ -367,14 +368,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                var content = contentRepo.Get(contentId);
+                var content = documentRepo.Get(contentId);
 
                 for (int i = 0; i < 10; i++)
                 {
@@ -383,7 +384,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RootContentId = content.Id,
                         LanguageId = lang.Id
                     };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                 }
 
@@ -402,22 +403,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var contentItems = new List<IContent>();
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                contentItems.Add(contentRepo.Get(contentId));
+                contentItems.Add(documentRepo.Get(contentId));
 
                 //more test data (3 content items total)
                 for (int i = 0; i < 2; i++)
                 {
                     var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
-                    contentRepo.AddOrUpdate(c);
+                    documentRepo.Save(c);
                     unitOfWork.Flush();
                     contentItems.Add(c);
                 }
@@ -429,7 +430,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RootContentId = ((i % 2 == 0) ? contentItems[0] : contentItems[1]).Id,
                         LanguageId = lang.Id
                     };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                 }
 
@@ -453,22 +454,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
-                ContentRepository contentRepo;
+                DocumentRepository documentRepo;
                 LanguageRepository langRepo;
                 ContentTypeRepository contentTypeRepo;
 
-                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo);
+                var repo = CreateRepository(unitOfWork, out contentTypeRepo, out documentRepo, out langRepo);
 
                 var contentItems = new List<IContent>();
 
                 var lang = langRepo.GetByIsoCode("en-AU");
-                contentItems.Add(contentRepo.Get(contentId));
+                contentItems.Add(documentRepo.Get(contentId));
 
                 //more test data (3 content items total)
                 for (int i = 0; i < 2; i++)
                 {
                     var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
-                    contentRepo.AddOrUpdate(c);
+                    documentRepo.Save(c);
                     unitOfWork.Flush();
                     contentItems.Add(c);
                 }
@@ -480,7 +481,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         RootContentId = ((i % 2 == 0) ? contentItems[0] : contentItems[1]).Id,
                         LanguageId = lang.Id
                     };
-                    repo.AddOrUpdate(domain);
+                    repo.Save(domain);
                     unitOfWork.Flush();
                 }
 

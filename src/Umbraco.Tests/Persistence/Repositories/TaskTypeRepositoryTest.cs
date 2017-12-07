@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -32,16 +33,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                     EntityId = -1,
                     OwnerUserId = 0
                 };
-                repo.AddOrUpdate(task);
+                repo.Save(task);
                 unitOfWork.Flush();
 
-                var alltasktypes = taskTypeRepo.GetAll();
+                var alltasktypes = taskTypeRepo.GetMany();
 
                 taskTypeRepo.Delete(taskType);
                 unitOfWork.Flush();
 
-                Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetAll().Count());
-                Assert.AreEqual(0, repo.GetAll().Count());
+                Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetMany().Count());
+                Assert.AreEqual(0, repo.GetMany().Count());
             }
 
 

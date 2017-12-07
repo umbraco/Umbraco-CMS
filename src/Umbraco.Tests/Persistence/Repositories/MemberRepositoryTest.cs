@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence;
 
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
                 var m2 = CreateTestMember(type, "Test 2", "test2@test.com", "pass2", "test2");
 
-                var members = repository.GetAll(m1.Id, m2.Id);
+                var members = repository.GetMany(m1.Id, m2.Id);
 
                 Assert.That(members, Is.Not.Null);
                 Assert.That(members.Count(), Is.EqualTo(2));
@@ -92,7 +93,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CreateTestMember(type, "Test " + i, "test" + i + "@test.com", "pass" + i, "test" + i);
                 }
 
-                var members = repository.GetAll();
+                var members = repository.GetMany();
 
                 Assert.That(members, Is.Not.Null);
                 Assert.That(members.Any(x => x == null), Is.False);
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<IMember>().Where(x => x.Key == key);
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.EqualTo(1));
@@ -161,11 +162,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
-                memberTypeRepository.AddOrUpdate(memberType);
+                memberTypeRepository.Save(memberType);
                 unitOfWork.Flush();
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
-                repository.AddOrUpdate(member);
+                repository.Save(member);
                 unitOfWork.Flush();
 
                 var sut = repository.Get(member.Id);
@@ -195,17 +196,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
-                memberTypeRepository.AddOrUpdate(memberType);
+                memberTypeRepository.Save(memberType);
                 unitOfWork.Flush();
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
-                repository.AddOrUpdate(member);
+                repository.Save(member);
                 unitOfWork.Flush();
 
                 sut = repository.Get(member.Id);
                 //when the password is null it will not overwrite what is already there.
                 sut.RawPasswordValue = null;
-                repository.AddOrUpdate(sut);
+                repository.Save(sut);
                 unitOfWork.Flush();
                 sut = repository.Get(member.Id);
 
@@ -225,17 +226,17 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
-                memberTypeRepository.AddOrUpdate(memberType);
+                memberTypeRepository.Save(memberType);
                 unitOfWork.Flush();
 
                 var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
-                repository.AddOrUpdate(member);
+                repository.Save(member);
                 unitOfWork.Flush();
 
                 sut = repository.Get(member.Id);
                 sut.Username = "This is new";
                 sut.Email = "thisisnew@hello.com";
-                repository.AddOrUpdate(sut);
+                repository.Save(sut);
                 unitOfWork.Flush();
                 sut = repository.Get(member.Id);
 
@@ -277,12 +278,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 if (memberType == null)
                 {
                     memberType = MockedContentTypes.CreateSimpleMemberType();
-                    memberTypeRepository.AddOrUpdate(memberType);
+                    memberTypeRepository.Save(memberType);
                     unitOfWork.Flush();
                 }
 
                 var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
-                repository.AddOrUpdate(member);
+                repository.Save(member);
                 unitOfWork.Complete();
 
                 return member;
@@ -299,7 +300,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository);
 
                 var memberType = MockedContentTypes.CreateSimpleMemberType(alias);
-                memberTypeRepository.AddOrUpdate(memberType);
+                memberTypeRepository.Save(memberType);
                 unitOfWork.Complete();
                 return memberType;
             }

@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
-                return repo.GetAll();
+                return repo.GetMany();
             }
         }
 
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
                 //This will retrieve from cache!
-                var entries = repo.GetAll().ToArray();
+                var entries = repo.GetMany().ToArray();
                 uow.Complete();
 
                 foreach (var id in ids)
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
-                entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+                entry = repo.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
                     return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
 
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Services
                     return OperationResult.Attempt.Cancel(evtMsgs, entry);
                 }
 
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
 
                 uow.Complete();
 
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
 
-                entry = repo.GetAll().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+                entry = repo.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null) return Attempt<OperationResult>.Fail(); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 uow.Complete();
 
                 saveEventArgs.CanCancel = false;
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repo = uow.CreateRepository<IPublicAccessRepository>();
-                repo.AddOrUpdate(entry);
+                repo.Save(entry);
                 uow.Complete();
 
                 saveEventArgs.CanCancel = false;

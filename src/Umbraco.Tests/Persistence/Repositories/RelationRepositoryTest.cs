@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var relationType = repositoryType.Get(1);
                 var relation = new Relation(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3, relationType);
-                repository.AddOrUpdate(relation);
+                repository.Save(relation);
                 unitOfWork.Flush();
 
                 // Assert
@@ -68,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var relation = repository.Get(1);
                 relation.Comment = "This relation has been updated";
-                repository.AddOrUpdate(relation);
+                repository.Save(relation);
                 unitOfWork.Flush();
 
                 var relationUpdated = repository.Get(1);
@@ -135,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out repositoryType);
 
                 // Act
-                var relations = repository.GetAll();
+                var relations = repository.GetMany();
 
                 // Assert
                 Assert.That(relations, Is.Not.Null);
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork, out repositoryType);
 
                 // Act
-                var relations = repository.GetAll(1, 2);
+                var relations = repository.GetMany(1, 2);
 
                 // Assert
                 Assert.That(relations, Is.Not.Null);
@@ -217,7 +218,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<IRelation>().Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
-                var relations = repository.GetByQuery(query);
+                var relations = repository.Get(query);
 
                 // Assert
                 Assert.That(relations, Is.Not.Null);
@@ -267,8 +268,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
                 var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository);
 
-                relationTypeRepository.AddOrUpdate(relateContent);
-                relationTypeRepository.AddOrUpdate(relateContentType);
+                relationTypeRepository.Save(relateContent);
+                relationTypeRepository.Save(relateContentType);
                 unitOfWork.Flush();
 
                 //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
@@ -290,8 +291,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var relation = new Relation(textpage.Id, subpage.Id, relateContent) { Comment = string.Empty };
                 var relation2 = new Relation(textpage.Id, subpage2.Id, relateContent) { Comment = string.Empty };
-                relationRepository.AddOrUpdate(relation);
-                relationRepository.AddOrUpdate(relation2);
+                relationRepository.Save(relation);
+                relationRepository.Save(relation2);
                 unitOfWork.Complete();
             }
         }

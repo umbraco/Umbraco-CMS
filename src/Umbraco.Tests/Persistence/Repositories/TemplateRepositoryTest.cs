@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 //Assert
@@ -88,7 +89,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var template = new Template("test", "test");
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 //Assert
@@ -115,13 +116,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 // Act
                 var template2 = new Template("test2", "test2");
                 template2.SetMasterTemplate(template);
-                repository.AddOrUpdate(template2);
+                repository.Save(template2);
                 unitOfWork.Flush();
 
                 //Assert
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var template = new Template("test", "test");
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 //Assert
@@ -169,7 +170,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 //Assert
@@ -193,13 +194,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //NOTE: This has to be persisted first
                 var template = new Template("test", "test");
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 // Act
                 var template2 = new Template("test2", "test2");
                 template2.SetMasterTemplate(template);
-                repository.AddOrUpdate(template2);
+                repository.Save(template2);
                 unitOfWork.Flush();
 
                 //Assert
@@ -225,14 +226,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 var template2 = new Template("test", "test")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template2);
+                repository.Save(template2);
                 unitOfWork.Flush();
 
                 //Assert
@@ -255,18 +256,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 var template2 = new Template("test1", "test1")
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template2);
+                repository.Save(template2);
                 unitOfWork.Flush();
 
                 template.Alias = "test1";
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 //Assert
@@ -291,11 +292,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 template.Content = @"<%@ Master Language=""VB"" %>";
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 var updated = repository.Get("test");
@@ -322,11 +323,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 template.Content += "<html></html>";
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 var updated = repository.Get("test");
@@ -350,7 +351,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 // Act
@@ -378,7 +379,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = ViewHelper.GetDefaultFileContent()
                 };
-                repository.AddOrUpdate(template);
+                repository.Save(template);
                 unitOfWork.Flush();
 
                 // Act
@@ -404,13 +405,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-                var contentRepo = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+                var contentRepo = new DocumentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 var textpage = MockedContent.CreateSimpleContent(contentType);
-                contentRepo.AddOrUpdate(textpage);
+                contentRepo.Save(textpage);
                 unitOfWork.Flush();
 
 
@@ -418,11 +419,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Content = @"<%@ Master Language=""C#"" %>"
                 };
-                templateRepository.AddOrUpdate(template);
+                templateRepository.Save(template);
                 unitOfWork.Flush();
 
                 textpage.Template = template;
-                contentRepo.AddOrUpdate(textpage);
+                contentRepo.Save(textpage);
                 unitOfWork.Flush();
 
                 // Act
@@ -460,9 +461,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 child.MasterTemplateId = new Lazy<int>(() => parent.Id);
                 baby.MasterTemplateAlias = child.Alias;
                 baby.MasterTemplateId = new Lazy<int>(() => child.Id);
-                repository.AddOrUpdate(parent);
-                repository.AddOrUpdate(child);
-                repository.AddOrUpdate(baby);
+                repository.Save(parent);
+                repository.Save(child);
+                repository.Save(baby);
                 unitOfWork.Flush();
 
                 // Act
@@ -516,7 +517,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var all = repository.GetAll();
                 var allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound");
-                var allById = repository.GetAll(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
+                var allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
 
                 // Assert
                 Assert.AreEqual(9, all.Count());
@@ -638,15 +639,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
 
                 // Act
-                repository.AddOrUpdate(parent);
-                repository.AddOrUpdate(child1);
-                repository.AddOrUpdate(child2);
-                repository.AddOrUpdate(toddler1);
-                repository.AddOrUpdate(toddler2);
-                repository.AddOrUpdate(toddler3);
-                repository.AddOrUpdate(toddler4);
-                repository.AddOrUpdate(baby1);
-                repository.AddOrUpdate(baby2);
+                repository.Save(parent);
+                repository.Save(child1);
+                repository.Save(child2);
+                repository.Save(toddler1);
+                repository.Save(toddler2);
+                repository.Save(toddler3);
+                repository.Save(toddler4);
+                repository.Save(baby1);
+                repository.Save(baby2);
                 unitOfWork.Flush();
 
                 // Assert
@@ -687,16 +688,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 toddler2.MasterTemplateAlias = child1.Alias;
                 toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
 
-                repository.AddOrUpdate(parent);
-                repository.AddOrUpdate(child1);
-                repository.AddOrUpdate(child2);
-                repository.AddOrUpdate(toddler1);
-                repository.AddOrUpdate(toddler2);
+                repository.Save(parent);
+                repository.Save(child1);
+                repository.Save(child2);
+                repository.Save(toddler1);
+                repository.Save(toddler2);
                 unitOfWork.Flush();
 
                 //Act
                 toddler2.SetMasterTemplate(child2);
-                repository.AddOrUpdate(toddler2);
+                repository.Save(toddler2);
                 unitOfWork.Flush();
 
                 //Assert
@@ -719,13 +720,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 child1.MasterTemplateAlias = parent.Alias;
                 child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
 
-                repository.AddOrUpdate(parent);
-                repository.AddOrUpdate(child1);
+                repository.Save(parent);
+                repository.Save(child1);
                 unitOfWork.Flush();
 
                 //Act
                 child1.SetMasterTemplate(null);
-                repository.AddOrUpdate(child1);
+                repository.Save(child1);
                 unitOfWork.Flush();
 
                 //Assert
@@ -829,15 +830,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             baby2.MasterTemplateAlias = toddler4.Alias;
             baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
 
-            repository.AddOrUpdate(parent);
-            repository.AddOrUpdate(child1);
-            repository.AddOrUpdate(child2);
-            repository.AddOrUpdate(toddler1);
-            repository.AddOrUpdate(toddler2);
-            repository.AddOrUpdate(toddler3);
-            repository.AddOrUpdate(toddler4);
-            repository.AddOrUpdate(baby1);
-            repository.AddOrUpdate(baby2);
+            repository.Save(parent);
+            repository.Save(child1);
+            repository.Save(child2);
+            repository.Save(toddler1);
+            repository.Save(toddler2);
+            repository.Save(toddler3);
+            repository.Save(toddler4);
+            repository.Save(baby1);
+            repository.Save(baby2);
             unitOfWork.Flush();
 
             return new[] {parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2};

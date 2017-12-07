@@ -11,7 +11,9 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -31,12 +33,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
@@ -78,14 +80,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
                 foreach (var template in templates)
                 {
-                    templateRepo.AddOrUpdate(template);
+                    templateRepo.Save(template);
                 }
                 unitOfWork.Flush();
 
                 var contentType = MockedContentTypes.CreateSimpleContentType();
                 contentType.AllowedTemplates = new[] { templates[0], templates[1] };
                 contentType.SetDefaultTemplate(templates[0]);
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 //re-get
@@ -106,16 +108,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
                 var repository = CreateRepository(unitOfWork);
                 var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah1" };
-                containerRepository.AddOrUpdate(container1);
+                containerRepository.Save(container1);
                 unitOfWork.Flush();
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah2", ParentId = container1.Id };
-                containerRepository.AddOrUpdate(container2);
+                containerRepository.Save(container2);
                 unitOfWork.Flush();
 
                 var contentType = (IContentType)MockedContentTypes.CreateBasicContentType("asdfasdf");
                 contentType.ParentId = container2.Id;
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 //create a
@@ -124,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Name = "Blahasdfsadf"
                 };
                 contentType.ParentId = contentType.Id;
-                repository.AddOrUpdate(contentType2);
+                repository.Save(contentType2);
                 unitOfWork.Flush();
 
                 var result = repository.Move(contentType, container1).ToArray();
@@ -151,7 +153,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
                 var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
-                containerRepository.AddOrUpdate(container);
+                containerRepository.Save(container);
                 unitOfWork.Flush();
                 Assert.That(container.Id, Is.GreaterThan(0));
 
@@ -171,11 +173,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
 
                 container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
-                containerRepository.AddOrUpdate(container1);
+                containerRepository.Save(container1);
                 container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container2" };
-                containerRepository.AddOrUpdate(container2);
+                containerRepository.Save(container2);
                 container3 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container3" };
-                containerRepository.AddOrUpdate(container3);
+                containerRepository.Save(container3);
                 unitOfWork.Flush();
                 Assert.That(container1.Id, Is.GreaterThan(0));
                 Assert.That(container2.Id, Is.GreaterThan(0));
@@ -187,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsNotNull(found2);
                 var found3 = containerRepository.Get(container3.Id);
                 Assert.IsNotNull(found3);
-                var allContainers = containerRepository.GetAll();
+                var allContainers = containerRepository.GetMany();
                 Assert.AreEqual(3, allContainers.Count());
             }
         }
@@ -200,7 +202,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.DocumentTypeContainer);
                 var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
-                containerRepository.AddOrUpdate(container);
+                containerRepository.Save(container);
                 unitOfWork.Flush();
 
                 // Act
@@ -221,12 +223,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainer);
                 var repository = CreateRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
-                containerRepository.AddOrUpdate(container);
+                containerRepository.Save(container);
                 unitOfWork.Flush();
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 Assert.AreEqual(container.Id, contentType.ParentId);
@@ -242,12 +244,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var containerRepository = CreateContainerRepository(unitOfWork, Constants.ObjectTypes.MediaTypeContainer);
                 var repository = CreateMediaTypeRepository(unitOfWork);
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
-                containerRepository.AddOrUpdate(container);
+                containerRepository.Save(container);
                 unitOfWork.Flush();
 
                 IMediaType contentType = MockedContentTypes.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 // Act
@@ -273,7 +275,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 var fetched = repository.Get(contentType.Id);
@@ -319,7 +321,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreEqual(4, mapped.PropertyTypes.Count());
 
-                repository.AddOrUpdate(mapped);
+                repository.Save(mapped);
                 unitOfWork.Flush();
 
                 Assert.AreEqual(4, mapped.PropertyTypes.Count());
@@ -367,7 +369,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     SortOrder = 1,
                     DataTypeDefinitionId = -88
                 });
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 var dirty = ((ICanBeDirty)contentType).IsDirty();
@@ -465,7 +467,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(mapped.Thumbnail, "Doc2.png");
                 Assert.IsTrue(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"));
 
-                repository.AddOrUpdate(mapped);
+                repository.Save(mapped);
                 unitOfWork.Flush();
 
                 var dirty = mapped.IsDirty();
@@ -496,7 +498,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 // Act
                 var contentType = MockedContentTypes.CreateSimpleContentType();
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 var contentType2 = repository.Get(contentType.Id);
@@ -522,9 +524,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
                 var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true);
 
-                repository.AddOrUpdate(ctMain);
-                repository.AddOrUpdate(ctChild1);
-                repository.AddOrUpdate(ctChild2);
+                repository.Save(ctMain);
+                repository.Save(ctChild1);
+                repository.Save(ctChild2);
                 unitOfWork.Flush();
 
                 // Act
@@ -550,15 +552,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
                 var child1 = MockedContentTypes.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true);
-                repository.AddOrUpdate(child1);
+                repository.Save(child1);
                 var child3 = MockedContentTypes.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true);
-                repository.AddOrUpdate(child3);
+                repository.Save(child3);
                 var child2 = MockedContentTypes.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true);
-                repository.AddOrUpdate(child2);
+                repository.Save(child2);
                 unitOfWork.Flush();
 
                 // Act
-                var contentTypes = repository.GetByQuery(unitOfWork.SqlContext.Query<IContentType>().Where(x => x.ParentId == contentType.Id));
+                var contentTypes = repository.Get(unitOfWork.SqlContext.Query<IContentType>().Where(x => x.ParentId == contentType.Id));
 
                 // Assert
                 Assert.That(contentTypes.Count(), Is.EqualTo(3));
@@ -597,7 +599,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
                 var childContentType = MockedContentTypes.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases:true);
-                repository.AddOrUpdate(childContentType);
+                repository.Save(childContentType);
                 unitOfWork.Flush();
 
                 // Act
@@ -635,7 +637,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var contentTypes = repository.GetAll();
+                var contentTypes = repository.GetMany();
                 int count =
                     unitOfWork.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
@@ -655,10 +657,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repository = CreateRepository(unitOfWork);
-                var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
+                var allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
 
                 // Act
-                var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetAll(allGuidIds);
+                var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetMany(allGuidIds);
                 int count =
                     unitOfWork.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
@@ -699,7 +701,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 contentType.PropertyGroups["Meta"].PropertyTypes.Remove("description");
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 var result = repository.Get(NodeDto.NodeIdSeed + 1);
@@ -775,7 +777,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(2));
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
 
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 // Assert
@@ -799,8 +801,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var subpageContentType = MockedContentTypes.CreateSimpleContentType("umbSubpage", "Subpage");
                 var simpleSubpageContentType = MockedContentTypes.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
-                repository.AddOrUpdate(subpageContentType);
-                repository.AddOrUpdate(simpleSubpageContentType);
+                repository.Save(subpageContentType);
+                repository.Save(simpleSubpageContentType);
                 unitOfWork.Flush();
 
                 // Act
@@ -810,7 +812,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         new ContentTypeSort(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias),
                         new ContentTypeSort(new Lazy<int>(() => simpleSubpageContentType.Id), 1, simpleSubpageContentType.Alias)
                     };
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 //Assert
@@ -834,12 +836,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.AddOrUpdate(subpage);
+                contentRepository.Save(subpage);
                 unitOfWork.Flush();
 
                 // Act
                 contentType.RemovePropertyType("keywords");
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 // Assert
@@ -861,13 +863,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.AddOrUpdate(subpage);
+                contentRepository.Save(subpage);
                 unitOfWork.Flush();
 
                 // Act
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
                 propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 // Assert
@@ -889,18 +891,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.AddOrUpdate(subpage);
+                contentRepository.Save(subpage);
                 unitOfWork.Flush();
 
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
                 propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 // Act
                 var content = contentRepository.Get(subpage.Id);
                 content.SetValue("metaAuthor", "John Doe");
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 //Assert
@@ -923,7 +925,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
-                contentRepository.AddOrUpdate(subpage);
+                contentRepository.Save(subpage);
                 unitOfWork.Flush();
 
                 //Remove PropertyType
@@ -931,13 +933,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Add PropertyType
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
                 propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-                repository.AddOrUpdate(contentType);
+                repository.Save(contentType);
                 unitOfWork.Flush();
 
                 // Act
                 var content = contentRepository.Get(subpage.Id);
                 content.SetValue("metaAuthor", "John Doe");
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 //Assert

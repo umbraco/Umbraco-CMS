@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     };
 
                 // Act
-                repository.AddOrUpdate(tag);
+                repository.Save(tag);
                 unitOfWork.Flush();
 
                 // Assert
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     };
 
                 // Act
-                repository.AddOrUpdate(tag);
+                repository.Save(tag);
                 unitOfWork.Flush();
 
                 var tag2 = new Tag()
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         Group = "Test",
                         Text = "Test2"
                     };
-                repository.AddOrUpdate(tag2);
+                repository.Save(tag2);
                 unitOfWork.Flush();
 
                 // Assert
@@ -93,10 +94,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -125,10 +126,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -166,10 +167,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -210,10 +211,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -252,10 +253,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -290,10 +291,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content);
+                contentRepository.Save(content);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -336,12 +337,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -382,12 +383,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -429,12 +430,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -449,7 +450,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                             new Tag {Text = "tag4", Group = "test"}
                         }, false);
 
-                var result = repository.GetAll();
+                var result = repository.GetMany();
                 Assert.AreEqual(4, result.Count());
             }
         }
@@ -466,12 +467,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -489,9 +490,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 //TODO: This would be nice to be able to map the ids back but unfortunately we are not doing this
                 //var result = repository.GetAll(new[] {tags[0].Id, tags[1].Id, tags[2].Id});
-                var all = repository.GetAll().ToArray();
+                var all = repository.GetMany().ToArray();
 
-                var result = repository.GetAll(new[] { all[0].Id, all[1].Id, all[2].Id });
+                var result = repository.GetMany(new[] { all[0].Id, all[1].Id, all[2].Id });
                 Assert.AreEqual(3, result.Count());
             }
         }
@@ -508,12 +509,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -554,10 +555,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -601,10 +602,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -647,10 +648,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -696,16 +697,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.AddOrUpdate(mediaType);
+                mediaTypeRepository.Save(mediaType);
                 unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.AddOrUpdate(media1);
+                mediaRepository.Save(media1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -756,16 +757,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.AddOrUpdate(mediaType);
+                mediaTypeRepository.Save(mediaType);
                 unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.AddOrUpdate(media1);
+                mediaRepository.Save(media1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -809,10 +810,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -851,22 +852,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.AddOrUpdate(mediaType);
+                mediaTypeRepository.Save(mediaType);
                 unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.AddOrUpdate(media1);
+                mediaRepository.Save(media1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -937,22 +938,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
-                contentTypeRepository.AddOrUpdate(contentType);
+                contentTypeRepository.Save(contentType);
                 unitOfWork.Flush();
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content1);
+                contentRepository.Save(content1);
                 unitOfWork.Flush();
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
-                contentRepository.AddOrUpdate(content2);
+                contentRepository.Save(content2);
                 unitOfWork.Flush();
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
-                mediaTypeRepository.AddOrUpdate(mediaType);
+                mediaTypeRepository.Save(mediaType);
                 unitOfWork.Flush();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                mediaRepository.AddOrUpdate(media1);
+                mediaRepository.Save(media1);
                 unitOfWork.Flush();
 
                 var repository = CreateRepository(unitOfWork);
@@ -1005,12 +1006,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 

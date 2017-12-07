@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -28,18 +29,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             return repository;
         }
 
-        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository)
         {
             ITemplateRepository tr;
             return CreateContentRepository(unitOfWork, out contentTypeRepository, out tr);
         }
 
-        private ContentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
+        private DocumentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out IContentTypeRepository contentTypeRepository, out ITemplateRepository templateRepository)
         {
             templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(unitOfWork, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var user = MockedUser.CreateUser();
 
                 // Act
-                repository.AddOrUpdate(user);
+                repository.Save(user);
                 unitOfWork.Flush();
 
                 // Assert
@@ -87,9 +88,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var use2 = MockedUser.CreateUser("2");
 
                 // Act
-                repository.AddOrUpdate(user1);
+                repository.Save(user1);
                 unitOfWork.Flush();
-                repository.AddOrUpdate(use2);
+                repository.Save(use2);
                 unitOfWork.Flush();
 
                 // Assert
@@ -108,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 var user = MockedUser.CreateUser();
-                repository.AddOrUpdate(user);
+                repository.Save(user);
                 unitOfWork.Flush();
 
                 // Act
@@ -137,12 +138,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var mediaRepository = CreateMediaRepository(unitOfWork, out var mediaTypeRepo);
                 var userGroupRepository = CreateUserGroupRepository(unitOfWork);
 
-                contentTypeRepo.AddOrUpdate(ct);
-                mediaTypeRepo.AddOrUpdate(mt);
+                contentTypeRepo.Save(ct);
+                mediaTypeRepo.Save(mt);
                 unitOfWork.Flush();
 
-                contentRepository.AddOrUpdate(content);
-                mediaRepository.AddOrUpdate(media);
+                contentRepository.Save(content);
+                mediaRepository.Save(media);
                 unitOfWork.Flush();
 
                 var user = CreateAndCommitUserWithGroup(userRepository, userGroupRepository, unitOfWork);
@@ -162,7 +163,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 resolved.Email = "new@new.com";
                 resolved.Username = "newName";
 
-                userRepository.AddOrUpdate(resolved);
+                userRepository.Save(resolved);
                 unitOfWork.Flush();
                 var updatedItem = (User) userRepository.Get(user.Id);
 
@@ -195,7 +196,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var user = MockedUser.CreateUser();
 
                 // Act
-                repository.AddOrUpdate(user);
+                repository.Save(user);
                 unitOfWork.Flush();
                 var id = user.Id;
 
@@ -249,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
@@ -268,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var users = CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetAll((int) users[0].Id, (int) users[1].Id);
+                var result = repository.GetMany((int) users[0].Id, (int) users[1].Id);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -289,7 +290,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUsers(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetAll();
+                var result = repository.GetMany();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -357,7 +358,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private static User CreateAndCommitUserWithGroup(IUserRepository repository, IUserGroupRepository userGroupRepository, IScopeUnitOfWork unitOfWork)
         {
             var user = MockedUser.CreateUser();
-            repository.AddOrUpdate(user);
+            repository.Save(user);
             unitOfWork.Flush();
 
             var group = MockedUserGroup.CreateUserGroup();
@@ -372,9 +373,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var user1 = MockedUser.CreateUser("1");
             var user2 = MockedUser.CreateUser("2");
             var user3 = MockedUser.CreateUser("3");
-            repository.AddOrUpdate(user1);
-            repository.AddOrUpdate(user2);
-            repository.AddOrUpdate(user3);
+            repository.Save(user1);
+            repository.Save(user2);
+            repository.Save(user3);
             unitOfWork.Complete();
             return new IUser[] { user1, user2, user3 };
         }

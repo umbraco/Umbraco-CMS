@@ -11,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -162,11 +163,11 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
-                var contents = repository.GetAll();
+                var contents = repository.GetMany();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
@@ -194,11 +195,11 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
-                var contents = repository.GetAll();
+                var contents = repository.GetMany();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
@@ -224,13 +225,13 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
-                var contents = repository.GetAll();
+                var contents = repository.GetMany();
 
                 Stopwatch watch = Stopwatch.StartNew();
-                var contentsCached = repository.GetAll();
+                var contentsCached = repository.GetMany();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
@@ -257,13 +258,13 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
                 var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, tRepository);
-                var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
 
                 // Act
-                var contents = repository.GetAll();
+                var contents = repository.GetMany();
 
                 Stopwatch watch = Stopwatch.StartNew();
-                var contentsCached = repository.GetAll();
+                var contentsCached = repository.GetMany();
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 

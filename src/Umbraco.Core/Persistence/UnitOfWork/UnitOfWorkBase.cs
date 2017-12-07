@@ -32,77 +32,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
         protected RepositoryFactory RepositoryFactory { get; }
 
-        public abstract TRepository CreateRepository<TRepository>(string name = null)
+        public abstract TRepository CreateRepository<TRepository>()
             where TRepository : IRepository;
-
-        /// <summary>
-        /// Registers an entity to be added as part of this unit of work.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <param name="repository">The repository in charge of the entity.</param>
-        public void RegisterCreated(IEntity entity, IUnitOfWorkRepository repository)
-        {
-            if (ReadOnly)
-                throw new NotSupportedException("This unit of work is read-only.");
-
-            Completed = false;
-
-            if (Immediate)
-                repository.PersistNewItem(entity);
-            else
-                Operations.Enqueue(new Operation
-                {
-                    Entity = entity,
-                    Repository = repository,
-                    Type = OperationType.Insert
-                });
-        }
-
-        /// <summary>
-        /// Registers an entity to be updated as part of this unit of work.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <param name="repository">The repository in charge of the entity.</param>
-        public void RegisterUpdated(IEntity entity, IUnitOfWorkRepository repository)
-        {
-            if (ReadOnly)
-                throw new NotSupportedException("This unit of work is read-only.");
-
-            Completed = false;
-
-            if (Immediate)
-                repository.PersistUpdatedItem(entity);
-            else
-                Operations.Enqueue(new Operation
-                {
-                    Entity = entity,
-                    Repository = repository,
-                    Type = OperationType.Update
-                });
-        }
-
-        /// <summary>
-        /// Registers an entity to be deleted as part of this unit of work.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <param name="repository">The repository in charge of the entity.</param>
-        public void RegisterDeleted(IEntity entity, IUnitOfWorkRepository repository)
-        {
-            if (ReadOnly)
-                throw new NotSupportedException("This unit of work is read-only.");
-
-            Completed = false;
-
-            if (Immediate)
-                repository.PersistDeletedItem(entity);
-            else
-                Operations.Enqueue(new Operation
-                {
-                    Entity = entity,
-                    Repository = repository,
-                    Type = OperationType.Delete
-                });
-        }
 
         // fixme - we don't need Begin, really, or do we?
         public virtual void Begin()

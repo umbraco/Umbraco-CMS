@@ -15,6 +15,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -169,9 +170,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            ContentRepository.UowRemovingEntity += OnContentRemovingEntity;
-            ContentRepository.UowRemovingVersion += OnContentRemovingVersion;
-            ContentRepository.UowRefreshedEntity += OnContentRefreshedEntity;
+            DocumentRepository.UowRemovingEntity += OnContentRemovingEntity;
+            DocumentRepository.UowRemovingVersion += OnContentRemovingVersion;
+            DocumentRepository.UowRefreshedEntity += OnContentRefreshedEntity;
             MediaRepository.UowRemovingEntity += OnMediaRemovingEntity;
             MediaRepository.UowRemovingVersion += OnMediaRemovingVersion;
             MediaRepository.UowRefreshedEntity += OnMediaRefreshedEntity;
@@ -189,9 +190,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private void ClearEvents()
         {
-            ContentRepository.UowRemovingEntity -= OnContentRemovingEntity;
-            ContentRepository.UowRemovingVersion -= OnContentRemovingVersion;
-            ContentRepository.UowRefreshedEntity -= OnContentRefreshedEntity;
+            DocumentRepository.UowRemovingEntity -= OnContentRemovingEntity;
+            DocumentRepository.UowRemovingVersion -= OnContentRemovingVersion;
+            DocumentRepository.UowRefreshedEntity -= OnContentRefreshedEntity;
             MediaRepository.UowRemovingEntity -= OnMediaRemovingEntity;
             MediaRepository.UowRemovingVersion -= OnMediaRemovingVersion;
             MediaRepository.UowRefreshedEntity -= OnMediaRefreshedEntity;
@@ -1448,7 +1449,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         // it is not the case at the moment, instead a global lock is used whenever content is modified - well,
         // almost: rollback or unpublish do not implement it - nevertheless
 
-        private static void OnContentRemovingEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
         {
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
@@ -1472,7 +1473,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // note: could be optimized by using "WHERE nodeId IN (...)" delete clauses
         }
 
-        private static void OnContentRemovingVersion(ContentRepository sender, ContentRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnContentRemovingVersion(DocumentRepository sender, DocumentRepository.UnitOfWorkVersionEventArgs args)
         {
             OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
         }
@@ -1507,7 +1508,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             return PropertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
-        private void OnContentRefreshedEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
         {
             var db = args.UnitOfWork.Database;
             var entity = args.Entity;
@@ -1657,7 +1658,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
+                var repository = uow.CreateRepository<IDocumentRepository>();
                 RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIdsA);
                 RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIdsA);
                 uow.Complete();
@@ -1671,7 +1672,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
+                var repository = uow.CreateRepository<IDocumentRepository>();
                 RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIds);
                 uow.Complete();
                 scope.Complete();
@@ -1679,7 +1680,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         }
 
         // assumes content tree lock
-        private void RebuildContentXmlLocked(IScopeUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildContentXmlLocked(IScopeUnitOfWork unitOfWork, IDocumentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Constants.ObjectTypes.Document;
@@ -1729,7 +1730,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 const bool published = true; // contentXml contains published content!
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml =
                     EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
@@ -1744,7 +1745,7 @@ WHERE cmsContentXml.nodeId IN (
             using (var uow = _uowProvider.CreateUnitOfWork())
             {
                 uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IContentRepository>();
+                var repository = uow.CreateRepository<IDocumentRepository>();
                 RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIds);
                 uow.Complete();
                 scope.Complete();
@@ -1752,7 +1753,7 @@ WHERE cmsContentXml.nodeId IN (
         }
 
         // assumes content tree lock
-        private void RebuildPreviewXmlLocked(IScopeUnitOfWork unitOfWork, IContentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildPreviewXmlLocked(IScopeUnitOfWork unitOfWork, IDocumentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Constants.ObjectTypes.Document;
@@ -1804,7 +1805,7 @@ WHERE cmsPreviewXml.nodeId IN (
             {
                 // .GetPagedResultsByQuery implicitely adds (uDocument.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 const bool published = true; // previewXml contains edit content!
                 var items = descendants.Select(c => new PreviewXmlDto
                 {
@@ -1880,7 +1881,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml =
                     EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
@@ -1952,7 +1953,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

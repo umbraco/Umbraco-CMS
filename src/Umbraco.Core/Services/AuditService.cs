@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
-                repo.AddOrUpdate(new AuditItem(objectId, comment, type, userId));
+                repo.Save(new AuditItem(objectId, comment, type, userId));
                 uow.Complete();
             }
         }
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork())
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
-                var result = repo.GetByQuery(Query<AuditItem>().Where(x => x.Id == objectId));
+                var result = repo.Get(Query<AuditItem>().Where(x => x.Id == objectId));
                 uow.Complete();
                 return result;
             }
@@ -41,8 +41,8 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 var result = sinceDate.HasValue == false
-                    ? repo.GetByQuery(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type))
-                    : repo.GetByQuery(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                    ? repo.Get(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type))
+                    : repo.Get(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type && x.CreateDate >= sinceDate.Value));
                 uow.Complete();
                 return result;
             }
@@ -54,8 +54,8 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<IAuditRepository>();
                 var result = sinceDate.HasValue == false
-                    ? repo.GetByQuery(Query<AuditItem>().Where(x => x.AuditType == type))
-                    : repo.GetByQuery(Query<AuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                    ? repo.Get(Query<AuditItem>().Where(x => x.AuditType == type))
+                    : repo.Get(Query<AuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate.Value));
                 uow.Complete();
                 return result;
             }

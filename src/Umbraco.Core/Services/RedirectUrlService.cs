@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
                     redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey };
-                repo.AddOrUpdate(redir);
+                repo.Save(redir);
                 uow.Complete();
             }
         }

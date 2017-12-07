@@ -5,6 +5,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Cache
             foreach (var payload in payloads)
             {
                 // remove that one
-                runtimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(payload.Id));
+                runtimeCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
 
                 // remove those that are in the branch
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))

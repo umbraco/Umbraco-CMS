@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                                             Constants.ObjectTypes.Document,
                                                             "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
 
-                repository.AddOrUpdate(relateMemberToContent);
+                repository.Save(relateMemberToContent);
                 unitOfWork.Flush();
 
                 // Assert
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relationType = repository.Get(3);
                 relationType.Alias = relationType.Alias + "Updated";
                 relationType.Name = relationType.Name + " Updated";
-                repository.AddOrUpdate(relationType);
+                repository.Save(relationType);
                 unitOfWork.Flush();
 
                 var relationTypeUpdated = repository.Get(3);
@@ -131,7 +132,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var relationTypes = repository.GetAll();
+                var relationTypes = repository.GetMany();
 
                 // Assert
                 Assert.That(relationTypes, Is.Not.Null);
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var relationTypes = repository.GetAll(2, 3);
+                var relationTypes = repository.GetMany(2, 3);
 
                 // Assert
                 Assert.That(relationTypes, Is.Not.Null);
@@ -210,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var childObjType = Constants.ObjectTypes.DocumentType;
                 var query = unitOfWork.SqlContext.Query<IRelationType>().Where(x => x.ChildObjectType == childObjType);
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -236,8 +237,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                repository.AddOrUpdate(relateContent);//Id 2
-                repository.AddOrUpdate(relateContentType);//Id 3
+                repository.Save(relateContent);//Id 2
+                repository.Save(relateContentType);//Id 3
                 unitOfWork.Complete();
             }
         }

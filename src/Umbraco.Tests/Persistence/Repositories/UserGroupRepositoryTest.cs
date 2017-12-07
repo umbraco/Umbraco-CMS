@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userGroup = MockedUserGroup.CreateUserGroup();
 
                 // Act
-                repository.AddOrUpdate(userGroup);
+                repository.Save(userGroup);
                 unitOfWork.Complete();
 
                 // Assert
@@ -54,9 +55,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userGroup2 = MockedUserGroup.CreateUserGroup("2");
 
                 // Act
-                repository.AddOrUpdate(userGroup1);
+                repository.Save(userGroup1);
                 unitOfWork.Flush();
-                repository.AddOrUpdate(userGroup2);
+                repository.Save(userGroup2);
                 unitOfWork.Complete();
 
                 // Assert
@@ -75,7 +76,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 var userGroup = MockedUserGroup.CreateUserGroup();
-                repository.AddOrUpdate(userGroup);
+                repository.Save(userGroup);
                 unitOfWork.Complete();
 
                 // Act
@@ -97,14 +98,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 var userGroup = MockedUserGroup.CreateUserGroup();
-                repository.AddOrUpdate(userGroup);
+                repository.Save(userGroup);
                 unitOfWork.Flush();
 
                 // Act
                 var resolved = repository.Get(userGroup.Id);
                 resolved.Name = "New Name";
                 resolved.Permissions = new[] { "Z", "Y", "X" };
-                repository.AddOrUpdate(resolved);
+                repository.Save(resolved);
                 unitOfWork.Complete();
                 var updatedItem = repository.Get(userGroup.Id);
 
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userGroup = MockedUserGroup.CreateUserGroup();
 
                 // Act
-                repository.AddOrUpdate(userGroup);
+                repository.Save(userGroup);
                 unitOfWork.Flush();
                 var id = userGroup.Id;
 
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 var userGroup = MockedUserGroup.CreateUserGroup();
-                repository.AddOrUpdate(userGroup);
+                repository.Save(userGroup);
                 unitOfWork.Complete();
 
                 // Act
@@ -180,7 +181,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<IUserGroup>().Where(x => x.Alias == "testUserGroup1");
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
@@ -199,7 +200,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var userGroups = CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetAll(userGroups[0].Id, userGroups[1].Id);
+                var result = repository.GetMany(userGroups[0].Id, userGroups[1].Id);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -220,7 +221,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 CreateAndCommitMultipleUserGroups(repository, unitOfWork);
 
                 // Act
-                var result = repository.GetAll();
+                var result = repository.GetMany();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -290,12 +291,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 groups[1].RemoveAllowedSection("media");
                 groups[1].RemoveAllowedSection("media");
 
-                repository.AddOrUpdate(groups[0]);
-                repository.AddOrUpdate(groups[1]);
+                repository.Save(groups[0]);
+                repository.Save(groups[1]);
                 unitOfWork.Complete();
 
                 // Assert
-                var result = repository.GetAll((int)groups[0].Id, (int)groups[1].Id).ToArray();
+                var result = repository.GetMany((int)groups[0].Id, (int)groups[1].Id).ToArray();
                 Assert.AreEqual(1, result[0].AllowedSections.Count());
                 Assert.AreEqual("media", result[0].AllowedSections.First());
                 Assert.AreEqual(1, result[1].AllowedSections.Count());
@@ -332,16 +333,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 groups[2].ClearAllowedSections();
 
-                repository.AddOrUpdate(groups[0]);
-                repository.AddOrUpdate(groups[1]);
-                repository.AddOrUpdate(groups[2]);
+                repository.Save(groups[0]);
+                repository.Save(groups[1]);
+                repository.Save(groups[2]);
                 unitOfWork.Complete();
 
                 for (var i = 0; i < 3; i++)
                     Assert.IsNotNull(repository.Get(groups[i].Id));
 
                 // Assert
-                var result = repository.GetAll(groups[0].Id, groups[1].Id, groups[2].Id).ToArray();
+                var result = repository.GetMany(groups[0].Id, groups[1].Id, groups[2].Id).ToArray();
                 Assert.AreEqual(3, result.Length);
 
                 Assert.AreEqual(3, result[0].AllowedSections.Count());
@@ -370,7 +371,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 groups[0].RemoveAllowedSection("content");
                 groups[0].AddAllowedSection("settings");
 
-                repository.AddOrUpdate(groups[0]);
+                repository.Save(groups[0]);
                 unitOfWork.Complete();
 
                 // Assert
@@ -394,9 +395,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var user1 = MockedUserGroup.CreateUserGroup("1", allowedSections: new[] { "test1" });
                 var user2 = MockedUserGroup.CreateUserGroup("2", allowedSections: new[] { "test2" });
                 var user3 = MockedUserGroup.CreateUserGroup("3", allowedSections: new[] { "test1" });
-                repository.AddOrUpdate(user1);
-                repository.AddOrUpdate(user2);
-                repository.AddOrUpdate(user3);
+                repository.Save(user1);
+                repository.Save(user2);
+                repository.Save(user3);
                 unitOfWork.Complete();
 
                 // Act
@@ -416,9 +417,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var userGroup1 = MockedUserGroup.CreateUserGroup("1");
             var userGroup2 = MockedUserGroup.CreateUserGroup("2");
             var userGroup3 = MockedUserGroup.CreateUserGroup("3");
-            repository.AddOrUpdate(userGroup1);
-            repository.AddOrUpdate(userGroup2);
-            repository.AddOrUpdate(userGroup3);
+            repository.Save(userGroup1);
+            repository.Save(userGroup2);
+            repository.Save(userGroup3);
             unitOfWork.Complete();
             return new IUserGroup[] { userGroup1, userGroup2, userGroup3 };
         }

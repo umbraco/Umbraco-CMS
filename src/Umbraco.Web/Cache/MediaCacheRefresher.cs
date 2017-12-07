@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Composing;
@@ -84,7 +85,7 @@ namespace Umbraco.Web.Cache
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
-                    mediaCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMedia>(payload.Id));
+                    mediaCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMedia>(payload.Id));
 
                     // remove those that are in the branch
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))

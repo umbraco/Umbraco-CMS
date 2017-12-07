@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
@@ -83,7 +84,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "blah",
                     CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
@@ -113,7 +114,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
@@ -126,7 +127,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "durg",
                     CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     ContentKey = _textpage.Key,
                     Url = "blah"
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
@@ -167,7 +168,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     ContentKey = _otherpage.Key,
                     Url = "durg"
                 };
-                repo.AddOrUpdate(rurl);
+                repo.Save(rurl);
                 uow.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);

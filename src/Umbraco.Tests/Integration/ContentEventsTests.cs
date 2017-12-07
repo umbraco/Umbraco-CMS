@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.Services;
@@ -36,9 +37,9 @@ namespace Umbraco.Tests.Integration
 
             _events = new List<EventInstance>();
 
-            ContentRepository.UowRefreshedEntity += ContentRepositoryRefreshed;
-            ContentRepository.UowRemovingEntity += ContentRepositoryRemoved;
-            ContentRepository.UowRemovingVersion += ContentRepositoryRemovedVersion;
+            DocumentRepository.UowRefreshedEntity += ContentRepositoryRefreshed;
+            DocumentRepository.UowRemovingEntity += ContentRepositoryRemoved;
+            DocumentRepository.UowRemovingVersion += ContentRepositoryRemovedVersion;
             ContentCacheRefresher.CacheUpdated += ContentCacheUpdated;
 
             // ensure there's a current context
@@ -77,9 +78,9 @@ namespace Umbraco.Tests.Integration
 
             // clear ALL events
 
-            ContentRepository.UowRefreshedEntity -= ContentRepositoryRefreshed;
-            ContentRepository.UowRemovingEntity -= ContentRepositoryRemoved;
-            ContentRepository.UowRemovingVersion -= ContentRepositoryRemovedVersion;
+            DocumentRepository.UowRefreshedEntity -= ContentRepositoryRefreshed;
+            DocumentRepository.UowRemovingEntity -= ContentRepositoryRemoved;
+            DocumentRepository.UowRemovingVersion -= ContentRepositoryRemovedVersion;
             ContentCacheRefresher.CacheUpdated -= ContentCacheUpdated;
         }
 
@@ -197,7 +198,7 @@ namespace Umbraco.Tests.Integration
             return PropertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
-        private void ContentRepositoryRefreshed(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private void ContentRepositoryRefreshed(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
         {
             // reports the event as : "ContentRepository/Refresh/XY-Z"
             // where
@@ -323,7 +324,7 @@ namespace Umbraco.Tests.Integration
             _events.Add(e);
         }
 
-        private void ContentRepositoryRemoved(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private void ContentRepositoryRemoved(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
         {
             // reports the event as : "ContentRepository/Remove/X"
             // where
@@ -343,7 +344,7 @@ namespace Umbraco.Tests.Integration
             _events.Add(e);
         }
 
-        private void ContentRepositoryRemovedVersion(ContentRepository sender, ContentRepository.UnitOfWorkVersionEventArgs args)
+        private void ContentRepositoryRemovedVersion(DocumentRepository sender, DocumentRepository.UnitOfWorkVersionEventArgs args)
         {
             // reports the event as : "ContentRepository/Remove/X:Y"
             // where

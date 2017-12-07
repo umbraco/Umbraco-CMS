@@ -26,14 +26,11 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="TRepository">The type of the repository.</typeparam>
         /// <param name="uow">A unit of work.</param>
-        /// <param name="name">The optional name of the repository.</param>
         /// <returns>The created repository for the unit of work.</returns>
-        public virtual TRepository CreateRepository<TRepository>(IScopeUnitOfWork uow, string name = null)
+        public virtual TRepository CreateRepository<TRepository>(IScopeUnitOfWork uow)
             where TRepository : IRepository
         {
-            return string.IsNullOrWhiteSpace(name)
-                ? _container.GetInstance<IScopeUnitOfWork, TRepository>(uow)
-                : _container.GetInstance<IScopeUnitOfWork, TRepository>(uow, name);
+            return _container.GetInstance<IScopeUnitOfWork, TRepository>(uow);
         }
     }
 }

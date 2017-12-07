@@ -17,6 +17,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
@@ -183,9 +184,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            ContentRepository.UowRemovingEntity += OnContentRemovingEntity;
+            DocumentRepository.UowRemovingEntity += OnContentRemovingEntity;
             //ContentRepository.RemovedVersion += OnContentRemovedVersion;
-            ContentRepository.UowRefreshedEntity += OnContentRefreshedEntity;
+            DocumentRepository.UowRefreshedEntity += OnContentRefreshedEntity;
             MediaRepository.UowRemovingEntity += OnMediaRemovingEntity;
             //MediaRepository.RemovedVersion += OnMediaRemovedVersion;
             MediaRepository.UowRefreshedEntity += OnMediaRefreshedEntity;
@@ -201,9 +202,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void TearDownRepositoryEvents()
         {
-            ContentRepository.UowRemovingEntity -= OnContentRemovingEntity;
+            DocumentRepository.UowRemovingEntity -= OnContentRemovingEntity;
             //ContentRepository.RemovedVersion -= OnContentRemovedVersion;
-            ContentRepository.UowRefreshedEntity -= OnContentRefreshedEntity;
+            DocumentRepository.UowRefreshedEntity -= OnContentRefreshedEntity;
             MediaRepository.UowRemovingEntity -= OnMediaRemovingEntity;
             //MediaRepository.RemovedVersion -= OnMediaRemovedVersion;
             MediaRepository.UowRefreshedEntity -= OnMediaRefreshedEntity;
@@ -1036,7 +1037,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // because they need to be consistent with the content that is being refreshed/removed - and that
         // should be guaranteed by a DB transaction
 
-        private void OnContentRemovingEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
         {
             OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
         }
@@ -1071,7 +1072,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return PropertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
-        private void OnContentRefreshedEntity(ContentRepository sender, ContentRepository.UnitOfWorkEntityEventArgs args)
+        private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
         {
             var db = args.UnitOfWork.Database;
             var content = (Content) args.Entity;
@@ -1254,7 +1255,7 @@ WHERE cmsContentNu.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var repository = uow.CreateRepository<IContentRepository>();
+            var repository = uow.CreateRepository<IDocumentRepository>();
             var query = _uowProvider.SqlContext.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
@@ -1264,7 +1265,7 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = new List<ContentNuDto>();
                 foreach (var c in descendants)
                 {
@@ -1334,7 +1335,7 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
@@ -1395,7 +1396,7 @@ WHERE cmsContentNu.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPagedResultsByQuery(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;

@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     }
                 };
 
-                repository.AddOrUpdate(dictionaryItem);
+                repository.Save(dictionaryItem);
                 unitOfWork.Flush();
 
                 //re-get
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     }
                 };
 
-                repository.AddOrUpdate(dictionaryItem);
+                repository.Save(dictionaryItem);
                 unitOfWork.Flush();
 
                 //re-get
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     }
                 };
 
-                repository.AddOrUpdate(dictionaryItem);
+                repository.Save(dictionaryItem);
                 unitOfWork.Flush();
 
                 //re-get
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
                 var dictionaryItem = (IDictionaryItem) new DictionaryItem("Testing1235");
 
-                repository.AddOrUpdate(dictionaryItem);
+                repository.Save(dictionaryItem);
                 unitOfWork.Flush();
 
                 //re-get
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var dictionaryItem = repository.Get(1);
-                var dictionaryItems = repository.GetAll();
+                var dictionaryItems = repository.GetMany();
 
                 // Assert
                 Assert.That(dictionaryItems, Is.Not.Null);
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var dictionaryItems = repository.GetAll(1, 2);
+                var dictionaryItems = repository.GetMany(1, 2);
 
                 // Assert
                 Assert.That(dictionaryItems, Is.Not.Null);
@@ -201,7 +201,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 read.Translations = translations;
 
                 // Act
-                repository.AddOrUpdate(read);
+                repository.Save(read);
                 unitOfWork.Flush();
 
                 var exists = repository.Exists(read.Id);
@@ -274,7 +274,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 translations[0].Value = "Read even more";
                 item.Translations = translations;
 
-                repository.AddOrUpdate(item);
+                repository.Save(item);
                 unitOfWork.Flush();
 
                 var dictionaryItem = repository.Get(1);
@@ -304,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
                 item.Translations = translations;
 
-                repository.AddOrUpdate(item);
+                repository.Save(item);
                 unitOfWork.Flush();
 
                 var dictionaryItem = (DictionaryItem) repository.Get(1);

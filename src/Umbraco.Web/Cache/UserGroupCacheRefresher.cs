@@ -2,6 +2,7 @@
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Web.Cache
 {
@@ -57,7 +58,7 @@ namespace Umbraco.Web.Cache
             var userGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserGroup>(id));
+                userGroupCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IUserGroup>(id));
                 userGroupCache.Result.ClearCacheByKeySearch(UserGroupRepository.GetByAliasCacheKeyPrefix);
             }
 

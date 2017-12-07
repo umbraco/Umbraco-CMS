@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
                 var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
 
                 Assert.Throws<SqlCeException>(unitOfWork.Flush);
             }
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var macro = repository.Get(1);
                 macro.Alias = "test2";
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 Assert.Throws<SqlCeException>(unitOfWork.Flush);
             }
 
@@ -116,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
                 // Act
-                var macros = repository.GetAll();
+                var macros = repository.GetMany();
 
                 // Assert
                 Assert.That(macros.Count(), Is.EqualTo(3));
@@ -135,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.AreEqual(1, result.Count());
@@ -172,7 +173,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
                 macro.Properties.Add(new MacroProperty("test", "Test", 0, "test"));
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 // Assert
@@ -204,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 macro.UseInEditor = true;
                 macro.XsltPath = "";
 
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 var macroUpdated = repository.Get(2);
@@ -277,7 +278,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
 
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
 
                 unitOfWork.Flush();
 
@@ -305,7 +306,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
 
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
 
                 unitOfWork.Flush();
 
@@ -330,12 +331,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 var result = repository.Get(macro.Id);
                 result.Properties.Remove("blah1");
-                repository.AddOrUpdate(result);
+                repository.Save(result);
                 unitOfWork.Flush();
 
                 // Assert
@@ -365,7 +366,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 macro.Properties.Remove("blah2");
                 macro.Properties.Add(prop2);
 
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 // Assert
@@ -388,13 +389,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 //Act
                 macro = repository.Get(1);
                 macro.Properties["new1"].Name = "this is a new name";
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
 
@@ -417,13 +418,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 //Act
                 macro = repository.Get(1);
                 macro.Properties.UpdateProperty("new1", newAlias: "newAlias");
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 unitOfWork.Flush();
 
                 // Assert
@@ -445,9 +446,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                repository.AddOrUpdate(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
-                repository.AddOrUpdate(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
-                repository.AddOrUpdate(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
+                repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
+                repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
+                repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
                 unitOfWork.Complete();
             }
 

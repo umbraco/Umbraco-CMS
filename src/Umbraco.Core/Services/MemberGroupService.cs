@@ -3,6 +3,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -52,7 +53,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.GetAll();
+                return repository.GetMany();
             }
         }
 
@@ -86,7 +87,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
-                repository.AddOrUpdate(memberGroup);
+                repository.Save(memberGroup);
                 uow.Complete();
 
                 if (raiseEvents)

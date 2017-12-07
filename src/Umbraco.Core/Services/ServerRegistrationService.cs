@@ -6,6 +6,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Sync;
 
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Services
 
                 ((ServerRegistrationRepository) repo).ClearCache(); // ensure we have up-to-date cache
 
-                var regs = repo.GetAll().ToArray();
+                var regs = repo.GetMany().ToArray();
                 var hasMaster = regs.Any(x => ((ServerRegistration)x).IsMaster);
                 var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
 
@@ -64,12 +65,12 @@ namespace Umbraco.Core.Services
                 if (hasMaster == false)
                     server.IsMaster = true;
 
-                repo.AddOrUpdate(server);
+                repo.Save(server);
                 uow.Flush(); // triggers a cache reload
                 repo.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
                 // reload - cheap, cached
-                regs = repo.GetAll().ToArray();
+                regs = repo.GetMany().ToArray();
 
                 // default role is single server, but if registrations contain more
                 // than one active server, then role is master or slave
@@ -96,10 +97,10 @@ namespace Umbraco.Core.Services
 
                 ((ServerRegistrationRepository) repo).ClearCache(); // ensure we have up-to-date cache
 
-                var server = repo.GetAll().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                var server = repo.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 if (server == null) return;
                 server.IsActive = server.IsMaster = false;
-                repo.AddOrUpdate(server); // will trigger a cache reload
+                repo.Save(server); // will trigger a cache reload
 
                 uow.Complete();
             }
@@ -136,7 +137,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.Servers);
                 var repo = uow.CreateRepository<IServerRegistrationRepository>();
                 if (refresh) ((ServerRegistrationRepository) repo).ClearCache();
-                return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
+                return repo.GetMany().Where(x => x.IsActive).ToArray(); // fast, cached
             }
         }
 

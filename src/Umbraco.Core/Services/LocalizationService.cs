@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
                     return item;
                 }
 
-                repository.AddOrUpdate(item);
+                repository.Save(item);
                 uow.Complete();
 
                 // ensure the lazy Language callback is assigned
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = repository.GetByQuery(query).ToArray();
+                var items = repository.Get(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)
                     EnsureDictionaryItemLanguageCallback(item);
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IDictionaryRepository>();
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = repository.GetByQuery(query).ToArray();
+                var items = repository.Get(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)
                     EnsureDictionaryItemLanguageCallback(item);
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IDictionaryRepository>();
-                repository.AddOrUpdate(dictionaryItem);
+                repository.Save(dictionaryItem);
 
                 // ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(dictionaryItem);
@@ -327,7 +327,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.GetAll();
+                return repository.GetMany();
             }
         }
 
@@ -348,7 +348,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<ILanguageRepository>();
-                repository.AddOrUpdate(language);
+                repository.Save(language);
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(SavedLanguage, this, saveEventArgs);
 
@@ -390,7 +390,7 @@ namespace Umbraco.Core.Services
         private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var repo = uow.CreateRepository<IAuditRepository>();
-            repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            repo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         /// <summary>

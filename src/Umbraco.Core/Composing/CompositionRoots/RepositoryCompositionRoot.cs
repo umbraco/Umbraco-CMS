@@ -3,7 +3,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Interfaces;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Composing.CompositionRoots
@@ -46,9 +46,9 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.Register<IExternalLoginRepository, ExternalLoginRepository>();
             container.Register<IPublicAccessRepository, PublicAccessRepository>();
             container.Register<ITagRepository, TagRepository>();
-            container.Register<IContentRepository, ContentRepository>();
+            container.Register<IDocumentRepository, DocumentRepository>();
             container.Register<IContentTypeRepository, ContentTypeRepository>();
-            container.Register<IContentBlueprintRepository, ContentBlueprintRepository>();
+            container.Register<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
             container.Register<IDataTypeDefinitionRepository, DataTypeDefinitionRepository>();
             container.Register<IDictionaryRepository, DictionaryRepository>();
             container.Register<ILanguageRepository, LanguageRepository>();

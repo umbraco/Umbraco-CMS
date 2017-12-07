@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -40,7 +41,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
-                repository.AddOrUpdate(server);
+                repository.Save(server);
 
                 Assert.Throws<SqlCeException>(unitOfWork.Flush);
             }
@@ -58,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var server = repository.Get(1);
                 server.ServerIdentity = "COMPUTER2";
-                repository.AddOrUpdate(server);
+                repository.Save(server);
                 Assert.Throws<SqlCeException>(unitOfWork.Flush);
             }
 
@@ -109,7 +110,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var servers = repository.GetAll();
+                var servers = repository.GetMany();
 
                 // Assert
                 Assert.That(servers.Count(), Is.EqualTo(3));
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
-                repository.AddOrUpdate(server);
+                repository.Save(server);
                 unitOfWork.Flush();
 
                 // Assert
@@ -187,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 server.ServerAddress = "https://umbraco.com";
                 server.IsActive = true;
 
-                repository.AddOrUpdate(server);
+                repository.Save(server);
                 unitOfWork.Flush();
 
                 var serverUpdated = repository.Get(2);
@@ -253,9 +254,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(unitOfWork);
 
-                repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
-                repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
-                repository.AddOrUpdate(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
+                repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
+                repository.Save(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
+                repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
                 unitOfWork.Complete();
             }
 

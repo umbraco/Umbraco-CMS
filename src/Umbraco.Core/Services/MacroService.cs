@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
                 var q = Query<IMacro>().Where(x => x.Alias == alias);
-                return repository.GetByQuery(q).FirstOrDefault();
+                return repository.Get(q).FirstOrDefault();
             }
         }
 
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.GetAll(ids);
+                return repository.GetMany(ids);
             }
         }
 
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.GetAll(ids);
+                return repository.GetMany(ids);
             }
         }
 
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IMacroRepository>();
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
                 Audit(uow, AuditType.Save, "Save Macro performed by user", userId, -1);
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Services
         private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var repo = uow.CreateRepository<IAuditRepository>();
-            repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            repo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #region Event Handlers

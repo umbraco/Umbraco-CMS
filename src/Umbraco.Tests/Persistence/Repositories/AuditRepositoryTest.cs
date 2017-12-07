@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var unitOfWork = provider.CreateUnitOfWork())
             {
                 var repo = new AuditRepository(unitOfWork, CacheHelper, Logger);
-                repo.AddOrUpdate(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
+                repo.Save(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
                 unitOfWork.Complete();
 
                 var dtos = unitOfWork.Database.Fetch<LogDto>("WHERE id > -1");

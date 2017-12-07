@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -68,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     CultureName = au.DisplayName
                 };
-                repository.AddOrUpdate(language);
+                repository.Save(language);
                 unitOfWork.Flush();
 
                 //re-get
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     CultureName = au.DisplayName
                 };
-                repository.AddOrUpdate(language);
+                repository.Save(language);
                 unitOfWork.Flush();
 
                 //re-get
@@ -136,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var languages = repository.GetAll();
+                var languages = repository.GetMany();
 
                 // Assert
                 Assert.That(languages, Is.Not.Null);
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(unitOfWork);
 
                 // Act
-                var languages = repository.GetAll(1, 2);
+                var languages = repository.GetMany(1, 2);
 
                 // Assert
                 Assert.That(languages, Is.Not.Null);
@@ -177,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var query = unitOfWork.SqlContext.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
-                var result = repository.GetByQuery(query);
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -215,7 +216,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var languageBR = new Language("pt-BR") {CultureName = "pt-BR"};
-                repository.AddOrUpdate(languageBR);
+                repository.Save(languageBR);
                 unitOfWork.Flush();
 
                 // Assert
@@ -238,7 +239,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 language.IsoCode = "pt-BR";
                 language.CultureName = "pt-BR";
 
-                repository.AddOrUpdate(language);
+                repository.Save(language);
                 unitOfWork.Flush();
 
                 var languageUpdated = repository.Get(5);

@@ -326,7 +326,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IMemberRepository>();
-                repository.AddOrUpdate(member);
+                repository.Save(member);
 
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Saved, this, saveEventArgs);
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 var query = Query<IMember>().Where(x => x.Key == id);
-                return repository.GetByQuery(query).FirstOrDefault();
+                return repository.Get(query).FirstOrDefault();
             }
         }
 
@@ -390,7 +390,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
+                return repository.GetPage(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
             }
         }
 
@@ -411,7 +411,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IMemberRepository>();
                 var query1 = memberTypeAlias == null ? null : Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
                 var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
-                return repository.GetPagedResultsByQuery(query1, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, query2);
+                return repository.GetPage(query1, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, query2);
             }
         }
 
@@ -445,7 +445,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 var query = Query<IMember>().Where(x => x.Email.Equals(email));
-                return repository.GetByQuery(query).FirstOrDefault();
+                return repository.Get(query).FirstOrDefault();
             }
         }
 
@@ -465,7 +465,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 var query = Query<IMember>().Where(x => x.Username.Equals(username));
-                return repository.GetByQuery(query).FirstOrDefault();
+                return repository.Get(query).FirstOrDefault();
             }
         }
 
@@ -481,7 +481,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 var query = Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -498,7 +498,7 @@ namespace Umbraco.Core.Services
                 var repository = uow.CreateRepository<IMemberRepository>();
                 repository.Get(memberTypeId);
                 var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -529,7 +529,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
-                return repository.GetAll(ids);
+                return repository.GetMany(ids);
             }
         }
 
@@ -571,7 +571,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException(nameof(matchType)); // causes rollback
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending, true);
+                return repository.GetPage(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending, true);
             }
         }
 
@@ -613,7 +613,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException(nameof(matchType));
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Email", Direction.Ascending, true);
+                return repository.GetPage(query, pageIndex, pageSize, out totalRecords, "Email", Direction.Ascending, true);
             }
         }
 
@@ -655,7 +655,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException(nameof(matchType));
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
+                return repository.GetPage(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
             }
         }
 
@@ -704,7 +704,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException(nameof(matchType));
                 }
 
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -754,7 +754,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException(nameof(matchType));
                 }
 
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -774,7 +774,7 @@ namespace Umbraco.Core.Services
                     ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
                     ((Member)x).BoolPropertyValue == value);
 
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -825,7 +825,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //TODO: Since this is by property value, we need a GetByPropertyQuery on the repo!
-                return repository.GetByQuery(query);
+                return repository.Get(query);
             }
         }
 
@@ -888,7 +888,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
 
-                repository.AddOrUpdate(member);
+                repository.Save(member);
 
                 if (raiseEvents)
                 {
@@ -923,7 +923,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberRepository>();
                 foreach (var member in membersA)
-                    repository.AddOrUpdate(member);
+                    repository.Save(member);
 
                 if (raiseEvents)
                 {
@@ -1001,7 +1001,7 @@ namespace Umbraco.Core.Services
             {
                 uow.ReadLock(Constants.Locks.MemberTree);
                 var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.GetAll().Select(x => x.Name).Distinct();
+                return repository.GetMany().Select(x => x.Name).Distinct();
             }
         }
 
@@ -1064,7 +1064,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var query = Query<IMemberGroup>().Where(g => g.Name == roleName);
-                var found = repository.GetByQuery(query).ToArray();
+                var found = repository.Get(query).ToArray();
 
                 foreach (var memberGroup in found)
                     _memberGroupService.Delete(memberGroup);
@@ -1145,7 +1145,7 @@ namespace Umbraco.Core.Services
         private void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var repo = uow.CreateRepository<IAuditRepository>();
-            repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            repo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #endregion
@@ -1309,7 +1309,7 @@ namespace Umbraco.Core.Services
 
                 //TODO: What about content that has the contenttype as part of its composition?
                 var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
-                var members = repository.GetByQuery(query).ToArray();
+                var members = repository.Get(query).ToArray();
 
                 var deleteEventArgs = new DeleteEventArgs<IMember>(members);
                 if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))

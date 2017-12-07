@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds);
                 var repo = uow.CreateRepository<IMemberTypeRepository>();
 
-                using (var e = repo.GetAll(new int[0]).GetEnumerator())
+                using (var e = repo.GetMany(new int[0]).GetEnumerator())
                 {
                     if (e.MoveNext() == false)
                         throw new InvalidOperationException("No member types could be resolved");

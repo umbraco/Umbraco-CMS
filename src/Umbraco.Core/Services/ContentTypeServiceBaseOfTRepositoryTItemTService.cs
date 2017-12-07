@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services.Changes;
 
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Services
             // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
             // but that cannot be used (conflict with descendants)
 
-            var allContentTypes = repository.GetAll(new int[0]).Cast<IContentTypeComposition>().ToArray();
+            var allContentTypes = repository.GetMany(new int[0]).Cast<IContentTypeComposition>().ToArray();
 
             var compositionAliases = compositionContentType.CompositionAliases();
             var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
@@ -227,7 +228,7 @@ namespace Umbraco.Core.Services
             {
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
-                return repo.GetAll(ids);
+                return repo.GetMany(ids);
             }
         }
 
@@ -238,7 +239,7 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
                 // IReadRepository<Guid, TEntity> is explicitely implemented, need to cast the repo
-                return ((IReadRepository<Guid, TItem>) repo).GetAll(ids);
+                return ((IReadRepository<Guid, TItem>) repo).GetMany(ids);
             }
         }
 
@@ -249,7 +250,7 @@ namespace Umbraco.Core.Services
                 var repo = uow.CreateRepository<TRepository>();
                 uow.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
-                return repo.GetByQuery(query);
+                return repo.Get(query);
             }
         }
 
@@ -262,7 +263,7 @@ namespace Umbraco.Core.Services
                 var found = Get(id);
                 if (found == null) return Enumerable.Empty<TItem>();
                 var query = Query<TItem>().Where(x => x.ParentId == found.Id);
-                return repo.GetByQuery(query);
+                return repo.Get(query);
             }
         }
 
@@ -323,7 +324,7 @@ namespace Umbraco.Core.Services
                 {
                     var i = ids.Pop();
                     var query = Query<TItem>().Where(x => x.ParentId == i);
-                    var result = repo.GetByQuery(query).ToArray();
+                    var result = repo.Get(query).ToArray();
 
                     foreach (var c in result)
                     {
@@ -403,7 +404,7 @@ namespace Umbraco.Core.Services
 
                 item.CreatorId = userId;
                 if (item.Description == string.Empty) item.Description = null;
-                repo.AddOrUpdate(item); // also updates content/media/member items
+                repo.Save(item); // also updates content/media/member items
 
                 // figure out impacted content types
                 var changes = ComposeContentTypeChanges(item).ToArray();
@@ -446,7 +447,7 @@ namespace Umbraco.Core.Services
                 {
                     contentType.CreatorId = userId;
                     if (contentType.Description == string.Empty) contentType.Description = null;
-                    repo.AddOrUpdate(contentType);
+                    repo.Save(contentType);
                 }
 
                 // figure out impacted content types
@@ -679,7 +680,7 @@ namespace Umbraco.Core.Services
                     }
 
                     copy.ParentId = containerId;
-                    repo.AddOrUpdate(copy);
+                    repo.Save(copy);
                     uow.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
@@ -777,7 +778,7 @@ namespace Umbraco.Core.Services
                         return OperationResult.Attempt.Cancel(evtMsgs, container);
                     }
 
-                    repo.AddOrUpdate(container);
+                    repo.Save(container);
                     uow.Complete();
 
                     saveEventArgs.CanCancel = false;
@@ -822,7 +823,7 @@ namespace Umbraco.Core.Services
                 uow.WriteLock(WriteLockIds); // also for containers
 
                 var repo = uow.CreateContainerRepository(containerObjectType);
-                repo.AddOrUpdate(container);
+                repo.Save(container);
                 uow.Complete();
 
                 OnSavedContainer(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs));
@@ -862,7 +863,7 @@ namespace Umbraco.Core.Services
                 uow.ReadLock(ReadLockIds); // also for containers
 
                 var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return repo.GetAll(containerIds);
+                return repo.GetMany(containerIds);
             }
         }
 
@@ -946,7 +947,7 @@ namespace Umbraco.Core.Services
                         throw new InvalidOperationException("No container found with id " + id);
 
                     container.Name = name;
-                    repository.AddOrUpdate(container);
+                    repository.Save(container);
                     uow.Complete();
 
                     OnRenamedContainer(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs));
@@ -967,7 +968,7 @@ namespace Umbraco.Core.Services
         private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
         {
             var repo = uow.CreateRepository<IAuditRepository>();
-            repo.AddOrUpdate(new AuditItem(objectId, message, type, userId));
+            repo.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #endregion

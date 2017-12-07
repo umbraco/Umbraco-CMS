@@ -15,6 +15,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Security;
 
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Services
                     return user;
                 }
 
-                repository.AddOrUpdate(user);
+                repository.Save(user);
 
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(SavedUser, this, saveEventArgs);
@@ -177,7 +178,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IUserRepository>();
                 var query = Query<IUser>().Where(x => x.Email.Equals(email));
-                return repository.GetByQuery(query).FirstOrDefault();
+                return repository.Get(query).FirstOrDefault();
             }
         }
 
@@ -318,13 +319,13 @@ namespace Umbraco.Core.Services
                     var groupRepository = uow.CreateRepository<IUserGroupRepository>();
                     foreach (var userGroup in explicitUser.GroupsToSave)
                     {
-                        groupRepository.AddOrUpdate(userGroup);
+                        groupRepository.Save(userGroup);
                     }
                 }
 
                 try
                 {
-                    repository.AddOrUpdate(entity);
+                    repository.Save(entity);
                     if (raiseEvents)
                     {
                         saveEventArgs.CanCancel = false;
@@ -382,7 +383,7 @@ namespace Umbraco.Core.Services
                     if (string.IsNullOrWhiteSpace(user.Name))
                         throw new ArgumentException("Empty name.", nameof(entities));
 
-                    repository.AddOrUpdate(user);
+                    repository.Save(user);
 
                     //Now we have to check for backwards compat hacks
                     var explicitUser = user as User;
@@ -390,7 +391,7 @@ namespace Umbraco.Core.Services
                     {
                         foreach (var userGroup in explicitUser.GroupsToSave)
                         {
-                            groupRepository.AddOrUpdate(userGroup);
+                            groupRepository.Save(userGroup);
                         }
                     }
                 }
@@ -740,7 +741,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IUserRepository>();
-                return repository.GetAll(ids);
+                return repository.GetMany(ids);
             }
         }
 
@@ -809,7 +810,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
             {
                 var repository = uow.CreateRepository<IUserGroupRepository>();
-                return repository.GetAll(ids).OrderBy(x => x.Name);
+                return repository.GetMany(ids).OrderBy(x => x.Name);
             }
         }
 
@@ -821,7 +822,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IUserGroupRepository>();
                 var query = Query<IUserGroup>().Where(x => aliases.SqlIn(x.Alias));
-                var contents = repository.GetByQuery(query);
+                var contents = repository.Get(query);
                 return contents.WhereNotNull().ToArray();
             }
         }
@@ -839,7 +840,7 @@ namespace Umbraco.Core.Services
             {
                 var repository = uow.CreateRepository<IUserGroupRepository>();
                 var query = Query<IUserGroup>().Where(x => x.Alias == alias);
-                var contents = repository.GetByQuery(query);
+                var contents = repository.Get(query);
                 return contents.FirstOrDefault();
             }
         }
@@ -932,7 +933,7 @@ namespace Umbraco.Core.Services
                 {
                     //now remove the section for each user and commit
                     group.RemoveAllowedSection(sectionAlias);
-                    repository.AddOrUpdate(group);
+                    repository.Save(group);
                 }
 
                 uow.Complete();

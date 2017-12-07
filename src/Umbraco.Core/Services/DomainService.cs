@@ -101,7 +101,7 @@ namespace Umbraco.Core.Services
                 }
 
                 var repository = uow.CreateRepository<IDomainRepository>();
-                repository.AddOrUpdate(domainEntity);
+                repository.Save(domainEntity);
                 uow.Complete();
                 saveEventArgs.CanCancel = false;
                 uow.Events.Dispatch(Saved, this, saveEventArgs);

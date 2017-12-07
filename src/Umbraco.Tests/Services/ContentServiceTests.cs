@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -38,12 +39,12 @@ namespace Umbraco.Tests.Services
         public override void SetUp()
         {
             base.SetUp();
-            VersionableRepositoryBase.ThrowOnWarning = true;
+            ContentRepositoryBase.ThrowOnWarning = true;
         }
 
         public override void TearDown()
         {
-            VersionableRepositoryBase.ThrowOnWarning = false;
+            ContentRepositoryBase.ThrowOnWarning = false;
             base.TearDown();
         }
 
@@ -2128,7 +2129,7 @@ namespace Umbraco.Tests.Services
 
                 foreach (var content in list)
                 {
-                    repository.AddOrUpdate(content.Value);
+                    repository.Save(content.Value);
                     unitOfWork.Flush();
                 }
 
@@ -2471,12 +2472,12 @@ namespace Umbraco.Tests.Services
             return list;
         }
 
-        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-            var repository = new ContentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }
