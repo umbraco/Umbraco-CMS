@@ -19,6 +19,8 @@ using Lucene.Net.Analysis;
 namespace UmbracoExamine
 {
 
+    
+
     /// <summary>
     /// Custom indexer for members
     /// </summary>
@@ -99,6 +101,11 @@ namespace UmbracoExamine
             _dataTypeService = dataTypeService;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
+        }
+
+        protected override IDataService CreateDefaultUmbracoDataService()
+        {
+            return new UmbracoMemberDataService();
         }
 
         /// <summary>

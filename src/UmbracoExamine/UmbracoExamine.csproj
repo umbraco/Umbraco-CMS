@@ -119,6 +119,8 @@
     <Compile Include="DataServices\UmbracoDataService.cs" />
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
+    <Compile Include="DataServices\UmbracoMemberContentService.cs" />
+    <Compile Include="DataServices\UmbracoMemberDataService.cs" />
     <Compile Include="DeletePolicyTracker.cs" />
     <Compile Include="ExamineHelper.cs" />
     <Compile Include="IndexTypes.cs" />
