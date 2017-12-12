@@ -10,6 +10,7 @@ function DictionaryListController($scope, $location, dictionaryResource) {
     vm = this;
     vm.title = "TODO dictoinary item";
     vm.loading = false;
+    vm.items = [];   
 
     function loadList() {
 
@@ -18,7 +19,7 @@ function DictionaryListController($scope, $location, dictionaryResource) {
         dictionaryResource.getList()
             .then(function (data) {
 
-                console.log(data);
+                vm.items = data;
 
                 vm.loading = false;
             });
