@@ -232,7 +232,7 @@
             foreach (var childItem in this.Services.LocalizationService.GetDictionaryItemChildren(
                 dictionaryItem.Key))
             {
-                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
+                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(childItem);
                 item.Level = level;
                 list.Add(item);
 
