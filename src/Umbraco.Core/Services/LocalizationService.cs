@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
@@ -14,9 +15,18 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class LocalizationService : ScopeRepositoryService, ILocalizationService
     {
-        public LocalizationService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IDictionaryRepository _dictionaryRepository;
+        private readonly ILanguageRepository _languageRepository;
+        private readonly IAuditRepository _auditRepository;
+
+        public LocalizationService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IDictionaryRepository dictionaryRepository, IAuditRepository auditRepository, ILanguageRepository languageRepository)
             : base(provider, logger, eventMessagesFactory)
-        { }
+        {
+            _dictionaryRepository = dictionaryRepository;
+            _auditRepository = auditRepository;
+            _languageRepository = languageRepository;
+        }
 
         /// <summary>
         /// Adds or updates a translation for a dictionary item and language
@@ -56,11 +66,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-
                 //validate the parent
+
                 if (parentId.HasValue && parentId.Value != Guid.Empty)
                 {
                     var parent = GetDictionaryItemById(parentId.Value);
@@ -79,21 +88,22 @@ namespace Umbraco.Core.Services
 
                     item.Translations = translations;
                 }
-
                 var saveEventArgs = new SaveEventArgs<IDictionaryItem>(item);
-                if (uow.Events.DispatchCancelable(SavingDictionaryItem, this, saveEventArgs))
+
+                if (scope.Events.DispatchCancelable(SavingDictionaryItem, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return item;
                 }
-
-                repository.Save(item);
-                uow.Complete();
+                _dictionaryRepository.Save(item);
 
                 // ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
+
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SavedDictionaryItem, this, saveEventArgs);
+                scope.Events.Dispatch(SavedDictionaryItem, this, saveEventArgs);
+
+                scope.Complete();
 
                 return item;
             }
@@ -106,10 +116,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                var item = repository.Get(id);
+                var item = _dictionaryRepository.Get(id);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
                 return item;
@@ -123,10 +132,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="DictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                var item = repository.Get(id);
+                var item = _dictionaryRepository.Get(id);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
                 return item;
@@ -140,10 +148,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemByKey(string key)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                var item = repository.Get(key);
+                var item = _dictionaryRepository.Get(key);
                 //ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
                 return item;
@@ -157,11 +164,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = repository.Get(query).ToArray();
+                var items = _dictionaryRepository.Get(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)
                     EnsureDictionaryItemLanguageCallback(item);
@@ -176,10 +182,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                var items = repository.GetDictionaryItemDescendants(parentId).ToArray();
+                var items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)
                     EnsureDictionaryItemLanguageCallback(item);
@@ -193,11 +198,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = repository.Get(query).ToArray();
+                var items = _dictionaryRepository.Get(query).ToArray();
                 //ensure the lazy Language callback is assigned
                 foreach (var item in items)
                     EnsureDictionaryItemLanguageCallback(item);
@@ -212,10 +216,9 @@ namespace Umbraco.Core.Services
         /// <returns>True if a <see cref="IDictionaryItem"/> exists, otherwise false</returns>
         public bool DictionaryItemExists(string key)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                var item = repository.Get(key);
+                var item = _dictionaryRepository.Get(key);
                 return item != null;
             }
         }
@@ -227,24 +230,24 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
         public void Save(IDictionaryItem dictionaryItem, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                if (uow.Events.DispatchCancelable(SavingDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem)))
+                if (scope.Events.DispatchCancelable(SavingDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem)))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                repository.Save(dictionaryItem);
+                _dictionaryRepository.Save(dictionaryItem);
 
                 // ensure the lazy Language callback is assigned
+                // ensure the lazy Language callback is assigned
+
                 EnsureDictionaryItemLanguageCallback(dictionaryItem);
+                scope.Events.Dispatch(SavedDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem, false));
 
-                uow.Events.Dispatch(SavedDictionaryItem, this, new SaveEventArgs<IDictionaryItem>(dictionaryItem, false));
-                Audit(uow, AuditType.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
-
-                uow.Complete();
+                Audit(AuditType.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
+                scope.Complete();
             }
         }
 
@@ -256,23 +259,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
         public void Delete(IDictionaryItem dictionaryItem, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IDictionaryItem>(dictionaryItem);
-                if (uow.Events.DispatchCancelable(DeletingDictionaryItem, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(DeletingDictionaryItem, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                repository.Delete(dictionaryItem);
+                _dictionaryRepository.Delete(dictionaryItem);
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedDictionaryItem, this, deleteEventArgs);
+                scope.Events.Dispatch(DeletedDictionaryItem, this, deleteEventArgs);
 
-                Audit(uow, AuditType.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
+                Audit(AuditType.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -283,10 +285,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.Get(id);
+                return _languageRepository.Get(id);
             }
         }
 
@@ -297,10 +298,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByCultureCode(string cultureName)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.GetByCultureName(cultureName);
+                return _languageRepository.GetByCultureName(cultureName);
             }
         }
 
@@ -311,10 +311,9 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByIsoCode(string isoCode)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.GetByIsoCode(isoCode);
+                return _languageRepository.GetByIsoCode(isoCode);
             }
         }
 
@@ -324,10 +323,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ILanguage"/> objects</returns>
         public IEnumerable<ILanguage> GetAllLanguages()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<ILanguageRepository>();
-                return repository.GetMany();
+                return _languageRepository.GetMany();
             }
         }
 
@@ -338,23 +336,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the language</param>
         public void Save(ILanguage language, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<ILanguage>(language);
-                if (uow.Events.DispatchCancelable(SavingLanguage, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingLanguage, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<ILanguageRepository>();
-                repository.Save(language);
+                _languageRepository.Save(language);
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SavedLanguage, this, saveEventArgs);
+                scope.Events.Dispatch(SavedLanguage, this, saveEventArgs);
 
-                Audit(uow, AuditType.Save, "Save Language performed by user", userId, language.Id);
+                Audit(AuditType.Save, "Save Language performed by user", userId, language.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -365,32 +362,30 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the language</param>
         public void Delete(ILanguage language, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<ILanguage>(language);
-                if (uow.Events.DispatchCancelable(DeletingLanguage, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(DeletingLanguage, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<ILanguageRepository>();
                 //NOTE: There isn't any constraints in the db, so possible references aren't deleted
-                repository.Delete(language);
 
+                _languageRepository.Delete(language);
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedLanguage, this, deleteEventArgs);
 
-                Audit(uow, AuditType.Delete, "Delete Language performed by user", userId, language.Id);
+                scope.Events.Dispatch(DeletedLanguage, this, deleteEventArgs);
 
-                uow.Complete();
+                Audit(AuditType.Delete, "Delete Language performed by user", userId, language.Id);
+                scope.Complete();
             }
         }
 
-        private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var repo = uow.CreateRepository<IAuditRepository>();
-            repo.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
         }
 
         /// <summary>
@@ -411,10 +406,9 @@ namespace Umbraco.Core.Services
 
         public Dictionary<string, Guid> GetDictionaryItemKeyMap()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDictionaryRepository>();
-                return repository.GetDictionaryItemKeyMap();
+                return _dictionaryRepository.GetDictionaryItemKeyMap();
             }
         }
 

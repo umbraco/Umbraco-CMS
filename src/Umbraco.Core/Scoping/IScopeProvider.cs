@@ -34,7 +34,8 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false);
+            bool callContext = false,
+            bool readOnly = false); // fixme rename to autoComplete + explain the risks!
 
         /// <summary>
         /// Creates a detached scope.

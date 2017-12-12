@@ -11,25 +11,39 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
+    /// Implements the content service.
     /// </summary>
-    public class ContentService : ScopeRepositoryService, IContentService
+    internal class ContentService : RepositoryService, IContentService
     {
-        private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IDocumentRepository _documentRepository;
+        private readonly IEntityRepository _entityRepository;
+        private readonly IAuditRepository _auditRepository;
+        private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
+
+        private readonly MediaFileSystem _mediaFileSystem;        
         private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
 
-        public ContentService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, MediaFileSystem mediaFileSystem)
+        public ContentService(IScopeProvider provider, ILogger logger,
+            IEventMessagesFactory eventMessagesFactory, MediaFileSystem mediaFileSystem,
+            IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
+            _documentRepository = documentRepository;
+            _entityRepository = entityRepository;
+            _auditRepository = auditRepository;
+            _contentTypeRepository = contentTypeRepository;
+            _documentBlueprintRepository = documentBlueprintRepository;
         }
 
         #endregion
@@ -46,41 +60,37 @@ namespace Umbraco.Core.Services
 
         public int CountPublished(string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                return repo.CountPublished();
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.CountPublished();
             }
         }
 
         public int Count(string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                return repo.Count(contentTypeAlias);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.Count(contentTypeAlias);
             }
         }
 
         public int CountChildren(int parentId, string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                return repo.CountChildren(parentId, contentTypeAlias);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.CountChildren(parentId, contentTypeAlias);
             }
         }
 
         public int CountDescendants(int parentId, string contentTypeAlias = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                return repo.CountDescendants(parentId, contentTypeAlias);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.CountDescendants(parentId, contentTypeAlias);
             }
         }
 
@@ -95,12 +105,11 @@ namespace Umbraco.Core.Services
         /// <param name="permissionSet"></param>
         public void SetPermissions(EntityPermissionSet permissionSet)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                repo.ReplaceContentPermissions(permissionSet);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.ContentTree);
+                _documentRepository.ReplaceContentPermissions(permissionSet);
+                scope.Complete();
             }
         }
 
@@ -112,12 +121,11 @@ namespace Umbraco.Core.Services
         /// <param name="groupIds"></param>
         public void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                repo.AssignEntityPermission(entity, permission, groupIds);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.ContentTree);
+                _documentRepository.AssignEntityPermission(entity, permission, groupIds);
+                scope.Complete();
             }
         }
 
@@ -128,11 +136,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public EntityPermissionCollection GetPermissions(IContent content)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                return repo.GetPermissionsForEntity(content.Id);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetPermissionsForEntity(content.Id);
             }
         }
 
@@ -182,10 +189,10 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No content with that id.", nameof(parentId));
 
             var content = new Content(name, parentId, contentType);
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                CreateContent(uow, content, parent, userId, false);
-                uow.Complete();
+                CreateContent(scope, content, parent, userId, false);
+                scope.Complete();
             }
 
             return content;
@@ -211,10 +218,10 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
 
             var content = new Content(name, -1, contentType);
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                CreateContent(uow, content, null, userId, false);
-                uow.Complete();
+                CreateContent(scope, content, null, userId, false);
+                scope.Complete();
             }
 
             return content;
@@ -236,7 +243,7 @@ namespace Umbraco.Core.Services
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 // not locking since not saving anything
 
@@ -245,9 +252,9 @@ namespace Umbraco.Core.Services
                     throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
                 var content = new Content(name, parent, contentType);
-                CreateContent(uow, content, parent, userId, false);
+                CreateContent(scope, content, parent, userId, false);
 
-                uow.Complete();
+                scope.Complete();
                 return content;
             }
         }
@@ -263,10 +270,10 @@ namespace Umbraco.Core.Services
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 // locking the content tree secures content types too
-                uow.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 var contentType = GetContentType(contentTypeAlias); // + locks
                 if (contentType == null)
@@ -277,9 +284,9 @@ namespace Umbraco.Core.Services
                     throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
 
                 var content = parentId > 0 ? new Content(name, parent, contentType) : new Content(name, parentId, contentType);
-                CreateContent(uow, content, parent, userId, true);
+                CreateContent(scope, content, parent, userId, true);
 
-                uow.Complete();
+                scope.Complete();
                 return content;
             }
         }
@@ -297,24 +304,24 @@ namespace Umbraco.Core.Services
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 // locking the content tree secures content types too
-                uow.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 var contentType = GetContentType(contentTypeAlias); // + locks
                 if (contentType == null)
                     throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
                 var content = new Content(name, parent, contentType);
-                CreateContent(uow, content, parent, userId, true);
+                CreateContent(scope, content, parent, userId, true);
 
-                uow.Complete();
+                scope.Complete();
                 return content;
             }
         }
 
-        private void CreateContent(IScopeUnitOfWork uow, Content content, IContent parent, int userId, bool withIdentity)
+        private void CreateContent(IScope scope, Content content, IContent parent, int userId, bool withIdentity)
         {
             // NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
@@ -322,7 +329,7 @@ namespace Umbraco.Core.Services
                 ? new NewEventArgs<IContent>(content, content.ContentType.Alias, parent)
                 : new NewEventArgs<IContent>(content, content.ContentType.Alias, -1);
 
-            if (uow.Events.DispatchCancelable(Creating, this, newArgs))
+            if (scope.Events.DispatchCancelable(Creating, this, newArgs))
             {
                 content.WasCancelled = true;
                 return;
@@ -334,28 +341,25 @@ namespace Umbraco.Core.Services
             if (withIdentity)
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(content);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     content.WasCancelled = true;
                     return;
                 }
 
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                repo.Save(content);
-
-                uow.Flush(); // need everything so we can serialize
+                _documentRepository.Save(content);
 
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
+                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
-            uow.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, content.ContentType.Alias, parent));
+            scope.Events.Dispatch(Created, this, new NewEventArgs<IContent>(content, false, content.ContentType.Alias, parent));
 
             if (withIdentity == false)
                 return;
 
-            Audit(uow, AuditType.New, $"Content '{content.Name}' was created with Id {content.Id}", content.CreatorId, content.Id);
+            Audit(AuditType.New, $"Content '{content.Name}' was created with Id {content.Id}", content.CreatorId, content.Id);
         }
 
         #endregion
@@ -369,11 +373,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.Get(id);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.Get(id);
             }
         }
 
@@ -387,11 +390,10 @@ namespace Umbraco.Core.Services
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return Enumerable.Empty<IContent>();
 
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                var items = repository.GetMany(idsA);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var items = _documentRepository.GetMany(idsA);
 
                 var index = items.ToDictionary(x => x.Id, x => x);
 
@@ -406,11 +408,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(Guid key)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.Get(key);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.Get(key);
             }
         }
 
@@ -424,11 +425,10 @@ namespace Umbraco.Core.Services
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return Enumerable.Empty<IContent>();
 
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                var items = repository.GetMany(idsA);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var items = _documentRepository.GetMany(idsA);
 
                 var index = items.ToDictionary(x => x.Key, x => x);
 
@@ -443,23 +443,21 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetByType(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
         internal IEnumerable<IContent> GetPublishedContentOfContentType(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ContentTypeId == id);
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -471,12 +469,11 @@ namespace Umbraco.Core.Services
         /// <remarks>Contrary to most methods, this method filters out trashed content items.</remarks>
         public IEnumerable<IContent> GetByLevel(int level)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -487,11 +484,10 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IContent"/> item</returns>
         public IContent GetVersion(int versionId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.GetVersion(versionId);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetVersion(versionId);
             }
         }
 
@@ -502,11 +498,10 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetVersions(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.GetAllVersions(id);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetAllVersions(id);
             }
         }
 
@@ -518,10 +513,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<int> GetVersionIds(int id, int maxRows)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.GetVersionIds(id, maxRows);
+                return _documentRepository.GetVersionIds(id, maxRows);
             }
         }
 
@@ -553,11 +547,10 @@ namespace Umbraco.Core.Services
             if (ids.Any() == false)
                 return new List<IContent>();
 
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.GetMany(ids);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.GetMany(ids);
             }
         }
 
@@ -568,12 +561,11 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetChildren(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == id);
-                return repository.Get(query).OrderBy(x => x.SortOrder);
+                return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
             }
         }
 
@@ -584,12 +576,11 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of published <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPublishedChildren(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
-                return repository.Get(query).OrderBy(x => x.SortOrder);
+                return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
             }
         }
 
@@ -607,14 +598,13 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
                     : Query<IContent>().Where(x => x.Name.Contains(filter));
-                // fixme nesting uow?!
+
                 return GetPagedChildren(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
             }
         }
@@ -637,16 +627,15 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
 
                 var query = Query<IContent>();
                 //if the id is System Root, then just get all - NO! does not make sense!
                 //if (id != Constants.System.Root)
                 query.Where(x => x.ParentId == id);
-                return repository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
         }
 
@@ -663,13 +652,13 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var filterQuery = filter.IsNullOrWhiteSpace()
                     ? null
                     : Query<IContent>().Where(x => x.Name.Contains(filter));
-                // fixme nesting uow?
+
                 return GetPagedDescendants(id, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, true, filterQuery);
             }
         }
@@ -691,17 +680,15 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
 
                 var query = Query<IContent>();
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
                 {
-                    var entityRepository = uow.CreateRepository<IEntityRepository>();
-                    var contentPath = entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
+                    var contentPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
                     if (contentPath.Length == 0)
                     {
                         totalChildren = 0;
@@ -709,7 +696,7 @@ namespace Umbraco.Core.Services
                     }
                     query.Where(x => x.Path.SqlStartsWith($"{contentPath[0]},", TextColumnType.NVarchar));
                 }
-                return repository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
+                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
         }
 
@@ -721,12 +708,11 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetChildren(int parentId, string name)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == parentId && x.Name.Contains(name));
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -737,19 +723,18 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetDescendants(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var content = GetById(id);
                 if (content == null)
                 {
-                    uow.Complete(); // else causes rollback
+                    scope.Complete(); // else causes rollback
                     return Enumerable.Empty<IContent>();
                 }
                 var pathMatch = content.Path + ",";
                 var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -760,13 +745,12 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetDescendants(IContent content)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var pathMatch = content.Path + ",";
                 var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch));
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -801,12 +785,11 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetRootContent()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -816,11 +799,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         internal IEnumerable<IContent> GetAllPublished()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return repository.Get(QueryNotTrashed);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.Get(QueryNotTrashed);
             }
         }
 
@@ -830,18 +812,12 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentForExpiration()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                return GetContentForExpiration(uow);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var query = Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
+                return _documentRepository.Get(query);
             }
-        }
-
-        private IEnumerable<IContent> GetContentForExpiration(IScopeUnitOfWork uow)
-        {
-            var repository = uow.CreateRepository<IDocumentRepository>();
-            var query = Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
-            return repository.Get(query);
         }
 
         /// <summary>
@@ -850,18 +826,12 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentForRelease()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                return GetContentForRelease(uow);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var query = Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
+                return _documentRepository.Get(query);
             }
-        }
-
-        private IEnumerable<IContent> GetContentForRelease(IScopeUnitOfWork uow)
-        {
-            var repository = uow.CreateRepository<IDocumentRepository>();
-            var query = Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
-            return repository.Get(query);
         }
 
         /// <summary>
@@ -870,13 +840,12 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentInRecycleBin()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.ReadLock(Constants.Locks.ContentTree);
                 var bin = $"{Constants.System.Root},{Constants.System.RecycleBinContent},";
                 var query = Query<IContent>().Where(x => x.Path.StartsWith(bin));
-                return repository.Get(query);
+                return _documentRepository.Get(query);
             }
         }
 
@@ -908,11 +877,10 @@ namespace Umbraco.Core.Services
 
         public bool IsPathPublished(IContent content)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repo = uow.CreateRepository<IDocumentRepository>();
-                return repo.IsPathPublished(content);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.IsPathPublished(content);
             }
         }
 
@@ -931,12 +899,12 @@ namespace Umbraco.Core.Services
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
                 }
 
@@ -947,24 +915,23 @@ namespace Umbraco.Core.Services
 
                 var isNew = content.IsNewEntity();
 
-                uow.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.ContentTree);
 
-                var repository = uow.CreateRepository<IDocumentRepository>();
                 if (content.HasIdentity == false)
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
-                repository.Save(content);
+                _documentRepository.Save(content);
 
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
                 var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                Audit(uow, AuditType.Save, "Save Content performed by user", userId, content.Id);
-                uow.Complete();
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
+                scope.Complete();
             }
 
             return OperationResult.Succeed(evtMsgs);
@@ -976,38 +943,37 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
             var contentsA = contents.ToArray();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(contentsA, evtMsgs);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
                 }
 
                 var treeChanges = contentsA.Select(x => new TreeChange<IContent>(x,
                     x.IsNewEntity() ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode));
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
                 foreach (var content in contentsA)
                 {
                     if (content.HasIdentity == false)
                         content.CreatorId = userId;
                     content.WriterId = userId;
 
-                    repository.Save(content);
+                    _documentRepository.Save(content);
                 }
 
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
-                uow.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
-                Audit(uow, AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
+                Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return OperationResult.Succeed(evtMsgs);
@@ -1027,12 +993,12 @@ namespace Umbraco.Core.Services
                 return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content);
             }
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
                 }
 
@@ -1040,31 +1006,30 @@ namespace Umbraco.Core.Services
                 var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
                 var previouslyPublished = content.HasIdentity && content.Published;
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 // ensure that the document can be published, and publish
                 // handling events, business rules, etc
-                result = StrategyCanPublish(uow, content, userId, /*checkPath:*/ true, evtMsgs);
+                result = StrategyCanPublish(scope, content, userId, /*checkPath:*/ true, evtMsgs);
                 if (result.Success)
-                    result = StrategyPublish(uow, content, /*canPublish:*/ true, userId, evtMsgs);
+                    result = StrategyPublish(scope, content, /*canPublish:*/ true, userId, evtMsgs);
 
                 // save - always, even if not publishing (this is SaveAndPublish)
                 if (content.HasIdentity == false)
                     content.CreatorId = userId;
                 content.WriterId = userId;
 
-                repository.Save(content);
+                _documentRepository.Save(content);
 
                 if (raiseEvents) // always
                 {
                     saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
 
                 if (result.Success == false)
                 {
-                    uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                     return result;
                 }
 
@@ -1072,22 +1037,22 @@ namespace Umbraco.Core.Services
                     changeType = TreeChangeTypes.RefreshBranch; // whole branch
 
                 // invalidate the node/branch
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
 
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
+                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(content, false, false), "Published");
 
                 // if was not published and now is... descendants that were 'published' (but
                 // had an unpublished ancestor) are 're-published' ie not explicitely published
                 // but back as 'published' nevertheless
                 if (isNew == false && previouslyPublished == false && HasChildren(content.Id))
                 {
-                    var descendants = GetPublishedDescendantsLocked(uow, repository, content).ToArray();
-                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
+                    var descendants = GetPublishedDescendantsLocked(content).ToArray();
+                    scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                 }
 
-                Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                Audit(AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return result;
@@ -1098,35 +1063,34 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 var newest = GetById(content.Id); // ensure we have the newest version
                 if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
                     content = newest;
                 if (content.Published == false)
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content); // already unpublished
                 }
 
                 // strategy
                 // fixme should we still complete the uow? don't want to rollback here!
-                var attempt = StrategyCanUnpublish(uow, content, userId, evtMsgs);
+                var attempt = StrategyCanUnpublish(scope, content, userId, evtMsgs);
                 if (attempt.Success == false) return attempt; // causes rollback
-                attempt = StrategyUnpublish(uow, content, true, userId, evtMsgs);
+                attempt = StrategyUnpublish(scope, content, true, userId, evtMsgs);
                 if (attempt.Success == false) return attempt; // causes rollback
 
                 content.WriterId = userId;
-                repository.Save(content);
+                _documentRepository.Save(content);
 
-                uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                Audit(uow, AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
+                scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return new PublishResult(PublishResultType.Success, evtMsgs, content);
@@ -1135,11 +1099,11 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public IEnumerable<PublishResult> PerformScheduledPublish()
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.ContentTree);
 
-                foreach (var d in GetContentForRelease(uow))
+                foreach (var d in GetContentForRelease())
                 {
                     PublishResult result;
                     try
@@ -1157,7 +1121,7 @@ namespace Umbraco.Core.Services
                     }
                     yield return result;
                 }
-                foreach (var d in GetContentForExpiration(uow))
+                foreach (var d in GetContentForExpiration())
                 {
                     try
                     {
@@ -1173,7 +1137,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1194,10 +1158,9 @@ namespace Umbraco.Core.Services
             var results = new List<PublishResult>();
             var publishedDocuments = new List<IContent>();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 // fixme events?!
 
@@ -1209,7 +1172,7 @@ namespace Umbraco.Core.Services
                     throw new InvalidOperationException("Do not publish values when publishing branches.");
 
                 // deal with the branch root - if it fails, abort
-                var result = SaveAndPublishBranchOne(document, repository, uow, editing, publishValues, true, publishedDocuments, evtMsgs, userId);
+                var result = SaveAndPublishBranchOne(scope, document, editing, publishValues, true, publishedDocuments, evtMsgs, userId);
                 results.Add(result);
                 if (!result.Success) return results;
 
@@ -1229,7 +1192,7 @@ namespace Umbraco.Core.Services
                     // no need to check path here,
                     // 1. because we know the parent is path-published (we just published it)
                     // 2. because it would not work as nothing's been written out to the db until the uow completes
-                    result = SaveAndPublishBranchOne(d, repository, uow, editing, publishValues, false, publishedDocuments, evtMsgs, userId);
+                    result = SaveAndPublishBranchOne(scope, d, editing, publishValues, false, publishedDocuments, evtMsgs, userId);
                     results.Add(result);
                     if (result.Success) continue;
 
@@ -1237,18 +1200,17 @@ namespace Umbraco.Core.Services
                     exclude.Add(d.Id);
                 }
 
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
-                Audit(uow, AuditType.Publish, "SaveAndPublishBranch performed by user", userId, document.Id);
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
+                Audit(AuditType.Publish, "SaveAndPublishBranch performed by user", userId, document.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return results;
         }
 
-        private PublishResult SaveAndPublishBranchOne(IContent document,
-            IDocumentRepository repository, IScopeUnitOfWork uow,
+        private PublishResult SaveAndPublishBranchOne(IScope scope, IContent document,
             Func<IContent, bool> editing, Func<IContent, bool> publishValues,
             bool checkPath,
             List<IContent> publishedDocuments,
@@ -1264,18 +1226,18 @@ namespace Umbraco.Core.Services
                 return new PublishResult(PublishResultType.FailedContentInvalid, evtMsgs, document);
 
             // check if we can publish
-            var result = StrategyCanPublish(uow, document, userId, checkPath, evtMsgs);
+            var result = StrategyCanPublish(scope, document, userId, checkPath, evtMsgs);
             if (!result.Success)
                 return result;
 
             // publish - should be successful
-            var publishResult = StrategyPublish(uow, document, /*canPublish:*/ true, userId, evtMsgs);
+            var publishResult = StrategyPublish(scope, document, /*canPublish:*/ true, userId, evtMsgs);
             if (!publishResult.Success)
                 throw new Exception("oops: failed to publish.");
 
             // save
             document.WriterId = userId;
-            repository.Save(document);
+            _documentRepository.Save(document);
             publishedDocuments.Add(document);
             return publishResult;
         }
@@ -1289,36 +1251,35 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IContent>(content, evtMsgs);
-                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 // if it's not trashed yet, and published, we should unpublish
                 // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                 // just raise the event
                 if (content.Trashed == false && content.Published)
-                    uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+                    scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
 
-                DeleteLocked(uow, repository, content);
+                DeleteLocked(scope, content);
 
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
-                Audit(uow, AuditType.Delete, "Delete Content performed by user", userId, content.Id);
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
+                Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return OperationResult.Succeed(evtMsgs);
         }
 
-        private void DeleteLocked(IScopeUnitOfWork uow, IDocumentRepository repository, IContent content)
+        private void DeleteLocked(IScope scope, IContent content)
         {
             // then recursively delete descendants, bottom-up
             // just repository.Delete + an event
@@ -1339,9 +1300,9 @@ namespace Umbraco.Core.Services
                 c = stack.Pop();
                 level = c.Level;
 
-                repository.Delete(c);
+                _documentRepository.Delete(c);
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
-                uow.Events.Dispatch(Deleted, this, args);
+                scope.Events.Dispatch(Deleted, this, args);
 
                 // fixme not going to work, do it differently
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
@@ -1364,24 +1325,23 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteRevisionsEventArgs = new DeleteRevisionsEventArgs(id, dateToRetain: versionDate);
-                if (uow.Events.DispatchCancelable(DeletingVersions, this, deleteRevisionsEventArgs))
+                if (scope.Events.DispatchCancelable(DeletingVersions, this, deleteRevisionsEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                repository.DeleteVersions(id, versionDate);
+                scope.WriteLock(Constants.Locks.ContentTree);
+                _documentRepository.DeleteVersions(id, versionDate);
 
                 deleteRevisionsEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs);
-                Audit(uow, AuditType.Delete, "Delete Content by version date performed by user", userId, Constants.System.Root);
+                scope.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs);
+                Audit(AuditType.Delete, "Delete Content by version date performed by user", userId, Constants.System.Root);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1395,11 +1355,11 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                if (uow.Events.DispatchCancelable(DeletingVersions, this, new DeleteRevisionsEventArgs(id, /*specificVersion:*/ versionId)))
+                if (scope.Events.DispatchCancelable(DeletingVersions, this, new DeleteRevisionsEventArgs(id, /*specificVersion:*/ versionId)))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
@@ -1410,16 +1370,15 @@ namespace Umbraco.Core.Services
                     DeleteVersions(id, content.UpdateDate, userId);
                 }
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                var c = repository.Get(id);
+                scope.WriteLock(Constants.Locks.ContentTree);
+                var c = _documentRepository.Get(id);
                 if (c.VersionId != versionId) // don't delete the current version
-                    repository.DeleteVersion(versionId);
+                    _documentRepository.DeleteVersion(versionId);
 
-                uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
-                Audit(uow, AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
+                scope.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
+                Audit(AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1433,17 +1392,16 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<Tuple<IContent, string>>();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 var originalPath = content.Path;
                 var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
                 var moveEventArgs = new MoveEventArgs<IContent>(evtMsgs, moveEventInfo);
-                if (uow.Events.DispatchCancelable(Trashing, this, moveEventArgs))
+                if (scope.Events.DispatchCancelable(Trashing, this, moveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Cancel(evtMsgs); // causes rollback
                 }
 
@@ -1453,8 +1411,8 @@ namespace Umbraco.Core.Services
                 //if (content.HasPublishedVersion)
                 //{ }
 
-                PerformMoveLocked(repository, content, Constants.System.RecycleBinContent, null, userId, moves, true);
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                PerformMoveLocked(content, Constants.System.RecycleBinContent, null, userId, moves, true);
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                 var moveInfo = moves
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
@@ -1462,10 +1420,10 @@ namespace Umbraco.Core.Services
 
                 moveEventArgs.CanCancel = false;
                 moveEventArgs.MoveInfoCollection = moveInfo;
-                uow.Events.Dispatch(Trashed, this, moveEventArgs);
-                Audit(uow, AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+                scope.Events.Dispatch(Trashed, this, moveEventArgs);
+                Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return OperationResult.Succeed(evtMsgs);
@@ -1493,10 +1451,9 @@ namespace Umbraco.Core.Services
 
             var moves = new List<Tuple<IContent, string>>();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 var parent = parentId == Constants.System.Root ? null : GetById(parentId);
                 if (parentId != Constants.System.Root && (parent == null || parent.Trashed))
@@ -1504,9 +1461,9 @@ namespace Umbraco.Core.Services
 
                 var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
                 var moveEventArgs = new MoveEventArgs<IContent>(moveEventInfo);
-                if (uow.Events.DispatchCancelable(Moving, this, moveEventArgs))
+                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return; // causes rollback
                 }
 
@@ -1525,9 +1482,9 @@ namespace Umbraco.Core.Services
                     ((Content) content).PublishedState = PublishedState.Unpublishing;
                 }
 
-                PerformMoveLocked(repository, content, parentId, parent, userId, moves, trashed);
+                PerformMoveLocked(content, parentId, parent, userId, moves, trashed);
 
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                 var moveInfo = moves //changes
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
@@ -1535,17 +1492,16 @@ namespace Umbraco.Core.Services
 
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Moved, this, moveEventArgs);
-                Audit(uow, AuditType.Move, "Move Content performed by user", userId, content.Id);
+                scope.Events.Dispatch(Moved, this, moveEventArgs);
+                Audit(AuditType.Move, "Move Content performed by user", userId, content.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
         // MUST be called from within WriteLock
         // trash indicates whether we are trashing, un-trashing, or not changing anything
-        private void PerformMoveLocked(IDocumentRepository repository,
-            IContent content, int parentId, IContent parent, int userId,
+        private void PerformMoveLocked(IContent content, int parentId, IContent parent, int userId,
             ICollection<Tuple<IContent, string>> moves,
             bool? trash)
         {
@@ -1568,7 +1524,7 @@ namespace Umbraco.Core.Services
             //content.Path = (parent == null ? "-1" : parent.Path) + "," + content.Id;
             //content.SortOrder = ((ContentRepository) repository).NextChildSortOrder(parentId);
             //content.Level += levelDelta;
-            PerformMoveContentLocked(repository, content, userId, trash);
+            PerformMoveContentLocked(content, userId, trash);
 
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
@@ -1585,15 +1541,15 @@ namespace Umbraco.Core.Services
                 descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                 Console.WriteLine("path " + descendant.Id + " = " + paths[descendant.Id]);
                 descendant.Level += levelDelta;
-                PerformMoveContentLocked(repository, descendant, userId, trash);
+                PerformMoveContentLocked(descendant, userId, trash);
             }
         }
 
-        private static void PerformMoveContentLocked(IDocumentRepository repository, IContent content, int userId, bool? trash)
+        private void PerformMoveContentLocked(IContent content, int userId, bool? trash)
         {
             if (trash.HasValue) ((ContentBase) content).Trashed = trash.Value;
             content.WriterId = userId;
-            repository.Save(content);
+            _documentRepository.Save(content);
         }
 
         /// <summary>
@@ -1605,10 +1561,9 @@ namespace Umbraco.Core.Services
             var deleted = new List<IContent>();
             var evtMsgs = EventMessagesFactory.Get(); // todo - and then?
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
                 // each deleted items will have its own deleting/deleted events. so, files and such
@@ -1616,28 +1571,28 @@ namespace Umbraco.Core.Services
 
                 // no idea what those events are for, keep a simplified version
                 var recycleBinEventArgs = new RecycleBinEventArgs(nodeObjectType);
-                if (uow.Events.DispatchCancelable(EmptyingRecycleBin, this, recycleBinEventArgs))
+                if (scope.Events.DispatchCancelable(EmptyingRecycleBin, this, recycleBinEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return; // causes rollback
                 }
 
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
                 var query = Query<IContent>().Where(x => x.ParentId == Constants.System.RecycleBinContent);
-                var contents = repository.Get(query).ToArray();
+                var contents = _documentRepository.Get(query).ToArray();
                 foreach (var content in contents)
                 {
-                    DeleteLocked(uow, repository, content);
+                    DeleteLocked(scope, content);
                     deleted.Add(content);
                 }
 
                 recycleBinEventArgs.CanCancel = false;
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
-                uow.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
-                uow.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(uow, AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
+                scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
+                scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
+                Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -1674,12 +1629,12 @@ namespace Umbraco.Core.Services
             var copy = content.DeepCloneWithResetIdentities();
             copy.ParentId = parentId;
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var copyEventArgs = new CopyEventArgs<IContent>(content, copy, true, parentId, relateToOriginal);
-                if (uow.Events.DispatchCancelable(Copying, this, copyEventArgs))
+                if (scope.Events.DispatchCancelable(Copying, this, copyEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return null;
                 }
 
@@ -1689,8 +1644,7 @@ namespace Umbraco.Core.Services
 
                 var copies = new List<Tuple<IContent, IContent>>();
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 // a copy is not published (but not really unpublishing either)
                 // update the create author and last edit author
@@ -1704,16 +1658,14 @@ namespace Umbraco.Core.Services
                 currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
 
                 // save and flush because we need the ID for the recursive Copying events
-                repository.Save(copy);
+                _documentRepository.Save(copy);
 
                 //add permissions
                 if (currentPermissions.Count > 0)
                 {
                     var permissionSet = new ContentPermissionSet(copy, currentPermissions);
-                    repository.AddOrUpdatePermissions(permissionSet);
+                    _documentRepository.AddOrUpdatePermissions(permissionSet);
                 }
-
-                uow.Flush();
 
                 // keep track of copies
                 copies.Add(Tuple.Create(content, copy));
@@ -1729,7 +1681,7 @@ namespace Umbraco.Core.Services
                         var descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        if (uow.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
+                        if (scope.Events.DispatchCancelable(Copying, this, new CopyEventArgs<IContent>(descendant, descendantCopy, parentId)))
                             continue;
 
                         // a copy is not published (but not really unpublishing either)
@@ -1740,8 +1692,7 @@ namespace Umbraco.Core.Services
                         descendantCopy.WriterId = userId;
 
                         // save and flush (see above)
-                        repository.Save(descendantCopy);
-                        uow.Flush();
+                        _documentRepository.Save(descendantCopy);
 
                         copies.Add(Tuple.Create(descendant, descendantCopy));
                         idmap[descendant.Id] = descendantCopy.Id;
@@ -1752,12 +1703,12 @@ namespace Umbraco.Core.Services
                 // - tags should be handled by the content repository
                 // - a copy is unpublished and therefore has no impact on tags in DB
 
-                uow.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
-                    uow.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
-                Audit(uow, AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                    scope.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
+                Audit(AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return copy;
@@ -1771,12 +1722,12 @@ namespace Umbraco.Core.Services
         /// <returns>True if sending publication was succesfull otherwise false</returns>
         public bool SendToPublication(IContent content, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var sendToPublishEventArgs = new SendToPublishEventArgs<IContent>(content);
-                if (uow.Events.DispatchCancelable(SendingToPublish, this, sendToPublishEventArgs))
+                if (scope.Events.DispatchCancelable(SendingToPublish, this, sendToPublishEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return false;
                 }
 
@@ -1785,8 +1736,8 @@ namespace Umbraco.Core.Services
                 Save(content, userId);
 
                 sendToPublishEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
-                Audit(uow, AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+                scope.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
+                Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
             }
 
             return true;
@@ -1809,17 +1760,16 @@ namespace Umbraco.Core.Services
             var itemsA = items.ToArray();
             if (itemsA.Length == 0) return true;
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                     return false;
 
                 var published = new List<IContent>();
                 var saved = new List<IContent>();
 
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
                 var sortOrder = 0;
 
                 foreach (var content in itemsA)
@@ -1843,23 +1793,23 @@ namespace Umbraco.Core.Services
 
                     // save
                     saved.Add(content);
-                    repository.Save(content);
+                    _documentRepository.Save(content);
                 }
 
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
 
-                uow.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
+                scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
 
                 if (raiseEvents && published.Any())
-                    uow.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
+                    scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
-                Audit(uow, AuditType.Sort, "Sorting content performed by user", userId, 0);
+                Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return true;
@@ -1876,19 +1826,18 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         internal IEnumerable<IContent> GetPublishedDescendants(IContent content)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                return GetPublishedDescendantsLocked(uow, repository, content).ToArray(); // ToArray important in uow!
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return GetPublishedDescendantsLocked(content).ToArray(); // ToArray important in uow!
             }
         }
 
-        internal IEnumerable<IContent> GetPublishedDescendantsLocked(IScopeUnitOfWork uow, IDocumentRepository repository, IContent content)
+        internal IEnumerable<IContent> GetPublishedDescendantsLocked(IContent content)
         {
             var pathMatch = content.Path + ",";
             var query = Query<IContent>().Where(x => x.Id != content.Id && x.Path.StartsWith(pathMatch) /*&& x.Trashed == false*/);
-            var contents = repository.Get(query);
+            var contents = _documentRepository.Get(query);
 
             // beware! contents contains all published version below content
             // including those that are not directly published because below an unpublished content
@@ -1909,10 +1858,9 @@ namespace Umbraco.Core.Services
 
         #region Private Methods
 
-        private void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var repo = uow.CreateRepository<IAuditRepository>();
-            repo.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #endregion
@@ -2064,10 +2012,10 @@ namespace Umbraco.Core.Services
         #region Publishing Strategies
 
         // ensures that a document can be published
-        internal PublishResult StrategyCanPublish(IScopeUnitOfWork uow, IContent content, int userId, bool checkPath, EventMessages evtMsgs)
+        internal PublishResult StrategyCanPublish(IScope scope, IContent content, int userId, bool checkPath, EventMessages evtMsgs)
         {
             // raise Publishing event
-            if (uow.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
+            if (scope.Events.DispatchCancelable(Publishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
                 Logger.Info<ContentService>($"Document  \"'{content.Name}\" (id={content.Id}) cannot be published: publishing was cancelled.");
                 return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
@@ -2113,7 +2061,7 @@ namespace Umbraco.Core.Services
         }
 
         // publishes a document
-        internal PublishResult StrategyPublish(IScopeUnitOfWork uow, IContent content, bool canPublish, int userId, EventMessages evtMsgs)
+        internal PublishResult StrategyPublish(IScope scope, IContent content, bool canPublish, int userId, EventMessages evtMsgs)
         {
             // note: when used at top-level, StrategyCanPublish with checkPath=true should have run already
             // and alreadyCheckedCanPublish should be true, so not checking again. when used at nested level,
@@ -2121,7 +2069,7 @@ namespace Umbraco.Core.Services
 
             var result = canPublish
                 ? new PublishResult(evtMsgs, content) // already know we can
-                : StrategyCanPublish(uow, content, userId, /*checkPath:*/ false, evtMsgs); // else check
+                : StrategyCanPublish(scope, content, userId, /*checkPath:*/ false, evtMsgs); // else check
 
             if (result.Success == false)
                 return result;
@@ -2134,10 +2082,10 @@ namespace Umbraco.Core.Services
         }
 
         // ensures that a document can be unpublished
-        internal PublishResult StrategyCanUnpublish(IScopeUnitOfWork uow, IContent content, int userId, EventMessages evtMsgs)
+        internal PublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
         {
             // raise UnPublishing event
-            if (uow.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
+            if (scope.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
                 Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be unpublished: unpublishing was cancelled.");
                 return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
@@ -2147,11 +2095,11 @@ namespace Umbraco.Core.Services
         }
 
         // unpublishes a document
-        internal PublishResult StrategyUnpublish(IScopeUnitOfWork uow, IContent content, bool canUnpublish, int userId, EventMessages evtMsgs)
+        internal PublishResult StrategyUnpublish(IScope scope, IContent content, bool canUnpublish, int userId, EventMessages evtMsgs)
         {
             var attempt = canUnpublish
                 ? new PublishResult(evtMsgs, content) // already know we can
-                : StrategyCanUnpublish(uow, content, userId, evtMsgs); // else check
+                : StrategyCanUnpublish(scope, content, userId, evtMsgs); // else check
 
             if (attempt.Success == false)
                 return attempt;
@@ -2203,17 +2151,16 @@ namespace Umbraco.Core.Services
             // PerformMoveLocked and DeleteLocked that must be applied immediately,
             // no point queuing operations
             //
-            using (var uow = UowProvider.CreateUnitOfWork(immediate: true))
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 var query = Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
-                var contents = repository.Get(query).ToArray();
+                var contents = _documentRepository.Get(query).ToArray();
 
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contents)))
+                if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contents)))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
@@ -2225,22 +2172,22 @@ namespace Umbraco.Core.Services
                     // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                     // just raise the event
                     if (content.Trashed == false && content.Published)
-                        uow.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+                        scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
 
                     // if current content has children, move them to trash
                     var c = content;
                     var childQuery = Query<IContent>().Where(x => x.ParentId == c.Id);
-                    var children = repository.Get(childQuery);
+                    var children = _documentRepository.Get(childQuery);
                     foreach (var child in children)
                     {
                         // see MoveToRecycleBin
-                        PerformMoveLocked(repository, child, Constants.System.RecycleBinContent, null, userId, moves, true);
+                        PerformMoveLocked(child, Constants.System.RecycleBinContent, null, userId, moves, true);
                         changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch));
                     }
 
                     // delete content
                     // triggers the deleted event (and handles the files)
-                    DeleteLocked(uow, repository, content);
+                    DeleteLocked(scope, content);
                     changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
                 }
 
@@ -2248,12 +2195,12 @@ namespace Umbraco.Core.Services
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 if (moveInfos.Length > 0)
-                    uow.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), "Trashed");
-                uow.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
+                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), "Trashed");
+                scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
-                Audit(uow, AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -2268,15 +2215,14 @@ namespace Umbraco.Core.Services
             DeleteOfTypes(new[] { contentTypeId }, userId);
         }
 
-        private IContentType GetContentType(IScopeUnitOfWork uow, string contentTypeAlias)
+        private IContentType GetContentType(IScope scope, string contentTypeAlias)
         {
             if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
 
-            uow.ReadLock(Constants.Locks.ContentTypes);
+            scope.ReadLock(Constants.Locks.ContentTypes);
 
-            var repository = uow.CreateRepository<IContentTypeRepository>();
             var query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-            var contentType = repository.Get(query).FirstOrDefault();
+            var contentType = _contentTypeRepository.Get(query).FirstOrDefault();
 
             if (contentType == null)
                 throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found"); // causes rollback
@@ -2288,9 +2234,9 @@ namespace Umbraco.Core.Services
         {
             if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
 
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                return GetContentType(uow, contentTypeAlias);
+                return GetContentType(scope, contentTypeAlias);
             }
         }
 
@@ -2300,11 +2246,10 @@ namespace Umbraco.Core.Services
 
         public IContent GetBlueprintById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentBlueprintRepository>();
-                var blueprint = repository.Get(id);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var blueprint = _documentBlueprintRepository.Get(id);
                 if (blueprint != null)
                     ((Content) blueprint).Blueprint = true;
                 return blueprint;
@@ -2313,11 +2258,10 @@ namespace Umbraco.Core.Services
 
         public IContent GetBlueprintById(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentBlueprintRepository>();
-                var blueprint = repository.Get(id);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var blueprint = _documentBlueprintRepository.Get(id);
                 if (blueprint != null)
                     ((Content) blueprint).Blueprint = true;
                 return blueprint;
@@ -2332,16 +2276,14 @@ namespace Umbraco.Core.Services
 
             ((Content) content).Blueprint = true;
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 if (string.IsNullOrWhiteSpace(content.Name))
                 {
                     throw new ArgumentException("Cannot save content blueprint with empty name.");
                 }
-
-                var repository = uow.CreateRepository<IDocumentBlueprintRepository>();
 
                 if (content.HasIdentity == false)
                 {
@@ -2349,23 +2291,22 @@ namespace Umbraco.Core.Services
                 }
                 content.WriterId = userId;
 
-                repository.Save(content);
+                _documentBlueprintRepository.Save(content);
 
-                uow.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<IContent>(content), "SavedBlueprint");
+                scope.Events.Dispatch(SavedBlueprint, this, new SaveEventArgs<IContent>(content), "SavedBlueprint");
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
         public void DeleteBlueprint(IContent content, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentBlueprintRepository>();
-                repository.Delete(content);
-                uow.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), "DeletedBlueprint");
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.ContentTree);
+                _documentBlueprintRepository.Delete(content);
+                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), "DeletedBlueprint");
+                scope.Complete();
             }
         }
 
@@ -2388,16 +2329,14 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IDocumentBlueprintRepository>();
-
                 var query = Query<IContent>();
                 if (contentTypeId.Length > 0)
                 {
                     query.Where(x => contentTypeId.Contains(x.ContentTypeId));
                 }
-                return repository.Get(query).Select(x =>
+                return _documentBlueprintRepository.Get(query).Select(x =>
                 {
                     ((Content) x).Blueprint = true;
                     return x;

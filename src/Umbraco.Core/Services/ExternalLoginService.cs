@@ -5,15 +5,20 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     public class ExternalLoginService : ScopeRepositoryService, IExternalLoginService
     {
-        public ExternalLoginService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IExternalLoginRepository _externalLoginRepository;
+
+        public ExternalLoginService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IExternalLoginRepository externalLoginRepository)
             : base(provider, logger, eventMessagesFactory)
-        { }
+        {
+            _externalLoginRepository = externalLoginRepository;
+        }
 
         /// <summary>
         /// Returns all user logins assigned
@@ -22,12 +27,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> GetAll(int userId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IExternalLoginRepository>();
-                return repo
-                    .Get(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
-                    .ToList(); // ToList is important here, must evaluate within uow!
+                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
+                    .ToList(); // ToList is important here, must evaluate within uow! // ToList is important here, must evaluate within uow!
             }
         }
 
@@ -39,12 +42,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> Find(UserLoginInfo login)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IExternalLoginRepository>();
-                return repo
-                    .Get(Query<IIdentityUserLogin>().Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
-                    .ToList(); // ToList is important here, must evaluate within uow!
+                return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
+                    .ToList(); // ToList is important here, must evaluate within uow! // ToList is important here, must evaluate within uow!
             }
         }
 
@@ -55,11 +56,10 @@ namespace Umbraco.Core.Services
         /// <param name="logins"></param>
         public void SaveUserLogins(int userId, IEnumerable<UserLoginInfo> logins)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IExternalLoginRepository>();
-                repo.SaveUserLogins(userId, logins);
-                uow.Complete();
+                _externalLoginRepository.SaveUserLogins(userId, logins);
+                scope.Complete();
             }
         }
 
@@ -69,11 +69,10 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void DeleteUserLogins(int userId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IExternalLoginRepository>();
-                repo.DeleteUserLogins(userId);
-                uow.Complete();
+                _externalLoginRepository.DeleteUserLogins(userId);
+                scope.Complete();
             }
         }
     }

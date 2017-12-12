@@ -5,7 +5,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -15,24 +14,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity managed by this repository.</typeparam>
     /// <typeparam name="TId">The type of the entity's unique identifier.</typeparam>
-    internal abstract class RepositoryBase<TId, TEntity> : IReadWriteQueryRepository<TId, TEntity>, IUnitOfWorkRepository
+    internal abstract class RepositoryBase<TId, TEntity> : IReadWriteQueryRepository<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
         private IRuntimeCacheProvider _isolatedCache;
 
-        protected RepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
         {
+            ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            UnitOfWork = work ?? throw new ArgumentNullException(nameof(work));
             GlobalCache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
-        protected IScopeUnitOfWork UnitOfWork { get; }
+        protected ILogger Logger { get; }
 
         protected CacheHelper GlobalCache { get; }
 
-        protected ILogger Logger { get; }
+        protected ScopeProvider ScopeProvider { get; }
+
+        protected IScope AmbientScope
+        {
+            get
+            {
+                var scope = ScopeProvider.AmbientScope;
+                if (scope == null)
+                    throw new InvalidOperationException("Cannot run a repository without an ambient scope.");
+                return scope;
+            }
+        }
 
         #region Static Queries
 
@@ -54,15 +64,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 if (_isolatedCache != null) return _isolatedCache;
 
-                var scope = UnitOfWork.Scope;
                 IsolatedRuntimeCache provider;
-                switch (scope.RepositoryCacheMode)
+                switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
                         provider = GlobalCache.IsolatedRuntimeCache;
                         break;
                     case RepositoryCacheMode.Scoped:
-                        provider = scope.IsolatedRuntimeCache;
+                        provider = AmbientScope.IsolatedRuntimeCache;
                         break;
                     case RepositoryCacheMode.None:
                         return new NullCacheProvider(); // fixme cache instance
@@ -105,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     // get count of all entities of current type (TEntity) to ensure cached result is correct
                     // create query once if it is needed (no need for locking here) - query is static!
-                    var query = _hasIdQuery ?? (_hasIdQuery = UnitOfWork.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
+                    var query = _hasIdQuery ?? (_hasIdQuery = AmbientScope.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
                     return PerformCount(query);
                 });
             }
@@ -132,8 +141,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // create the cache policy using IsolatedCache which is either global
                 // or scoped depending on the repository cache mode for the current scope
-                var scope = UnitOfWork.Scope;
-                switch (scope.RepositoryCacheMode)
+                switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
                         _cachePolicy = CreateCachePolicy(IsolatedCache);
@@ -141,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     case RepositoryCacheMode.Scoped:
                         _cachePolicy = CreateCachePolicy(IsolatedCache);
                         var globalIsolatedCache = GetIsolatedCache(GlobalCache.IsolatedRuntimeCache);
-                        _cachePolicy = _cachePolicy.Scoped(globalIsolatedCache, scope);
+                        _cachePolicy = _cachePolicy.Scoped(globalIsolatedCache, AmbientScope);
                         break;
                     case RepositoryCacheMode.None:
                         _cachePolicy = NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;

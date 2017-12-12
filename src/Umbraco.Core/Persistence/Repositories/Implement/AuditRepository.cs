@@ -9,14 +9,14 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class AuditRepository : NPocoRepositoryBase<int, AuditItem>, IAuditRepository
     {
-        public AuditRepository(IScopeUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        public AuditRepository(ScopeProvider scopeProvider, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
 
         protected override void PersistNewItem(AuditItem entity)

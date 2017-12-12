@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -19,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, Guid containerObjectType)
-            : base(work, cache, logger)
+        public EntityContainerRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, Guid containerObjectType)
+            : base(scopeProvider, cache, logger)
         {
             var allowedContainers = new[] { Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer, Constants.ObjectTypes.DataTypeContainer };
             _containerObjectType = containerObjectType;

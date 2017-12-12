@@ -5,111 +5,105 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     internal class RedirectUrlService : ScopeRepositoryService, IRedirectUrlService
     {
-        public RedirectUrlService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IRedirectUrlRepository _redirectUrlRepository;
+
+        public RedirectUrlService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         { }
 
         public void Register(string url, Guid contentKey)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                var redir = repo.Get(url, contentKey);
+                var redir = _redirectUrlRepository.Get(url, contentKey);
                 if (redir != null)
                     redir.CreateDateUtc = DateTime.UtcNow;
                 else
                     redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey };
-                repo.Save(redir);
-                uow.Complete();
+                _redirectUrlRepository.Save(redir);
+                scope.Complete();
             }
         }
 
         public void Delete(IRedirectUrl redirectUrl)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                repo.Delete(redirectUrl);
-                uow.Complete();
+                _redirectUrlRepository.Delete(redirectUrl);
+                scope.Complete();
             }
         }
 
         public void Delete(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                repo.Delete(id);
-                uow.Complete();
+                _redirectUrlRepository.Delete(id);
+                scope.Complete();
             }
         }
 
         public void DeleteContentRedirectUrls(Guid contentKey)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                repo.DeleteContentUrls(contentKey);
-                uow.Complete();
+                _redirectUrlRepository.DeleteContentUrls(contentKey);
+                scope.Complete();
             }
         }
 
         public void DeleteAll()
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                repo.DeleteAll();
-                uow.Complete();
+                _redirectUrlRepository.DeleteAll();
+                scope.Complete();
             }
         }
 
         public IRedirectUrl GetMostRecentRedirectUrl(string url)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                return repo.GetMostRecentUrl(url);
+                return _redirectUrlRepository.GetMostRecentUrl(url);
             }
         }
 
         public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                return repo.GetContentUrls(contentKey);
+                return _redirectUrlRepository.GetContentUrls(contentKey);
             }
         }
 
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                return repo.GetAllUrls(pageIndex, pageSize, out total);
+                return _redirectUrlRepository.GetAllUrls(pageIndex, pageSize, out total);
             }
         }
 
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                return repo.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
+                return _redirectUrlRepository.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
             }
         }
+
         public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IRedirectUrlRepository>();
-                return repo.SearchUrls(searchTerm, pageIndex, pageSize, out total);
+                return _redirectUrlRepository.SearchUrls(searchTerm, pageIndex, pageSize, out total);
             }
         }
     }

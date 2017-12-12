@@ -6,17 +6,22 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     public class RelationService : ScopeRepositoryService, IRelationService
     {
         private readonly IEntityService _entityService;
+        private readonly IRelationRepository _relationRepository;
+        private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationService(IScopeUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService)
+        public RelationService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
+            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository)
             : base(uowProvider, logger, eventMessagesFactory)
         {
+            _relationRepository = relationRepository;
+            _relationTypeRepository = relationTypeRepository;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
@@ -27,10 +32,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Relation"/> object</returns>
         public IRelation GetById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
-                return repository.Get(id);
+                return _relationRepository.Get(id);
             }
         }
 
@@ -41,10 +45,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="RelationType"/> object</returns>
         public IRelationType GetRelationTypeById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
-                return repository.Get(id);
+                return _relationTypeRepository.Get(id);
             }
         }
 
@@ -55,10 +58,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="RelationType"/> object</returns>
         public IRelationType GetRelationTypeById(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
-                return repository.Get(id);
+                return _relationTypeRepository.Get(id);
             }
         }
 
@@ -69,11 +71,10 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="RelationType"/> object</returns>
         public IRelationType GetRelationTypeByAlias(string alias)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
                 var query = Query<IRelationType>().Where(x => x.Alias == alias);
-                return repository.Get(query).FirstOrDefault();
+                return _relationTypeRepository.Get(query).FirstOrDefault();
             }
         }
 
@@ -84,10 +85,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetAllRelations(params int[] ids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
-                return repository.GetMany(ids);
+                return _relationRepository.GetMany(ids);
             }
         }
 
@@ -108,11 +108,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
-                return repository.Get(query);
+                return _relationRepository.Get(query);
             }
         }
 
@@ -123,10 +122,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="RelationType"/> objects</returns>
         public IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
-                return repository.GetMany(ids);
+                return _relationTypeRepository.GetMany(ids);
             }
         }
 
@@ -137,11 +135,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByParentId(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.ParentId == id);
-                return repository.Get(query);
+                return _relationRepository.Get(query);
             }
         }
 
@@ -173,11 +170,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByChildId(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.ChildId == id);
-                return repository.Get(query);
+                return _relationRepository.Get(query);
             }
         }
 
@@ -210,28 +206,25 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByParentOrChildId(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
-                return repository.Get(query);
+                return _relationRepository.Get(query);
             }
         }
 
         public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
 
                 var rtQuery = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
-                var relationType = repository.Get(rtQuery).FirstOrDefault();
+                var relationType = _relationTypeRepository.Get(rtQuery).FirstOrDefault();
                 if (relationType == null)
                     return Enumerable.Empty<IRelation>();
 
-                var relationRepo = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
-                return relationRepo.Get(query);
+                return _relationRepository.Get(query);
             }
         }
 
@@ -243,11 +236,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
         {
             List<int> relationTypeIds;
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
                 var query = Query<IRelationType>().Where(x => x.Name == relationTypeName);
-                var relationTypes = repository.Get(query);
+                var relationTypes = _relationTypeRepository.Get(query);
                 relationTypeIds = relationTypes.Select(x => x.Id).ToList();
             }
 
@@ -264,11 +256,10 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias)
         {
             List<int> relationTypeIds;
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
                 var query = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
-                var relationTypes = repository.Get(query);
+                var relationTypes = _relationTypeRepository.Get(query);
                 relationTypeIds = relationTypes.Select(x => x.Id).ToList();
             }
 
@@ -284,11 +275,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
-                return repository.Get(query);
+                return _relationRepository.Get(query);
             }
         }
 
@@ -398,20 +388,19 @@ namespace Umbraco.Core.Services
 
             var relation = new Relation(parent.Id, child.Id, relationType);
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IRelation>(relation);
-                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
-                    uow.Complete();
-                    return relation; // fixme - returning sth that does not exist here?!
+                    scope.Complete();
+                    return relation; // fixme - returning sth that does not exist here?! // fixme - returning sth that does not exist here?!
                 }
 
-                var repository = uow.CreateRepository<IRelationRepository>();
-                repository.Save(relation);
+                _relationRepository.Save(relation);
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
-                uow.Complete();
+                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                scope.Complete();
             }
 
             return relation;
@@ -432,20 +421,19 @@ namespace Umbraco.Core.Services
 
             var relation = new Relation(parent.Id, child.Id, relationType);
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IRelation>(relation);
-                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
-                    uow.Complete();
-                    return relation; // fixme - returning sth that does not exist here?!
+                    scope.Complete();
+                    return relation; // fixme - returning sth that does not exist here?! // fixme - returning sth that does not exist here?!
                 }
 
-                var repository = uow.CreateRepository<IRelationRepository>();
-                repository.Save(relation);
+                _relationRepository.Save(relation);
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
-                uow.Complete();
+                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                scope.Complete();
             }
 
             return relation;
@@ -458,11 +446,10 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists for the given <see cref="RelationType"/>, otherwise <c>False</c></returns>
         public bool HasRelations(IRelationType relationType)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-                return repository.Get(query).Any();
+                return _relationRepository.Get(query).Any();
             }
         }
 
@@ -473,11 +460,10 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c></returns>
         public bool IsRelated(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
-                return repository.Get(query).Any();
+                return _relationRepository.Get(query).Any();
             }
         }
 
@@ -489,11 +475,10 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists with the given Ids, otherwise <c>False</c></returns>
         public bool AreRelated(int parentId, int childId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
-                return repository.Get(query).Any();
+                return _relationRepository.Get(query).Any();
             }
         }
 
@@ -523,11 +508,10 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
         public bool AreRelated(int parentId, int childId, IRelationType relationType)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
-                return repository.Get(query).Any();
+                return _relationRepository.Get(query).Any();
             }
         }
 
@@ -561,20 +545,19 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to save</param>
         public void Save(IRelation relation)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IRelation>(relation);
-                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IRelationRepository>();
-                repository.Save(relation);
-                uow.Complete();
+                _relationRepository.Save(relation);
+                scope.Complete();
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
             }
         }
 
@@ -584,20 +567,19 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">RelationType to Save</param>
         public void Save(IRelationType relationType)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IRelationType>(relationType);
-                if (uow.Events.DispatchCancelable(SavingRelationType, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingRelationType, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
-                repository.Save(relationType);
-                uow.Complete();
+                _relationTypeRepository.Save(relationType);
+                scope.Complete();
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(SavedRelationType, this, saveEventArgs);
+                scope.Events.Dispatch(SavedRelationType, this, saveEventArgs);
             }
         }
 
@@ -607,20 +589,19 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to Delete</param>
         public void Delete(IRelation relation)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IRelation>(relation);
-                if (uow.Events.DispatchCancelable(DeletingRelation, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(DeletingRelation, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IRelationRepository>();
-                repository.Delete(relation);
-                uow.Complete();
+                _relationRepository.Delete(relation);
+                scope.Complete();
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedRelation, this, deleteEventArgs);
+                scope.Events.Dispatch(DeletedRelation, this, deleteEventArgs);
             }
         }
 
@@ -630,20 +611,19 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">RelationType to Delete</param>
         public void Delete(IRelationType relationType)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IRelationType>(relationType);
-                if (uow.Events.DispatchCancelable(DeletingRelationType, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(DeletingRelationType, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IRelationTypeRepository>();
-                repository.Delete(relationType);
-                uow.Complete();
+                _relationTypeRepository.Delete(relationType);
+                scope.Complete();
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedRelationType, this, deleteEventArgs);
+                scope.Events.Dispatch(DeletedRelationType, this, deleteEventArgs);
             }
         }
 
@@ -654,18 +634,17 @@ namespace Umbraco.Core.Services
         public void DeleteRelationsOfType(IRelationType relationType)
         {
             var relations = new List<IRelation>();
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 var query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-                relations.AddRange(repository.Get(query).ToList());
+                relations.AddRange(_relationRepository.Get(query).ToList());
 
                 foreach (var relation in relations)
-                    repository.Delete(relation);
+                    _relationRepository.Delete(relation);
 
-                uow.Complete();
+                scope.Complete();
 
-                uow.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relations, false));
+                scope.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relations, false));
             }
         }
 
@@ -674,14 +653,13 @@ namespace Umbraco.Core.Services
         private IEnumerable<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
         {
             var relations = new List<IRelation>();
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IRelationRepository>();
                 foreach (var relationTypeId in relationTypeIds)
                 {
                     var id = relationTypeId;
                     var query = Query<IRelation>().Where(x => x.RelationTypeId == id);
-                    relations.AddRange(repository.Get(query));
+                    relations.AddRange(_relationRepository.Get(query));
                 }
             }
             return relations;

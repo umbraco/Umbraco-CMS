@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -19,29 +20,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IAggregateRoot
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/>.
+        /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/> class.
         /// </summary>
-        /// <param name="work">A database unit of work.</param>
-        /// <param name="cache">A cache helper.</param>
-        /// <param name="logger">A logger.</param>
-        protected NPocoRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        protected NPocoRepositoryBase(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
-
-        /// <summary>
-        /// Gets the repository's unit of work.
-        /// </summary>
-        protected internal new IScopeUnitOfWork UnitOfWork => base.UnitOfWork;
 
         /// <summary>
         /// Gets the repository's database.
         /// </summary>
-        protected IUmbracoDatabase Database => UnitOfWork.Database;
+        protected IUmbracoDatabase Database => AmbientScope.Database;
 
         /// <summary>
         /// Gets the Sql context.
         /// </summary>
-        protected ISqlContext SqlContext=> UnitOfWork.SqlContext;
+        protected ISqlContext SqlContext=> AmbientScope.SqlContext;
 
         protected Sql<ISqlContext> Sql() => SqlContext.Sql();
         protected Sql<ISqlContext> Sql(string sql, params object[] args) => SqlContext.Sql(sql, args);

@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -37,8 +38,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="passwordConfig">
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
-        public UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection)
-            : base(work, cacheHelper, logger)
+        public UserRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection)
+            : base(scopeProvider, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
 
@@ -49,8 +50,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         // for tests
-        internal UserRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig)
-            : base(work, cacheHelper, logger)
+        internal UserRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig)
+            : base(scopeProvider, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
             _passwordConfig = passwordConfig;

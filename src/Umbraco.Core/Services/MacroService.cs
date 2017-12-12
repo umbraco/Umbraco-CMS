@@ -6,17 +6,25 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    public class MacroService : ScopeRepositoryService, IMacroService
+    internal class MacroService : ScopeRepositoryService, IMacroService
     {
-        public MacroService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IMacroRepository _macroRepository;
+        private readonly IAuditRepository _auditRepository;
+
+        public MacroService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IMacroRepository macroRepository, IAuditRepository auditRepository)
             : base(provider, logger, eventMessagesFactory)
-        { }
+        {
+            _macroRepository = macroRepository;
+            _auditRepository = auditRepository;
+        }
 
         /// <summary>
         /// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
@@ -43,11 +51,10 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMacroRepository>();
                 var q = Query<IMacro>().Where(x => x.Alias == alias);
-                return repository.Get(q).FirstOrDefault();
+                return _macroRepository.Get(q).FirstOrDefault();
             }
         }
 
@@ -58,37 +65,33 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.GetMany(ids);
+                return _macroRepository.GetMany(ids);
             }
         }
 
         public IEnumerable<IMacro> GetAll(params Guid[] ids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.GetMany(ids);
+                return _macroRepository.GetMany(ids);
             }
         }
 
         public IMacro GetById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.Get(id);
+                return _macroRepository.Get(id);
             }
         }
 
         public IMacro GetById(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMacroRepository>();
-                return repository.Get(id);
+                return _macroRepository.Get(id);
             }
         }
 
@@ -99,22 +102,21 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the macro</param>
         public void Delete(IMacro macro, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IMacro>(macro);
-                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IMacroRepository>();
-                repository.Delete(macro);
+                _macroRepository.Delete(macro);
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
-                Audit(uow, AuditType.Delete, "Delete Macro performed by user", userId, -1);
+                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+                Audit(AuditType.Delete, "Delete Macro performed by user", userId, -1);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -125,12 +127,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMacro>(macro);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
@@ -139,13 +141,12 @@ namespace Umbraco.Core.Services
                     throw new ArgumentException("Cannot save macro with empty name.");
                 }
 
-                var repository = uow.CreateRepository<IMacroRepository>();
-                repository.Save(macro);
+                _macroRepository.Save(macro);
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs);
-                Audit(uow, AuditType.Save, "Save Macro performed by user", userId, -1);
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
+                Audit(AuditType.Save, "Save Macro performed by user", userId, -1);
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -168,10 +169,9 @@ namespace Umbraco.Core.Services
         //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
         //}
 
-        private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var repo = uow.CreateRepository<IAuditRepository>();
-            repo.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #region Event Handlers

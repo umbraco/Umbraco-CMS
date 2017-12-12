@@ -6,10 +6,9 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services
@@ -19,10 +18,21 @@ namespace Umbraco.Core.Services
         where TItem : class, IContentTypeComposition
         where TService : class, IContentTypeServiceBase<TItem>
     {
-        protected ContentTypeServiceBase(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(provider, logger, eventMessagesFactory)
-        { }
+        private readonly IAuditRepository _auditRepository;
+        private readonly IEntityContainerRepository _containerRepository;
+        private readonly IEntityRepository _entityRepository;
 
+        protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository containerRepository, IEntityRepository entityRepository)
+            : base(provider, logger, eventMessagesFactory)
+        {
+            Repository = repository;
+            _auditRepository = auditRepository;
+            _containerRepository = containerRepository;
+            _entityRepository = entityRepository;
+        }
+
+        protected TRepository Repository { get; }
         protected abstract int[] WriteLockIds { get; }
         protected abstract int[] ReadLockIds { get; }
 
@@ -32,11 +42,10 @@ namespace Umbraco.Core.Services
         {
             try
             {
-                using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+                using (var scope = ScopeProvider.CreateScope(readOnly: true))
                 {
-                    var repo = uow.CreateRepository<TRepository>();
-                    uow.ReadLock(ReadLockIds);
-                    ValidateLocked(repo, compo);
+                    scope.ReadLock(ReadLockIds);
+                    ValidateLocked(compo);
                 }
                 return Attempt<string[]>.Succeed();
             }
@@ -46,7 +55,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        protected void ValidateLocked(TRepository repository, TItem compositionContentType)
+        protected void ValidateLocked(TItem compositionContentType)
         {
             // performs business-level validation of the composition
             // should ensure that it is absolutely safe to save the composition
@@ -54,7 +63,7 @@ namespace Umbraco.Core.Services
             // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
             // but that cannot be used (conflict with descendants)
 
-            var allContentTypes = repository.GetMany(new int[0]).Cast<IContentTypeComposition>().ToArray();
+            var allContentTypes = Repository.GetMany(new int[0]).Cast<IContentTypeComposition>().ToArray();
 
             var compositionAliases = compositionContentType.CompositionAliases();
             var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
@@ -136,8 +145,8 @@ namespace Umbraco.Core.Services
                 // existing property alias change?
                 var hasAnyPropertyChangedAlias = contentType.PropertyTypes.Any(propertyType =>
                 {
-                    var dirtyProperty = propertyType as IRememberBeingDirty;
-                    if (dirtyProperty == null) throw new Exception("oops");
+                    if (!(propertyType is IRememberBeingDirty dirtyProperty))
+                        throw new Exception("oops");
 
                     // skip new properties
                     var isNewProperty = dirtyProperty.WasPropertyDirty("HasIdentity");
@@ -194,101 +203,91 @@ namespace Umbraco.Core.Services
 
         public TItem Get(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
-                return repo.Get(id);
+                scope.ReadLock(ReadLockIds);
+                return Repository.Get(id);
             }
         }
 
         public TItem Get(string alias)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
-                return repo.Get(alias);
+                scope.ReadLock(ReadLockIds);
+                return Repository.Get(alias);
             }
         }
 
         public TItem Get(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
-                return repo.Get(id);
+                scope.ReadLock(ReadLockIds);
+                return Repository.Get(id);
             }
         }
 
         public IEnumerable<TItem> GetAll(params int[] ids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
-                return repo.GetMany(ids);
+                scope.ReadLock(ReadLockIds);
+                return Repository.GetMany(ids);
             }
         }
 
         public IEnumerable<TItem> GetAll(params Guid[] ids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
-                // IReadRepository<Guid, TEntity> is explicitely implemented, need to cast the repo
-                return ((IReadRepository<Guid, TItem>) repo).GetMany(ids);
+                scope.ReadLock(ReadLockIds);
+                return Repository.GetMany(ids);
             }
         }
 
         public IEnumerable<TItem> GetChildren(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
+                scope.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
-                return repo.Get(query);
+                return Repository.Get(query);
             }
         }
 
         public IEnumerable<TItem> GetChildren(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
+                scope.ReadLock(ReadLockIds);
                 var found = Get(id);
                 if (found == null) return Enumerable.Empty<TItem>();
                 var query = Query<TItem>().Where(x => x.ParentId == found.Id);
-                return repo.Get(query);
+                return Repository.Get(query);
             }
         }
 
         public bool HasChildren(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
+                scope.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
-                var count = repo.Count(query);
+                var count = Repository.Count(query);
                 return count > 0;
             }
         }
 
         public bool HasChildren(Guid id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
+                scope.ReadLock(ReadLockIds);
                 var found = Get(id);
                 if (found == null) return false;
                 var query = Query<TItem>().Where(x => x.ParentId == found.Id);
-                var count = repo.Count(query);
+                var count = Repository.Count(query);
                 return count > 0;
             }
         }
@@ -300,23 +299,21 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public bool HasContainerInPath(string contentPath)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
                 // can use same repo for both content and media
-                var repo = uow.CreateRepository<TRepository>();
-                return repo.HasContainerInPath(contentPath);
+                return Repository.HasContainerInPath(contentPath);
             }
         }
 
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
+                scope.ReadLock(ReadLockIds);
 
                 var descendants = new List<TItem>();
-                if (andSelf) descendants.Add(repo.Get(id));
+                if (andSelf) descendants.Add(Repository.Get(id));
                 var ids = new Stack<int>();
                 ids.Push(id);
 
@@ -324,7 +321,7 @@ namespace Umbraco.Core.Services
                 {
                     var i = ids.Pop();
                     var query = Query<TItem>().Where(x => x.ParentId == i);
-                    var result = repo.Get(query).ToArray();
+                    var result = Repository.Get(query).ToArray();
 
                     foreach (var c in result)
                     {
@@ -339,10 +336,9 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetComposedOf(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
+                scope.ReadLock(ReadLockIds);
 
                 // hash set handles duplicates
                 var composed = new HashSet<TItem>(new DelegateEqualityComparer<TItem>(
@@ -355,7 +351,7 @@ namespace Umbraco.Core.Services
                 while (ids.Count > 0)
                 {
                     var i = ids.Pop();
-                    var result = repo.GetTypesDirectlyComposedOf(i).ToArray();
+                    var result = Repository.GetTypesDirectlyComposedOf(i).ToArray();
 
                     foreach (var c in result)
                     {
@@ -370,11 +366,10 @@ namespace Umbraco.Core.Services
 
         public int Count()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.ReadLock(ReadLockIds);
-                return repo.Count(Query<TItem>());
+                scope.ReadLock(ReadLockIds);
+                return Repository.Count(Query<TItem>());
             }
         }
 
@@ -384,41 +379,39 @@ namespace Umbraco.Core.Services
 
         public void Save(TItem item, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<TItem>(item);
-                if (OnSavingCancelled(uow, saveEventArgs))
+                if (OnSavingCancelled(scope, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(item.Name))
                     throw new ArgumentException("Cannot save item with empty name.");
 
-                var repo = uow.CreateRepository<TRepository>();
-                uow.WriteLock(WriteLockIds);
+                scope.WriteLock(WriteLockIds);
 
                 // validate the DAG transform, within the lock
-                ValidateLocked(repo, item); // throws if invalid
+                ValidateLocked(item); // throws if invalid
 
                 item.CreatorId = userId;
                 if (item.Description == string.Empty) item.Description = null;
-                repo.Save(item); // also updates content/media/member items
+                Repository.Save(item); // also updates content/media/member items
 
                 // figure out impacted content types
                 var changes = ComposeContentTypeChanges(item).ToArray();
                 var args = changes.ToEventArgs();
 
-                uow.Flush(); // to db but no commit yet - for uow event
                 OnUowRefreshedEntity(args);
 
-                OnChanged(uow, args);
+                OnChanged(scope, args);
                 saveEventArgs.CanCancel = false;
-                OnSaved(uow, saveEventArgs);
+                OnSaved(scope, saveEventArgs);
 
-                Audit(uow, AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
-                uow.Complete();
+                Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, item.Id);
+                scope.Complete();
             }
         }
 
@@ -426,43 +419,41 @@ namespace Umbraco.Core.Services
         {
             var itemsA = items.ToArray();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<TItem>(itemsA);
-                if (OnSavingCancelled(uow, saveEventArgs))
+                if (OnSavingCancelled(scope, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repo = uow.CreateRepository<TRepository>();
-                uow.WriteLock(WriteLockIds);
+                scope.WriteLock(WriteLockIds);
 
                 // all-or-nothing, validate them all first
                 foreach (var contentType in itemsA)
                 {
-                    ValidateLocked(repo, contentType); // throws if invalid
+                    ValidateLocked(contentType); // throws if invalid
                 }
                 foreach (var contentType in itemsA)
                 {
                     contentType.CreatorId = userId;
                     if (contentType.Description == string.Empty) contentType.Description = null;
-                    repo.Save(contentType);
+                    Repository.Save(contentType);
                 }
 
                 // figure out impacted content types
                 var changes = ComposeContentTypeChanges(itemsA).ToArray();
                 var args = changes.ToEventArgs();
 
-                uow.Flush(); // to db but no commit yet - for uow event
                 OnUowRefreshedEntity(args);
 
-                OnChanged(uow, args);
+                OnChanged(scope, args);
                 saveEventArgs.CanCancel = false;
-                OnSaved(uow, saveEventArgs);
+                OnSaved(scope, saveEventArgs);
 
-                Audit(uow, AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
-                uow.Complete();
+                Audit(AuditType.Save, $"Save {typeof(TItem).Name} performed by user", userId, -1);
+                scope.Complete();
             }
         }
 
@@ -472,17 +463,16 @@ namespace Umbraco.Core.Services
 
         public void Delete(TItem item, int userId = 0)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<TItem>(item);
-                if (OnDeletingCancelled(uow, deleteEventArgs))
+                if (OnDeletingCancelled(scope, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repo = uow.CreateRepository<TRepository>();
-                uow.WriteLock(WriteLockIds);
+                scope.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
                 var descendantsAndSelf = GetDescendants(item.Id, true)
@@ -506,23 +496,22 @@ namespace Umbraco.Core.Services
                 //  (contents of any descendant type have been deleted but
                 //   contents of any composed (impacted) type remain but
                 //   need to have their property data cleared)
-                repo.Delete(item);
+                Repository.Delete(item);
 
                 //...
                 var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                     .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
                 var args = changes.ToEventArgs();
 
-                uow.Flush(); // to db but no commit yet - for uow event
                 OnUowRefreshedEntity(args);
 
-                OnChanged(uow, args);
+                OnChanged(scope, args);
                 deleteEventArgs.DeletedEntities = deleted.DistinctBy(x => x.Id);
                 deleteEventArgs.CanCancel = false;
-                OnDeleted(uow, deleteEventArgs);
+                OnDeleted(scope, deleteEventArgs);
 
-                Audit(uow, AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, item.Id);
-                uow.Complete();
+                Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, item.Id);
+                scope.Complete();
             }
         }
 
@@ -530,17 +519,16 @@ namespace Umbraco.Core.Services
         {
             var itemsA = items.ToArray();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<TItem>(itemsA);
-                if (OnDeletingCancelled(uow, deleteEventArgs))
+                if (OnDeletingCancelled(scope, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repo = uow.CreateRepository<TRepository>();
-                uow.WriteLock(WriteLockIds);
+                scope.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
                 var allDescendantsAndSelf = itemsA.SelectMany(xx => GetDescendants(xx.Id, true))
@@ -562,22 +550,21 @@ namespace Umbraco.Core.Services
                 // finally delete the content types
                 // (see notes in overload)
                 foreach (var item in itemsA)
-                    repo.Delete(item);
+                    Repository.Delete(item);
 
                 var changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                     .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
                 var args = changes.ToEventArgs();
 
-                uow.Flush(); // to db but no commit yet - for uow event
                 OnUowRefreshedEntity(args);
 
-                OnChanged(uow, args);
+                OnChanged(scope, args);
                 deleteEventArgs.DeletedEntities = deleted.DistinctBy(x => x.Id);
                 deleteEventArgs.CanCancel = false;
-                OnDeleted(uow, deleteEventArgs);
+                OnDeleted(scope, deleteEventArgs);
 
-                Audit(uow, AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, -1);
-                uow.Complete();
+                Audit(AuditType.Delete, $"Delete {typeof(TItem).Name} performed by user", userId, -1);
+                scope.Complete();
             }
         }
 
@@ -646,21 +633,19 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
 
             TItem copy;
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<TRepository>();
-                uow.WriteLock(WriteLockIds);
+                scope.WriteLock(WriteLockIds);
 
-                var containerRepository = uow.CreateContainerRepository(ContainerObjectType);
                 try
                 {
                     if (containerId > 0)
                     {
-                        var container = containerRepository.Get(containerId);
+                        var container = _containerRepository.Get(containerId);
                         if (container == null)
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
-                    var alias = repo.GetUniqueAlias(copying.Alias);
+                    var alias = Repository.GetUniqueAlias(copying.Alias);
 
                     // this is illegal
                     //var copyingb = (ContentTypeCompositionBase) copying;
@@ -674,14 +659,14 @@ namespace Umbraco.Core.Services
                     // all other compositions remain in place in the copied content type
                     if (copy.ParentId > 0)
                     {
-                        var parent = repo.Get(copy.ParentId);
+                        var parent = Repository.Get(copy.ParentId);
                         if (parent != null)
                             copy.RemoveContentType(parent.Alias);
                     }
 
                     copy.ParentId = containerId;
-                    repo.Save(copy);
-                    uow.Complete();
+                    Repository.Save(copy);
+                    scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
@@ -701,36 +686,33 @@ namespace Umbraco.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
 
             var moveInfo = new List<MoveEventInfo<TItem>>();
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId);
                 var moveEventArgs = new MoveEventArgs<TItem>(evtMsgs, moveEventInfo);
-                if (OnMovingCancelled(uow, moveEventArgs))
+                if (OnMovingCancelled(scope, moveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
                 }
 
-                uow.WriteLock(WriteLockIds); // also for containers
-
-                var repo = uow.CreateRepository<TRepository>();
-                var containerRepo = uow.CreateRepository<IDocumentTypeContainerRepository>();
+                scope.WriteLock(WriteLockIds); // also for containers
 
                 try
                 {
                     EntityContainer container = null;
                     if (containerId > 0)
                     {
-                        container = containerRepo.Get(containerId);
+                        container = _containerRepository.Get(containerId);
                         if (container == null)
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
-                    moveInfo.AddRange(repo.Move(moving, container));
-                    uow.Complete();
+                    moveInfo.AddRange(Repository.Move(moving, container));
+                    scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Fail(ex.Operation, evtMsgs);
                 }
 
@@ -740,7 +722,7 @@ namespace Umbraco.Core.Services
 
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
-                OnMoved(uow, moveEventArgs);
+                OnMoved(scope, moveEventArgs);
             }
 
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
@@ -757,11 +739,10 @@ namespace Umbraco.Core.Services
         public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(WriteLockIds); // also for containers
+                scope.WriteLock(WriteLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(ContainerObjectType);
                 try
                 {
                     var container = new EntityContainer(Constants.ObjectTypes.DocumentType)
@@ -772,24 +753,24 @@ namespace Umbraco.Core.Services
                     };
 
                     var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
-                    if (OnSavingContainerCancelled(uow, saveEventArgs))
+                    if (OnSavingContainerCancelled(scope, saveEventArgs))
                     {
-                        uow.Complete();
+                        scope.Complete();
                         return OperationResult.Attempt.Cancel(evtMsgs, container);
                     }
 
-                    repo.Save(container);
-                    uow.Complete();
+                    _containerRepository.Save(container);
+                    scope.Complete();
 
                     saveEventArgs.CanCancel = false;
-                    OnSavedContainer(uow, saveEventArgs);
+                    OnSavedContainer(scope, saveEventArgs);
                     //TODO: Audit trail ?
 
                     return OperationResult.Attempt.Succeed(evtMsgs, container);
                 }
                 catch (Exception ex)
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Fail<OperationResultType, EntityContainer>(OperationResultType.FailedCancelledByEvent, evtMsgs, ex);
                 }
             }
@@ -812,21 +793,20 @@ namespace Umbraco.Core.Services
                 return OperationResult.Attempt.Fail(evtMsgs, ex);
             }
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                if (OnSavingContainerCancelled(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                if (OnSavingContainerCancelled(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                uow.WriteLock(WriteLockIds); // also for containers
+                scope.WriteLock(WriteLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(containerObjectType);
-                repo.Save(container);
-                uow.Complete();
+                _containerRepository.Save(container);
+                scope.Complete();
 
-                OnSavedContainer(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                OnSavedContainer(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs));
             }
 
             //TODO: Audit trail ?
@@ -836,34 +816,31 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(int containerId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(ReadLockIds); // also for containers
+                scope.ReadLock(ReadLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return repo.Get(containerId);
+                return _containerRepository.Get(containerId);
             }
         }
 
         public EntityContainer GetContainer(Guid containerId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(ReadLockIds); // also for containers
+                scope.ReadLock(ReadLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return ((EntityContainerRepository) repo).Get(containerId);
+                return ((EntityContainerRepository) _containerRepository).Get(containerId);
             }
         }
 
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(ReadLockIds); // also for containers
+                scope.ReadLock(ReadLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return repo.GetMany(containerIds);
+                return _containerRepository.GetMany(containerIds);
             }
         }
 
@@ -883,47 +860,44 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(ReadLockIds); // also for containers
+                scope.ReadLock(ReadLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(ContainerObjectType);
-                return ((EntityContainerRepository) repo).Get(name, level);
+                return ((EntityContainerRepository) _containerRepository).Get(name, level);
             }
         }
 
         public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(WriteLockIds); // also for containers
+                scope.WriteLock(WriteLockIds); // also for containers
 
-                var repo = uow.CreateContainerRepository(ContainerObjectType);
-                var container = repo.Get(containerId);
+                var container = _containerRepository.Get(containerId);
                 if (container == null) return OperationResult.Attempt.NoOperation(evtMsgs);
 
-                var erepo = uow.CreateRepository<IEntityRepository>();
-                var entity = erepo.Get(container.Id);
+                var entity = _entityRepository.Get(container.Id);
                 if (entity.HasChildren()) // fixme because container.HasChildren() does not work?
                 {
                     // fixme - here and everywhere, original v8 would not Complete, thus causing rollback = ?
-                    uow.Complete();
+                    scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
                 }
 
                 var deleteEventArgs = new DeleteEventArgs<EntityContainer>(container, evtMsgs);
-                if (OnDeletingContainerCancelled(uow, deleteEventArgs))
+                if (OnDeletingContainerCancelled(scope, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs));
                 }
 
-                repo.Delete(container);
-                uow.Complete();
+                _containerRepository.Delete(container);
+                scope.Complete();
 
                 deleteEventArgs.CanCancel = false;
-                OnDeletedContainer(uow, deleteEventArgs);
+                OnDeletedContainer(scope, deleteEventArgs);
 
                 return OperationResult.Attempt.Succeed(evtMsgs);
                 //TODO: Audit trail ?
@@ -933,24 +907,23 @@ namespace Umbraco.Core.Services
         public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(WriteLockIds); // also for containers
+                scope.WriteLock(WriteLockIds); // also for containers
 
-                var repository = uow.CreateContainerRepository(ContainerObjectType);
                 try
                 {
-                    var container = repository.Get(id);
+                    var container = _containerRepository.Get(id);
 
                     //throw if null, this will be caught by the catch and a failed returned
                     if (container == null)
                         throw new InvalidOperationException("No container found with id " + id);
 
                     container.Name = name;
-                    repository.Save(container);
-                    uow.Complete();
+                    _containerRepository.Save(container);
+                    scope.Complete();
 
-                    OnRenamedContainer(uow, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    OnRenamedContainer(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs));
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
                 }
@@ -965,10 +938,9 @@ namespace Umbraco.Core.Services
 
         #region Audit
 
-        private void Audit(IScopeUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var repo = uow.CreateRepository<IAuditRepository>();
-            repo.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #endregion

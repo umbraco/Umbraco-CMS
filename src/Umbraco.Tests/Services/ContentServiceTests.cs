@@ -2211,7 +2211,7 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
@@ -2219,7 +2219,7 @@ namespace Umbraco.Tests.Services
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
             }
@@ -2234,7 +2234,7 @@ namespace Umbraco.Tests.Services
 
             contentService.Save(content);
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId", new{nodeId = content.Id}) != null);
             }

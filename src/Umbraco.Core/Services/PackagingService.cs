@@ -21,7 +21,7 @@ using Umbraco.Core.Packaging;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Content = Umbraco.Core.Models.Content;
 using Umbraco.Core.Strings;
 
@@ -42,11 +42,13 @@ namespace Umbraco.Core.Services
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
         private readonly IEntityService _entityService;
-        private readonly IScopeUnitOfWorkProvider _uowProvider;
+        private readonly IScopeProvider _scopeProvider;
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
+        private readonly IAuditRepository _auditRepository;
+        private readonly IContentTypeRepository _contentTypeRepository;
 
         public PackagingService(
             ILogger logger,
@@ -59,8 +61,9 @@ namespace Umbraco.Core.Services
             ILocalizationService localizationService,
             IEntityService entityService,
             IUserService userService,
-            IScopeUnitOfWorkProvider uowProvider,
-            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
+            IScopeProvider scopeProvider,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
+            IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository)
         {
             _logger = logger;
             _contentService = contentService;
@@ -71,13 +74,15 @@ namespace Umbraco.Core.Services
             _fileService = fileService;
             _localizationService = localizationService;
             _entityService = entityService;
-            _uowProvider = uowProvider;
+            _scopeProvider = scopeProvider;
             _urlSegmentProviders = urlSegmentProviders;
+            _auditRepository = auditRepository;
+            _contentTypeRepository = contentTypeRepository;
             _userService = userService;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
 
-        protected IQuery<T> Query<T>() => _uowProvider.ScopeProvider.SqlContext.Query<T>();
+        protected IQuery<T> Query<T>() => _scopeProvider.SqlContext.Query<T>();
 
         #region Content
 
@@ -249,7 +254,7 @@ namespace Umbraco.Core.Services
                 content.Key = key;
             }
 
-            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = _scopeProvider.CreateScope(readOnly: true))
             {
                 foreach (var property in properties)
                 {
@@ -269,7 +274,7 @@ namespace Umbraco.Core.Services
                             {
 
                                 //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
-                                var database = uow.Database;
+                                var database = scope.Database;
                                 var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
 
                                 var propertyValueList = new List<string>();
@@ -784,16 +789,15 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<IContentTypeRepository>();
                 var query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-                var contentType = repository.Get(query).FirstOrDefault();
+                var contentType = _contentTypeRepository.Get(query).FirstOrDefault();
 
                 if (contentType == null)
                     throw new Exception($"ContentType matching the passed in Alias: '{contentTypeAlias}' was null");
 
-                uow.Complete();
+                scope.Complete();
                 return contentType;
             }
         }
@@ -1477,7 +1481,7 @@ namespace Umbraco.Core.Services
             var packageRepo = UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault();
 
             using (var httpClient = new HttpClient())
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
                 var url = $"{packageRepo.RestApiUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
@@ -1509,15 +1513,14 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                Audit(uow, AuditType.PackagerInstall, $"Package {packageId} fetched from {packageRepo.Id}", userId, -1);
+                Audit(AuditType.PackagerInstall, $"Package {packageId} fetched from {packageRepo.Id}", userId, -1);
                 return null;
             }
         }
 
-        private static void Audit(IUnitOfWork uow, AuditType type, string message, int userId, int objectId)
+        private void Audit(AuditType type, string message, int userId, int objectId)
         {
-            var auditRepo = uow.CreateRepository<IAuditRepository>();
-            auditRepo.Save(new AuditItem(objectId, message, type, userId));
+            _auditRepository.Save(new AuditItem(objectId, message, type, userId));
         }
 
         #endregion

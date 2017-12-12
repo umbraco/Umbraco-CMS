@@ -4,16 +4,20 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     internal class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
     {
-        public MemberTypeService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
-            : base(provider, logger, eventMessagesFactory)
+        private readonly IMemberTypeRepository _memberTypeRepository;
+
+        public MemberTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
+            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityContainerRepository entityContainerRepository, IEntityRepository entityRepository)
+            : base(provider, logger, eventMessagesFactory, memberTypeRepository, auditRepository, entityContainerRepository, entityRepository)
         {
             MemberService = memberService;
+            _memberTypeRepository = memberTypeRepository;
         }
 
         protected override IMemberTypeService This => this;
@@ -34,12 +38,11 @@ namespace Umbraco.Core.Services
 
         public string GetDefault()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(ReadLockIds);
-                var repo = uow.CreateRepository<IMemberTypeRepository>();
+                scope.ReadLock(ReadLockIds);
 
-                using (var e = repo.GetMany(new int[0]).GetEnumerator())
+                using (var e = _memberTypeRepository.GetMany(new int[0]).GetEnumerator())
                 {
                     if (e.MoveNext() == false)
                         throw new InvalidOperationException("No member types could be resolved");

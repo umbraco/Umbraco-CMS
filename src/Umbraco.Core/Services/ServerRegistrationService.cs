@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Services
@@ -17,6 +18,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
     {
+        private readonly IServerRegistrationRepository _serverRegistrationRepository;
+
         private static readonly string CurrentServerIdentityValue = NetworkHelper.MachineName // eg DOMAIN\SERVER
                                                             + "/" + HttpRuntime.AppDomainAppId; // eg /LM/S3SVC/11/ROOT
 
@@ -25,12 +28,15 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
         /// </summary>
-        /// <param name="uowProvider">A UnitOfWork provider.</param>
+        /// <param name="scopeProvider">A UnitOfWork provider.</param>
         /// <param name="logger">A logger.</param>
         /// <param name="eventMessagesFactory"></param>
-        public ServerRegistrationService(IScopeUnitOfWorkProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
-            : base(uowProvider, logger, eventMessagesFactory)
-        { }
+        public ServerRegistrationService(IScopeProvider scopeProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IServerRegistrationRepository serverRegistrationRepository)
+            : base(scopeProvider, logger, eventMessagesFactory)
+        {
+            _serverRegistrationRepository = serverRegistrationRepository;
+        }
 
         /// <summary>
         /// Touches a server to mark it as active; deactivate stale servers.
@@ -40,15 +46,14 @@ namespace Umbraco.Core.Services
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void TouchServer(string serverAddress, string serverIdentity, TimeSpan staleTimeout)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.Servers);
-                var repo = uow.CreateRepository<IServerRegistrationRepository>();
+                scope.WriteLock(Constants.Locks.Servers);
 
-                ((ServerRegistrationRepository) repo).ClearCache(); // ensure we have up-to-date cache
+                ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache
 
-                var regs = repo.GetMany().ToArray();
-                var hasMaster = regs.Any(x => ((ServerRegistration)x).IsMaster);
+                var regs = _serverRegistrationRepository.GetMany().ToArray();
+                var hasMaster = regs.Any(x => ((ServerRegistration) x).IsMaster);
                 var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
 
                 if (server == null)
@@ -65,20 +70,23 @@ namespace Umbraco.Core.Services
                 if (hasMaster == false)
                     server.IsMaster = true;
 
-                repo.Save(server);
-                uow.Flush(); // triggers a cache reload
-                repo.DeactiveStaleServers(staleTimeout); // triggers a cache reload
+                _serverRegistrationRepository.Save(server);
+                _serverRegistrationRepository.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
                 // reload - cheap, cached
-                regs = repo.GetMany().ToArray();
+                // reload - cheap, cached
+
+                // default role is single server, but if registrations contain more
+                // than one active server, then role is master or slave
+                regs = _serverRegistrationRepository.GetMany().ToArray();
 
                 // default role is single server, but if registrations contain more
                 // than one active server, then role is master or slave
                 _currentServerRole = regs.Count(x => x.IsActive) > 1
-                        ? (server.IsMaster ? ServerRole.Master : ServerRole.Slave)
-                        : ServerRole.Single;
+                    ? (server.IsMaster ? ServerRole.Master : ServerRole.Slave)
+                    : ServerRole.Single;
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -90,19 +98,18 @@ namespace Umbraco.Core.Services
         {
             // because the repository caches "all" and has queries disabled...
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.Servers);
-                var repo = uow.CreateRepository<IServerRegistrationRepository>();
+                scope.WriteLock(Constants.Locks.Servers);
 
-                ((ServerRegistrationRepository) repo).ClearCache(); // ensure we have up-to-date cache
+                ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
 
-                var server = repo.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                var server = _serverRegistrationRepository.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 if (server == null) return;
                 server.IsActive = server.IsMaster = false;
-                repo.Save(server); // will trigger a cache reload
+                _serverRegistrationRepository.Save(server); // will trigger a cache reload // will trigger a cache reload
 
-                uow.Complete();
+                scope.Complete();
             }
         }
 
@@ -112,12 +119,11 @@ namespace Umbraco.Core.Services
         /// <param name="staleTimeout">The time after which a server is considered stale.</param>
         public void DeactiveStaleServers(TimeSpan staleTimeout)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                uow.WriteLock(Constants.Locks.Servers);
-                var repo = uow.CreateRepository<IServerRegistrationRepository>();
-                repo.DeactiveStaleServers(staleTimeout);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.Servers);
+                _serverRegistrationRepository.DeactiveStaleServers(staleTimeout);
+                scope.Complete();
             }
         }
 
@@ -132,12 +138,11 @@ namespace Umbraco.Core.Services
         /// from the database.</remarks>
         public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                uow.ReadLock(Constants.Locks.Servers);
-                var repo = uow.CreateRepository<IServerRegistrationRepository>();
-                if (refresh) ((ServerRegistrationRepository) repo).ClearCache();
-                return repo.GetMany().Where(x => x.IsActive).ToArray(); // fast, cached
+                scope.ReadLock(Constants.Locks.Servers);
+                if (refresh) ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache();
+                return _serverRegistrationRepository.GetMany().Where(x => x.IsActive).ToArray(); // fast, cached // fast, cached
             }
         }
 

@@ -14,20 +14,23 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly IScopeUnitOfWorkProvider _uowProvider;
+        private readonly IScopeProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
+        private readonly INotificationsRepository _notificationsRepository;
         private readonly ILogger _logger;
 
-        public NotificationService(IScopeUnitOfWorkProvider provider, IUserService userService, IContentService contentService, ILogger logger)
+        public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILogger logger,
+            INotificationsRepository notificationsRepository)
         {
+            _notificationsRepository = notificationsRepository;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -202,10 +205,9 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = _uowProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                return repository.GetUsersNotifications(userIds, action, nodeIds, objectType);
+                return _notificationsRepository.GetUsersNotifications(userIds, action, nodeIds, objectType);
             }
         }
         /// <summary>
@@ -215,10 +217,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = _uowProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                return repository.GetUserNotifications(user);
+                return _notificationsRepository.GetUserNotifications(user);
             }
         }
 
@@ -255,10 +256,9 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = _uowProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                return repository.GetEntityNotifications(entity);
+                return _notificationsRepository.GetEntityNotifications(entity);
             }
         }
 
@@ -268,11 +268,10 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IEntity entity)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _uowProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                repository.DeleteNotifications(entity);
-                uow.Complete();
+                _notificationsRepository.DeleteNotifications(entity);
+                scope.Complete();
             }
         }
 
@@ -282,11 +281,10 @@ namespace Umbraco.Core.Services
         /// <param name="user"></param>
         public void DeleteNotifications(IUser user)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _uowProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                repository.DeleteNotifications(user);
-                uow.Complete();
+                _notificationsRepository.DeleteNotifications(user);
+                scope.Complete();
             }
         }
 
@@ -297,11 +295,10 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public void DeleteNotifications(IUser user, IEntity entity)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _uowProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                repository.DeleteNotifications(user, entity);
-                uow.Complete();
+                _notificationsRepository.DeleteNotifications(user, entity);
+                scope.Complete();
             }
         }
 
@@ -316,11 +313,10 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _uowProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                var notifications = repository.SetNotifications(user, entity, actions);
-                uow.Complete();
+                var notifications = _notificationsRepository.SetNotifications(user, entity, actions);
+                scope.Complete();
                 return notifications;
             }
         }
@@ -334,11 +330,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _uowProvider.CreateScope())
             {
-                var repository = uow.CreateRepository<INotificationsRepository>();
-                var notification = repository.CreateNotification(user, entity, action);
-                uow.Complete();
+                var notification = _notificationsRepository.CreateNotification(user, entity, action);
+                scope.Complete();
                 return notification;
             }
         }

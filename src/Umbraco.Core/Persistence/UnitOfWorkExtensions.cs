@@ -7,19 +7,6 @@ namespace Umbraco.Core.Persistence
 {
     internal static class UnitOfWorkExtensions
     {
-        public static IPartialViewRepository CreatePartialViewRepository(this IUnitOfWork uow, PartialViewType partialViewType)
-        {
-            switch (partialViewType)
-            {
-                case PartialViewType.PartialView:
-                    return uow.CreateRepository<IPartialViewRepository>();
-                case PartialViewType.PartialViewMacro:
-                    return uow.CreateRepository<IPartialViewMacroRepository>();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(partialViewType));
-            }
-        }
-
         public static IEntityContainerRepository CreateContainerRepository(this IUnitOfWork uow, Guid containerObjectType)
         {
             if (containerObjectType == Constants.ObjectTypes.DocumentTypeContainer)

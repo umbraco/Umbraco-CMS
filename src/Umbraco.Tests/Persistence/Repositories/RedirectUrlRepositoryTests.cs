@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "blah"
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repo = CreateRepository(uow);
                 var rurl = repo.GetMostRecentUrl("blah");
-                uow.Complete();
+                scope.Complete();
 
                 Assert.IsNotNull(rurl);
                 Assert.AreEqual(_textpage.Id, rurl.ContentId);
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "blah"
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
 
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repo = CreateRepository(uow);
                 var rurl = repo.GetMostRecentUrl("blah");
-                uow.Complete();
+                scope.Complete();
 
                 Assert.IsNotNull(rurl);
                 Assert.AreEqual(_otherpage.Id, rurl.ContentId);
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "blah"
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
 
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repo = CreateRepository(uow);
                 var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreEqual(2, rurls.Length);
                 Assert.AreEqual("durg", rurls[0].Url);
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "blah"
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
 
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Url = "durg"
                 };
                 repo.Save(rurl);
-                uow.Complete();
+                scope.Complete();
 
                 Assert.AreNotEqual(0, rurl.Id);
             }
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repo = CreateRepository(uow);
                 repo.DeleteContentUrls(_textpage.Key);
-                uow.Complete();
+                scope.Complete();
 
                 var rurls = repo.GetContentUrls(_textpage.Key);
 

@@ -5,15 +5,19 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     public class PublicAccessService : ScopeRepositoryService, IPublicAccessService
     {
-        public PublicAccessService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IPublicAccessRepository _publicAccessRepository;
+
+        public PublicAccessService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IPublicAccessRepository publicAccessRepository)
             : base(provider, logger, eventMessagesFactory)
         {
+            _publicAccessRepository = publicAccessRepository;
         }
 
         /// <summary>
@@ -22,10 +26,9 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<PublicAccessEntry> GetAll()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repo = uow.CreateRepository<IPublicAccessRepository>();
-                return repo.GetMany();
+                return _publicAccessRepository.GetMany();
             }
         }
 
@@ -59,14 +62,12 @@ namespace Umbraco.Core.Services
             //start with the deepest id
             ids.Reverse();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IPublicAccessRepository>();
-
                 //This will retrieve from cache!
-                var entries = repo.GetMany().ToArray();
-                uow.Complete();
+                var entries = _publicAccessRepository.GetMany().ToArray();
 
+                scope.Complete();
                 foreach (var id in ids)
                 {
                     var found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
@@ -110,13 +111,11 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IPublicAccessRepository>();
-
-                entry = repo.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+                entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
+                    return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -126,22 +125,23 @@ namespace Umbraco.Core.Services
                 else
                 {
                     //If they are both the same already then there's nothing to update, exit
+                    //If they are both the same already then there's nothing to update, exit
                     return OperationResult.Attempt.Succeed(evtMsgs, entry);
                 }
 
                 var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs, entry);
                 }
 
-                repo.Save(entry);
+                _publicAccessRepository.Save(entry);
 
-                uow.Complete();
+                scope.Complete();
 
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs, entry);
@@ -157,30 +157,28 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublicAccessEntry entry;
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IPublicAccessRepository>();
-
-                entry = repo.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-                if (entry == null) return Attempt<OperationResult>.Fail(); // causes rollback
+                entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+                if (entry == null) return Attempt<OperationResult>.Fail(); // causes rollback // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-                if (existingRule == null) return Attempt<OperationResult>.Fail(); // causes rollback
+                if (existingRule == null) return Attempt<OperationResult>.Fail(); // causes rollback // causes rollback
 
                 entry.RemoveRule(existingRule);
 
                 var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                repo.Save(entry);
-                uow.Complete();
+                _publicAccessRepository.Save(entry);
+                scope.Complete();
 
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -194,21 +192,20 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                var repo = uow.CreateRepository<IPublicAccessRepository>();
-                repo.Save(entry);
-                uow.Complete();
+                _publicAccessRepository.Save(entry);
+                scope.Complete();
 
                 saveEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -222,21 +219,20 @@ namespace Umbraco.Core.Services
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                var repo = uow.CreateRepository<IPublicAccessRepository>();
-                repo.Delete(entry);
-                uow.Complete();
+                _publicAccessRepository.Delete(entry);
+                scope.Complete();
 
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
+                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);

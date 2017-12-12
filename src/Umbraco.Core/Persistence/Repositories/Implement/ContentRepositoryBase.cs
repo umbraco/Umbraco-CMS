@@ -16,6 +16,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -32,8 +33,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        protected ContentRepositoryBase(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
 
         protected abstract TRepository This { get; }
@@ -233,7 +234,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // orderBy: the name of an ordering field
         // orderDirection: direction for orderBy
         // orderBySystemField: whether orderBy is a system field or a custom field (property value)
-        private Sql<ISqlContext> PrepareSqlForPagedResults(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField)
+        private Sql<ISqlContext> PrepareSqlForPage(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, string orderBy, Direction orderDirection, bool orderBySystemField)
         {
             if (filterSql == null && string.IsNullOrEmpty(orderBy)) return sql;
 
@@ -352,7 +353,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return "customPropData.customPropVal";
         }
 
-        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto>(IQuery<TEntity> query,
+        protected IEnumerable<TEntity> GetPage<TDto>(IQuery<TEntity> query,
             long pageIndex, int pageSize, out long totalRecords,
             Func<List<TDto>, IEnumerable<TEntity>> mapDtos,
             string orderBy, Direction orderDirection, bool orderBySystemField,
@@ -361,11 +362,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
             // start with base query, and apply the supplied IQuery
-            if (query == null) query = UnitOfWork.SqlContext.Query<TEntity>();
+            if (query == null) query = AmbientScope.SqlContext.Query<TEntity>();
             var sql = new SqlTranslator<TEntity>(GetBaseQuery(QueryType.Many), query).Translate();
 
             // sort and filter
-            sql = PrepareSqlForPagedResults(sql, filterSql, orderBy, orderDirection, orderBySystemField);
+            sql = PrepareSqlForPage(sql, filterSql, orderBy, orderDirection, orderBySystemField);
 
             // get a page of DTOs and the total count
             var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
@@ -539,49 +540,49 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region UnitOfWork Events
 
-        public class UnitOfWorkEntityEventArgs : EventArgs
+        public class ScopedEntityEventArgs : EventArgs
         {
-            public UnitOfWorkEntityEventArgs(IScopeUnitOfWork unitOfWork, TEntity entity)
+            public ScopedEntityEventArgs(IScope scope, TEntity entity)
             {
-                UnitOfWork = unitOfWork;
+                Scope = scope;
                 Entity = entity;
             }
 
-            public IScopeUnitOfWork UnitOfWork { get; }
+            public IScope Scope { get; }
             public TEntity Entity { get; }
         }
 
-        public class UnitOfWorkVersionEventArgs : EventArgs
+        public class ScopedVersionEventArgs : EventArgs
         {
-            public UnitOfWorkVersionEventArgs(IScopeUnitOfWork unitOfWork, int entityId, int versionId)
+            public ScopedVersionEventArgs(IScope scope, int entityId, int versionId)
             {
-                UnitOfWork = unitOfWork;
+                Scope = scope;
                 EntityId = entityId;
                 VersionId = versionId;
             }
 
-            public IScopeUnitOfWork UnitOfWork { get; }
+            public IScope Scope { get; }
             public int EntityId { get; }
             public int VersionId { get; }
         }
 
-        public static event TypedEventHandler<TRepository, UnitOfWorkEntityEventArgs> UowRefreshedEntity;
-        public static event TypedEventHandler<TRepository, UnitOfWorkEntityEventArgs> UowRemovingEntity;
-        public static event TypedEventHandler<TRepository, UnitOfWorkVersionEventArgs> UowRemovingVersion;
+        public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopedEntityRefresh;
+        public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopeEntityRemove;
+        public static event TypedEventHandler<TRepository, ScopedVersionEventArgs> ScopeVersionRemove;
 
-        protected void OnUowRefreshedEntity(UnitOfWorkEntityEventArgs args)
+        protected void OnUowRefreshedEntity(ScopedEntityEventArgs args)
         {
-            UowRefreshedEntity.RaiseEvent(args, This);
+            ScopedEntityRefresh.RaiseEvent(args, This);
         }
 
-        protected void OnUowRemovingEntity(UnitOfWorkEntityEventArgs args)
+        protected void OnUowRemovingEntity(ScopedEntityEventArgs args)
         {
-            UowRemovingEntity.RaiseEvent(args, This);
+            ScopeEntityRemove.RaiseEvent(args, This);
         }
 
-        protected void OnUowRemovingVersion(UnitOfWorkVersionEventArgs args)
+        protected void OnUowRemovingVersion(ScopedVersionEventArgs args)
         {
-            UowRemovingVersion.RaiseEvent(args, This);
+            ScopeVersionRemove.RaiseEvent(args, This);
         }
 
         #endregion

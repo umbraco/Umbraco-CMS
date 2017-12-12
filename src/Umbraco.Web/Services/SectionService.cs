@@ -11,6 +11,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using File = System.IO.File;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Services
         private readonly IUserService _userService;
         private readonly Lazy<IEnumerable<Section>> _allAvailableSections;
         private readonly IApplicationTreeService _applicationTreeService;
-        private readonly IScopeUnitOfWorkProvider _uowProvider;
+        private readonly IScopeProvider _scopeProvider;
         private readonly CacheHelper _cache;
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
@@ -31,13 +32,13 @@ namespace Umbraco.Web.Services
         public SectionService(
             IUserService userService,
             IApplicationTreeService applicationTreeService,
-            IScopeUnitOfWorkProvider uowProvider,
+            IScopeProvider scopeProvider,
             CacheHelper cache)
         {
             _applicationTreeService = applicationTreeService ?? throw new ArgumentNullException(nameof(applicationTreeService));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _userService = userService;
-            _uowProvider = uowProvider;
+            _scopeProvider = scopeProvider;
             _allAvailableSections = new Lazy<IEnumerable<Section>>(() => new LazyEnumerableSections());
         }
 
@@ -213,11 +214,11 @@ namespace Umbraco.Web.Services
             lock (Locker)
             {
                 //delete the assigned applications
-                using (var uow = _uowProvider.CreateUnitOfWork())
+                using (var scope = _scopeProvider.CreateScope())
                 {
-                    uow.Database.Execute("delete from umbracoUserGroup2App where app = @appAlias",
+                    scope.Database.Execute("delete from umbracoUserGroup2App where app = @appAlias",
                         new { appAlias = section.Alias });
-                    uow.Complete();
+                    scope.Complete();
                 }
 
                 //delete the assigned trees

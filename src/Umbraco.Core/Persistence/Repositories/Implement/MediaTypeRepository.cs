@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -16,10 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
     {
-        private IRepositoryCachePolicy<IMediaType, int> _cachePolicy;
-
-        public MediaTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        public MediaTypeRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
 
         protected override bool IsPublishing => MediaType.IsPublishingConst;

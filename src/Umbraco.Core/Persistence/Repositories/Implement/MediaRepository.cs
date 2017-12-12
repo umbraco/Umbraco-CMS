@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -25,12 +26,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
-        public MediaRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
-            : base(work, cache, logger)
+        public MediaRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
+            : base(scopeProvider, cache, logger)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, work, cache, logger);
+            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeProvider, cache, logger);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
@@ -216,7 +217,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
-            OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
+            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<ContentVersionDto>("WHERE versionId = @versionId", new { versionId });
@@ -300,7 +301,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // set tags
             UpdateEntityTags(entity, _tagRepository);
 
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             entity.ResetDirtyProperties();
         }
@@ -354,7 +355,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             UpdateEntityTags(entity, _tagRepository);
 
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             entity.ResetDirtyProperties();
         }
@@ -362,7 +363,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistDeletedItem(IMedia entity)
         {
             // raise event first else potential FK issues
-            OnUowRemovingEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
             base.PersistDeletedItem(entity);
         }
 
@@ -402,8 +403,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly MediaRepository _outerRepo;
 
-            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-                : base(work, cache, logger)
+            public MediaByGuidReadRepository(MediaRepository outerRepo, ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+                : base(scopeProvider, cache, logger)
             {
                 _outerRepo = outerRepo;
             }
@@ -482,7 +483,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
             }
 
-            return GetPagedResultsByQuery<ContentDto>(query, pageIndex, pageSize, out totalRecords,
+            return GetPage<ContentDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }

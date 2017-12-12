@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -23,11 +24,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
         private readonly PermissionRepository<IContent> _permissionRepository;
 
-        public UserGroupRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger)
-            : base(work, cacheHelper, logger)
+        public UserGroupRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger)
+            : base(scopeProvider, cacheHelper, logger)
         {
-            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, work, cacheHelper, logger);
-            _permissionRepository = new PermissionRepository<IContent>(work, cacheHelper, logger);
+            _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeProvider, cacheHelper, logger);
+            _permissionRepository = new PermissionRepository<IContent>(scopeProvider, cacheHelper, logger);
         }
 
         public const string GetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
@@ -360,8 +361,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly UserGroupRepository _userGroupRepo;
 
-            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-                : base(work, cache, logger)
+            public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+                : base(scopeProvider, cache, logger)
             {
                 _userGroupRepo = userGroupRepo;
             }

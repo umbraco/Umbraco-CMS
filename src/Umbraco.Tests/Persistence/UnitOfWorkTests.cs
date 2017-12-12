@@ -18,8 +18,8 @@ namespace Umbraco.Tests.Persistence
             {
                 using (var uow = provider.CreateUnitOfWork())
                 {
-                    uow.ReadLock(-666);
-                    uow.Complete();
+                    scope.ReadLock(-666);
+                    scope.Complete();
                 }
             });
         }
@@ -30,8 +30,8 @@ namespace Umbraco.Tests.Persistence
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var uow = provider.CreateUnitOfWork())
             {
-                uow.ReadLock(Constants.Locks.Servers);
-                uow.Complete();
+                scope.ReadLock(Constants.Locks.Servers);
+                scope.Complete();
             }
         }
 
@@ -43,8 +43,8 @@ namespace Umbraco.Tests.Persistence
             {
                 using (var uow = provider.CreateUnitOfWork())
                 {
-                    uow.WriteLock(-666);
-                    uow.Complete();
+                    scope.WriteLock(-666);
+                    scope.Complete();
                 }
             });
         }
@@ -55,8 +55,8 @@ namespace Umbraco.Tests.Persistence
             var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             using (var uow = provider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.Servers);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.Servers);
+                scope.Complete();
             }
         }
     }

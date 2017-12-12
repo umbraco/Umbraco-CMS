@@ -2,33 +2,31 @@
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     public class IdkMap
     {
-        private readonly IScopeUnitOfWorkProvider _uowProvider;
+        private readonly IScopeProvider _scopeProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
         private readonly Dictionary<int, TypedId<Guid>> _id2Key = new Dictionary<int, TypedId<Guid>>();
         private readonly Dictionary<Guid, TypedId<int>> _key2Id = new Dictionary<Guid, TypedId<int>>();
 
-        public IdkMap(IScopeUnitOfWorkProvider uowProvider)
+        public IdkMap(IScopeProvider scopeProvider)
         {
-            _uowProvider = uowProvider;
+            _scopeProvider = scopeProvider;
         }
 
-        // note - no need for uow, scope would be enough, but a pain to wire
         // note - for pure read-only we might want to *not* enforce a transaction?
 
         public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
-            TypedId<int> id;
             try
             {
                 _locker.EnterReadLock();
-                if (_key2Id.TryGetValue(key, out id) && id.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(id.Id);
+                if (_key2Id.TryGetValue(key, out var id) && id.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(id.Id);
             }
             finally
             {
@@ -37,11 +35,11 @@ namespace Umbraco.Core.Services
             }
 
             int? val;
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND nodeObjectType=@nodeObjectType",
+                val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND nodeObjectType=@nodeObjectType",
                     new { id = key, nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType) });
-                uow.Complete();
+                scope.Complete();
             }
 
             if (val == null) return Attempt<int>.Fail();
@@ -77,11 +75,10 @@ namespace Umbraco.Core.Services
 
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            TypedId<Guid> key;
             try
             {
                 _locker.EnterReadLock();
-                if (_id2Key.TryGetValue(id, out key) && key.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(key.Id);
+                if (_id2Key.TryGetValue(id, out var key) && key.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(key.Id);
             }
             finally
             {
@@ -90,11 +87,11 @@ namespace Umbraco.Core.Services
             }
 
             Guid? val;
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND nodeObjectType=@nodeObjectType",
+                val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND nodeObjectType=@nodeObjectType",
                     new { id, nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType) });
-                uow.Complete();
+                scope.Complete();
             }
 
             if (val == null) return Attempt<Guid>.Fail();
@@ -106,7 +103,7 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType); ;
+                _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType);
                 _key2Id[val.Value] = new TypedId<int>();
             }
             finally
@@ -146,8 +143,7 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                TypedId<Guid> key;
-                if (_id2Key.TryGetValue(id, out key) == false) return;
+                if (_id2Key.TryGetValue(id, out var key) == false) return;
                 _id2Key.Remove(id);
                 _key2Id.Remove(key.Id);
             }
@@ -163,8 +159,7 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                TypedId<int> id;
-                if (_key2Id.TryGetValue(key, out id) == false) return;
+                if (_key2Id.TryGetValue(key, out var id) == false) return;
                 _id2Key.Remove(id.Id);
                 _key2Id.Remove(key);
             }
@@ -177,23 +172,14 @@ namespace Umbraco.Core.Services
 
         private struct TypedId<T>
         {
-            private readonly T _id;
-            private readonly UmbracoObjectTypes _umbracoObjectType;
+            public T Id { get; }
 
-            public T Id
-            {
-                get { return _id; }
-            }
-
-            public UmbracoObjectTypes UmbracoObjectType
-            {
-                get { return _umbracoObjectType; }
-            }
+            public UmbracoObjectTypes UmbracoObjectType { get; }
 
             public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
             {
-                _umbracoObjectType = umbracoObjectType;
-                _id = id;
+                UmbracoObjectType = umbracoObjectType;
+                Id = id;
             }
         }
     }

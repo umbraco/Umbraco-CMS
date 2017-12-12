@@ -1,13 +1,13 @@
 ﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     class MediaTypeContainerRepository : EntityContainerRepository, IMediaTypeContainerRepository
     {
-        public MediaTypeContainerRepository(IScopeUnitOfWork uow, CacheHelper cache, ILogger logger)
-            : base(uow, cache, logger, Constants.ObjectTypes.MediaTypeContainer)
+        public MediaTypeContainerRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger, Constants.ObjectTypes.MediaTypeContainer)
         { }
     }
 }

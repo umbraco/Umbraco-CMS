@@ -11,6 +11,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -25,8 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class PermissionRepository<TEntity> : NPocoRepositoryBase<int, ContentPermissionSet>
         where TEntity : class, IAggregateRoot
     {
-        public PermissionRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        public PermissionRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         .SelectAll()
                         .From<UserGroup2NodePermissionDto>()
                         .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId));
-                    var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                    var permissions = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
                     foreach (var permission in ConvertToPermissionList(permissions))
                     {
                         result.Add(permission);
@@ -71,7 +72,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                             .SelectAll()
                             .From<UserGroup2NodePermissionDto>()
                             .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId) && ids.Contains(dto.NodeId));
-                        var permissions = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                        var permissions = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
                         foreach (var permission in ConvertToPermissionList(permissions))
                         {
                             result.Add(permission);
@@ -96,7 +97,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<UserGroup2NodePermissionDto>(dto => entityIds.Contains(dto.NodeId))
                 .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId);
 
-            var result = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+            var result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
             return ConvertToPermissionList(result);
         }
 
@@ -113,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<UserGroup2NodePermissionDto>(dto => dto.NodeId == entityId)
                 .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId);
 
-            var result = UnitOfWork.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+            var result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
             return ConvertToPermissionList(result);
         }
 
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entityIds.Length == 0)
                 return;
 
-            var db = UnitOfWork.Database;
+            var db = AmbientScope.Database;
 
             //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)";
@@ -165,7 +166,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="entityIds"></param>
         public void AssignPermission(int groupId, char permission, params int[] entityIds)
         {
-            var db = UnitOfWork.Database;
+            var db = AmbientScope.Database;
 
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds)";
             db.Execute(sql,
@@ -194,7 +195,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="groupIds"></param>
         public void AssignEntityPermission(TEntity entity, char permission, IEnumerable<int> groupIds)
         {
-            var db = UnitOfWork.Database;
+            var db = AmbientScope.Database;
             var groupIdsA = groupIds.ToArray();
 
             const string sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds)";
@@ -226,7 +227,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </remarks>
         public void ReplaceEntityPermissions(EntityPermissionSet permissionSet)
         {
-            var db = UnitOfWork.Database;
+            var db = AmbientScope.Database;
 
             const string sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId";
             db.Execute(sql, new { nodeId = permissionSet.EntityId });

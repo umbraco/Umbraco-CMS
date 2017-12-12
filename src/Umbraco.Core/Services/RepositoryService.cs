@@ -2,7 +2,7 @@
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
@@ -13,15 +13,15 @@ namespace Umbraco.Core.Services
     {
         protected ILogger Logger { get; }
         protected IEventMessagesFactory EventMessagesFactory { get; }
-        protected IScopeUnitOfWorkProvider UowProvider { get; }
+        protected IScopeProvider ScopeProvider { get; }
 
-        protected RepositoryService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        protected RepositoryService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             EventMessagesFactory = eventMessagesFactory ?? throw new ArgumentNullException(nameof(eventMessagesFactory));
-            UowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+            ScopeProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        protected IQuery<T> Query<T>() => UowProvider.ScopeProvider.SqlContext.Query<T>();
+        protected IQuery<T> Query<T>() => ScopeProvider.SqlContext.Query<T>();
     }
 }

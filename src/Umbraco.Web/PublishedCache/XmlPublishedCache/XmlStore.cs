@@ -16,7 +16,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
@@ -40,6 +39,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// </remarks>
     class XmlStore : IDisposable
     {
+        private readonly IDocumentRepository _documentRepository;
+        private readonly IMediaRepository _mediaRepository;
+        private readonly IMemberRepository _memberRepository;
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
         private bool _withRepositoryEvents;
@@ -49,7 +51,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IEnumerable<IUrlSegmentProvider> _segmentProviders;
         private readonly RoutesCache _routesCache;
         private readonly ServiceContext _serviceContext; // fixme WHY
-        private readonly IScopeUnitOfWorkProvider _uowProvider;
         private readonly IScopeProvider _scopeProvider;
 
         #region Constructors
@@ -58,27 +59,29 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// Initializes a new instance of the <see cref="XmlStore"/> class.
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
-        public XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom)
-            : this(serviceContext, scopeProvider, uowProvider, routesCache, contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, false, false)
+        public XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
+            : this(serviceContext, scopeProvider, routesCache, contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository)
         { }
 
         // internal for unit tests
         // no file nor db, no config check
         // fixme - er, we DO have a DB?
-        internal XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, IScopeUnitOfWorkProvider uowProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
+        internal XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
-            bool testing, bool enableRepositoryEvents)
+            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
 
             _serviceContext = serviceContext;
             _scopeProvider = scopeProvider;
-            _uowProvider = uowProvider;
             _routesCache = routesCache;
             _contentTypeCache = contentTypeCache;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _documentRepository = documentRepository;
+            _mediaRepository = mediaRepository;
+            _memberRepository = memberRepository;
             _segmentProviders = segmentProviders;
 
             if (testing)
@@ -96,9 +99,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // internal for unit tests
         // initialize with an xml document
         // no events, no file nor db, no config check
-        internal XmlStore(XmlDocument xmlDocument)
+        internal XmlStore(XmlDocument xmlDocument, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
         {
             _xmlDocument = xmlDocument;
+            _documentRepository = documentRepository;
+            _mediaRepository = mediaRepository;
+            _memberRepository = memberRepository;
             _xmlFileEnabled = false;
 
             // do not plug events, we may not have what it takes to handle them
@@ -107,8 +113,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // internal for unit tests
         // initialize with a function returning an xml document
         // no events, no file nor db, no config check
-        internal XmlStore(Func<XmlDocument> getXmlDocument)
+        internal XmlStore(Func<XmlDocument> getXmlDocument, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
         {
+            _documentRepository = documentRepository;
+            _mediaRepository = mediaRepository;
+            _memberRepository = memberRepository;
             GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
 
@@ -170,15 +179,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            DocumentRepository.UowRemovingEntity += OnContentRemovingEntity;
-            DocumentRepository.UowRemovingVersion += OnContentRemovingVersion;
-            DocumentRepository.UowRefreshedEntity += OnContentRefreshedEntity;
-            MediaRepository.UowRemovingEntity += OnMediaRemovingEntity;
-            MediaRepository.UowRemovingVersion += OnMediaRemovingVersion;
-            MediaRepository.UowRefreshedEntity += OnMediaRefreshedEntity;
-            MemberRepository.UowRemovingEntity += OnMemberRemovingEntity;
-            MemberRepository.UowRemovingVersion += OnMemberRemovingVersion;
-            MemberRepository.UowRefreshedEntity += OnMemberRefreshedEntity;
+            DocumentRepository.ScopeEntityRemove += OnContentRemovingEntity;
+            DocumentRepository.ScopeVersionRemove += OnContentRemovingVersion;
+            DocumentRepository.ScopedEntityRefresh += OnContentRefreshedEntity;
+            MediaRepository.ScopeEntityRemove += OnMediaRemovingEntity;
+            MediaRepository.ScopeVersionRemove += OnMediaRemovingVersion;
+            MediaRepository.ScopedEntityRefresh += OnMediaRefreshedEntity;
+            MemberRepository.ScopeEntityRemove += OnMemberRemovingEntity;
+            MemberRepository.ScopeVersionRemove += OnMemberRemovingVersion;
+            MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
             // plug
             ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
@@ -190,15 +199,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         private void ClearEvents()
         {
-            DocumentRepository.UowRemovingEntity -= OnContentRemovingEntity;
-            DocumentRepository.UowRemovingVersion -= OnContentRemovingVersion;
-            DocumentRepository.UowRefreshedEntity -= OnContentRefreshedEntity;
-            MediaRepository.UowRemovingEntity -= OnMediaRemovingEntity;
-            MediaRepository.UowRemovingVersion -= OnMediaRemovingVersion;
-            MediaRepository.UowRefreshedEntity -= OnMediaRefreshedEntity;
-            MemberRepository.UowRemovingEntity -= OnMemberRemovingEntity;
-            MemberRepository.UowRemovingVersion -= OnMemberRemovingVersion;
-            MemberRepository.UowRefreshedEntity -= OnMemberRefreshedEntity;
+            DocumentRepository.ScopeEntityRemove -= OnContentRemovingEntity;
+            DocumentRepository.ScopeVersionRemove -= OnContentRemovingVersion;
+            DocumentRepository.ScopedEntityRefresh -= OnContentRefreshedEntity;
+            MediaRepository.ScopeEntityRemove -= OnMediaRemovingEntity;
+            MediaRepository.ScopeVersionRemove -= OnMediaRemovingVersion;
+            MediaRepository.ScopedEntityRefresh -= OnMediaRefreshedEntity;
+            MemberRepository.ScopeEntityRemove -= OnMemberRemovingEntity;
+            MemberRepository.ScopeVersionRemove -= OnMemberRemovingVersion;
+            MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
 
             ContentTypeService.UowRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.UowRefreshedEntity -= OnMediaTypeRefreshedEntity;
@@ -432,17 +441,17 @@ WHERE umbracoNode.nodeObjectType = @nodeObjectType
 AND (umbracoNode.id=@id)";
 
             XmlDto xmlDto;
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.MediaTree);
-                var xmlDtos = uow.Database.Query<XmlDto>(sql,
+                scope.ReadLock(Constants.Locks.MediaTree);
+                var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
                         nodeObjectType = Constants.ObjectTypes.Media,
                         id = mediaId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
-                uow.Complete();
+                scope.Complete();
             }
 
             if (xmlDto == null) return null;
@@ -464,17 +473,17 @@ WHERE umbracoNode.nodeObjectType = @nodeObjectType
 AND (umbracoNode.id=@id)";
 
             XmlDto xmlDto;
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.MemberTree);
-                var xmlDtos = uow.Database.Query<XmlDto>(sql,
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
                         nodeObjectType = Constants.ObjectTypes.Member,
                         id = memberId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
-                uow.Complete();
+                scope.Complete();
             }
 
             if (xmlDto == null) return null;
@@ -495,17 +504,17 @@ WHERE umbracoNode.nodeObjectType = @nodeObjectType
 AND (umbracoNode.id=@id)";
 
             XmlDto xmlDto;
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var xmlDtos = uow.Database.Query<XmlDto>(sql,
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
                         nodeObjectType = Constants.ObjectTypes.Document,
                         id = contentId
                     });
                 xmlDto = xmlDtos.FirstOrDefault();
-                uow.Complete();
+                scope.Complete();
             }
             if (xmlDto == null) return null;
 
@@ -543,17 +552,17 @@ AND (umbracoNode.id=@id)";
             var doc = (XmlDocument)Xml.Clone();
             if (content == null) return doc;
 
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var sqlSyntax = uow.SqlContext.SqlSyntax;
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var sqlSyntax = scope.SqlContext.SqlSyntax;
 
                 var sql = ReadCmsPreviewXmlSql1;
                 sql += " @path LIKE " + sqlSyntax.GetConcat("umbracoNode.Path", "',%"); // concat(umbracoNode.path, ',%')
                 if (includeSubs) sql += " OR umbracoNode.path LIKE " + sqlSyntax.GetConcat("@path", "',%"); // concat(@path, ',%')
                 sql += ReadCmsPreviewXmlSql2;
 
-                var xmlDtos = uow.Database.Query<XmlDto>(sql,
+                var xmlDtos = scope.Database.Query<XmlDto>(sql,
                     new
                     {
                         nodeObjectType = Constants.ObjectTypes.Document,
@@ -569,7 +578,7 @@ AND (umbracoNode.id=@id)";
                     doc = AddOrUpdateXmlNode(doc, xmlDto);
                 }
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return doc;
@@ -905,12 +914,12 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             XmlNode parent = null;
             var parentId = 0;
 
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
+                scope.ReadLock(Constants.Locks.ContentTree);
 
                 // get xml
-                var xmlDtos = uow.Database.Query<XmlDto>(ReadTreeCmsContentXmlSql,
+                var xmlDtos = scope.Database.Query<XmlDto>(ReadTreeCmsContentXmlSql,
                     new { nodeObjectType = Constants.ObjectTypes.Document });
 
                 foreach (var xmlDto in xmlDtos)
@@ -931,7 +940,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     parent.AppendChild(xmlDto.XmlNode);
                 }
 
-                uow.Complete();
+                scope.Complete();
             }
 
             safeXml.Xml = xml;
@@ -941,16 +950,16 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         {
             var xmlDoc = new XmlDocument();
 
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
                 if (nodeObjectType == Constants.ObjectTypes.Document)
-                    uow.ReadLock(Constants.Locks.ContentTree);
+                    scope.ReadLock(Constants.Locks.ContentTree);
                 else if (nodeObjectType == Constants.ObjectTypes.Media)
-                    uow.ReadLock(Constants.Locks.MediaTree);
+                    scope.ReadLock(Constants.Locks.MediaTree);
                 else if (nodeObjectType == Constants.ObjectTypes.Member)
-                    uow.ReadLock(Constants.Locks.MemberTree);
+                    scope.ReadLock(Constants.Locks.MemberTree);
 
-                var xmlDtos = uow.Database.Query<XmlDto>(ReadMoreCmsContentXmlSql,
+                var xmlDtos = scope.Database.Query<XmlDto>(ReadMoreCmsContentXmlSql,
                     new { /*@nodeObjectType =*/ nodeObjectType });
 
                 // Initialise the document ready for the final composition of content
@@ -982,7 +991,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     parent.AppendChild(node);
                 }
 
-                uow.Complete();
+                scope.Complete();
             }
 
             return xmlDoc;
@@ -1068,12 +1077,12 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     // else we have a published version
 
                     // get xml
-                    using (var uow = _uowProvider.CreateUnitOfWork())
+                    using (var scope = _scopeProvider.CreateScope())
                     {
-                        uow.ReadLock(Constants.Locks.ContentTree);
+                        scope.ReadLock(Constants.Locks.ContentTree);
 
                         // that query is yielding results so will only load what's needed
-                        var xmlDtos = uow.Database.Query<XmlDto>(ReadBranchCmsContentXmlSql,
+                        var xmlDtos = scope.Database.Query<XmlDto>(ReadBranchCmsContentXmlSql,
                             new
                             {
                                 nodeObjectType = Constants.ObjectTypes.Document,
@@ -1174,7 +1183,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                             }
                         }
 
-                        uow.Complete();
+                        scope.Complete();
                     }
 
                     publishedChanged = true;
@@ -1247,10 +1256,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         private void RefreshContentTypes(IEnumerable<int> ids)
         {
             using (var safeXml = GetSafeXmlWriter())
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var xmlDtos = uow.Database.Query<XmlDto>(ReadCmsContentXmlForContentTypesSql,
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var xmlDtos = scope.Database.Query<XmlDto>(ReadCmsContentXmlForContentTypesSql,
                     new { nodeObjectType = Constants.ObjectTypes.Document, /*@ids =*/ ids });
 
                 foreach (var xmlDto in xmlDtos)
@@ -1259,7 +1268,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     safeXml.Xml = AddOrUpdateXmlNode(safeXml.Xml, xmlDto);
                 }
 
-                uow.Complete();
+                scope.Complete();
                 safeXml.AcceptChanges();
             }
         }
@@ -1449,19 +1458,19 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         // it is not the case at the moment, instead a global lock is used whenever content is modified - well,
         // almost: rollback or unpublish do not implement it - nevertheless
 
-        private static void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
         {
-            OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
+            OnRemovedEntity(args.Scope.Database, args.Entity);
         }
 
-        private static void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
         {
-            OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
+            OnRemovedEntity(args.Scope.Database, args.Entity);
         }
 
-        private static void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.UnitOfWorkEntityEventArgs args)
+        private static void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
         {
-            OnRemovedEntity(args.UnitOfWork.Database, args.Entity);
+            OnRemovedEntity(args.Scope.Database, args.Entity);
         }
 
         private static void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
@@ -1473,19 +1482,19 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // note: could be optimized by using "WHERE nodeId IN (...)" delete clauses
         }
 
-        private static void OnContentRemovingVersion(DocumentRepository sender, DocumentRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnContentRemovingVersion(DocumentRepository sender, DocumentRepository.ScopedVersionEventArgs args)
         {
-            OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
         }
 
-        private static void OnMediaRemovingVersion(MediaRepository sender, MediaRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnMediaRemovingVersion(MediaRepository sender, MediaRepository.ScopedVersionEventArgs args)
         {
-            OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
         }
 
-        private static void OnMemberRemovingVersion(MemberRepository sender, MemberRepository.UnitOfWorkVersionEventArgs args)
+        private static void OnMemberRemovingVersion(MemberRepository sender, MemberRepository.ScopedVersionEventArgs args)
         {
-            OnRemovedVersion(args.UnitOfWork.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
         }
 
         private static void OnRemovedVersion(IUmbracoDatabase db, int entityId, int versionId)
@@ -1508,9 +1517,9 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             return PropertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
-        private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.UnitOfWorkEntityEventArgs args)
+        private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
         {
-            var db = args.UnitOfWork.Database;
+            var db = args.Scope.Database;
             var entity = args.Entity;
 
             // serialize edit values for preview
@@ -1549,9 +1558,9 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         }
 
-        private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.UnitOfWorkEntityEventArgs args)
+        private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
         {
-            var db = args.UnitOfWork.Database;
+            var db = args.Scope.Database;
             var entity = args.Entity;
 
             // for whatever reason we delete some xml when the media is trashed
@@ -1565,9 +1574,9 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRepositoryRefreshed(db, dto1);
         }
 
-        private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.UnitOfWorkEntityEventArgs args)
+        private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
         {
-            var db = args.UnitOfWork.Database;
+            var db = args.Scope.Database;
             var entity = args.Entity;
 
             var xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, entity).ToDataString();
@@ -1655,13 +1664,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             var contentTypeIdsA = contentTypeIds?.ToArray();
 
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
-            using (var uow = _uowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIdsA);
-                RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIdsA);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.ContentTree);
+                RebuildContentXmlLocked(scope, groupSize, contentTypeIdsA);
+                RebuildPreviewXmlLocked(scope, groupSize, contentTypeIdsA);
                 scope.Complete();
             }
         }
@@ -1669,22 +1675,19 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         public void RebuildContentXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
-            using (var uow = _uowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                RebuildContentXmlLocked(uow, repository, groupSize, contentTypeIds);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.ContentTree);
+                RebuildContentXmlLocked(scope, groupSize, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes content tree lock
-        private void RebuildContentXmlLocked(IScopeUnitOfWork unitOfWork, IDocumentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildContentXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Constants.ObjectTypes.Document;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
             if (contentTypeIds == null || contentTypeIdsA.Length == 0)
@@ -1721,7 +1724,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.SqlContext.Query<IContent>().Where(x => x.Published);
+            var query = scope.SqlContext.Query<IContent>().Where(x => x.Published);
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1730,7 +1733,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 const bool published = true; // contentXml contains published content!
                 var items = descendants.Select(c => new ContentXmlDto { NodeId = c.Id, Xml =
                     EntityXmlSerializer.Serialize(_serviceContext.ContentService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, c, published).ToDataString() }).ToArray();
@@ -1742,22 +1745,20 @@ WHERE cmsContentXml.nodeId IN (
         public void RebuildPreviewXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
-            using (var uow = _uowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.ContentTree);
-                var repository = uow.CreateRepository<IDocumentRepository>();
-                RebuildPreviewXmlLocked(uow, repository, groupSize, contentTypeIds);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.ContentTree);
+                RebuildPreviewXmlLocked(scope, groupSize, contentTypeIds);
+                scope.Complete();
                 scope.Complete();
             }
         }
 
         // assumes content tree lock
-        private void RebuildPreviewXmlLocked(IScopeUnitOfWork unitOfWork, IDocumentRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        private void RebuildPreviewXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var contentObjectType = Constants.ObjectTypes.Document;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
             if (contentTypeIds == null || contentTypeIdsA.Length == 0)
@@ -1794,7 +1795,7 @@ WHERE cmsPreviewXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.SqlContext.Query<IContent>();
+            var query = scope.SqlContext.Query<IContent>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1805,7 +1806,7 @@ WHERE cmsPreviewXml.nodeId IN (
             {
                 // .GetPagedResultsByQuery implicitely adds (uDocument.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
-                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 const bool published = true; // previewXml contains edit content!
                 var items = descendants.Select(c => new PreviewXmlDto
                 {
@@ -1820,22 +1821,19 @@ WHERE cmsPreviewXml.nodeId IN (
         public void RebuildMediaXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
-            using (var uow = _uowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.MediaTree);
-                var repository = uow.CreateRepository<IMediaRepository>();
-                RebuildMediaXmlLocked(uow, repository, groupSize, contentTypeIds);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.MediaTree);
+                RebuildMediaXmlLocked(scope, groupSize, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes media tree lock
-        public void RebuildMediaXmlLocked(IScopeUnitOfWork unitOfWork, IMediaRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMediaXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var mediaObjectType = Constants.ObjectTypes.Media;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
             if (contentTypeIds == null || contentTypeIdsA.Length == 0)
@@ -1872,7 +1870,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.SqlContext.Query<IMedia>();
+            var query = scope.SqlContext.Query<IMedia>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1881,7 +1879,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml =
                     EntityXmlSerializer.Serialize(_serviceContext.MediaService, _serviceContext.DataTypeService, _serviceContext.UserService, _serviceContext.LocalizationService, _segmentProviders, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
@@ -1892,22 +1890,19 @@ WHERE cmsContentXml.nodeId IN (
         public void RebuildMemberXml(int groupSize = 5000, IEnumerable<int> contentTypeIds = null)
         {
             using (var scope = _scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.None))
-            using (var uow = _uowProvider.CreateUnitOfWork())
             {
-                uow.WriteLock(Constants.Locks.MemberTree);
-                var repository = uow.CreateRepository<IMemberRepository>();
-                RebuildMemberXmlLocked(uow, repository, groupSize, contentTypeIds);
-                uow.Complete();
+                scope.WriteLock(Constants.Locks.MemberTree);
+                RebuildMemberXmlLocked(scope, groupSize, contentTypeIds);
                 scope.Complete();
             }
         }
 
         // assumes member tree lock
-        public void RebuildMemberXmlLocked(IScopeUnitOfWork unitOfWork, IMemberRepository repository, int groupSize, IEnumerable<int> contentTypeIds)
+        public void RebuildMemberXmlLocked(IScope scope, int groupSize, IEnumerable<int> contentTypeIds)
         {
             var contentTypeIdsA = contentTypeIds?.ToArray();
             var memberObjectType = Constants.ObjectTypes.Member;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             // remove all - if anything fails the transaction will rollback
             if (contentTypeIds == null || contentTypeIdsA.Length == 0)
@@ -1944,7 +1939,7 @@ WHERE cmsContentXml.nodeId IN (
             }
 
             // insert back - if anything fails the transaction will rollback
-            var query = _uowProvider.SqlContext.Query<IMember>();
+            var query = scope.SqlContext.Query<IMember>();
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
@@ -1953,7 +1948,7 @@ WHERE cmsContentXml.nodeId IN (
             long total;
             do
             {
-                var descendants = repository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
+                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 var items = descendants.Select(m => new ContentXmlDto { NodeId = m.Id, Xml = EntityXmlSerializer.Serialize(_serviceContext.DataTypeService, _serviceContext.LocalizationService, m).ToDataString() }).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
@@ -1962,24 +1957,24 @@ WHERE cmsContentXml.nodeId IN (
 
         public bool VerifyContentAndPreviewXml()
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.ContentTree);
-                var ok = VerifyContentAndPreviewXmlLocked(uow);
-                uow.Complete();
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var ok = VerifyContentAndPreviewXmlLocked(scope);
+                scope.Complete();
                 return ok;
             }
         }
 
         // assumes content tree lock
-        private static bool VerifyContentAndPreviewXmlLocked(IScopeUnitOfWork unitOfWork)
+        private static bool VerifyContentAndPreviewXmlLocked(IScope scope)
         {
             // every published content item should have a corresponding row in cmsContentXml
             // every content item should have a corresponding row in cmsPreviewXml
             // and that row should have the key="..." attribute
 
             var contentObjectType = Constants.ObjectTypes.Document;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
@@ -2003,25 +1998,24 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
 
         public bool VerifyMediaXml()
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.MediaTree);
-                var repository = uow.CreateRepository<IMediaRepository>();
-                var ok = VerifyMediaXmlLocked(uow, repository);
-                uow.Complete();
+                scope.ReadLock(Constants.Locks.MediaTree);
+                var ok = VerifyMediaXmlLocked(scope);
+                scope.Complete();
                 return ok;
             }
         }
 
         // assumes media tree lock
-        public bool VerifyMediaXmlLocked(IScopeUnitOfWork unitOfWork, IMediaRepository repository)
+        public bool VerifyMediaXmlLocked(IScope scope)
         {
             // every non-trashed media item should have a corresponding row in cmsContentXml
             // and that row should have the key="..." attribute
             // fixme - where's the trashed test here?
 
             var mediaObjectType = Constants.ObjectTypes.Media;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode
@@ -2036,23 +2030,22 @@ AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
 
         public bool VerifyMemberXml()
         {
-            using (var uow = _uowProvider.CreateUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
-                uow.ReadLock(Constants.Locks.MemberTree);
-                var repository = uow.CreateRepository<IMemberRepository>();
-                var ok = VerifyMemberXmlLocked(uow, repository);
-                uow.Complete();
+                scope.ReadLock(Constants.Locks.MemberTree);
+                var ok = VerifyMemberXmlLocked(scope);
+                scope.Complete();
                 return ok;
             }
         }
 
         // assumes member tree lock
-        public bool VerifyMemberXmlLocked(IScopeUnitOfWork unitOfWork, IMemberRepository repository)
+        public bool VerifyMemberXmlLocked(IScope scope)
         {
             // every member item should have a corresponding row in cmsContentXml
 
             var memberObjectType = Constants.ObjectTypes.Member;
-            var db = unitOfWork.Database;
+            var db = scope.Database;
 
             var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
 FROM umbracoNode

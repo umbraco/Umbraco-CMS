@@ -14,6 +14,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -26,11 +27,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, IContentTypeRepository contentTypeRepository)
-            : base(work, cache, logger)
+        public DataTypeDefinitionRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, IContentTypeRepository contentTypeRepository)
+            : base(scopeProvider, cache, logger)
         {
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.NoCache, logger);
+            _preValRepository = new DataTypePreValueRepository(scopeProvider, CacheHelper.NoCache, logger);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -478,8 +479,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-                : base(work, cache, logger)
+            public DataTypePreValueRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+                : base(scopeProvider, cache, logger)
             { }
 
             #region Not implemented (don't need to for the purposes of this repo)

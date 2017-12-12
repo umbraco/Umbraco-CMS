@@ -9,14 +9,14 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        public MemberGroupRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
 
         private readonly MemberGroupFactory _modelFactory = new MemberGroupFactory();
@@ -145,10 +145,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             };
             PersistNewItem(grp);
 
-            if (UnitOfWork.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp)))
+            if (AmbientScope.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp)))
                 return null;
 
-            UnitOfWork.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp));
+            AmbientScope.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp));
             return grp;
         }
 
@@ -239,13 +239,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var missingRoles = roleNames.Except(existingRoles);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
 
-            if (UnitOfWork.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
+            if (AmbientScope.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
                 return;
 
             foreach (var m in missingGroups)
                 PersistNewItem(m);
 
-            UnitOfWork.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups));
+            AmbientScope.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups));
 
             //now go get all the dto's for roles with these role names
             var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();

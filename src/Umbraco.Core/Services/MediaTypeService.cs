@@ -4,14 +4,16 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     internal class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType, IMediaTypeService>, IMediaTypeService
     {
-        public MediaTypeService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService)
-            : base(provider, logger, eventMessagesFactory)
+        public MediaTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService,
+            IMediaTypeRepository mediaTypeRepository, IAuditRepository auditRepository, IEntityContainerRepository entityContainerRepository,
+            IEntityRepository entityRepository)
+            : base(provider, logger, eventMessagesFactory, mediaTypeRepository, auditRepository, entityContainerRepository, entityRepository)
         {
             MediaService = mediaService;
         }

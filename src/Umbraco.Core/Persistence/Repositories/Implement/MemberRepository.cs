@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -23,8 +24,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
-            : base(work, cache, logger)
+        public MemberRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
+            : base(scopeProvider, cache, logger)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
@@ -217,7 +218,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
-            OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
+            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             Database.Delete<PropertyDataDto>("WHERE versionId = @VersionId", new { versionId });
             Database.Delete<ContentVersionDto>("WHERE versionId = @VersionId", new { versionId });
@@ -312,7 +313,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             UpdateEntityTags(entity, _tagRepository);
 
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             entity.ResetDirtyProperties();
         }
@@ -377,7 +378,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             UpdateEntityTags(entity, _tagRepository);
 
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             entity.ResetDirtyProperties();
         }
@@ -385,7 +386,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistDeletedItem(IMember entity)
         {
             // raise event first else potential FK issues
-            OnUowRemovingEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
             base.PersistDeletedItem(entity);
         }
 
@@ -504,7 +505,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
             }
 
-            return GetPagedResultsByQuery<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+            return GetPage<MemberDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x), orderBy, orderDirection, orderBySystemField,
                 filterSql);
         }

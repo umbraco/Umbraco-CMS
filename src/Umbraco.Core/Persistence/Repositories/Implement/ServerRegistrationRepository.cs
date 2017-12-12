@@ -8,15 +8,15 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         // fixme - should we use NoCache instead of CreateDisabledCacheHelper?!
-        public ServerRegistrationRepository(IScopeUnitOfWork work, ILogger logger)
-            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger)
+        public ServerRegistrationRepository(ScopeProvider scopeProvider, ILogger logger)
+            : base(scopeProvider, CacheHelper.CreateDisabledCacheHelper(), logger)
         { }
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)

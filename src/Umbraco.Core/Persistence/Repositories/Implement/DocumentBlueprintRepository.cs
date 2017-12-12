@@ -3,6 +3,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -17,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </remarks>
     internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBlueprintRepository
     {
-        public DocumentBlueprintRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
-            : base(work, cacheHelper, logger, contentTypeRepository, templateRepository, tagRepository, settings)
+        public DocumentBlueprintRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
+            : base(scopeProvider, cacheHelper, logger, contentTypeRepository, templateRepository, tagRepository, settings)
         {
             EnsureUniqueNaming = false; // duplicates are allowed
         }

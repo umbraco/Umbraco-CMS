@@ -4,70 +4,70 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     public sealed class AuditService : ScopeRepositoryService, IAuditService
     {
-        public AuditService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IAuditRepository _auditRepository;
+
+        public AuditService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IAuditRepository auditRepository)
             : base(provider, logger, eventMessagesFactory)
-        { }
+        {
+            _auditRepository = auditRepository;
+        }
 
         public void Add(AuditType type, string comment, int userId, int objectId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IAuditRepository>();
-                repo.Save(new AuditItem(objectId, comment, type, userId));
-                uow.Complete();
+                _auditRepository.Save(new AuditItem(objectId, comment, type, userId));
+                scope.Complete();
             }
         }
 
         public IEnumerable<AuditItem> GetLogs(int objectId)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IAuditRepository>();
-                var result = repo.Get(Query<AuditItem>().Where(x => x.Id == objectId));
-                uow.Complete();
+                var result = _auditRepository.Get(Query<AuditItem>().Where(x => x.Id == objectId));
+                scope.Complete();
                 return result;
             }
         }
 
         public IEnumerable<AuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IAuditRepository>();
                 var result = sinceDate.HasValue == false
-                    ? repo.Get(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type))
-                    : repo.Get(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type && x.CreateDate >= sinceDate.Value));
-                uow.Complete();
+                    ? _auditRepository.Get(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type))
+                    : _auditRepository.Get(Query<AuditItem>().Where(x => x.UserId == userId && x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                scope.Complete();
                 return result;
             }
         }
 
         public IEnumerable<AuditItem> GetLogs(AuditType type, DateTime? sinceDate = null)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IAuditRepository>();
                 var result = sinceDate.HasValue == false
-                    ? repo.Get(Query<AuditItem>().Where(x => x.AuditType == type))
-                    : repo.Get(Query<AuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate.Value));
-                uow.Complete();
+                    ? _auditRepository.Get(Query<AuditItem>().Where(x => x.AuditType == type))
+                    : _auditRepository.Get(Query<AuditItem>().Where(x => x.AuditType == type && x.CreateDate >= sinceDate.Value));
+                scope.Complete();
                 return result;
             }
         }
 
         public void CleanLogs(int maximumAgeOfLogsInMinutes)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = uow.CreateRepository<IAuditRepository>();
-                repo.CleanLogs(maximumAgeOfLogsInMinutes);
-                uow.Complete();
+                _auditRepository.CleanLogs(maximumAgeOfLogsInMinutes);
+                scope.Complete();
             }
         }
     }

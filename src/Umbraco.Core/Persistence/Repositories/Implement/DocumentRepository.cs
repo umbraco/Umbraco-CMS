@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -22,6 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentRepository>, IDocumentRepository
     {
+        private readonly ScopeProvider _scopeProvider;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
@@ -29,14 +31,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private PermissionRepository<IContent> _permissionRepository;
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
 
-        public DocumentRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
-            : base(work, cacheHelper, logger)
+        public DocumentRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
+            : base(scopeProvider, cacheHelper, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _cacheHelper = cacheHelper;
-            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, work, cacheHelper, logger);
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeProvider, cacheHelper, logger);
             EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
@@ -46,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-            ?? (_permissionRepository = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, Logger));
+            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeProvider, _cacheHelper, Logger));
 
         #region Repository Base
 
@@ -213,7 +215,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PerformDeleteVersion(int id, int versionId)
         {
             // raise event first else potential FK issues
-            OnUowRemovingVersion(new UnitOfWorkVersionEventArgs(UnitOfWork, id, versionId));
+            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
 
             // fixme - syntax + ...
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
@@ -325,7 +327,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             // flip the entity's published property
             // this also flips its published state
@@ -467,7 +469,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 UpdateEntityTags(entity, _tagRepository);
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             // flip the entity's published property
             // this also flips its published state
@@ -506,7 +508,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistDeletedItem(IContent entity)
         {
             // raise event first else potential FK issues
-            OnUowRemovingEntity(new UnitOfWorkEntityEventArgs(UnitOfWork, entity));
+            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
             //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
@@ -603,7 +605,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     filterSql.Append($"AND ({filterClause.Item1})", filterClause.Item2);
             }
 
-            return GetPagedResultsByQuery<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
+            return GetPage<DocumentDto>(query, pageIndex, pageSize, out totalRecords,
                 x => MapDtosToContent(x),
                 orderBy, orderDirection, orderBySystemField,
                 filterSql);
@@ -662,8 +664,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DocumentRepository _outerRepo;
 
-            public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-                : base(work, cache, logger)
+            public ContentByGuidReadRepository(DocumentRepository outerRepo, ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+                : base(scopeProvider, cache, logger)
             {
                 _outerRepo = outerRepo;
             }

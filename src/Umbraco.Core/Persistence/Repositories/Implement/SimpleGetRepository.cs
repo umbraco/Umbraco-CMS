@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -17,11 +18,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IAggregateRoot
         where TDto: class
     {
-
-        protected SimpleGetRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
-        {
-        }
+        protected SimpleGetRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
+        { }
 
         protected abstract TEntity ConvertToEntity(TDto dto);
         protected abstract object GetBaseWhereClauseArguments(TId id);
@@ -43,8 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var entity = ConvertToEntity(dto);
 
-            var dirtyEntity = entity as Entity;
-            if (dirtyEntity != null)
+            if (entity is Entity dirtyEntity)
             {
                 // reset dirty initial properties (U4-1946)
                 dirtyEntity.ResetDirtyProperties(false);
@@ -77,23 +75,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected sealed override IEnumerable<string> GetDeleteClauses()
         {
-            throw new NotImplementedException();
+            throw new WontImplementException();
         }
 
-        protected sealed override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected sealed override Guid NodeObjectTypeId => throw new WontImplementException();
 
         protected sealed override void PersistNewItem(TEntity entity)
         {
-            throw new NotImplementedException();
+            throw new WontImplementException();
         }
 
         protected sealed override void PersistUpdatedItem(TEntity entity)
         {
-            throw new NotImplementedException();
+            throw new WontImplementException();
         }
+
         #endregion
     }
 }

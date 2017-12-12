@@ -5,19 +5,20 @@ using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing.CompositionRoots;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TaskRepository : NPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IScopeUnitOfWork work, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
-            : base(work, cache, logger)
+        public TaskRepository(ScopeProvider scopeProvider, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+            : base(scopeProvider, cache, logger)
         { }
 
         protected override Task PerformGet(int id)
@@ -89,10 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override Guid NodeObjectTypeId => throw new WontImplementException();
 
         protected override void PersistNewItem(Task entity)
         {

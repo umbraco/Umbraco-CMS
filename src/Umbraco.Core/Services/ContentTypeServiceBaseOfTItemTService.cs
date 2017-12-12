@@ -1,8 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using Umbraco.Core.Events;
+﻿using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Core.Services
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Services
         where TItem : class, IContentTypeComposition
         where TService : class, IContentTypeServiceBase<TItem>
     {
-        protected ContentTypeServiceBase(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        protected ContentTypeServiceBase(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, logger, eventMessagesFactory)
         { }
 
@@ -37,9 +37,9 @@ namespace Umbraco.Core.Services
 
         // fixme - can we have issues with event names?
 
-        protected void OnChanged(IScopeUnitOfWork uow, ContentTypeChange<TItem>.EventArgs args)
+        protected void OnChanged(IScope scope, ContentTypeChange<TItem>.EventArgs args)
         {
-            uow.Events.Dispatch(Changed, This, args, "Changed");
+            scope.Events.Dispatch(Changed, This, args, "Changed");
         }
 
         protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
@@ -49,89 +49,89 @@ namespace Umbraco.Core.Services
         }
 
         // fixme what is thsi?
-        protected void OnSaving(IScopeUnitOfWork uow,  SaveEventArgs<TItem> args)
+        protected void OnSaving(IScope scope,  SaveEventArgs<TItem> args)
         {
             Saving.RaiseEvent(args, This);
         }
 
-        protected bool OnSavingCancelled(IScopeUnitOfWork uow, SaveEventArgs<TItem> args)
+        protected bool OnSavingCancelled(IScope scope, SaveEventArgs<TItem> args)
         {
-            return uow.Events.DispatchCancelable(Saving, This, args);
+            return scope.Events.DispatchCancelable(Saving, This, args);
         }
 
-        protected void OnSaved(IScopeUnitOfWork uow, SaveEventArgs<TItem> args)
+        protected void OnSaved(IScope scope, SaveEventArgs<TItem> args)
         {
-            uow.Events.Dispatch(Saved, This, args);
+            scope.Events.Dispatch(Saved, This, args);
         }
 
         // fixme what is thsi?
-        protected void OnDeleting(IScopeUnitOfWork uow,  DeleteEventArgs<TItem> args)
+        protected void OnDeleting(IScope scope,  DeleteEventArgs<TItem> args)
         {
             Deleting.RaiseEvent(args, This);
         }
 
-        protected bool OnDeletingCancelled(IScopeUnitOfWork uow, DeleteEventArgs<TItem> args)
+        protected bool OnDeletingCancelled(IScope scope, DeleteEventArgs<TItem> args)
         {
-            return uow.Events.DispatchCancelable(Deleting, This, args);
+            return scope.Events.DispatchCancelable(Deleting, This, args);
         }
 
-        protected void OnDeleted(IScopeUnitOfWork uow, DeleteEventArgs<TItem> args)
+        protected void OnDeleted(IScope scope, DeleteEventArgs<TItem> args)
         {
-            uow.Events.Dispatch(Deleted, This, args);
+            scope.Events.Dispatch(Deleted, This, args);
         }
 
         // fixme what is thsi?
-        protected void OnMoving(IScopeUnitOfWork uow,  MoveEventArgs<TItem> args)
+        protected void OnMoving(IScope scope,  MoveEventArgs<TItem> args)
         {
             Moving.RaiseEvent(args, This);
         }
 
-        protected bool OnMovingCancelled(IScopeUnitOfWork uow, MoveEventArgs<TItem> args)
+        protected bool OnMovingCancelled(IScope scope, MoveEventArgs<TItem> args)
         {
-            return uow.Events.DispatchCancelable(Moving, This, args);
+            return scope.Events.DispatchCancelable(Moving, This, args);
         }
 
-        protected void OnMoved(IScopeUnitOfWork uow, MoveEventArgs<TItem> args)
+        protected void OnMoved(IScope scope, MoveEventArgs<TItem> args)
         {
-            uow.Events.Dispatch(Moved, This, args);
+            scope.Events.Dispatch(Moved, This, args);
         }
 
         // fixme what is this?
-        protected void OnSavingContainer(IScopeUnitOfWork uow,  SaveEventArgs<EntityContainer> args)
+        protected void OnSavingContainer(IScope scope,  SaveEventArgs<EntityContainer> args)
         {
             SavingContainer.RaiseEvent(args, This);
         }
 
-        protected bool OnSavingContainerCancelled(IScopeUnitOfWork uow, SaveEventArgs<EntityContainer> args)
+        protected bool OnSavingContainerCancelled(IScope scope, SaveEventArgs<EntityContainer> args)
         {
-            return uow.Events.DispatchCancelable(SavingContainer, This, args);
+            return scope.Events.DispatchCancelable(SavingContainer, This, args);
         }
 
-        protected void OnSavedContainer(IScopeUnitOfWork uow, SaveEventArgs<EntityContainer> args)
+        protected void OnSavedContainer(IScope scope, SaveEventArgs<EntityContainer> args)
         {
-            uow.Events.DispatchCancelable(SavedContainer, This, args);
+            scope.Events.DispatchCancelable(SavedContainer, This, args);
         }
 
-        protected void OnRenamedContainer(IScopeUnitOfWork uow, SaveEventArgs<EntityContainer> args)
+        protected void OnRenamedContainer(IScope scope, SaveEventArgs<EntityContainer> args)
         {
             // fixme changing the name of the event?!
-            uow.Events.DispatchCancelable(SavedContainer, This, args, "RenamedContainer");
+            scope.Events.DispatchCancelable(SavedContainer, This, args, "RenamedContainer");
         }
 
         // fixme what is this?
-        protected void OnDeletingContainer(IScopeUnitOfWork uow,  DeleteEventArgs<EntityContainer> args)
+        protected void OnDeletingContainer(IScope scope,  DeleteEventArgs<EntityContainer> args)
         {
             DeletingContainer.RaiseEvent(args, This);
         }
 
-        protected bool OnDeletingContainerCancelled(IScopeUnitOfWork uow, DeleteEventArgs<EntityContainer> args)
+        protected bool OnDeletingContainerCancelled(IScope scope, DeleteEventArgs<EntityContainer> args)
         {
-            return uow.Events.DispatchCancelable(DeletingContainer, This, args);
+            return scope.Events.DispatchCancelable(DeletingContainer, This, args);
         }
 
-        protected void OnDeletedContainer(IScopeUnitOfWork uow, DeleteEventArgs<EntityContainer> args)
+        protected void OnDeletedContainer(IScope scope, DeleteEventArgs<EntityContainer> args)
         {
-            uow.Events.Dispatch(DeletedContainer, This, args);
+            scope.Events.Dispatch(DeletedContainer, This, args);
         }
     }
 }

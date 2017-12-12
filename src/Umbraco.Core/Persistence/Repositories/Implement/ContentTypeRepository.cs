@@ -10,6 +10,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -19,10 +20,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
         private readonly ITemplateRepository _templateRepository;
-        private IRepositoryCachePolicy<IContentType, int> _cachePolicy;
 
-        public ContentTypeRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
-            : base(work, cache, logger)
+        public ContentTypeRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
+            : base(scopeProvider, cache, logger)
         {
             _templateRepository = templateRepository;
         }

@@ -4,7 +4,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
@@ -13,13 +13,15 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
-        public ContentTypeService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService)
-            : base(provider, logger, eventMessagesFactory)
+        public ContentTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
+            IContentTypeRepository repository, IAuditRepository auditRepository, IEntityContainerRepository entityContainerRepository, IEntityRepository entityRepository)
+            : base(provider, logger, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository)
         {
             ContentService = contentService;
         }
 
         protected override IContentTypeService This => this;
+
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
         protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
@@ -41,12 +43,11 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
                 // that one is special because it works accross content, media and member types
-                uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-                var repo = uow.CreateRepository<IContentTypeRepository>();
-                return repo.GetAllPropertyTypeAliases();
+                scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                return Repository.GetAllPropertyTypeAliases();
             }
         }
 
@@ -58,12 +59,11 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
                 // that one is special because it works accross content, media and member types
-                uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-                var repo = uow.CreateRepository<IContentTypeRepository>();
-                return repo.GetAllContentTypeAliases(guids);
+                scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                return Repository.GetAllContentTypeAliases(guids);
             }
         }
 
@@ -75,12 +75,11 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
                 // that one is special because it works accross content, media and member types
-                uow.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-                var repo = uow.CreateRepository<IContentTypeRepository>();
-                return repo.GetAllContentTypeIds(aliases);
+                scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                return Repository.GetAllContentTypeIds(aliases);
             }
         }
 

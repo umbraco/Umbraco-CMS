@@ -374,7 +374,8 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
+            bool callContext = false,
+            bool readOnly = false) // fixme
         {
             var ambient = AmbientScope;
             if (ambient == null)

@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.Composing;
 using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
@@ -22,9 +23,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         // we want arrays, we want them all loaded, not an enumerable
 
-        private Sql<ISqlContext> ContentSourcesSelect(IScopeUnitOfWork uow, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> ContentSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
         {
-            var sql = uow.SqlContext.Sql()
+            var sql = scope.SqlContext.Sql()
 
                 .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
@@ -63,29 +64,29 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return sql;
         }
 
-        public ContentNodeKit GetContentSource(IScopeUnitOfWork uow, int id)
+        public ContentNodeKit GetContentSource(IScope scope, int id)
         {
-            var sql = ContentSourcesSelect(uow)
+            var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id)
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            var dto = uow.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+            var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
         }
 
-        public IEnumerable<ContentNodeKit> GetAllContentSources(IScopeUnitOfWork uow)
+        public IEnumerable<ContentNodeKit> GetAllContentSources(IScope scope)
         {
-            var sql = ContentSourcesSelect(uow)
+            var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
+            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetBranchContentSources(IScopeUnitOfWork uow, int id)
+        public IEnumerable<ContentNodeKit> GetBranchContentSources(IScope scope, int id)
         {
-            var syntax = uow.SqlContext.SqlSyntax;
-            var sql = ContentSourcesSelect(uow, s => s
+            var syntax = scope.SqlContext.SqlSyntax;
+            var sql = ContentSourcesSelect(scope, s => s
 
                     .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
 
@@ -93,22 +94,22 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
+            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetTypeContentSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
+        public IEnumerable<ContentNodeKit> GetTypeContentSources(IScope scope, IEnumerable<int> ids)
         {
-            var sql = ContentSourcesSelect(uow)
+            var sql = ContentSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
                 .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
+            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateContentNodeKit);
         }
 
-        private Sql<ISqlContext> MediaSourcesSelect(IScopeUnitOfWork uow, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> MediaSourcesSelect(IScope scope, Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
         {
-            var sql = uow.SqlContext.Sql()
+            var sql = scope.SqlContext.Sql()
 
                 .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
@@ -134,29 +135,29 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return sql;
         }
 
-        public ContentNodeKit GetMediaSource(IScopeUnitOfWork uow, int id)
+        public ContentNodeKit GetMediaSource(IScope scope, int id)
         {
-            var sql = MediaSourcesSelect(uow)
+            var sql = MediaSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && x.NodeId == id)
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            var dto = uow.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+            var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
             return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
         }
 
-        public IEnumerable<ContentNodeKit> GetAllMediaSources(IScopeUnitOfWork uow)
+        public IEnumerable<ContentNodeKit> GetAllMediaSources(IScope scope)
         {
-            var sql = MediaSourcesSelect(uow)
+            var sql = MediaSourcesSelect(scope)
                 .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media)
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
+            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScopeUnitOfWork uow, int id)
+        public IEnumerable<ContentNodeKit> GetBranchMediaSources(IScope scope, int id)
         {
-            var syntax = uow.SqlContext.SqlSyntax;
-            var sql = MediaSourcesSelect(uow, s => s
+            var syntax = scope.SqlContext.SqlSyntax;
+            var sql = MediaSourcesSelect(scope, s => s
 
                     .InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
 
@@ -164,17 +165,17 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .Where<NodeDto>(x => x.NodeId == id, "x")
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
+            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
-        public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScopeUnitOfWork uow, IEnumerable<int> ids)
+        public IEnumerable<ContentNodeKit> GetTypeMediaSources(IScope scope, IEnumerable<int> ids)
         {
-            var sql = MediaSourcesSelect(uow)
+            var sql = MediaSourcesSelect(scope)
                     .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media)
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
                     .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
-            return uow.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
+            return scope.Database.Query<ContentSourceDto>(sql).Select(CreateMediaNodeKit);
         }
 
         private static ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)

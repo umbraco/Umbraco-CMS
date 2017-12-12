@@ -4,15 +4,19 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
 {
     public class MemberGroupService : RepositoryService, IMemberGroupService
     {
-        public MemberGroupService(IScopeUnitOfWorkProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IMemberGroupRepository _memberGroupRepository;
+
+        public MemberGroupService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IMemberGroupRepository memberGroupRepository)
             : base(provider, logger, eventMessagesFactory)
         {
+            _memberGroupRepository = memberGroupRepository;
             //Proxy events!
             MemberGroupRepository.SavedMemberGroup += MemberGroupRepository_SavedMemberGroup;
             MemberGroupRepository.SavingMemberGroup += MemberGroupRepository_SavingMemberGroup;
@@ -50,70 +54,65 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.GetMany();
+                return _memberGroupRepository.GetMany();
             }
         }
 
         public IMemberGroup GetById(int id)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.Get(id);
+                return _memberGroupRepository.Get(id);
             }
         }
 
         public IMemberGroup GetByName(string name)
         {
-            using (var uow = UowProvider.CreateUnitOfWork(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(readOnly: true))
             {
-                var repository = uow.CreateRepository<IMemberGroupRepository>();
-                return repository.GetByName(name);
+                return _memberGroupRepository.GetByName(name);
             }
         }
 
         public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMemberGroup>(memberGroup);
-                if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IMemberGroupRepository>();
-                repository.Save(memberGroup);
-                uow.Complete();
+                _memberGroupRepository.Save(memberGroup);
+                scope.Complete();
 
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
-                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
             }
         }
 
         public void Delete(IMemberGroup memberGroup)
         {
-            using (var uow = UowProvider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IMemberGroup>(memberGroup);
-                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
-                    uow.Complete();
+                    scope.Complete();
                     return;
                 }
 
-                var repository = uow.CreateRepository<IMemberGroupRepository>();
-                repository.Delete(memberGroup);
-                uow.Complete();
+                _memberGroupRepository.Delete(memberGroup);
+                scope.Complete();
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
+                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
         }
 
