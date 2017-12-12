@@ -77,7 +77,26 @@
                                                               LanguageId = lang.Id
                                                           });
                             }
-                        });            
+                        });
+
+            config.CreateMap<IDictionaryItem, DictionaryOverviewDisplay>()
+                .ForMember(dest => dest.Translations, expression => expression.Ignore()).AfterMap(
+                    (src, dest) =>
+                        {
+                            // add all languages and  the translations
+                            foreach (var lang in lazyDictionaryService.Value.GetAllLanguages())
+                            {
+                                var langId = lang.Id;
+                                var translation = src.Translations.FirstOrDefault(x => x.LanguageId == langId);
+
+                                dest.Translations.Add(
+                                    new DictionaryOverviewTranslationDisplay()
+                                        {
+                                            DisplayName = lang.CultureInfo.DisplayName,
+                                            HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false                                           
+                                        });
+                            }
+                        });
         }
 
 

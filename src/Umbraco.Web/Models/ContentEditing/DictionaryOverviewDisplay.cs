@@ -33,6 +33,6 @@
         /// Gets or sets the translations.
         /// </summary>
         [DataMember(Name = "translations")]
-        public IEnumerable<DictionaryOverviewTranslationDisplay> Translations { get; set; }
+        public List<DictionaryOverviewTranslationDisplay> Translations { get; set; }
     }
 }
