@@ -30,6 +30,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the level.
+        /// </summary>
+        public int Level { get; set; }
+
+        /// <summary>
         /// Gets or sets the translations.
         /// </summary>
         [DataMember(Name = "translations")]

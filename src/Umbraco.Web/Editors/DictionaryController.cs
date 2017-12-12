@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Net;
     using System.Net.Http;
     using System.Web.Http;
@@ -66,17 +67,17 @@
         {
             if (string.IsNullOrEmpty(key))
             {
-                
+
                 return this.Request
                     .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
             }
 
             if (this.Services.LocalizationService.DictionaryItemExists(key))
             {
-               var message = this.Services.TextService.Localize(
-                    "dictionaryItem/changeKeyError",
-                    this.Security.CurrentUser.GetUserCulture(this.Services.TextService),
-                    new Dictionary<string, string> { { "0", key } });
+                var message = this.Services.TextService.Localize(
+                     "dictionaryItem/changeKeyError",
+                     this.Security.CurrentUser.GetUserCulture(this.Services.TextService),
+                     new Dictionary<string, string> { { "0", key } });
                 return this.Request.CreateNotificationValidationErrorResponse(message);
             }
 
@@ -153,7 +154,7 @@
 
                     if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
                     {
-                       
+
                         var message = this.Services.TextService.Localize(
                             "dictionaryItem/changeKeyError",
                             userCulture,
@@ -188,6 +189,55 @@
             }
 
             throw new HttpResponseException(this.Request.CreateNotificationValidationErrorResponse("Dictionary item does not exist"));
+        }
+
+        /// <summary>
+        /// Retrieves a list with all dictionary items
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IEnumerable{T}"/>.
+        /// </returns>
+        public IEnumerable<DictionaryOverviewDisplay> GetList()
+        {
+            var list = new List<DictionaryOverviewDisplay>();
+
+            var level = 0;
+
+            foreach (var dictionaryItem in this.Services.LocalizationService.GetRootDictionaryItems())
+            {
+                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
+                item.Level = 0;
+                list.Add(item);
+
+                this.GetChildItemsForList(dictionaryItem, level + 1, list);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Get child items for list.
+        /// </summary>
+        /// <param name="dictionaryItem">
+        /// The dictionary item.
+        /// </param>
+        /// <param name="level">
+        /// The level.
+        /// </param>
+        /// <param name="list">
+        /// The list.
+        /// </param>
+        private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, List<DictionaryOverviewDisplay> list)
+        {
+            foreach (var childItem in this.Services.LocalizationService.GetDictionaryItemChildren(
+                dictionaryItem.ParentId.GetValueOrDefault()))
+            {
+                var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
+                item.Level = level;
+                list.Add(item);
+
+                this.GetChildItemsForList(childItem, level + 1, list);
+            }
         }
     }
 }
