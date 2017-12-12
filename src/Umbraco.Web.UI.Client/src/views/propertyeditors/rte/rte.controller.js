@@ -374,6 +374,9 @@ angular.module("umbraco")
                 // element might still be there even after the modal has been hidden.
                 $scope.$on('$destroy', function () {
                     unsubscribe();
+					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+						tinyMceEditor.destroy()
+					}
                 });
             });
         });
