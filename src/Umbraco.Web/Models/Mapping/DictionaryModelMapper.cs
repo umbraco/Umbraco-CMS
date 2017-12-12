@@ -80,6 +80,7 @@
                         });
 
             config.CreateMap<IDictionaryItem, DictionaryOverviewDisplay>()
+                .ForMember(dest => dest.Level, expression => expression.Ignore())
                 .ForMember(dest => dest.Translations, expression => expression.Ignore())
                 .ForMember(
                     x => x.Name,
