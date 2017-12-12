@@ -1,16 +1,16 @@
 ﻿/**
  * @ngdoc controller
- * @name Umbraco.Editors.Dictionary.DictionaryOverviewController
+ * @name Umbraco.Editors.Dictionary.ListController
  * @function
  * 
  * @description
  * The controller for listting dictionary items
  */
-function DictionaryOverviewController($scope, $location, dictionaryResource) {
+function DictionaryListController($scope, $location, dictionaryResource) {
     vm = this;
-    vm.title = "TODO dictoinary item"
+    vm.title = "TODO dictoinary item";
     vm.loading = false;
 }
 
 
-angular.module("umbraco").controller("Umbraco.Editors.Dictionary.OverviewController", DictionaryOverviewController);
+angular.module("umbraco").controller("Umbraco.Editors.Dictionary.ListController", DictionaryListController);
