@@ -6,9 +6,9 @@
  * @description
  * The controller for listting dictionary items
  */
-function DictionaryListController($scope, $location, dictionaryResource) {
+function DictionaryListController($scope, $location, dictionaryResource, localizationService) {
     vm = this;
-    vm.title = "TODO dictoinary item";
+    vm.title = 'Dictionary overview';
     vm.loading = false;
     vm.items = [];   
 
@@ -32,6 +32,10 @@ function DictionaryListController($scope, $location, dictionaryResource) {
     vm.clickItem = clickItem;
 
     function onInit() {
+        localizationService.localize('dictionaryItem_overviewTitle').then(function (value) {
+            vm.title = value;
+        });
+
         loadList();
     }
 
