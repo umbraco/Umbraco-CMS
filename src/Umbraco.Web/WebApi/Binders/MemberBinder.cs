@@ -99,15 +99,6 @@ namespace Umbraco.Web.WebApi.Binders
                 throw new InvalidOperationException("Could not find member with key " + key);
             }
 
-            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
-
-            //remove all membership properties, these values are set with the membership provider.
-            var exclude = standardProps.Select(x => x.Value.Alias).ToArray();
-
-            foreach (var remove in exclude)
-            {
-                member.Properties.Remove(remove);
-            }
             return member;
         }
 
