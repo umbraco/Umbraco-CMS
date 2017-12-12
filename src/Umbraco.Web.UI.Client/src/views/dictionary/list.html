@@ -36,7 +36,7 @@
                             </a>
                         </div>
                         <div class="umb-table-cell" ng-repeat="column in item.translations">
-                            <span title="{{column.displayName}}">{{column.hasTranslation}}</span>
+                            <i class="{{column.hasTranslation ? 'icon-check color-green' : 'icon-alert color-red'}}"></i>                            
                         </div>
                     </div>
                 </div>
