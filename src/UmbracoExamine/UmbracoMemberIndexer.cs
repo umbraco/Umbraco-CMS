@@ -115,34 +115,26 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
-            var indexerData = base.GetIndexerData(indexSet);
-
             if (CanInitialize())
             {
-                //If the fields are missing a custom _searchEmail, then add it
-
-                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
+                //Add a custom _searchEmail to the index criteria no matter what is in config
+                var field = new IndexField { Name = "_searchEmail" };
+                StaticField policy;
+                if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
                 {
-                    var field = new IndexField { Name = "_searchEmail" };
-
-                    StaticField policy;
-                    if (IndexFieldPolicies.TryGetValue("_searchEmail", out policy))
-                    {
-                        field.Type = policy.Type;
-                        field.EnableSorting = policy.EnableSorting;
-                    }
-
-                    return new IndexCriteria(
-                        indexerData.StandardFields,
-                        indexerData.UserFields.Concat(new[] { field }),
-                        indexerData.IncludeNodeTypes,
-                        indexerData.ExcludeNodeTypes,
-                        indexerData.ParentNodeId
-                        );
+                    field.Type = policy.Type;
+                    field.EnableSorting = policy.EnableSorting;
                 }
-            }
 
-            return indexerData;
+                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies,
+                    //add additional explicit fields
+                    new []{field});
+            }
+            else
+            {
+                return base.GetIndexerData(indexSet);
+            }
+            
         }
 
         /// <summary>
@@ -240,8 +232,8 @@ namespace UmbracoExamine
         protected override XDocument GetXDocument(string xPath, string type)
         {
             throw new NotSupportedException();
-        }       
-        
+        }
+
         /// <summary>
         /// Add the special __key and _searchEmail fields
         /// </summary>
