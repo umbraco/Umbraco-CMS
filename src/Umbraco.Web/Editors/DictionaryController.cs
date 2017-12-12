@@ -230,7 +230,7 @@
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, List<DictionaryOverviewDisplay> list)
         {
             foreach (var childItem in this.Services.LocalizationService.GetDictionaryItemChildren(
-                dictionaryItem.ParentId.GetValueOrDefault()))
+                dictionaryItem.Key))
             {
                 var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
                 item.Level = level;

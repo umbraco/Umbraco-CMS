@@ -20,18 +20,19 @@
         /// <summary>
         /// Gets or sets the key.
         /// </summary>
-        [DataMember(Name = "key")]
-        public string Key { get; set; }
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
         [DataMember(Name = "id")]
         public int Id { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the level.
         /// </summary>
+        [DataMember(Name = "level")]
         public int Level { get; set; }
 
         /// <summary>

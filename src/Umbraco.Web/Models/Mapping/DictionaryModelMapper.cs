@@ -80,7 +80,11 @@
                         });
 
             config.CreateMap<IDictionaryItem, DictionaryOverviewDisplay>()
-                .ForMember(dest => dest.Translations, expression => expression.Ignore()).AfterMap(
+                .ForMember(dest => dest.Translations, expression => expression.Ignore())
+                .ForMember(
+                    x => x.Name,
+                    expression => expression.MapFrom(content => content.ItemKey))
+                .AfterMap(
                     (src, dest) =>
                         {
                             // add all languages and  the translations
