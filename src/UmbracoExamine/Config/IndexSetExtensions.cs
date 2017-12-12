@@ -13,10 +13,12 @@ namespace UmbracoExamine.Config
     /// </summary>
     public static class IndexSetExtensions
     {
-        internal static IIndexCriteria ToIndexCriteria(this IndexSet set, IDataService svc,
-            StaticFieldCollection indexFieldPolicies)
+        internal static IIndexCriteria ToIndexCriteria(this IndexSet set,
+            IDataService svc,
+            StaticFieldCollection indexFieldPolicies,
+            IEnumerable<IndexField> additionalUserFields = null)
         {
-            return new LazyIndexCriteria(set, svc, indexFieldPolicies);
+            return new LazyIndexCriteria(set, svc, indexFieldPolicies, additionalUserFields);
         }
 
         /// <summary>
