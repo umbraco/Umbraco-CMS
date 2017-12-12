@@ -25,6 +25,12 @@ function DictionaryListController($scope, $location, dictionaryResource) {
             });
     }
 
+    function clickItem(id) {
+        $location.path("/settings/dictionary/edit/" + id);
+    }
+
+    vm.clickItem = clickItem;
+
     function onInit() {
         loadList();
     }

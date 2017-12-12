@@ -30,8 +30,8 @@
                     <div class="umb-table-row"
                          ng-repeat="item in vm.items">                        
                         <div class="umb-table-cell umb-table__name not-fixed">
-                            <a title="{{ item.name }}" class="umb-table-body__link" href=""
-                               ng-click="clickItem(item, $event)"
+                            <a title="{{ item.name }}" class="umb-table-body__link" prevent-default
+                               ng-click="vm.clickItem(item.id)"
                                ng-bind="item.name" style="padding-left:{{item.level*10}}px">
                             </a>
                         </div>
