@@ -410,7 +410,11 @@ namespace UmbracoExamine
         {
             if (SupportedTypes.Contains(type) == false)
                 return;
-            
+
+            //if the app is shutting down do not continue
+            if (IsCancellationRequested)
+                return;
+
             var pageIndex = 0;
 
             DataService.LogService.AddInfoLog(-1, string.Format("PerformIndexAll - Start data queries - {0}", type));
@@ -530,7 +534,7 @@ namespace UmbracoExamine
                                     content, notPublished).WhereNotNull(), type);
 
                                 pageIndex++;
-                            } while (currentPageSize == PageSize);
+                            } while (currentPageSize == PageSize && IsCancellationRequested == false); //do not continue if app is shutting down
                         }
 
                         break;
@@ -628,7 +632,7 @@ namespace UmbracoExamine
 
                 AddNodesToIndex(xElements, type);
                 pageIndex++;
-            } while (more);
+            } while (more && IsCancellationRequested == false); //don't continue if the app is shutting down
         }
 
         internal static IEnumerable<XElement> GetSerializedContent(
