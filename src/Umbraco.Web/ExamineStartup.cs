@@ -79,6 +79,7 @@ namespace Umbraco.Web
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled
                 //from indexing anything on startup!!
                 _disableExamineIndexing = true;
+                Suspendable.ExamineEvents.SuspendIndexers();
             }
         }
 
