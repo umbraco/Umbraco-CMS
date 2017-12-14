@@ -377,7 +377,7 @@ namespace Umbraco.Core.Services
                 repo.Delete(container);
                 uow.Commit();
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedMediaTypeContainer, this, deleteEventArgs);
+                uow.Events.Dispatch(DeletedMediaTypeContainer, this, deleteEventArgs, "DeletedMediaTypeContainer");
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
-using System.Reflection;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -11,10 +10,7 @@ using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
-using Examine;
-using Examine.Config;
 using Examine.Providers;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -27,25 +23,18 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Install;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
@@ -64,8 +53,9 @@ namespace Umbraco.Web
     public class WebBootManager : CoreBootManager
     {
         private readonly bool _isForTesting;
-        //NOTE: see the Initialize method for what this is used for
-        private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>();
+
+        //needs to be static because we have the public static method GetIndexesForColdBoot
+        private static ExamineStartup _examineStartup;
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : base(umbracoApplication)
@@ -109,14 +99,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Initialize()
         {
-             //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
-             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
-             // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
-             // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
-             // boot process has completed. It's a hack but it works.
-            ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
-
             base.Initialize();
+
+            _examineStartup = new ExamineStartup(ApplicationContext);
+            _examineStartup.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
             ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
@@ -214,25 +200,15 @@ namespace Umbraco.Web
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
-            //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
-            // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
-            // initialize during startup, in which case we want it to rebuild the indexes itself.
-            ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
-            if (IndexesToRebuild.Any())
-            {
-                foreach (var indexer in IndexesToRebuild)
-                {
-                    indexer.RebuildIndex();
-                }
-            }
+            _examineStartup.Complete();
 
             //Now ensure webapi is initialized after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
-            
+
             return this;
         }
 
-        
+
 
         internal static void ConfigureGlobalFilters()
         {
@@ -381,7 +357,7 @@ namespace Umbraco.Web
 
             XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveXsltExtensions());
 
-            EditorValidationResolver.Current= new EditorValidationResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveTypes<IEditorValidator>());
+            EditorValidationResolver.Current = new EditorValidationResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveTypes<IEditorValidator>());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
@@ -421,23 +397,6 @@ namespace Umbraco.Web
             }
             else
             {
-
-                //We are using a custom action here so we can check the examine settings value first, we don't want to
-                // put that check into the CreateIndexesOnColdBoot method because developers may choose to use this
-                // method directly and they will be in charge of this check if they need it
-                Action rebuildIndexes = () =>
-                {
-                    //If the developer has explicitly opted out of rebuilding indexes on startup then we
-                    // should adhere to that and not do it, this means that if they are load balancing things will be
-                    // out of sync if they are auto-scaling but there's not much we can do about that.
-                    if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
-
-                    foreach (var indexer in GetIndexesForColdBoot())
-                    {
-                        indexer.RebuildIndex();
-                    }
-                };
-
                 ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
                     ApplicationContext,
                     true,
@@ -453,7 +412,7 @@ namespace Umbraco.Web
                             //rebuild indexes if the server is not synced
                             // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                             // indexes then they can adjust this logic themselves.
-                            rebuildIndexes
+                            () => _examineStartup.RebuildIndexes()
                         }
                     }));
             }
@@ -489,9 +448,9 @@ namespace Umbraco.Web
                 // add all known factories, devs can then modify this list on application
                 // startup either by binding to events or in their own global.asax
                 new[]
-					{
-						typeof (RenderControllerFactory)
-					});
+                    {
+                        typeof (RenderControllerFactory)
+                    });
 
             UrlProviderResolver.Current = new UrlProviderResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
@@ -559,42 +518,11 @@ namespace Umbraco.Web
         /// <remarks>
         /// A cold boot is when the server determines it will not (or cannot) process instructions in the cache table and
         /// will rebuild it's own caches itself.
+        /// TODO: Does this method need to exist? Is it used publicly elsewhere (i.e. outside of core?)
         /// </remarks>
         public static IEnumerable<BaseIndexProvider> GetIndexesForColdBoot()
         {
-            // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed
-            // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty.
-            // This callback is used above for the DatabaseServerMessenger startup options.
-
-            // all indexes
-            IEnumerable<BaseIndexProvider> indexes = ExamineManager.Instance.IndexProviderCollection;
-
-            // except those that are already flagged
-            // and are processed in Complete()
-            if (IndexesToRebuild.Any())
-                indexes = indexes.Except(IndexesToRebuild);
-
-            // return
-            foreach (var index in indexes)
-                yield return index;
-        }
-
-
-        private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
-        {
-            //store the indexer that needs rebuilding because it's empty for when the boot process
-            // is complete and cancel this current event so the rebuild process doesn't start right now.
-            args.Cancel = true;
-            IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
-
-            //check if the index is rebuilding due to an error and log it
-            if (args.IsHealthy == false)
-            {
-                var baseIndex = args.Indexer as BaseIndexProvider;
-                var name = baseIndex != null ? baseIndex.Name : "[UKNOWN]";
-
-                ProfilingLogger.Logger.Error<WebBootManager>(string.Format("The index {0} is rebuilding due to being unreadable/corrupt", name), args.UnhealthyException);
-            }
+            return _examineStartup.GetIndexesForColdBoot();
         }
     }
 }

@@ -422,7 +422,7 @@
     <key alias="showPageOnSend">Hvilken side skal vises etter at skjemaet er sendt</key>
     <key alias="size">Størrelse</key>
     <key alias="sort">Sorter</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Send</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Søk...</key>
     <key alias="up">Opp</key>
@@ -439,6 +439,17 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søkeresultater</key>
+    <key alias="reorder">Sorter</key>
+    <key alias="reorderDone">Avslutt sortering</key>
+    <key alias="preview">Eksempel</key>
+    <key alias="changePassword">Bytt passord</key>
+    <key alias="to">til</key>
+    <key alias="listView">Listevisning</key>
+    <key alias="saving">Lagrer...</key>
+    <key alias="current">nåværende</key>
+    <key alias="embed">Innbygging</key>
+    <key alias="retrieve">Hent</key>
+    <key alias="selected">valgt</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrunnsfarge</key>
