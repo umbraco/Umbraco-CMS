@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.Config;
@@ -94,6 +95,17 @@ namespace Umbraco.Web
             foreach (var luceneIndexer in ExamineManager.Instance.IndexProviderCollection.OfType<LuceneIndexer>())
             {
                 luceneIndexer.WaitForIndexQueueOnShutdown = false;
+
+                //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
+                //the indexes are not operational unless MainDom is true so if _disableExamineIndexing is false then we should be in charge
+                if (_disableExamineIndexing == false)
+                {
+                    var dir = luceneIndexer.GetLuceneDirectory();
+                    if (IndexWriter.IsLocked(dir))
+                    {
+                        IndexWriter.Unlock(dir);
+                    }
+                }
             }
 
             //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
