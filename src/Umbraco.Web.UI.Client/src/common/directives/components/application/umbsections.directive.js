@@ -18,32 +18,21 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             scope.showTray = false; //appState.getGlobalState("showTray");
             scope.stickyNavigation = appState.getGlobalState("stickyNavigation");
             scope.needTray = false;
-            scope.trayAnimation = function() {
-                if (scope.showTray) {
-                    return 'slide';
-                }
-                else if (scope.showTray === false) {
-                    return 'slide';
-                }
-                else {
-                    return '';
-                }
-            };
 
 			function loadSections(){
 			    sectionService.getSectionsForUser()
 					.then(function (result) {
 						scope.sections = result;
-						calculateHeight();
+						calculateWidth();
 					});
 			}
 
-			function calculateHeight(){
+			function calculateWidth(){
 				$timeout(function(){
-					//total height minus room for avatar and help icon
-					var height = $(window).height()-200;
+					//total width minus room for avatar, search, and help icon
+					var width = $(window).width()-200;
 					scope.totalSections = scope.sections.length;
-					scope.maxSections = Math.floor(height / 70);
+					scope.maxSections = Math.floor(width / 70);
 					scope.needTray = false;
 
 					if(scope.totalSections > scope.maxSections){
@@ -84,40 +73,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			});
 
 			//on page resize
-			window.onresize = calculateHeight;
-
-			scope.avatarClick = function(){
-
-                if(scope.helpDialog) {
-                    closeHelpDialog();
-                }
-
-                if(!scope.userDialog) {
-                    scope.userDialog = {
-                        view: "user",
-                        show: true,
-                        close: function(oldModel) {
-                            closeUserDialog();
-                        }
-                    };
-                } else {
-                    closeUserDialog();
-                }
-
-			};
-
-            function closeUserDialog() {
-                scope.userDialog.show = false;
-                scope.userDialog = null;
-            }
-
-            //toggle the help dialog by raising the global app state to toggle the help drawer
-            scope.helpClick = function () {
-                var showDrawer = appState.getDrawerState("showDrawer");
-                var drawer = { view: "help", show: !showDrawer };
-                appState.setDrawerState("view", drawer.view);
-                appState.setDrawerState("showDrawer", drawer.show);
-            };
+			window.onresize = calculateWidth;
 
 			scope.sectionClick = function (event, section) {
 
@@ -154,14 +110,6 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			};
 
 			scope.trayClick = function () {
-                // close dialogs
-			    if (scope.userDialog) {
-                    closeUserDialog();
-			    }
-			    if (scope.helpDialog) {
-                    closeHelpDialog();
-			    }
-
 			    if (appState.getGlobalState("showTray") === true) {
 			        navigationService.hideTray();
 			    } else {

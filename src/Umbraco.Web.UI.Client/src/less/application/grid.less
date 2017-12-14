@@ -41,7 +41,10 @@ body {
 
 #mainwrapper {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
   margin: 0;
 }
 
@@ -51,9 +54,16 @@ body.umb-drawer-is-visible #mainwrapper{
 
 #contentwrapper, #contentcolumn {
   position: absolute;
-  top: 0px; bottom: 0px; right: 0px; left: 80px;
+  top: 0px;
+  bottom: 0px;
+  right: 0px; 
+  left: 0px;
   z-index: 10;
   margin: 0
+}
+
+#contentwrapper {
+    top: 60px;
 }
 
 #umb-notifications-wrapper {
@@ -75,30 +85,9 @@ body.umb-drawer-is-visible #mainwrapper{
 #leftcolumn {
   height: 100%;
   z-index: 1100;
-  width: 80px;
   float: left;
   position: absolute;
-}
-
-#applications {
-  z-index: 1000;
-  height: 100%;
-  left: 0px;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  text-align: center;
-  box-shadow: -10px 0px 25px rgba(0, 0, 0, 0.3)
-}
-
-#applications-tray {
-  z-index: 900;
-  left: 80px;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  height: 100%;
-  text-align: center;
+  top: 60px;
 }
 
 #search-form {
@@ -135,7 +124,7 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 #navigation {
-  left: 80px;
+  left: 0;
   top: 0;
   bottom: 0;
   position: absolute;
@@ -216,7 +205,7 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 @media (min-width: 1101px) {
-  #contentwrapper, #umb-notifications-wrapper {left: 440px;}
+  #contentwrapper, #umb-notifications-wrapper {left: 360px;}
   #speechbubble {left: 360px;}
 }
 
