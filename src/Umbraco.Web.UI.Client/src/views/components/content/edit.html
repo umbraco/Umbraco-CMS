@@ -12,35 +12,19 @@
          <umb-editor-header
             menu="page.menu"
             name="content.name"
-            tabs="content.tabs"
             hide-icon="true"
             hide-description="true"
-            hide-alias="true">
+            hide-alias="true"
+            navigation="content.apps">
          </umb-editor-header>
 
          <umb-editor-container>
-            <umb-tabs-content class="form-horizontal" view="true">
-                
-               <umb-tab id="tab{{tab.id}}" ng-repeat="tab in content.tabs" rel="{{tab.id}}">
-                    
-                    <!-- Other tabs than info -->
-                    <div ng-if="tab.id !== -1 && tab.alias !== '_umb_infoTab'">
-                        <umb-property data-element="property-{{property.alias}}" ng-repeat="property in tab.properties" property="property">
-                            <umb-editor model="property"></umb-editor>
-                        </umb-property>
-                    </div>
-                    
-                    <!-- Info tab -->
-                    <div ng-if="tab.id === -1 && tab.alias === '_umb_infoTab'">
-                        <umb-content-node-info
-                            ng-if="content"
-                            node="content">
-                        </umb-content-node-info>
-                    </div>
 
-               </umb-tab>
-
-            </umb-tabs-content>
+            <umb-editor-sub-views
+                ng-if="!page.loading"
+                sub-views="content.apps"
+                model="content">
+            </umb-editor-sub-views>
 
          </umb-editor-container>
 

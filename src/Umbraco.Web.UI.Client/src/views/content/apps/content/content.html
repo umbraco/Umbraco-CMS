@@ -1,0 +1,18 @@
+<div class="form-horizontal">
+
+    <div class="umb-expansion-panel" ng-repeat="group in model.tabs">
+
+        <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
+            <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-right': !group.open, 'icon-navigation-down': group.open}" class="icon-navigation-right">&nbsp;</ins>                        
+            <div>{{ group.label }}</div>
+        </div>
+
+        <div class="umb-expansion-panel__content" ng-show="group.open">
+            <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties" property="property">
+                <umb-editor model="property"></umb-editor>
+            </umb-property>
+        </div>
+
+    </div>
+
+</div>

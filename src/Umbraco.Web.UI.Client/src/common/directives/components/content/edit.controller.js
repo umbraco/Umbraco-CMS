@@ -45,7 +45,27 @@
       }));
 
       // We don't get the info tab from the server from version 7.8 so we need to manually add it
-      contentEditingHelper.addInfoTab($scope.content.tabs);
+      //contentEditingHelper.addInfoTab($scope.content.tabs);
+
+      // prototype content and info apps
+      var contentApp = {
+        "name": "Content",
+        "alias": "content",
+        "icon": "icon-document",
+        "view": "views/content/apps/content/content.html",
+        "active": true
+      };
+
+      var infoApp = {
+        "name": "Info",
+        "alias": "info",
+        "icon": "icon-info",
+        "view": "views/content/apps/info/info.html"
+      };
+
+      $scope.content.apps = [];
+      $scope.content.apps.push(contentApp);
+      $scope.content.apps.push(infoApp);
 
     }
 

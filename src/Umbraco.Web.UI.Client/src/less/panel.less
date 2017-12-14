@@ -356,8 +356,6 @@
 .umb-panel-header-content-wrapper {
   display: flex;
   flex-direction: column;
-  height: 99px;
-  padding: 0 20px;
 }
 
 .umb-panel-header-content {
@@ -370,11 +368,6 @@
    display: flex;
    flex: 1;
    flex-direction: row;
-}
-
-.umb-panel-header-left-side.-top-position {
-  position: relative;
-  top: -12px;
 }
 
 .umb-panel-header-icon {
@@ -440,7 +433,8 @@
 }
 
 input.umb-panel-header-name-input {
-  border-color: @gray-8;
+  border-color: @gray-10;
+  background-color: @gray-10;
   font-size: 15px;
   color: @black;
   margin-bottom: 0;
@@ -450,8 +444,8 @@ input.umb-panel-header-name-input {
   line-height: 32px;
   width: 100%;
   &:hover {
-    background: @white;
-    border: 1px solid @gray-7;
+    background-color: @gray-9;    
+    border: 1px solid @gray-9;
   }
 }
 
@@ -487,20 +481,4 @@ input.umb-panel-header-description {
     margin-top: 3px;
     height: 25px;
     line-height: 25px;
-}
-
-.umb-editor-drawer-content {
-  display: flex;
-  align-items: center;
-}
-
-.umb-editor-drawer-content__right-side {
-	margin-left: auto;
-    flex: 0 0 auto;
-    padding-left: 10px;
-}
-
-.umb-editor-drawer-content__left-side {
-	margin-right: auto;
-    padding-right: 10px;
 }
