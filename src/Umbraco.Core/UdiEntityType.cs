@@ -80,6 +80,7 @@ namespace Umbraco.Core
             public const string DocumentType = "document-type";
             public const string DocumentTypeContainer = "document-type-container";
 
+            //TODO: What is this? This alias is only used for the blue print tree to render the blueprint's document type, it's not a real udi type
             public const string DocumentTypeBluePrints = "document-type-blueprints";
             public const string MediaType = "media-type";
             public const string MediaTypeContainer = "media-type-container";
@@ -118,7 +119,7 @@ namespace Umbraco.Core
                     case UmbracoObjectTypes.Document:
                         return Document;
                     case UmbracoObjectTypes.DocumentBlueprint:
-                        return DocumentBluePrint;
+                        return DocumentBlueprint;
                     case UmbracoObjectTypes.Media:
                         return Media;
                     case UmbracoObjectTypes.Member:
@@ -163,7 +164,7 @@ namespace Umbraco.Core
                 {
                     case Document:
                         return UmbracoObjectTypes.Document;
-                    case DocumentBluePrint:
+                    case DocumentBlueprint:
                         return UmbracoObjectTypes.DocumentBlueprint;
                     case Media:
                         return UmbracoObjectTypes.Media;
