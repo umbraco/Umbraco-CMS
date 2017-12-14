@@ -7,7 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -35,37 +35,41 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
-            IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
-            : this(serviceContext, publishedContentTypeFactory, scopeProvider, uowProvider, requestCache, segmentProviders, publishedSnapshotAccessor, logger, null, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, segmentProviders, publishedSnapshotAccessor,
+                documentRepository, mediaRepository, memberRepository,
+                logger, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
         internal PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
-            IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : this(serviceContext, publishedContentTypeFactory, scopeProvider, uowProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), publishedSnapshotAccessor, logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
+            : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), publishedSnapshotAccessor,
+                documentRepository, mediaRepository, memberRepository,
+                logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
         private PublishedSnapshotService(ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
-            IScopeUnitOfWorkProvider uowProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
@@ -76,7 +80,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
 
-            _xmlStore = new XmlStore(serviceContext, scopeProvider, uowProvider, _routesCache, _contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents);
+            _xmlStore = new XmlStore(serviceContext, scopeProvider, _routesCache, _contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
+                documentRepository, mediaRepository, memberRepository);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;

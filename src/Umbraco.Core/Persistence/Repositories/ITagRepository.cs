@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface ITagRepository : IUnitOfWorkRepository, IReadWriteQueryRepository<int, ITag>
+    public interface ITagRepository : IReadWriteQueryRepository<int, ITag>
     {
 
         TaggedEntity GetTaggedEntityByKey(Guid key);

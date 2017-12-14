@@ -15,8 +15,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class ServerRegistrationRepository : NPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         // fixme - should we use NoCache instead of CreateDisabledCacheHelper?!
-        public ServerRegistrationRepository(ScopeProvider scopeProvider, ILogger logger)
-            : base(scopeProvider, CacheHelper.CreateDisabledCacheHelper(), logger)
+        public ServerRegistrationRepository(IScopeAccessor scopeAccessor, ILogger logger)
+            : base(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), logger)
         { }
 
         protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)

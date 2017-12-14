@@ -11,7 +11,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -23,8 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(ScopeProvider scopeProvider, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
-            : base(scopeProvider, cache, logger)
+        public RelationRepository(IScopeAccessor scopeAccessor, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger, IRelationTypeRepository relationTypeRepository)
+            : base(scopeAccessor, cache, logger)
         {
             _relationTypeRepository = relationTypeRepository;
         }

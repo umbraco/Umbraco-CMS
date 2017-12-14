@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -17,7 +15,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Media.Exif;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.IO
 {
@@ -53,9 +50,6 @@ namespace Umbraco.Core.IO
 
         [Inject]
         internal ILogger Logger { get; set; }
-
-        [Inject]
-        internal IDataTypeService DataTypeService { get; set; }
 
         internal UploadAutoFillProperties UploadAutoFillProperties { get; }
 

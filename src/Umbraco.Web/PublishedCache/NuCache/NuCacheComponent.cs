@@ -1,11 +1,11 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using LightInject;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -22,10 +22,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 factory.GetInstance<IRuntimeState>(),
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IPublishedContentTypeFactory>(),
-                factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<IPublishedSnapshotAccessor>(),
                 factory.GetInstance<ILogger>(),
-                factory.GetInstance<IScopeProvider>()));
+                factory.GetInstance<IScopeProvider>(),
+                factory.GetInstance<IDocumentRepository>(),
+                factory.GetInstance<IMediaRepository>(),
+                factory.GetInstance<IMemberRepository>()));
 
             // add the NuCache health check (hidden from type finder)
             // todo - no NuCache health check yet

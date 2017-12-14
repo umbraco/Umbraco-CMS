@@ -9,7 +9,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;

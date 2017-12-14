@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LightInject;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Services
     internal class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
         public ContentTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
-            IContentTypeRepository repository, IAuditRepository auditRepository, IEntityContainerRepository entityContainerRepository, IEntityRepository entityRepository)
+            IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository)
             : base(provider, logger, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository)
         {
             ContentService = contentService;

@@ -15,10 +15,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TagRepository : NPocoRepositoryBase<int, ITag>, ITagRepository
     {
-        public TagRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger)
-        {
-        }
+        public TagRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
+        { }
 
         protected override ITag PerformGet(int id)
         {

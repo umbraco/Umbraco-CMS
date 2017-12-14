@@ -12,7 +12,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -26,12 +25,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
 
-        public MediaRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
-            : base(scopeProvider, cache, logger)
+        public MediaRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IMediaTypeRepository mediaTypeRepository, ITagRepository tagRepository, IContentSection contentSection)
+            : base(scopeAccessor, cache, logger)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeProvider, cache, logger);
+            _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
             EnsureUniqueNaming = contentSection.EnsureUniqueNaming;
         }
 
@@ -403,8 +402,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly MediaRepository _outerRepo;
 
-            public MediaByGuidReadRepository(MediaRepository outerRepo, ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-                : base(scopeProvider, cache, logger)
+            public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+                : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;
             }

@@ -9,7 +9,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -21,8 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
-            : base(scopeProvider, cache, logger)
+        public ContentTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, ITemplateRepository templateRepository)
+            : base(scopeAccessor, cache, logger)
         {
             _templateRepository = templateRepository;
         }

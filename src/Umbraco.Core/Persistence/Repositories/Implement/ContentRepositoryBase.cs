@@ -14,7 +14,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -33,8 +32,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger)
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
         { }
 
         protected abstract TRepository This { get; }

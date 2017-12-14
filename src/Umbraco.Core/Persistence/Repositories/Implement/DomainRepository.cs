@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
     internal class DomainRepository : NPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
-        public DomainRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger)
+        public DomainRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
         { }
 
         protected override IRepositoryCachePolicy<IDomain, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)

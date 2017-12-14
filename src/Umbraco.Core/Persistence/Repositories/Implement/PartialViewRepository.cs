@@ -5,13 +5,13 @@ using System.Text;
 using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {
-        public PartialViewRepository(IUnitOfWork work, [Inject("PartialViewFileSystem")] IFileSystem fileSystem) : base(work, fileSystem)
+        public PartialViewRepository([Inject("PartialViewFileSystem")] IFileSystem fileSystem)
+            : base(fileSystem)
         { }
 
         protected virtual PartialViewType ViewType => PartialViewType.PartialView;

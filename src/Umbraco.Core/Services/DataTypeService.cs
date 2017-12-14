@@ -20,18 +20,20 @@ namespace Umbraco.Core.Services
     {
         private readonly IDataTypeDefinitionRepository _dataTypeDefinitionRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
+        private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
 
         public DataTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IDataTypeDefinitionRepository dataTypeDefinitionRepository, IDataTypeContainerRepository dataTypeContainerRepository,
-            IAuditRepository auditRepository, IEntityRepository entityRepository)
+            IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository)
             : base(provider, logger, eventMessagesFactory)
         {
             _dataTypeDefinitionRepository = dataTypeDefinitionRepository;
             _dataTypeContainerRepository = dataTypeContainerRepository;
             _auditRepository = auditRepository;
             _entityRepository = entityRepository;
+            _contentTypeRepository = contentTypeRepository;
         }
 
         #region Containers
@@ -559,6 +561,34 @@ namespace Umbraco.Core.Services
                 {
                     scope.Complete();
                     return;
+                }
+
+
+                // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
+                // fixme - media and members?!
+                // fixme - non-group properties?!
+                var query = Query<PropertyType>().Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id);
+                var contentTypes = _contentTypeRepository.GetByQuery(query);
+                foreach (var contentType in contentTypes)
+                {
+                    foreach (var propertyGroup in contentType.PropertyGroups)
+                    {
+                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id).ToList();
+                        foreach (var propertyType in types)
+                        {
+                            propertyGroup.PropertyTypes.Remove(propertyType);
+                        }
+                    }
+
+                    // so... we are modifying content types here. the service will trigger Deleted event,
+                    // which will propagate to DataTypeCacheRefresher which will clear almost every cache
+                    // there is to clear... and in addition published snapshot caches will clear themselves too, so
+                    // this is probably safe alghough it looks... weird.
+                    //
+                    // what IS weird is that a content type is losing a property and we do NOT raise any
+                    // content type event... so ppl better listen on the data type events too.
+
+                    _contentTypeRepository.Save(contentType);
                 }
 
                 _dataTypeDefinitionRepository.Delete(dataTypeDefinition);

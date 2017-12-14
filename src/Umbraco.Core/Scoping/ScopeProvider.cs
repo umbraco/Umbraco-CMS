@@ -19,7 +19,7 @@ namespace Umbraco.Core.Scoping
     /// <summary>
     /// Implements <see cref="IScopeProvider"/>.
     /// </summary>
-    internal class ScopeProvider : IScopeProvider
+    internal class ScopeProvider : IScopeProvider, IScopeAccessor
     {
         private readonly ILogger _logger;
         private readonly FileSystems _fileSystems;
@@ -263,14 +263,14 @@ namespace Umbraco.Core.Scoping
         // only 1 instance which can be disposed and disposed again
         private readonly ScopeReference _scopeReference;
 
+        IScope IScopeAccessor.AmbientScope => AmbientScope;
+
+        // null if there is none
         public Scope AmbientScope
         {
-            get
-            {
-                // try http context, fallback onto call context
-                var value = GetHttpContextObject<Scope>(ScopeItemKey, false);
-                return value ?? GetCallContextObject<Scope>(ScopeItemKey);
-            }
+            // try http context, fallback onto call context
+            get => GetHttpContextObject<Scope>(ScopeItemKey, false)
+                   ?? GetCallContextObject<Scope>(ScopeItemKey);
             set
             {
                 // clear both

@@ -6,7 +6,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -22,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/> class.
         /// </summary>
-        protected NPocoRepositoryBase(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger)
+        protected NPocoRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
         { }
 
         /// <summary>

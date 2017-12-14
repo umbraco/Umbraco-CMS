@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class MigrationEntryRepository : NPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
     {
-        public MigrationEntryRepository(ScopeProvider scopeProvider, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger)
+        public MigrationEntryRepository(IScopeAccessor scopeAccessor, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
         { }
 
         protected override IMigrationEntry PerformGet(int id)

@@ -4,7 +4,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
@@ -13,9 +12,12 @@ namespace Umbraco.Core.Services
     {
         private readonly IRedirectUrlRepository _redirectUrlRepository;
 
-        public RedirectUrlService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public RedirectUrlService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
+            IRedirectUrlRepository redirectUrlRepository)
             : base(provider, logger, eventMessagesFactory)
-        { }
+        {
+            _redirectUrlRepository = redirectUrlRepository;
+        }
 
         public void Register(string url, Guid contentKey)
         {

@@ -4,23 +4,17 @@ using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal abstract class FileRepository<TId, TEntity> : DisposableObject, IUnitOfWorkRepository, IReadRepository<TId, TEntity>, IWriteRepository<TEntity>
+    internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEntity>, IWriteRepository<TEntity>
         where TEntity : IFile
     {
-        protected FileRepository(IUnitOfWork work, IFileSystem fileSystem)
+        protected FileRepository(IFileSystem fileSystem)
         {
-            UnitOfWork = work;
             FileSystem = fileSystem;
         }
-
-        /// <summary>
-        /// Returns the Unit of Work added to the repository
-        /// </summary>
-        protected IUnitOfWork UnitOfWork { get; }
 
         protected IFileSystem FileSystem { get; }
 
@@ -225,18 +219,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 return -1; // deal with race conds
             }
-        }
-
-        /// <summary>
-        /// Dispose any disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Dispose the unit of work
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            // fixme - wtf in v8?
-            UnitOfWork.DisposeIfDisposable();
         }
     }
 }

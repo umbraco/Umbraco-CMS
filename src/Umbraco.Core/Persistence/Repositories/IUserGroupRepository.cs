@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IUserGroupRepository : IUnitOfWorkRepository, IReadWriteQueryRepository<int, IUserGroup>
+    public interface IUserGroupRepository : IReadWriteQueryRepository<int, IUserGroup>
     {
         /// <summary>
         /// Gets a group by it's alias

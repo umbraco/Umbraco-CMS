@@ -13,8 +13,8 @@ namespace Umbraco.Core.Services
         private readonly IMemberTypeRepository _memberTypeRepository;
 
         public MemberTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
-            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityContainerRepository entityContainerRepository, IEntityRepository entityRepository)
-            : base(provider, logger, eventMessagesFactory, memberTypeRepository, auditRepository, entityContainerRepository, entityRepository)
+            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityRepository entityRepository)
+            : base(provider, logger, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository)
         {
             MemberService = memberService;
             _memberTypeRepository = memberTypeRepository;

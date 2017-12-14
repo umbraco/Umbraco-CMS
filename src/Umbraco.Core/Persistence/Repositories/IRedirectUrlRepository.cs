@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
     /// Defines the <see cref="IRedirectUrl"/> repository.
     /// </summary>
-    public interface IRedirectUrlRepository : IUnitOfWorkRepository, IReadWriteQueryRepository<Guid, IRedirectUrl>
+    public interface IRedirectUrlRepository : IReadWriteQueryRepository<Guid, IRedirectUrl>
     {
         /// <summary>
         /// Gets a redirect url.

@@ -6,7 +6,6 @@ using LightInject;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -17,11 +16,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IContentSection _contentConfig;
 
-        public ScriptRepository(IUnitOfWork work, [Inject("ScriptFileSystem")] IFileSystem fileSystem, IContentSection contentConfig)
-            : base(work, fileSystem)
+        public ScriptRepository([Inject("ScriptFileSystem")] IFileSystem fileSystem, IContentSection contentConfig)
+            : base(fileSystem)
         {
-            if (contentConfig == null) throw new ArgumentNullException(nameof(contentConfig));
-            _contentConfig = contentConfig;
+            _contentConfig = contentConfig ?? throw new ArgumentNullException(nameof(contentConfig));
         }
 
         #region Implementation of IRepository<string,Script>

@@ -15,7 +15,6 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
 
@@ -27,7 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class UserRepository : NPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IMapperCollection _mapperCollection;
-        private readonly IDictionary<string, string> _passwordConfig;
+        private string _passwordConfigJson;
+        private bool _passwordConfigInitialized;
 
         /// <summary>
         /// Constructor
@@ -38,23 +38,36 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="passwordConfig">
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
-        public UserRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection)
-            : base(scopeProvider, cacheHelper, logger)
+        public UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection)
+            : base(scopeAccessor, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
-
-            var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
-            _passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
-                ? null
-                : new Dictionary<string, string> { { "hashAlgorithm", Membership.HashAlgorithmType } };
         }
 
         // for tests
-        internal UserRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig)
-            : base(scopeProvider, cacheHelper, logger)
+        internal UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig)
+            : base(scopeAccessor, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
-            _passwordConfig = passwordConfig;
+            _passwordConfigJson = JsonConvert.SerializeObject(passwordConfig);
+            _passwordConfigInitialized = true;
+        }
+
+        private string PasswordConfigJson
+        {
+            get
+            {
+                if (_passwordConfigInitialized)
+                    return _passwordConfigJson;
+
+                var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+                var passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
+                    ? null
+                    : new Dictionary<string, string> { { "hashAlgorithm", Membership.HashAlgorithmType } };
+                _passwordConfigJson = passwordConfig == null ? null : JsonConvert.SerializeObject(passwordConfig);
+                _passwordConfigInitialized = true;
+                return _passwordConfigJson;
+            }
         }
 
         #region Overrides of RepositoryBase<int,IUser>
@@ -343,11 +356,8 @@ ORDER BY colName";
 
             // check if we have a known config, we only want to store config for hashing
             //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
-            if (_passwordConfig != null && _passwordConfig.Count > 0)
-            {
-                var json = JsonConvert.SerializeObject(_passwordConfig);
-                userDto.PasswordConfig = json;
-            }
+            if (PasswordConfigJson != null)
+                userDto.PasswordConfig = PasswordConfigJson;
 
             var id = Convert.ToInt32(Database.Insert(userDto));
             entity.Id = id;
@@ -440,11 +450,9 @@ ORDER BY colName";
 
                 // check if we have a known config, we only want to store config for hashing
                 //TODO: This logic will need to be updated when we do http://issues.umbraco.org/issue/U4-10089
-                if (_passwordConfig != null && _passwordConfig.Count > 0)
+                if (PasswordConfigJson != null)
                 {
-                    var json = JsonConvert.SerializeObject(_passwordConfig);
-                    userDto.PasswordConfig = json;
-
+                    userDto.PasswordConfig = PasswordConfigJson;
                     changedCols.Add("passwordConfig");
                 }
             }

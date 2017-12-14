@@ -1,7 +1,6 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Logging;
@@ -9,6 +8,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 using LightInject;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -24,10 +24,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<ServiceContext>(),
                 factory.GetInstance<IPublishedContentTypeFactory>(),
                 factory.GetInstance<IScopeProvider>(),
-                factory.GetInstance<IScopeUnitOfWorkProvider>(),
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetInstance<UrlSegmentProviderCollection>(),
                 factory.GetInstance<IPublishedSnapshotAccessor>(),
+                factory.GetInstance<IDocumentRepository>(), factory.GetInstance<IMediaRepository>(), factory.GetInstance<IMemberRepository>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<MainDom>()));
 

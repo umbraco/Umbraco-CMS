@@ -43,14 +43,15 @@ namespace Umbraco.Core
             composition.Container.Register<DatabaseBuilder>();
 
             // register filesystems
-            composition.Container.Register<FileSystems>();
-            composition.Container.Register(factory => factory.GetInstance<FileSystems>().MediaFileSystem);
-            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().ScriptsFileSystem, "ScriptFileSystem");
-            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().PartialViewsFileSystem, "PartialViewFileSystem");
-            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().MacroPartialsFileSystem, "PartialViewMacroFileSystem");
-            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().StylesheetsFileSystem, "StylesheetFileSystem");
-            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().MasterPagesFileSystem, "MasterpageFileSystem");
-            composition.Container.RegisterSingleton<IFileSystem>(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, "ViewFileSystem");
+            composition.Container.RegisterSingleton<FileSystems>();
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MediaFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().ScriptsFileSystem, Constants.Composing.FileSystems.ScriptFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().PartialViewsFileSystem, Constants.Composing.FileSystems.PartialViewFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MacroPartialsFileSystem, Constants.Composing.FileSystems.PartialViewMacroFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().StylesheetsFileSystem, Constants.Composing.FileSystems.StylesheetFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MasterPagesFileSystem, Constants.Composing.FileSystems.MasterpageFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, Constants.Composing.FileSystems.ViewFileSystem);
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().XsltFileSystem, Constants.Composing.FileSystems.XsltFileSystem);
 
             // register manifest builder, will be injected in eg PropertyEditorCollectionBuilder
             composition.Container.RegisterSingleton(factory

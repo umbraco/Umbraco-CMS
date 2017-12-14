@@ -4,6 +4,6 @@
     // without resorting to constants, names, whatever - and IPartialViewRepository
     // is implemented by PartialViewRepository and IPartialViewMacroRepository by
     // PartialViewMacroRepository - just to inject the proper filesystem.
-    internal interface IPartialViewMacroRepository : IPartialViewRepository
+    public interface IPartialViewMacroRepository : IPartialViewRepository
     { }
 }

@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IAggregateRoot
         where TDto: class
     {
-        protected SimpleGetRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger)
+        protected SimpleGetRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
         { }
 
         protected abstract TEntity ConvertToEntity(TDto dto);

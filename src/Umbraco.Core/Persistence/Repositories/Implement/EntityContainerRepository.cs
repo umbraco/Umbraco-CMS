@@ -8,7 +8,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -16,12 +15,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <summary>
     /// An internal repository for managing entity containers such as doc type, media type, data type containers.
     /// </summary>
-    internal class EntityContainerRepository : NPocoRepositoryBase<int, EntityContainer>
+    internal class EntityContainerRepository : NPocoRepositoryBase<int, EntityContainer>, IEntityContainerRepository
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, Guid containerObjectType)
-            : base(scopeProvider, cache, logger)
+        public EntityContainerRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, Guid containerObjectType)
+            : base(scopeAccessor, cache, logger)
         {
             var allowedContainers = new[] { Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer, Constants.ObjectTypes.DataTypeContainer };
             _containerObjectType = containerObjectType;

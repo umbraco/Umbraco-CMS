@@ -13,7 +13,6 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -23,22 +22,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentRepository>, IDocumentRepository
     {
-        private readonly ScopeProvider _scopeProvider;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
+        private readonly IScopeAccessor _scopeAccessor;
 
-        public DocumentRepository(ScopeProvider scopeProvider, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
-            : base(scopeProvider, cacheHelper, logger)
+        public DocumentRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection settings)
+            : base(scopeAccessor, cacheHelper, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _cacheHelper = cacheHelper;
-            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeProvider, cacheHelper, logger);
+            _scopeAccessor = scopeAccessor;
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, cacheHelper, logger);
             EnsureUniqueNaming = settings.EnsureUniqueNaming;
         }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         // note: is ok to 'new' the repo here as it's a sub-repo really
         private PermissionRepository<IContent> PermissionRepository => _permissionRepository
-            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeProvider, _cacheHelper, Logger));
+            ?? (_permissionRepository = new PermissionRepository<IContent>(_scopeAccessor, _cacheHelper, Logger));
 
         #region Repository Base
 
@@ -664,8 +664,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             private readonly DocumentRepository _outerRepo;
 
-            public ContentByGuidReadRepository(DocumentRepository outerRepo, ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-                : base(scopeProvider, cache, logger)
+            public ContentByGuidReadRepository(DocumentRepository outerRepo, IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+                : base(scopeAccessor, cache, logger)
             {
                 _outerRepo = outerRepo;
             }

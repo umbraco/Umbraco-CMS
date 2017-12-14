@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMemberRepository : IUnitOfWorkRepository, IContentRepository<int, IMember>
+    public interface IMemberRepository : IContentRepository<int, IMember>
     {
         /// <summary>
         /// Finds members in a given role

@@ -1,10 +1,8 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Composing.CompositionRoots
 {
@@ -17,12 +15,6 @@ namespace Umbraco.Core.Composing.CompositionRoots
 
         public void Compose(IServiceRegistry container)
         {
-            // register the IUnitOfWork provider
-            container.RegisterSingleton<IScopeUnitOfWorkProvider, ScopeUnitOfWorkProvider>();
-
-            // register repository factory
-            container.RegisterSingleton<RepositoryFactory>();
-
             // register cache helpers
             // the main cache helper is registered by CoreBootManager and is used by most repositories
             // the disabled one is used by those repositories that have an annotated ctor parameter
@@ -32,62 +24,58 @@ namespace Umbraco.Core.Composing.CompositionRoots
             // the container, 'info' describes the ctor argument, and 'args' contains the args that
             // were passed to GetInstance() - use first arg if it is the right type,
             //
-            // for IScopeUnitOfWork
-            container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IScopeUnitOfWork : null);
-            // for IUnitOfWork
-            //container.RegisterConstructorDependency((factory, info, args) => args.Length > 0 ? args[0] as IUnitOfWork : null);
+            // for ...
+            //container.RegisterConstructorDependency((factory, info, args) =>
+            //{
+            //    if (info.Member.DeclaringType != typeof(EntityContainerRepository)) return default;
+            //    return args.Length > 0 && args[0] is Guid guid ? guid : default;
+            //});
 
             // register repositories
-            // repos depend on various things, and a IDatabaseUnitOfWork (registered above)
+            // repos depend on various things,
             // some repositories have an annotated ctor parameter to pick the right cache helper
 
             // repositories
-            container.Register<INotificationsRepository, NotificationsRepository>();
-            container.Register<IExternalLoginRepository, ExternalLoginRepository>();
-            container.Register<IPublicAccessRepository, PublicAccessRepository>();
-            container.Register<ITagRepository, TagRepository>();
-            container.Register<IDocumentRepository, DocumentRepository>();
-            container.Register<IContentTypeRepository, ContentTypeRepository>();
-            container.Register<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
-            container.Register<IDataTypeDefinitionRepository, DataTypeDefinitionRepository>();
-            container.Register<IDictionaryRepository, DictionaryRepository>();
-            container.Register<ILanguageRepository, LanguageRepository>();
-            container.Register<IMediaRepository, MediaRepository>();
-            container.Register<IMediaTypeRepository, MediaTypeRepository>();
-            container.Register<ITemplateRepository, TemplateRepository>();
-            container.Register<IUserGroupRepository, UserGroupRepository>();
-            container.Register<IUserRepository, UserRepository>();
-            container.Register<IMacroRepository, MacroRepository>();
-            container.Register<IMemberRepository, MemberRepository>();
-            container.Register<IMemberTypeRepository, MemberTypeRepository>();
-            container.Register<IMemberGroupRepository, MemberGroupRepository>();
-            container.Register<IEntityRepository, EntityRepository>();
-            container.Register<IDomainRepository, DomainRepository>();
-            container.Register<ITaskRepository, TaskRepository>();
-            container.Register<ITaskTypeRepository,TaskTypeRepository>();
-            container.Register<IAuditRepository, AuditRepository>();
-            container.Register<IRelationRepository, RelationRepository>();
-            container.Register<IRelationTypeRepository, RelationTypeRepository>();
-            container.Register<IMigrationEntryRepository, MigrationEntryRepository>();
-            container.Register<IServerRegistrationRepository, ServerRegistrationRepository>();
-            container.Register<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
-            container.Register<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
-            container.Register<IDataTypeContainerRepository, DataTypeContainerRepository>();
-            container.Register<IRedirectUrlRepository, RedirectUrlRepository>();
+            container.RegisterSingleton<IAuditRepository, AuditRepository>();
+            container.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
+            container.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
+            container.RegisterSingleton<IDataTypeDefinitionRepository, DataTypeDefinitionRepository>();
+            container.RegisterSingleton<IDictionaryRepository, DictionaryRepository>();
+            container.RegisterSingleton<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
+            container.RegisterSingleton<IDocumentRepository, DocumentRepository>();
+            container.RegisterSingleton<IDocumentTypeContainerRepository, DocumentTypeContainerRepository>();
+            container.RegisterSingleton<IDomainRepository, DomainRepository>();
+            container.RegisterSingleton<IEntityRepository, EntityRepository>();
+            container.RegisterSingleton<IExternalLoginRepository, ExternalLoginRepository>();
+            container.RegisterSingleton<ILanguageRepository, LanguageRepository>();
+            container.RegisterSingleton<IMacroRepository, MacroRepository>();
+            container.RegisterSingleton<IMediaRepository, MediaRepository>();
+            container.RegisterSingleton<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
+            container.RegisterSingleton<IMediaTypeRepository, MediaTypeRepository>();
+            container.RegisterSingleton<IMemberGroupRepository, MemberGroupRepository>();
+            container.RegisterSingleton<IMemberRepository, MemberRepository>();
+            container.RegisterSingleton<IMemberTypeRepository, MemberTypeRepository>();
+            container.RegisterSingleton<IMigrationEntryRepository, MigrationEntryRepository>();
+            container.RegisterSingleton<INotificationsRepository, NotificationsRepository>();
+            container.RegisterSingleton<IPublicAccessRepository, PublicAccessRepository>();
+            container.RegisterSingleton<IRedirectUrlRepository, RedirectUrlRepository>();
+            container.RegisterSingleton<IRelationRepository, RelationRepository>();
+            container.RegisterSingleton<IRelationTypeRepository, RelationTypeRepository>();
+            container.RegisterSingleton<IServerRegistrationRepository, ServerRegistrationRepository>();
+            container.RegisterSingleton<ITagRepository, TagRepository>();
+            container.RegisterSingleton<ITaskRepository, TaskRepository>();
+            container.RegisterSingleton<ITaskTypeRepository, TaskTypeRepository>();
+            container.RegisterSingleton<ITemplateRepository, TemplateRepository>();
+            container.RegisterSingleton<IUserGroupRepository, UserGroupRepository>();
+            container.RegisterSingleton<IUserRepository, UserRepository>();
 
             // repositories that depend on a filesystem
             // these have an annotated ctor parameter to pick the right file system
-            container.Register<IScriptRepository, ScriptRepository>();
-            container.Register<IPartialViewRepository, PartialViewRepository>();
-            container.Register<IPartialViewMacroRepository, PartialViewMacroRepository>();
-            container.Register<IStylesheetRepository, StylesheetRepository>();
-
-            // collection builders require a full IServiceContainer because they need to
-            // be able to both register stuff, and get stuff - but ICompositionRoot gives
-            // us an IServiceRegistry - which *is* a full container - so, casting - bit
-            // awkward but it works
-            var serviceContainer = container as IServiceContainer;
-            if (serviceContainer == null) throw new Exception("Container is not IServiceContainer.");
+            container.RegisterSingleton<IPartialViewMacroRepository, PartialViewMacroRepository>();
+            container.RegisterSingleton<IPartialViewRepository, PartialViewRepository>();
+            container.RegisterSingleton<IScriptRepository, ScriptRepository>();
+            container.RegisterSingleton<IStylesheetRepository, StylesheetRepository>();
+            container.RegisterSingleton<IXsltFileRepository, XsltFileRepository>();
         }
     }
 }

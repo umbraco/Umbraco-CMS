@@ -13,7 +13,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
@@ -24,14 +23,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DataTypeDefinitionRepository : NPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
-        private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger, IContentTypeRepository contentTypeRepository)
-            : base(scopeProvider, cache, logger)
+        public DataTypeDefinitionRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger)
         {
-            _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(scopeProvider, CacheHelper.NoCache, logger);
+            _preValRepository = new DataTypePreValueRepository(scopeAccessor, CacheHelper.NoCache, logger);
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -70,47 +67,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
             return dtos.Select(factory.BuildEntity).ToArray();
-        }
-
-        /// <summary>
-        /// Override the delete method so that we can ensure that all related content type's are updated as part of the overall transaction
-        /// </summary>
-        /// <param name="entity"></param>
-        public override void Delete(IDataTypeDefinition entity)
-        {
-            //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-            var query = Query<PropertyType>().Where(x => x.DataTypeDefinitionId == entity.Id);
-
-            //TODO: Don't we need to be concerned about media and member types here too ?
-            var contentTypes = _contentTypeRepository.GetByQuery(query);
-
-            //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
-            foreach (var contentType in contentTypes)
-            {
-                if (contentType == null) continue;
-
-                foreach (var group in contentType.PropertyGroups)
-                {
-                    var types = @group.PropertyTypes.Where(x => x.DataTypeDefinitionId == entity.Id).ToList();
-                    foreach (var propertyType in types)
-                    {
-                        @group.PropertyTypes.Remove(propertyType);
-                    }
-                }
-
-                // so... we are modifying content types here. the service will trigger Deleted event,
-                // which will propagate to DataTypeCacheRefresher which will clear almost every cache
-                // there is to clear... and in addition published snapshot caches will clear themselves too, so
-                // this is probably safe alghough it looks... weird.
-                //
-                // what IS weird is that a content type is losing a property and we do NOT raise any
-                // content type event... so ppl better listen on the data type events too.
-
-                _contentTypeRepository.Save(contentType);
-            }
-
-            //call the base method to queue the deletion of this data type
-            base.Delete(entity);
         }
 
         #endregion
@@ -479,8 +435,8 @@ AND umbracoNode.id <> @id",
         /// </summary>
         private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
         {
-            public DataTypePreValueRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-                : base(scopeProvider, cache, logger)
+            public DataTypePreValueRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+                : base(scopeAccessor, cache, logger)
             { }
 
             #region Not implemented (don't need to for the purposes of this repo)

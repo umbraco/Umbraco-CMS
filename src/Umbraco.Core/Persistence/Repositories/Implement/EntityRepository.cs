@@ -7,7 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -21,14 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </remarks>
     internal class EntityRepository : IEntityRepository
     {
-        public EntityRepository(IScopeUnitOfWork work)
+        private readonly IScopeAccessor _scopeAccessor;
+        public EntityRepository(IScopeAccessor scopeAccessor)
         {
-            UnitOfWork = work;
+            _scopeAccessor = scopeAccessor;
         }
 
-        protected IScopeUnitOfWork UnitOfWork { get; }
-        protected IUmbracoDatabase Database => UnitOfWork.Database;
-        protected Sql<ISqlContext> Sql() => UnitOfWork.SqlContext.Sql();
+        protected IUmbracoDatabase Database => _scopeAccessor.AmbientScope.Database;
+        protected Sql<ISqlContext> Sql() => _scopeAccessor.AmbientScope.SqlContext.Sql();
 
         #region Repository
 

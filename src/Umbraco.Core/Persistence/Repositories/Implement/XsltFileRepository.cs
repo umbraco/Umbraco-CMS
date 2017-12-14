@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -12,10 +12,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class XsltFileRepository : FileRepository<string, XsltFile>, IXsltFileRepository
     {
-        public XsltFileRepository(IUnitOfWork work, IFileSystem fileSystem)
-            : base(work, fileSystem)
-        {
-        }
+        public XsltFileRepository([Inject("XsltFileSystem")] IFileSystem fileSystem)
+            : base(fileSystem)
+        { }
 
         public override XsltFile Get(string id)
         {

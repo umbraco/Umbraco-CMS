@@ -300,6 +300,7 @@
     <Compile Include="Constants-Conventions.cs" />
     <Compile Include="Constants-DatabaseProviders.cs" />
     <Compile Include="Constants-DataTypes.cs" />
+    <Compile Include="Constants-Composing.cs" />
     <Compile Include="Constants-DeploySelector.cs" />
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
@@ -1148,7 +1149,6 @@
     <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\Implement\VersionableRepositoryBaseAliasRegex.cs" />
     <Compile Include="Persistence\Repositories\Implement\XsltFileRepository.cs" />
-    <Compile Include="Persistence\RepositoryFactory.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
@@ -1166,14 +1166,6 @@
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UmbracoDatabaseExtensions.cs" />
     <Compile Include="Persistence\UmbracoDatabaseFactory.cs" />
-    <Compile Include="Persistence\UnitOfWorkExtensions.cs" />
-    <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\IScopeUnitOfWorkProvider.cs" />
-    <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
-    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\ScopeUnitOfWorkProvider.cs" />
-    <Compile Include="Persistence\UnitOfWork\UnitOfWorkBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
@@ -1249,6 +1241,7 @@
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />
+    <Compile Include="Scoping\IScopeAccessor.cs" />
     <Compile Include="Scoping\IScopeContext.cs" />
     <Compile Include="Scoping\IScopeProvider.cs" />
     <Compile Include="Scoping\RepositoryCacheMode.cs" />

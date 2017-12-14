@@ -6,8 +6,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     class DocumentTypeContainerRepository : EntityContainerRepository, IDocumentTypeContainerRepository
     {
-        public DocumentTypeContainerRepository(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
-            : base(scopeProvider, cache, logger, Constants.ObjectTypes.DocumentTypeContainer)
+        public DocumentTypeContainerRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+            : base(scopeAccessor, cache, logger, Constants.ObjectTypes.DocumentTypeContainer)
         { }
     }
 }

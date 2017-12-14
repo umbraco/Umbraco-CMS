@@ -4,7 +4,6 @@ using System.Linq;
 using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -13,8 +12,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        public StylesheetRepository(IUnitOfWork work, [Inject("StylesheetFileSystem")] IFileSystem fileSystem)
-            : base(work, fileSystem)
+        public StylesheetRepository([Inject("StylesheetFileSystem")] IFileSystem fileSystem)
+            : base(fileSystem)
         { }
 
         #region Overrides of FileRepository<string,Stylesheet>

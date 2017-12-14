@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IPartialViewRepository : IReadRepository<string, IPartialView>, IWriteRepository<IPartialView>
+    public interface IPartialViewRepository : IReadRepository<string, IPartialView>, IWriteRepository<IPartialView>
     {
         void AddFolder(string folderPath);
         void DeleteFolder(string folderPath);

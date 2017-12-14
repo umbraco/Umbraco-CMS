@@ -20,9 +20,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
         private IRuntimeCacheProvider _isolatedCache;
 
-        protected RepositoryBase(ScopeProvider scopeProvider, CacheHelper cache, ILogger logger)
+        protected RepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
         {
-            ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
+            ScopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             GlobalCache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
@@ -31,13 +31,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected CacheHelper GlobalCache { get; }
 
-        protected ScopeProvider ScopeProvider { get; }
+        protected IScopeAccessor ScopeAccessor { get; }
 
         protected IScope AmbientScope
         {
             get
             {
-                var scope = ScopeProvider.AmbientScope;
+                var scope = ScopeAccessor.AmbientScope;
                 if (scope == null)
                     throw new InvalidOperationException("Cannot run a repository without an ambient scope.");
                 return scope;

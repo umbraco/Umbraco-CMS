@@ -4,11 +4,10 @@ using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IUserRepository : IUnitOfWorkRepository, IReadWriteQueryRepository<int, IUser>
+    public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     {
         /// <summary>
         /// Gets the count of items based on a complex query
