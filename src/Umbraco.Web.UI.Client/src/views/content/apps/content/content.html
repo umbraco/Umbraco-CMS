@@ -1,6 +1,6 @@
 <div class="form-horizontal">
 
-    <div class="umb-expansion-panel" ng-repeat="group in model.tabs">
+    <div class="umb-expansion-panel" ng-repeat="group in model.tabs | filter: { hide : '!' + true }">
 
         <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
             <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-right': !group.open, 'icon-navigation-down': group.open}" class="icon-navigation-right">&nbsp;</ins>                        

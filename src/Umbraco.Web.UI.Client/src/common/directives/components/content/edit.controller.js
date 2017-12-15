@@ -52,8 +52,7 @@
         "name": "Content",
         "alias": "content",
         "icon": "icon-document",
-        "view": "views/content/apps/content/content.html",
-        "active": true
+        "view": "views/content/apps/content/content.html"
       };
 
       var infoApp = {
@@ -63,9 +62,33 @@
         "view": "views/content/apps/info/info.html"
       };
 
+      var listview = {
+        "name": "Child items",
+        "alias": "childItems",
+        "icon": "icon-list",
+        "view": "views/content/apps/listview/listview.html"
+      };
+
       $scope.content.apps = [];
+
+      if($scope.content.isContainer) {
+        // add list view app
+        $scope.content.apps.push(listview);
+
+        // remove the list view tab
+        angular.forEach($scope.content.tabs, function(tab, index){
+          if(tab.alias === "umbContainerView") {
+            tab.hide = true;
+          }
+        });
+
+      }
+      
       $scope.content.apps.push(contentApp);
       $scope.content.apps.push(infoApp);
+      
+      // set first app to active
+      $scope.content.apps[0].active = true;
 
     }
 
