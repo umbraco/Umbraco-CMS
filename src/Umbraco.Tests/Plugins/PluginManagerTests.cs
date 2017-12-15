@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Plugins
         public void Initialize()
         {
             //this ensures its reset
-            _manager = new TypeLoader(new NullCacheProvider(),
+            _manager = new TypeLoader(NullCacheProvider.Instance,
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver

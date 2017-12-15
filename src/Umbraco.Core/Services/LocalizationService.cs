@@ -115,7 +115,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var item = _dictionaryRepository.Get(id);
                 //ensure the lazy Language callback is assigned
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="DictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var item = _dictionaryRepository.Get(id);
                 //ensure the lazy Language callback is assigned
@@ -147,7 +147,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemByKey(string key)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var item = _dictionaryRepository.Get(key);
                 //ensure the lazy Language callback is assigned
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
                 var items = _dictionaryRepository.Get(query).ToArray();
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
                 //ensure the lazy Language callback is assigned
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
                 var items = _dictionaryRepository.Get(query).ToArray();
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if a <see cref="IDictionaryItem"/> exists, otherwise false</returns>
         public bool DictionaryItemExists(string key)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var item = _dictionaryRepository.Get(key);
                 return item != null;
@@ -284,7 +284,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.Get(id);
             }
@@ -297,7 +297,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByCultureCode(string cultureName)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.GetByCultureName(cultureName);
             }
@@ -310,7 +310,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByIsoCode(string isoCode)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.GetByIsoCode(isoCode);
             }
@@ -322,7 +322,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ILanguage"/> objects</returns>
         public IEnumerable<ILanguage> GetAllLanguages()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.GetMany();
             }
@@ -405,7 +405,7 @@ namespace Umbraco.Core.Services
 
         public Dictionary<string, Guid> GetDictionaryItemKeyMap()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dictionaryRepository.GetDictionaryItemKeyMap();
             }

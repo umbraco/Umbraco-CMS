@@ -9,8 +9,7 @@ namespace Umbraco.Core.Cache
     internal class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        private NoCacheRepositoryCachePolicy()
-        { }
+        private NoCacheRepositoryCachePolicy() { }
 
         public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new NoCacheRepositoryCachePolicy<TEntity, TId>();
 

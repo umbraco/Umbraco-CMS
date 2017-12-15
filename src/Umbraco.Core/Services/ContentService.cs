@@ -60,7 +60,7 @@ namespace Umbraco.Core.Services
 
         public int CountPublished(string contentTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.CountPublished();
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
 
         public int Count(string contentTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.Count(contentTypeAlias);
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
 
         public int CountChildren(int parentId, string contentTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.CountChildren(parentId, contentTypeAlias);
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
 
         public int CountDescendants(int parentId, string contentTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.CountDescendants(parentId, contentTypeAlias);
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public EntityPermissionCollection GetPermissions(IContent content)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetPermissionsForEntity(content.Id);
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.Get(id);
@@ -390,7 +390,7 @@ namespace Umbraco.Core.Services
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return Enumerable.Empty<IContent>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var items = _documentRepository.GetMany(idsA);
@@ -408,7 +408,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent GetById(Guid key)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.Get(key);
@@ -425,7 +425,7 @@ namespace Umbraco.Core.Services
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return Enumerable.Empty<IContent>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var items = _documentRepository.GetMany(idsA);
@@ -443,7 +443,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetByType(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ContentTypeId == id);
@@ -453,7 +453,7 @@ namespace Umbraco.Core.Services
 
         internal IEnumerable<IContent> GetPublishedContentOfContentType(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ContentTypeId == id);
@@ -469,7 +469,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Contrary to most methods, this method filters out trashed content items.</remarks>
         public IEnumerable<IContent> GetByLevel(int level)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
@@ -484,7 +484,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IContent"/> item</returns>
         public IContent GetVersion(int versionId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetVersion(versionId);
@@ -498,7 +498,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetVersions(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetAllVersions(id);
@@ -513,7 +513,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<int> GetVersionIds(int id, int maxRows)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _documentRepository.GetVersionIds(id, maxRows);
             }
@@ -547,7 +547,7 @@ namespace Umbraco.Core.Services
             if (ids.Any() == false)
                 return new List<IContent>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetMany(ids);
@@ -561,7 +561,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == id);
@@ -576,7 +576,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of published <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPublishedChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
@@ -598,7 +598,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
             string orderBy, Direction orderDirection, string filter = "")
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var filterQuery = filter.IsNullOrWhiteSpace()
@@ -627,7 +627,7 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -652,7 +652,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var filterQuery = filter.IsNullOrWhiteSpace()
@@ -680,7 +680,7 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -708,7 +708,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetChildren(int parentId, string name)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == parentId && x.Name.Contains(name));
@@ -723,7 +723,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetDescendants(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var content = GetById(id);
@@ -745,7 +745,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetDescendants(IContent content)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var pathMatch = content.Path + ",";
@@ -785,7 +785,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetRootContent()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
@@ -799,7 +799,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         internal IEnumerable<IContent> GetAllPublished()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.Get(QueryNotTrashed);
@@ -812,7 +812,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentForExpiration()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.Published && x.ExpireDate <= DateTime.Now);
@@ -826,7 +826,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentForRelease()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var query = Query<IContent>().Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
@@ -840,7 +840,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentInRecycleBin()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var bin = $"{Constants.System.Root},{Constants.System.RecycleBinContent},";
@@ -877,7 +877,7 @@ namespace Umbraco.Core.Services
 
         public bool IsPathPublished(IContent content)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.IsPathPublished(content);
@@ -1018,6 +1018,10 @@ namespace Umbraco.Core.Services
                 if (content.HasIdentity == false)
                     content.CreatorId = userId;
                 content.WriterId = userId;
+
+                // if not going to publish, must reset the published state
+                if (!result.Success)
+                    ((Content) content).Published = content.Published;
 
                 _documentRepository.Save(content);
 
@@ -1826,7 +1830,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         internal IEnumerable<IContent> GetPublishedDescendants(IContent content)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 return GetPublishedDescendantsLocked(content).ToArray(); // ToArray important in uow!
@@ -2234,7 +2238,7 @@ namespace Umbraco.Core.Services
         {
             if (string.IsNullOrWhiteSpace(contentTypeAlias)) throw new ArgumentNullOrEmptyException(nameof(contentTypeAlias));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return GetContentType(scope, contentTypeAlias);
             }
@@ -2246,7 +2250,7 @@ namespace Umbraco.Core.Services
 
         public IContent GetBlueprintById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var blueprint = _documentBlueprintRepository.Get(id);
@@ -2258,7 +2262,7 @@ namespace Umbraco.Core.Services
 
         public IContent GetBlueprintById(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
                 var blueprint = _documentBlueprintRepository.Get(id);
@@ -2329,7 +2333,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] contentTypeId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IContent>();
                 if (contentTypeId.Length > 0)

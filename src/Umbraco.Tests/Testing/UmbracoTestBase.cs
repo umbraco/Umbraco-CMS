@@ -272,6 +272,7 @@ namespace Umbraco.Tests.Testing
             //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
             Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Xslt", "/xslt"), "XsltFileSystem");
 
             // no factory (noop)
             Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
@@ -294,6 +295,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
             Container.RegisterSingleton(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
+            Container.RegisterSingleton(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
             Container.RegisterFrom<ServicesCompositionRoot>();
             // composition root is doing weird things, fix
@@ -362,8 +364,7 @@ namespace Umbraco.Tests.Testing
             // reset and dispose scopes
             // ensures we don't leak an opened database connection
             // which would lock eg SqlCe .sdf files
-            var scopeProvider = Container?.TryGetInstance<IScopeProvider>() as ScopeProvider;
-            if (scopeProvider != null)
+            if (Container?.TryGetInstance<IScopeProvider>() is ScopeProvider scopeProvider)
             {
                 Core.Scoping.Scope scope;
                 while ((scope = scopeProvider.AmbientScope) != null)

@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
         /// from the database.</remarks>
         public IEnumerable<IServerRegistration> GetActiveServers(bool refresh = false)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.Servers);
                 if (refresh) ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache();

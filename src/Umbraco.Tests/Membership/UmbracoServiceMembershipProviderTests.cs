@@ -16,13 +16,6 @@ namespace Umbraco.Tests.Membership
     [UmbracoTest(Database = UmbracoTestOptions.Database.None, WithApplication = true)]
     public class UmbracoServiceMembershipProviderTests : UmbracoTestBase
     {
-        //[SetUp]
-        //public void SetUp()
-        //{
-        //    SettingsForTests.ConfigureSettings(SettingsForTests.GenerateMockSettings());
-        //    var container = new ServiceContainer
-        //}
-
         [Test]
         public void Sets_Default_Member_Type_From_Service_On_Init()
         {

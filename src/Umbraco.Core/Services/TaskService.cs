@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
 
         public TaskType GetTaskTypeByAlias(string taskTypeAlias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _taskTypeRepository.Get(Query<TaskType>().Where(x => x.Alias == taskTypeAlias)).FirstOrDefault();
             }
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Services
 
         public TaskType GetTaskTypeById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _taskTypeRepository.Get(id);
             }
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TaskType> GetAllTaskTypes()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _taskTypeRepository.GetMany();
             }
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<Task> GetTasks(int? itemId = null, int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _taskRepository.GetTasks(itemId, assignedUser, ownerUser, taskTypeAlias);
             }
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Services
 
         public Task GetTaskById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _taskRepository.Get(id);
             }

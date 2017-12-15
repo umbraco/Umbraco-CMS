@@ -22,7 +22,7 @@ using Umbraco.Web.Security.Providers;
 namespace Umbraco.Tests.Services
 {
     [TestFixture, RequiresSTA]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class MemberServiceTests : TestWithSomeContentBase
     {
         public override void SetUp()

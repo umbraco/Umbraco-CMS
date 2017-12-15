@@ -13,7 +13,7 @@ using Umbraco.Tests.Testing;
 namespace Umbraco.Tests.Services
 {
     [TestFixture, RequiresSTA]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class MemberTypeServiceTests : TestWithSomeContentBase
     {
         [Test]

@@ -22,9 +22,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override bool IsPublishing => MediaType.IsPublishingConst;
 
-        protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy()
         {
-            return new FullDataSetRepositoryCachePolicy<IMediaType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
+            return new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
         }
 
         protected override IMediaType PerformGet(int id)

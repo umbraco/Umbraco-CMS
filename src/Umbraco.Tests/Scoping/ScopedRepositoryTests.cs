@@ -18,7 +18,7 @@ using Umbraco.Core.Sync;
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class ScopedRepositoryTests : TestWithDatabaseBase
     {
         private CacheRefresherComponent _cacheRefresher;
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Scoping
             var cacheHelper = new CacheHelper(
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
-                new NullCacheProvider(),
+                NullCacheProvider.Instance,
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
             Container.RegisterSingleton(f => cacheHelper);
             Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);

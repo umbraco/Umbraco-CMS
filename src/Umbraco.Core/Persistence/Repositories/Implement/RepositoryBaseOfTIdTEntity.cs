@@ -18,7 +18,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IAggregateRoot
     {
         private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
-        private IRuntimeCacheProvider _isolatedCache;
 
         protected RepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
         {
@@ -30,6 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected ILogger Logger { get; }
 
         protected CacheHelper GlobalCache { get; }
+
+        protected IRuntimeCacheProvider GlobalIsolatedCache => GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
 
         protected IScopeAccessor ScopeAccessor { get; }
 
@@ -56,38 +57,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         /// <summary>
-        /// The runtime cache used for this repo by default is the isolated cache for this type
+        /// Gets the isolated cache.
         /// </summary>
+        /// <remarks>Depends on the ambient scope cache mode.</remarks>
         protected IRuntimeCacheProvider IsolatedCache
         {
             get
             {
-                if (_isolatedCache != null) return _isolatedCache;
-
-                IsolatedRuntimeCache provider;
                 switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
-                        provider = GlobalCache.IsolatedRuntimeCache;
-                        break;
+                        return GlobalCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
                     case RepositoryCacheMode.Scoped:
-                        provider = AmbientScope.IsolatedRuntimeCache;
-                        break;
+                        return AmbientScope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
                     case RepositoryCacheMode.None:
-                        return new NullCacheProvider(); // fixme cache instance
+                        return NullCacheProvider.Instance;
                     default:
                         throw new Exception("oops: cache mode.");
                 }
-
-                return _isolatedCache = GetIsolatedCache(provider);
             }
         }
 
-        protected virtual IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
-        {
-            return provider.GetOrCreateCache<TEntity>();
-        }
-
+        // fixme - but now that we have 1 unique repository?
         // this is a *bad* idea because PerformCount captures the current repository and its UOW
         //
         //private static RepositoryCachePolicyOptions _defaultOptions;
@@ -132,39 +123,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //    }
         //}
 
-        protected virtual IRepositoryCachePolicy<TEntity, TId> CachePolicy
+        protected IRepositoryCachePolicy<TEntity, TId> CachePolicy
         {
             get
             {
                 if (GlobalCache == CacheHelper.NoCache)
-                    return _cachePolicy = NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
+                    return NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
 
                 // create the cache policy using IsolatedCache which is either global
                 // or scoped depending on the repository cache mode for the current scope
+
                 switch (AmbientScope.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
-                        _cachePolicy = CreateCachePolicy(IsolatedCache);
-                        break;
                     case RepositoryCacheMode.Scoped:
-                        _cachePolicy = CreateCachePolicy(IsolatedCache);
-                        var globalIsolatedCache = GetIsolatedCache(GlobalCache.IsolatedRuntimeCache);
-                        _cachePolicy = _cachePolicy.Scoped(globalIsolatedCache, AmbientScope);
-                        break;
+                        // return the same cache policy in both cases - the cache policy is
+                        // supposed to pick either the global or scope cache depending on the
+                        // scope cache mode
+                        return _cachePolicy ?? (_cachePolicy = CreateCachePolicy());
                     case RepositoryCacheMode.None:
-                        _cachePolicy = NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
-                        break;
+                        return NoCacheRepositoryCachePolicy<TEntity, TId>.Instance;
                     default:
                         throw new Exception("oops: cache mode.");
                 }
-
-                return _cachePolicy;
             }
         }
 
-        protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
         {
-            return new DefaultRepositoryCachePolicy<TEntity, TId>(runtimeCache, DefaultOptions);
+            return new DefaultRepositoryCachePolicy<TEntity, TId>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
         }
 
         /// <summary>
@@ -175,9 +162,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public void Save(TEntity entity)
         {
             if (entity.HasIdentity == false)
-                PersistNewItem(entity);
+                CachePolicy.Create(entity, PersistNewItem);
             else
-                PersistUpdatedItem(entity);
+                CachePolicy.Update(entity, PersistUpdatedItem);
         }
 
         /// <summary>
@@ -186,7 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="entity"></param>
         public virtual void Delete(TEntity entity)
         {
-            PersistDeletedItem(entity);
+            CachePolicy.Delete(entity, PersistDeletedItem);
         }
 
         protected abstract TEntity PerformGet(TId id);
@@ -194,6 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
         protected abstract bool PerformExists(TId id);
         protected abstract int PerformCount(IQuery<TEntity> query);
+
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
@@ -261,33 +249,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public int Count(IQuery<TEntity> query)
         {
             return PerformCount(query);
-        }
-
-        /// <summary>
-        /// Unit of work method that tells the repository to persist the new entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void PersistNewItem(IEntity entity)
-        {
-            CachePolicy.Create((TEntity) entity, PersistNewItem);
-        }
-
-        /// <summary>
-        /// Unit of work method that tells the repository to persist the updated entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void PersistUpdatedItem(IEntity entity)
-        {
-            CachePolicy.Update((TEntity) entity, PersistUpdatedItem);
-        }
-
-        /// <summary>
-        /// Unit of work method that tells the repository to persist the deletion of the entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void PersistDeletedItem(IEntity entity)
-        {
-            CachePolicy.Delete((TEntity) entity, PersistDeletedItem);
         }
     }
 }

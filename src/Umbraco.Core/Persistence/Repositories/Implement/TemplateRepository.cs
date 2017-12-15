@@ -42,9 +42,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
         }
 
-        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy()
         {
-            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(runtimeCache, GetEntityId, /*expires:*/ false);
+            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>

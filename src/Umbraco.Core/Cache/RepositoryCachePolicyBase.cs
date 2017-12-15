@@ -13,14 +13,33 @@ namespace Umbraco.Core.Cache
     internal abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        protected RepositoryCachePolicyBase(IRuntimeCacheProvider cache)
+        private readonly IRuntimeCacheProvider _globalCache;
+        private readonly IScopeAccessor _scopeAccessor;
+
+        protected RepositoryCachePolicyBase(IRuntimeCacheProvider globalCache, IScopeAccessor scopeAccessor)
         {
-            Cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _globalCache = globalCache ?? throw new ArgumentNullException(nameof(globalCache));
+            _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
         }
 
-        public abstract IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope);
-
-        protected IRuntimeCacheProvider Cache { get; }
+        protected IRuntimeCacheProvider Cache
+        {
+            get
+            {
+                var ambientScope = _scopeAccessor.AmbientScope;
+                switch (ambientScope.RepositoryCacheMode)
+                {
+                    case RepositoryCacheMode.Default:
+                        return _globalCache;
+                    case RepositoryCacheMode.Scoped:
+                        return ambientScope.IsolatedRuntimeCache.GetOrCreateCache<TEntity>();
+                    case RepositoryCacheMode.None:
+                        return NullCacheProvider.Instance;
+                    default:
+                        throw new NotSupportedException($"Repository cache mode {ambientScope.RepositoryCacheMode} is not supported.");
+                }
+            }
+        }
 
         /// <inheritdoc />
         public abstract TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);

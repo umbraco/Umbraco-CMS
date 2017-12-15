@@ -60,6 +60,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (_passwordConfigInitialized)
                     return _passwordConfigJson;
 
+                // fixme - this is bad
+                // because the membership provider we're trying to get has a dependency on the user service
+                // and we should not depend on services in repositories - need a way better way to do this
+
                 var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
                 var passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
                     ? null

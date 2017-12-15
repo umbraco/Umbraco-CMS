@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
         /// <returns><c>True</c> if the User exists otherwise <c>False</c></returns>
         public bool Exists(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.Exists(username);
             }
@@ -152,7 +152,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.Get(id);
             }
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetByEmail(string email)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUser>().Where(x => x.Email.Equals(email));
                 return _userRepository.Get(query).FirstOrDefault();
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetByUsername(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 try
                 {
@@ -422,7 +422,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUser>();
 
@@ -462,7 +462,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUser>();
 
@@ -503,7 +503,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="System.int"/> with number of Users for passed in type</returns>
         public int GetCount(MemberCountType countType)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 IQuery<IUser> query;
 
@@ -544,7 +544,7 @@ namespace Umbraco.Core.Services
 
         public IDictionary<UserState, int> GetUserStates()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.GetUserStates();
             }
@@ -563,7 +563,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[] userState = null, string[] includeUserGroups = null, string[] excludeUserGroups = null, IQuery<IUser> filter = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 Expression<Func<IUser, object>> sort;
                 switch (orderBy.ToUpperInvariant())
@@ -615,7 +615,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
         public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
             }
@@ -623,7 +623,7 @@ namespace Umbraco.Core.Services
 
         internal IEnumerable<IUser> GetNextUsers(int id, int count)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return ((UserRepository) _userRepository).GetNextUsers(id, count);
             }
@@ -636,7 +636,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
         public IEnumerable<IUser> GetAllInGroup(int groupId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.GetAllInGroup(groupId);
             }
@@ -679,7 +679,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileByUserName(string username)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.GetProfile(username);
             }
@@ -692,7 +692,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUser"/></returns>
         public IUser GetUserById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 try
                 {
@@ -723,7 +723,7 @@ namespace Umbraco.Core.Services
         {
             if (ids.Length <= 0) return Enumerable.Empty<IUser>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userRepository.GetMany(ids);
             }
@@ -779,7 +779,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUserGroup"/></returns>
         public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userGroupRepository.GetMany(ids).OrderBy(x => x.Name);
             }
@@ -789,7 +789,7 @@ namespace Umbraco.Core.Services
         {
             if (aliases.Length == 0) return Enumerable.Empty<IUserGroup>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUserGroup>().Where(x => aliases.SqlIn(x.Alias));
                 var contents = _userGroupRepository.Get(query);
@@ -806,7 +806,7 @@ namespace Umbraco.Core.Services
         {
             if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value cannot be null or whitespace.", "alias");
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IUserGroup>().Where(x => x.Alias == alias);
                 var contents = _userGroupRepository.Get(query);
@@ -821,7 +821,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IUserGroup"/></returns>
         public IUserGroup GetUserGroupById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userGroupRepository.Get(id);
             }
@@ -914,7 +914,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
         public EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userGroupRepository.GetPermissions(user.Groups.ToArray(), true, nodeIds);
             }
@@ -933,7 +933,7 @@ namespace Umbraco.Core.Services
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userGroupRepository.GetPermissions(groups, fallbackToDefaultPermissions, nodeIds);
             }
@@ -951,7 +951,7 @@ namespace Umbraco.Core.Services
         public EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _userGroupRepository.GetPermissions(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), fallbackToDefaultPermissions, nodeIds);
             }

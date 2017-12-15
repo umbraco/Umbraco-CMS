@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Services
     /// Tests covering the UserService
     /// </summary>
     [TestFixture, RequiresSTA]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class UserServiceTests : TestWithSomeContentBase
     {
         [Test]

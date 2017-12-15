@@ -22,9 +22,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger)
         { }
 
-        protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy()
         {
-            return new FullDataSetRepositoryCachePolicy<ILanguage, int>(runtimeCache, GetEntityId, /*expires:*/ false);
+            return new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
         #region Overrides of RepositoryBase<int,Language>

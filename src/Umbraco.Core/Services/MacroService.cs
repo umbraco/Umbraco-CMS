@@ -50,7 +50,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var q = Query<IMacro>().Where(x => x.Alias == alias);
                 return _macroRepository.Get(q).FirstOrDefault();
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMacro> GetAll(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _macroRepository.GetMany(ids);
             }
@@ -72,7 +72,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMacro> GetAll(params Guid[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _macroRepository.GetMany(ids);
             }
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
 
         public IMacro GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _macroRepository.Get(id);
             }
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
 
         public IMacro GetById(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _macroRepository.Get(id);
             }

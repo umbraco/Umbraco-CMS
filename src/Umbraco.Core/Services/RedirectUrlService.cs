@@ -71,7 +71,7 @@ namespace Umbraco.Core.Services
 
         public IRedirectUrl GetMostRecentRedirectUrl(string url)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetMostRecentUrl(url);
             }
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetContentUrls(contentKey);
             }
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetAllUrls(pageIndex, pageSize, out total);
             }
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _redirectUrlRepository.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
             }
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _redirectUrlRepository.SearchUrls(searchTerm, pageIndex, pageSize, out total);
             }

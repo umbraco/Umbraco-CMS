@@ -24,16 +24,11 @@ namespace Umbraco.Core.Cache
         private readonly Func<TEntity, TId> _entityGetId;
         private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> entityGetId, bool expires)
-            : base(cache)
+        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, IScopeAccessor scopeAccessor, Func<TEntity, TId> entityGetId, bool expires)
+            : base(cache, scopeAccessor)
         {
             _entityGetId = entityGetId;
             _expires = expires;
-        }
-
-        public override IRepositoryCachePolicy<TEntity, TId> Scoped(IRuntimeCacheProvider runtimeCache, IScope scope)
-        {
-            return new ScopedRepositoryCachePolicy<TEntity, TId>(this, runtimeCache, scope);
         }
 
         protected static readonly TId[] EmptyIds = new TId[0]; // const
@@ -56,13 +51,15 @@ namespace Umbraco.Core.Cache
             // set to ListCloneBehavior.CloneOnce ie it will clone *once* when inserting,
             // and then will *not* clone when retrieving.
 
+            var key = GetEntityTypeCacheKey();
+
             if (_expires)
             {
-                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
+                Cache.InsertCacheItem(key, () => new DeepCloneableList<TEntity>(entities), TimeSpan.FromMinutes(5), true);
             }
             else
             {
-                Cache.InsertCacheItem(GetEntityTypeCacheKey(), () => new DeepCloneableList<TEntity>(entities));
+                Cache.InsertCacheItem(key, () => new DeepCloneableList<TEntity>(entities));
             }
         }
 

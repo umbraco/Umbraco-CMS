@@ -18,7 +18,7 @@ namespace Umbraco.Tests.DI
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(new NullCacheProvider(),
+            TypeLoader = new TypeLoader(NullCacheProvider.Instance,
                 ProfilingLogger,
                 false)
             {

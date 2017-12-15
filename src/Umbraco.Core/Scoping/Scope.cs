@@ -28,6 +28,7 @@ namespace Umbraco.Core.Scoping
         private readonly RepositoryCacheMode _repositoryCacheMode;
         private readonly bool? _scopeFileSystem;
         private readonly ScopeContext _scopeContext;
+        private readonly bool _autoComplete;
         private bool _callContext;
 
         private bool _disposed;
@@ -48,7 +49,8 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
+            bool callContext = false,
+            bool autoComplete = false)
         {
             _scopeProvider = scopeProvider;
             _logger = logger;
@@ -60,6 +62,7 @@ namespace Umbraco.Core.Scoping
             _eventDispatcher = eventDispatcher;
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
+            _autoComplete = autoComplete;
 
             Detachable = detachable;
 
@@ -72,6 +75,7 @@ namespace Umbraco.Core.Scoping
             {
                 if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
                 if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+                if (autoComplete) throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
 
                 // detachable creates its own scope context
                 _scopeContext = new ScopeContext();
@@ -119,8 +123,9 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
-            : this(scopeProvider, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
+            bool callContext = false,
+            bool autoComplete = false)
+            : this(scopeProvider, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
@@ -130,8 +135,9 @@ namespace Umbraco.Core.Scoping
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
-            bool callContext = false)
-            : this(scopeProvider, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext)
+            bool callContext = false,
+            bool autoComplete = false)
+            : this(scopeProvider, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -356,6 +362,9 @@ namespace Umbraco.Core.Scoping
             _scopeProvider.Disposed(this);
 #endif
 
+            if (_autoComplete && _completed == null)
+                _completed = true;
+
             if (parent != null)
                 parent.ChildCompleted(_completed);
             else
@@ -414,7 +423,7 @@ namespace Umbraco.Core.Scoping
         //    to ensure we don't leave a scope around, etc
         private void RobustExit(bool completed, bool onException)
         {
-            if (onException) completed = false;
+             if (onException) completed = false;
 
             TryFinally(() =>
             {

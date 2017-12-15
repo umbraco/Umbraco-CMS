@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Macros
             var cacheHelper = new CacheHelper(
                 new ObjectCacheRuntimeCacheProvider(),
                 new StaticCacheProvider(),
-                new NullCacheProvider(),
+                NullCacheProvider.Instance,
                 new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 

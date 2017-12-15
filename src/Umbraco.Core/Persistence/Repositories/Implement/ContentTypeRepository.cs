@@ -28,9 +28,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override bool IsPublishing => ContentType.IsPublishingConst;
 
-        protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy()
         {
-            return new FullDataSetRepositoryCachePolicy<IContentType, int>(runtimeCache, GetEntityId, /*expires:*/ true);
+            return new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
         }
 
         protected override IContentType PerformGet(int id)
@@ -201,9 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var children = Get(query);
             foreach (var child in children)
             {
-                //NOTE: We must cast here so that it goes to the outter method to
-                // ensure the cache is updated.
-                PersistDeletedItem((IEntity)child);
+                PersistDeletedItem(child);
             }
 
             //Before we call the base class methods to run all delete clauses, we need to first

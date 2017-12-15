@@ -1,42 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
-using System.Diagnostics;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Security;
 using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Membership
 {
     [TestFixture]
-    public class MembershipProviderBaseTests
+    [UmbracoTest(WithApplication = true)]
+    public class MembershipProviderBaseTests : UmbracoTestBase
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Current.Container = new ServiceContainer();
-
-            var mRuntimeState = new Mock<IRuntimeState>();
-            mRuntimeState.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
-            Current.Container.RegisterSingleton(f => mRuntimeState.Object);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
-
         [Test]
         public void Change_Password_Without_AllowManuallyChangingPassword_And_No_Pass_Validation()
         {

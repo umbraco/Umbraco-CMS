@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), logger)
         { }
 
-        protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<IServerRegistration, int> CreateCachePolicy()
         {
             // fixme - wtf are we doing with cache here?
             // why are we using disabled cache helper up there?
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // and this is because the repository is special and should not participate in scopes
             // (cleanup in v8)
             //
-            return new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(GlobalCache.RuntimeCache, GetEntityId, /*expires:*/ false);
+            return new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(GlobalCache.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
         public void ClearCache()

@@ -254,7 +254,7 @@ namespace Umbraco.Core.Services
                 content.Key = key;
             }
 
-            using (var scope = _scopeProvider.CreateScope(readOnly: true))
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 foreach (var property in properties)
                 {

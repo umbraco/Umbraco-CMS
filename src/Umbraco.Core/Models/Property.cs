@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
             public CompositeKey(int? key1, string key2)
             {
                 _key1 = key1 ?? -1;
-                _key2 = key2;
+                _key2 = key2?.ToLowerInvariant() ?? "NEUTRAL";
             }
 
             public bool Equals(CompositeKey other)

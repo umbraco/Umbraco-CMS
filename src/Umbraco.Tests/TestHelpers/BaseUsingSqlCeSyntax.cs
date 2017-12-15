@@ -39,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
-            var pluginManager = new TypeLoader(new NullCacheProvider(),
+            var pluginManager = new TypeLoader(NullCacheProvider.Instance,
                 logger,
                 false);
             container.RegisterInstance(pluginManager);

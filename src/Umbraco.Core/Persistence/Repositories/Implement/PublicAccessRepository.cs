@@ -18,9 +18,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger)
         { }
 
-        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy()
         {
-            return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(runtimeCache, GetEntityId, /*expires:*/ false);
+            return new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
         protected override PublicAccessEntry PerformGet(Guid id)

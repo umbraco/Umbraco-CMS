@@ -53,7 +53,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IMigrationEntry FindEntry(string migrationName, SemVersion version)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _migrationEntryRepository.FindEntry(migrationName, version);
             }
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IMigrationEntry> GetAll(string migrationName)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IMigrationEntry>()
                     .Where(x => x.MigrationName.ToUpper() == migrationName.ToUpper());

@@ -375,14 +375,14 @@ namespace Umbraco.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool readOnly = false) // fixme
+            bool autoComplete = false)
         {
             var ambient = AmbientScope;
             if (ambient == null)
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _logger, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
+                var scope = new Scope(this, _logger, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
@@ -391,7 +391,7 @@ namespace Umbraco.Core.Scoping
             var ambientScope = ambient as Scope;
             if (ambientScope == null) throw new Exception("Ambient scope is not a Scope instance.");  // fixme - why? how?
 
-            var nested = new Scope(this, _logger, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext);
+            var nested = new Scope(this, _logger, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
             SetAmbient(nested, AmbientContext);
             return nested;
         }

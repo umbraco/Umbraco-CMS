@@ -194,7 +194,7 @@ namespace Umbraco.Core
             container.RegisterSingleton(_ => new CacheHelper(
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
-                new NullCacheProvider(),
+                NullCacheProvider.Instance,
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
             container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 

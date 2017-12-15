@@ -54,7 +54,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _memberGroupRepository.GetMany();
             }
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _memberGroupRepository.Get(id);
             }
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetByName(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _memberGroupRepository.GetByName(name);
             }

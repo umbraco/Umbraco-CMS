@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Services
     /// Tests covering the SectionService
     /// </summary>
     [TestFixture, RequiresSTA]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class SectionServiceTests : TestWithSomeContentBase
     {
         public override void CreateTestData()

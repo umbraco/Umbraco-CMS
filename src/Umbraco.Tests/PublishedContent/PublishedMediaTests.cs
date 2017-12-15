@@ -28,7 +28,7 @@ namespace Umbraco.Tests.PublishedContent
     /// Tests the typed extension methods on IPublishedContent using the DefaultPublishedMediaStore
     /// </summary>
     [TestFixture, RequiresSTA]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class PublishedMediaTests : PublishedContentTestBase
     {
         /// <summary>

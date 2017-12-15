@@ -732,7 +732,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     newIds.Add(payload.Id);
             }
 
-            if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0) return;
+            if (removedIds.Count == 0 && refreshedIds.Count == 0 && otherIds.Count == 0 && newIds.Count == 0) return;
 
             using (store.GetWriter(_scopeProvider))
             {

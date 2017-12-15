@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services
 
         public string GetDefault()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
 

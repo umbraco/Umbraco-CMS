@@ -23,7 +23,7 @@ namespace Umbraco.Tests.CoreThings
         {
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IServiceContainer>();
-            container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(new TypeLoader(new NullCacheProvider(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(new TypeLoader(NullCacheProvider.Instance, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             Current.Container = container.Object;
         }
 

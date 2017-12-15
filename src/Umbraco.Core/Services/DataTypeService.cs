@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(int containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeContainerRepository.Get(containerId);
             }
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(Guid containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return ((EntityContainerRepository) _dataTypeContainerRepository).Get(containerId);
             }
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return ((EntityContainerRepository) _dataTypeContainerRepository).Get(name, level);
             }
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeContainerRepository.GetMany(containerIds);
             }
@@ -220,7 +220,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionByName(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeDefinitionRepository.Get(Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
             }
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeDefinitionRepository.Get(id);
             }
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataTypeDefinition>().Where(x => x.Key == id);
                 return _dataTypeDefinitionRepository.Get(query).FirstOrDefault();
@@ -260,7 +260,7 @@ namespace Umbraco.Core.Services
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 return _dataTypeDefinitionRepository.Get(query);
@@ -274,7 +274,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
         public IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeDefinitionRepository.GetMany(ids);
             }
@@ -287,7 +287,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of string values</returns>
         public IEnumerable<string> GetPreValuesByDataTypeId(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var collection = _dataTypeDefinitionRepository.GetPreValuesCollectionByDataTypeId(id);
                 //now convert the collection to a string list
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeDefinitionRepository.GetPreValuesCollectionByDataTypeId(id);
             }
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Services
         /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _dataTypeDefinitionRepository.GetPreValueAsString(id);
             }

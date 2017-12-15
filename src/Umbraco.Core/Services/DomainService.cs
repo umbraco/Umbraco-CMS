@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
 
         public bool Exists(string domainName)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _domainRepository.Exists(domainName);
             }
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services
 
         public IDomain GetByName(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _domainRepository.GetByName(name);
             }
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Services
 
         public IDomain GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _domainRepository.Get(id);
             }
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IDomain> GetAll(bool includeWildcards)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _domainRepository.GetAll(includeWildcards);
             }
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _domainRepository.GetAssignedDomains(contentId, includeWildcards);
             }

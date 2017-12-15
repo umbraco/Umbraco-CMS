@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> GetAll(int userId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == userId))
                     .ToList(); // ToList is important here, must evaluate within uow! // ToList is important here, must evaluate within uow!
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IIdentityUserLogin> Find(UserLoginInfo login)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.ProviderKey == login.ProviderKey && x.LoginProvider == login.LoginProvider))
                     .ToList(); // ToList is important here, must evaluate within uow! // ToList is important here, must evaluate within uow!

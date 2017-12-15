@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider());
+            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), NullCacheProvider.Instance);
         }
 
         [Test]

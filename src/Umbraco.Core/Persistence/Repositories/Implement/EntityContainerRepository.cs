@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -29,10 +30,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         // never cache
-        private static readonly IRuntimeCacheProvider NullCache = new NullCacheProvider();
-        protected override IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
+        protected override IRepositoryCachePolicy<EntityContainer, int> CreateCachePolicy()
         {
-            return NullCache;
+            return NoCacheRepositoryCachePolicy<EntityContainer, int>.Instance;
         }
 
         protected override EntityContainer PerformGet(int id)

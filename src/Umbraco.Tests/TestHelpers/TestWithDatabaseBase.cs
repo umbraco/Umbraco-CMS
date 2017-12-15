@@ -29,6 +29,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using LightInject;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -241,7 +242,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual IPublishedSnapshotService CreatePublishedSnapshotService()
         {
-            var cache = new NullCacheProvider();
+            var cache = NullCacheProvider.Instance;
 
             ContentTypesCache = new PublishedContentTypeCache(
                 Current.Services.ContentTypeService,
@@ -258,7 +259,7 @@ namespace Umbraco.Tests.TestHelpers
                 Container.GetInstance<IPublishedContentTypeFactory>(),
                 (ScopeProvider) Current.ScopeProvider,
                 cache, publishedSnapshotAccessor,
-                null, null, null,
+                Current.Container.GetInstance<IDocumentRepository>(), Current.Container.GetInstance<IMediaRepository>(), Current.Container.GetInstance<IMemberRepository>(),
                 Current.Logger, ContentTypesCache, null, true, Options.PublishedRepositoryEvents);
 
             // initialize PublishedCacheService content with an Xml source

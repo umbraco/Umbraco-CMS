@@ -5,12 +5,25 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Cache
 {
     [TestFixture]
     public class DefaultCachePolicyTests
     {
+        private IScopeAccessor DefaultAccessor
+        {
+            get
+            {
+                var accessor = new Mock<IScopeAccessor>();
+                var scope = new Mock<IScope>();
+                scope.Setup(x => x.RepositoryCacheMode).Returns(RepositoryCacheMode.Default);
+                accessor.Setup(x => x.AmbientScope).Returns(scope.Object);
+                return accessor.Object;
+            }
+        }
+
         [Test]
         public void Caches_Single()
         {
@@ -23,7 +36,7 @@ namespace Umbraco.Tests.Cache
                     isCached = true;
                 });
 
-            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
             var unused = defaultPolicy.Get(1, id => new AuditItem(1, "blah", AuditType.Copy, 123), o => null);
             Assert.IsTrue(isCached);
@@ -35,7 +48,7 @@ namespace Umbraco.Tests.Cache
             var cache = new Mock<IRuntimeCacheProvider>();
             cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(new AuditItem(1, "blah", AuditType.Copy, 123));
 
-            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
             var found = defaultPolicy.Get(1, id => null, ids => null);
             Assert.IsNotNull(found);
@@ -54,7 +67,7 @@ namespace Umbraco.Tests.Cache
                 });
             cache.Setup(x => x.GetCacheItemsByKeySearch(It.IsAny<string>())).Returns(new AuditItem[] {});
 
-            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
             var unused = defaultPolicy.GetAll(new object[] {}, ids => new[]
                     {
@@ -75,7 +88,7 @@ namespace Umbraco.Tests.Cache
                 new AuditItem(2, "blah2", AuditType.Copy, 123)
             });
 
-            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
 
             var found = defaultPolicy.GetAll(new object[] {}, ids => new[] { (AuditItem)null });
             Assert.AreEqual(2, found.Length);
@@ -92,7 +105,7 @@ namespace Umbraco.Tests.Cache
                     cacheCleared = true;
                 });
 
-            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
             try
             {
                 defaultPolicy.Update(new AuditItem(1, "blah", AuditType.Copy, 123), item => throw new Exception("blah!"));
@@ -118,7 +131,7 @@ namespace Umbraco.Tests.Cache
                     cacheCleared = true;
                 });
 
-            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions());
             try
             {
                 defaultPolicy.Delete(new AuditItem(1, "blah", AuditType.Copy, 123), item => throw new Exception("blah!"));

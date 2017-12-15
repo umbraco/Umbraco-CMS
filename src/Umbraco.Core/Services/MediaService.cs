@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
 
         public int Count(string mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.Count(mediaTypeAlias);
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Services
 
         public int CountNotTrashed(string mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
 
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
 
         public int CountChildren(int parentId, string mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.CountChildren(parentId, mediaTypeAlias);
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Services
 
         public int CountDescendants(int parentId, string mediaTypeAlias = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.CountDescendants(parentId, mediaTypeAlias);
@@ -325,7 +325,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.Get(id);
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Services
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return Enumerable.Empty<IMedia>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.GetMany(idsA);
@@ -356,7 +356,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(Guid key)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.Get(key);
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Services
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return Enumerable.Empty<IMedia>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.GetMany(idsA);
@@ -387,7 +387,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetMediaOfMediaType(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>().Where(x => x.ContentTypeId == id);
@@ -403,7 +403,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
         public IEnumerable<IMedia> GetByLevel(int level)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>().Where(x => x.Level == level && x.Trashed == false);
@@ -418,7 +418,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMedia"/> item</returns>
         public IMedia GetVersion(int versionId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.GetVersion(versionId);
@@ -432,7 +432,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetVersions(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.GetAllVersions(id);
@@ -469,7 +469,7 @@ namespace Umbraco.Core.Services
             if (ids.Any() == false)
                 return new List<IMedia>();
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.GetMany(ids);
@@ -483,7 +483,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>().Where(x => x.ParentId == id);
@@ -528,7 +528,7 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>();
@@ -560,7 +560,7 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
 
@@ -618,7 +618,7 @@ namespace Umbraco.Core.Services
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
 
@@ -645,7 +645,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetDescendants(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var media = GetById(id);
@@ -665,7 +665,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetDescendants(IMedia media)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var pathMatch = media.Path + ",";
@@ -705,7 +705,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetRootMedia()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var query = Query<IMedia>().Where(x => x.ParentId == Constants.System.Root);
@@ -719,7 +719,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetMediaInRecycleBin()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 var bin = $"{Constants.System.Root},{Constants.System.RecycleBinMedia},";
@@ -735,7 +735,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if the media has any children otherwise False</returns>
         public bool HasChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<IMedia>().Where(x => x.ParentId == id);
                 var count = _mediaRepository.Count(query);
@@ -750,7 +750,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetMediaByPath(string mediaPath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _mediaRepository.GetMediaByPath(mediaPath);
             }

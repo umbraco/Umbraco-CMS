@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache
 {
@@ -15,8 +16,8 @@ namespace Umbraco.Core.Cache
     internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options)
-            : base(cache, options)
+        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
+            : base(cache, scopeAccessor, options)
         { }
 
         protected override void InsertEntities(TId[] ids, TEntity[] entities)

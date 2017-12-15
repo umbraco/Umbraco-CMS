@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
         {
             try
             {
-                using (var scope = ScopeProvider.CreateScope(readOnly: true))
+                using (var scope = ScopeProvider.CreateScope(autoComplete: true))
                 {
                     scope.ReadLock(ReadLockIds);
                     ValidateLocked(compo);
@@ -203,7 +203,7 @@ namespace Umbraco.Core.Services
 
         public TItem Get(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Get(id);
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Services
 
         public TItem Get(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Get(alias);
@@ -221,7 +221,7 @@ namespace Umbraco.Core.Services
 
         public TItem Get(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Get(id);
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetAll(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.GetMany(ids);
@@ -239,7 +239,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetAll(params Guid[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.GetMany(ids);
@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
@@ -258,7 +258,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetChildren(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var found = Get(id);
@@ -270,7 +270,7 @@ namespace Umbraco.Core.Services
 
         public bool HasChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
@@ -281,7 +281,7 @@ namespace Umbraco.Core.Services
 
         public bool HasChildren(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var found = Get(id);
@@ -299,7 +299,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public bool HasContainerInPath(string contentPath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // can use same repo for both content and media
                 return Repository.HasContainerInPath(contentPath);
@@ -308,7 +308,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
 
@@ -336,7 +336,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<TItem> GetComposedOf(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
 
@@ -366,7 +366,7 @@ namespace Umbraco.Core.Services
 
         public int Count()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Count(Query<TItem>());
@@ -816,7 +816,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(int containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -826,7 +826,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContainer(Guid containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -836,7 +836,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -860,7 +860,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 

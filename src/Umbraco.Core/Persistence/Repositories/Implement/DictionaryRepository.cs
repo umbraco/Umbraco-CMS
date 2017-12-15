@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger)
         { }
 
-        protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+        protected override IRepositoryCachePolicy<IDictionaryItem, int> CreateCachePolicy()
         {
             var options = new RepositoryCachePolicyOptions
             {
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 GetAllCacheAllowZeroCount = true
             };
 
-            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(runtimeCache, options);
+            return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, int>(GlobalIsolatedCache, ScopeAccessor, options);
         }
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
@@ -333,7 +333,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
             }
 
-            protected override IRepositoryCachePolicy<IDictionaryItem, Guid> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+            protected override IRepositoryCachePolicy<IDictionaryItem, Guid> CreateCachePolicy()
             {
                 var options = new RepositoryCachePolicyOptions
                 {
@@ -341,7 +341,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     GetAllCacheAllowZeroCount = true
                 };
 
-                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(runtimeCache, options);
+                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, Guid>(GlobalIsolatedCache, ScopeAccessor, options);
             }
         }
 
@@ -386,7 +386,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
             }
 
-            protected override IRepositoryCachePolicy<IDictionaryItem, string> CreateCachePolicy(IRuntimeCacheProvider runtimeCache)
+            protected override IRepositoryCachePolicy<IDictionaryItem, string> CreateCachePolicy()
             {
                 var options = new RepositoryCachePolicyOptions
                 {
@@ -394,7 +394,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     GetAllCacheAllowZeroCount = true
                 };
 
-                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(runtimeCache, options);
+                return new SingleItemsOnlyRepositoryCachePolicy<IDictionaryItem, string>(GlobalIsolatedCache, ScopeAccessor, options);
             }
         }
     }

@@ -53,7 +53,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
         public IEnumerable<Stylesheet> GetStylesheets(params string[] names)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _stylesheetRepository.GetMany(names);
             }
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Stylesheet"/> object</returns>
         public Stylesheet GetStylesheetByName(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _stylesheetRepository.Get(name);
             }
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if Stylesheet is valid, otherwise false</returns>
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _stylesheetRepository.ValidateStylesheet(stylesheet);
             }
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetStylesheetFileContentStream(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _stylesheetRepository.GetFileContentStream(filepath);
             }
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Services
 
         public long GetStylesheetFileSize(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _stylesheetRepository.GetFileSize(filepath);
             }
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
         public IEnumerable<Script> GetScripts(params string[] names)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _scriptRepository.GetMany(names);
             }
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Script"/> object</returns>
         public Script GetScriptByName(string name)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _scriptRepository.Get(name);
             }
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateScript(Script script)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _scriptRepository.ValidateScript(script);
             }
@@ -287,7 +287,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetScriptFileContentStream(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _scriptRepository.GetFileContentStream(filepath);
             }
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Services
 
         public long GetScriptFileSize(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _scriptRepository.GetFileSize(filepath);
             }
@@ -384,7 +384,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
             }
@@ -396,7 +396,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
             }
@@ -409,7 +409,7 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
         public ITemplate GetTemplate(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.Get(alias);
             }
@@ -422,7 +422,7 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.Get(id);
             }
@@ -435,7 +435,7 @@ namespace Umbraco.Core.Services
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var query = Query<ITemplate>().Where(x => x.Key == id);
                 return _templateRepository.Get(query).SingleOrDefault();
@@ -444,7 +444,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<ITemplate> GetTemplateDescendants(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetDescendants(alias);
             }
@@ -457,7 +457,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetDescendants(masterTemplateId);
             }
@@ -470,7 +470,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateChildren(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetChildren(alias);
             }
@@ -483,7 +483,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetChildren(masterTemplateId);
             }
@@ -498,7 +498,7 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode GetTemplateNode(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetTemplateNode(alias);
             }
@@ -514,7 +514,7 @@ namespace Umbraco.Core.Services
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.FindTemplateInTree(anyNode, alias);
             }
@@ -585,7 +585,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.DetermineTemplateRenderingEngine(template);
             }
@@ -631,7 +631,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateTemplate(ITemplate template)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.ValidateTemplate(template);
             }
@@ -639,7 +639,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetTemplateFileContentStream(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetFileContentStream(filepath);
             }
@@ -656,7 +656,7 @@ namespace Umbraco.Core.Services
 
         public long GetTemplateFileSize(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetFileSize(filepath);
             }
@@ -702,7 +702,7 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialView(string path)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewRepository.Get(path);
             }
@@ -710,7 +710,7 @@ namespace Umbraco.Core.Services
 
         public IPartialView GetPartialViewMacro(string path)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.Get(path);
             }
@@ -718,7 +718,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.GetMany(names).OrderBy(x => x.Name);
             }
@@ -726,7 +726,7 @@ namespace Umbraco.Core.Services
 
         public IXsltFile GetXsltFile(string path)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _xsltRepository.Get(path);
             }
@@ -734,7 +734,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _xsltRepository.GetMany(names).OrderBy(x => x.Name);
             }
@@ -885,7 +885,7 @@ namespace Umbraco.Core.Services
 
         public bool ValidatePartialView(PartialView partialView)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewRepository.ValidatePartialView(partialView);
             }
@@ -893,7 +893,7 @@ namespace Umbraco.Core.Services
 
         public bool ValidatePartialViewMacro(PartialView partialView)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.ValidatePartialView(partialView);
             }
@@ -920,7 +920,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetPartialViewMacroFileContentStream(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.GetFileContentStream(filepath);
             }
@@ -937,7 +937,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetPartialViewFileContentStream(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewRepository.GetFileContentStream(filepath);
             }
@@ -972,7 +972,7 @@ namespace Umbraco.Core.Services
 
         public long GetPartialViewMacroFileSize(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewMacroRepository.GetFileSize(filepath);
             }
@@ -980,7 +980,7 @@ namespace Umbraco.Core.Services
 
         public long GetPartialViewFileSize(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _partialViewRepository.GetFileSize(filepath);
             }
@@ -1056,7 +1056,7 @@ namespace Umbraco.Core.Services
 
         public Stream GetXsltFileContentStream(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _xsltRepository.GetFileContentStream(filepath);
             }
@@ -1073,7 +1073,7 @@ namespace Umbraco.Core.Services
 
         public long GetXsltFileSize(string filepath)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _xsltRepository.GetFileSize(filepath);
             }

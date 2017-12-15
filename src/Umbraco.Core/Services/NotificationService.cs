@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
         {
-            using (var scope = _uowProvider.CreateScope(readOnly: true))
+            using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
                 return _notificationsRepository.GetUsersNotifications(userIds, action, nodeIds, objectType);
             }
@@ -217,7 +217,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
-            using (var scope = _uowProvider.CreateScope(readOnly: true))
+            using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
                 return _notificationsRepository.GetUserNotifications(user);
             }
@@ -256,7 +256,7 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
-            using (var scope = _uowProvider.CreateScope(readOnly: true))
+            using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
                 return _notificationsRepository.GetEntityNotifications(entity);
             }

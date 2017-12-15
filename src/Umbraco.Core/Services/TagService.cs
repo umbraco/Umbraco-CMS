@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
 
         public TaggedEntity GetTaggedEntityById(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntityById(id);
             }
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
 
         public TaggedEntity GetTaggedEntityByKey(Guid key)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntityByKey(key);
             }
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string tagGroup)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
             }
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
             }
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string tagGroup)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
             }
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
             }
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string tagGroup)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
             }
@@ -122,7 +122,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
             }
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllTags(string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.All, tagGroup);
             }
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllContentTags(string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.Content, tagGroup);
             }
@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllMediaTags(string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.Media, tagGroup);
             }
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllMemberTags(string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForEntityType(TaggableObjectTypes.Member, tagGroup);
             }
@@ -197,7 +197,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
             }
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetTagsForEntity(int contentId, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForEntity(contentId, tagGroup);
             }
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
             }
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string tagGroup = null)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _tagRepository.GetTagsForEntity(contentId, tagGroup);
             }

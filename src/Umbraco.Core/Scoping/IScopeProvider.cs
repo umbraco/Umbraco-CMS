@@ -22,12 +22,15 @@ namespace Umbraco.Core.Scoping
         /// <param name="eventDispatcher">An optional events dispatcher.</param>
         /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
         /// <param name="callContext">A value indicating whether this scope should always be registered in the call context.</param>
+        /// <param name="autoComplete">A value indicating whether this scope is auto-completed.</param>
         /// <returns>The created ambient scope.</returns>
         /// <remarks>
         /// <para>The created scope becomes the ambient scope.</para>
         /// <para>If an ambient scope already exists, it becomes the parent of the created scope.</para>
         /// <para>When the created scope is disposed, the parent scope becomes the ambient scope again.</para>
         /// <para>Parameters must be specified on the outermost scope, or must be compatible with the parents.</para>
+        /// <para>Auto-completed scopes should be used for read-only operations ONLY. Do not use them if you do not
+        /// understand the associated issues, such as the scope being completed even though an exception is thrown.</para>
         /// </remarks>
         IScope CreateScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
@@ -35,7 +38,7 @@ namespace Umbraco.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool readOnly = false); // fixme rename to autoComplete + explain the risks!
+            bool autoComplete = false);
 
         /// <summary>
         /// Creates a detached scope.

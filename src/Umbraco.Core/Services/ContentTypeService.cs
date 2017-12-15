@@ -44,7 +44,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works accross content, media and member types
                 scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works accross content, media and member types
                 scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Beware! Works accross content, media and member types.</remarks>
         public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
         {
-            using (var scope = ScopeProvider.CreateScope(readOnly: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works accross content, media and member types
                 scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);

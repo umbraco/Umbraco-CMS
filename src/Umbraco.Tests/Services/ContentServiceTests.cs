@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Services
     /// as well as configuration.
     /// </summary>
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class ContentServiceTests : TestWithSomeContentBase
     {
         //TODO Add test to verify there is only ONE newest document/content in uDocument table after updating.
@@ -2113,7 +2113,6 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var provider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
 
@@ -2121,10 +2120,9 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            using (var scope = provider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                ContentTypeRepository contentTypeRepository;
-                var repository = CreateRepository(provider, out contentTypeRepository);
+                var repository = CreateRepository(ScopeProvider, out _);
 
                 foreach (var content in list)
                 {
