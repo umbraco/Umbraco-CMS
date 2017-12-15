@@ -11,7 +11,7 @@
            <umb-editor-sub-header-content-left>
 
                <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && currentNodePermissions.canCreate">
-                   <div class="btn-group" ng-show="listViewAllowedTypes.length > 1">
+                   <div class="btn-group btn-success" ng-show="listViewAllowedTypes.length > 1">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
@@ -26,7 +26,7 @@
                        </ul>
                    </div>
                    <div class="btn-group" ng-show="listViewAllowedTypes.length === 1">
-                       <a class="btn" href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{listViewAllowedTypes[0].alias}}&create=true">
+                       <a class="btn btn-success" href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{listViewAllowedTypes[0].alias}}&create=true">
                            <i class="icon-{{listViewAllowedTypes[0].cssClass}}"></i>
                            <localize key="actions_create">Create</localize> {{ listViewAllowedTypes[0].name }}
                        </a>
