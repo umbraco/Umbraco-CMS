@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models
 
         private List<PropertyValue> _values = new List<PropertyValue>();
         private PropertyValue _pvalue;
-        private Dictionary<(int?, string), PropertyValue> _vvalues;
+        private Dictionary<CompositeKey, PropertyValue> _vvalues;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -47,6 +47,33 @@ namespace Umbraco.Core.Models
 
             public PropertyValue Clone()
                 => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
+        }
+
+        private struct CompositeKey : IEquatable<CompositeKey>
+        {
+            private readonly int _key1;
+            private readonly string _key2;
+
+            public CompositeKey(int? key1, string key2)
+            {
+                _key1 = key1 ?? -1;
+                _key2 = key2;
+            }
+
+            public bool Equals(CompositeKey other)
+                => _key2 == other._key2 && _key1 == other._key1;
+
+            public override bool Equals(object obj)
+                => obj is CompositeKey other && _key2 == other._key2 && _key1 == other._key1;
+
+            public override int GetHashCode()
+                => _key2.GetHashCode() * 31 + _key1;
+
+            public static bool operator ==(CompositeKey key1, CompositeKey key2)
+                => key1._key2 == key2._key2 && key1._key1 == key2._key1;
+
+            public static bool operator !=(CompositeKey key1, CompositeKey key2)
+                => key1._key2 != key2._key2 || key1._key1 != key2._key1;
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -95,7 +122,7 @@ namespace Umbraco.Core.Models
                 _values = value.Where(x => _propertyType.ValidateVariation(x.LanguageId, x.Segment, false)).ToList();
                 _pvalue = _values.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
                 _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
-                    ? _values.Where(x => x != _pvalue).ToDictionary(x => (x.LanguageId, x.Segment), x => x)
+                    ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeKey(x.LanguageId, x.Segment), x => x)
                     : null;
             }
         }
@@ -139,7 +166,7 @@ namespace Umbraco.Core.Models
             if (!_propertyType.ValidateVariation(languageId, segment, false)) return null;
             if (!languageId.HasValue && segment == null) return GetPropertyValue(_pvalue, published);
             if (_vvalues == null) return null;
-            return _vvalues.TryGetValue((languageId, segment), out var pvalue)
+            return _vvalues.TryGetValue(new CompositeKey(languageId, segment), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
                 : null;
         }
@@ -316,13 +343,14 @@ namespace Umbraco.Core.Models
             if (_vvalues == null)
             {
                 if (!create) return (null, false);
-                _vvalues = new Dictionary<(int?, string), PropertyValue>();
+                _vvalues = new Dictionary<CompositeKey, PropertyValue>();
                 change = true;
             }
-            if (!_vvalues.TryGetValue((languageId, segment), out var pvalue))
+            var k = new CompositeKey(languageId, segment);
+            if (!_vvalues.TryGetValue(k, out var pvalue))
             {
                 if (!create) return (null, false);
-                pvalue = _vvalues[(languageId, segment)] = new PropertyValue();
+                pvalue = _vvalues[k] = new PropertyValue();
                 pvalue.LanguageId = languageId;
                 pvalue.Segment = segment;
                 _values.Add(pvalue);
