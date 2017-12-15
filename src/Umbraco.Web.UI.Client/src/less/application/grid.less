@@ -63,7 +63,7 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 #contentwrapper {
-    top: 60px;
+    top: @appHeaderHeight;
 }
 
 #umb-notifications-wrapper {
@@ -87,7 +87,6 @@ body.umb-drawer-is-visible #mainwrapper{
   z-index: 1100;
   float: left;
   position: absolute;
-  top: 60px;
 }
 
 #search-form {
@@ -121,6 +120,7 @@ body.umb-drawer-is-visible #mainwrapper{
     #search-form .form-search {
         width: calc(100% - 80px);
     }
+  top: @appHeaderHeight;
 }
 
 #navigation {
