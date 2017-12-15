@@ -993,8 +993,7 @@ namespace Umbraco.Core.Services
                     FROM umbracoNode
                     JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
-                    true, false, ids);
-                Console.WriteLine(sql.SQL);
+                    true, false, ids);                    
                 var x = uow.Database.Fetch<int>(sql);
                 return ids.Length == x.Count;
             }
