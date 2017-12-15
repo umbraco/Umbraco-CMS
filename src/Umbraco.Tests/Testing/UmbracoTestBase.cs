@@ -294,9 +294,6 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
             Container.RegisterSingleton(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
-            Container.RegisterSingleton(factory
-                => TestObjects.GetScopeUnitOfWorkProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<IUmbracoDatabaseFactory>(),
-                    factory.TryGetInstance<RepositoryFactory>(), factory.TryGetInstance<IScopeProvider>()));
 
             Container.RegisterFrom<ServicesCompositionRoot>();
             // composition root is doing weird things, fix

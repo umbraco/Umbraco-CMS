@@ -6,12 +6,12 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 using LightInject;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -57,38 +57,37 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IDataTypeDefinitionRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        private IDataTypeDefinitionRepository CreateRepository()
         {
-            return Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+            return Container.GetInstance<IDataTypeDefinitionRepository>();
         }
 
-        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
+        private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, Constants.ObjectTypes.DataTypeContainer);
+            return new EntityContainerRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, Constants.ObjectTypes.DataTypeContainer);
         }
 
         [Test]
         public void Can_Move()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
-                var repository = CreateRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(accessor);
+                var repository = CreateRepository();
                 var container1 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah1" };
                 containerRepository.Save(container1);
-                unitOfWork.Flush();
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
-                unitOfWork.Flush();
 
                 var dataType = (IDataTypeDefinition)new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt1"
                 };
                 repository.Save(dataType);
-                unitOfWork.Flush();
 
                 //create a
                 var dataType2 = (IDataTypeDefinition)new DataTypeDefinition(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
@@ -96,10 +95,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Name = "dt2"
                 };
                 repository.Save(dataType2);
-                unitOfWork.Flush();
 
                 var result = repository.Move(dataType, container1).ToArray();
-                unitOfWork.Flush();
 
                 Assert.AreEqual(2, result.Count());
 
@@ -111,19 +108,20 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType.Id).OriginalPath, dataType.Path);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType2.Id).OriginalPath, dataType2.Path);
             }
-
         }
 
         [Test]
         public void Can_Create_Container()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(accessor);
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
+
                 Assert.That(container.Id, Is.GreaterThan(0));
 
                 var found = containerRepository.Get(container.Id);
@@ -134,17 +132,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(accessor);
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -154,18 +152,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Data_Types()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
-                var repository = CreateRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(accessor);
+                var repository = CreateRepository();
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
 
                 var dataTypeDefinition = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataTypeDefinition);
-                unitOfWork.Flush();
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
             }
@@ -174,22 +172,21 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Data_Types()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
-                var repository = CreateRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(accessor);
+                var repository = CreateRepository();
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
 
                 IDataTypeDefinition dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataType);
-                unitOfWork.Flush();
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Flush();
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -203,15 +200,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
 
                 repository.Save(dataTypeDefinition);
 
-                unitOfWork.Flush();
                 var id = dataTypeDefinition.Id;
                 Assert.That(id, Is.GreaterThan(0));
 
@@ -228,11 +226,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 // Act
                 var dataTypeDefinition = repository.Get(-42);
 
@@ -246,11 +245,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetAll_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
 
                 // Act
                 var dataTypeDefinitions = repository.GetMany();
@@ -266,11 +266,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetAll_With_Params_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
 
                 // Act
                 var dataTypeDefinitions = repository.GetMany(-40, -41, -42);
@@ -286,14 +287,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_GetByQuery_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
+                var query = scope.SqlContext.Query<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
                 var result = repository.Get(query);
 
                 // Assert
@@ -306,14 +308,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Count_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<IDataTypeDefinition>().Where(x => x.Name.StartsWith("D"));
+                var query = scope.SqlContext.Query<IDataTypeDefinition>().Where(x => x.Name.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -324,11 +327,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Add_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
                 {
                     DatabaseType = DataTypeDatabaseType.Integer,
@@ -338,7 +342,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(dataTypeDefinition);
-                unitOfWork.Flush();
+
                 var exists = repository.Exists(dataTypeDefinition.Id);
 
                 var fetched = repository.Get(dataTypeDefinition.Id);
@@ -354,11 +358,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Update_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 var dataTypeDefinition = new DataTypeDefinition("Test.blah")
                 {
                     DatabaseType = DataTypeDatabaseType.Integer,
@@ -366,14 +371,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CreatorId = 0
                 };
                 repository.Save(dataTypeDefinition);
-                unitOfWork.Flush();
 
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
                 definition.PropertyEditorAlias = "Test.TestEditor"; //change
                 repository.Save(definition);
-                unitOfWork.Flush();
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
 
@@ -387,11 +390,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Delete_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
                 {
                     DatabaseType = DataTypeDatabaseType.Integer,
@@ -401,11 +405,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(dataTypeDefinition);
-                unitOfWork.Flush();
+
                 var existsBefore = repository.Exists(dataTypeDefinition.Id);
 
                 repository.Delete(dataTypeDefinition);
-                unitOfWork.Flush();
 
                 var existsAfter = repository.Exists(dataTypeDefinition.Id);
 
@@ -418,11 +421,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Exists_On_DataTypeDefinitionRepository()
         {
-            // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
 
                 // Act
                 var exists = repository.Exists(1046); //Content picker
@@ -437,17 +441,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataTypeDefinition);
-                unitOfWork.Flush();
+
                 var dtid = dataTypeDefinition.Id;
 
-                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
-                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+                scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1"});
+                scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
 
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtid);
                 Assert.AreEqual(2, collection.PreValuesAsArray.Count());
@@ -457,17 +463,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository();
                 var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataTypeDefinition);
-                unitOfWork.Flush();
+
                 var dtid = dataTypeDefinition.Id;
 
-                var id = unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
-                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
+                var id = scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 0, Value = "test1" });
+                scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtid, SortOrder = 1, Value = "test2" });
 
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);
@@ -477,17 +485,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection_With_Cache()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             DataTypeDefinition dtd;
-            using (var unitOfWork = provider.CreateUnitOfWork())
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                var repository = Container.GetInstance<IDataTypeDefinitionRepository>();
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dtd);
-                unitOfWork.Flush();
 
-                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-                unitOfWork.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
                 //this will cache the result
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
@@ -507,18 +517,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String_With_Cache()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
             DataTypeDefinition dtd;
             object id;
-            using (var unitOfWork = provider.CreateUnitOfWork())
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var accessor = (IScopeAccessor) provider;
+
+            using (var scope = provider.CreateScope())
             {
-                var repository = Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                var repository = Container.GetInstance<IDataTypeDefinitionRepository>();
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dtd);
-                unitOfWork.Flush();
 
-                id = unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
-                unitOfWork.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
+                id = scope.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
+                scope.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
                 //this will cache the result
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
@@ -534,9 +546,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual(1, cached.Count());
             Assert.AreEqual(2, cached.Single().FormatAsDictionary().Count);
 
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repository = Container.GetInstance<IScopeUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
+                var repository = Container.GetInstance<IDataTypeDefinitionRepository>();
                 //ensure it still gets resolved!
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);

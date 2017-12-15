@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -20,15 +21,15 @@ namespace Umbraco.Tests.Services
         {
             base.CreateTestData();
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
                 repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
                 repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
                 repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
-                unitOfWork.Complete();
+                scope.Complete();
             }
         }
 

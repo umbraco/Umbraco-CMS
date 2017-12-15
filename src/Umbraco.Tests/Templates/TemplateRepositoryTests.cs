@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Templates
@@ -31,11 +31,13 @@ namespace Umbraco.Tests.Templates
         {
             var logger = Mock.Of<ILogger>();
 
-            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
+            var accessorMock = new Mock<IScopeAccessor>();
+            var scopeMock = new Mock<IScope>();
             var database = TestObjects.GetUmbracoSqlCeDatabase(logger);
-            unitOfWorkMock.Setup(x => x.Database).Returns(database);
+            scopeMock.Setup(x => x.Database).Returns(database);
+            accessorMock.Setup(x => x.AmbientScope).Returns(scopeMock.Object);
 
-            _templateRepository = new TemplateRepository(unitOfWorkMock.Object, _cacheMock.Object, logger, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object);
+            _templateRepository = new TemplateRepository(accessorMock.Object, _cacheMock.Object, logger, _templateConfigMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object);
 
         }
 

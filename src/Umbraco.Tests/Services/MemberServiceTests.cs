@@ -1182,7 +1182,7 @@ namespace Umbraco.Tests.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
+                Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(customMember.Id));
             }
         }
     }

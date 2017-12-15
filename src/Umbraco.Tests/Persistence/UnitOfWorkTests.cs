@@ -13,10 +13,10 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ReadLockNonExisting()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
             Assert.Throws<Exception>(() =>
             {
-                using (var uow = provider.CreateUnitOfWork())
+                using (var scope = provider.CreateScope())
                 {
                     scope.ReadLock(-666);
                     scope.Complete();
@@ -27,8 +27,8 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void ReadLockExisting()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var uow = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 scope.ReadLock(Constants.Locks.Servers);
                 scope.Complete();
@@ -38,10 +38,10 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void WriteLockNonExisting()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
             Assert.Throws<Exception>(() =>
             {
-                using (var uow = provider.CreateUnitOfWork())
+                using (var scope = provider.CreateScope())
                 {
                     scope.WriteLock(-666);
                     scope.Complete();
@@ -52,8 +52,8 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void WriteLockExisting()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var uow = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.Servers);
                 scope.Complete();

@@ -6,7 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -17,9 +17,9 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TagRepositoryTest : TestWithDatabaseBase
     {
-        private TagRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        private TagRepository CreateRepository(IScopeProvider provider)
         {
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
+            var tagRepository = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
             return tagRepository;
         }
 
@@ -27,10 +27,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var tag = new Tag()
                     {
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(tag);
-                unitOfWork.Flush();
+                
 
                 // Assert
                 Assert.That(tag.HasIdentity, Is.True);
@@ -51,10 +51,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Multiple_Adds_On_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var tag = new Tag()
                     {
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 repository.Save(tag);
-                unitOfWork.Flush();
+                
 
                 var tag2 = new Tag()
                     {
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         Text = "Test2"
                     };
                 repository.Save(tag2);
-                unitOfWork.Flush();
+                
 
                 // Assert
                 Assert.That(tag.HasIdentity, Is.True);
@@ -85,22 +85,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
@@ -117,22 +117,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Append_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
@@ -158,22 +158,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Replace_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
@@ -202,22 +202,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Merge_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
@@ -244,22 +244,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Clear_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
@@ -282,22 +282,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Remove_Specific_Tags_From_Property()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content.Id,
                     contentType.PropertyTypes.First().Id,
@@ -328,24 +328,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_By_Id()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -374,24 +374,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_By_Key()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -421,24 +421,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -458,24 +458,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_All_With_Ids()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 var tags = new[]
                 {
                     new Tag {Text = "tag1", Group = "test"},
@@ -500,24 +500,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Content_For_Group()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -546,22 +546,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_By_Id()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -593,22 +593,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_By_Key()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -639,22 +639,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Property_For_Group()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -686,30 +686,30 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Entity_Type()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
+                var mediaRepository = CreateMediaRepository(provider, out mediaTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.Save(mediaType);
-                unitOfWork.Flush();
+                
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.Save(media1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -746,30 +746,30 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
+                var mediaRepository = CreateMediaRepository(provider, out mediaTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.Save(mediaType);
-                unitOfWork.Flush();
+                
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.Save(media1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -801,22 +801,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Cascade_Deletes_Tag_Relations()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -830,9 +830,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 contentRepository.Delete(content1);
 
-                unitOfWork.Flush();
+                
 
-                Assert.AreEqual(0, unitOfWork.Database.ExecuteScalar<int>(
+                Assert.AreEqual(0, scope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
             }
@@ -841,36 +841,36 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
+                var mediaRepository = CreateMediaRepository(provider, out mediaTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.Save(mediaType);
-                unitOfWork.Flush();
+                
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.Save(media1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -927,36 +927,36 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Tagged_Entities_For_Tag()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 MediaTypeRepository mediaTypeRepository;
                 ContentTypeRepository contentTypeRepository;
-                var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository);
-                var mediaRepository = CreateMediaRepository(unitOfWork, out mediaTypeRepository);
+                var contentRepository = CreateContentRepository(provider, out contentTypeRepository);
+                var mediaRepository = CreateMediaRepository(provider, out mediaTypeRepository);
 
                 //create data to relate to
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
                 contentTypeRepository.Save(contentType);
-                unitOfWork.Flush();
+                
 
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content1);
-                unitOfWork.Flush();
+                
 
                 var content2 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.Save(content2);
-                unitOfWork.Flush();
+                
 
                 var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.Save(mediaType);
-                unitOfWork.Flush();
+                
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
                 mediaRepository.Save(media1);
-                unitOfWork.Flush();
+                
 
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
                 repository.AssignTagsToProperty(
                     content1.Id,
                     contentType.PropertyTypes.First().Id,
@@ -1006,20 +1006,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private DocumentRepository CreateContentRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateContentRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-            var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var accessor = (IScopeAccessor) provider;
+            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
+            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
-        private MediaRepository CreateMediaRepository(IScopeUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
+        private MediaRepository CreateMediaRepository(IScopeProvider provider, out MediaTypeRepository mediaTypeRepository)
         {
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, DisabledCache, Logger);
-            var repository = new MediaRepository(unitOfWork, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            var accessor = (IScopeAccessor) provider;
+            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
+            mediaTypeRepository = new MediaTypeRepository(accessor, DisabledCache, Logger);
+            var repository = new MediaRepository(accessor, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

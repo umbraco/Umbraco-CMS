@@ -5,7 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -18,10 +18,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var created = DateTime.Now;
                 var task = new Task(new TaskType("asdfasdf"))
@@ -33,10 +33,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                     OwnerUserId = 0
                 };
                 repo.Save(task);
-                unitOfWork.Flush();
+                
 
                 repo.Delete(task);
-                unitOfWork.Flush();
+                
 
                 task = repo.Get(task.Id);
                 Assert.IsNull(task);
@@ -46,10 +46,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Add()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var created = DateTime.Now;
                 repo.Save(new Task(new TaskType("asdfasdf"))
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     EntityId = -1,
                     OwnerUserId = 0
                 });
-                unitOfWork.Flush();
+                
 
                 var found = repo.GetMany().ToArray();
 
@@ -79,10 +79,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Update()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repo.Save(task);
-                unitOfWork.Flush();
+                
 
                 //re-get
                 task = repo.Get(task.Id);
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 task.Closed = true;
 
                 repo.Save(task);
-                unitOfWork.Flush();
+                
 
                 //re-get
                 task = repo.Get(task.Id);
@@ -116,10 +116,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_By_Id()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
 
                 repo.Save(task);
-                unitOfWork.Flush();
+                
 
                 //re-get
                 task = repo.Get(task.Id);
@@ -145,10 +145,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestData(false, 20);
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var found = repo.GetMany().ToArray();
                 Assert.AreEqual(20, found.Count());
@@ -161,10 +161,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var found = repo.GetTasks(includeClosed: true).ToArray();
                 Assert.AreEqual(15, found.Count());
@@ -177,10 +177,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10, -20);
             CreateTestData(false, 5, -21);
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var found = repo.GetTasks(itemId:-20).ToArray();
                 Assert.AreEqual(10, found.Count());
@@ -193,10 +193,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var found = repo.GetTasks(includeClosed: false);
                 Assert.AreEqual(10, found.Count());
@@ -205,10 +205,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private void CreateTestData(bool closed, int count, int entityId = -1)
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 for (int i = 0; i < count; i++)
                 {
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     });
                 }
 
-                unitOfWork.Complete();
+                scope.Complete();
             }
         }
     }

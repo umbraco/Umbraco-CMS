@@ -79,10 +79,10 @@ namespace Umbraco.Tests.Scoping
                 runtimeStateMock.Object,
                 ServiceContext,
                 contentTypeFactory,
-                UowProvider,
                 publishedSnapshotAccessor,
                 Logger,
-                ScopeProvider);
+                ScopeProvider,
+                null, null, null);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

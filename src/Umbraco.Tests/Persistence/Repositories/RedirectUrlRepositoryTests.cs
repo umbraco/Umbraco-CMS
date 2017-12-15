@@ -5,7 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -26,11 +26,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGet()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -42,9 +42,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurl = repo.GetMostRecentUrl("blah");
                 scope.Complete();
 
@@ -56,13 +56,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetMostRecent()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
             Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -90,9 +90,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurl = repo.GetMostRecentUrl("blah");
                 scope.Complete();
 
@@ -104,11 +104,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndGetByContent()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -133,9 +133,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
                 scope.Complete();
 
@@ -148,11 +148,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void CanSaveAndDelete()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
+            var provider = TestObjects.GetScopeProvider(Logger);
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 var rurl = new RedirectUrl
                 {
                     ContentKey = _textpage.Key,
@@ -174,9 +174,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreNotEqual(0, rurl.Id);
             }
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
-                var repo = CreateRepository(uow);
+                var repo = CreateRepository(provider);
                 repo.DeleteContentUrls(_textpage.Key);
                 scope.Complete();
 
@@ -186,9 +186,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IRedirectUrlRepository CreateRepository(IScopeUnitOfWork uow)
+        private IRedirectUrlRepository CreateRepository(IScopeProvider provider)
         {
-            return new RedirectUrlRepository(uow, CacheHelper, Logger);
+            return new RedirectUrlRepository((IScopeAccessor) provider, CacheHelper, Logger);
         }
 
         private IContent _textpage, _subpage, _otherpage, _trashed;

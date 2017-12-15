@@ -9,7 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -27,10 +27,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private RelationRepository CreateRepository(IScopeUnitOfWork unitOfWork, out RelationTypeRepository relationTypeRepository)
+        private RelationRepository CreateRepository(IScopeProvider provider, out RelationTypeRepository relationTypeRepository)
         {
-            relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
-            var repository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository);
+            var accessor = (IScopeAccessor) provider;
+            relationTypeRepository = new RelationTypeRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            var repository = new RelationRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository);
             return repository;
         }
 
@@ -38,17 +39,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var relationType = repositoryType.Get(1);
                 var relation = new Relation(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3, relationType);
                 repository.Save(relation);
-                unitOfWork.Flush();
+                
 
                 // Assert
                 Assert.That(relation, Is.Not.Null);
@@ -60,17 +61,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var relation = repository.Get(1);
                 relation.Comment = "This relation has been updated";
                 repository.Save(relation);
-                unitOfWork.Flush();
+                
 
                 var relationUpdated = repository.Get(1);
 
@@ -85,16 +86,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var relation = repository.Get(2);
                 repository.Delete(relation);
-                unitOfWork.Flush();
+                
 
                 var exists = repository.Exists(2);
 
@@ -107,11 +108,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var relation = repository.Get(1);
@@ -129,11 +130,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var relations = repository.GetMany();
@@ -150,11 +151,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var relations = repository.GetMany(1, 2);
@@ -171,11 +172,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
                 var exists = repository.Exists(2);
@@ -191,14 +192,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<IRelation>().Where(x => x.ParentId == NodeDto.NodeIdSeed + 2);
+                var query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == NodeDto.NodeIdSeed + 2);
                 int count = repository.Count(query);
 
                 // Assert
@@ -210,14 +211,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_RelationRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<IRelation>().Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
+                var query = scope.SqlContext.Query<IRelation>().Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
                 var relations = repository.Get(query);
 
                 // Assert
@@ -232,11 +233,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Content_And_Verify_Relation_Is_Removed()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
                 RelationTypeRepository repositoryType;
-                var repository = CreateRepository(unitOfWork, out repositoryType);
+                var repository = CreateRepository(provider, out repositoryType);
 
                 var content = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 3);
                 ServiceContext.ContentService.Delete(content, 0);
@@ -262,15 +263,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relateContent = new RelationType(Constants.ObjectTypes.Document, new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
             var relateContentType = new RelationType(Constants.ObjectTypes.DocumentType, new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
-                var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository);
+                var relationTypeRepository = new RelationTypeRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+                var relationRepository = new RelationRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), relationTypeRepository);
 
                 relationTypeRepository.Save(relateContent);
                 relationTypeRepository.Save(relateContentType);
-                unitOfWork.Flush();
+                
 
                 //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
                 ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
@@ -293,7 +294,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var relation2 = new Relation(textpage.Id, subpage2.Id, relateContent) { Comment = string.Empty };
                 relationRepository.Save(relation);
                 relationRepository.Save(relation2);
-                unitOfWork.Complete();
+                scope.Complete();
             }
         }
     }

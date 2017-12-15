@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -17,12 +17,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
                 var taskType = new TaskType("asdfasdf");
-                var repo = new TaskRepository(unitOfWork, CacheHelper, Logger);
-                var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var taskTypeRepo = new TaskTypeRepository((IScopeAccessor) provider, CacheHelper, Logger);
 
                 var created = DateTime.Now;
                 var task = new Task(taskType)
@@ -34,12 +34,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                     OwnerUserId = 0
                 };
                 repo.Save(task);
-                unitOfWork.Flush();
-
+                
                 var alltasktypes = taskTypeRepo.GetMany();
 
                 taskTypeRepo.Delete(taskType);
-                unitOfWork.Flush();
 
                 Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetMany().Count());
                 Assert.AreEqual(0, repo.GetMany().Count());

@@ -7,7 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -18,38 +18,38 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MediaTypeRepositoryTest : TestWithDatabaseBase
     {
-        private MediaTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        private MediaTypeRepository CreateRepository(IScopeProvider provider)
         {
-            return new MediaTypeRepository(unitOfWork, DisabledCache, Logger);
+            return new MediaTypeRepository((IScopeAccessor) provider, DisabledCache, Logger);
         }
 
-        private EntityContainerRepository CreateContainerRepository(IScopeUnitOfWork unitOfWork)
+        private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
         {
-            return new EntityContainerRepository(unitOfWork, DisabledCache, Logger, Constants.ObjectTypes.MediaTypeContainer);
+            return new EntityContainerRepository((IScopeAccessor) provider, DisabledCache, Logger, Constants.ObjectTypes.MediaTypeContainer);
 
         }
 
         [Test]
         public void Can_Move()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
-                var repository = CreateRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(provider);
+                var repository = CreateRepository(provider);
 
                 var container1 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah1" };
                 containerRepository.Save(container1);
-                unitOfWork.Flush();
+                
 
                 var container2 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
-                unitOfWork.Flush();
+                
 
                 var contentType = (IMediaType)MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container2.Id;
                 repository.Save(contentType);
-                unitOfWork.Flush();
+                
 
                 //create a
                 var contentType2 = (IMediaType)new MediaType(contentType, "hello")
@@ -58,10 +58,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 };
                 contentType.ParentId = contentType.Id;
                 repository.Save(contentType2);
-                unitOfWork.Flush();
+                
 
                 var result = repository.Move(contentType, container1).ToArray();
-                unitOfWork.Flush();
+                
 
                 Assert.AreEqual(2, result.Length);
 
@@ -79,14 +79,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(provider);
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
+                
                 Assert.That(container.Id, Is.GreaterThan(0));
 
                 var found = containerRepository.Get(container.Id);
@@ -97,19 +97,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(provider);
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
+                
                 Assert.That(container.Id, Is.GreaterThan(0));
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Flush();
+                
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -119,20 +119,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Create_Container_Containing_Media_Types()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
-                var repository = CreateRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(provider);
+                var repository = CreateRepository(provider);
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
+                
 
                 var contentType = MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
-                unitOfWork.Flush();
+                
 
                 Assert.AreEqual(container.Id, contentType.ParentId);
             }
@@ -141,24 +141,24 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete_Container_Containing_Media_Types()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var containerRepository = CreateContainerRepository(unitOfWork);
-                var repository = CreateRepository(unitOfWork);
+                var containerRepository = CreateContainerRepository(provider);
+                var repository = CreateRepository(provider);
 
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
-                unitOfWork.Flush();
+                
 
                 IMediaType contentType = MockedContentTypes.CreateVideoMediaType();
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
-                unitOfWork.Flush();
+                
 
                 // Act
                 containerRepository.Delete(container);
-                unitOfWork.Flush();
+                
 
                 var found = containerRepository.Get(container.Id);
                 Assert.IsNull(found);
@@ -173,15 +173,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var contentType = MockedContentTypes.CreateVideoMediaType();
                 repository.Save(contentType);
-                unitOfWork.Flush();
+                
 
                 var fetched = repository.Get(contentType.Id);
 
@@ -201,14 +201,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var videoMediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.Save(videoMediaType);
-                unitOfWork.Flush();
+                
 
                 // Act
                 var mediaType = repository.Get(NodeDto.NodeIdSeed);
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                         DataTypeDefinitionId = -88
                     });
                 repository.Save(mediaType);
-                unitOfWork.Flush();
+                
 
                 var dirty = ((MediaType) mediaType).IsDirty();
 
@@ -239,19 +239,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.Save(mediaType);
-                unitOfWork.Flush();
+                
 
                 var contentType2 = repository.Get(mediaType.Id);
                 repository.Delete(contentType2);
-                unitOfWork.Flush();
+                
 
                 var exists = repository.Exists(mediaType.Id);
 
@@ -264,10 +264,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var mediaType = repository.Get(1033); //File
@@ -283,10 +283,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_By_Guid_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var mediaType = repository.Get(1033); //File
 
@@ -304,15 +304,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var mediaTypes = repository.GetMany();
                 int count =
-                    unitOfWork.Database.ExecuteScalar<int>(
+                    scope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
@@ -326,10 +326,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Guid_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
 
@@ -338,7 +338,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetMany(allGuidIds);
 
                 int count =
-                    unitOfWork.Database.ExecuteScalar<int>(
+                    scope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
@@ -352,10 +352,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_MediaTypeRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var exists = repository.Exists(1032); //Image
@@ -369,20 +369,20 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_MediaType_With_PropertyType_Removed()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.Save(mediaType);
-                unitOfWork.Flush();
+                
 
                 // Act
                 var mediaTypeV2 = repository.Get(NodeDto.NodeIdSeed);
                 mediaTypeV2.PropertyGroups["Media"].PropertyTypes.Remove("title");
                 repository.Save(mediaTypeV2);
-                unitOfWork.Flush();
+                
 
                 var mediaTypeV3 = repository.Get(NodeDto.NodeIdSeed);
 
@@ -397,14 +397,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_Video_MediaType()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var mediaType = MockedContentTypes.CreateVideoMediaType();
                 repository.Save(mediaType);
-                unitOfWork.Flush();
+                
 
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed);
@@ -419,10 +419,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_File_MediaType()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var contentType = repository.Get(1033); //File

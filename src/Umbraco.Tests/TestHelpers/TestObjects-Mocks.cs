@@ -9,7 +9,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -75,14 +74,6 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IDomainService>(),
                 MockService<ITaskService>(),
                 MockService<IMacroService>());
-        }
-
-        public static IScopeUnitOfWork GetUnitOfWorkMock()
-        {
-            var unitOfWorkMock = new Mock<IScopeUnitOfWork>();
-            unitOfWorkMock.Setup(x => x.Messages).Returns(() => new EventMessages());
-            unitOfWorkMock.Setup(x => x.Events).Returns(() => new PassThroughEventDispatcher());
-            return unitOfWorkMock.Object;
         }
 
         private T MockService<T>(IServiceFactory container = null)

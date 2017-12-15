@@ -9,7 +9,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -123,7 +122,7 @@ namespace Umbraco.Tests.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
+                Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(media.Id));
             }
         }
 

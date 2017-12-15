@@ -4,6 +4,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sp = TestObjects.GetScopeProvider(Logger);
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository(sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
                 repo.Save(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
 
                 var dtos = scope.Database.Fetch<LogDto>("WHERE id > -1");

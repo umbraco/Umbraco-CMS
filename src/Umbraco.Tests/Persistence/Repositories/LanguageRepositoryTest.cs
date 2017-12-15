@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -28,9 +28,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private LanguageRepository CreateRepository(IScopeUnitOfWork unitOfWork)
+        private LanguageRepository CreateRepository(IScopeProvider provider)
         {
-            return new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+            return new LanguageRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
 
 
@@ -39,11 +39,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                unitOfWork.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                var repository = CreateRepository(unitOfWork);
+                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                var repository = CreateRepository(provider);
 
                 // Act
                 var language = repository.Get(1);
@@ -59,10 +59,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
@@ -70,7 +70,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CultureName = au.DisplayName
                 };
                 repository.Save(language);
-                unitOfWork.Flush();
 
                 //re-get
                 language = repository.GetByIsoCode(au.Name);
@@ -86,10 +85,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 var au = CultureInfo.GetCultureInfo("en-AU");
                 var language = (ILanguage)new Language(au.Name)
@@ -97,7 +96,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                     CultureName = au.DisplayName
                 };
                 repository.Save(language);
-                unitOfWork.Flush();
 
                 //re-get
                 language = repository.GetByCultureName(au.DisplayName);
@@ -114,10 +112,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_WhenIdDoesntExist_ReturnsNull()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var language = repository.Get(0);
@@ -131,10 +129,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var languages = repository.GetMany();
@@ -151,10 +149,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var languages = repository.GetMany(1, 2);
@@ -171,13 +169,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
+                var query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
                 var result = repository.Get(query);
 
                 // Assert
@@ -191,13 +189,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
-                var query = unitOfWork.SqlContext.Query<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
+                var query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -209,15 +207,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var languageBR = new Language("pt-BR") {CultureName = "pt-BR"};
                 repository.Save(languageBR);
-                unitOfWork.Flush();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
@@ -229,10 +226,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var language = repository.Get(5);
@@ -240,7 +237,6 @@ namespace Umbraco.Tests.Persistence.Repositories
                 language.CultureName = "pt-BR";
 
                 repository.Save(language);
-                unitOfWork.Flush();
 
                 var languageUpdated = repository.Get(5);
 
@@ -255,15 +251,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var language = repository.Get(3);
                 repository.Delete(language);
-                unitOfWork.Flush();
 
                 var exists = repository.Exists(3);
 
@@ -276,10 +271,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_LanguageRepository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository(unitOfWork);
+                var repository = CreateRepository(provider);
 
                 // Act
                 var exists = repository.Exists(3);

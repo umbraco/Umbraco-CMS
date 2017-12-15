@@ -14,7 +14,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -52,8 +51,6 @@ namespace Umbraco.Tests.TestHelpers
         private static byte[] _databaseBytes;
 
         protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
-
-        protected IScopeUnitOfWorkProvider UowProvider => Current.Container.GetInstance<IScopeUnitOfWorkProvider>();
 
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 
@@ -260,8 +257,9 @@ namespace Umbraco.Tests.TestHelpers
                 Current.Services,
                 Container.GetInstance<IPublishedContentTypeFactory>(),
                 (ScopeProvider) Current.ScopeProvider,
-                UowProvider,
-                cache, publishedSnapshotAccessor, Current.Logger, ContentTypesCache, null, true, Options.PublishedRepositoryEvents);
+                cache, publishedSnapshotAccessor,
+                null, null, null,
+                Current.Logger, ContentTypesCache, null, true, Options.PublishedRepositoryEvents);
 
             // initialize PublishedCacheService content with an Xml source
             service.XmlStore.GetXmlDocument = () =>

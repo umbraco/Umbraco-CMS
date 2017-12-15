@@ -14,12 +14,12 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using LightInject;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
@@ -1202,10 +1202,9 @@ namespace Umbraco.Tests.Services
             content.PublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Logger);
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+                Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(content.Id));
             }
 
             // Act
@@ -1216,9 +1215,9 @@ namespace Umbraco.Tests.Services
             Assert.That(unpublished.Success, Is.True);
             Assert.That(content.Published, Is.False);
 
-            using (var uow = provider.CreateUnitOfWork())
+            using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+                Assert.IsFalse(scope.Database.Exists<ContentXmlDto>(content.Id));
             }
         }
 
@@ -2114,7 +2113,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-            var provider = TestObjects.GetScopeUnitOfWorkProvider(Mock.Of<ILogger>());
+            var provider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
 
@@ -2122,15 +2121,14 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            using (var unitOfWork = provider.CreateUnitOfWork())
+            using (var scope = provider.CreateScope())
             {
                 ContentTypeRepository contentTypeRepository;
-                var repository = CreateRepository(unitOfWork, out contentTypeRepository);
+                var repository = CreateRepository(provider, out contentTypeRepository);
 
                 foreach (var content in list)
                 {
                     repository.Save(content.Value);
-                    unitOfWork.Flush();
                 }
 
                 Assert.That(c.Value.HasIdentity, Is.True);
@@ -2213,7 +2211,7 @@ namespace Umbraco.Tests.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsFalse(uow.Database.Exists<ContentXmlDto>(content.Id));
+                Assert.IsFalse(scope.Database.Exists<ContentXmlDto>(content.Id));
             }
 
             content.PublishValues();
@@ -2221,7 +2219,7 @@ namespace Umbraco.Tests.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(content.Id));
+                Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(content.Id));
             }
         }
 
@@ -2236,7 +2234,7 @@ namespace Umbraco.Tests.Services
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                Assert.IsTrue(uow.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId", new{nodeId = content.Id}) != null);
+                Assert.IsTrue(scope.Database.SingleOrDefault<PreviewXmlDto>("WHERE nodeId=@nodeId", new{nodeId = content.Id}) != null);
             }
         }
 
@@ -2472,12 +2470,13 @@ namespace Umbraco.Tests.Services
             return list;
         }
 
-        private DocumentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, DisabledCache, Logger, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
-            var tagRepository = new TagRepository(unitOfWork, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, DisabledCache, Logger, templateRepository);
-            var repository = new DocumentRepository(unitOfWork, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var accessor = (IScopeAccessor) provider;
+            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
+            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

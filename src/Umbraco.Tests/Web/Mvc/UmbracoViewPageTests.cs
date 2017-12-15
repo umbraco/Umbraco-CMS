@@ -13,7 +13,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -423,9 +422,10 @@ namespace Umbraco.Tests.Web.Mvc
             var cache = new NullCacheProvider();
             //var provider = new ScopeUnitOfWorkProvider(databaseFactory, new RepositoryFactory(Mock.Of<IServiceContainer>()));
             var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
-            var uowProvider = TestObjects.GetScopeUnitOfWorkProvider(Mock.Of<ILogger>(), scopeProvider: scopeProvider);
             var factory = Mock.Of<IPublishedContentTypeFactory>();
-            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, uowProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null, Current.Logger, null, true, false); // no events
+            _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null,
+                null, null, null,
+                Current.Logger, null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
