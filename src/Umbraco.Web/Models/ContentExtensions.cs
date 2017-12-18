@@ -44,9 +44,7 @@ namespace Umbraco.Web.Models
             IDomainService domainService, ILocalizationService localizationService, IContentService contentService,
             int contentId, string contentPath, Uri current)
         {
-            var route = umbracoContext == null
-                ? null // for tests only
-                : umbracoContext.ContentCache.GetRouteById(contentId); // may be cached
+            var route = umbracoContext.ContentCache.GetRouteById(contentId); // may be cached
 
             var domainHelper = umbracoContext.DomainHelper;
             IDomain domain;

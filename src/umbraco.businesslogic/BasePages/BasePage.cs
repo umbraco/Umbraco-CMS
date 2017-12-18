@@ -410,7 +410,11 @@ namespace umbraco.BasePages
         {
             base.OnLoad(e);
 
-            if (!Request.IsSecureConnection && GlobalSettings.UseSSL)
+            //NOTE: This is old legacy code and this assembly doesn't have access to the Umbraco.Web project so we are going to leave
+            //this here as-is for now, it should however check
+            //global::Umbraco.Web.UmbracoContext.Current.SecureRequest.IsSecure(new HttpRequestWrapper(HttpContext.Current.Request)) == false
+            //instead but since this is old we don't care.
+            if (GlobalSettings.UseSSL && !Request.IsSecureConnection)
             {
                 string serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
                 Response.Redirect(string.Format("https://{0}{1}", serverName, Request.FilePath));

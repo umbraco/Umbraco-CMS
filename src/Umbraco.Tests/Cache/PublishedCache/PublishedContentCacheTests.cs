@@ -9,6 +9,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {
@@ -85,12 +86,14 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 {
                     GetXmlDelegate = (context, preview) => _xml
                 };
-
+            
 		    _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 ApplicationContext,
                 new PublishedCaches(cache, new PublishedMediaCache(ApplicationContext)),
-                new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext));
+                new WebSecurity(_httpContextFactory.HttpContext, ApplicationContext),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance));
 
 		    _cache = _umbracoContext.ContentCache;
         }

@@ -94,13 +94,15 @@ namespace Umbraco.Tests
             var appCtx = new ApplicationContext(
                CacheHelper.CreateDisabledCacheHelper(),
                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            
+
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
                 appCtx,
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
             
             Assert.AreEqual(umbCtx, UmbracoContext.Current);
@@ -119,6 +121,8 @@ namespace Umbraco.Tests
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var helper = new UmbracoHelper(umbCtx,
@@ -147,6 +151,8 @@ namespace Umbraco.Tests
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var urlHelper = new Mock<IUrlProvider>();

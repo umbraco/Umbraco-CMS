@@ -20,35 +20,68 @@ namespace Umbraco.Web.WebApi.Filters
     /// </remarks>
     public class UmbracoWebApiRequireHttpsAttribute : AuthorizationFilterAttribute
     {
+        private readonly UmbracoContext _umbracoContext;
+
+        public UmbracoWebApiRequireHttpsAttribute()
+        {
+        }
+
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public UmbracoWebApiRequireHttpsAttribute(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            _umbracoContext = umbracoContext;
+        }
+
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
+
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            var request = actionContext.Request;
-            if (GlobalSettings.UseSSL && request.RequestUri.Scheme != Uri.UriSchemeHttps)
+            var request = actionContext.Request;            
+
+            if (GlobalSettings.UseSSL)
             {
-                HttpResponseMessage response;
-                var uri = new UriBuilder(request.RequestUri)
+                var umbCtx = GetUmbracoContext();
+                if (umbCtx == null)
+                    throw new InvalidOperationException("No UmbracoContext was found in the request");
+
+                var httpCtx = actionContext.Request.TryGetHttpContext();
+                if (httpCtx.Success == false)
+                    throw new InvalidOperationException("No HttpContext was found in the request");
+
+                if (umbCtx.SecureRequest.IsSecure(httpCtx.Result.Request))
                 {
-                    Scheme = Uri.UriSchemeHttps,
-                    Port = 443
-                };
-                var body = string.Format("<p>The resource can be found at <a href =\"{0}\">{0}</a>.</p>",
-                uri.Uri.AbsoluteUri);
-                if (request.Method.Equals(HttpMethod.Get) || request.Method.Equals(HttpMethod.Head))
-                {
-                    response = request.CreateResponse(HttpStatusCode.Found);
-                    response.Headers.Location = uri.Uri;
-                    if (request.Method.Equals(HttpMethod.Get))
+                    HttpResponseMessage response;
+                    var uri = new UriBuilder(request.RequestUri)
                     {
+                        Scheme = Uri.UriSchemeHttps,
+                        Port = 443
+                    };
+                    var body = string.Format("<p>The resource can be found at <a href =\"{0}\">{0}</a>.</p>",
+                    uri.Uri.AbsoluteUri);
+                    if (request.Method.Equals(HttpMethod.Get) || request.Method.Equals(HttpMethod.Head))
+                    {
+                        response = request.CreateResponse(HttpStatusCode.Found);
+                        response.Headers.Location = uri.Uri;
+                        if (request.Method.Equals(HttpMethod.Get))
+                        {
+                            response.Content = new StringContent(body, Encoding.UTF8, "text/html");
+                        }
+                    }
+                    else
+                    {
+                        response = request.CreateResponse(HttpStatusCode.NotFound);
                         response.Content = new StringContent(body, Encoding.UTF8, "text/html");
                     }
-                }
-                else
-                {
-                    response = request.CreateResponse(HttpStatusCode.NotFound);
-                    response.Content = new StringContent(body, Encoding.UTF8, "text/html");
-                }
 
-                actionContext.Response = response;
+                    actionContext.Response = response;
+                }
             }
         }
     }

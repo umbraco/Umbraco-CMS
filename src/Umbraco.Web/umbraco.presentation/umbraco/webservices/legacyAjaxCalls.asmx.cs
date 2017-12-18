@@ -460,7 +460,7 @@ namespace umbraco.presentation.webservices
         public static void Authorize()
         {
             // check for secure connection
-            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
+            if (GlobalSettings.UseSSL && global::Umbraco.Web.UmbracoContext.Current.SecureRequest.IsSecure(new HttpRequestWrapper(HttpContext.Current.Request)) == false)
                 throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
 
             if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))

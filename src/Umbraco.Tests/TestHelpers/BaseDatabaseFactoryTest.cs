@@ -26,6 +26,7 @@ using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -378,7 +379,9 @@ namespace Umbraco.Tests.TestHelpers
                 httpContext,
                 ApplicationContext,
                 new PublishedCaches(cache, new PublishedMediaCache(ApplicationContext)),
-                new WebSecurity(httpContext, ApplicationContext));
+                new WebSecurity(httpContext, ApplicationContext),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance));
 
             if (setSingleton)
             {

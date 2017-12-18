@@ -44,7 +44,7 @@ namespace Umbraco.Core.Sync
 
         // request: will be null if called from ApplicationContext
         // settings: for unit tests only
-        internal static void EnsureApplicationUrl(ApplicationContext appContext, HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
+        internal static void EnsureApplicationUrl(ApplicationContext appContext, HttpRequestBase request = null, IUmbracoSettingsSection settings = null, ISecureRequest secureRequest = null)
         {
             // if initialized, return
             if (appContext._umbracoApplicationUrl != null) return;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Sync
             // last chance,
             // use the current request as application url
             if (request == null) return;
-            SetApplicationUrlFromCurrentRequest(appContext, request);
+            SetApplicationUrlFromCurrentRequest(appContext, request, secureRequest);
         }
 
         // internal for tests
@@ -128,9 +128,14 @@ namespace Umbraco.Core.Sync
             return false;
         }
 
-        private static void SetApplicationUrlFromCurrentRequest(ApplicationContext appContext, HttpRequestBase request)
+        private static void SetApplicationUrlFromCurrentRequest(ApplicationContext appContext, HttpRequestBase request, ISecureRequest secureRequest)
         {
+            if (appContext == null) throw new ArgumentNullException(nameof(appContext));
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
             var logger = appContext.ProfilingLogger.Logger;
+
+            var isSecureRequest = secureRequest == null ? request.IsSecureConnection : secureRequest.IsSecure(request);
 
             // if (HTTP and SSL not required) or (HTTPS and SSL required),
             //  use ports from request
@@ -138,8 +143,8 @@ namespace Umbraco.Core.Sync
             //  if non-standard ports used,
             //  user may need to set umbracoApplicationUrl manually per 
             //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
-            var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
-                        || (request.IsSecureConnection && GlobalSettings.UseSSL)
+            var port = (isSecureRequest == false && GlobalSettings.UseSSL == false)
+                        || (isSecureRequest && GlobalSettings.UseSSL)
                 ? ":" + request.ServerVariables["SERVER_PORT"]
                 : "";
 

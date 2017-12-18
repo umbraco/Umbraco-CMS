@@ -474,7 +474,9 @@ namespace Umbraco.Tests.Web.Mvc
                 GetHttpContextFactory(url, routeData).HttpContext,
                 appCtx,
                 new PublishedCaches(cache, new PublishedMediaCache(appCtx)),
-                new WebSecurity(http, appCtx));
+                new WebSecurity(http, appCtx),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance));
 
             //if (setSingleton)
             //{

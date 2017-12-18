@@ -17,6 +17,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Models.ContentEditing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using User = umbraco.BusinessLogic.User;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Security
 {
@@ -275,10 +276,11 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
-        internal ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
+        internal ValidateRequestAttempt AuthorizeRequest(ISecureRequest secureRequest, bool throwExceptions = false)
         {
             // check for secure connection
-            if (GlobalSettings.UseSSL && _httpContext.Request.IsSecureConnection == false)
+            
+            if (GlobalSettings.UseSSL && secureRequest.IsSecure(_httpContext.Request) == false)
             {
                 if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;

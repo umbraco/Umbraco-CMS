@@ -44,7 +44,7 @@ namespace Umbraco.Web
         static void BeginRequest(HttpContextBase httpContext)
 		{
             // ensure application url is initialized
-            ApplicationUrlHelper.EnsureApplicationUrl(ApplicationContext.Current, httpContext.Request);
+            ApplicationUrlHelper.EnsureApplicationUrl(ApplicationContext.Current, httpContext.Request, secureRequest: SecureRequestResolver.Current.SecureRequest);
 
             // do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())

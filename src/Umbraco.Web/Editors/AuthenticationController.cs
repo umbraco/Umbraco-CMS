@@ -133,7 +133,7 @@ namespace Umbraco.Web.Editors
         [System.Web.Http.HttpGet]
         public bool IsAuthenticated()
         {
-            var attempt = UmbracoContext.Security.AuthorizeRequest();
+            var attempt = UmbracoContext.Security.AuthorizeRequest(UmbracoContext.SecureRequest);
             if (attempt == ValidateRequestAttempt.Success)
             {
                 return true;

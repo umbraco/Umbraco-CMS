@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Web.Mvc
@@ -17,6 +18,16 @@ namespace Umbraco.Web.Mvc
             // If umbracoUseSSL is set, let base method handle redirect.  Otherwise, we don't care.
             if (GlobalSettings.UseSSL)
             {
+                if (filterContext == null)
+                   throw new ArgumentNullException("filterContext");
+
+                var umbCtx = filterContext.HttpContext.GetUmbracoContext();
+                if (umbCtx == null)
+                    throw new InvalidOperationException("No UmbracoContext was found in the request");
+
+                if (umbCtx.SecureRequest.IsSecure(filterContext.HttpContext.Request))
+                   return;
+
                 base.HandleNonHttpsRequest(filterContext);
             }
         }

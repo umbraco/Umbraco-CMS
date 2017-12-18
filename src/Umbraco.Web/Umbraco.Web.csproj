@@ -466,7 +466,6 @@
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
     <Compile Include="PublishedContentQueryExtensions.cs" />
-    <Compile Include="Routing\ISecureRequest.cs" />
     <Compile Include="Routing\RedirectTrackingEventHandler.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />

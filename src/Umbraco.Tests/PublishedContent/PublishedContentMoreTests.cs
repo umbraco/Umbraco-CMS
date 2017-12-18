@@ -13,6 +13,7 @@ using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -57,13 +58,15 @@ namespace Umbraco.Tests.PublishedContent
             RouteData routeData = null;
 
             var caches = CreatePublishedContent();
-
+            
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
             var ctx = new UmbracoContext(
                 httpContext,
                 ApplicationContext,
                 caches,
-                new WebSecurity(httpContext, ApplicationContext));
+                new WebSecurity(httpContext, ApplicationContext),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance));
 
             UmbracoContext.Current = ctx;
         }

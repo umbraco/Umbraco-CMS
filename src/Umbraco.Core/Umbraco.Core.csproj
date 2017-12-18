@@ -360,6 +360,7 @@
     <Compile Include="HashGenerator.cs" />
     <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
+    <Compile Include="ISecureRequest.cs" />
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />

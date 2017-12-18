@@ -26,6 +26,7 @@ namespace Umbraco.Web
         private static readonly object Locker = new object();
 
         private bool _replacing;
+        private readonly ISiteDomainHelper _siteDomainHelper;
         private bool? _previewing;
         private readonly Lazy<ContextualPublishedContentCache> _contentCache;
         private readonly Lazy<ContextualPublishedMediaCache> _mediaCache;
@@ -85,8 +86,44 @@ namespace Umbraco.Web
             bool? preview)
         {
             return EnsureContext(httpContext, applicationContext, webSecurity, UmbracoConfig.For.UmbracoSettings(), UrlProviderResolver.Current.Providers, replaceContext, preview);
-        } 
+        }
+
+        [Obsolete("Use the method that specifies ISecureRequest instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity,
+            IUmbracoSettingsSection umbracoSettings,
+            IEnumerable<IUrlProvider> urlProviders,
+            bool replaceContext,
+            bool? preview = null)
+        {
+            return EnsureContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders,
+                SecureRequestResolver.Current.SecureRequest,
+                SiteDomainHelperResolver.Current.Helper,
+                replaceContext, preview);
+        }
+
+        [Obsolete("Use the method that specifies ISecureRequest instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static UmbracoContext CreateContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity,
+            IUmbracoSettingsSection umbracoSettings,
+            IEnumerable<IUrlProvider> urlProviders,
+            bool? preview)
+        {
+            return CreateContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders,
+                SecureRequestResolver.Current.SecureRequest,
+                SiteDomainHelperResolver.Current.Helper,
+                preview);
+        }
+
         #endregion
+
+        //TODO: Obsolete this and add ISecureRequest as a param
 
         /// <summary>
         /// This is a helper method which is called to ensure that the singleton context is created
@@ -116,7 +153,9 @@ namespace Umbraco.Web
             ApplicationContext applicationContext,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,
+            IEnumerable<IUrlProvider> urlProviders,            
+            ISecureRequest secureRequest,
+            ISiteDomainHelper siteDomainHelper,
             bool replaceContext,
             bool? preview = null)
         {
@@ -134,12 +173,14 @@ namespace Umbraco.Web
                 UmbracoContext.Current._replacing = true;
             }
 
-            var umbracoContext = CreateContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders, preview);
+            var umbracoContext = CreateContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders, secureRequest, siteDomainHelper, preview);
 
             //assign the singleton
             UmbracoContext.Current = umbracoContext;
             return UmbracoContext.Current;
         }
+
+        //TODO: Obsolete this and add ISecureRequest as a param
 
         /// <summary>
         /// Creates a standalone UmbracoContext instance
@@ -158,20 +199,24 @@ namespace Umbraco.Web
             ApplicationContext applicationContext,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,        
+            IEnumerable<IUrlProvider> urlProviders,
+            ISecureRequest secureRequest,
+            ISiteDomainHelper siteDomainHelper,
             bool? preview)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
             if (webSecurity == null) throw new ArgumentNullException("webSecurity");
             if (umbracoSettings == null) throw new ArgumentNullException("umbracoSettings");
-            if (urlProviders == null) throw new ArgumentNullException("urlProviders");          
+            if (urlProviders == null) throw new ArgumentNullException("urlProviders");
 
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 applicationContext,
                 new Lazy<IPublishedCaches>(() => PublishedCachesResolver.Current.Caches, false),
                 webSecurity,
+                secureRequest,
+                siteDomainHelper,
                 preview);
 
             // create the RoutingContext, and assign
@@ -210,8 +255,10 @@ namespace Umbraco.Web
             ApplicationContext applicationContext,
             IPublishedCaches publishedCaches,
             WebSecurity webSecurity,
+            ISecureRequest secureRequest,
+            ISiteDomainHelper siteDomainHelper,
             bool? preview = null)
-            : this(httpContext, applicationContext, new Lazy<IPublishedCaches>(() => publishedCaches), webSecurity, preview)
+            : this(httpContext, applicationContext, new Lazy<IPublishedCaches>(() => publishedCaches), webSecurity, secureRequest, siteDomainHelper, preview)
         {
         }
 
@@ -228,6 +275,8 @@ namespace Umbraco.Web
 			ApplicationContext applicationContext,
             Lazy<IPublishedCaches> publishedCaches,
             WebSecurity webSecurity,
+            ISecureRequest secureRequest,
+            ISiteDomainHelper siteDomainHelper,
             bool? preview = null)
         {
             //This ensures the dispose method is called when the request terminates, though
@@ -244,12 +293,9 @@ namespace Umbraco.Web
             HttpContext = httpContext;
             Application = applicationContext;
             Security = webSecurity;
-            //TODO: should be a ctor param!
-            SecureRequest = SecureRequestResolver.Current.SecureRequest;
-            //TODO: should be a ctor param!
-            DomainHelper = new DomainHelper(applicationContext.Services.DomainService, SecureRequest,
-                (ISiteDomainHelper2)SiteDomainHelperResolver.Current.Helper);
+            SecureRequest = secureRequest;
 
+            _siteDomainHelper = siteDomainHelper;
             _contentCache = new Lazy<ContextualPublishedContentCache>(() => publishedCaches.Value.CreateContextualContentCache(this));
             _mediaCache = new Lazy<ContextualPublishedMediaCache>(() => publishedCaches.Value.CreateContextualMediaCache(this));
             _previewing = preview;
@@ -337,7 +383,11 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the <see cref="DomainHelper"/> class
         /// </summary>
-        public DomainHelper DomainHelper { get; private set; }
+        public DomainHelper DomainHelper
+        {
+            get { return _domainHelper ?? (_domainHelper = new DomainHelper(Application.Services.DomainService, SecureRequest, _siteDomainHelper)); }
+        }
+        private DomainHelper _domainHelper;
 
         /// <summary>
         /// Gets the <see cref="SecureRequest"/> class

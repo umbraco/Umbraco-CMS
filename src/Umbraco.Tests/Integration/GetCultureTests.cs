@@ -51,24 +51,26 @@ namespace Umbraco.Tests.Integration
             foreach (var d in ServiceContext.DomainService.GetAll(true).ToArray())
                 ServiceContext.DomainService.Delete(d);
 
+            var umbCtx = GetUmbracoContext("/", 0);
+
             ServiceContext.DomainService.Save(new UmbracoDomain("domain1.com") {DomainName="domain1.com", RootContentId = c1.Id, LanguageId = l0.Id});
             ServiceContext.DomainService.Save(new UmbracoDomain("domain1.fr") { DomainName = "domain1.fr", RootContentId = c1.Id, LanguageId = l1.Id });
             ServiceContext.DomainService.Save(new UmbracoDomain("*100112") { DomainName = "*100112", RootContentId = c3.Id, LanguageId = l2.Id });
 
             var content = c2;
-            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
+            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbCtx,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
                 content.Id, content.Path, new Uri("http://domain1.com/"));
             Assert.AreEqual("en-US", culture.Name);
 
             content = c2;
-            culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
+            culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbCtx,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService, 
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("fr-FR", culture.Name);
 
             content = c4;
-            culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
+            culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbCtx,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService, 
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("de-DE", culture.Name);

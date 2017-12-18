@@ -102,7 +102,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         protected bool AuthorizeRequest(bool throwExceptions = false)
         {
-            var result = Security.AuthorizeRequest(throwExceptions);
+            var result = Security.AuthorizeRequest(UmbracoContext.SecureRequest, throwExceptions);
             return result == ValidateRequestAttempt.Success;
         }
 
