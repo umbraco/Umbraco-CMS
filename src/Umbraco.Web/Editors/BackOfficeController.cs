@@ -434,33 +434,33 @@ namespace Umbraco.Web.Editors
             if (autoLinkOptions == null)
                 return false;
 
-            if (autoLinkOptions.ShouldAutoLinkExternalAccount(this.UmbracoContext, loginInfo) == false)
+            if (autoLinkOptions.ShouldAutoLinkExternalAccount(UmbracoContext, loginInfo) == false)
                 return true;
 
             //we are allowing auto-linking/creating of local accounts
             if (loginInfo.Email.IsNullOrWhiteSpace())
             {
-                this.ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
             }
             else
             {
                 //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                var foundByEmail = this.Services.UserService.GetByEmail(loginInfo.Email);
+                var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
                 if (foundByEmail != null)
                 {
-                    this.ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                    ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
                 }
                 else
                 {
                     if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
                     if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
 
-                    var groups = this.Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(this.UmbracoContext, loginInfo));
+                    var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
 
                     var autoLinkUser = BackOfficeIdentityUser.CreateNew(
                         loginInfo.Email,
                         loginInfo.Email,
-                        autoLinkOptions.GetDefaultCulture(this.UmbracoContext, loginInfo));
+                        autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));
                     autoLinkUser.Name = loginInfo.ExternalIdentity.Name;
                     foreach (var userGroup in groups)
                     {
@@ -473,31 +473,31 @@ namespace Umbraco.Web.Editors
                         autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
                     }
 
-                    var userCreationResult = await this.UserManager.CreateAsync(autoLinkUser);
+                    var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
 
                     if (userCreationResult.Succeeded == false)
                     {
-                        this.ViewData[TokenExternalSignInError] = userCreationResult.Errors;
+                        ViewData[TokenExternalSignInError] = userCreationResult.Errors;
                     }
                     else
                     {
-                        var linkResult = await this.UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+                        var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
                         if (linkResult.Succeeded == false)
                         {
-                            this.ViewData[TokenExternalSignInError] = linkResult.Errors;
+                            ViewData[TokenExternalSignInError] = linkResult.Errors;
 
                             //If this fails, we should really delete the user since it will be in an inconsistent state!
-                            var deleteResult = await this.UserManager.DeleteAsync(autoLinkUser);
+                            var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
                             if (deleteResult.Succeeded == false)
                             {
                                 //DOH! ... this isn't good, combine all errors to be shown
-                                this.ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
+                                ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
                             }
                         }
                         else
                         {
                             //sign in
-                            await this.SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
+                            await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
                         }
                     }
                 }
