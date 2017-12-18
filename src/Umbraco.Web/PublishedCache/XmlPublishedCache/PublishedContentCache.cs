@@ -24,14 +24,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         #region Routes cache
 
         private readonly RoutesCache _routesCache = new RoutesCache(!UnitTesting);
-
-        private DomainHelper _domainHelper;
-
-        private DomainHelper GetDomainHelper(IDomainService domainService)
-        {
-            return _domainHelper ?? (_domainHelper = new DomainHelper(domainService));
-        }
-
+        
         // for INTERNAL, UNIT TESTS use ONLY
         internal RoutesCache RoutesCache { get { return _routesCache; } }
 
@@ -233,7 +226,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var elt = xml.GetElementById(contentId.ToString(CultureInfo.InvariantCulture));
             if (elt == null) return null;
 
-            var domainHelper = GetDomainHelper(umbracoContext.Application.Services.DomainService);
+            var domainHelper = umbracoContext.DomainHelper;
 
             // walk up from that node until we hit a node with a domain,
             // or we reach the content root, collecting urls in the way

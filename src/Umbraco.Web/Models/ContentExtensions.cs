@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models
                 ? null // for tests only
                 : umbracoContext.ContentCache.GetRouteById(contentId); // may be cached
 
-            var domainHelper = new DomainHelper(domainService);
+            var domainHelper = umbracoContext.DomainHelper;
             IDomain domain;
 
             if (route == null)

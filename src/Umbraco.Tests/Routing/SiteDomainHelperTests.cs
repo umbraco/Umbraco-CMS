@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Routing
             //SiteDomainHelper.BindSites("site2", "site4");
 
             // map methods are not static because we can override them
-            var helper = new SiteDomainHelper();
+            var helper = new SiteDomainHelper(new SecureRequest());
 
             // current is a site1 uri, domains contain current
             // so we'll get current
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Routing
             SiteDomainHelper.AddSite("site4", "https://domain4.com", "https://domain4.net", "https://domain4.org");
 
             // map methods are not static because we can override them
-            var helper = new SiteDomainHelper();
+            var helper = new SiteDomainHelper(new SecureRequest());
 
             // this works, but it's purely by chance / arbitrary
             // don't use the www in tests here!
@@ -281,7 +281,7 @@ namespace Umbraco.Tests.Routing
             SiteDomainHelper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
 
             // map methods are not static because we can override them
-            var helper = new SiteDomainHelper();
+            var helper = new SiteDomainHelper(new SecureRequest());
 
             // the rule is:
             // - exclude the current domain

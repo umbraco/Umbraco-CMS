@@ -335,7 +335,7 @@ namespace umbraco
             if (ignoreUmbracoHostNames)
             {
                 var httpRequestBase = new HttpRequestWrapper(HttpContext.Current.Request);
-                return httpRequestBase.GetLeftUriPart(UriPartial.Authority) + NiceUrl(nodeID);
+                return httpRequestBase.GetLeftUriPart(UriPartial.Authority, Umbraco.Web.UmbracoContext.Current.SecureRequest) + NiceUrl(nodeID);
             }
                 
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using Umbraco.Core;
@@ -11,33 +12,53 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides utilities to handle domains.
     /// </summary>
+    /// <remarks>
+    /// This object is a request based scope
+    /// </remarks>
 	public class DomainHelper
 	{
         private readonly IDomainService _domainService;
+        private readonly ISecureRequest _secureRequest;
+
+        public ISiteDomainHelper2 SiteDomainHelper { get; private set; }
 
         [Obsolete("Use the contructor specifying all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public DomainHelper()
             : this(ApplicationContext.Current.Services.DomainService)
         {
         }
 
-        public DomainHelper(IDomainService domainService)
+        [Obsolete("Use the contructor specifying all dependencies instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public DomainHelper(IDomainService domainService) : this(domainService, new SecureRequest(), (ISiteDomainHelper2)SiteDomainHelperResolver.Current.Helper)
+        {            
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="domainService"></param>
+        /// <param name="secureRequest"></param>
+        public DomainHelper(IDomainService domainService, ISecureRequest secureRequest, ISiteDomainHelper2 siteDomainHelper)
         {
             _domainService = domainService;
+            _secureRequest = secureRequest;
+            SiteDomainHelper = siteDomainHelper;
         }
 
         #region Domain for Node
 
-	    /// <summary>
-	    /// Finds the domain for the specified node, if any, that best matches a specified uri.
-	    /// </summary>
-	    /// <param name="nodeId">The node identifier.</param>
-	    /// <param name="current">The uri, or null.</param>
-	    /// <param name="httpRequest"></param>
-	    /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
-	    /// <remarks>If at least a domain is set on the node then the method returns the domain that
-	    /// best matches the specified uri, else it returns null.</remarks>
-	    internal DomainAndUri DomainForNode(int nodeId, Uri current, HttpRequestBase httpRequest)
+        /// <summary>
+        /// Finds the domain for the specified node, if any, that best matches a specified uri.
+        /// </summary>
+        /// <param name="nodeId">The node identifier.</param>
+        /// <param name="current">The uri, or null.</param>
+        /// <param name="httpRequest"></param>
+        /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
+        /// <remarks>If at least a domain is set on the node then the method returns the domain that
+        /// best matches the specified uri, else it returns null.</remarks>
+        internal DomainAndUri DomainForNode(int nodeId, Uri current, HttpRequestBase httpRequest)
         {
             // be safe
             if (nodeId <= 0)
@@ -51,7 +72,7 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // else filter
-            var helper = SiteDomainHelperResolver.Current.Helper;
+            var helper = SiteDomainHelper;
 
             var helperV2 = helper as ISiteDomainHelper2;
             var domainAndUri = helperV2 != null
@@ -101,7 +122,7 @@ namespace Umbraco.Web.Routing
             var domainAndUris = DomainsForUri(domains, current).ToArray();
 
             // filter
-            var helper = SiteDomainHelperResolver.Current.Helper;
+            var helper = SiteDomainHelper;
 
             var helperV2 = helper as ISiteDomainHelper2;
             return helperV2 != null
@@ -125,7 +146,7 @@ namespace Umbraco.Web.Routing
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        internal static DomainAndUri DomainForUri(IEnumerable<IDomain> domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
+        internal DomainAndUri DomainForUri(IEnumerable<IDomain> domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
@@ -182,7 +203,7 @@ namespace Umbraco.Web.Routing
         /// <param name="domains">The group of domains.</param>
         /// <param name="current">The uri, or null.</param>
         /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
-        internal static IEnumerable<DomainAndUri> DomainsForUri(IEnumerable<IDomain> domains, Uri current)
+        internal IEnumerable<DomainAndUri> DomainsForUri(IEnumerable<IDomain> domains, Uri current)
         {
             var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
             return domains
@@ -205,14 +226,14 @@ namespace Umbraco.Web.Routing
         /// using hostnames such as "/en" which happened to work pre-4.10 but really make no sense at
         /// all... and 4.10 throws on them, so here we just try to find a way so 4.11 does not throw.
         /// But really... no.</remarks>
-        private static IDomain SanitizeForBackwardCompatibility(IDomain domain)
+        private IDomain SanitizeForBackwardCompatibility(IDomain domain)
         {
             var context = System.Web.HttpContext.Current;
             if (context != null && domain.DomainName.StartsWith("/"))
             {
                 // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
                 var httpRequest = new HttpRequestWrapper(context.Request);
-                var authority = httpRequest.GetLeftUriPart(UriPartial.Authority);
+                var authority = httpRequest.GetLeftUriPart(UriPartial.Authority, _secureRequest);
                 domain.DomainName = authority + domain.DomainName;
             }
             return domain;

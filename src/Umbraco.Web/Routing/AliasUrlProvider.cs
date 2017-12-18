@@ -62,7 +62,7 @@ namespace Umbraco.Web.Routing
             if (string.IsNullOrWhiteSpace(umbracoUrlName))
                 return Enumerable.Empty<string>();
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+            var domainHelper = umbracoContext.DomainHelper;
 
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, umbracoContext.HttpContext.Request, false);
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Routing
             }
 
             return domainUris
-                .Select(domainUri => new Uri(CombinePaths(umbracoContext.HttpContext.Request.GetLeftUriPart(domainUri.Uri, UriPartial.Path), path)))
+                .Select(domainUri => new Uri(CombinePaths(umbracoContext.HttpContext.Request.GetLeftUriPart(domainUri.Uri, UriPartial.Path, umbracoContext.SecureRequest), path)))
                 .Select(uri => UriUtility.UriFromUmbraco(uri).ToString());
         }
 

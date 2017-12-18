@@ -10,6 +10,7 @@ using Examine.Providers;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Web;
+using System.ComponentModel;
 
 namespace umbraco.presentation
 {
@@ -17,6 +18,7 @@ namespace umbraco.presentation
     /// Class that encapsulates Umbraco information of a specific HTTP request.
     /// </summary>
     [Obsolete("Use Umbraco.Web.UmbracoContext instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class UmbracoContext
     {
         private UmbracoServerUtility _server;
@@ -163,7 +165,7 @@ namespace umbraco.presentation
         //TODO: This doesn't seem to be used for anything....
         public virtual string GetBaseUrl()
         {
-            return Request.GetLeftUriPart(UriPartial.Authority);
+            return Request.GetLeftUriPart(UriPartial.Authority, Umbraco.Web.UmbracoContext.Current.SecureRequest);
         }
 
         public virtual UmbracoServerUtility Server

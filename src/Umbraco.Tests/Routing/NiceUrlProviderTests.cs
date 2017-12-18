@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Routing
 	{
         protected override void FreezeResolution()
         {
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper(new SecureRequest()));
 
             base.FreezeResolution();
         }

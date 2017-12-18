@@ -466,12 +466,15 @@
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentPublishedPropertyTypeExtensions.cs" />
     <Compile Include="PublishedContentQueryExtensions.cs" />
+    <Compile Include="Routing\ISecureRequest.cs" />
     <Compile Include="Routing\RedirectTrackingEventHandler.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />
     <Compile Include="RelatedLinksTypeConverter.cs" />
     <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Routing\ContentFinderByRedirectUrl.cs" />
+    <Compile Include="Routing\SecureRequest.cs" />
+    <Compile Include="Routing\SecureRequestResolver.cs" />
     <Compile Include="Scheduling\HealthCheckNotifier.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Search\SearchableApplicationTree.cs" />

@@ -14,6 +14,28 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class SiteDomainHelper : ISiteDomainHelper2
     {
+        [Obsolete("Use a constructor that specifies all dependencies")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public SiteDomainHelper()
+        {
+            _secureRequestResolver = () => SecureRequestResolver.Current.SecureRequest;
+        }
+
+        public SiteDomainHelper(SecureRequestResolver secureRequestResolver)
+        {
+            _secureRequestResolver = () => secureRequestResolver.SecureRequest;
+        }
+
+        public SiteDomainHelper(ISecureRequest secureRequest)
+        {
+            _secureRequestResolver = () => secureRequest;
+        }
+
+        public SiteDomainHelper(Func<ISecureRequest> secureRequest)
+        {
+            _secureRequestResolver = secureRequest;
+        }
+
         #region Configure
 
         private static readonly ReaderWriterLockSlim ConfigLock = new ReaderWriterLockSlim();
@@ -29,6 +51,7 @@ namespace Umbraco.Web.Routing
         //private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
         private const string DomainValidationSource = @"^(((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/)?))$";
         private static readonly Regex DomainValidation = new Regex(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly Func<ISecureRequest> _secureRequestResolver;
 
         /// <summary>
         /// Returns a disposable object that represents safe write access to config.
@@ -200,7 +223,9 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual DomainAndUri MapDomain(Uri current, HttpRequestBase httpRequest, DomainAndUri[] domainAndUris)
         {
-            var currentAuthority = httpRequest.GetLeftUriPart(current, UriPartial.Authority);
+            //var umbCtx = httpRequest.
+
+            var currentAuthority = httpRequest.GetLeftUriPart(current, UriPartial.Authority, _secureRequestResolver());
             var qualifiedSites = GetQualifiedSites(current, httpRequest);
 
             return MapDomain(httpRequest, domainAndUris, qualifiedSites, currentAuthority);
@@ -227,7 +252,7 @@ namespace Umbraco.Web.Routing
         /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
         public virtual IEnumerable<DomainAndUri> MapDomains(Uri current, HttpRequestBase httpRequest, DomainAndUri[] domainAndUris, bool excludeDefault)
         {
-            var currentAuthority = httpRequest.GetLeftUriPart(current, UriPartial.Authority);
+            var currentAuthority = httpRequest.GetLeftUriPart(current, UriPartial.Authority, _secureRequestResolver());
             KeyValuePair<string, string[]>[] candidateSites = null;
             IEnumerable<DomainAndUri> ret = domainAndUris;
 
@@ -280,12 +305,12 @@ namespace Umbraco.Web.Routing
             // if we are able to filter, then filter, else return the whole lot
             return candidateSites == null ? ret : ret.Where(d =>
                 {
-                    var authority = httpRequest.GetLeftUriPart(d.Uri, UriPartial.Authority);
+                    var authority = httpRequest.GetLeftUriPart(d.Uri, UriPartial.Authority, _secureRequestResolver());
                     return candidateSites.Any(site => site.Value.Contains(authority));
                 });
         }
 
-        private static Dictionary<string, string[]> GetQualifiedSites(Uri current, HttpRequestBase httpRequest)
+        private Dictionary<string, string[]> GetQualifiedSites(Uri current, HttpRequestBase httpRequest)
         {
             using (ConfigReadLock)
             {
@@ -293,7 +318,7 @@ namespace Umbraco.Web.Routing
             }
         }
 
-        private static Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current, HttpRequestBase httpRequest)
+        private Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current, HttpRequestBase httpRequest)
         {
             // we do our best, but can't do the impossible
             if (_sites == null)
@@ -318,7 +343,7 @@ namespace Umbraco.Web.Routing
             // therefore it is safe to return and exit the configuration lock
         }
 
-        private static DomainAndUri MapDomain(HttpRequestBase httpRequest, DomainAndUri[] domainAndUris, Dictionary<string, string[]> qualifiedSites, string currentAuthority)
+        private DomainAndUri MapDomain(HttpRequestBase httpRequest, DomainAndUri[] domainAndUris, Dictionary<string, string[]> qualifiedSites, string currentAuthority)
         {
             if (domainAndUris == null)
                 throw new ArgumentNullException("domainAndUris");
@@ -362,10 +387,10 @@ namespace Umbraco.Web.Routing
         /// <param name="httpRequest"></param>
         /// <param name="uri"></param>
         /// <returns></returns>
-        private static string GetLeftPartWithBackwardsCompat(HttpRequestBase httpRequest, Uri uri)
+        private string GetLeftPartWithBackwardsCompat(HttpRequestBase httpRequest, Uri uri)
         {
             return httpRequest != null
-                ? httpRequest.GetLeftUriPart(uri, UriPartial.Authority)
+                ? httpRequest.GetLeftUriPart(uri, UriPartial.Authority, _secureRequestResolver())
                 : uri.GetLeftPart(UriPartial.Authority);
         }
     }

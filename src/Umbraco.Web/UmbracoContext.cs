@@ -244,6 +244,11 @@ namespace Umbraco.Web
             HttpContext = httpContext;
             Application = applicationContext;
             Security = webSecurity;
+            //TODO: should be a ctor param!
+            SecureRequest = SecureRequestResolver.Current.SecureRequest;
+            //TODO: should be a ctor param!
+            DomainHelper = new DomainHelper(applicationContext.Services.DomainService, SecureRequest,
+                (ISiteDomainHelper2)SiteDomainHelperResolver.Current.Helper);
 
             _contentCache = new Lazy<ContextualPublishedContentCache>(() => publishedCaches.Value.CreateContextualContentCache(this));
             _mediaCache = new Lazy<ContextualPublishedMediaCache>(() => publishedCaches.Value.CreateContextualMediaCache(this));
@@ -328,6 +333,16 @@ namespace Umbraco.Web
         [UmbracoWillObsolete("Do not access the ApplicationContext via the UmbracoContext, either inject the ApplicationContext into the services you need or access it via it's own Singleton accessor ApplicationContext.Current")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ApplicationContext Application { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="DomainHelper"/> class
+        /// </summary>
+        public DomainHelper DomainHelper { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="SecureRequest"/> class
+        /// </summary>
+        public ISecureRequest SecureRequest { get; private set; }
 
         /// <summary>
         /// Gets the WebSecurity class

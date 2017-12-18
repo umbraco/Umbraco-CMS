@@ -432,9 +432,9 @@ namespace Umbraco.Web
             // (the limited one, defined in Core, is there for tests)
             PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
             // same for other converters
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.TextStringValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.MarkdownEditorValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.ImageCropperValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<TextStringValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<MarkdownEditorValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<ImageCropperValueConverter>();
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
@@ -490,7 +490,8 @@ namespace Umbraco.Web
                 typeof(ContentFinderByNotFoundHandlers)
             );
 
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            SecureRequestResolver.Current = new SecureRequestResolver(new SecureRequest());
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper(SecureRequestResolver.Current));
 
             // ain't that a bit dirty?
             PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;

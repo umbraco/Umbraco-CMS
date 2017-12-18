@@ -213,7 +213,7 @@ namespace umbraco
         public static string GetBaseUrl(HttpContext Context)
         {
             var httpRequest = new HttpRequestWrapper(Context.Request);
-            return httpRequest.GetLeftUriPart(UriPartial.Authority);
+            return httpRequest.GetLeftUriPart(UriPartial.Authority, Umbraco.Web.UmbracoContext.Current.SecureRequest);
         }
     }
 }

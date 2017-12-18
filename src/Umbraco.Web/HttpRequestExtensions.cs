@@ -13,9 +13,6 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HttpRequestExtensions
 	{
-        //TODO: We should be able to replace this service
-        private static readonly ISecureRequest SecureRequest = new SecureRequest();
-
         /// <summary>
         /// Gets the left part of a URL
         /// </summary>
@@ -25,9 +22,9 @@ namespace Umbraco.Web
         /// <remarks>
         /// The scheme is determined by the data found in the request, not just based on the request's URI
         /// </remarks>
-        internal static string GetLeftUriPart(this HttpRequestBase request, UriPartial leftPart)
+        internal static string GetLeftUriPart(this HttpRequestBase request, UriPartial leftPart, ISecureRequest secureRequest)
         {
-            return request.GetLeftUriPart(request.Url, leftPart);
+            return request.GetLeftUriPart(request.Url, leftPart, secureRequest);
         }
 
 	    /// <summary>
@@ -40,7 +37,7 @@ namespace Umbraco.Web
 	    /// <remarks>
 	    /// The scheme is determined by the data found in the request, not just based on the request's URI
 	    /// </remarks>
-	    internal static string GetLeftUriPart(this HttpRequestBase request, Uri uri, UriPartial leftPart)
+	    internal static string GetLeftUriPart(this HttpRequestBase request, Uri uri, UriPartial leftPart, ISecureRequest secureRequest)
 	    {
 	        if (request == null) throw new ArgumentNullException("request");
 	        if (uri == null) throw new ArgumentException("request.uri");
@@ -48,7 +45,7 @@ namespace Umbraco.Web
 	        var left = uri.GetLeftPart(leftPart);
 	        var withoutScheme = left.Substring(uri.Scheme.Length);
 	        
-	        var scheme = SecureRequest.IsSecure(request) ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
+	        var scheme = secureRequest.IsSecure(request) ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
             
             return scheme + withoutScheme;
 	    }

@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -352,12 +353,25 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetAbsoluteMediaUrl(this UrlHelper urlHelper, IPublishedContent mediaItem)
         {
+            return GetAbsoluteMediaUrl(urlHelper, mediaItem, UmbracoContext.Current.SecureRequest);
+        }
+
+        /// <summary>
+        /// Generates a Absolute Media Item URL based on the current context
+        /// </summary>
+        /// <param name="urlHelper"></param>
+        /// <param name="mediaItem"></param>
+        /// <param name="secureRequest"></param>
+        /// <returns></returns>
+        public static string GetAbsoluteMediaUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, ISecureRequest secureRequest)
+        {
             if (urlHelper == null) throw new ArgumentNullException("urlHelper");
             if (mediaItem == null) throw new ArgumentNullException("mediaItem");
+            if (secureRequest == null) throw new ArgumentNullException("secureRequest");
 
             if (urlHelper.RequestContext.HttpContext.Request.Url != null)
             {
-                var requestUrl = urlHelper.RequestContext.HttpContext.Request.GetLeftUriPart(UriPartial.Authority);
+                var requestUrl = urlHelper.RequestContext.HttpContext.Request.GetLeftUriPart(UriPartial.Authority, secureRequest);
                 return string.Format("{0}{1}", requestUrl, mediaItem.Url);
             }
             return null;

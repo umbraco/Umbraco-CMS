@@ -35,7 +35,7 @@ namespace Umbraco.Web.Routing
 	    /// </summary>
 	    /// <param name="webRoutingSection"></param>
 	    /// <param name="pcr">The content request.</param>
-	    public PublishedContentRequestEngine(            
+	    public PublishedContentRequestEngine(
             IWebRoutingSection webRoutingSection,
             PublishedContentRequest pcr)
 		{
@@ -63,15 +63,19 @@ namespace Umbraco.Web.Routing
 	    protected ServiceContext Services
 	    {
             get { return _routingContext.UmbracoContext.Application.Services; }
-
 	    }
 
-		#region Public
+        protected UmbracoContext UmbracoContext
+        {
+            get { return _routingContext.UmbracoContext; }
+        }
+
+        #region Public
 
         /// <summary>
         /// Tries to route the request.
         /// </summary>
-	    internal bool TryRouteRequest()
+        internal bool TryRouteRequest()
 	    {
             // disabled - is it going to change the routing?
             //_pcr.OnPreparing();
@@ -271,7 +275,7 @@ namespace Umbraco.Web.Routing
 			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Uri=\"{1}\"", () => tracePrefix, () => _pcr.Uri);
 
 			// try to find a domain matching the current request
-            var domainAndUri = DomainHelper.DomainForUri(Services.DomainService.GetAll(false), _pcr.Uri);
+            var domainAndUri = UmbracoContext.DomainHelper.DomainForUri(Services.DomainService.GetAll(false), _pcr.Uri);
 
 			// handle domain
 			if (domainAndUri != null && domainAndUri.UmbracoDomain.LanguageIsoCode.IsNullOrWhiteSpace() == false)
