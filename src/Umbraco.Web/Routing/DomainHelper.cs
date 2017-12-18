@@ -20,7 +20,7 @@ namespace Umbraco.Web.Routing
         private readonly IDomainService _domainService;
         private readonly ISecureRequest _secureRequest;
 
-        public ISiteDomainHelper2 SiteDomainHelper { get; private set; }
+        public ISiteDomainHelper SiteDomainHelper { get; private set; }
 
         [Obsolete("Use the contructor specifying all dependencies instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
 
         [Obsolete("Use the contructor specifying all dependencies instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public DomainHelper(IDomainService domainService) : this(domainService, new SecureRequest(), (ISiteDomainHelper2)SiteDomainHelperResolver.Current.Helper)
+        public DomainHelper(IDomainService domainService) : this(domainService, new SecureRequest(), SiteDomainHelperResolver.Current.Helper)
         {            
         }
 
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="domainService"></param>
         /// <param name="secureRequest"></param>
-        public DomainHelper(IDomainService domainService, ISecureRequest secureRequest, ISiteDomainHelper2 siteDomainHelper)
+        public DomainHelper(IDomainService domainService, ISecureRequest secureRequest, ISiteDomainHelper siteDomainHelper)
         {
             _domainService = domainService;
             _secureRequest = secureRequest;
