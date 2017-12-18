@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Threading;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -102,7 +101,7 @@ namespace Umbraco.Core.Scoping
                     throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
 
                 // cannot specify a different fs scope!
-                // fixme - in fact, can be 'true' only on outer scope, and false does not make much sense
+                // can be 'true' only on outer scope (and false does not make much sense)
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
                     throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
             }

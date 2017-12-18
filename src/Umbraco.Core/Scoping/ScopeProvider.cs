@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Web;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+
 #if DEBUG_SCOPES
 using System.Linq;
 #endif
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Scoping
             {
                 var objectKey = CallContext.LogicalGetData(key).AsGuid();
                 CallContext.FreeNamedDataSlot(key);
-                if (objectKey == default (Guid)) return;
+                if (objectKey == default) return;
                 lock (StaticCallContextObjectsLock)
                 {
 #if DEBUG_SCOPES
@@ -329,9 +329,10 @@ namespace Umbraco.Core.Scoping
         /// <inheritdoc />
         public void AttachScope(IScope other, bool callContext = false)
         {
-            var otherScope = other as Scope;
-            if (otherScope == null)
-                throw new ArgumentException("Not a Scope instance."); // fixme - why? how?
+            // IScopeProvider.AttachScope works with an IScope
+            // but here we can only deal with our own Scope class
+            if (!(other is Scope otherScope))
+                throw new ArgumentException("Not a Scope instance.");
 
             if (otherScope.Detachable == false)
                 throw new ArgumentException("Not a detachable scope.");
@@ -350,22 +351,18 @@ namespace Umbraco.Core.Scoping
         /// <inheritdoc />
         public IScope DetachScope()
         {
-            var ambient = AmbientScope;
-            if (ambient == null)
+            var ambientScope = AmbientScope;
+            if (ambientScope == null)
                 throw new InvalidOperationException("There is no ambient scope.");
 
-            var scope = ambient as Scope;
-            if (scope == null)
-                throw new Exception("Ambient scope is not a Scope instance."); // fixme - why? how?
-
-            if (scope.Detachable == false)
+            if (ambientScope.Detachable == false)
                 throw new InvalidOperationException("Ambient scope is not detachable.");
 
-            SetAmbient(scope.OrigScope, scope.OrigContext);
-            scope.OrigScope = null;
-            scope.OrigContext = null;
-            scope.Attached = false;
-            return scope;
+            SetAmbient(ambientScope.OrigScope, ambientScope.OrigContext);
+            ambientScope.OrigScope = null;
+            ambientScope.OrigContext = null;
+            ambientScope.Attached = false;
+            return ambientScope;
         }
 
         /// <inheritdoc />
@@ -377,8 +374,8 @@ namespace Umbraco.Core.Scoping
             bool callContext = false,
             bool autoComplete = false)
         {
-            var ambient = AmbientScope;
-            if (ambient == null)
+            var ambientScope = AmbientScope;
+            if (ambientScope == null)
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
@@ -388,18 +385,14 @@ namespace Umbraco.Core.Scoping
                 return scope;
             }
 
-            var ambientScope = ambient as Scope;
-            if (ambientScope == null) throw new Exception("Ambient scope is not a Scope instance.");  // fixme - why? how?
-
             var nested = new Scope(this, _logger, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
             SetAmbient(nested, AmbientContext);
             return nested;
         }
 
-        /// <inheritdoc />
         public void Reset()
         {
-            var scope = AmbientScope as Scope;
+            var scope = AmbientScope;
             scope?.Reset();
 
             _scopeReference.Dispose();
