@@ -7,8 +7,8 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;
 

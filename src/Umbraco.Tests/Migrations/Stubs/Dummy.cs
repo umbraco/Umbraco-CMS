@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Persistence.Migrations;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {

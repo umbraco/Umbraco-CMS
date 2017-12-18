@@ -6,7 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Migrations;
 using Umbraco.Tests.Migrations.Stubs;
 using Umbraco.Tests.TestHelpers;
 

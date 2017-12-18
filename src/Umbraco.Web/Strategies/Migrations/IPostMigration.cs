@@ -1,5 +1,5 @@
 ﻿using Umbraco.Core.Events;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Migrations;
 
 namespace Umbraco.Web.Strategies.Migrations
 {

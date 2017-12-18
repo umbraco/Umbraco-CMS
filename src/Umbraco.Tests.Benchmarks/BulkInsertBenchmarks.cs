@@ -10,10 +10,10 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Benchmarks
                 //use the db  to create the initial schema so we can reuse in each bench
                 using (_dbSqlCe = GetSqlCeDatabase(sqlCeConnectionString, logger))
                 {
-                    var creation = new DatabaseSchemaCreation(_dbSqlCe, logger);
+                    var creation = new DatabaseSchemaCreator(_dbSqlCe, logger);
                     creation.InitializeDatabaseSchema();
                 }
                 _initDbBytes = File.ReadAllBytes(_dbFile);

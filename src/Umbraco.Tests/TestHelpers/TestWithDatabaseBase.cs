@@ -28,6 +28,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using LightInject;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 
@@ -293,9 +294,9 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaHelper(scope.Database, Logger);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, Logger);
                     //Create the umbraco database and its base data
-                    schemaHelper.CreateDatabaseSchema(Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>());
+                    schemaHelper.InitializeDatabaseSchema();
                     scope.Complete();
                 }
 

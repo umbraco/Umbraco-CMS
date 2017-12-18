@@ -5,7 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Migrations;
 
 namespace Umbraco.Web.Strategies.Migrations
 {

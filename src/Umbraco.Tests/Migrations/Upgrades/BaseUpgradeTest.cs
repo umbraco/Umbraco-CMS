@@ -6,8 +6,9 @@ using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
@@ -81,11 +82,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             Assert.That(upgraded, Is.True);
 
-            var schemaHelper = new DatabaseSchemaHelper(db, logger);
+            var schemaHelper = new DatabaseSchemaCreator(db, logger);
 
-            var hasTabTable = schemaHelper.TableExist("cmsTab");
-            var hasPropertyTypeGroupTable = schemaHelper.TableExist("cmsPropertyTypeGroup");
-            var hasAppTreeTable = schemaHelper.TableExist("umbracoAppTree");
+            var hasTabTable = schemaHelper.TableExists("cmsTab");
+            var hasPropertyTypeGroupTable = schemaHelper.TableExists("cmsPropertyTypeGroup");
+            var hasAppTreeTable = schemaHelper.TableExists("umbracoAppTree");
 
             Assert.That(hasTabTable, Is.False);
             Assert.That(hasPropertyTypeGroupTable, Is.True);

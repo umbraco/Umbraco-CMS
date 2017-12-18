@@ -2,6 +2,7 @@
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
 

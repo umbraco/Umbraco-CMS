@@ -7,6 +7,7 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -87,16 +88,16 @@ namespace Umbraco.Tests.Persistence
             //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             // create the umbraco database
-            DatabaseSchemaHelper schemaHelper;
+            DatabaseSchemaCreator schemaHelper;
             using (var database = _databaseFactory.CreateDatabase())
             {
-                schemaHelper = new DatabaseSchemaHelper(database, _logger);
-                schemaHelper.CreateDatabaseSchema(_runtime, _migrationEntryService, false);
+                schemaHelper = new DatabaseSchemaCreator(database, _logger);
+                schemaHelper.InitializeDatabaseSchema();
             }
 
-            var umbracoNodeTable = schemaHelper.TableExist("umbracoNode");
-            var umbracoUserTable = schemaHelper.TableExist("umbracoUser");
-            var cmsTagsTable = schemaHelper.TableExist("cmsTags");
+            var umbracoNodeTable = schemaHelper.TableExists("umbracoNode");
+            var umbracoUserTable = schemaHelper.TableExists("umbracoUser");
+            var cmsTagsTable = schemaHelper.TableExists("cmsTags");
 
             Assert.That(umbracoNodeTable, Is.True);
             Assert.That(umbracoUserTable, Is.True);

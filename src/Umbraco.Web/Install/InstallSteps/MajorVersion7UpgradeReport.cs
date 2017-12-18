@@ -4,6 +4,7 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;

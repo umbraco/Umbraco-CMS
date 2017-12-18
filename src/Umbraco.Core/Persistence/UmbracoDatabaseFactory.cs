@@ -8,6 +8,7 @@ using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;

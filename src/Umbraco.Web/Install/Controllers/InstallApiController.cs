@@ -6,6 +6,7 @@ using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.WebApi;
 

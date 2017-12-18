@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Persistence.Migrations;
 using LightInject;
+using Umbraco.Core.Migrations;
 
 namespace Umbraco.Web.Strategies.Migrations
 {

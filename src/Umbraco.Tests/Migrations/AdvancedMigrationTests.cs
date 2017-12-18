@@ -3,13 +3,12 @@ using Moq;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations;
+using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Syntax.Execute;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.Migrations.Initial;
-using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionEight;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -47,8 +46,8 @@ namespace Umbraco.Tests.Migrations
                 var upgraded = runner.Execute(context);
                 Assert.IsTrue(upgraded);
 
-                var helper = new DatabaseSchemaHelper(database, logger);
-                var exists = helper.TableExist("umbracoNode");
+                var helper = new DatabaseSchemaCreator(database, logger);
+                var exists = helper.TableExists("umbracoNode");
                 Assert.IsTrue(exists);
 
                 scope.Complete();
@@ -237,7 +236,7 @@ namespace Umbraco.Tests.Migrations
             public override void Up()
             {
                 // creates *all* tables keys and indexes
-                foreach (var x in DatabaseSchemaCreation.OrderedTables)
+                foreach (var x in DatabaseSchemaCreator.OrderedTables)
                 {
                     // ok - for tests, restrict to Node
                     if (x.Value != typeof(NodeDto)) continue;

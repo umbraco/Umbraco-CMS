@@ -272,7 +272,7 @@
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
     <Compile Include="Persistence\BulkDataReaderTests.cs" />
-    <Compile Include="Persistence\Migrations\PostMigrationTests.cs" />
+    <Compile Include="Migrations\PostMigrationTests.cs" />
     <Compile Include="Persistence\NPocoTests\NPocoSqlExtensionsTests.cs" />
     <Compile Include="Persistence\UnitOfWorkTests.cs" />
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />

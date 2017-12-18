@@ -3,8 +3,8 @@ using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Migrations;
 
 namespace Umbraco.Web.Strategies.Migrations
 {

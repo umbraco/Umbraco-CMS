@@ -5,7 +5,8 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Migrations;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 

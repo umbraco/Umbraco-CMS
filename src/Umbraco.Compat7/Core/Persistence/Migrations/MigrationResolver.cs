@@ -2,6 +2,7 @@
 using Umbraco.Core.ObjectResolution;
 using CoreCurrent = Umbraco.Core.Composing.Current;
 using LightInject;
+using Umbraco.Core.Migrations;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core.Persistence.Migrations

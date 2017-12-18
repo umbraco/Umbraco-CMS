@@ -9,8 +9,8 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             // Arrange
             var db = GetConfiguredDatabase();
-            var schema = new DatabaseSchemaCreation(db, Mock.Of<ILogger>());
+            var schema = new DatabaseSchemaCreator(db, Mock.Of<ILogger>());
 
             //Create db schema and data from old Total.sql file for Sql Ce
             string statements = GetDatabaseSpecificSqlScript();

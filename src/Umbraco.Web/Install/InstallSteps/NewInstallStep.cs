@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;

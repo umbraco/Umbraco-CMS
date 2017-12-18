@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations.Initial;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Persistence
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var schema = new DatabaseSchemaCreation(scope.Database, Logger);
+                var schema = new DatabaseSchemaCreator(scope.Database, Logger);
                 result = schema.ValidateSchema();
             }
 

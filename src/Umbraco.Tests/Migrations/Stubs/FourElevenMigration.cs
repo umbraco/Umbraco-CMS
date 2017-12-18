@@ -1,5 +1,5 @@
 ﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Migrations.Stubs

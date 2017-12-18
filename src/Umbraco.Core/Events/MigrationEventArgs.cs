@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Semver;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Migrations;
 
 namespace Umbraco.Core.Events
 {
