@@ -1015,7 +1015,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="sortCreationDate">Date de création</key>
     <key alias="sortDone">Tri achevé.</key>
     <key alias="sortHelp">Faites glisser les différents éléments vers le haut ou vers le bas pour définir la manière dont ils doivent être organisés. Ou cliquez sur les entêtes de colonnes pour trier la collection complète d'éléments</key>
-    <key alias="sortPleaseWait"><![CDATA[Veuillez patienter. Les éléments sont en cours de tri, cela peut prendre un moment.<br/> <br/> Ne fermez pas cette fenêtre durant le tri.]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Veuillez patienter. Les éléments sont en cours de tri, cela peut prendre un moment.]]></key>
   </area>
   <area alias="speechBubbles">
 	<key alias="validationFailedHeader">Validation</key>

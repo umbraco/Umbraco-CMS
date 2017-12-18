@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +19,9 @@ using umbraco;
 using legacyUser = umbraco.BusinessLogic.User;
 using System.Net.Http;
 using System.Collections.Specialized;
+using System.Linq;
+using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
@@ -30,6 +35,49 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// Saves a tour status for the current user
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public IEnumerable<UserTourStatus> PostSetUserTour(UserTourStatus status)
+        {
+            if (status == null) throw new ArgumentNullException("status");
+
+            List<UserTourStatus> userTours;
+            if (Security.CurrentUser.TourData.IsNullOrWhiteSpace())
+            {
+                userTours = new List<UserTourStatus> {status};
+                Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
+                Services.UserService.Save(Security.CurrentUser);
+                return userTours;
+            }
+
+            userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(Security.CurrentUser.TourData).ToList();
+            var found = userTours.FirstOrDefault(x => x.Alias == status.Alias);
+            if (found != null)
+            {
+                //remove it and we'll replace it next
+                userTours.Remove(found);
+            }
+            userTours.Add(status);
+            Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
+            Services.UserService.Save(Security.CurrentUser);
+            return userTours;
+        }
+
+        /// <summary>
+        /// Returns the user's tours
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<UserTourStatus> GetUserTours()
+        {
+            if (Security.CurrentUser.TourData.IsNullOrWhiteSpace())
+                return Enumerable.Empty<UserTourStatus>();
+
+            var userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(Security.CurrentUser.TourData);
+            return userTours;
+        }
 
         /// <summary>
         /// When a user is invited and they click on the invitation link, they will be partially logged in

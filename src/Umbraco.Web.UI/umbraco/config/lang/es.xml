@@ -685,8 +685,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Ordenación completa.</key>
     <key alias="sortHelp">Arrastra las diferentes páginas debajo para colocarlas como deberían estar. O haz click en las cabeceras de las columnas para ordenar todas las páginas</key>
-    <key alias="sortPleaseWait"><![CDATA[Espere por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.<br/>
-<br/> No cierre esta ventana mientras se está ordenando ]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Espere por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">La publicación fue cancelada por un complemento de terceros</key>

@@ -14,7 +14,7 @@
                 if (!model) {
                     return null;
                 }
-                var trimmed = _.omit(model, ["confirm", "generatedPassword"])
+                var trimmed = _.omit(model, ["confirm", "generatedPassword"]);
 
                 //ensure that the pass value is null if all child properties are null
                 var allNull = true;
@@ -242,8 +242,8 @@
                 var propGroups = _.find(genericTab.properties, function (item) {
                     return item.alias === "_umb_membergroup";
                 });
-                saveModel.email = propEmail.value;
-                saveModel.username = propLogin.value;
+                saveModel.email = propEmail.value.trim();
+                saveModel.username = propLogin.value.trim();
                 
                 saveModel.password = this.formatChangePasswordModel(propPass.value);
 
@@ -324,22 +324,13 @@
                 //this is basically the same as for media but we need to explicitly add some extra properties
                 var saveModel = this.formatMediaPostData(displayModel, action);
 
-                var genericTab = _.find(displayModel.tabs, function (item) {
-                    return item.id === 0;
-                });
-
-                var propExpireDate = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_expiredate";
-                });
-                var propReleaseDate = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_releasedate";
-                });
-                var propTemplate = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_template";
-                });
-                saveModel.expireDate = propExpireDate ? propExpireDate.value : null;
-                saveModel.releaseDate = propReleaseDate ? propReleaseDate.value : null;
-                saveModel.templateAlias = propTemplate ? propTemplate.value : null;
+                var propExpireDate = displayModel.removeDate;
+                var propReleaseDate = displayModel.releaseDate;
+                var propTemplate = displayModel.template;
+            
+                saveModel.expireDate = propExpireDate ? propExpireDate : null;
+                saveModel.releaseDate = propReleaseDate ? propReleaseDate : null;
+                saveModel.templateAlias = propTemplate ? propTemplate : null;
 
                 return saveModel;
             }

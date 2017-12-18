@@ -657,7 +657,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone"><![CDATA[Ordinamento completato.]]></key>
     <key alias="sortHelp"><![CDATA[Sposta su o giù le pagine trascinandole per determinarne l'ordinamento. Oppure clicca la testata della colonna per ordinare l'intero gruppo di pagine]]></key>
-    <key alias="sortPleaseWait"><![CDATA[Si prega di attendere. Gli elementi sono in fase di ordinamento, questo può richiedere del tempo.<br/> <br/>Non chiudere questa finestra durante l'operazione]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Si prega di attendere. Gli elementi sono in fase di ordinamento, questo può richiedere del tempo.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent"><![CDATA[La pubblicazione è stata cancellata da un add-in di terze parti.]]></key>

@@ -188,11 +188,11 @@ namespace Umbraco.Core.Models
         Language,
 
         /// <summary>
-        /// Document
+        /// Document Blueprint
         /// </summary>
         [UmbracoObjectType(Constants.ObjectTypes.DocumentBlueprint, typeof(IContent))]
         [FriendlyName("DocumentBlueprint")]
-        [UmbracoUdiType(Constants.UdiEntityType.DocumentBluePrint)]
+        [UmbracoUdiType(Constants.UdiEntityType.DocumentBlueprint)]
         DocumentBlueprint,
         
         /// <summary>

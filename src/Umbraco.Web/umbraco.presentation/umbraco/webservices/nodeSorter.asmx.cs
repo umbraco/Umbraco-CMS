@@ -176,12 +176,15 @@ namespace umbraco.presentation.webservices
             var contentService = ApplicationContext.Services.ContentService;
             try
             {
-                var intIds = ids.Select(int.Parse).ToArray();
-                var allContent = contentService.GetByIds(intIds).ToDictionary(x => x.Id, x => x);
-                var sortedContent = intIds.Select(x => allContent[x]);
-
                 // Save content with new sort order and update db+cache accordingly
-                var sorted = contentService.Sort(sortedContent);
+                var intIds = new List<int>();
+                foreach (var stringId in ids)
+                {
+                    int intId;
+                    if (int.TryParse(stringId, out intId))
+                        intIds.Add(intId);
+                }
+                var sorted = contentService.Sort(intIds.ToArray());
 
                 // refresh sort order on cached xml
                 // but no... this is not distributed - solely relying on content service & events should be enough

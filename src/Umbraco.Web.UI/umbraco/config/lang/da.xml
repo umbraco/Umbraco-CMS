@@ -26,7 +26,7 @@
     <key alias="notify">Notificeringer</key>
     <key alias="protect">Offentlig adgang</key>
     <key alias="publish">Udgiv</key>
-    <key alias="unpublish">Fortryd udgivelse</key>
+    <key alias="unpublish">Afpublicér</key>
     <key alias="refreshNode">Genindlæs elementer</key>
     <key alias="republish">Genudgiv hele sitet</key>
     <key alias="rename" version="7.3.0">Omdøb</key>
@@ -182,6 +182,7 @@
     <key alias="membergroup">Medlemsgruppe</key>
     <key alias="memberrole">Rolle</key>
     <key alias="membertype">Medlemstype</key>
+    <key alias="noChanges">Der er endnu ikke lavet nogle ændringer.</key>
     <key alias="noDate">Ingen dato valgt</key>
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
@@ -192,15 +193,16 @@
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
-    <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
+    <key alias="unpublishDate">Afpubliceringsdato</key>
     <key alias="removeDate">Fjern dato</key>
+    <key alias="setDate">Vælg dato</key>
     <key alias="sortDone">Sorteringsrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
     <key alias="titleOptional">Titel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
-    <key alias="unPublish">Fortryd udgivelse</key>
+    <key alias="unPublish">Afpublicér</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
@@ -530,6 +532,7 @@
     <key alias="height">Højde</key>
     <key alias="help">Hjælp</key>
     <key alias="hide">Skjul</key>
+    <key alias="history">Historik</key>
     <key alias="icon">Ikon</key>
     <key alias="import">Importer</key>
     <key alias="innerMargin">Indre margen</key>
@@ -576,6 +579,7 @@
     <key alias="retrieve">Hent</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
+    <key alias="scheduledPublishing">Planlagt publicering</key>
     <key alias="search">Søg</key>
     <key alias="searchNoResult">Beklager, vi kan ikke finde det, du leder efter.</key>
     <key alias="noItemsInList">Ingen elementer er blevet tilføjet</key>
@@ -586,7 +590,6 @@
     <key alias="sort">Sortér</key>
     <key alias="status">Status</key>
     <key alias="submit">Indsend</key>
-    <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="up">Op</key>
@@ -612,6 +615,7 @@
     <key alias="saving">Gemmer...</key>
     <key alias="current">nuværende</key>
     <key alias="embed">Indlejring</key>
+    <key alias="retrieve">Hent</key>
     <key alias="selected">valgt</key>
   </area>
 
@@ -1014,7 +1018,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortCreationDate">Oprettelsesdato</key>
     <key alias="sortDone">Sortering udført</key>
     <key alias="sortHelp">Træk de forskellige sider op eller ned for at indstille hvordan de skal arrangeres, eller klik på kolonnehovederne for at sortere hele rækken af sider</key>
-    <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid<br/><br/>Luk ikke dette vindue imens]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationCancelledHeader">Annulleret</key>

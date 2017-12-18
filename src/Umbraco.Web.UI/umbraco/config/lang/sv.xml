@@ -411,7 +411,7 @@
     <key alias="showPageOnSend">Vilken sida skall visas när formuläret är skickat</key>
     <key alias="size">Storlek</key>
     <key alias="sort">Sortera</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Skicka</key>
     <key alias="type">Skriv</key>
     <key alias="typeToSearch">Skriv för att söka...</key>
     <key alias="up">Upp</key>
@@ -426,8 +426,17 @@
     <key alias="width">Bredd</key>
     <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
-    <key alias="reorder">Reorder</key>
-    <key alias="reorderDone">I am done reordering</key>
+    <key alias="reorder">Sortera</key>
+    <key alias="reorderDone">Avsluta sortering</key>
+    <key alias="preview">Förhandsvisning</key>
+    <key alias="changePassword">Ändra lösenord</key>
+    <key alias="to">till</key>
+    <key alias="listView">Listvy</key>
+    <key alias="saving">Sparar...</key>
+    <key alias="current">nuvarande</key>
+    <key alias="embed">Inbäddning</key>
+    <key alias="retrieve">Hämta</key>
+    <key alias="selected">valgt</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
@@ -694,7 +703,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
-    <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.<br/><br/>Stäng inte fönstret under tiden sidorna sorteras.]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publiceringen avbröts av ett tredjepartstillägg</key>

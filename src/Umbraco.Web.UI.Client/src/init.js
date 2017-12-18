@@ -1,7 +1,7 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService',
-  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService) {
-
+app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
+  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
+      
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
         // it cannot be static
@@ -18,13 +18,24 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
         eventsService.on("app.authenticated", function(evt, data) {
             
             assetsService._loadInitAssets().then(function() {
-                appState.setGlobalState("isReady", true);
+                
+                //Register all of the tours on the server
+                tourService.registerAllTours().then(function (dashboards) {
+                    appReady(data);
+                }, function(){
+                    appReady(data);
+                });
 
-                //send the ready event with the included returnToPath,returnToSearch data
-                eventsService.emit("app.ready", data);
-                returnToPath = null, returnToSearch = null;
             });
+
         });
+
+        function appReady(data) {
+            appState.setGlobalState("isReady", true);
+            //send the ready event with the included returnToPath,returnToSearch data
+            eventsService.emit("app.ready", data);
+            returnToPath = null, returnToSearch = null;
+        }
 
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
@@ -96,4 +107,5 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
         var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
         appState.setGlobalState("touchDevice", touchDevice);
+
     }]);

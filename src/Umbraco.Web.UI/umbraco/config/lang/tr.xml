@@ -844,7 +844,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
     <key alias="sortHelp">Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items</key>
-    <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
+    <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationFailedHeader">Hata</key>

@@ -1,7 +1,7 @@
 <div>
     <div id="applications" ng-class="{faded:stickyNavigation}">
         <ul class="sections">
-            <li class="avatar">
+            <li data-element="section-user" id="section-avatar" class="avatar">
                 <a href="#" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
                     <umb-avatar
                         size="xs"
@@ -12,7 +12,7 @@
                     </umb-avatar>
                 </a>
             </li>
-            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
+            <li data-element="section-{{section.alias}}" ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
                 <a href="#/{{section.alias}}"
                    ng-dblclick="sectionDblClick(section)"
                    ng-click="sectionClick($event, section)"
@@ -22,13 +22,13 @@
                 </a>
             </li>
 
-            <li class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
+            <li data-element="section-expand" class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
                 <a href ng-click="trayClick()">
                     <i class="icon icon-arrow-right"></i>
                 </a>
             </li>
 
-            <li class="help">
+            <li data-element="section-help" class="help">
                 <a href class="help" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
                     <i class="icon-help-alt"></i>
                     <span><localize key="sections_help">Help</localize></span>
@@ -52,17 +52,19 @@
     </div>
 
     <umb-overlay
-      ng-if="helpDialog.show"
-      model="helpDialog"
-      view="helpDialog.view"
-      position="left">
+        data-element="overlay-help"
+        ng-if="helpDialog.show"
+        model="helpDialog"
+        view="helpDialog.view"
+        position="left">
     </umb-overlay>
 
     <umb-overlay
-      ng-if="userDialog.show"
-      model="userDialog"
-      view="userDialog.view"
-      position="left">
+        data-element="overlay-user"
+        ng-if="userDialog.show"
+        model="userDialog"
+        view="userDialog.view"
+        position="left">
     </umb-overlay>
 
 </div>

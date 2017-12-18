@@ -82,16 +82,14 @@
     <AssemblyOriginatorKeyFile>..\Solution Items\TheFARM-Public.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Examine, Version=0.1.85.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.85\lib\net45\Examine.dll</HintPath>
+    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -119,6 +117,8 @@
     <Compile Include="DataServices\UmbracoDataService.cs" />
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
+    <Compile Include="DataServices\UmbracoMemberContentService.cs" />
+    <Compile Include="DataServices\UmbracoMemberDataService.cs" />
     <Compile Include="DeletePolicyTracker.cs" />
     <Compile Include="ExamineHelper.cs" />
     <Compile Include="IndexTypes.cs" />
@@ -134,6 +134,7 @@
     <Compile Include="LocalStorage\MultiIndexLockFactory.cs" />
     <Compile Include="LocalStorage\MultiIndexOutput.cs" />
     <Compile Include="LoggingLevel.cs" />
+    <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="StaticField.cs" />
     <Compile Include="StaticFieldCollection.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
