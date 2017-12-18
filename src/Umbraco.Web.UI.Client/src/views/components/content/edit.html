@@ -15,7 +15,9 @@
             hide-icon="true"
             hide-description="true"
             hide-alias="true"
-            navigation="content.apps">
+            navigation="content.apps"
+            on-back="backToListView()"
+            show-back-button="{{page.listViewPath}}">
          </umb-editor-header>
 
          <umb-editor-container>
@@ -43,15 +45,6 @@
             
             
             <umb-editor-footer-content-right>
-                
-                <umb-button
-                    alias="returnToListView"
-                    ng-if="page.listViewPath"
-                    type="link"
-                    href="#{{page.listViewPath}}"
-                    label="Return to list"
-                    label-key="buttons_returnToList">
-                </umb-button>
 
                 <umb-button
                     alias="preview"

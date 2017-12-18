@@ -225,6 +225,12 @@ Use this directive to construct a header inside the main editor window.
                 }
             ];
 
+            scope.goBack = function() {
+                if(scope.onBack) {
+                    scope.onBack();
+                }
+            };
+
             scope.openIconPicker = function() {
                 scope.dialogModel = {
                     view: "iconpicker",
@@ -272,7 +278,9 @@ Use this directive to construct a header inside the main editor window.
                 hideDescription: "@",
                 descriptionLocked: "@",
                 navigation: "=",
-                key: "="
+                key: "=",
+                onBack: "&?",
+                showBackButton: "@?"
             },
             link: link
         };

@@ -2,10 +2,10 @@
     
     <div class="flex items-center">
 
-        <div>
-            <!--
-                <a href="#" ng-click="" prevent-default>Back</a>
-            -->
+        <div ng-if="showBackButton" style="margin-right: 15px;">
+            <a class="umb-editor-header__back" href="#" ng-click="goBack()" prevent-default>
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </a>
         </div>
 
         <div style="flex: 1; margin-right: 20px;">

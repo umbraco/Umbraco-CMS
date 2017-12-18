@@ -302,6 +302,10 @@
 
     };
 
+    $scope.backToListView = function() {
+      $location.path($scope.page.listViewPath);
+    };
+
     $scope.restore = function (content) {
 
       $scope.page.buttonRestore = "busy";
