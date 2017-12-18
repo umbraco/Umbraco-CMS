@@ -208,6 +208,23 @@ Use this directive to construct a header inside the main editor window.
 
         function link(scope, el, attr, ctrl) {
 
+            scope.vm = {};
+
+            scope.variants = [
+                {
+                    "culture": "English (United States)"
+                },
+                {
+                    "culture": "Spanish (Spain)"
+                },
+                {
+                    "culture": "French (France)"
+                },
+                {
+                    "culture": "German (Germany)"
+                }
+            ];
+
             scope.openIconPicker = function() {
                 scope.dialogModel = {
                     view: "iconpicker",
