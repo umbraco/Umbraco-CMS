@@ -10,8 +10,12 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
         templateUrl: 'views/components/application/umb-sections.html',
         link: function (scope, element, attr, ctrl) {
 
+			var sectionItemsWidth = [];
+			var evts = [];
+			var maxSections = 7;
+
             //setup scope vars
-			scope.maxSections = 7;
+			scope.maxSections = maxSections;
 			scope.overflowingSections = 0;
             scope.sections = [];
             scope.currentSection = appState.getSectionState("currentSection");
@@ -23,6 +27,14 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			    sectionService.getSectionsForUser()
 					.then(function (result) {
 						scope.sections = result;
+						// store the width of each section so we can hide/show them based on browser width 
+						// we store them because the sections get removed from the dom and then we 
+						// can't tell when to show them gain
+						$timeout(function(){
+							$("#applications .sections li").each(function(index) {
+								sectionItemsWidth.push($(this).outerWidth());
+							});
+						});
 						calculateWidth();
 					});
 			}
@@ -30,19 +42,27 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			function calculateWidth(){
 				$timeout(function(){
 					//total width minus room for avatar, search, and help icon
-					var width = $(window).width()-200;
+					var windowWidth = $(window).width()-200;
+					var sectionsWidth = 0;
 					scope.totalSections = scope.sections.length;
-					scope.maxSections = Math.floor(width / 70);
+					scope.maxSections = maxSections;
+					scope.overflowingSections = 0;
 					scope.needTray = false;
+					
+					// detect how many sections we can show on the screen
+					for (var i = 0; i < sectionItemsWidth.length; i++) {
+						var sectionItemWidth = sectionItemsWidth[i];
+						sectionsWidth += sectionItemWidth;
 
-					if(scope.totalSections > scope.maxSections){
-						scope.needTray = true;
-						scope.overflowingSections = scope.maxSections - scope.totalSections;
+						if(sectionsWidth > windowWidth) {
+							scope.needTray = true;
+							scope.maxSections = i - 1;
+							scope.overflowingSections = scope.maxSections - scope.totalSections;
+							break;
+						}
 					}
 				});
 			}
-
-			var evts = [];
 
             //Listen for global state changes
             evts.push(eventsService.on("appState.globalState.changed", function(e, args) {

@@ -72,7 +72,7 @@ ul.sections>li.expand i {
 
 ul.sections-tray {
 	position: absolute;
-	top: 60px;
+	top: @appHeaderHeight;
 	left: 0;
 	margin: 0;
     list-style: none;
@@ -85,9 +85,31 @@ ul.sections-tray>li>a {
 	padding: 8px 24px;
 	color: @white;
 	text-decoration: none;
-    display: block;
+	display: block;
+	position: relative;
 }
 
-ul.sections-tray>li>a:hover {
-	background: @purple-l1;
+ul.sections-tray>li>a::after {
+	content: "";
+	width: 4px;
+	height: 100%;
+	background-color: @turquoise;
+	position: absolute;
+	border-radius: 0 3px 3px 0;
+	opacity: 0;
+	transition: all .2s linear;
+	top: 0;
+	left: 0;
+}
+
+ul.sections-tray>li.current>a::after {
+	opacity: 1;
+}
+
+ul.sections-tray>li>a .section__name {
+	opacity: 0.6;
+}
+
+ul.sections-tray>li>a:hover	.section__name {
+	opacity: 1;
 }

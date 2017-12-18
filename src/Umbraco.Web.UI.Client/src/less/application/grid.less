@@ -176,7 +176,7 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 //empty section modification
-.emptySection #contentwrapper, .emptySection #umb-notifications-wrapper {left: 80px;}
+.emptySection #umb-notifications-wrapper {left: 80px;}
 .emptySection #speechbubble {left: 0;}
 .emptySection #navigation {display: none}
 
@@ -186,60 +186,4 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 .login-only #speechbubble ul {
     padding-left:20px
-}
-
-@media (max-width: 767px) {
-
-    // make leftcolumn smaller on tablets
-    #leftcolumn {
-        width: 61px;
-    }
-    #applications ul.sections {
-        width: 61px;
-    }
-    ul.sections.sections-tray {
-        width: 61px;
-    }
-    #applications-tray {
-        left: 60px;
-    }
-    #navigation {
-        left: 60px;
-    }
-    #contentwrapper, #contentcolumn, #umb-notifications-wrapper {
-        left: 30px;
-    }
-    #umbracoMainPageBody .umb-modal-left.fade.in {
-        margin-left: 61px;
-    }
-}
-
-@media (max-width: 500px) {
-
-    // make leftcolumn smaller on mobiles
-    #leftcolumn {
-        width: 41px;
-    }
-    #applications ul.sections {
-        width: 41px;
-    }
-    #applications ul.sections-tray {
-        width: 41px;
-    }
-    ul.sections.sections-tray {
-        width: 41px;
-    }
-    #applications-tray {
-        left: 40px;
-    }
-    #navigation {
-        left: 40px;
-    }
-    #contentwrapper, #contentcolumn, #umb-notifications-wrapper {
-        left: 20px;
-    }
-    #umbracoMainPageBody .umb-modal-left.fade.in {
-        margin-left: 41px;
-        width: 85%!important;
-    }
 }
