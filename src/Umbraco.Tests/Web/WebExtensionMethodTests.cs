@@ -36,6 +36,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 false);
             var items = new Dictionary<object, object>()
             {
@@ -62,6 +64,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 false);
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -84,6 +88,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 false);
 
             var r1 = new RouteData();
@@ -114,6 +120,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), appCtx),
                 Mock.Of<IUmbracoSettingsSection>(),
                 new List<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 false);
             var items = new Dictionary<object, object>()
             {

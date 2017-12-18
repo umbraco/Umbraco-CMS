@@ -66,6 +66,10 @@ namespace Umbraco.Web
                 httpContext,
                 ApplicationContext.Current,
                 new WebSecurity(httpContext, ApplicationContext.Current),
+                UmbracoConfig.For.UmbracoSettings(),
+                UrlProviderResolver.Current.Providers,
+                SecureRequestResolver.Current.SecureRequest,
+                SiteDomainHelperResolver.Current.Helper,
                 true);
 		}
 

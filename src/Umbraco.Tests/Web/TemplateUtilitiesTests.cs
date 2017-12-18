@@ -64,6 +64,8 @@ namespace Umbraco.Tests.Web
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 //pass in the custom url provider
                 new[]{ testUrlProvider.Object },
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true))
             {
                 var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);

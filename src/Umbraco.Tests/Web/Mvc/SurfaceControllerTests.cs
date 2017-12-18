@@ -40,6 +40,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var ctrl = new TestSurfaceController(umbCtx);
@@ -64,6 +66,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var ctrl = new TestSurfaceController(umbCtx);
@@ -86,6 +90,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var ctrl = new TestSurfaceController(umbCtx);
@@ -106,6 +112,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var helper = new UmbracoHelper(
@@ -144,6 +152,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);

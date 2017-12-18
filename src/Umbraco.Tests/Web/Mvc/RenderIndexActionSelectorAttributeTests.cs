@@ -49,6 +49,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
             var ctrl = new MatchesDefaultIndexController(umbCtx);
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -72,6 +74,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
             var ctrl = new MatchesOverriddenIndexController(umbCtx);
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -95,6 +99,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
             var ctrl = new MatchesCustomIndexController(umbCtx);
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -118,6 +124,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null).Object,
                 Mock.Of<IUmbracoSettingsSection>(),
                 Enumerable.Empty<IUrlProvider>(),
+                SecureRequest.Instance,
+                new SiteDomainHelper(SecureRequest.Instance),
                 true);
             var ctrl = new MatchesAsyncIndexController(umbCtx);
             var controllerCtx = new ControllerContext(req, ctrl);

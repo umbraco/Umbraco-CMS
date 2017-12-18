@@ -72,6 +72,8 @@ namespace Umbraco.Web.Scheduling
                         new WebSecurity(httpContext, _appContext),
                         _settings,
                         UrlProviderResolver.Current.Providers,
+                        SecureRequestResolver.Current.SecureRequest,
+                        SiteDomainHelperResolver.Current.Helper,
                         true);
 
                     var publisher = new ScheduledPublisher(_appContext.Services.ContentService);

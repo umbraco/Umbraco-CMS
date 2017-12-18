@@ -124,6 +124,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                     webSecurity.Object,
                     Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                     Enumerable.Empty<IUrlProvider>(),
+                    SecureRequest.Instance,
+                    new SiteDomainHelper(SecureRequest.Instance),
                     true); //replace it
 
                 var urlHelper = new Mock<IUrlProvider>();

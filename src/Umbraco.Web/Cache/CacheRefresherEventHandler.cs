@@ -758,6 +758,8 @@ namespace Umbraco.Web.Cache
                     new WebSecurity(httpContext, ApplicationContext.Current),
                     UmbracoConfig.For.UmbracoSettings(),
                     UrlProviderResolver.Current.Providers,
+                    SecureRequestResolver.Current.SecureRequest,
+                    SiteDomainHelperResolver.Current.Helper,
                     true);
             }
 
