@@ -56,15 +56,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             if ($scope.user.locale) {
                 tmhDynamicLocale.set($scope.user.locale);
             }
-
-            if ($scope.user.avatars) {
-                $scope.avatar = [];
-                if (angular.isArray($scope.user.avatars)) {
-                    for (var i = 0; i < $scope.user.avatars.length; i++) {
-                        $scope.avatar.push({ value: $scope.user.avatars[i] });
-                    }
-                }
-            }
         });
     }));
 
@@ -110,16 +101,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             tmhDynamicLocale.set($scope.user.locale);
         }
 
-        if ($scope.user.avatars) {
-
-            $scope.avatar = [];
-            if (angular.isArray($scope.user.avatars)) {
-                for (var i = 0; i < $scope.user.avatars.length; i++) {
-                    $scope.avatar.push({ value: $scope.user.avatars[i] });
-                }
-            }
-
-        }
     }));
 
     evts.push(eventsService.on("app.ysod", function (name, error) {
