@@ -1,65 +1,112 @@
 ﻿using System;
 using NPoco;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Syntax.Alter;
-using Umbraco.Core.Migrations.Syntax.Create;
-using Umbraco.Core.Migrations.Syntax.Delete;
-using Umbraco.Core.Migrations.Syntax.Execute;
-using Umbraco.Core.Migrations.Syntax.IfDatabase;
-using Umbraco.Core.Migrations.Syntax.Insert;
-using Umbraco.Core.Migrations.Syntax.Rename;
-using Umbraco.Core.Migrations.Syntax.Update;
+using Umbraco.Core.Migrations.Expressions.Alter;
+using Umbraco.Core.Migrations.Expressions.Create;
+using Umbraco.Core.Migrations.Expressions.Delete;
+using Umbraco.Core.Migrations.Expressions.Execute;
+using Umbraco.Core.Migrations.Expressions.Insert;
+using Umbraco.Core.Migrations.Expressions.Rename;
+using Umbraco.Core.Migrations.Expressions.Update;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations
 {
+    /// <summary>
+    /// Provides a base class to all migrations.
+    /// </summary>
     public abstract class MigrationBase : IMigration
     {
-        public ISqlSyntaxProvider SqlSyntax => Context.SqlContext.SqlSyntax;
-
-        public DatabaseType DatabaseType => Context.Database.DatabaseType;
-
-        public ILogger Logger { get; }
-        protected IMigrationContext Context { get; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationBase"/> class.
+        /// </summary>
+        /// <param name="context">A migration context.</param>
         protected MigrationBase(IMigrationContext context)
         {
-            Logger = context.Logger;
             Context = context;
         }
 
+        /// <summary>
+        /// Gets the migration context.
+        /// </summary>
+        protected IMigrationContext Context { get; }
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        protected ILogger Logger => Context.Logger;
+
+        /// <summary>
+        /// Gets the Sql syntax.
+        /// </summary>
+        protected ISqlSyntaxProvider SqlSyntax => Context.SqlContext.SqlSyntax;
+
+        /// <summary>
+        /// Gets the database instance.
+        /// </summary>
+        protected IUmbracoDatabase Database => Context.Database;
+
+        /// <summary>
+        /// Gets the database type.
+        /// </summary>
+        protected DatabaseType DatabaseType => Context.Database.DatabaseType;
+
+        /// <summary>
+        /// Creates a new Sql statement.
+        /// </summary>
+        protected Sql<ISqlContext> Sql() => Context.SqlContext.Sql();
+
+        /// <summary>
+        /// Creates a new Sql statement with arguments.
+        /// </summary>
+        protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
+
+        /// <inheritdoc />
         public virtual void Up()
         {
             throw new NotSupportedException("This migration does not implement the \"up\" operation.");
         }
 
+        /// <inheritdoc />
         public virtual void Down()
         {
             throw new NotSupportedException("This migration does not implement the \"down\" operation.");
         }
 
-        public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(Context);
+        /// <summary>
+        /// Builds an Alter expression.
+        /// </summary>
+        public IAlterBuilder Alter => new AlterBuilder(Context);
 
+        /// <summary>
+        /// Builds a Create expression.
+        /// </summary>
         public ICreateBuilder Create => new CreateBuilder(Context);
 
+        /// <summary>
+        /// Builds a Delete expression.
+        /// </summary>
         public IDeleteBuilder Delete => new DeleteBuilder(Context);
 
+        /// <summary>
+        /// Builds an Execute expression.
+        /// </summary>
         public IExecuteBuilder Execute => new ExecuteBuilder(Context);
 
+        /// <summary>
+        /// Builds an Insert expression.
+        /// </summary>
         public IInsertBuilder Insert => new InsertBuilder(Context);
 
+        /// <summary>
+        /// Builds a Rename expression.
+        /// </summary>
         public IRenameBuilder Rename => new RenameBuilder(Context);
 
+        /// <summary>
+        /// Builds an Update expression.
+        /// </summary>
         public IUpdateBuilder Update => new UpdateBuilder(Context);
-
-        protected Sql<ISqlContext> Sql() => Context.SqlContext.Sql();
-
-        protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
-
-        public IIfDatabaseBuilder IfDatabase(params DatabaseType[] supportedDatabaseTypes)
-        {
-            return new IfDatabaseBuilder(Context, supportedDatabaseTypes);
-        }
     }
 }

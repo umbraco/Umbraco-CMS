@@ -4,8 +4,8 @@ using NUnit.Framework;
 using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
+using Umbraco.Core.Migrations.Expressions.Execute;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.Syntax.Execute;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -208,7 +208,7 @@ namespace Umbraco.Tests.Migrations
                 //Execute.DropKeysAndIndexes("umbracoNode");
 
                 // drops *all* tables keys and indexes
-                Execute.DropKeysAndIndexes();
+                Delete.KeysAndIndexes();
             }
         }
 
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Migrations
             public override void Up()
             {
                 // cannot delete the column without this, of course
-                Execute.DropKeysAndIndexes();
+                Delete.KeysAndIndexes();
 
                 Delete.Column("id").FromTable("umbracoNode");
 

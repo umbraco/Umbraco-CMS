@@ -8,7 +8,7 @@ using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Syntax.Alter.Expressions;
+using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;

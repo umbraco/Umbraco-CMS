@@ -5,6 +5,7 @@
     /// </summary>
     public interface IMigrationExpression
     {
-        string Process(IMigrationContext context);
+        string Process(IMigrationContext context); // fixme kill
+        void Execute();
     }
 }

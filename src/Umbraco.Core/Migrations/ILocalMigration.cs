@@ -1,8 +1,8 @@
-﻿using Umbraco.Core.Migrations.Syntax.Alter;
-using Umbraco.Core.Migrations.Syntax.Create;
-using Umbraco.Core.Migrations.Syntax.Delete;
-using Umbraco.Core.Migrations.Syntax.Execute;
-using Umbraco.Core.Migrations.Syntax.Update;
+﻿using Umbraco.Core.Migrations.Expressions.Alter;
+using Umbraco.Core.Migrations.Expressions.Create;
+using Umbraco.Core.Migrations.Expressions.Delete;
+using Umbraco.Core.Migrations.Expressions.Execute;
+using Umbraco.Core.Migrations.Expressions.Update;
 
 namespace Umbraco.Core.Migrations
 {
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Migrations
         IExecuteBuilder Execute { get; }
         IDeleteBuilder Delete { get; }
         IUpdateBuilder Update { get; }
-        IAlterSyntaxBuilder Alter { get; }
+        IAlterBuilder Alter { get; }
         ICreateBuilder Create { get; }
         string GetSql();
     }

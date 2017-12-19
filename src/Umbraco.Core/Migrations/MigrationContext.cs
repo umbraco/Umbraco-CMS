@@ -15,14 +15,16 @@ namespace Umbraco.Core.Migrations
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public ICollection<IMigrationExpression> Expressions { get; set; }
+        public ILogger Logger { get; }
 
         public IUmbracoDatabase Database { get; }
 
         public ISqlContext SqlContext => Database.SqlContext;
 
-        public ILogger Logger { get; }
+        public int Index { get; set; }
 
-        public ILocalMigration GetLocalMigration() => new LocalMigration(Database, Logger);
+        public ICollection<IMigrationExpression> Expressions { get; set; } // fixme kill
+
+        public ILocalMigration GetLocalMigration() => new LocalMigration(Database, Logger); // fixme kill
     }
 }

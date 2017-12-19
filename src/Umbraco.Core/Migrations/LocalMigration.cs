@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Text;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Syntax.Alter;
-using Umbraco.Core.Migrations.Syntax.Create;
-using Umbraco.Core.Migrations.Syntax.Delete;
-using Umbraco.Core.Migrations.Syntax.Execute;
-using Umbraco.Core.Migrations.Syntax.Update;
+using Umbraco.Core.Migrations.Expressions.Alter;
+using Umbraco.Core.Migrations.Expressions.Create;
+using Umbraco.Core.Migrations.Expressions.Delete;
+using Umbraco.Core.Migrations.Expressions.Execute;
+using Umbraco.Core.Migrations.Expressions.Update;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Migrations
 
         public IUpdateBuilder Update => new UpdateBuilder(this);
 
-        public IAlterSyntaxBuilder Alter => new AlterSyntaxBuilder(this);
+        public IAlterBuilder Alter => new AlterBuilder(this);
 
         public ICreateBuilder Create => new CreateBuilder(this);
 
