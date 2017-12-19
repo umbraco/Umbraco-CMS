@@ -805,13 +805,13 @@ namespace Umbraco.Web.Cache
         /// <summary>
         /// Used to cache all found event handlers
         /// </summary>
-        private static readonly ConcurrentDictionary<IEventDefinition, MethodInfo> FoundHandlers = new ConcurrentDictionary<IEventDefinition, MethodInfo>();
+        private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();
 
         internal static MethodInfo FindHandler(IEventDefinition eventDefinition)
         {
             var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
 
-            return FoundHandlers.GetOrAdd(eventDefinition, _ => CandidateHandlers.Value.FirstOrDefault(x => x.Name == name));
+            return FoundHandlers.GetOrAdd(name, n => CandidateHandlers.Value.FirstOrDefault(x => x.Name == n));
         }
     }
 }
