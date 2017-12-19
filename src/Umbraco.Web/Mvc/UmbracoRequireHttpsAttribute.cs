@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Web.Mvc
@@ -30,7 +31,19 @@ namespace Umbraco.Web.Mvc
             // If umbracoSSL is set, let base method handle checking for HTTPS.  Otherwise, we don't care.
             if (GlobalSettings.UseSSL)
             {
-                base.OnAuthorization(filterContext);
+                if (filterContext == null)
+                  throw new ArgumentNullException("filterContext");
+
+                if (filterContext.HttpContext.Request.IsSecureConnection)
+                  return;
+
+                if (string.Equals(filterContext.HttpContext.Request.Headers["X-Forwarded-Proto"], "https", StringComparison.OrdinalIgnoreCase))
+                  return;
+
+                if (filterContext.HttpContext.Request.IsLocal)
+                  return;
+                
+                base.HandleNonHttpsRequest(filterContext);
             }
         }
 
