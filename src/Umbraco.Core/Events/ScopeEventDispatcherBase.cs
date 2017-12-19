@@ -170,10 +170,13 @@ namespace Umbraco.Core.Events
                     if (eventObjects == null)
                     {
                         // single object, cast as an IEntity
-                        // if cannot cast, cannot filter, nothing to do - just add to output FIXME not?
+                        // if cannot cast, cannot filter, nothing - just include event definition in result
                         var eventEntity = args.EventObject as IEntity;
                         if (eventEntity == null)
+                        {
+                            result.Add(def);
                             continue;
+                        }
 
                         // look for this entity in superceding event args
                         // found = must be removed (ie not added), else track
