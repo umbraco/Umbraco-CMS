@@ -2,10 +2,10 @@
 
     <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
-
+    
     <div class="flex error">
-        <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
-            <li style="width: 120px; height: 100px; overflow: hidden;" ng-repeat="image in images">
+        <ul ui-sortable="sortableOptions" ng-model="images" ng-if="images.length > 0" class="umb-sortable-thumbnails">
+            <li class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images">
 
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
@@ -30,9 +30,9 @@
                 </div>
 
             </li>
-
         </ul>
-        <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': images.length === 0}" ng-if="showAdd()" prevent-default>
+
+        <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" ng-if="showAdd()" prevent-default>
             <i class="icon icon-add large"></i>
         </a>
     </div>
