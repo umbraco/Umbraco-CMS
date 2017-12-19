@@ -32,11 +32,10 @@ angular.module("umbraco.directives")
                                 var wrapper = $("#mainwrapper");
                                 var contentPanel = $("#contentwrapper");
                                 var umbNotification = $("#umb-notifications-wrapper");
-                                var apps = $("#applications");
                                 var bottomBar = contentPanel.find(".umb-bottom-bar");
                                 var navOffeset = $("#navOffset");
 
-                                var leftPanelWidth = ui.element.width() + apps.width();
+                                var leftPanelWidth = ui.element.width();
 
                                 contentPanel.css({ left: leftPanelWidth });
                                 bottomBar.css({ left: leftPanelWidth });
