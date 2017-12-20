@@ -5,7 +5,7 @@
     
     <div class="flex error">
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
-            <li class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images">
+            <li class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
