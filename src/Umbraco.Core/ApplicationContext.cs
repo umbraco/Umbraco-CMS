@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
 using Umbraco.Core.Configuration;
@@ -260,7 +261,7 @@ namespace Umbraco.Core
         /// - http://issues.umbraco.org/issue/U4-5728
         /// - http://issues.umbraco.org/issue/U4-5391
         /// </remarks>
-        internal string UmbracoApplicationUrl
+        public string UmbracoApplicationUrl
         {
             get
             {
@@ -269,8 +270,20 @@ namespace Umbraco.Core
             }
         }
 
+        /// <summary>
+        /// Resets the url.
+        /// </summary>
+        public void ResetUmbracoApplicationUrl()
+        {
+            _umbracoApplicationUrl = null;
+        }
+
 	    // ReSharper disable once InconsistentNaming
 	    internal string _umbracoApplicationUrl;
+
+        internal List<string> _umbracoApplicationDomains = new List<string>();
+
+        internal string _umbracoApplicationDeploymentId;
 
         private Lazy<bool> _configured;
         internal MainDom MainDom { get; private set; }
