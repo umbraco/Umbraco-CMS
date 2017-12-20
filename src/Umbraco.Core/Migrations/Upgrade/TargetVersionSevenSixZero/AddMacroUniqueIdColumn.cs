@@ -16,31 +16,33 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 
             if (columns.Any(x => x.TableName.InvariantEquals("cmsMacro") && x.ColumnName.InvariantEquals("uniqueId")) == false)
             {
-                Create.Column("uniqueId").OnTable("cmsMacro").AsGuid().Nullable();
-                Execute.Code(UpdateMacroGuids);
-                Alter.Table("cmsMacro").AlterColumn("uniqueId").AsGuid().NotNullable();
+                Create.Column("uniqueId").OnTable("cmsMacro").AsGuid().Nullable().Do();
+                UpdateMacroGuids();
+                Alter.Table("cmsMacro").AlterColumn("uniqueId").AsGuid().NotNullable().Do();
                 Create.Index("IX_cmsMacro_UniqueId").OnTable("cmsMacro").OnColumn("uniqueId")
                     .Ascending()
                     .WithOptions().NonClustered()
-                    .WithOptions().Unique();
+                    .WithOptions().Unique()
+                    .Do();
 
             }
 
             if (columns.Any(x => x.TableName.InvariantEquals("cmsMacroProperty") && x.ColumnName.InvariantEquals("uniquePropertyId")) == false)
             {
-                Create.Column("uniquePropertyId").OnTable("cmsMacroProperty").AsGuid().Nullable();
-                Execute.Code(UpdateMacroPropertyGuids);
-                Alter.Table("cmsMacroProperty").AlterColumn("uniquePropertyId").AsGuid().NotNullable();
+                Create.Column("uniquePropertyId").OnTable("cmsMacroProperty").AsGuid().Nullable().Do();
+                UpdateMacroPropertyGuids();
+                Alter.Table("cmsMacroProperty").AlterColumn("uniquePropertyId").AsGuid().NotNullable().Do();
                 Create.Index("IX_cmsMacroProperty_UniquePropertyId").OnTable("cmsMacroProperty").OnColumn("uniquePropertyId")
                     .Ascending()
                     .WithOptions().NonClustered()
-                    .WithOptions().Unique();
+                    .WithOptions().Unique()
+                    .Do();
             }
         }
 
-        private static string UpdateMacroGuids(IMigrationContext context)
+        private void UpdateMacroGuids()
         {
-            var database = context.Database;
+            var database = Database;
 
             var updates = database.Query<dynamic>("SELECT id, macroAlias FROM cmsMacro")
                 .Select(macro => Tuple.Create((int) macro.id, ("macro____" + (string) macro.macroAlias).ToGuid()))
@@ -48,13 +50,11 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 
             foreach (var update in updates)
                 database.Execute("UPDATE cmsMacro set uniqueId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
-
-            return string.Empty;
         }
 
-        private static string UpdateMacroPropertyGuids(IMigrationContext context)
+        private void UpdateMacroPropertyGuids()
         {
-            var database = context.Database;
+            var database = Database;
 
             var updates = database.Query<dynamic>(@"SELECT cmsMacroProperty.id id, macroPropertyAlias propertyAlias, cmsMacro.macroAlias macroAlias
 FROM cmsMacroProperty
@@ -64,8 +64,6 @@ JOIN cmsMacro ON cmsMacroProperty.macro=cmsMacro.id")
 
             foreach (var update in updates)
                 database.Execute("UPDATE cmsMacroProperty set uniquePropertyId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
-
-            return string.Empty;
         }
 
         public override void Down()

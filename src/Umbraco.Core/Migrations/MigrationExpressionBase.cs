@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Umbraco.Core.Migrations
     public abstract class MigrationExpressionBase : IMigrationExpression
     {
         private bool _executed;
+        private List<IMigrationExpression> _expressions;
 
         protected MigrationExpressionBase(IMigrationContext context, DatabaseType[] supportedDatabaseTypes = null)
         {
@@ -31,6 +33,8 @@ namespace Umbraco.Core.Migrations
         protected IUmbracoDatabase Database => Context.Database;
 
         public DatabaseType DatabaseType => Context.Database.DatabaseType;
+
+        public List<IMigrationExpression> Expressions => _expressions ?? (_expressions = new List<IMigrationExpression>());
 
         public DatabaseType[] SupportedDatabaseTypes { get; }
 
@@ -93,6 +97,12 @@ namespace Umbraco.Core.Migrations
             }
 
             Context.Index++;
+
+            if (_expressions == null)
+                return;
+
+            foreach (var expression in _expressions)
+                expression.Execute();
         }
 
         private void ExecuteStatement(StringBuilder stmtBuilder)

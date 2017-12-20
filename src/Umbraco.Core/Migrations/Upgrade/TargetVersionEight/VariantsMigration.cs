@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Umbraco.Core.Migrations.Expressions.Execute;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -24,7 +23,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
         public override void Up()
         {
             // delete *all* keys and indexes - because of FKs
-            Delete.KeysAndIndexes();
+            Delete.KeysAndIndexes().Do();
 
             MigratePropertyData();
             MigrateContentAndPropertyTypes();
@@ -54,7 +53,7 @@ HAVING COUNT(v2.id) <> 1").Any())
 
             // re-create *all* keys and indexes
             foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x.Value);
+                Create.KeysAndIndexes(x.Value).Do();
         }
 
         private void MigratePropertyData()
@@ -84,21 +83,21 @@ HAVING COUNT(v2.id) <> 1").Any())
             // transform column versionId from guid to integer (contentVersion.id)
             if (ColumnType(PreTables.PropertyData, "versionId") == "uniqueidentifier")
             {
-                Execute.Sql($"ALTER TABLE {PreTables.PropertyData} ADD COLUMN versionId2 INT NULL;");
+                Database.Execute($"ALTER TABLE {PreTables.PropertyData} ADD COLUMN versionId2 INT NULL;");
                 // SQLCE does not support UPDATE...FROM
                 var temp = Database.Fetch<dynamic>($"SELECT id, versionId FROM {PreTables.ContentVersion}");
                 foreach (var t in temp)
                     Database.Execute($"UPDATE {PreTables.PropertyData} SET versionId2=@v2 WHERE versionId=@v1", new { v1 = t.versionId, v2 = t.id });
-                Delete.Column("versionId").FromTable(PreTables.PropertyData);
+                Delete.Column("versionId").FromTable(PreTables.PropertyData).Do();
                 ReplaceColumn<PropertyDataDto>(PreTables.PropertyData, "versionId2", "versionId");
             }
 
             // drop column
             if (ColumnExists(PreTables.PropertyData, "contentNodeId"))
-                Delete.Column("contentNodeId").FromTable(PreTables.PropertyData);
+                Delete.Column("contentNodeId").FromTable(PreTables.PropertyData).Do();
 
             // rename table
-            Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData);
+            Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData).Do();
         }
 
         private void MigrateContentAndPropertyTypes()
@@ -121,10 +120,10 @@ HAVING COUNT(v2.id) <> 1").Any())
 
             // drop columns
             if (ColumnExists(PreTables.Content, "pk"))
-                Delete.Column("pk").FromTable(PreTables.Content);
+                Delete.Column("pk").FromTable(PreTables.Content).Do();
 
             // rename table
-            Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content);
+            Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content).Do();
         }
 
         private void MigrateVersions()
@@ -149,14 +148,14 @@ HAVING COUNT(v2.id) <> 1").Any())
             if (!ColumnExists(PreTables.ContentVersion, "current"))
             {
                 AddColumn<ContentVersionDto>(PreTables.ContentVersion, "current", out var sqls);
-                Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} SET {SqlSyntax.GetQuotedColumnName("current")}=0");
-                foreach (var sql in sqls) Execute.Sql(sql);
+                Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} SET {SqlSyntax.GetQuotedColumnName("current")}=0");
+                foreach (var sql in sqls) Database.Execute(sql);
             }
             if (!ColumnExists(PreTables.ContentVersion, "userId"))
             {
                 AddColumn<ContentVersionDto>(PreTables.ContentVersion, "userId", out var sqls);
-                Execute.Sql($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} SET userId=0");
-                foreach (var sql in sqls) Execute.Sql(sql);
+                Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} SET userId=0");
+                foreach (var sql in sqls) Database.Execute(sql);
             }
 
             // rename contentVersion contentId column
@@ -182,10 +181,10 @@ WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName
                     new { text = t.text, versionId=t.versionId });
 
             // create table
-            Create.Table<DocumentVersionDto>(withoutKeysAndIndexes: true);
+            Create.Table<DocumentVersionDto>(withoutKeysAndIndexes: true).Do();
 
             // every document row becomes a document version
-            Execute.Sql($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
+            Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
 SELECT cver.id, doc.templateId, doc.published
 FROM {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId");
@@ -219,23 +218,23 @@ VALUES (@id, @templateId, 0)", new { id=id, templateId=t.templateId });
             }
 
             // reduce document to 1 row per content
-            Execute.Sql($@"DELETE FROM {PreTables.Document}
+            Database.Execute($@"DELETE FROM {PreTables.Document}
 WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE {SqlSyntax.GetQuotedColumnName("current")} = 1) AND (published<>1 OR newest<>1)");
 
             // drop some document columns
-            Delete.Column("text").FromTable(PreTables.Document);
-            Delete.Column("templateId").FromTable(PreTables.Document);
-            Delete.Column("documentUser").FromTable(PreTables.Document);
-            Delete.Column("updateDate").FromTable(PreTables.Document);
-            Delete.Column("versionId").FromTable(PreTables.Document);
-            Delete.Column("newest").FromTable(PreTables.Document);
+            Delete.Column("text").FromTable(PreTables.Document).Do();
+            Delete.Column("templateId").FromTable(PreTables.Document).Do();
+            Delete.Column("documentUser").FromTable(PreTables.Document).Do();
+            Delete.Column("updateDate").FromTable(PreTables.Document).Do();
+            Delete.Column("versionId").FromTable(PreTables.Document).Do();
+            Delete.Column("newest").FromTable(PreTables.Document).Do();
 
             // add and populate edited column
             if (!ColumnExists(PreTables.Document, "edited"))
             {
                 AddColumn<DocumentDto>(PreTables.Document, "edited", out var sqls);
-                Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edited=0");
-                foreach (var sql in sqls) Execute.Sql(sql);
+                Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edited=0");
+                foreach (var sql in sqls) Database.Execute(sql);
             }
 
             // set 'edited' to true whenever a 'non-published' property data is != a published one
@@ -258,11 +257,11 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
                     Database.Execute("UPDATE {SqlSyntax.GetQuotedTableName(PreTables.Document)} SET edited=1 WHERE nodeId=@nodeIdd", new { t.id });
 
             // drop more columns
-            Delete.Column("versionId").FromTable(PreTables.ContentVersion);
+            Delete.Column("versionId").FromTable(PreTables.ContentVersion).Do();
 
             // rename tables
-            Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion);
-            Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document);
+            Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion).Do();
+            Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document).Do();
         }
 
         private static class PreTables
@@ -335,7 +334,7 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
         private void AddColumn<T>(string tableName, string columnName)
         {
             AddColumn<T>(tableName, columnName, out var sqls);
-            foreach (var sql in sqls) Execute.Sql(sql);
+            foreach (var sql in sqls) Database.Execute(sql);
         }
 
         private void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
@@ -346,15 +345,15 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out sqls);
-            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
+            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
         }
 
         private void ReplaceColumn<T>(string tableName, string currentName, string newName)
         {
             AddColumn<T>(tableName, newName, out var sqls);
-            Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}");
-            foreach (var sql in sqls) Execute.Sql(sql);
-            Delete.Column(currentName).FromTable(tableName);
+            Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}");
+            foreach (var sql in sqls) Database.Execute(sql);
+            Delete.Column(currentName).FromTable(tableName).Do();
         }
 
         private bool TableExists(string tableName)

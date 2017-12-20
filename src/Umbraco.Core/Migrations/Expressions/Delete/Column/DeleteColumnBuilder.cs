@@ -1,21 +1,20 @@
-﻿using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Column
 {
-    /// <summary>
-    /// Implements <see cref="IDeleteColumnBuilder"/>.
-    /// </summary>
-    public class DeleteColumnBuilder : ExpressionBuilderBase<DeleteColumnExpression>, IDeleteColumnBuilder
+    public class DeleteColumnBuilder : ExpressionBuilderBase<DeleteColumnExpression>,
+        IDeleteColumnBuilder
     {
         public DeleteColumnBuilder(DeleteColumnExpression expression)
             : base(expression)
         { }
 
         /// <inheritdoc />
-        public void FromTable(string tableName)
+        public IExecutableBuilder FromTable(string tableName)
         {
             Expression.TableName = tableName;
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
 
         /// <inheritdoc />

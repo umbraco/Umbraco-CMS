@@ -6,7 +6,7 @@
     public interface IUpdateBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Builds an Update Table expression.
+        /// Specifies the table to update.
         /// </summary>
         IUpdateTableBuilder Table(string tableName);
     }

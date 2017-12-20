@@ -1,13 +1,15 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
 {
     /// <summary>
-    /// Builds a Delete Default Constraint On Column expression.
+    /// Builds a Delete expression.
     /// </summary>
     public interface IDeleteDefaultConstraintOnColumnBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Specifies the column of the constraint to delete, and executes.
+        /// Specifies the column of the constraint to delete.
         /// </summary>
-        void OnColumn(string columnName);
+        IExecutableBuilder OnColumn(string columnName);
     }
 }

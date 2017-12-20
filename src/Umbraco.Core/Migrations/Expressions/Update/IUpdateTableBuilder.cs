@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Migrations.Expressions.Update
 {
     /// <summary>
-    /// Builds an Update Table expression.
+    /// Builds an Update expression.
     /// </summary>
     public interface IUpdateTableBuilder
     {

@@ -15,18 +15,19 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
         public override void Up()
         {
             if (ColumnExists("cmsContentXml", "Rv") == false)
-                Alter.Table("cmsContentXml").AddColumn("Rv").AsInt64().NotNullable().WithDefaultValue(0);
+                Alter.Table("cmsContentXml").AddColumn("Rv").AsInt64().NotNullable().WithDefaultValue(0).Do();
 
             if (ColumnExists("cmsPreviewXml", "Rv") == false)
-                Alter.Table("cmsPreviewXml").AddColumn("Rv").AsInt64().NotNullable().WithDefaultValue(0);
+                Alter.Table("cmsPreviewXml").AddColumn("Rv").AsInt64().NotNullable().WithDefaultValue(0).Do();
 
             // remove the any PK_ and the FK_ to cmsContentVersion.VersionId
             if (DatabaseType.IsMySql())
             {
-                Delete.PrimaryKey("PK_cmsPreviewXml").FromTable("cmsPreviewXml");
+                Delete.PrimaryKey("PK_cmsPreviewXml").FromTable("cmsPreviewXml").Do();
 
                 Delete.ForeignKey().FromTable("cmsPreviewXml").ForeignColumn("VersionId")
-                    .ToTable("cmsContentVersion").PrimaryColumn("VersionId");
+                    .ToTable("cmsContentVersion").PrimaryColumn("VersionId")
+                    .Do();
             }
             else
             {
@@ -41,28 +42,30 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
                         continue;
                     }
                     dups.Add(keyName);
-                    Delete.PrimaryKey(c.Item3).FromTable(c.Item1);
+                    Delete.PrimaryKey(c.Item3).FromTable(c.Item1).Do();
                 }
                 foreach (var c in constraints.Where(x => x.Item1.InvariantEquals("cmsPreviewXml") && x.Item3.InvariantStartsWith("FK_cmsPreviewXml_cmsContentVersion")))
                 {
                     Delete.ForeignKey().FromTable("cmsPreviewXml").ForeignColumn("VersionId")
-                        .ToTable("cmsContentVersion").PrimaryColumn("VersionId");
+                        .ToTable("cmsContentVersion").PrimaryColumn("VersionId")
+                        .Do();
                 }
             }
 
             if (ColumnExists("cmsPreviewXml", "Timestamp"))
-                Delete.Column("Timestamp").FromTable("cmsPreviewXml");
+                Delete.Column("Timestamp").FromTable("cmsPreviewXml").Do();
 
             if (ColumnExists("cmsPreviewXml", "VersionId"))
             {
                 RemoveDuplicates();
-                Delete.Column("VersionId").FromTable("cmsPreviewXml");
+                Delete.Column("VersionId").FromTable("cmsPreviewXml").Do();
             }
 
             // re-create the primary key
             Create.PrimaryKey("PK_cmsPreviewXml")
                 .OnTable("cmsPreviewXml")
-                .Columns(new[] { "nodeId" });
+                .Columns(new[] { "nodeId" })
+                .Do();
         }
 
         public override void Down()

@@ -9,12 +9,12 @@ namespace Umbraco.Core.Migrations.Expressions.Rename
     public interface IRenameBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Builds a Rename Table expression.
+        /// Specifies the table to rename.
         /// </summary>
         IRenameTableBuilder Table(string oldName);
 
         /// <summary>
-        /// Builds a Rename Column expression.
+        /// Specifies the column to rename.
         /// </summary>
         IRenameColumnBuilder Column(string oldName);
     }

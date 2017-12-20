@@ -16,7 +16,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Expressions
         public virtual string TableName { get; set; }
         public virtual IList<ColumnDefinition> Columns { get; set; }
 
-        public override string ToString()
+        protected override string GetSql()
         {
             var table = new TableDefinition { Name = TableName, SchemaName = SchemaName, Columns = Columns };
 

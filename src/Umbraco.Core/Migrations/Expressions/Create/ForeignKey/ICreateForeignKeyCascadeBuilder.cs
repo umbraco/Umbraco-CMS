@@ -1,11 +1,12 @@
 ﻿using System.Data;
+using Umbraco.Core.Migrations.Expressions.Common;
 
 namespace Umbraco.Core.Migrations.Expressions.Create.ForeignKey
 {
-    public interface ICreateForeignKeyCascadeBuilder : IFluentBuilder
+    public interface ICreateForeignKeyCascadeBuilder : IFluentBuilder, IExecutableBuilder
     {
         ICreateForeignKeyCascadeBuilder OnDelete(Rule rule);
         ICreateForeignKeyCascadeBuilder OnUpdate(Rule rule);
-        void OnDeleteOrUpdate(Rule rule);
+        IExecutableBuilder OnDeleteOrUpdate(Rule rule);
     }
 }

@@ -1,21 +1,20 @@
-﻿using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Constraint
 {
-    /// <summary>
-    /// Implements <see cref="IDeleteConstraintBuilder"/>.
-    /// </summary>
-    public class DeleteConstraintBuilder : ExpressionBuilderBase<DeleteConstraintExpression>, IDeleteConstraintBuilder
+    public class DeleteConstraintBuilder : ExpressionBuilderBase<DeleteConstraintExpression>,
+        IDeleteConstraintBuilder
     {
         public DeleteConstraintBuilder(DeleteConstraintExpression expression)
             : base(expression)
         { }
 
         /// <inheritdoc />
-        public void FromTable(string tableName)
+        public IExecutableBuilder FromTable(string tableName)
         {
             Expression.Constraint.TableName = tableName;
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
     }
 }

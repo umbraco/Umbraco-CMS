@@ -19,9 +19,6 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
 
         public ForeignKeyDefinition ForeignKey { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             if (IsExpressionSupported() == false)

@@ -16,9 +16,6 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
 
         public virtual object DefaultValue { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             //NOTE Should probably investigate if Deleting a Default Constraint is different from deleting a 'regular' constraint

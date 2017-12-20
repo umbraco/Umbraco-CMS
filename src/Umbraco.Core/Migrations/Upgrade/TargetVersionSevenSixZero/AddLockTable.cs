@@ -17,7 +17,8 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                 Create.Table("umbracoLock")
                     .WithColumn("id").AsInt32().PrimaryKey("PK_umbracoLock")
                     .WithColumn("value").AsInt32().NotNullable()
-                    .WithColumn("name").AsString(64).NotNullable();
+                    .WithColumn("name").AsString(64).NotNullable()
+                    .Do();
             }
         }
 

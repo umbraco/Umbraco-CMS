@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Migrations.Expressions.Create.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Migrations.Expressions.Create.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Create.Constraint
 {
@@ -6,27 +7,30 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Constraint
                                            ICreateConstraintOnTableBuilder,
                                            ICreateConstraintColumnsBuilder
     {
-        public CreateConstraintBuilder(CreateConstraintExpression expression) : base(expression)
-        {
-        }
+        public CreateConstraintBuilder(CreateConstraintExpression expression)
+            : base(expression)
+        { }
 
+        /// <inheritdoc />
         public ICreateConstraintColumnsBuilder OnTable(string tableName)
         {
             Expression.Constraint.TableName = tableName;
             return this;
         }
 
-        public void Column(string columnName)
+        /// <inheritdoc />
+        public IExecutableBuilder Column(string columnName)
         {
             Expression.Constraint.Columns.Add(columnName);
+            return new ExecutableBuilder(Expression);
         }
 
-        public void Columns(string[] columnNames)
+        /// <inheritdoc />
+        public IExecutableBuilder Columns(string[] columnNames)
         {
             foreach (var columnName in columnNames)
-            {
                 Expression.Constraint.Columns.Add(columnName);
-            }
+            return new ExecutableBuilder(Expression);
         }
     }
 }

@@ -21,13 +21,14 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                     .OnColumn("nodeId")
                     .Ascending()
                     .WithOptions()
-                    .NonClustered();
+                    .NonClustered()
+                    .Do();
             }
         }
 
         public override void Down()
         {
-            Delete.Index("IX_umbracoUser2NodePermission_nodeId").OnTable("cmsMember");
+            Delete.Index("IX_umbracoUser2NodePermission_nodeId").OnTable("cmsMember").Do();
         }
     }
 }

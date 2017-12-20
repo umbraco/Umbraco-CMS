@@ -15,7 +15,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Expressions
 
         public ConstraintDefinition Constraint { get; private set; }
 
-        public override string ToString()
+        protected override string GetSql()
         {
             var constraintType = (Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
 

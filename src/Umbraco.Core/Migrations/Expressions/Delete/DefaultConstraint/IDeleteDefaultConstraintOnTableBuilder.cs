@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
 {
     /// <summary>
-    /// Builds a Delete Default Constraint On Table expression.
+    /// Builds a Delete expression.
     /// </summary>
     public interface IDeleteDefaultConstraintOnTableBuilder : IFluentBuilder
     {

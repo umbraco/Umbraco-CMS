@@ -22,9 +22,6 @@ namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
         public virtual string NewName { get; set; }
 
         /// <inheritdoc />
-        public override string ToString() // fixme kill
-            => GetSql();
-
         /// <inheritdoc />
         protected override string GetSql()
         {

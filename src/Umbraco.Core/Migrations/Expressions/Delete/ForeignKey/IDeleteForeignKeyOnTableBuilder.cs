@@ -1,13 +1,15 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
 {
     /// <summary>
-    /// Builds a Delete Foreign Key expression.
+    /// Builds a Delete expression.
     /// </summary>
     public interface IDeleteForeignKeyOnTableBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Specifies the table of the foreign key, and executes.
+        /// Specifies the table of the foreign key.
         /// </summary>
-        void OnTable(string foreignTableName);
+        IExecutableBuilder OnTable(string foreignTableName);
     }
 }

@@ -13,12 +13,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 
         public override void Up()
         {
-            Execute.Code(UpdateTemplateGuids);
-        }
-
-        private static string UpdateTemplateGuids(IMigrationContext context)
-        {
-            var database = context.Database;
+            var database = Database;
 
             // we need this migration because ppl running pre-7.6 on Cloud and Courier have templates in different
             // environments having different GUIDs (Courier does not sync template GUIDs) and we need to normalize
@@ -29,7 +24,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
             // so... testing if we already have a 7.6.0 version installed. not pretty but...?
             //
             var version = database.FirstOrDefault<string>("SELECT version FROM umbracoMigration WHERE name=@name ORDER BY version DESC", new { name = Constants.System.UmbracoMigrationName });
-            if (version != null && version.StartsWith("7.6.0")) return string.Empty;
+            if (version != null && version.StartsWith("7.6.0")) return;
 
             var updates = database.Query<dynamic>(@"SELECT umbracoNode.id, cmsTemplate.alias FROM umbracoNode
 JOIN cmsTemplate ON umbracoNode.id=cmsTemplate.nodeId
@@ -39,8 +34,6 @@ WHERE nodeObjectType = @guid", new { guid = Constants.ObjectTypes.TemplateType }
 
             foreach (var update in updates)
                 database.Execute("UPDATE umbracoNode set uniqueId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
-
-            return string.Empty;
         }
 
         public override void Down()

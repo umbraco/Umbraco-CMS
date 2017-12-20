@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.SyntaxProvider
 {
@@ -97,65 +98,85 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_NonClustered_CreatesNonClusteredIndex()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
+            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
+
             var createExpression = new CreateIndexExpression(context, new []{ DatabaseType.SqlServer2005 })
             {
                 Index = { Name = "IX_A" }
             };
-            var builder = new CreateIndexBuilder(createExpression);
-            builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().NonClustered();
-            Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", createExpression.ToString());
+
+            new CreateIndexBuilder(createExpression)
+                .OnTable("TheTable").OnColumn("A").Ascending().WithOptions().NonClustered()
+                .Do();
+
+            Assert.AreEqual(1, db.Operations.Count);
+            Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
         }
 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
+            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
+
             var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
             {
                 Index = { Name = "IX_A" }
             };
-            var builder = new CreateIndexBuilder(createExpression);
-            builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Unique();
-            Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", createExpression.ToString());
+
+            new CreateIndexBuilder(createExpression)
+                .OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Unique()
+                .Do();
+
+            Assert.AreEqual(1, db.Operations.Count);
+            Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
         }
 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex_Multi_Columnn()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
+            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
+
             var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
             {
                 Index = { Name = "IX_AB" }
             };
-            var builder = new CreateIndexBuilder(createExpression);
-            builder.OnTable("TheTable").OnColumn("A").Ascending().OnColumn("B").Ascending().WithOptions().Unique();
-            Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", createExpression.ToString());
+
+            new CreateIndexBuilder(createExpression)
+                .OnTable("TheTable").OnColumn("A").Ascending().OnColumn("B").Ascending().WithOptions().Unique()
+                .Do();
+
+            Assert.AreEqual(1, db.Operations.Count);
+            Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", db.Operations[0].Sql);
         }
 
         [Test]
         public void CreateIndexBuilder_SqlServer_Clustered_CreatesClusteredIndex()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
             var logger = Mock.Of<ILogger>();
-            var db = TestObjects.GetUmbracoSqlServerDatabase(logger);
+            var sqlSyntax = new SqlServerSyntaxProvider(new Lazy<IScopeProvider>(() => null));
+            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
+
             var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
             {
                 Index = { Name = "IX_A" }
             };
-            var builder = new CreateIndexBuilder(createExpression);
-            builder.OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Clustered();
-            Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", createExpression.ToString());
+
+            new CreateIndexBuilder(createExpression)
+                .OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Clustered()
+                .Do();
+
+            Assert.AreEqual(1, db.Operations.Count);
+            Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
         }
 
         private static IndexDefinition CreateIndexDefinition()

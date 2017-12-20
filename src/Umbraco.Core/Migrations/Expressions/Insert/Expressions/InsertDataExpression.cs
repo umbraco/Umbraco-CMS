@@ -18,9 +18,6 @@ namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions
 
         public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             if (IsExpressionSupported() == false)

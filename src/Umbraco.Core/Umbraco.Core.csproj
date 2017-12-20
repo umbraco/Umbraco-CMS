@@ -314,6 +314,11 @@
     <Compile Include="CoreRuntime.cs" />
     <Compile Include="CoreRuntimeComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
+    <Compile Include="Migrations\Expressions\Common\ExecutableBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Common\IExecutableBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Create\KeysAndIndexes\CreateKeysAndIndexesBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Create\Table\CreateTableOfDtoBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
@@ -882,7 +887,6 @@
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Migrations\DataLossException.cs" />
-    <Compile Include="Migrations\ILocalMigration.cs" />
     <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationCollectionBuilder.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
@@ -890,7 +894,6 @@
     <Compile Include="Migrations\Install\DatabaseDataCreator.cs" />
     <Compile Include="Migrations\Install\DatabaseSchemaCreator.cs" />
     <Compile Include="Migrations\Install\DatabaseSchemaResult.cs" />
-    <Compile Include="Migrations\LocalMigration.cs" />
     <Compile Include="Migrations\MigrationAttribute.cs" />
     <Compile Include="Migrations\MigrationBase.cs" />
     <Compile Include="Migrations\MigrationCollection.cs" />
@@ -909,10 +912,10 @@
     <Compile Include="Migrations\Expressions\Alter\Table\IAlterTableColumnTypeBuilder.cs" />
     <Compile Include="Migrations\Expressions\Alter\Table\IAlterTableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Column\CreateColumnBuilder.cs" />
-    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnOnTableSyntax.cs" />
-    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnOptionForeignKeyCascadeSyntax.cs" />
-    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnOptionSyntax.cs" />
-    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnTypeSyntax.cs" />
+    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnOnTableBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnOptionForeignKeyCascadeBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnOptionBuilder.cs" />
+    <Compile Include="Migrations\Expressions\Create\Column\ICreateColumnTypeBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Constraint\CreateConstraintBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Constraint\ICreateConstraintColumnsBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Constraint\ICreateConstraintOnTableBuilder.cs" />
@@ -932,7 +935,7 @@
     <Compile Include="Migrations\Expressions\Create\Index\ICreateIndexOnColumnBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Index\ICreateIndexOptionsBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Table\CreateTableBuilder.cs" />
-    <Compile Include="Migrations\Expressions\Create\Table\ICreateTableColumnAsTypeSyntax.cs" />
+    <Compile Include="Migrations\Expressions\Create\Table\ICreateTableColumnAsTypeBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Table\ICreateTableColumnOptionForeignKeyCascadeBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Table\ICreateTableColumnOptionBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Table\ICreateTableWithColumnBuilder.cs" />
@@ -963,9 +966,7 @@
     <Compile Include="Migrations\Expressions\Delete\Index\DeleteIndexBuilder.cs" />
     <Compile Include="Migrations\Expressions\Delete\Index\IDeleteIndexForTableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Delete\Index\IDeleteIndexOnColumnBuilder.cs" />
-    <Compile Include="Migrations\Expressions\Delete\Table\DeleteTableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Execute\ExecuteBuilder.cs" />
-    <Compile Include="Migrations\Expressions\Execute\Expressions\ExecuteCodeStatementExpression.cs" />
     <Compile Include="Migrations\Expressions\Execute\Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Migrations\Expressions\Execute\IExecuteBuilder.cs" />
     <Compile Include="Migrations\Expressions\ExpressionBuilderBaseOfNext.cs" />

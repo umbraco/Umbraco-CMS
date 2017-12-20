@@ -21,12 +21,12 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
             {
                 var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
                 if (columns.Any(x => x.TableName.InvariantEquals("umbracoDeployDependency") && x.ColumnName.InvariantEquals("sourceId")))
-                    Delete.Table("umbracoDeployDependency");
+                    Delete.Table("umbracoDeployDependency").Do();
             }
 
             // always remove umbracoDeployChecksum
             if (tables.InvariantContains("umbracoDeployChecksum"))
-                Delete.Table("umbracoDeployChecksum");
+                Delete.Table("umbracoDeployChecksum").Do();
         }
 
         public override void Down()

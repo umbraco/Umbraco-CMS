@@ -5,9 +5,6 @@ using Umbraco.Core.Migrations.Expressions.Rename.Table;
 
 namespace Umbraco.Core.Migrations.Expressions.Rename
 {
-    /// <summary>
-    /// Implements <see cref="IRenameBuilder"/>.
-    /// </summary>
     public class RenameBuilder : IRenameBuilder
     {
         private readonly IMigrationContext _context;

@@ -1,9 +1,11 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Delete.Data
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Delete.Data
 {
     /// <summary>
-    /// Builds a Delete Data expression.
+    /// Builds a Delete expression.
     /// </summary>
-    public interface IDeleteDataBuilder : IFluentBuilder
+    public interface IDeleteDataBuilder : IFluentBuilder, IExecutableBuilder
     {
         /// <summary>
         /// Specifies a row to be deleted.
@@ -11,18 +13,13 @@
         IDeleteDataBuilder Row(object dataAsAnonymousType);
 
         /// <summary>
-        /// Specifies that all rows must be deleted, and executes.
+        /// Specifies that all rows must be deleted.
         /// </summary>
-        void AllRows();
+        IExecutableBuilder AllRows();
 
         /// <summary>
-        /// Specifies that rows with a specified column being null must be deleted, and executes.
+        /// Specifies that rows with a specified column being null must be deleted.
         /// </summary>
-        void IsNull(string columnName);
-
-        /// <summary>
-        /// Executes.
-        /// </summary>
-        void Execute();
+        IExecutableBuilder IsNull(string columnName);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Rename.Column
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Rename.Column
 {
     /// <summary>
     /// Builds a Rename Column expression.
@@ -6,8 +8,8 @@
     public interface IRenameColumnToBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Specifies the new name of the column and executes.
+        /// Specifies the new name of the column.
         /// </summary>
-        void To(string name);
+        IExecutableBuilder To(string name);
     }
 }

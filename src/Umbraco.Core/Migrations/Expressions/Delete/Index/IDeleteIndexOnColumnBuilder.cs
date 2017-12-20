@@ -1,22 +1,23 @@
 ﻿using System;
+using Umbraco.Core.Migrations.Expressions.Common;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Index
 {
     /// <summary>
-    /// Builds a Delete Index expression.
+    /// Builds a Delete expression.
     /// </summary>
-    public interface IDeleteIndexOnColumnBuilder : IFluentBuilder
+    public interface IDeleteIndexOnColumnBuilder : IFluentBuilder, IExecutableBuilder
     {
         /// <summary>
-        /// Specifies the column of the index, and executes.
+        /// Specifies the column of the index.
         /// </summary>
         [Obsolete("I don't think this would ever be used when dropping an index, see DeleteIndexExpression.ToString")]
-        void OnColumn(string columnName);
+        IExecutableBuilder OnColumn(string columnName);
 
         /// <summary>
-        /// Specifies the column of the index, and executes.
+        /// Specifies the column of the index.
         /// </summary>
         [Obsolete("I don't think this would ever be used when dropping an index, see DeleteIndexExpression.ToString")]
-        void OnColumns(params string[] columnNames);
+        IExecutableBuilder OnColumns(params string[] columnNames);
     }
 }

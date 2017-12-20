@@ -10,9 +10,6 @@ namespace Umbraco.Core.Migrations.Expressions.Execute.Expressions
 
         public virtual string SqlStatement { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             if (IsExpressionSupported() == false)

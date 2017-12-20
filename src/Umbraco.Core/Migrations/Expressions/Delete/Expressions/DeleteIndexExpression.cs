@@ -19,9 +19,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         public IndexDefinition Index { get; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             return string.Format(SqlSyntax.DropIndex,

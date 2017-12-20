@@ -12,20 +12,16 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
             Column = new ColumnDefinition { ModificationType = ModificationType.Alter };
         }
 
-
-
-
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual ColumnDefinition Column { get; set; }
 
-        public override string ToString()
+        protected override string GetSql()
         {
 
             return string.Format(SqlSyntax.AlterColumn,
                                 SqlSyntax.GetQuotedTableName(TableName),
                                 SqlSyntax.Format(Column));
-
         }
     }
 }

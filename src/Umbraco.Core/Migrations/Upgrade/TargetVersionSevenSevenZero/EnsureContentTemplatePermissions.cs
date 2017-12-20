@@ -16,29 +16,23 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 
         public override void Up()
         {
-            Execute.Code(context =>
+            var database = Database;
+            var userGroups = database.Fetch<UserGroupDto>(
+                Context.SqlContext.Sql().Select("*")
+                    .From<UserGroupDto>()
+                    .Where<UserGroupDto>(x => x.Alias == "admin" || x.Alias == "editor"));
+
+            foreach (var userGroup in userGroups)
             {
-                var database = context.Database;
-                var userGroups = database.Fetch<UserGroupDto>(
-                    Context.SqlContext.Sql().Select("*")
-                        .From<UserGroupDto>()
-                        .Where<UserGroupDto>(x => x.Alias == "admin" || x.Alias == "editor"));
-
-                var local = Context.GetLocalMigration();
-
-                foreach (var userGroup in userGroups)
+                if (userGroup.DefaultPermissions.Contains('�') == false)
                 {
-                    if (userGroup.DefaultPermissions.Contains('�') == false)
-                    {
-                        userGroup.DefaultPermissions += "�";
-                        local.Update.Table("umbracoUserGroup")
-                            .Set(new { userGroupDefaultPermissions = userGroup.DefaultPermissions })
-                            .Where(new { id = userGroup.Id });
-                    }
+                    userGroup.DefaultPermissions += "�";
+                    Update.Table("umbracoUserGroup")
+                        .Set(new { userGroupDefaultPermissions = userGroup.DefaultPermissions })
+                        .Where(new { id = userGroup.Id })
+                        .Do();
                 }
-
-                return local.GetSql();
-            });
+            }
         }
     }
 }

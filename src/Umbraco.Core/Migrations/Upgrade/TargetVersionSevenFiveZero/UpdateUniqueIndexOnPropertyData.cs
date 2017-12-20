@@ -38,24 +38,25 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
                         "id",
                         Sql("SELECT MIN(id) FROM cmsPropertyData GROUP BY nodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL"),
                         WhereInType.NotIn);
-                    Execute.Sql(delPropQry.SQL);
+                    Database.Execute(delPropQry.SQL);
                 }
                 else
                 {
                     //NOTE: Even though the above will work for MSSQL, we are not going to execute the
                     // nested delete sub query logic since it will be slower and there could be a ton of property
                     // data here so needs to be as fast as possible.
-                    Execute.Sql("DELETE FROM cmsPropertyData WHERE id NOT IN (SELECT MIN(id) FROM cmsPropertyData GROUP BY nodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL)");
+                    Database.Execute("DELETE FROM cmsPropertyData WHERE id NOT IN (SELECT MIN(id) FROM cmsPropertyData GROUP BY nodeId, versionId, propertytypeid HAVING MIN(id) IS NOT NULL)");
                 }
 
                 //we need to re create this index
-                Delete.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData");
+                Delete.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData").Do();
                 Create.Index("IX_cmsPropertyData_1").OnTable("cmsPropertyData")
                     .OnColumn("nodeId").Ascending()
                     .OnColumn("versionId").Ascending()
                     .OnColumn("propertytypeid").Ascending()
                     .WithOptions().NonClustered()
-                    .WithOptions().Unique();
+                    .WithOptions().Unique()
+                    .Do();
             }
         }
 

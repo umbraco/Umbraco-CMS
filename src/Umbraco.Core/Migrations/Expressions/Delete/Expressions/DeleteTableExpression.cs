@@ -10,7 +10,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         public virtual string TableName { get; set; }
 
-        public override string ToString()
+        protected override string GetSql()
         {
             return string.Format(SqlSyntax.DropTable,
                 SqlSyntax.GetQuotedTableName(TableName));

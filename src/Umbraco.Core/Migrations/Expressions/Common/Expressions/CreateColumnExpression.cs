@@ -14,9 +14,6 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
         public string TableName { get; set; }
         public ColumnDefinition Column { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             if (IsExpressionSupported() == false)

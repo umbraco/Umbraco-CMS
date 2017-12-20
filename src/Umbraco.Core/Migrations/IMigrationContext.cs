@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations
@@ -28,9 +27,5 @@ namespace Umbraco.Core.Migrations
         /// Gets the expression index.
         /// </summary>
         int Index { get; set; }
-
-        ICollection<IMigrationExpression> Expressions { get; set; } // fixme kill
-
-        ILocalMigration GetLocalMigration(); // fixme kill
     }
 }

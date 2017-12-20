@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
 {
@@ -47,24 +48,25 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
         }
 
         /// <inheritdoc />
-        public void PrimaryColumn(string column)
+        public IExecutableBuilder PrimaryColumn(string column)
         {
             Expression.ForeignKey.PrimaryColumns.Add(column);
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
 
         /// <inheritdoc />
-        public void PrimaryColumns(params string[] columns)
+        public IExecutableBuilder PrimaryColumns(params string[] columns)
         {
             foreach (var column in columns)
                 Expression.ForeignKey.PrimaryColumns.Add(column);
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
 
         /// <inheritdoc />
-        public void OnTable(string foreignTableName)
+        public IExecutableBuilder OnTable(string foreignTableName)
         {
             Expression.ForeignKey.ForeignTable = foreignTableName;
+            return new ExecutableBuilder(Expression);
         }
     }
 }

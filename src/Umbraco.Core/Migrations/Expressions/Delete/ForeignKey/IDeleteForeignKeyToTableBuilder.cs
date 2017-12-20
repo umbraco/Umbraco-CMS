@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
 {
     /// <summary>
-    /// Builds a Delete Foreign Key expression.
+    /// Builds a Delete expression.
     /// </summary>
     public interface IDeleteForeignKeyToTableBuilder : IFluentBuilder
     {

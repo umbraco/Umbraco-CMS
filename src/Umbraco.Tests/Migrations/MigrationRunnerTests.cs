@@ -12,6 +12,7 @@ using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -43,11 +44,12 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(4 /*, 0, 0*/), new SemVersion(6 /*, 0, 0*/), "Test");
 
+            var database = new TestDatabase();
             var context = new MigrationContext(_database, _logger);
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(context) });
-            runner.InitializeMigrations(migrations.ToList() /*, true*/);
+            runner.ExecuteMigrations(context, migrations.ToList() /*, true*/);
 
-            Assert.AreEqual(1, context.Expressions.Count);
+            Assert.AreEqual(1, database.Operations.Count);
         }
 
         [Test]
@@ -58,11 +60,12 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(4 /*, 0, 0*/), new SemVersion(5 /*, 0, 0*/), "Test");
 
-            var context = new MigrationContext(_database, _logger);
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(context) });
-            runner.InitializeMigrations(migrations.ToList() /*, true*/);
+            runner.ExecuteMigrations(context, migrations.ToList() /*, true*/);
 
-            Assert.AreEqual(1, context.Expressions.Count);
+            Assert.AreEqual(1, database.Operations.Count);
         }
 
         [Test]
@@ -73,11 +76,12 @@ namespace Umbraco.Tests.Migrations
                 Mock.Of<IMigrationEntryService>(),
                 _logger, new SemVersion(5, 0, 1), new SemVersion(6 /*, 0, 0*/), "Test");
 
-            var context = new MigrationContext(_database, _logger);
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(context) });
-            runner.InitializeMigrations(migrations.ToList() /*, true*/);
+            runner.ExecuteMigrations(context, migrations.ToList() /*, true*/);
 
-            Assert.AreEqual(1, context.Expressions.Count);
+            Assert.AreEqual(1, database.Operations.Count);
         }
 
         [Migration("6.0.0", 1, "Test")]
@@ -90,12 +94,12 @@ namespace Umbraco.Tests.Migrations
 
             public override void Up()
             {
-                Context.Expressions.Add(new AlterColumnExpression(Context, new [] { DatabaseType.SQLCe }));
+                new AlterColumnExpression(Context, new [] { DatabaseType.SQLCe }).Execute();
             }
 
             public override void Down()
             {
-                Context.Expressions.Add(new AlterColumnExpression(Context, new[] { DatabaseType.SQLCe }));
+                new AlterColumnExpression(Context, new[] { DatabaseType.SQLCe }).Execute();
             }
         }
     }

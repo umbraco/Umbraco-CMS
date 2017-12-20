@@ -48,19 +48,20 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            foreach (var migration1 in list)
-            {
-                var migration = (MigrationBase) migration1;
-                migration.Up();
-            }
+            // migrations Up actually executes in v8
+            //foreach (var migration1 in list)
+            //{
+            //    var migration = (MigrationBase) migration1;
+            //    migration.Up();
+            //}
 
-            Assert.That(context.Expressions.Any(), Is.True);
+            //Assert.That(context.Expressions.Any(), Is.True);
 
-            //Console output
-            foreach (var expression in context.Expressions)
-            {
-                Debug.Print(expression.ToString());
-            }
+            ////Console output
+            //foreach (var expression in context.Expressions)
+            //{
+            //    Debug.Print(expression.ToString());
+            //}
         }
     }
 }

@@ -21,13 +21,14 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                     .OnColumn("path")
                     .Ascending()
                     .WithOptions()
-                    .NonClustered();
+                    .NonClustered()
+                    .Do();
             }
         }
 
         public override void Down()
         {
-            Delete.Index("IX_umbracoNodePath").OnTable("umbracoNode");
+            Delete.Index("IX_umbracoNodePath").OnTable("umbracoNode").Do();
         }
     }
 }

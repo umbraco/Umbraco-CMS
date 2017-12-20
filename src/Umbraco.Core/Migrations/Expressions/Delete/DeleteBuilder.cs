@@ -1,5 +1,5 @@
 ﻿using NPoco;
-using System.Linq;
+using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Delete.Column;
 using Umbraco.Core.Migrations.Expressions.Delete.Constraint;
 using Umbraco.Core.Migrations.Expressions.Delete.Data;
@@ -7,14 +7,11 @@ using Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint;
 using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 using Umbraco.Core.Migrations.Expressions.Delete.ForeignKey;
 using Umbraco.Core.Migrations.Expressions.Delete.Index;
+using Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete
 {
-    /// <summary>
-    /// Implements <see cref="IDeleteBuilder"/>.
-    /// </summary>
     public class DeleteBuilder : IDeleteBuilder
     {
         private readonly IMigrationContext _context;
@@ -27,43 +24,16 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         }
 
         /// <inheritdoc />
-        public void Table(string tableName)
+        public IExecutableBuilder Table(string tableName)
         {
             var expression = new DeleteTableExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
-            expression.Execute();
+            return new ExecutableBuilder(expression);
         }
 
         /// <inheritdoc />
-        public void KeysAndIndexes(string tableName = null)
+        public IExecutableBuilder KeysAndIndexes(string tableName = null)
         {
-            if (tableName == null)
-            {
-                // drop keys
-                var keys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToArray();
-                foreach (var key in keys.Where(x => x.Item2.StartsWith("FK_")))
-                    ForeignKey(key.Item2).OnTable(key.Item1);
-                foreach (var key in keys.Where(x => x.Item2.StartsWith("PK_")))
-                    PrimaryKey(key.Item2).FromTable(key.Item1);
-
-                // drop indexes
-                var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToArray();
-                foreach (var index in indexes)
-                    Index(index.IndexName).OnTable(index.TableName);
-            }
-            else
-            {
-                // drop keys
-                var keys = _context.SqlContext.SqlSyntax.GetConstraintsPerTable(_context.Database).DistinctBy(x => x.Item2).ToArray();
-                foreach (var key in keys.Where(x => x.Item1 == tableName && x.Item2.StartsWith("FK_")))
-                    ForeignKey(key.Item2).OnTable(key.Item1);
-                foreach (var key in keys.Where(x => x.Item1 == tableName && x.Item2.StartsWith("PK_")))
-                    PrimaryKey(key.Item2).FromTable(key.Item1);
-
-                // drop indexes
-                var indexes = _context.SqlContext.SqlSyntax.GetDefinedIndexesDefinitions(_context.Database).DistinctBy(x => x.IndexName).ToArray();
-                foreach (var index in indexes.Where(x => x.TableName == tableName))
-                    Index(index.IndexName).OnTable(index.TableName);
-            }
+            return new DeleteKeysAndIndexesBuilder(_context, _supportedDatabaseTypes) { TableName = tableName };
         }
 
         /// <inheritdoc />

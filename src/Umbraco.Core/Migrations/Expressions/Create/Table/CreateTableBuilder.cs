@@ -8,9 +8,8 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Migrations.Expressions.Create.Table
 {
     public class CreateTableBuilder : ExpressionBuilderBase<CreateTableExpression, ICreateTableColumnOptionBuilder>,
-                                                ICreateTableWithColumnBuilder,
-                                                ICreateTableColumnAsTypeSyntax,
-                                                ICreateTableColumnOptionForeignKeyCascadeBuilder
+        ICreateTableColumnAsTypeBuilder,
+        ICreateTableColumnOptionForeignKeyCascadeBuilder
     {
         private readonly IMigrationContext _context;
         private readonly DatabaseType[] _supportedDatabaseTypes;
@@ -22,6 +21,9 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
+        /// <inheritdoc />
+        public void Do() => Expression.Execute();
+
         public ColumnDefinition CurrentColumn { get; set; }
 
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
@@ -31,7 +33,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             return CurrentColumn;
         }
 
-        public ICreateTableColumnAsTypeSyntax WithColumn(string name)
+        /// <inheritdoc />
+        public ICreateTableColumnAsTypeBuilder WithColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, TableName = Expression.TableName, ModificationType = ModificationType.Create };
             Expression.Columns.Add(column);
@@ -39,6 +42,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder WithDefault(SystemMethods method)
         {
             CurrentColumn.DefaultValue = method;
@@ -51,17 +55,20 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder Identity()
         {
             CurrentColumn.IsIdentity = true;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder Indexed()
         {
             return Indexed(null);
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder Indexed(string indexName)
         {
             CurrentColumn.IsIndexed = true;
@@ -74,15 +81,16 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             });
 
             index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
+            {
+                Name = CurrentColumn.Name
+            });
 
-            _context.Expressions.Add(index);
+            Expression.Expressions.Add(index);
 
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder PrimaryKey()
         {
             CurrentColumn.IsPrimaryKey = true;
@@ -104,12 +112,13 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
                     Columns = new[] { CurrentColumn.Name }
                 }
                 };
-                _context.Expressions.Add(expression);
+                Expression.Expressions.Add(expression);
             }
 
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder PrimaryKey(string primaryKeyName)
         {
             CurrentColumn.IsPrimaryKey = true;
@@ -134,29 +143,33 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
                     Columns = new[] { CurrentColumn.Name }
                 }
                 };
-                _context.Expressions.Add(expression);
+                Expression.Expressions.Add(expression);
             }
 
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder Nullable()
         {
             CurrentColumn.IsNullable = true;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder NotNullable()
         {
             CurrentColumn.IsNullable = false;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder Unique()
         {
             return Unique(null);
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder Unique(string indexName)
         {
             CurrentColumn.IsUnique = true;
@@ -174,22 +187,25 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
                                             Name = CurrentColumn.Name
                                         });
 
-            _context.Expressions.Add(index);
+            Expression.Expressions.Add(index);
 
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(null, null, primaryTableName, primaryColumnName);
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableName,
                                                                           string primaryColumnName)
         {
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableSchema,
                                                                           string primaryTableName, string primaryColumnName)
         {
@@ -207,28 +223,32 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
             fk.ForeignKey.ForeignColumns.Add(CurrentColumn.Name);
 
-            _context.Expressions.Add(fk);
+            Expression.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey()
         {
             CurrentColumn.IsForeignKey = true;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(null, null, foreignTableName, foreignColumnName);
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableName,
                                                                             string foreignColumnName)
         {
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                             string foreignTableName, string foreignColumnName)
         {
@@ -244,23 +264,26 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
-            _context.Expressions.Add(fk);
+            Expression.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder OnDelete(Rule rule)
         {
             CurrentForeignKey.OnDelete = rule;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionForeignKeyCascadeBuilder OnUpdate(Rule rule)
         {
             CurrentForeignKey.OnUpdate = rule;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateTableColumnOptionBuilder OnDeleteOrUpdate(Rule rule)
         {
             OnDelete(rule);

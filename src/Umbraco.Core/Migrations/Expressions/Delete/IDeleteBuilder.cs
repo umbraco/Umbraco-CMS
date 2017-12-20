@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Migrations.Expressions.Delete.Column;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Migrations.Expressions.Delete.Column;
 using Umbraco.Core.Migrations.Expressions.Delete.Constraint;
 using Umbraco.Core.Migrations.Expressions.Delete.Data;
 using Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint;
@@ -13,14 +14,14 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
     public interface IDeleteBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Specifies the table to delete, and executes.
+        /// Specifies the table to delete.
         /// </summary>
-        void Table(string tableName);
+        IExecutableBuilder Table(string tableName);
 
         /// <summary>
-        /// Specifies the table to delete keys and indexes for, and executes.
+        /// Specifies the table to delete keys and indexes for.
         /// </summary>
-        void KeysAndIndexes(string tableName = null);
+        IExecutableBuilder KeysAndIndexes(string tableName = null);
 
         /// <summary>
         /// Specifies the column to delete.

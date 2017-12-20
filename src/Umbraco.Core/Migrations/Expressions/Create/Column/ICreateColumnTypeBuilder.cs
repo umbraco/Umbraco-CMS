@@ -2,8 +2,6 @@
 
 namespace Umbraco.Core.Migrations.Expressions.Create.Column
 {
-    public interface ICreateColumnTypeSyntax : IColumnTypeBuilder<ICreateColumnOptionSyntax>
-    {
-
-    }
+    public interface ICreateColumnTypeBuilder : IColumnTypeBuilder<ICreateColumnOptionBuilder>
+    { }
 }

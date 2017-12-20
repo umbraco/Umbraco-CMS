@@ -16,9 +16,6 @@ namespace Umbraco.Core.Migrations.Expressions.Update.Expressions
         public List<KeyValuePair<string, object>> Where { get; set; }
         public bool IsAllRows { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             if (IsExpressionSupported() == false)

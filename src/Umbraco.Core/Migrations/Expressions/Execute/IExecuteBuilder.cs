@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
 
 namespace Umbraco.Core.Migrations.Expressions.Execute
 {
@@ -9,11 +9,8 @@ namespace Umbraco.Core.Migrations.Expressions.Execute
     public interface IExecuteBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Executes an Sql statement.
+        /// Specifies the Sql statement to execute.
         /// </summary>
-        void Sql(string sqlStatement);
-
-        [Obsolete("kill.kill.kill")]
-        void Code(Func<IMigrationContext, string> codeStatement);
+        IExecutableBuilder Sql(string sqlStatement);
     }
 }

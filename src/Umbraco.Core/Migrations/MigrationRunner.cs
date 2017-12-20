@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -63,12 +61,9 @@ namespace Umbraco.Core.Migrations
                 return false;
             }
 
-            //Loop through migrations to generate sql
-            InitializeMigrations(migrations, isUpgrade);
-
             try
             {
-                ExecuteMigrations(migrationContext);
+                ExecuteMigrations(migrationContext, migrations, isUpgrade);
             }
             catch (Exception ex)
             {
@@ -152,96 +147,21 @@ namespace Umbraco.Core.Migrations
             return _migrations ?? _builder.CreateCollection(context).ToArray();
         }
 
-        internal void InitializeMigrations(
-            List<IMigration> migrations,
-            bool isUpgrade = true)
+        internal void ExecuteMigrations(IMigrationContext context, IEnumerable<IMigration> migrations, bool isUp = true)
         {
-            foreach (var migration in migrations)
+            using (var transaction = context.Database.GetTransaction()) // fixme scope?
             {
-                if (isUpgrade)
+                foreach (var migration in migrations)
                 {
-                    migration.Up();
-                    _logger.Info<MigrationRunner>($"Added UPGRADE migration '{migration.GetType().Name}' to context");
+                    if (isUp) migration.Up();
+                    else migration.Down();
                 }
-                else
-                {
-                    migration.Down();
-                    _logger.Info<MigrationRunner>($"Added DOWNGRADE migration '{migration.GetType().Name}' to context");
-                }
-            }
 
-        }
-
-        private void ExecuteMigrations(IMigrationContext context)
-        {
-            //Transactional execution of the sql that was generated from the found migrations
-            using (var transaction = context.Database.GetTransaction())
-            {
-                int i = 1;
-                foreach (var expression in context.Expressions)
-                {
-                    var sql = expression.Process(context);
-                    if (string.IsNullOrEmpty(sql))
-                    {
-                        i++;
-                        continue;
-                    }
-
-                    //TODO: We should output all of these SQL calls to files in a migration folder in App_Data/TEMP
-                    // so if people want to executed them manually on another environment, they can.
-
-                    //The following ensures the multiple statement sare executed one at a time, this is a requirement
-                    // of SQLCE, it's unfortunate but necessary.
-                    // http://stackoverflow.com/questions/13665491/sql-ce-inconsistent-with-multiple-statements
-                    var sb = new StringBuilder();
-                    using (var reader = new StringReader(sql))
-                    {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            line = line.Trim();
-                            if (line.Equals("GO", StringComparison.OrdinalIgnoreCase))
-                            {
-                                //Execute the SQL up to the point of a GO statement
-                                var exeSql = sb.ToString();
-                                _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
-                                Console.WriteLine("EXEC: " + exeSql);
-                                context.Database.Execute(exeSql);
-
-                                //restart the string builder
-                                sb.Remove(0, sb.Length);
-                            }
-                            else
-                            {
-                                sb.AppendLine(line);
-                            }
-                        }
-                        //execute anything remaining
-                        if (sb.Length > 0)
-                        {
-                            var exeSql = sb.ToString();
-                            _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
-                            Console.WriteLine("EXEC: " + exeSql);
-                            context.Database.Execute(exeSql);
-                        }
-                    }
-
-                    i++;
-                }
+                var exists = _migrationEntryService.FindEntry(_productName, _targetVersion); // fixme refactor
+                if (exists == null)
+                    _migrationEntryService.CreateEntry(_productName, _targetVersion);
 
                 transaction.Complete();
-
-                //Now that this is all complete, we need to add an entry to the migrations table flagging that migrations
-                // for this version have executed.
-                //NOTE: We CANNOT do this as part of the transaction!!! This is because when upgrading to 7.3, we cannot
-                // create the migrations table and then add data to it in the same transaction without issuing things like GO
-                // commands and since we need to support all Dbs, we need to just do this after the fact.
-                var exists = _migrationEntryService.FindEntry(_productName, _targetVersion);
-                if (exists == null)
-                {
-                    _migrationEntryService.CreateEntry(_productName, _targetVersion);
-                }
-
             }
         }
 

@@ -22,11 +22,13 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
                 .WithColumn("nodeId").AsInt32().NotNullable()
                 .WithColumn("published").AsBoolean().NotNullable()
                 .WithColumn("data").AsCustom(textType).NotNullable()
-                .WithColumn("rv").AsInt64().NotNullable().WithDefaultValue(0);
+                .WithColumn("rv").AsInt64().NotNullable().WithDefaultValue(0)
+                .Do();
 
             Create.PrimaryKey("PK_cmsContentNu")
                 .OnTable("cmsContentNu")
-                .Columns(new[] { "nodeId", "published" });
+                .Columns(new[] { "nodeId", "published" })
+                .Do();
 
             Create.ForeignKey("FK_cmsContentNu_umbracoNode_id")
                 .FromTable("cmsContentNu")
@@ -34,7 +36,8 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
                 .ToTable("umbracoNode")
                 .PrimaryColumn("id")
                 .OnDelete(Rule.Cascade)
-                .OnUpdate(Rule.None);
+                .OnUpdate(Rule.None)
+                .Do();
         }
 
         public override void Down()

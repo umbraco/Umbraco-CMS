@@ -1,18 +1,20 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Delete.ForeignKey
 {
     /// <summary>
-    /// Builds a Delete Foreign Key expression.
+    /// Builds a Delete expression.
     /// </summary>
     public interface IDeleteForeignKeyPrimaryColumnBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Specifies the target primary column, and executes.
+        /// Specifies the target primary column.
         /// </summary>
-        void PrimaryColumn(string column);
+        IExecutableBuilder PrimaryColumn(string column);
 
         /// <summary>
-        /// Specifies the target primary columns, and executes.
+        /// Specifies the target primary columns.
         /// </summary>
-        void PrimaryColumns(params string[] columns);
+        IExecutableBuilder PrimaryColumns(params string[] columns);
     }
 }

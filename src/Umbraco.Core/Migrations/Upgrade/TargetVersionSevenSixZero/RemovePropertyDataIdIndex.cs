@@ -23,7 +23,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
             if (found != null)
             {
                 //drop the index
-                Delete.Index("IX_cmsPropertyData").OnTable("cmsPropertyData");
+                Delete.Index("IX_cmsPropertyData").OnTable("cmsPropertyData").Do();
             }
         }
 

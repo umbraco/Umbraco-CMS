@@ -5,10 +5,10 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Create.Column
 {
-    public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression, ICreateColumnOptionSyntax>,
-                                             ICreateColumnOnTableSyntax,
-                                             ICreateColumnTypeSyntax,
-                                             ICreateColumnOptionForeignKeyCascadeSyntax
+    public class CreateColumnBuilder : ExpressionBuilderBase<CreateColumnExpression, ICreateColumnOptionBuilder>,
+                                             ICreateColumnOnTableBuilder,
+                                             ICreateColumnTypeBuilder,
+                                             ICreateColumnOptionForeignKeyCascadeBuilder
     {
         private readonly IMigrationContext _context;
         private readonly DatabaseType[] _supportedDatabaseTypes;
@@ -20,6 +20,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
+        public void Do() => Expression.Execute();
+
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
 
         public override ColumnDefinition GetColumnForType()
@@ -27,35 +29,35 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
             return Expression.Column;
         }
 
-        public ICreateColumnTypeSyntax OnTable(string name)
+        public ICreateColumnTypeBuilder OnTable(string name)
         {
             Expression.TableName = name;
             return this;
         }
 
-        public ICreateColumnOptionSyntax WithDefault(SystemMethods method)
+        public ICreateColumnOptionBuilder WithDefault(SystemMethods method)
         {
             Expression.Column.DefaultValue = method;
             return this;
         }
 
-        public ICreateColumnOptionSyntax WithDefaultValue(object value)
+        public ICreateColumnOptionBuilder WithDefaultValue(object value)
         {
             Expression.Column.DefaultValue = value;
             return this;
         }
 
-        public ICreateColumnOptionSyntax Identity()
+        public ICreateColumnOptionBuilder Identity()
         {
             return Indexed(null);
         }
 
-        public ICreateColumnOptionSyntax Indexed()
+        public ICreateColumnOptionBuilder Indexed()
         {
             return Indexed(null);
         }
 
-        public ICreateColumnOptionSyntax Indexed(string indexName)
+        public ICreateColumnOptionBuilder Indexed(string indexName)
         {
             Expression.Column.IsIndexed = true;
 
@@ -70,42 +72,42 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
                                             Name = Expression.Column.Name
                                         });
 
-            _context.Expressions.Add(index);
+            Expression.Expressions.Add(index);
 
             return this;
         }
 
-        public ICreateColumnOptionSyntax PrimaryKey()
+        public ICreateColumnOptionBuilder PrimaryKey()
         {
             Expression.Column.IsPrimaryKey = true;
             return this;
         }
 
-        public ICreateColumnOptionSyntax PrimaryKey(string primaryKeyName)
+        public ICreateColumnOptionBuilder PrimaryKey(string primaryKeyName)
         {
             Expression.Column.IsPrimaryKey = true;
             Expression.Column.PrimaryKeyName = primaryKeyName;
             return this;
         }
 
-        public ICreateColumnOptionSyntax Nullable()
+        public ICreateColumnOptionBuilder Nullable()
         {
             Expression.Column.IsNullable = true;
             return this;
         }
 
-        public ICreateColumnOptionSyntax NotNullable()
+        public ICreateColumnOptionBuilder NotNullable()
         {
             Expression.Column.IsNullable = false;
             return this;
         }
 
-        public ICreateColumnOptionSyntax Unique()
+        public ICreateColumnOptionBuilder Unique()
         {
             return Unique(null);
         }
 
-        public ICreateColumnOptionSyntax Unique(string indexName)
+        public ICreateColumnOptionBuilder Unique(string indexName)
         {
             Expression.Column.IsUnique = true;
 
@@ -121,23 +123,23 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
                                             Name = Expression.Column.Name
                                         });
 
-            _context.Expressions.Add(index);
+            Expression.Expressions.Add(index);
 
             return this;
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(null, null, primaryTableName, primaryColumnName);
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableName,
+        public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableName,
                                                                      string primaryColumnName)
         {
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableSchema,
+        public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableSchema,
                                                                      string primaryTableName, string primaryColumnName)
         {
             Expression.Column.IsForeignKey = true;
@@ -153,29 +155,29 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
             fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
             fk.ForeignKey.ForeignColumns.Add(Expression.Column.Name);
 
-            _context.Expressions.Add(fk);
+            Expression.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ForeignKey()
+        public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey()
         {
             Expression.Column.IsForeignKey = true;
             return this;
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(null, null, foreignTableName, foreignColumnName);
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableName,
+        public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableName,
                                                                        string foreignColumnName)
         {
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
+        public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                        string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
@@ -189,24 +191,24 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
             fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
-            _context.Expressions.Add(fk);
+            Expression.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax OnDelete(Rule rule)
+        public ICreateColumnOptionForeignKeyCascadeBuilder OnDelete(Rule rule)
         {
             CurrentForeignKey.OnDelete = rule;
             return this;
         }
 
-        public ICreateColumnOptionForeignKeyCascadeSyntax OnUpdate(Rule rule)
+        public ICreateColumnOptionForeignKeyCascadeBuilder OnUpdate(Rule rule)
         {
             CurrentForeignKey.OnUpdate = rule;
             return this;
         }
 
-        public ICreateColumnOptionSyntax OnDeleteOrUpdate(Rule rule)
+        public ICreateColumnOptionBuilder OnDeleteOrUpdate(Rule rule)
         {
             OnDelete(rule);
             OnUpdate(rule);

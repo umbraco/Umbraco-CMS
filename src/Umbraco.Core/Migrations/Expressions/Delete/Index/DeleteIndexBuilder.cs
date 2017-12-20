@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Index
 {
-    /// <summary>
-    /// Implements <see cref="IDeleteIndexForTableBuilder"/>, <see cref="IDeleteIndexOnColumnBuilder"/>.
-    /// </summary>
-    public class DeleteIndexBuilder : ExpressionBuilderBase<DeleteIndexExpression>, IDeleteIndexForTableBuilder, IDeleteIndexOnColumnBuilder
+    public class DeleteIndexBuilder : ExpressionBuilderBase<DeleteIndexExpression>,
+        IDeleteIndexForTableBuilder, IDeleteIndexOnColumnBuilder
     {
         public DeleteIndexBuilder(DeleteIndexExpression expression)
             : base(expression)
         { }
+
+        /// <inheritdoc />
+        public void Do() => Expression.Execute();
 
         public IndexColumnDefinition CurrentColumn { get; set; }
 
@@ -22,19 +23,19 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Index
         }
 
         /// <inheritdoc />
-        public void OnColumn(string columnName)
+        public IExecutableBuilder OnColumn(string columnName)
         {
             var column = new IndexColumnDefinition { Name = columnName };
             Expression.Index.Columns.Add(column);
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
 
         /// <inheritdoc />
-        public void OnColumns(params string[] columnNames)
+        public IExecutableBuilder OnColumns(params string[] columnNames)
         {
             foreach (string columnName in columnNames)
                 Expression.Index.Columns.Add(new IndexColumnDefinition { Name = columnName });
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
     }
 }

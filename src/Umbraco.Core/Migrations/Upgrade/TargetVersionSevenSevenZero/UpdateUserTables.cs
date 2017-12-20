@@ -19,29 +19,29 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("createDate")) == false)
-                Create.Column("createDate").OnTable("umbracoUser").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime);
+                Create.Column("createDate").OnTable("umbracoUser").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime).Do();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("updateDate")) == false)
-                Create.Column("updateDate").OnTable("umbracoUser").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime);
+                Create.Column("updateDate").OnTable("umbracoUser").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime).Do();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("emailConfirmedDate")) == false)
-                Create.Column("emailConfirmedDate").OnTable("umbracoUser").AsDateTime().Nullable();
+                Create.Column("emailConfirmedDate").OnTable("umbracoUser").AsDateTime().Nullable().Do();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("invitedDate")) == false)
-                Create.Column("invitedDate").OnTable("umbracoUser").AsDateTime().Nullable();
+                Create.Column("invitedDate").OnTable("umbracoUser").AsDateTime().Nullable().Do();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("avatar")) == false)
-                Create.Column("avatar").OnTable("umbracoUser").AsString(500).Nullable();
+                Create.Column("avatar").OnTable("umbracoUser").AsString(500).Nullable().Do();
 
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("passwordConfig")) == false)
             {
-                Create.Column("passwordConfig").OnTable("umbracoUser").AsString(500).Nullable();
+                Create.Column("passwordConfig").OnTable("umbracoUser").AsString(500).Nullable().Do();
                 //Check if we have a known config, we only want to store config for hashing
                 var membershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
                 if (membershipProvider.PasswordFormat == MembershipPasswordFormat.Hashed)
                 {
                     var json = JsonConvert.SerializeObject(new { hashAlgorithm = Membership.HashAlgorithmType });
-                    Execute.Sql("UPDATE umbracoUser SET passwordConfig = '" + json + "'");
+                    Database.Execute("UPDATE umbracoUser SET passwordConfig = '" + json + "'");
                 }
             }
         }

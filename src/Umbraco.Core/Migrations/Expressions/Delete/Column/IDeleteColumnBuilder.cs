@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Delete.Column
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Delete.Column
 {
     /// <summary>
     /// Builds a Delete Column expression.
@@ -6,9 +8,9 @@
     public interface IDeleteColumnBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Specifies the table of the column to delete, and execute.
+        /// Specifies the table of the column to delete.
         /// </summary>
-        void FromTable(string tableName);
+        IExecutableBuilder FromTable(string tableName);
 
         /// <summary>
         /// Specifies the column to delete.

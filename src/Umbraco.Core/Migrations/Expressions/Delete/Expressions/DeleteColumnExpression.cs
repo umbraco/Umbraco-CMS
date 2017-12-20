@@ -15,9 +15,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
         public virtual string TableName { get; set; }
         public ICollection<string> ColumnNames { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             if (IsExpressionSupported() == false)

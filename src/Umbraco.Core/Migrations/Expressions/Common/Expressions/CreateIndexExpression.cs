@@ -20,9 +20,6 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
 
         public IndexDefinition Index { get; set; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             return SqlSyntax.Format(Index);

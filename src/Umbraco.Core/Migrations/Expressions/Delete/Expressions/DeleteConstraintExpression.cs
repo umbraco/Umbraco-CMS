@@ -14,9 +14,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         public ConstraintDefinition Constraint { get; }
 
-        public override string ToString() // fixme kill
-            => GetSql();
-
         protected override string GetSql()
         {
             return DatabaseType.IsMySql()

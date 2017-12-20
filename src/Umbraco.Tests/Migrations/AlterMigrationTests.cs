@@ -11,6 +11,7 @@ using Umbraco.Core.Migrations;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -36,28 +37,30 @@ namespace Umbraco.Tests.Migrations
         public void Drop_Foreign_Key()
         {
             // Arrange
-            var context = new MigrationContext(_database, _logger);
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
             var stub = new DropForeignKeyMigrationStub(context);
 
             // Act
             stub.Up();
 
             // Assert
-            Assert.That(context.Expressions.Count, Is.EqualTo(1));
-            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
+            Assert.That(database.Operations.Count, Is.EqualTo(1));
+            Assert.That(database.Operations.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
 
         }
 
         [Test]
         public void CreateColumn()
         {
-            var context = new MigrationContext(_database, _logger);
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
             var migration = new CreateColumnMigration(context);
 
             migration.Up();
 
-            Assert.That(context.Expressions.Count, Is.EqualTo(1));
-            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
+            Assert.That(database.Operations.Count, Is.EqualTo(1));
+            Assert.That(database.Operations.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
         }
 
         [Migration("1.0.0", 0, "Test")]
@@ -79,13 +82,14 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void AlterColumn()
         {
-            var context = new MigrationContext(_database, _logger);
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
             var migration = new AlterColumnMigration(context);
 
             migration.Up();
 
-            Assert.That(context.Expressions.Count, Is.EqualTo(1));
-            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
+            Assert.That(database.Operations.Count, Is.EqualTo(1));
+            Assert.That(database.Operations.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
         }
 
         [Migration("1.0.0", 0, "Test")]
@@ -111,19 +115,20 @@ namespace Umbraco.Tests.Migrations
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange
-            var context = new MigrationContext(_database, _logger);
+            var database = new TestDatabase();
+            var context = new MigrationContext(database, _logger);
             var stub = new AlterUserTableMigrationStub(context);
 
             // Act
             stub.Up();
 
             // Assert
-            Assert.That(context.Expressions.Any(), Is.True);
+            Assert.That(database.Operations.Any(), Is.True);
 
             //Console output
-            Debug.Print("Number of expressions in context: {0}", context.Expressions.Count);
+            Debug.Print("Number of expressions in context: {0}", database.Operations.Count);
             Debug.Print("");
-            foreach (var expression in context.Expressions)
+            foreach (var expression in database.Operations)
             {
                 Debug.Print(expression.ToString());
             }

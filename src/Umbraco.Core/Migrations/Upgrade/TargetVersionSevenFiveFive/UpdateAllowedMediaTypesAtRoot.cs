@@ -12,7 +12,7 @@
 
         public override void Up()
         {
-            Execute.Sql("UPDATE cmsContentType SET allowAtRoot = 1 WHERE nodeId = 1032 OR nodeId = 1033");
+            Database.Execute("UPDATE cmsContentType SET allowAtRoot = 1 WHERE nodeId = 1032 OR nodeId = 1033");
         }
 
         public override void Down()

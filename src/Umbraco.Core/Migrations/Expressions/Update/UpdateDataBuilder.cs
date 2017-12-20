@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Update.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Update
 {
-    /// <summary>
-    /// Implements <see cref="IUpdateTableBuilder"/>, <see cref="IUpdateWhereBuilder"/>/
-    /// </summary>
-    public class UpdateDataBuilder : ExpressionBuilderBase<UpdateDataExpression>, IUpdateTableBuilder, IUpdateWhereBuilder
+    public class UpdateDataBuilder : ExpressionBuilderBase<UpdateDataExpression>,
+        IUpdateTableBuilder, IUpdateWhereBuilder, IExecutableBuilder
     {
         public UpdateDataBuilder(UpdateDataExpression expression)
             : base(expression)
         { }
+
+        /// <inheritdoc />
+        public void Do() => Expression.Execute();
 
         /// <inheritdoc />
         public IUpdateWhereBuilder Set(object dataAsAnonymousType)
@@ -22,17 +23,17 @@ namespace Umbraco.Core.Migrations.Expressions.Update
         }
 
         /// <inheritdoc />
-        public void Where(object dataAsAnonymousType)
+        public IExecutableBuilder Where(object dataAsAnonymousType)
         {
             Expression.Where = GetData(dataAsAnonymousType);
-            Expression.Execute();
+            return this;
         }
 
         /// <inheritdoc />
-        public void AllRows()
+        public IExecutableBuilder AllRows()
         {
             Expression.IsAllRows = true;
-            Expression.Execute();
+            return this;
         }
 
         private static List<KeyValuePair<string, object>> GetData(object dataAsAnonymousType)

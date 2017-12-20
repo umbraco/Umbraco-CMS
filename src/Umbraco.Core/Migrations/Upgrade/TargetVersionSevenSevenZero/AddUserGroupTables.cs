@@ -52,7 +52,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                 {
                     //before we add any foreign key we need to make sure there's no stale data in there which would  have happened in the beta
                     //release if a start node was assigned and then that start node was deleted.
-                    Execute.Sql(@"UPDATE umbracoUserGroup SET startContentId = NULL WHERE startContentId NOT IN (SELECT id FROM umbracoNode)");
+                    Database.Execute(@"UPDATE umbracoUserGroup SET startContentId = NULL WHERE startContentId NOT IN (SELECT id FROM umbracoNode)");
 
                     Create.ForeignKey("FK_startContentId_umbracoNode_id")
                         .FromTable("umbracoUserGroup")
@@ -60,7 +60,8 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                         .ToTable("umbracoNode")
                         .PrimaryColumn("id")
                         .OnDelete(Rule.None)
-                        .OnUpdate(Rule.None);
+                        .OnUpdate(Rule.None)
+                        .Do();
                 }
 
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUserGroup")
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                 {
                     //before we add any foreign key we need to make sure there's no stale data in there which would  have happened in the beta
                     //release if a start node was assigned and then that start node was deleted.
-                    Execute.Sql(@"UPDATE umbracoUserGroup SET startMediaId = NULL WHERE startMediaId NOT IN (SELECT id FROM umbracoNode)");
+                    Database.Execute(@"UPDATE umbracoUserGroup SET startMediaId = NULL WHERE startMediaId NOT IN (SELECT id FROM umbracoNode)");
 
                     Create.ForeignKey("FK_startMediaId_umbracoNode_id")
                         .FromTable("umbracoUserGroup")
@@ -77,7 +78,8 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                         .ToTable("umbracoNode")
                         .PrimaryColumn("id")
                         .OnDelete(Rule.None)
-                        .OnUpdate(Rule.None);
+                        .OnUpdate(Rule.None)
+                        .Do();
                 }
             }
         }
@@ -100,7 +102,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                         && x.TableName.Equals("umbracoUser2userGroup", StringComparison.InvariantCultureIgnoreCase));
                 if (foundOldColumn != null)
                 {
-                    Delete.Table("umbracoUser2userGroup");
+                    Delete.Table("umbracoUser2userGroup").Do();
                     //remove from the tables list since this will be re-checked in further logic
                     tables.Remove("umbracoUser2userGroup");
                 }
@@ -113,7 +115,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                     .Count(x => x.TableName.Equals("umbracoUserGroup", StringComparison.InvariantCultureIgnoreCase));
                 if (countOfCols == 2)
                 {
-                    Delete.Table("umbracoUserGroup");
+                    Delete.Table("umbracoUserGroup").Do();
                     //remove from the tables list since this will be re-checked in further logic
                     tables.Remove("umbracoUserGroup");
                 }
@@ -122,10 +124,10 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 
         private void SetDefaultIcons()
         {
-            Execute.Sql($"UPDATE umbracoUserGroup SET icon = \'\' WHERE userGroupAlias = \'{Constants.Security.AdminGroupAlias}\'");
-            Execute.Sql("UPDATE umbracoUserGroup SET icon = \'icon-edit\' WHERE userGroupAlias = \'writer\'");
-            Execute.Sql("UPDATE umbracoUserGroup SET icon = \'icon-tools\' WHERE userGroupAlias = \'editor\'");
-            Execute.Sql("UPDATE umbracoUserGroup SET icon = \'icon-globe\' WHERE userGroupAlias = \'translator\'");
+            Database.Execute($"UPDATE umbracoUserGroup SET icon = \'\' WHERE userGroupAlias = \'{Constants.Security.AdminGroupAlias}\'");
+            Database.Execute("UPDATE umbracoUserGroup SET icon = \'icon-edit\' WHERE userGroupAlias = \'writer\'");
+            Database.Execute("UPDATE umbracoUserGroup SET icon = \'icon-tools\' WHERE userGroupAlias = \'editor\'");
+            Database.Execute("UPDATE umbracoUserGroup SET icon = \'icon-globe\' WHERE userGroupAlias = \'translator\'");
         }
 
         private bool AddNewTables(List<string> tables)
@@ -133,25 +135,25 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
             var updated = false;
             if (tables.InvariantContains("umbracoUserGroup") == false)
             {
-                Create.Table<UserGroupDto>();
+                Create.Table<UserGroupDto>().Do();
                 updated = true;
             }
 
             if (tables.InvariantContains("umbracoUser2UserGroup") == false)
             {
-                Create.Table<User2UserGroupDto>();
+                Create.Table<User2UserGroupDto>().Do();
                 updated = true;
             }
 
             if (tables.InvariantContains("umbracoUserGroup2App") == false)
             {
-                Create.Table<UserGroup2AppDto>();
+                Create.Table<UserGroup2AppDto>().Do();
                 updated = true;
             }
 
             if (tables.InvariantContains("umbracoUserGroup2NodePermission") == false)
             {
-                Create.Table<UserGroup2NodePermissionDto>();
+                Create.Table<UserGroup2NodePermissionDto>().Do();
                 updated = true;
             }
 
@@ -161,12 +163,12 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
         private void MigrateUserTypesToGroups()
         {
             // Create a user group for each user type
-            Execute.Sql(@"INSERT INTO umbracoUserGroup (userGroupAlias, userGroupName, userGroupDefaultPermissions)
+            Database.Execute(@"INSERT INTO umbracoUserGroup (userGroupAlias, userGroupName, userGroupDefaultPermissions)
                 SELECT userTypeAlias, userTypeName, userTypeDefaultPermissions
                 FROM umbracoUserType");
 
             // Add each user to the group created from their type
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                 SELECT u.id, ug.id
                 FROM umbracoUser u
                 INNER JOIN umbracoUserType ut ON ut.id = u.userType
@@ -175,7 +177,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
             // Add the built-in administrator account to all apps
             // this will lookup all of the apps that the admin currently has access to in order to assign the sections
             // instead of use statically assigning since there could be extra sections we don't know about.
-            Execute.Sql(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
+            Database.Execute(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
                 SELECT ug.id, app
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
@@ -185,21 +187,21 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 
             // Add the default section access to the other built-in accounts
             //  writer:
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'content' as app
                 FROM umbracoUserGroup ug
                 WHERE ug.userGroupAlias {0} = 'writer' {0}", _collateSyntax));
             //  editor
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'content' as app
                 FROM umbracoUserGroup ug
                 WHERE ug.userGroupAlias {0} = 'editor' {0}", _collateSyntax));
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'media' as app
                 FROM umbracoUserGroup ug
                 WHERE ug.userGroupAlias {0} = 'editor' {0}", _collateSyntax));
             //  translator
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                 SELECT ug.id, 'translation' as app
                 FROM umbracoUserGroup ug
                 WHERE ug.userGroupAlias {0} = 'translator' {0}", _collateSyntax));
@@ -240,12 +242,12 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                 {
                     userGroupAlias = "MigratedSectionAccessGroup_" + (i + 1),
                     userGroupName = "Migrated Section Access Group " + (i + 1)
-                });
+                }).Do();
                 //now assign the apps
                 var distinctApp = distinctApps[i];
                 foreach (var app in distinctApp.appCollection)
                 {
-                    Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
+                    Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId, app)
                         SELECT ug.id, '" + app + @"' as app
                         FROM umbracoUserGroup ug
                         WHERE ug.userGroupAlias {0} = '" + alias + "' {0}", _collateSyntax));
@@ -258,7 +260,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                     if (hash == distinctApp.appsHash)
                     {
                         //it matches so assign the user to this group
-                        Execute.Sql(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+                        Database.Execute(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                             SELECT " + userWithApps.Key + @", ug.id
                             FROM umbracoUserGroup ug
                             WHERE ug.userGroupAlias {0} = '" + alias + "' {0}", _collateSyntax));
@@ -267,24 +269,24 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
             }
 
             // Rename some groups for consistency (plural form)
-            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupAlias = 'writer'");
-            Execute.Sql("UPDATE umbracoUserGroup SET userGroupName = 'Translators' WHERE userGroupAlias = 'translator'");
+            Database.Execute("UPDATE umbracoUserGroup SET userGroupName = 'Writers' WHERE userGroupAlias = 'writer'");
+            Database.Execute("UPDATE umbracoUserGroup SET userGroupName = 'Translators' WHERE userGroupAlias = 'translator'");
 
             //Ensure all built in groups have a start node of -1
-            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'editor'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'editor'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'writer'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'writer'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'translator'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'translator'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'admin'");
-            Execute.Sql("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'admin'");
+            Database.Execute("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'editor'");
+            Database.Execute("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'editor'");
+            Database.Execute("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'writer'");
+            Database.Execute("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'writer'");
+            Database.Execute("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'translator'");
+            Database.Execute("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'translator'");
+            Database.Execute("UPDATE umbracoUserGroup SET startContentId = -1 WHERE userGroupAlias = 'admin'");
+            Database.Execute("UPDATE umbracoUserGroup SET startMediaId = -1 WHERE userGroupAlias = 'admin'");
         }
 
         private void MigrateUserPermissions()
         {
             // Create user group records for all non-admin users that have specific permissions set
-            Execute.Sql(@"INSERT INTO umbracoUserGroup(userGroupAlias, userGroupName)
+            Database.Execute(@"INSERT INTO umbracoUserGroup(userGroupAlias, userGroupName)
                 SELECT 'permissionGroupFor' + userLogin, 'Migrated Permission Group for ' + userLogin
                 FROM umbracoUser
                 WHERE (id IN (
@@ -294,13 +296,13 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                 AND id > 0");
 
             // Associate those groups with the users
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUser2UserGroup (userId, userGroupId)
                 SELECT u.id, ug.id
                 FROM umbracoUser u
                 INNER JOIN umbracoUserGroup ug ON ug.userGroupAlias {0} = 'permissionGroupFor' + userLogin {0}", _collateSyntax));
 
             // Create node permissions on the groups
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2NodePermission (userGroupId,nodeId,permission)
                 SELECT ug.id, nodeId, permission
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
@@ -312,7 +314,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                 )", _collateSyntax));
 
             // Create app permissions on the groups
-            Execute.Sql(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
+            Database.Execute(string.Format(@"INSERT INTO umbracoUserGroup2app (userGroupId,app)
                 SELECT ug.id, app
                 FROM umbracoUserGroup ug
                 INNER JOIN umbracoUser2UserGroup u2ug ON u2ug.userGroupId = ug.id
@@ -328,28 +330,28 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
         {
             if (tables.InvariantContains("umbracoUser2App"))
             {
-                Delete.Table("umbracoUser2App");
+                Delete.Table("umbracoUser2App").Do();
             }
 
             if (tables.InvariantContains("umbracoUser2NodePermission"))
             {
-                Delete.Table("umbracoUser2NodePermission");
+                Delete.Table("umbracoUser2NodePermission").Do();
             }
 
             if (tables.InvariantContains("umbracoUserType") && tables.InvariantContains("umbracoUser"))
             {
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
                 {
-                    Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser");
+                    Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser").Do();
                 }
                 //This is the super old constraint name of the FK for user type so check this one too
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_user_userType")))
                 {
-                    Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser");
+                    Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser").Do();
                 }
 
-                Delete.Column("userType").FromTable("umbracoUser");
-                Delete.Table("umbracoUserType");
+                Delete.Column("userType").FromTable("umbracoUser").Do();
+                Delete.Table("umbracoUserType").Do();
             }
         }
     }

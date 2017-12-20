@@ -1,23 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.Data
 {
-    /// <summary>
-    /// Implements <see cref="IDeleteDataBuilder"/>.
-    /// </summary>
-    public class DeleteDataBuilder : ExpressionBuilderBase<DeleteDataExpression>, IDeleteDataBuilder
+    public class DeleteDataBuilder : ExpressionBuilderBase<DeleteDataExpression>,
+        IDeleteDataBuilder
     {
         public DeleteDataBuilder(DeleteDataExpression expression)
             : base(expression)
         { }
 
         /// <inheritdoc />
-        public void IsNull(string columnName)
+        public IExecutableBuilder IsNull(string columnName)
         {
             Expression.Rows.Add(new DeletionDataDefinition { new KeyValuePair<string, object>(columnName, null) });
+            return this;
         }
 
         /// <inheritdoc />
@@ -28,14 +28,14 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Data
         }
 
         /// <inheritdoc />
-        public void AllRows()
+        public IExecutableBuilder AllRows()
         {
             Expression.IsAllRows = true;
-            Expression.Execute();
+            return this;
         }
 
         /// <inheritdoc />
-        public void Execute()
+        public void Do()
         {
             Expression.Execute();
         }

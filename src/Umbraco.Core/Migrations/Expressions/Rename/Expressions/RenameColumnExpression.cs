@@ -16,9 +16,6 @@ namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
         public override string Process(IMigrationContext context)
             => GetSql();
 
-        public override string ToString() // fixme kill
-                => GetBaseSql();
-
         /// <inheritdoc />
         protected override string GetSql()
         {

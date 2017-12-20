@@ -3,9 +3,6 @@ using Umbraco.Core.Migrations.Expressions.Update.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Update
 {
-    /// <summary>
-    /// Implements <see cref="IUpdateBuilder"/>.
-    /// </summary>
     public class UpdateBuilder : IUpdateBuilder
     {
         private readonly IMigrationContext _context;

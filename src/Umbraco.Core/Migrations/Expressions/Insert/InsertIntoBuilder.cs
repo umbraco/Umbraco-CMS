@@ -8,11 +8,15 @@ namespace Umbraco.Core.Migrations.Expressions.Insert
     /// <summary>
     /// Implements <see cref="IInsertIntoBuilder"/>.
     /// </summary>
-    public class InsertIntoBuilder : ExpressionBuilderBase<InsertDataExpression>, IInsertIntoBuilder
+    public class InsertIntoBuilder : ExpressionBuilderBase<InsertDataExpression>,
+        IInsertIntoBuilder
     {
         public InsertIntoBuilder(InsertDataExpression expression)
             : base(expression)
         { }
+
+        /// <inheritdoc />
+        public void Do() => Expression.Execute();
 
         /// <inheritdoc />
         public IInsertIntoBuilder EnableIdentityInsert()
@@ -26,12 +30,6 @@ namespace Umbraco.Core.Migrations.Expressions.Insert
         {
             Expression.Rows.Add(GetData(dataAsAnonymousType));
             return this;
-        }
-
-        /// <inheritdoc />
-        public void Execute()
-        {
-            Expression.Execute();
         }
 
         private static InsertionDataDefinition GetData(object dataAsAnonymousType)

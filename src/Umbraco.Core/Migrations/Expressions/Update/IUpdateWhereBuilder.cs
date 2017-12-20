@@ -1,18 +1,20 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Update
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+
+namespace Umbraco.Core.Migrations.Expressions.Update
 {
     /// <summary>
-    /// Builds an Update Table ... Where expression.
+    /// Builds an Update expression.
     /// </summary>
     public interface IUpdateWhereBuilder
     {
         /// <summary>
-        /// Specifies rows to update, and executes.
+        /// Specifies rows to update.
         /// </summary>
-        void Where(object dataAsAnonymousType);
+        IExecutableBuilder Where(object dataAsAnonymousType);
 
         /// <summary>
-        /// Specifies that all rows must be updated, and executes.
+        /// Specifies that all rows must be updated.
         /// </summary>
-        void AllRows();
+        IExecutableBuilder AllRows();
     }
 }

@@ -21,17 +21,13 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveFive
 
         private void EnsureLockObject(int id, string name)
         {
-            Execute.Code(context =>
-            {
-                var db = context.Database;
-                var exists = db.Exists<LockDto>(id);
-                if (exists) return string.Empty;
-                // be safe: delete old umbracoNode lock objects if any
-                db.Execute("DELETE FROM umbracoNode WHERE id=@id;", new { id });
-                // then create umbracoLock object
-                db.Execute("INSERT umbracoLock (id, name, value) VALUES (@id, @name, 1);", new { id, name });
-                return string.Empty;
-            });
+            var db = Database;
+            var exists = db.Exists<LockDto>(id);
+            if (exists) return;
+            // be safe: delete old umbracoNode lock objects if any
+            db.Execute("DELETE FROM umbracoNode WHERE id=@id;", new { id });
+            // then create umbracoLock object
+            db.Execute("INSERT umbracoLock (id, name, value) VALUES (@id, @name, 1);", new { id, name });
         }
     }
 }

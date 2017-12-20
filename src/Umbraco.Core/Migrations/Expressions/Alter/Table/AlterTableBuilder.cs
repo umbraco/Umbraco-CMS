@@ -20,6 +20,8 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
+        public void Do() => Expression.Execute();
+
         public ColumnDefinition CurrentColumn { get; set; }
 
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
@@ -46,7 +48,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
                                  DefaultValue = value
                              };
 
-                _context.Expressions.Add(dc);
+                Expression.Expressions.Add(dc);
             }
 
             CurrentColumn.DefaultValue = value;
@@ -79,7 +81,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
                                             Name = CurrentColumn.Name
                                         });
 
-            _context.Expressions.Add(index);
+            Expression.Expressions.Add(index);
 
             return this;
         }
@@ -130,7 +132,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
                                             Name = CurrentColumn.Name
                                         });
 
-            _context.Expressions.Add(index);
+            Expression.Expressions.Add(index);
 
             return this;
         }
@@ -162,7 +164,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
             fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
             fk.ForeignKey.ForeignColumns.Add(CurrentColumn.Name);
 
-            _context.Expressions.Add(fk);
+            Expression.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }
@@ -198,7 +200,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
             fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
-            _context.Expressions.Add(fk);
+            Expression.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }
@@ -214,7 +216,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
 
             CurrentColumn = column;
 
-            _context.Expressions.Add(createColumn);
+            Expression.Expressions.Add(createColumn);
             return this;
         }
 
@@ -229,7 +231,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
 
             CurrentColumn = column;
 
-            _context.Expressions.Add(alterColumn);
+            Expression.Expressions.Add(alterColumn);
             return this;
         }
 

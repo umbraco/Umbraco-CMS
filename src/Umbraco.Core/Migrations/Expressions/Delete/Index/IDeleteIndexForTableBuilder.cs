@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Migrations.Expressions.Delete.Index
 {
     /// <summary>
-    /// Builds a Delete Index expression.
+    /// Builds a Delete expression.
     /// </summary>
     public interface IDeleteIndexForTableBuilder : IFluentBuilder
     {

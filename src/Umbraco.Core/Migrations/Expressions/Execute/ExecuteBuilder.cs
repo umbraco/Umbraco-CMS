@@ -1,33 +1,24 @@
-﻿using System;
-using NPoco;
+﻿using NPoco;
+using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Execute.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Execute
 {
-    /// <summary>
-    /// Implements <see cref="IExecuteBuilder"/>.
-    /// </summary>
-    public class ExecuteBuilder : IExecuteBuilder
+    public class ExecuteBuilder : ExpressionBuilderBase<ExecuteSqlStatementExpression>,
+        IExecuteBuilder, IExecutableBuilder
     {
-        private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
-
         public ExecuteBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
-        {
-            _context = context;
-            _supportedDatabaseTypes = supportedDatabaseTypes;
-        }
+            : base(new ExecuteSqlStatementExpression(context, supportedDatabaseTypes))
+        { }
 
-        public void Sql(string sqlStatement)
-        {
-            var expression = new ExecuteSqlStatementExpression(_context, _supportedDatabaseTypes) {SqlStatement = sqlStatement};
-            expression.Execute();
-        }
+        /// <inheritdoc />
+        public void Do() => Expression.Execute();
 
-        public void Code(Func<IMigrationContext, string> codeStatement)
+        /// <inheritdoc />
+        public IExecutableBuilder Sql(string sqlStatement)
         {
-            var expression = new ExecuteCodeStatementExpression(_context, _supportedDatabaseTypes) { CodeStatement = codeStatement };
-            _context.Expressions.Add(expression);
+            Expression.SqlStatement = sqlStatement;
+            return this;
         }
     }
 }

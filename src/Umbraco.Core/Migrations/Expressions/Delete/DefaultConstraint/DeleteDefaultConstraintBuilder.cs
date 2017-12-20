@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+﻿using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
 
 namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
 {
@@ -21,10 +22,10 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
         }
 
         /// <inheritdoc />
-        public void OnColumn(string columnName)
+        public IExecutableBuilder OnColumn(string columnName)
         {
             Expression.ColumnName = columnName;
-            Expression.Execute();
+            return new ExecutableBuilder(Expression);
         }
     }
 }

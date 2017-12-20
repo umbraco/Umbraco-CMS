@@ -6,7 +6,7 @@
     public interface IInsertBuilder : IFluentBuilder
     {
         /// <summary>
-        /// Builds an Insert Into expression.
+        /// Specifies the table to insert into.
         /// </summary>
         IInsertIntoBuilder IntoTable(string tableName);
     }

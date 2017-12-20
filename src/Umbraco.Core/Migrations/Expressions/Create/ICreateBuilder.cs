@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Create.Column;
 using Umbraco.Core.Migrations.Expressions.Create.Constraint;
 using Umbraco.Core.Migrations.Expressions.Create.ForeignKey;
@@ -15,17 +16,17 @@ namespace Umbraco.Core.Migrations.Expressions.Create
         /// <summary>
         /// Builds a Create Table expresion, and executes.
         /// </summary>
-        void Table<TDto>(bool withoutKeysAndIndexes = false);
+        IExecutableBuilder Table<TDto>(bool withoutKeysAndIndexes = false);
 
         /// <summary>
         /// Builds a Create Keys and Indexes expresion, and executes.
         /// </summary>
-        void KeysAndIndexes<TDto>();
+        IExecutableBuilder KeysAndIndexes<TDto>();
 
         /// <summary>
         /// Builds a Create Keys and Indexes expresion, and executes.
         /// </summary>
-        void KeysAndIndexes(Type typeOfDto);
+        IExecutableBuilder KeysAndIndexes(Type typeOfDto);
 
         /// <summary>
         /// Builds a Create Table expression.
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create
         /// <summary>
         /// Builds a Create Column expression.
         /// </summary>
-        ICreateColumnOnTableSyntax Column(string columnName);
+        ICreateColumnOnTableBuilder Column(string columnName);
 
         /// <summary>
         /// Builds a Create Foreign Key expression.
