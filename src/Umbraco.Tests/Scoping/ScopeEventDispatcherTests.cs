@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Scoping
 
                 //content1 will be filtered from the args
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(new[]{ content1 , content3}));
-                scope.Events.Dispatch(DoDeleteForContent, this, new DeleteEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoDeleteForContent, this, new DeleteEventArgs<IContent>(content1), "DoDeleteForContent");
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
                 //this entire event will be filtered
                 scope.Events.Dispatch(DoForTestArgs, this, new TestEventArgs(content1));
