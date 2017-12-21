@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
@@ -107,7 +108,7 @@ namespace Umbraco.Core.IO
 
             try
             {
-                Directory.Delete(fullPath, recursive);
+                WithRetry(() => Directory.Delete(fullPath, recursive));
             }
             catch (DirectoryNotFoundException ex)
             {
@@ -226,7 +227,7 @@ namespace Umbraco.Core.IO
 
             try
             {
-                File.Delete(fullPath);
+                WithRetry(() => File.Delete(fullPath));
             }
             catch (FileNotFoundException ex)
             {
@@ -378,7 +379,7 @@ namespace Umbraco.Core.IO
             {
                 if (overrideIfExists == false)
                     throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
-                File.Delete(fullPath);
+                WithRetry(() => File.Delete(fullPath));
             }
 
             var directory = Path.GetDirectoryName(fullPath);
@@ -386,9 +387,9 @@ namespace Umbraco.Core.IO
             Directory.CreateDirectory(directory); // ensure it exists
 
             if (copy)
-                File.Copy(physicalPath, fullPath);
+                WithRetry(() => File.Copy(physicalPath, fullPath));
             else
-                File.Move(physicalPath, fullPath);
+                WithRetry(() => File.Move(physicalPath, fullPath));
         }
 
         #region Helper Methods
@@ -415,6 +416,32 @@ namespace Umbraco.Core.IO
         {
             path = path.Replace('\\', '/');
             return path;
+        }
+
+        protected void WithRetry(Action action)
+        {
+            // 10 times 100ms is 1s
+            const int count = 10;
+            const int pausems = 100;
+
+            for (var i = 0;; i++)
+            {
+                try
+                {
+                    action();
+                }
+                catch (IOException e)
+                {
+                    // if it's not *exactly* IOException then it could be
+                    // some inherited exception such as FileNotFoundException,
+                    // and then we don't want to retry
+                    if (e.GetType() != typeof(IOException)) throw;
+
+                    if (i == count) throw;
+                    // else retry
+                }
+                Thread.Sleep(pausems);
+            }
         }
 
         #endregion
