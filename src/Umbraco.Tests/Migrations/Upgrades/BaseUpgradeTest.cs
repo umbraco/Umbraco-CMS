@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
@@ -52,10 +53,10 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             var logger = Mock.Of<ILogger>();
-            var context = new MigrationContext(db, logger);
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
+                Mock.Of<IScopeProvider>(),
                 Mock.Of<IMigrationCollectionBuilder>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
@@ -78,7 +79,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
                 //new UpdateCmsPropertyTypeGroupTable(context)
                 );
 
-            var upgraded = migrationRunner.Execute(context /*, true*/);
+            var upgraded = migrationRunner.Execute(/*true*/);
 
             Assert.That(upgraded, Is.True);
 

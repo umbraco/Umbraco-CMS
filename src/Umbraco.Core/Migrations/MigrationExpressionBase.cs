@@ -73,27 +73,26 @@ namespace Umbraco.Core.Migrations
             if (string.IsNullOrWhiteSpace(sql))
             {
                 Logger.Info(GetType(), $"SQL [{Context.Index}]: <empty>");
-                Context.Index++;
-                return;
             }
-
-            // split multiple statements - required for SQL CE
-            // http://stackoverflow.com/questions/13665491/sql-ce-inconsistent-with-multiple-statements
-            var stmtBuilder = new StringBuilder();
-            using (var reader = new StringReader(sql))
+            else
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                // split multiple statements - required for SQL CE
+                // http://stackoverflow.com/questions/13665491/sql-ce-inconsistent-with-multiple-statements
+                var stmtBuilder = new StringBuilder();
+                using (var reader = new StringReader(sql))
                 {
-                    line = line.Trim();
-                    if (line.Equals("GO", StringComparison.OrdinalIgnoreCase))
-                        ExecuteStatement(stmtBuilder);
-                    else
-                        stmtBuilder.AppendLine(line);
-                }
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.Trim().Equals("GO", StringComparison.OrdinalIgnoreCase))
+                            ExecuteStatement(stmtBuilder);
+                        else
+                            stmtBuilder.Append(line);
+                    }
 
-                if (stmtBuilder.Length > 0)
-                    ExecuteStatement(stmtBuilder);
+                    if (stmtBuilder.Length > 0)
+                        ExecuteStatement(stmtBuilder);
+                }
             }
 
             Context.Index++;

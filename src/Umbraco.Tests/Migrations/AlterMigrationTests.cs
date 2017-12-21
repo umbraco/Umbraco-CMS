@@ -44,9 +44,12 @@ namespace Umbraco.Tests.Migrations
             // Act
             stub.Up();
 
+            foreach (var op in database.Operations)
+                Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+
             // Assert
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
+            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
 
         }
 
@@ -59,8 +62,11 @@ namespace Umbraco.Tests.Migrations
 
             migration.Up();
 
+            foreach (var op in database.Operations)
+                Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
+            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
         }
 
         [Migration("1.0.0", 0, "Test")]
@@ -72,7 +78,7 @@ namespace Umbraco.Tests.Migrations
 
             public override void Up()
             {
-                Alter.Table("bar").AddColumn("foo").AsGuid();
+                Alter.Table("bar").AddColumn("foo").AsGuid().Do();
             }
 
             public override void Down()
@@ -88,8 +94,11 @@ namespace Umbraco.Tests.Migrations
 
             migration.Up();
 
+            foreach (var op in database.Operations)
+                Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
+
             Assert.That(database.Operations.Count, Is.EqualTo(1));
-            Assert.That(database.Operations.Single().ToString(), Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
+            Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
         }
 
         [Migration("1.0.0", 0, "Test")]
@@ -103,7 +112,7 @@ namespace Umbraco.Tests.Migrations
             {
                 // bad/good syntax...
                 //Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
-                Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable();
+                Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
             }
 
             public override void Down()

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -27,9 +27,9 @@ namespace Umbraco.Web.Strategies.Migrations
         {
             if (args.ProductName != Constants.System.UmbracoMigrationName) return;
 
-            var target70 = new Version(7, 0, 0);
+            var target70 = new SemVersion(7 /*, 0, 0*/);
 
-            if (args.ConfiguredVersion <= target70)
+            if (args.ConfiguredSemVersion <= target70)
             {
                 //This query is structured to work with MySql, SQLCE and SqlServer:
                 // http://issues.umbraco.org/issue/U4-3876

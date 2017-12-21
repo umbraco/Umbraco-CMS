@@ -12,7 +12,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
 
         protected override string GetSql()
         {
-            return $"ALTER TABLE {TableName}";
+            return string.Empty;
         }
     }
 }

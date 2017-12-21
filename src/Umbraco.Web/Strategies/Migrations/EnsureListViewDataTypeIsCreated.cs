@@ -1,5 +1,6 @@
 ﻿using System;
 using NPoco;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Rdbms;
@@ -17,9 +18,9 @@ namespace Umbraco.Web.Strategies.Migrations
         {
             if (args.ProductName != Constants.System.UmbracoMigrationName) return;
 
-            var target720 = new Version(7, 2, 0);
+            var target720 = new SemVersion(7, 2, 0);
 
-            if (args.ConfiguredVersion <= target720)
+            if (args.ConfiguredSemVersion <= target720)
             {
                 EnsureListViewDataTypeCreated(args);
 

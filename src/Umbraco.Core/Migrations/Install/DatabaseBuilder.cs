@@ -558,10 +558,9 @@ namespace Umbraco.Core.Migrations.Install
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, Constants.System.UmbracoMigrationName);
+                var runner = new MigrationRunner(_scopeProvider, builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, Constants.System.UmbracoMigrationName);
 
-                var migrationContext = new MigrationContext(database, _logger);
-                var upgraded = runner.Execute(migrationContext /*, true*/);
+                var upgraded = runner.Execute(/*upgrade:true*/);
 
                 if (upgraded == false)
                 {

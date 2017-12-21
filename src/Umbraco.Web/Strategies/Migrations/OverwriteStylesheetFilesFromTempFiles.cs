@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -21,9 +22,9 @@ namespace Umbraco.Web.Strategies.Migrations
         {
             if (args.ProductName != Constants.System.UmbracoMigrationName) return;
 
-            var target73 = new Version(7, 3, 0);
+            var target73 = new SemVersion(7, 3, 0);
 
-            if (args.ConfiguredVersion <= target73)
+            if (args.ConfiguredSemVersion <= target73)
             {
                 var tempCssFolder = IOHelper.MapPath("~/App_Data/TEMP/CssMigration/");
                 var cssFolder = IOHelper.MapPath("~/css");

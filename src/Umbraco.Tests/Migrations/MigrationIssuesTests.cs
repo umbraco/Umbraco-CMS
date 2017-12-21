@@ -25,15 +25,28 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
+            var builder = Mock.Of<IMigrationCollectionBuilder>();
+            Mock.Get(builder)
+                .Setup(x => x.Instanciate(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+                .Returns<Type, IMigrationContext>((t, c) =>
+                {
+                    switch (t.Name)
+                    {
+                        case "DeleteRedirectUrlTable":
+                            return new DeleteRedirectUrlTable(c);
+                        case "AddRedirectUrlTable":
+                            return new AddRedirectUrlTable(c);
+                        default:
+                            throw new NotSupportedException();
+                    }
+                });
+
             using (var scope = Current.ScopeProvider.CreateScope())
             {
-                var database = scope.Database;
-
-                var migrationContext = new MigrationContext(database, Logger);
-
                 //Setup the MigrationRunner
                 var migrationRunner = new MigrationRunner(
-                    Mock.Of<IMigrationCollectionBuilder>(),
+                    ScopeProvider,
+                    builder,
                     Mock.Of<IMigrationEntryService>(),
                     logger,
                     new SemVersion(7, 5, 0),
@@ -41,11 +54,11 @@ namespace Umbraco.Tests.Migrations
                     Constants.System.UmbracoMigrationName,
 
                     //pass in explicit migrations
-                    new DeleteRedirectUrlTable(migrationContext),
-                    new AddRedirectUrlTable(migrationContext)
+                    typeof(DeleteRedirectUrlTable),
+                    typeof(AddRedirectUrlTable)
                 );
 
-                var upgraded = migrationRunner.Execute(migrationContext, true);
+                var upgraded = migrationRunner.Execute();
                 Assert.IsTrue(upgraded);
             }
         }

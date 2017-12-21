@@ -47,15 +47,14 @@ namespace Umbraco.Tests.Testing
             }
 
             public Operation(string text, string sql)
+                : this(text)
             {
-                Text = text;
                 Sql = sql;
             }
 
             public Operation(string text, string sql, params object[] args)
+                : this(text, sql)
             {
-                Text = text.Trim();
-                Sql = sql.Trim();
                 Args = args;
             }
 

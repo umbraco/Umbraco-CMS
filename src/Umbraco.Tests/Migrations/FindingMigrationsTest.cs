@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Tests.Migrations.Stubs;
 using Umbraco.Tests.TestHelpers;
@@ -26,17 +22,13 @@ namespace Umbraco.Tests.Migrations
                 .Add<FourElevenMigration>()
                 .Add<FiveZeroMigration>();
 
-            var database = TestObjects.GetUmbracoSqlServerDatabase(Mock.Of<ILogger>());
-
-            var context = new MigrationContext(database, Logger);
-
-            var foundMigrations = builder.CreateCollection(context);
+            var foundMigrations = builder.MigrationTypes;
             var targetVersion = new Version("6.0.0");
-            var list = new List<IMigration>();
+            var list = new List<Type>();
 
             foreach (var migration in foundMigrations)
             {
-                var migrationAttribute = migration.GetType().FirstAttribute<MigrationAttribute>();
+                var migrationAttribute = migration.FirstAttribute<MigrationAttribute>();
                 if (migrationAttribute != null)
                 {
                     if (migrationAttribute.TargetVersion == targetVersion)

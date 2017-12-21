@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Migrations.Stubs
 
         public override void Up()
         {
-            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id");
+            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id").Do();
         }
 
         public override void Down()

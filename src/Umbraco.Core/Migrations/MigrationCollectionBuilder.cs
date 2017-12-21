@@ -1,4 +1,6 @@
-﻿using LightInject;
+﻿using System;
+using System.Collections.Generic;
+using LightInject;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations
@@ -32,9 +34,11 @@ namespace Umbraco.Core.Migrations
         // however, keep it here to be absolutely explicit about it
         protected override ILifetime CollectionLifetime { get; } = null; // transient
 
-        public MigrationCollection CreateCollection(IMigrationContext context)
+        public IEnumerable<Type> MigrationTypes => GetTypes();
+
+        public IMigration Instanciate(Type migrationType, IMigrationContext context)
         {
-            return new MigrationCollection(CreateItems(context));
+            return (IMigration) Container.GetInstance(migrationType, new [] { context });
         }
     }
 }

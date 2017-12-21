@@ -521,6 +521,7 @@
     <Compile Include="Media\Result.cs" />
     <Compile Include="Media\Status.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
+    <Compile Include="Migrations\MigrationCollection.cs" />
     <Compile Include="Models\ApplicationTree.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
@@ -896,7 +897,6 @@
     <Compile Include="Migrations\Install\DatabaseSchemaResult.cs" />
     <Compile Include="Migrations\MigrationAttribute.cs" />
     <Compile Include="Migrations\MigrationBase.cs" />
-    <Compile Include="Migrations\MigrationCollection.cs" />
     <Compile Include="Migrations\MigrationCollectionBuilder.cs" />
     <Compile Include="Migrations\MigrationContext.cs" />
     <Compile Include="Migrations\MigrationExpressionBase.cs" />
