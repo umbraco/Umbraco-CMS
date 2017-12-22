@@ -5,14 +5,13 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
     /// <summary>
     /// See: http://issues.umbraco.org/issue/U4-9188
     /// </summary>
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class UpdateUniqueIndexOnPropertyData : MigrationBase
     {
         public UpdateUniqueIndexOnPropertyData(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             //tuple = tablename, indexname, columnname, unique
             var indexes = SqlSyntax.GetDefinedIndexes(Context.Database).ToArray();
@@ -25,10 +24,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                 //drop the index
                 Delete.Index("IX_cmsPropertyData").OnTable("cmsPropertyData").Do();
             }
-        }
-
-        public override void Down()
-        {
         }
     }
 }

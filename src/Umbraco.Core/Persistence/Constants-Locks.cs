@@ -13,6 +13,7 @@ namespace Umbraco.Core
             public const int MediaTypes = -336;
             public const int MemberTypes = -337;
             public const int Domains = -338;
+            public const int KeyValues = -339;
         }
     }
 }

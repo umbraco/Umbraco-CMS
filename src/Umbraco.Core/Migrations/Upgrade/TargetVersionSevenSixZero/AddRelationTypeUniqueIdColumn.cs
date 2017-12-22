@@ -3,14 +3,13 @@ using System.Linq;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddRelationTypeUniqueIdColumn : MigrationBase
     {
         public AddRelationTypeUniqueIdColumn(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
@@ -36,11 +35,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 
             foreach (var update in updates)
                 database.Execute("UPDATE umbracoRelationType set typeUniqueId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
-        }
-
-        public override void Down()
-        {
-            throw new NotImplementedException();
         }
     }
 }

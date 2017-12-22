@@ -1,10 +1,10 @@
 ﻿using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
+using Umbraco.Core.Scoping;
 
-namespace Umbraco.Web.Strategies.Migrations
+namespace Umbraco.Web.Migrations
 {
     /// <summary>
     /// This will execute after upgrading to remove any xml cache for media that are currently in the bin
@@ -23,25 +23,25 @@ namespace Umbraco.Web.Strategies.Migrations
             _logger = logger;
         }
 
-        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
+        public void Execute(string name, IScope scope, SemVersion originVersion, SemVersion targetVersion, ILogger logger)
         {
-            if (args.ProductName != Constants.System.UmbracoMigrationName) return;
+            if (name != Constants.System.UmbracoUpgraderName) return;
 
             var target70 = new SemVersion(7 /*, 0, 0*/);
 
-            if (args.ConfiguredSemVersion <= target70)
+            if (originVersion <= target70)
             {
                 //This query is structured to work with MySql, SQLCE and SqlServer:
                 // http://issues.umbraco.org/issue/U4-3876
 
-                var syntax = args.MigrationContext.SqlContext.SqlSyntax;
+                var syntax = scope.SqlContext.SqlSyntax;
 
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
     (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml
     INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
     WHERE nodeObjectType = '" + Constants.ObjectTypes.Media + "' AND " + syntax.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
 
-                var count = args.MigrationContext.Database.Execute(sql);
+                var count = scope.Database.Execute(sql);
 
                 _logger.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared " + count + " items from the media xml cache that were trashed and not meant to be there");
             }

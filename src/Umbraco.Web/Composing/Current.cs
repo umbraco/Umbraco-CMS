@@ -116,9 +116,6 @@ namespace Umbraco.Web.Composing
         public static ActionCollection Actions
             => Container.GetInstance<ActionCollection>();
 
-        public static MigrationCollectionBuilder MigrationCollectionBuilder
-            => Container.GetInstance<MigrationCollectionBuilder>();
-
         public static ContentFinderCollection ContentFinders
             => Container.GetInstance<ContentFinderCollection>();
 

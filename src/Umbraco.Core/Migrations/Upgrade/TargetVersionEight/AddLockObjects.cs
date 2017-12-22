@@ -2,14 +2,13 @@
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
 {
-    [Migration("8.0.0", 101, Constants.System.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
         public AddLockObjects(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             // some may already exist, just ensure everything we need is here
             EnsureLockObject(Constants.Locks.Servers, "Servers");
@@ -20,11 +19,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
             EnsureLockObject(Constants.Locks.MediaTypes, "MediaTypes");
             EnsureLockObject(Constants.Locks.MemberTypes, "MemberTypes");
             EnsureLockObject(Constants.Locks.Domains, "Domains");
-        }
-
-        public override void Down()
-        {
-            // not implemented
         }
 
         private void EnsureLockObject(int id, string name)

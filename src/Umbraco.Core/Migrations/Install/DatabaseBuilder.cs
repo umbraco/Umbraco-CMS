@@ -4,11 +4,11 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
@@ -24,18 +24,22 @@ namespace Umbraco.Core.Migrations.Install
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IScopeProvider _scopeProvider;
         private readonly IRuntimeState _runtime;
-        private readonly IMigrationEntryService _migrationEntryService;
+        private readonly IMigrationBuilder _migrationBuilder;
+        private readonly IKeyValueService _keyValueService;
+        private readonly PostMigrationCollection _postMigrations;
         private readonly ILogger _logger;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
-        public DatabaseBuilder(IScopeProvider scopeProvider, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, IMigrationEntryService migrationEntryService, ILogger logger)
+        public DatabaseBuilder(IScopeProvider scopeProvider, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations)
         {
             _scopeProvider = scopeProvider;
             _databaseFactory = databaseFactory;
             _runtime = runtime;
-            _migrationEntryService = migrationEntryService;
             _logger = logger;
+            _migrationBuilder = migrationBuilder;
+            _keyValueService = keyValueService;
+            _postMigrations = postMigrations;
         }
 
         #region Status
@@ -495,18 +499,8 @@ namespace Umbraco.Core.Migrations.Install
             }
         }
 
-        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService, MigrationCollectionBuilder builder)
-        {
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                var result = UpgradeSchemaAndData(scope, migrationEntryService, builder);
-                scope.Complete();
-                return result;
-            }
-        }
-
         // This assumes all of the previous checks are done!
-        private Result UpgradeSchemaAndData(IScope scope, IMigrationEntryService migrationEntryService, MigrationCollectionBuilder builder)
+        internal Result UpgradeSchemaAndData()
         {
             try
             {
@@ -518,54 +512,56 @@ namespace Umbraco.Core.Migrations.Install
 
                 _logger.Info<DatabaseBuilder>("Database upgrade started");
 
-                var database = scope.Database;
+                //var database = scope.Database;
                 //var supportsCaseInsensitiveQueries = SqlSyntax.SupportsCaseInsensitiveQueries(database);
 
                 var message = GetResultMessageForMySql();
 
-                var schemaResult = ValidateDatabaseSchema();
+                // fixme - remove this code
+                //var schemaResult = ValidateDatabaseSchema();
+                //
+                //var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
+                //var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
+                //var targetVersion = UmbracoVersion.Current;
+                //
+                ////In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
+                //// return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the
+                //// migrations are run for the target version
+                //if (installedMigrationVersion == new SemVersion(new Version(0, 0, 0)) && installedSchemaVersion > new SemVersion(new Version(0, 0, 0)))
+                //{
+                //    //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
+                //    installedMigrationVersion = new SemVersion(targetVersion.SubtractRevision());
+                //}
+                //
+                ////Figure out what our current installed version is. If the web.config doesn't have a version listed, then we'll use the minimum
+                //// version detected between the schema installed and the migrations listed in the migration table.
+                //// If there is a version in the web.config, we'll take the minimum between the listed migration in the db and what
+                //// is declared in the web.config.
+                //
+                //var currentInstalledVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+                //    //Take the minimum version between the detected schema version and the installed migration version
+                //    ? new[] { installedSchemaVersion, installedMigrationVersion }.Min()
+                //    //Take the minimum version between the installed migration version and the version specified in the config
+                //    : new[] { SemVersion.Parse(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
+                //
+                ////Ok, another edge case here. If the current version is a pre-release,
+                //// then we want to ensure all migrations for the current release are executed.
+                //if (currentInstalledVersion.Prerelease.IsNullOrWhiteSpace() == false)
+                //{
+                //    currentInstalledVersion = new SemVersion(currentInstalledVersion.GetVersion().SubtractRevision());
+                //}
 
-                var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
-                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
-                var targetVersion = UmbracoVersion.Current;
+                // upgrade
+                var upgrader = new UmbracoUpgrader(_scopeProvider, _migrationBuilder, _keyValueService, _postMigrations, _logger);
+                upgrader.Execute();
 
-                //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
-                // return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the
-                // migrations are run for the target version
-                if (installedMigrationVersion == new SemVersion(new Version(0, 0, 0)) && installedSchemaVersion > new SemVersion(new Version(0, 0, 0)))
-                {
-                    //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
-                    installedMigrationVersion = new SemVersion(targetVersion.SubtractRevision());
-                }
-
-                //Figure out what our current installed version is. If the web.config doesn't have a version listed, then we'll use the minimum
-                // version detected between the schema installed and the migrations listed in the migration table.
-                // If there is a version in the web.config, we'll take the minimum between the listed migration in the db and what
-                // is declared in the web.config.
-
-                var currentInstalledVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
-                    //Take the minimum version between the detected schema version and the installed migration version
-                    ? new[] { installedSchemaVersion, installedMigrationVersion }.Min()
-                    //Take the minimum version between the installed migration version and the version specified in the config
-                    : new[] { SemVersion.Parse(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
-
-                //Ok, another edge case here. If the current version is a pre-release,
-                // then we want to ensure all migrations for the current release are executed.
-                if (currentInstalledVersion.Prerelease.IsNullOrWhiteSpace() == false)
-                {
-                    currentInstalledVersion = new SemVersion(currentInstalledVersion.GetVersion().SubtractRevision());
-                }
-
-                //DO the upgrade!
-
-                var runner = new MigrationRunner(_scopeProvider, builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, Constants.System.UmbracoMigrationName);
-
-                var upgraded = runner.Execute(/*upgrade:true*/);
-
-                if (upgraded == false)
-                {
-                    throw new ApplicationException("Upgrading failed, either an error occurred during the upgrade process or an event canceled the upgrade process, see log for full details");
-                }
+                // fixme remove this code
+                //var runner = new MigrationRunner(_scopeProvider, builder, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.SemanticVersion, Constants.System.UmbracoMigrationName);
+                //var upgraded = runner.Execute(/*upgrade:true*/);
+                //if (upgraded == false)
+                //{
+                //    throw new ApplicationException("Upgrading failed, either an error occurred during the upgrade process or an event canceled the upgrade process, see log for full details");
+                //}
 
                 message = message + "<p>Upgrade completed!</p>";
 

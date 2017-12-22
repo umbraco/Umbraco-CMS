@@ -224,6 +224,8 @@
     <Compile Include="CoreThings\CallContextTests.cs" />
     <Compile Include="Components\ComponentTests.cs" />
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
+    <Compile Include="Migrations\MigrationPlanTests.cs" />
+    <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -235,7 +237,6 @@
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Integration\ContentEventsTests.cs" />
     <Compile Include="Migrations\AdvancedMigrationTests.cs" />
-    <Compile Include="Migrations\MigrationIssuesTests.cs" />
     <Compile Include="Models\Mapping\AutoMapper6Tests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Packaging\PackageExtractionTests.cs" />
@@ -331,7 +332,6 @@
     <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
-    <Compile Include="Migrations\MigrationRunnerTests.cs" />
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
@@ -450,8 +450,6 @@
     <Compile Include="Strings\MockShortStringHelper.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
-    <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
-    <Compile Include="Migrations\FindingMigrationsTest.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -460,10 +458,6 @@
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
-    <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
-    <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
-    <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
-    <Compile Include="Migrations\Upgrades\ValidateOlderSchemaTest.cs" />
     <Compile Include="Models\Collections\PropertyCollectionTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\FaultHandling\ConnectionRetryTest.cs" />

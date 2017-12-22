@@ -7,7 +7,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
     /// <summary>
     /// See: http://issues.umbraco.org/issue/U4-8522
     /// </summary>
-    [Migration("7.5.0", 2, Constants.System.UmbracoMigrationName)]
     public class UpdateUniqueIndexOnPropertyData : MigrationBase
     {
         public UpdateUniqueIndexOnPropertyData(IMigrationContext context)
@@ -15,7 +14,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
         {
         }
 
-        public override void Up()
+        public override void Migrate()
         {
             //Clear all stylesheet data if the tables exist
             //tuple = tablename, indexname, columnname, unique
@@ -58,10 +57,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
                     .WithOptions().Unique()
                     .Do();
             }
-        }
-
-        public override void Down()
-        {
         }
     }
 }

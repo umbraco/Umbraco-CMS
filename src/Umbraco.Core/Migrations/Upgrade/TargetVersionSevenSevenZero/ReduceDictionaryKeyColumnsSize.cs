@@ -3,14 +3,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 {
-    [Migration("7.7.0", 5, Constants.System.UmbracoMigrationName)]
     public class ReduceDictionaryKeyColumnsSize : MigrationBase
     {
         public ReduceDictionaryKeyColumnsSize(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             //Now we need to check if we can actually do this because we won't be able to if there's data in there that is too long
 

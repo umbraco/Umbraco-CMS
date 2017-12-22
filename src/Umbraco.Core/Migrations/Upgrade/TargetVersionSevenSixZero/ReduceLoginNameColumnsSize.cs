@@ -3,14 +3,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 2, Constants.System.UmbracoMigrationName)]
     public class ReduceLoginNameColumnsSize : MigrationBase
     {
         public ReduceLoginNameColumnsSize(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             //Now we need to check if we can actually d6 this because we won't be able to if there's data in there that is too long
             //http://issues.umbraco.org/issue/U4-9758

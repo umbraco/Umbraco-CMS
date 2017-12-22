@@ -36,13 +36,6 @@ namespace Umbraco.Core.Components
             => composition.Container.GetInstance<MapperCollectionBuilder>();
 
         /// <summary>
-        /// Gets the migrations collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static MigrationCollectionBuilder Migrations(this Composition composition)
-            => composition.Container.GetInstance<MigrationCollectionBuilder>();
-
-        /// <summary>
         /// Gets the package actions collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
@@ -83,6 +76,13 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         internal static ValidatorCollectionBuilder Validators(this Composition composition)
             => composition.Container.GetInstance<ValidatorCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the post-migrations collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        internal static PostMigrationCollectionBuilder PostMigrations(this Composition composition)
+            => composition.Container.GetInstance<PostMigrationCollectionBuilder>();
 
         #endregion
 

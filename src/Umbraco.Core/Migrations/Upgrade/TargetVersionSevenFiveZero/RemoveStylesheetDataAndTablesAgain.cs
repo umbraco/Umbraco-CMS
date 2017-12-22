@@ -5,7 +5,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
     /// <summary>
     /// This is here to re-remove these tables, we dropped them in 7.3 but new installs created them again so we're going to re-drop them
     /// </summary>
-    [Migration("7.5.0", 1, Constants.System.UmbracoMigrationName)]
     public class RemoveStylesheetDataAndTablesAgain : MigrationBase
     {
         public RemoveStylesheetDataAndTablesAgain(IMigrationContext context)
@@ -13,7 +12,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
         {
         }
 
-        public override void Up()
+        public override void Migrate()
         {
             //Clear all stylesheet data if the tables exist
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
@@ -32,8 +31,5 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
                 Delete.Table("cmsStylesheet").Do();
             }
         }
-
-        public override void Down()
-        { }
     }
 }

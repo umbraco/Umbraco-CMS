@@ -2,14 +2,13 @@
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 100, Constants.System.UmbracoMigrationName)]
     public class AddLockTable : MigrationBase
     {
         public AddLockTable(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("umbracoLock") == false)
@@ -20,11 +19,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                     .WithColumn("name").AsString(64).NotNullable()
                     .Do();
             }
-        }
-
-        public override void Down()
-        {
-            // not implemented
         }
     }
 }

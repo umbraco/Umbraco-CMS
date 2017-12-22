@@ -3,11 +3,10 @@
 namespace Umbraco.Core.Migrations
 {
     /// <summary>
-    /// Marker interface for database migrations
+    /// Represents a migration.
     /// </summary>
     public interface IMigration : IDiscoverable
     {
-        void Up();
-        void Down();
+        void Migrate();
     }
 }

@@ -1,10 +1,7 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [Migration("6.0.0", 1, "Test")]
     public class SixZeroMigration1 : MigrationBase
     {
         public SixZeroMigration1(IMigrationContext context)
@@ -12,14 +9,9 @@ namespace Umbraco.Tests.Migrations.Stubs
         { }
 
 
-        public override void Up()
+        public override void Migrate()
         {
             Alter.Table("umbracoUser").AddColumn("secret").AsString(255);
-        }
-
-        public override void Down()
-        {
-            Alter.Table("umbracoUser").AlterColumn("passwordTip").AsString(100);
         }
     }
 }

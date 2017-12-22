@@ -1,25 +1,19 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [Migration("6.0.0", 0, "Test")]
     public class AlterUserTableMigrationStub : MigrationBase
     {
         public AlterUserTableMigrationStub(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             Alter.Table("umbracoUser")
                  .AddColumn("Birthday")
                  .AsDateTime()
                  .Nullable();
         }
-
-        public override void Down()
-        { }
     }
 }

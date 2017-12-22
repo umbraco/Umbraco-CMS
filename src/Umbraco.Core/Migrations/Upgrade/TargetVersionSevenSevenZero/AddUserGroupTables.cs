@@ -7,7 +7,6 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 {
-    [Migration("7.7.0", 5, Constants.System.UmbracoMigrationName)]
     public class AddUserGroupTables : MigrationBase
     {
         private readonly string _collateSyntax;
@@ -23,7 +22,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
                 : "COLLATE DATABASE_DEFAULT";
         }
 
-        public override void Up()
+        public override void Migrate()
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToList();
             var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();

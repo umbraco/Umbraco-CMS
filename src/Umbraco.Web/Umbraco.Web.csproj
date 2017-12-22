@@ -322,10 +322,6 @@
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="SignalR\PreviewHubComponent.cs" />
     <Compile Include="Strategies\LegacyServerRegistrarAndMessengerComponent.cs" />
-    <Compile Include="Strategies\Migrations\IPostMigration.cs" />
-    <Compile Include="Strategies\Migrations\PostMigrationCollection.cs" />
-    <Compile Include="Strategies\Migrations\PostMigrationCollectionBuilder.cs" />
-    <Compile Include="Strategies\Migrations\PostMigrationComponent.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
@@ -705,10 +701,10 @@
     <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
     <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
-    <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
-    <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
-    <Compile Include="Strategies\Migrations\EnsureListViewDataTypeIsCreated.cs" />
-    <Compile Include="Strategies\Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
+    <Compile Include="Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
+    <Compile Include="Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
+    <Compile Include="Migrations\EnsureListViewDataTypeIsCreated.cs" />
+    <Compile Include="Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
     <Compile Include="Strategies\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
@@ -901,7 +897,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
-    <Compile Include="Strategies\Migrations\RebuildXmlCachesAfterUpgrade.cs" />
+    <Compile Include="Migrations\RebuildXmlCachesAfterUpgrade.cs" />
     <Compile Include="Strategies\PublicAccessComponent.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />

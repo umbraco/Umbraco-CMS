@@ -50,7 +50,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
             {
-                var allMigrations = migrationEntryService.GetAll(Constants.System.UmbracoMigrationName);
+                var allMigrations = migrationEntryService.GetAll(Constants.System.UmbracoUpgraderName);
                  mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
             }
 

@@ -4,14 +4,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
 {
-    [Migration("8.0.0", 100, Constants.System.UmbracoMigrationName)]
     class AddContentNuTable : MigrationBase
     {
         public AddContentNuTable(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("cmsContentNu")) return;
@@ -39,8 +38,5 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
                 .OnUpdate(Rule.None)
                 .Do();
         }
-
-        public override void Down()
-        { }
     }
 }

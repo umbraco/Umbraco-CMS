@@ -3,14 +3,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 3, Constants.System.UmbracoMigrationName)]
     public class AddIndexToCmsMemberLoginName : MigrationBase
     {
         public AddIndexToCmsMemberLoginName(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var database = Database;
 
@@ -39,11 +38,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                     .NonClustered()
                     .Do();
             }
-        }
-
-        public override void Down()
-        {
-            Delete.Index("IX_cmsMember_LoginName").OnTable("cmsMember").Do();
         }
     }
 }

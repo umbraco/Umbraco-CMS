@@ -1,7 +1,7 @@
 ﻿using LightInject;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.Strategies.Migrations
+namespace Umbraco.Core.Migrations
 {
     public class PostMigrationCollectionBuilder : LazyCollectionBuilderBase<PostMigrationCollectionBuilder, PostMigrationCollection, IPostMigration>
     {

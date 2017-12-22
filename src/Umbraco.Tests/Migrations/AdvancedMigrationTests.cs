@@ -2,7 +2,6 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
@@ -23,9 +22,9 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var builder = Mock.Of<IMigrationCollectionBuilder>();
+            var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
-                .Setup(x => x.Instanciate(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
                 {
                     if (t != typeof(CreateTableOfTDtoMigration))
@@ -35,21 +34,11 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var runner = new MigrationRunner(
-                    ScopeProvider,
-                    builder,
-                    Mock.Of<IMigrationEntryService>(),
-                    logger,
-                    new SemVersion(0), // 0.0.0
-                    new SemVersion(1), // 1.0.0
-                    "Test",
+                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                        .Add<CreateTableOfTDtoMigration>(string.Empty, "done"));
 
-                    // explicit migrations
-                    typeof(CreateTableOfTDtoMigration)
-                );
-
-                var upgraded = runner.Execute();
-                Assert.IsTrue(upgraded);
+                upgrader.Execute();
 
                 var helper = new DatabaseSchemaCreator(scope.Database, logger);
                 var exists = helper.TableExists("umbracoNode");
@@ -64,9 +53,9 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var builder = Mock.Of<IMigrationCollectionBuilder>();
+            var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
-                .Setup(x => x.Instanciate(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
                 {
                     switch (t.Name)
@@ -82,23 +71,12 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var runner = new MigrationRunner(
-                    ScopeProvider,
-                    builder,
-                    Mock.Of<IMigrationEntryService>(),
-                    logger,
-                    new SemVersion(0), // 0.0.0
-                    new SemVersion(1), // 1.0.0
-                    "Test",
+                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
+                        .Add<DeleteKeysAndIndexesMigration>("a", "done"));
 
-                    // explicit migrations
-                    typeof(CreateTableOfTDtoMigration),
-                    typeof(DeleteKeysAndIndexesMigration)
-                );
-
-                var upgraded = runner.Execute();
-                Assert.IsTrue(upgraded);
-
+                upgrader.Execute();
                 scope.Complete();
             }
         }
@@ -108,9 +86,9 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var builder = Mock.Of<IMigrationCollectionBuilder>();
+            var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
-                .Setup(x => x.Instanciate(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
                 {
                     switch (t.Name)
@@ -128,24 +106,13 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var runner = new MigrationRunner(
-                    ScopeProvider,
-                    builder,
-                    Mock.Of<IMigrationEntryService>(),
-                    logger,
-                    new SemVersion(0), // 0.0.0
-                    new SemVersion(1), // 1.0.0
-                    "Test",
+                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
+                        .Add<DeleteKeysAndIndexesMigration>("a", "b")
+                        .Add<CreateKeysAndIndexesOfTDtoMigration>("b", "done"));
 
-                    // explicit migrations
-                    typeof(CreateTableOfTDtoMigration),
-                    typeof(DeleteKeysAndIndexesMigration),
-                    typeof(CreateKeysAndIndexesOfTDtoMigration)
-                );
-
-                var upgraded = runner.Execute();
-                Assert.IsTrue(upgraded);
-
+                upgrader.Execute();
                 scope.Complete();
             }
         }
@@ -155,9 +122,9 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var builder = Mock.Of<IMigrationCollectionBuilder>();
+            var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
-                .Setup(x => x.Instanciate(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
                 {
                     switch (t.Name)
@@ -175,24 +142,13 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var runner = new MigrationRunner(
-                    ScopeProvider,
-                    builder,
-                    Mock.Of<IMigrationEntryService>(),
-                    logger,
-                    new SemVersion(0), // 0.0.0
-                    new SemVersion(1), // 1.0.0
-                    "Test",
+                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
+                        .Add<DeleteKeysAndIndexesMigration>("a", "b")
+                        .Add<CreateKeysAndIndexesMigration>("b", "done"));
 
-                    // explicit migrations
-                    typeof(CreateTableOfTDtoMigration),
-                    typeof(DeleteKeysAndIndexesMigration),
-                    typeof(CreateKeysAndIndexesMigration)
-                );
-
-                var upgraded = runner.Execute();
-                Assert.IsTrue(upgraded);
-
+                upgrader.Execute();
                 scope.Complete();
             }
         }
@@ -202,9 +158,9 @@ namespace Umbraco.Tests.Migrations
         {
             var logger = new DebugDiagnosticsLogger();
 
-            var builder = Mock.Of<IMigrationCollectionBuilder>();
+            var builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
-                .Setup(x => x.Instanciate(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
+                .Setup(x => x.Build(It.IsAny<Type>(), It.IsAny<IMigrationContext>()))
                 .Returns<Type, IMigrationContext>((t, c) =>
                 {
                     switch (t.Name)
@@ -220,50 +176,36 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var runner = new MigrationRunner(
-                    ScopeProvider,
-                    builder,
-                    Mock.Of<IMigrationEntryService>(),
-                    logger,
-                    new SemVersion(0), // 0.0.0
-                    new SemVersion(1), // 1.0.0
-                    "Test",
+                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                        .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
+                        .Add<CreateColumnMigration>("a", "done"));
 
-                    // explicit migrations
-                    typeof(CreateTableOfTDtoMigration),
-                    typeof(CreateColumnMigration)
-                );
-
-                var upgraded = runner.Execute();
-                Assert.IsTrue(upgraded);
-
+                upgrader.Execute();
                 scope.Complete();
             }
-
         }
 
-        [Migration("1.0.0", 0, "Test")]
         public class CreateTableOfTDtoMigration : MigrationBase
         {
             public CreateTableOfTDtoMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // creates Node table with keys, indexes, etc
                 Create.Table<NodeDto>().Do();
             }
         }
 
-        [Migration("1.0.0", 1, "Test")]
         public class DeleteKeysAndIndexesMigration : MigrationBase
         {
             public DeleteKeysAndIndexesMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // drops Node table keys and indexes
                 //Execute.DropKeysAndIndexes("umbracoNode");
@@ -273,28 +215,26 @@ namespace Umbraco.Tests.Migrations
             }
         }
 
-        [Migration("1.0.0", 2, "Test")]
         public class CreateKeysAndIndexesOfTDtoMigration : MigrationBase
         {
             public CreateKeysAndIndexesOfTDtoMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // creates Node table keys and indexes
                 Create.KeysAndIndexes<NodeDto>().Do();
             }
         }
 
-        [Migration("1.0.0", 3, "Test")]
         public class CreateKeysAndIndexesMigration : MigrationBase
         {
             public CreateKeysAndIndexesMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // creates *all* tables keys and indexes
                 foreach (var x in DatabaseSchemaCreator.OrderedTables)
@@ -307,14 +247,13 @@ namespace Umbraco.Tests.Migrations
             }
         }
 
-        [Migration("1.0.0", 2, "Test")]
         public class CreateColumnMigration : MigrationBase
         {
             public CreateColumnMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // cannot delete the column without this, of course
                 Delete.KeysAndIndexes().Do();

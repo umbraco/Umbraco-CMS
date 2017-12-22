@@ -306,7 +306,7 @@ namespace Umbraco.Core.Migrations.Install
             var dto = new MigrationDto
             {
                 Id = 1,
-                Name = Constants.System.UmbracoMigrationName,
+                Name = Constants.System.UmbracoUpgraderName,
                 Version = UmbracoVersion.SemanticVersion.ToString(),
                 CreateDate = DateTime.Now
             };

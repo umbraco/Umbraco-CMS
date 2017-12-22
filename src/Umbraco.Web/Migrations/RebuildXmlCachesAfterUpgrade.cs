@@ -1,14 +1,13 @@
 ﻿using System;
-using umbraco;
+using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Services;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
-namespace Umbraco.Web.Strategies.Migrations
+namespace Umbraco.Web.Migrations
 {
     /// <summary>
     /// Rebuilds the Xml caches after upgrading.
@@ -23,14 +22,14 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </remarks>
     public class RebuildXmlCachesAfterUpgrade : IPostMigration
     {
-        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
+        public void Execute(string name, IScope scope, SemVersion originVersion, SemVersion targetVersion, ILogger logger)
         {
-            if (args.ProductName != Constants.System.UmbracoMigrationName) return;
+            if (name != Constants.System.UmbracoUpgraderName) return;
 
-            var v730 = new Semver.SemVersion(new Version(7, 3, 0));
+            var v730 = new SemVersion(new Version(7, 3, 0));
 
-            var doMedia = args.ConfiguredSemVersion < v730;
-            var doContent = args.ConfiguredSemVersion < v730;
+            var doMedia = originVersion < v730;
+            var doContent = originVersion < v730;
 
             if (doMedia)
             {

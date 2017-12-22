@@ -9,7 +9,6 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
 {
-    [Migration("8.0.0", 1000, Constants.System.UmbracoMigrationName)]
     public class VariantsMigration : MigrationBase
     {
         public VariantsMigration(IMigrationContext context)
@@ -20,7 +19,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
         // do NOT use Rename.Column as it's borked on SQLCE - use ReplaceColumn instead
         // not sure it all runs on MySql, needs to test
 
-        public override void Up()
+        public override void Migrate()
         {
             // delete *all* keys and indexes - because of FKs
             Delete.KeysAndIndexes().Do();

@@ -2,21 +2,15 @@
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 101, Constants.System.UmbracoMigrationName)]
     public class AddLockObjects : MigrationBase
     {
         public AddLockObjects(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             EnsureLockObject(Constants.Locks.Servers, "Servers");
-        }
-
-        public override void Down()
-        {
-            // not implemented
         }
 
         private void EnsureLockObject(int id, string name)

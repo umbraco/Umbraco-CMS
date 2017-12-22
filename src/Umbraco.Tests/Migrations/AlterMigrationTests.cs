@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Migrations
             var stub = new DropForeignKeyMigrationStub(context);
 
             // Act
-            stub.Up();
+            stub.Migrate();
 
             foreach (var op in database.Operations)
                 Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Migrations
             var context = new MigrationContext(database, _logger);
             var migration = new CreateColumnMigration(context);
 
-            migration.Up();
+            migration.Migrate();
 
             foreach (var op in database.Operations)
                 Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
@@ -69,20 +69,16 @@ namespace Umbraco.Tests.Migrations
             Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
         }
 
-        [Migration("1.0.0", 0, "Test")]
         public class CreateColumnMigration : MigrationBase
         {
             public CreateColumnMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 Alter.Table("bar").AddColumn("foo").AsGuid().Do();
             }
-
-            public override void Down()
-            { }
         }
 
         [Test]
@@ -92,7 +88,7 @@ namespace Umbraco.Tests.Migrations
             var context = new MigrationContext(database, _logger);
             var migration = new AlterColumnMigration(context);
 
-            migration.Up();
+            migration.Migrate();
 
             foreach (var op in database.Operations)
                 Console.WriteLine("{0}\r\n\t{1}", op.Text, op.Sql);
@@ -101,22 +97,18 @@ namespace Umbraco.Tests.Migrations
             Assert.That(database.Operations[0].Sql, Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
         }
 
-        [Migration("1.0.0", 0, "Test")]
         public class AlterColumnMigration : MigrationBase
         {
             public AlterColumnMigration(IMigrationContext context)
                 : base(context)
             { }
 
-            public override void Up()
+            public override void Migrate()
             {
                 // bad/good syntax...
                 //Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
                 Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
             }
-
-            public override void Down()
-            { }
         }
 
         [NUnit.Framework.Ignore("this doesn't actually test anything")]
@@ -129,7 +121,7 @@ namespace Umbraco.Tests.Migrations
             var stub = new AlterUserTableMigrationStub(context);
 
             // Act
-            stub.Up();
+            stub.Migrate();
 
             // Assert
             Assert.That(database.Operations.Any(), Is.True);

@@ -63,16 +63,7 @@ namespace Umbraco.Core.Migrations
         protected Sql<ISqlContext> Sql(string sql, params object[] args) => Context.SqlContext.Sql(sql, args);
 
         /// <inheritdoc />
-        public virtual void Up()
-        {
-            throw new NotSupportedException("This migration does not implement the \"up\" operation.");
-        }
-
-        /// <inheritdoc />
-        public virtual void Down()
-        {
-            throw new NotSupportedException("This migration does not implement the \"down\" operation.");
-        }
+        public abstract void Migrate();
 
         /// <summary>
         /// Builds an Alter expression.

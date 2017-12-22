@@ -1,23 +1,16 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [Migration("1.0.0", 0, "Test")]
     public class DropForeignKeyMigrationStub : MigrationBase
     {
         public DropForeignKeyMigrationStub(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id").Do();
-        }
-
-        public override void Down()
-        {
         }
     }
 }

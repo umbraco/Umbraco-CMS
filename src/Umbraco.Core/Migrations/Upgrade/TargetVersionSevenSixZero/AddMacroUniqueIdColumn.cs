@@ -3,14 +3,13 @@ using System.Linq;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddMacroUniqueIdColumn : MigrationBase
     {
         public AddMacroUniqueIdColumn(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
@@ -64,11 +63,6 @@ JOIN cmsMacro ON cmsMacroProperty.macro=cmsMacro.id")
 
             foreach (var update in updates)
                 database.Execute("UPDATE cmsMacroProperty set uniquePropertyId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
-        }
-
-        public override void Down()
-        {
-            throw new NotImplementedException();
         }
     }
 }

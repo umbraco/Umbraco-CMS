@@ -8,12 +8,7 @@ namespace Umbraco.Tests.Migrations.Stubs
     /// </summary>
     public class Dummy : IMigration
     {
-        public void Up()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Down()
+        public void Migrate()
         {
             throw new System.NotImplementedException();
         }

@@ -3,14 +3,13 @@ using System.Linq;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class RemoveUmbracoDeployTables : MigrationBase
     {
         public RemoveUmbracoDeployTables(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
 
@@ -27,11 +26,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
             // always remove umbracoDeployChecksum
             if (tables.InvariantContains("umbracoDeployChecksum"))
                 Delete.Table("umbracoDeployChecksum").Do();
-        }
-
-        public override void Down()
-        {
-            throw new NotImplementedException();
         }
     }
 }

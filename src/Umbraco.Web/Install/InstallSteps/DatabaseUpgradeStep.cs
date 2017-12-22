@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
@@ -17,17 +13,13 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;
-        private readonly IMigrationEntryService _migrationEntryService;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
-        private readonly MigrationCollectionBuilder _migrationCollectionBuilder;
 
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IMigrationEntryService migrationEntryService, IRuntimeState runtime, MigrationCollectionBuilder migrationCollectionBuilder, ILogger logger)
+        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
         {
             _databaseBuilder = databaseBuilder;
-            _migrationEntryService = migrationEntryService;
             _runtime = runtime;
-            _migrationCollectionBuilder = migrationCollectionBuilder;
             _logger = logger;
         }
 
@@ -41,7 +33,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var result = _databaseBuilder.UpgradeSchemaAndData(_migrationEntryService, _migrationCollectionBuilder);
+                var result = _databaseBuilder.UpgradeSchemaAndData();
 
                 if (result.Success == false)
                 {

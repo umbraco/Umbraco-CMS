@@ -4,14 +4,13 @@ using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class NormalizeTemplateGuids : MigrationBase
     {
         public NormalizeTemplateGuids(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var database = Database;
 
@@ -23,7 +22,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
             // of 7.6 on Courier.
             // so... testing if we already have a 7.6.0 version installed. not pretty but...?
             //
-            var version = database.FirstOrDefault<string>("SELECT version FROM umbracoMigration WHERE name=@name ORDER BY version DESC", new { name = Constants.System.UmbracoMigrationName });
+            var version = database.FirstOrDefault<string>("SELECT version FROM umbracoMigration WHERE name=@name ORDER BY version DESC", new { name = Constants.System.UmbracoUpgraderName });
             if (version != null && version.StartsWith("7.6.0")) return;
 
             var updates = database.Query<dynamic>(@"SELECT umbracoNode.id, cmsTemplate.alias FROM umbracoNode
@@ -34,11 +33,6 @@ WHERE nodeObjectType = @guid", new { guid = Constants.ObjectTypes.TemplateType }
 
             foreach (var update in updates)
                 database.Execute("UPDATE umbracoNode set uniqueId=@guid WHERE id=@id", new { guid = update.Item2, id = update.Item1 });
-        }
-
-        public override void Down()
-        {
-            throw new WontImplementException();
         }
     }
 }

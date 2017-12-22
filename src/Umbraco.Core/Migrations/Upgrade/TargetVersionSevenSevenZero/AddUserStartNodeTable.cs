@@ -3,14 +3,13 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 {
-    [Migration("7.7.0", 5, Constants.System.UmbracoMigrationName)]
     public class AddUserStartNodeTable : MigrationBase
     {
         public AddUserStartNodeTable(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
 

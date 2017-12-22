@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.Strategies.Migrations
+namespace Umbraco.Core.Migrations
 {
     public class PostMigrationCollection : BuilderCollectionBase<IPostMigration>
     {

@@ -4,14 +4,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
 {
-    [Migration("7.6.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddIndexesToUmbracoRelationTables : MigrationBase
     {
         public AddIndexesToUmbracoRelationTables(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database).ToArray();
 
@@ -81,11 +80,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
                     .Do();
             }
 
-        }
-
-        public override void Down()
-        {
-            Delete.Index("IX_umbracoNodePath").OnTable("umbracoNode").Do();
         }
     }
 }

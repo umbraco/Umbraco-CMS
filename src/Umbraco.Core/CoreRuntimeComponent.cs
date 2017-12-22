@@ -105,9 +105,6 @@ namespace Umbraco.Core
             composition.Container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(f => f.GetInstance<TypeLoader>().GetPackageActions());
 
-            composition.Container.RegisterCollectionBuilder<MigrationCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IMigration>());
-
             // need to filter out the ones we dont want!! fixme - what does that mean?
             composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
@@ -120,6 +117,9 @@ namespace Umbraco.Core
 
             composition.Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>()
                 .Append<DefaultUrlSegmentProvider>();
+
+            composition.Container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
+                .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IPostMigration>());
 
             // by default, register a noop factory
             composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();

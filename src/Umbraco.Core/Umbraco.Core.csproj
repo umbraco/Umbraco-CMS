@@ -319,6 +319,7 @@
     <Compile Include="Migrations\Expressions\Create\KeysAndIndexes\CreateKeysAndIndexesBuilder.cs" />
     <Compile Include="Migrations\Expressions\Create\Table\CreateTableOfDtoBuilder.cs" />
     <Compile Include="Migrations\Expressions\Delete\KeysAndIndexes\DeleteKeysAndIndexesBuilder.cs" />
+    <Compile Include="Migrations\IMigrationBuilder.cs" />
     <Compile Include="Migrations\Install\DatabaseBuilder.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
@@ -521,7 +522,16 @@
     <Compile Include="Media\Result.cs" />
     <Compile Include="Media\Status.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
-    <Compile Include="Migrations\MigrationCollection.cs" />
+    <Compile Include="Migrations\IPostMigration.cs" />
+    <Compile Include="Migrations\MigrationBuilder.cs" />
+    <Compile Include="Migrations\MigrationPlan.cs" />
+    <Compile Include="Migrations\NopMigration.cs" />
+    <Compile Include="Migrations\PostMigrationCollection.cs" />
+    <Compile Include="Migrations\PostMigrationCollectionBuilder.cs" />
+    <Compile Include="Migrations\Upgrade\UmbracoPlan.cs" />
+    <Compile Include="Migrations\Upgrade\TargetVersionEight\AddLockTable.cs" />
+    <Compile Include="Migrations\Upgrade\UmbracoUpgrader.cs" />
+    <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Models\ApplicationTree.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
@@ -696,6 +706,7 @@
     <Compile Include="Models\Rdbms\DocumentVersionDto.cs" />
     <Compile Include="Models\Rdbms\DomainDto.cs" />
     <Compile Include="Models\Rdbms\ExternalLoginDto.cs" />
+    <Compile Include="Models\Rdbms\KeyValueDto.cs" />
     <Compile Include="Models\Rdbms\LanguageDto.cs" />
     <Compile Include="Models\Rdbms\LanguageTextDto.cs" />
     <Compile Include="Models\Rdbms\LockDto.cs" />
@@ -889,18 +900,14 @@
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Migrations\DataLossException.cs" />
     <Compile Include="Migrations\IMigration.cs" />
-    <Compile Include="Migrations\IMigrationCollectionBuilder.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
     <Compile Include="Migrations\Install\DatabaseDataCreator.cs" />
     <Compile Include="Migrations\Install\DatabaseSchemaCreator.cs" />
     <Compile Include="Migrations\Install\DatabaseSchemaResult.cs" />
-    <Compile Include="Migrations\MigrationAttribute.cs" />
     <Compile Include="Migrations\MigrationBase.cs" />
-    <Compile Include="Migrations\MigrationCollectionBuilder.cs" />
     <Compile Include="Migrations\MigrationContext.cs" />
     <Compile Include="Migrations\MigrationExpressionBase.cs" />
-    <Compile Include="Migrations\MigrationRunner.cs" />
     <Compile Include="Migrations\Expressions\Alter\AlterBuilder.cs" />
     <Compile Include="Migrations\Expressions\Alter\Expressions\AlterColumnExpression.cs" />
     <Compile Include="Migrations\Expressions\Alter\Expressions\AlterDefaultConstraintExpression.cs" />
@@ -1000,13 +1007,9 @@
     <Compile Include="Migrations\Expressions\Update\UpdateDataBuilder.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionEight\AddContentNuTable.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionEight\AddLockObjects.cs" />
-    <Compile Include="Migrations\Upgrade\TargetVersionEight\AddLockTable.cs" />
-    <Compile Include="Migrations\Upgrade\TargetVersionEight\AddRedirectUrlTable.cs" />
+    <Compile Include="Migrations\Upgrade\TargetVersionSevenFiveZero\AddRedirectUrlTable.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionEight\VariantsMigration.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionEight\RefactorXmlColumns.cs" />
-    <Compile Include="Migrations\Upgrade\TargetVersionEight\Seven1.cs" />
-    <Compile Include="Migrations\Upgrade\TargetVersionSevenFiveFive\AddLockObjects.cs" />
-    <Compile Include="Migrations\Upgrade\TargetVersionSevenFiveFive\AddLockTable.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionSevenFiveFive\UpdateAllowedMediaTypesAtRoot.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionSevenFiveZero\RemoveStylesheetDataAndTablesAgain.cs" />
     <Compile Include="Migrations\Upgrade\TargetVersionSevenFiveZero\UpdateUniqueIndexOnPropertyData.cs" />
@@ -1321,6 +1324,7 @@
     <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IExternalLoginService.cs" />
     <Compile Include="Services\IFileService.cs" />
+    <Compile Include="Services\IKeyValueService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\ILocalizedTextService.cs" />
     <Compile Include="Services\IMacroService.cs" />
@@ -1333,6 +1337,7 @@
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IMigrationEntryService.cs" />
+    <Compile Include="Services\Implement\KeyValueService.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\IPublicAccessService.cs" />
@@ -1468,8 +1473,6 @@
   <ItemGroup>
     <EmbeddedResource Include="FileResources\Files.resx" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\Implement\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

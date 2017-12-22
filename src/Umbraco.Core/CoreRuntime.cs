@@ -335,7 +335,7 @@ namespace Umbraco.Core
                 var sql = databaseFactory.SqlContext.Sql()
                     .Select<MigrationDto>()
                     .From<MigrationDto>()
-                    .Where<MigrationDto>(x => x.Name.InvariantEquals(Constants.System.UmbracoMigrationName) && x.Version == codeVersionString);
+                    .Where<MigrationDto>(x => x.Name.InvariantEquals(Constants.System.UmbracoUpgraderName) && x.Version == codeVersionString);
                 return database.FirstOrDefault<MigrationDto>(sql) != null;
             }
         }

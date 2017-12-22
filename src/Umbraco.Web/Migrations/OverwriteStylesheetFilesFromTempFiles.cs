@@ -1,14 +1,13 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Semver;
-using Umbraco.Core.Events;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
+using Umbraco.Core.Migrations.Upgrade;
+using Umbraco.Core.Scoping;
 
-namespace Umbraco.Web.Strategies.Migrations
+namespace Umbraco.Web.Migrations
 {
 
     /// <summary>
@@ -18,13 +17,13 @@ namespace Umbraco.Web.Strategies.Migrations
     /// </summary>
     public sealed class OverwriteStylesheetFilesFromTempFiles : IPostMigration
     {
-        public void Migrated(MigrationRunner sender, MigrationEventArgs args)
+        public void Execute(string name, IScope scope, SemVersion originVersion, SemVersion targetVersion, ILogger logger)
         {
-            if (args.ProductName != Constants.System.UmbracoMigrationName) return;
+            if (name != Constants.System.UmbracoUpgraderName) return;
 
             var target73 = new SemVersion(7, 3, 0);
 
-            if (args.ConfiguredSemVersion <= target73)
+            if (originVersion <= target73)
             {
                 var tempCssFolder = IOHelper.MapPath("~/App_Data/TEMP/CssMigration/");
                 var cssFolder = IOHelper.MapPath("~/css");
@@ -39,7 +38,7 @@ namespace Umbraco.Web.Strategies.Migrations
                         {
                             //backup
                             var targetPath = Path.Combine(tempCssFolder, relativePath.EnsureEndsWith(".bak"));
-                            args.MigrationContext.Logger.Info<OverwriteStylesheetFilesFromTempFiles>("CSS file is being backed up from {0}, to {1} before being migrated to new format", () => cssFilePath, () => targetPath);
+                            logger.Info<OverwriteStylesheetFilesFromTempFiles>("CSS file is being backed up from {0}, to {1} before being migrated to new format", () => cssFilePath, () => targetPath);
                             File.Copy(cssFilePath, targetPath, true);
                         }
 

@@ -6,14 +6,13 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero
 {
-    [Migration("7.7.0", 5, Constants.System.UmbracoMigrationName)]
     public class UpdateUserTables : MigrationBase
     {
         public UpdateUserTables(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             //Don't exeucte if the column is already there
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();

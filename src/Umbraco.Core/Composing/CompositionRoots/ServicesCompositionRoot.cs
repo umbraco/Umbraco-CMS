@@ -7,6 +7,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Composing.CompositionRoots
 {
@@ -25,6 +26,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<IdkMap>();
 
             // register the services
+            container.RegisterSingleton<IKeyValueService, KeyValueService>();
             container.RegisterSingleton<IMigrationEntryService, MigrationEntryService>();
             container.RegisterSingleton<IPublicAccessService, PublicAccessService>();
             container.RegisterSingleton<ITaskService, TaskService>();

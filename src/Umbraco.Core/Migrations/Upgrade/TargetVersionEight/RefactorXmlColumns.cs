@@ -5,14 +5,13 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
 {
-    [Migration("8.0.0", 100, Constants.System.UmbracoMigrationName)]
     public class RefactorXmlColumns : MigrationBase
     {
         public RefactorXmlColumns(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             if (ColumnExists("cmsContentXml", "Rv") == false)
                 Alter.Table("cmsContentXml").AddColumn("Rv").AsInt64().NotNullable().WithDefaultValue(0).Do();
@@ -66,16 +65,6 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
                 .OnTable("cmsPreviewXml")
                 .Columns(new[] { "nodeId" })
                 .Do();
-        }
-
-        public override void Down()
-        {
-            throw new DataLossException("Downgrading is not supported.");
-
-            //if (Exists("cmsContentXml", "Rv"))
-            //    Delete.Column("Rv").FromTable("cmsContentXml");
-            //if (Exists("cmsPreviewXml", "Rv"))
-            //    Delete.Column("Rv").FromTable("cmsContentXml");
         }
 
         private bool ColumnExists(string tableName, string columnName)

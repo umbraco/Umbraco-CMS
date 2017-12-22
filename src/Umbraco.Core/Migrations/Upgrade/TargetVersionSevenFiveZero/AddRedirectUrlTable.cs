@@ -1,15 +1,14 @@
 ﻿using System.Linq;
 
-namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
+namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero
 {
-    [Migration("8.0.0", 100, Constants.System.UmbracoMigrationName)]
     public class AddRedirectUrlTable : MigrationBase
     {
         public AddRedirectUrlTable(IMigrationContext context)
             : base(context)
         { }
 
-        public override void Up()
+        public override void Migrate()
         {
             var database = Database;
             var umbracoRedirectUrlTableName = "umbracoRedirectUrl";
@@ -47,8 +46,5 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionEight
                 .ToTable("umbracoNode").PrimaryColumn("uniqueID")
                 .Do();
         }
-
-        public override void Down()
-        { }
     }
 }
