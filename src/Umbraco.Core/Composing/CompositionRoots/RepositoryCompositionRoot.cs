@@ -55,7 +55,6 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<IMemberGroupRepository, MemberGroupRepository>();
             container.RegisterSingleton<IMemberRepository, MemberRepository>();
             container.RegisterSingleton<IMemberTypeRepository, MemberTypeRepository>();
-            container.RegisterSingleton<IMigrationEntryRepository, MigrationEntryRepository>();
             container.RegisterSingleton<INotificationsRepository, NotificationsRepository>();
             container.RegisterSingleton<IPublicAccessRepository, PublicAccessRepository>();
             container.RegisterSingleton<IRedirectUrlRepository, RedirectUrlRepository>();

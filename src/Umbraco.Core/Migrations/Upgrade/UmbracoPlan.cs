@@ -1,4 +1,8 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using System.Configuration;
+using Semver;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_5;
 using Umbraco.Core.Migrations.Upgrade.V_7_6_0;
@@ -27,26 +31,59 @@ namespace Umbraco.Core.Migrations.Upgrade
             DefinePlan();
         }
 
+        public override string InitialState
+        {
+            get
+            {
+                // no state in database yet - assume we have something in web.config that makes some sense
+                if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
+                    throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
+
+                // must be at least 7.8.0 - fixme adjust when releasing
+                if (currentVersion < new SemVersion(7, 8)) 
+                    throw new InvalidOperationException($"Version {currentVersion} cannot be upgraded to {UmbracoVersion.SemanticVersion}.");
+
+                // cannot go back in time
+                if (currentVersion > UmbracoVersion.SemanticVersion)
+                    throw new InvalidOperationException($"Version {currentVersion} cannot be upgraded to {UmbracoVersion.SemanticVersion}.");
+
+                switch (currentVersion.Major)
+                {
+                    case 7:
+                        return "{orig-" + currentVersion + "}";
+                    case 8: // fixme remove when releasing
+                        // this is very temp and for my own website - zpqrtbnk
+                        return "{04F54303-3055-4700-8F76-35A37F232FF5}"; // right before the variants migration
+                    default:
+                        throw new InvalidOperationException($"Version {currentVersion} should have an upgrade state in the key-value table.");
+                }
+
+            }
+        }
+
         private void DefinePlan()
         {
             // INSTALL
-            // when installing, the source state is empty, and the target state should be the installed state,
-            // ie the common end state to all upgrade branches, representing the current version
-            Add(string.Empty, "{6550C7E8-77B7-4DE3-9B58-E31C81CB9504}");
+            //
+            // when installing, the source state is empty, and the target state should be the final state.
+
+            Add(string.Empty, "{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
 
             // UPGRADE FROM 7
+            //
             // when 8.0.0 is released, on the first upgrade, the state is automatically
-            // set to {init-7.x.y} where 7.x.y is the version, detected from the database.
+            // set to {init-7.x.y} where 7.x.y is the version (see above), and then we define upgrades.
+            //
+            // then, as more v7 and v8 versions are released, new chains needs to be defined to
+            // support the upgrades (new v7 may backport some migrations and require their own
+            // upgrade paths, etc).
 
             From("{init-7.8.0}")
                 .Chain<AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}") // add more lock objects
                 .Chain<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}")
                 .Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}")
-                .Chain<VariantsMigration>("{6550C7E8-77B7-4DE3-9B58-E31C81CB9504}");
-
-            // UPGRADE FROM 7
-            // after 8.0.0 has been released we are going to release more v7 versions, which
-            // may backport some migrations, etc - so they would need their own upgrade path.
+                .Chain<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}")
+                .Chain<DropMigrationsTable>("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
 
             // 7.8.1 = same as 7.8.0
             From("{init-7.8.1}")
@@ -55,24 +92,25 @@ namespace Umbraco.Core.Migrations.Upgrade
             // 7.9.0 = requires its own chain
             From("{init-7.9.0}")
                 // chain...
-                .Chain("{6550C7E8-77B7-4DE3-9B58-E31C81CB9504}");
+                .Chain("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
 
             // UPGRADE 8
-            // chain migrations for 8.0.1 etc
-            // should start from the install state when 8.0.0 is released, and chain
-            // migrations, and end with the new install state.
+            //
+            // starting from the original 8.0.0 final state, chain migrations to upgrade version 8,
+            // defining new final states as more migrations are added to the chain.
 
             //From("")
             //    .Chain("")
             //    .Chain("");
 
             // WIP 8
-            // during v8 development, we have existing v8 sites that we want to upgrade,
-            // and this requires merging in some v7 migrations. This chain should quite
-            // probably never be released. NOTE that when adding a migration at the bottom
-            // of this chain, one should update the installed state in the INSTALL and
-            // UPGRADE chains above. And, once 8.0.0 has been released, this chain should
-            // never ever change again.
+            //
+            // before v8 is released, some sites may exist, and these "pre-8" versions require their
+            // own upgrade plan. in other words, this is the plan for sites that were on v8 before
+            // v8 was released
+
+            // fixme - this is essentially for ZpqrtBnk website
+            // need to determine which version it is and where it should resume running migrations
 
             // 8.0.0
             From("{init-origin}");
@@ -112,6 +150,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // 8.0.0
             Chain<VariantsMigration>("{6550C7E8-77B7-4DE3-9B58-E31C81CB9504}");
+            Chain<DropMigrationsTable>("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
         }
     }
 }

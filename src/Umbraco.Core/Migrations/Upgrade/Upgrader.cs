@@ -34,7 +34,6 @@ namespace Umbraco.Core.Migrations.Upgrade
         protected MigrationPlan Plan => _plan ?? (_plan = GetPlan());
 
         protected abstract MigrationPlan GetPlan();
-        protected abstract string GetInitialState();
         protected abstract (SemVersion, SemVersion) GetVersions();
 
         public void Execute()
@@ -44,16 +43,14 @@ namespace Umbraco.Core.Migrations.Upgrade
             using (var scope = ScopeProvider.CreateScope())
             {
                 // read current state
-                var currentState = _keyValueService.GetValue(StateValueKey) ?? string.Empty;
+                var currentState = _keyValueService.GetValue(StateValueKey);
                 var forceState = false;
 
-                if (currentState == string.Empty)
+                if (currentState == null)
                 {
-                    currentState = GetInitialState();
+                    currentState = plan.InitialState;
                     forceState = true;
                 }
-
-                (var originVersion, var targetVersion) = GetVersions();
 
                 // execute plan
                 var state = plan.Execute(scope, currentState);
@@ -67,6 +64,7 @@ namespace Umbraco.Core.Migrations.Upgrade
                     _keyValueService.SetValue(StateValueKey, currentState, state);
 
                 // run post-migrations
+                (var originVersion, var targetVersion) = GetVersions();
                 foreach (var postMigration in _postMigrations)
                     postMigration.Execute(Name, scope, originVersion, targetVersion, Logger);
 

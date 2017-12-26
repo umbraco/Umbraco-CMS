@@ -75,9 +75,6 @@ namespace Umbraco.Core.Migrations.Install
             if (tableName.Equals(Constants.DatabaseSchema.Tables.TaskType))
                 CreateTaskTypeData();
 
-            if (tableName.Equals(Constants.DatabaseSchema.Tables.Migration))
-                CreateMigrationData();
-
             _logger.Info<DatabaseDataCreator>($"Done creating table {tableName} data.");
         }
 
@@ -299,19 +296,6 @@ namespace Umbraco.Core.Migrations.Install
         private void CreateTaskTypeData()
         {
             _database.Insert(Constants.DatabaseSchema.Tables.TaskType, "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
-        }
-
-        private void CreateMigrationData()
-        {
-            var dto = new MigrationDto
-            {
-                Id = 1,
-                Name = Constants.System.UmbracoUpgradePlanName,
-                Version = UmbracoVersion.SemanticVersion.ToString(),
-                CreateDate = DateTime.Now
-            };
-
-            _database.Insert(Constants.DatabaseSchema.Tables.Migration, "pk", false, dto);
         }
     }
 }

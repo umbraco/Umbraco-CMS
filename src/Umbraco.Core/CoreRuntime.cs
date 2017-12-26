@@ -343,7 +343,7 @@ namespace Umbraco.Core
             }
 
             var umbracoPlan = new UmbracoPlan();
-            var finalState = umbracoPlan.Validate();
+            var finalState = umbracoPlan.FinalState;
 
             logger.Debug<CoreRuntime>($"Final upgrade state is \"{finalState}\", database contains \"{state ?? "<null>"}\".");
 

@@ -28,11 +28,6 @@ namespace Umbraco.Tests.Migrations
                 return _plan;
             }
 
-            protected override string GetInitialState()
-            {
-                return string.Empty;
-            }
-
             protected override (SemVersion, SemVersion) GetVersions()
             {
                 return (new SemVersion(0), new SemVersion(0));

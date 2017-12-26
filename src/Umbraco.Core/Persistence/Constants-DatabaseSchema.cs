@@ -63,7 +63,6 @@ namespace Umbraco.Core
                 public const string RedirectUrl = /*TableNamePrefix*/ "umbraco" + "RedirectUrl";
 
                 public const string CacheInstruction = /*TableNamePrefix*/ "umbraco" + "CacheInstruction";
-                public const string Migration = /*TableNamePrefix*/ "umbraco" + "Migration";
                 public const string Server = /*TableNamePrefix*/ "umbraco" + "Server";
 
                 public const string Tag = /*TableNamePrefix*/ "cms" + "Tags";

@@ -41,7 +41,6 @@ namespace Umbraco.Core.Persistence.Mappers
             Add<MemberGroupMapper>();
             Add<MemberMapper>();
             Add<MemberTypeMapper>();
-            Add<MigrationEntryMapper>();
             Add<PropertyGroupMapper>();
             Add<PropertyMapper>();
             Add<PropertyTypeMapper>();

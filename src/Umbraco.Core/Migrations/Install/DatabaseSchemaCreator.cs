@@ -79,7 +79,7 @@ namespace Umbraco.Core.Migrations.Install
             {42, typeof (AccessRuleDto)},
             {43, typeof (CacheInstructionDto)},
             {44, typeof (ExternalLoginDto)},
-            {45, typeof (MigrationDto)},
+            //removed: {45, typeof (MigrationDto)},
             //removed: {46, typeof (UmbracoDeployChecksumDto)},
             //removed: {47, typeof (UmbracoDeployDependencyDto)},
             {48, typeof (RedirectUrlDto) },

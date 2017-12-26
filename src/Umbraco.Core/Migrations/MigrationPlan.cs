@@ -14,6 +14,7 @@ namespace Umbraco.Core.Migrations
         private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
 
         private string _prevState;
+        private string _finalState;
 
         // initializes a non-executing plan
         public MigrationPlan(string name)
@@ -72,6 +73,7 @@ namespace Umbraco.Core.Migrations
                 _transitions.Add(targetState, null);
 
             _prevState = targetState;
+            _finalState = null;
 
             return this;
         }
@@ -91,6 +93,10 @@ namespace Umbraco.Core.Migrations
             _prevState = sourceState ?? throw new ArgumentNullException(nameof(sourceState));
             return this;
         }
+
+        public virtual string InitialState => string.Empty;
+
+        public string FinalState => _finalState ?? (_finalState = Validate());
 
         public string Validate()
         {
