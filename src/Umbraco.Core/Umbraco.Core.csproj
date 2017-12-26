@@ -525,7 +525,7 @@
     <Compile Include="Migrations\IPostMigration.cs" />
     <Compile Include="Migrations\MigrationBuilder.cs" />
     <Compile Include="Migrations\MigrationPlan.cs" />
-    <Compile Include="Migrations\NopMigration.cs" />
+    <Compile Include="Migrations\NoopMigration.cs" />
     <Compile Include="Migrations\PostMigrationCollection.cs" />
     <Compile Include="Migrations\PostMigrationCollectionBuilder.cs" />
     <Compile Include="Migrations\Upgrade\UmbracoPlan.cs" />
@@ -1336,7 +1336,6 @@
     <Compile Include="Services\IMembershipRoleService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
-    <Compile Include="Services\IMigrationEntryService.cs" />
     <Compile Include="Services\Implement\KeyValueService.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
@@ -1360,7 +1359,6 @@
     <Compile Include="Services\MemberGroupService.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
-    <Compile Include="Services\MigrationEntryService.cs" />
     <Compile Include="Services\MoveOperationStatusType.cs" />
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Services\OperationResult.cs" />

@@ -23,7 +23,7 @@
             public const int RecycleBinMedia = -21;
 
             public const string UmbracoConnectionName = "umbracoDbDSN";
-            public const string UmbracoUpgraderName = "Umbraco.Core";
+            public const string UmbracoUpgradePlanName = "Umbraco.Core";
         }
     }
 }

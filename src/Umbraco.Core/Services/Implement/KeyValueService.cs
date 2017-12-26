@@ -34,17 +34,40 @@ namespace Umbraco.Core.Services.Implement
 
         private void Initialize()
         {
+            // all this cannot be achieved via migrations since it needs to run
+            // before any migration, in order to figure out migrations
+
             using (var scope = _scopeProvider.CreateScope())
             {
-                if (!scope.Database.Exists<LockDto>(Constants.Locks.KeyValues))
-                    scope.Database.Execute($@"INSERT {scope.SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Lock)} (id, name, value)
+                // assume that if the lock object exists, then everything is ok
+                if (scope.Database.Exists<LockDto>(Constants.Locks.KeyValues))
+                {
+                    scope.Complete();
+                    return;
+                }
+
+                // drop the 'identity' on primary key
+                foreach (var sql in new[]
+                {
+                    "alter table umbracoLock add column nid int null;",
+                    "update umbracoLock set nid = id;",
+                    "alter table umbracoLock drop constraint PK_umbracoLock;",
+                    "alter table umbracoLock drop column id;",
+                    "alter table umbracoLock add column id int null;",
+                    "update umbracoLock set id = nid;",
+                    "alter table umbracoLock drop column nid;",
+                    "alter table umbracoLock alter column id int not null;",
+                    "alter table umbracoLock add constraint PK_umbracoLock primary key (id);"
+                })
+                    scope.Database.Execute(sql);
+
+                // insert the key-value lock
+                scope.Database.Execute($@"INSERT {scope.SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Lock)} (id, name, value)
 VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
 
-                if (!scope.SqlContext.SqlSyntax.DoesTableExist(scope.Database, Constants.DatabaseSchema.Tables.KeyValue))
-                {
-                    var context = new MigrationContext(scope.Database, _logger);
-                    new CreateBuilder(context).Table<KeyValueDto>().Do();
-                }
+                // create the key-value table
+                var context = new MigrationContext(scope.Database, _logger);
+                new CreateBuilder(context).Table<KeyValueDto>().Do();
 
                 scope.Complete();
             }

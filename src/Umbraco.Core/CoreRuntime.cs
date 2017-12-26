@@ -12,13 +12,13 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core
 {
@@ -176,7 +176,9 @@ namespace Umbraco.Core
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Composes the runtime.
+        /// </summary>
         public virtual void Compose(ServiceContainer container)
         {
             // compose the very essential things that are needed to bootstrap, before anything else,
@@ -252,7 +254,7 @@ namespace Umbraco.Core
             {
                 // there *is* a local version, but it does not match the code version
                 // need to upgrade
-                logger.Debug<CoreRuntime>($"Local version \"{localVersion}\" != code version, need to upgrade Umbraco.");
+                logger.Debug<CoreRuntime>($"Local version \"{localVersion}\" != code version \"{codeVersion}\", need to upgrade Umbraco.");
                 runtimeState.Level = RuntimeLevel.Upgrade;
             }
             else if (databaseFactory.Configured == false)
@@ -297,16 +299,15 @@ namespace Umbraco.Core
             // else
             // look for a matching migration entry - bypassing services entirely - they are not 'up' yet
             // fixme - in a LB scenario, ensure that the DB gets upgraded only once!
-            // fixme - eventually move to yol-style guid-based transitions
             bool exists;
             try
             {
-                exists = EnsureMigration(databaseFactory, codeVersion);
+                exists = EnsureUmbracoUpgradeState(databaseFactory, logger);
             }
             catch
             {
                 // can connect to the database but cannot access the migration table... need to install
-                logger.Debug<CoreRuntime>("Could not check migrations, need to install Umbraco.");
+                logger.Debug<CoreRuntime>("Could not check the upgrade state, need to install Umbraco.");
                 runtimeState.Level = RuntimeLevel.Install;
                 return;
             }
@@ -323,21 +324,30 @@ namespace Umbraco.Core
 
             // although the files version matches the code version, the database version does not
             // which means the local files have been upgraded but not the database - need to upgrade
-            logger.Debug<CoreRuntime>("Database migrations have not executed, need to upgrade Umbraco.");
+            logger.Debug<CoreRuntime>("Has not reached the final upgrade step, need to upgrade Umbraco.");
             runtimeState.Level = RuntimeLevel.Upgrade;
         }
 
-        protected virtual bool EnsureMigration(IUmbracoDatabaseFactory databaseFactory, SemVersion codeVersion)
+        protected virtual bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            using (var database = databaseFactory.CreateDatabase()) // no scope - just the database
+            // no scope, no key value service - just directly accessing the database
+
+            string state;
+            using (var database = databaseFactory.CreateDatabase())
             {
-                var codeVersionString = codeVersion.ToString();
                 var sql = databaseFactory.SqlContext.Sql()
-                    .Select<MigrationDto>()
-                    .From<MigrationDto>()
-                    .Where<MigrationDto>(x => x.Name.InvariantEquals(Constants.System.UmbracoUpgraderName) && x.Version == codeVersionString);
-                return database.FirstOrDefault<MigrationDto>(sql) != null;
+                    .Select<KeyValueDto>()
+                    .From<KeyValueDto>()
+                    .Where<KeyValueDto>(x => x.Key == "Umbraco.Core.Upgrader.State+Umbraco.Core");
+                state = database.FirstOrDefault<KeyValueDto>(sql)?.Value;
             }
+
+            var umbracoPlan = new UmbracoPlan();
+            var finalState = umbracoPlan.Validate();
+
+            logger.Debug<CoreRuntime>($"Final upgrade state is \"{finalState}\", database contains \"{state ?? "<null>"}\".");
+
+            return state == finalState;
         }
 
         private static string LocalVersion

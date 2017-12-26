@@ -7,7 +7,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private readonly Lazy<IMigrationEntryService> _migrationEntryService;
         private readonly Lazy<IPublicAccessService> _publicAccessService;
         private readonly Lazy<ITaskService> _taskService;
         private readonly Lazy<IDomainService> _domainService;
@@ -40,9 +39,8 @@ namespace Umbraco.Core.Services
         /// Initializes a new instance of the <see cref="ServiceContext"/> class with lazy services.
         /// </summary>
         /// <remarks>Used by IoC. Note that LightInject will favor lazy args when picking a constructor.</remarks>
-        public ServiceContext(Lazy<IMigrationEntryService> migrationEntryService, Lazy<IPublicAccessService> publicAccessService, Lazy<ITaskService> taskService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IMediaTypeService> mediaTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IApplicationTreeService> treeService, Lazy<ISectionService> sectionService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService, Lazy<IRedirectUrlService> redirectUrlService)
+        public ServiceContext(Lazy<IPublicAccessService> publicAccessService, Lazy<ITaskService> taskService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IMediaTypeService> mediaTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IApplicationTreeService> treeService, Lazy<ISectionService> sectionService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService, Lazy<IRedirectUrlService> redirectUrlService)
         {
-            _migrationEntryService = migrationEntryService;
             _publicAccessService = publicAccessService;
             _taskService = taskService;
             _domainService = domainService;
@@ -102,12 +100,10 @@ namespace Umbraco.Core.Services
             IMacroService macroService = null,
             IPublicAccessService publicAccessService = null,
             IExternalLoginService externalLoginService = null,
-            IMigrationEntryService migrationEntryService = null,
             IServerRegistrationService serverRegistrationService = null,
             IRedirectUrlService redirectUrlService = null)
         {
             if (serverRegistrationService != null) _serverRegistrationService = new Lazy<IServerRegistrationService>(() => serverRegistrationService);
-            if (migrationEntryService != null) _migrationEntryService = new Lazy<IMigrationEntryService>(() => migrationEntryService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
             if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
             if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
@@ -135,12 +131,7 @@ namespace Umbraco.Core.Services
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
         }
-
-        /// <summary>
-        /// Gets the <see cref="IMigrationEntryService"/>
-        /// </summary>
-        public IMigrationEntryService MigrationEntryService => _migrationEntryService.Value;
-
+        
         /// <summary>
         /// Gets the <see cref="IPublicAccessService"/>
         /// </summary>

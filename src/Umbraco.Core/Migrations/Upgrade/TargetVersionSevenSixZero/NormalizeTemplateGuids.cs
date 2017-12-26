@@ -22,7 +22,7 @@ namespace Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero
             // of 7.6 on Courier.
             // so... testing if we already have a 7.6.0 version installed. not pretty but...?
             //
-            var version = database.FirstOrDefault<string>("SELECT version FROM umbracoMigration WHERE name=@name ORDER BY version DESC", new { name = Constants.System.UmbracoUpgraderName });
+            var version = database.FirstOrDefault<string>("SELECT version FROM umbracoMigration WHERE name=@name ORDER BY version DESC", new { name = Constants.System.UmbracoUpgradePlanName });
             if (version != null && version.StartsWith("7.6.0")) return;
 
             var updates = database.Query<dynamic>(@"SELECT umbracoNode.id, cmsTemplate.alias FROM umbracoNode

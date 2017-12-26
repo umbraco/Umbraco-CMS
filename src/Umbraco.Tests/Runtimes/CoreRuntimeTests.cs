@@ -4,7 +4,6 @@ using System.Web.Hosting;
 using LightInject;
 using Moq;
 using NUnit.Framework;
-using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
@@ -108,7 +107,7 @@ namespace Umbraco.Tests.Runtimes
 
             // pretend we have the proper migration
             // else BootFailedException because our mock IUmbracoDatabaseFactory does not provide databases
-            protected override bool EnsureMigration(IUmbracoDatabaseFactory databaseFactory, SemVersion codeVersion)
+            protected override bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
             {
                 return true;
             }

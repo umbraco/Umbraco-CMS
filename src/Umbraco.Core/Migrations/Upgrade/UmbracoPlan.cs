@@ -4,7 +4,6 @@ using Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveFive;
 using Umbraco.Core.Migrations.Upgrade.TargetVersionSevenFiveZero;
 using Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSevenZero;
 using Umbraco.Core.Migrations.Upgrade.TargetVersionSevenSixZero;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -13,8 +12,19 @@ namespace Umbraco.Core.Migrations.Upgrade
     /// </summary>
     public class UmbracoPlan : MigrationPlan
     {
-        public UmbracoPlan(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, ILogger logger)
-            : base("umbraco", scopeProvider, migrationBuilder, logger)
+        public UmbracoPlan()
+            : base(Constants.System.UmbracoUpgradePlanName)
+        {
+            DefinePlan();
+        }
+
+        public UmbracoPlan(IMigrationBuilder migrationBuilder, ILogger logger)
+            : base(Constants.System.UmbracoUpgradePlanName, migrationBuilder, logger)
+        {
+            DefinePlan();
+        }
+
+        private void DefinePlan()
         {
             // INSTALL
             // when installing, the source state is empty, and the target state should be the installed state,

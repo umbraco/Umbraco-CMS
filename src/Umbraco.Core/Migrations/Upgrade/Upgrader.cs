@@ -1,6 +1,5 @@
 ﻿using System;
 using Semver;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -11,13 +10,10 @@ namespace Umbraco.Core.Migrations.Upgrade
     {
         private readonly IKeyValueService _keyValueService;
         private readonly PostMigrationCollection _postMigrations;
+        private MigrationPlan _plan;
 
-        protected Upgrader(string name, IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger)
+        protected Upgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            Name = name;
-            StateValueKey = "Umbraco.Core.Upgrader.State+" + name;
-
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
             MigrationBuilder = migrationBuilder ?? throw new ArgumentNullException(nameof(migrationBuilder));
             _keyValueService = keyValueService ?? throw new ArgumentNullException(nameof(keyValueService));
@@ -25,9 +21,9 @@ namespace Umbraco.Core.Migrations.Upgrade
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public string Name { get; }
+        public string Name => Plan.Name;
 
-        public string StateValueKey { get; }
+        public string StateValueKey => "Umbraco.Core.Upgrader.State+" + Plan.Name;
 
         protected IScopeProvider ScopeProvider { get; }
 
@@ -35,13 +31,15 @@ namespace Umbraco.Core.Migrations.Upgrade
 
         protected ILogger Logger { get; }
 
+        protected MigrationPlan Plan => _plan ?? (_plan = GetPlan());
+
         protected abstract MigrationPlan GetPlan();
         protected abstract string GetInitialState();
         protected abstract (SemVersion, SemVersion) GetVersions();
 
         public void Execute()
         {
-            var plan = GetPlan();
+            var plan = Plan;
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -59,6 +57,8 @@ namespace Umbraco.Core.Migrations.Upgrade
 
                 // execute plan
                 var state = plan.Execute(scope, currentState);
+                if (string.IsNullOrWhiteSpace(state))
+                    throw new Exception("Plan execution returned an invalid null or empty state.");
 
                 // save new state
                 if (forceState)

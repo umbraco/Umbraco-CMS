@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Data;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
-using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
@@ -38,7 +35,7 @@ namespace Umbraco.Tests.Migrations
                     switch (t.Name)
                     {
                         case "NopMigration":
-                            return new NopMigration();
+                            return new NoopMigration();
                         default:
                             throw new NotSupportedException();
                     }
@@ -53,9 +50,9 @@ namespace Umbraco.Tests.Migrations
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var u1 = new MigrationTests.TestUpgrader("Test", scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
-                new MigrationPlan("Test", scopeProvider, builder, logger)
-                    .Add<NopMigration>(string.Empty, "done"));
+            var u1 = new MigrationTests.TestUpgrader(scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
+                new MigrationPlan("Test",  builder, logger)
+                    .Add<NoopMigration>(string.Empty, "done"));
             u1.Execute();
 
             Assert.AreEqual(1, changed1.CountExecuted);
@@ -82,7 +79,7 @@ namespace Umbraco.Tests.Migrations
                     switch (t.Name)
                     {
                         case "NopMigration":
-                            return new NopMigration();
+                            return new NoopMigration();
                         default:
                             throw new NotSupportedException();
                     }
@@ -97,17 +94,17 @@ namespace Umbraco.Tests.Migrations
             var sqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
-            var u1 = new MigrationTests.TestUpgrader("Test1", scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
-                new MigrationPlan("Test1", scopeProvider, builder, logger)
-                    .Add<NopMigration>(string.Empty, "done"));
+            var u1 = new MigrationTests.TestUpgrader(scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
+                new MigrationPlan("Test1", builder, logger)
+                    .Add<NoopMigration>(string.Empty, "done"));
             u1.Execute();
 
             Assert.AreEqual(1, changed1.CountExecuted);
             Assert.AreEqual(0, changed2.CountExecuted);
 
-            var u2 = new MigrationTests.TestUpgrader("Test2", scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
-                new MigrationPlan("Test2", scopeProvider, builder, logger)
-                    .Add<NopMigration>(string.Empty, "done"));
+            var u2 = new MigrationTests.TestUpgrader(scopeProvider, builder, Mock.Of<IKeyValueService>(), posts, logger,
+                new MigrationPlan("Test2", builder, logger)
+                    .Add<NoopMigration>(string.Empty, "done"));
             u2.Execute();
 
             Assert.AreEqual(1, changed1.CountExecuted);

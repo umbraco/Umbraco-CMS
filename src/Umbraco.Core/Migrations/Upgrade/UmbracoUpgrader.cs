@@ -11,12 +11,12 @@ namespace Umbraco.Core.Migrations.Upgrade
     public class UmbracoUpgrader : Upgrader
     {
         public UmbracoUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger)
-            : base(Constants.System.UmbracoUpgraderName, scopeProvider, migrationBuilder, keyValueService, postMigrations, logger)
+            : base(scopeProvider, migrationBuilder, keyValueService, postMigrations, logger)
         { }
 
         protected override MigrationPlan GetPlan()
         {
-            return new UmbracoPlan(ScopeProvider, MigrationBuilder, Logger);
+            return new UmbracoPlan(MigrationBuilder, Logger);
         }
 
         protected override string GetInitialState()

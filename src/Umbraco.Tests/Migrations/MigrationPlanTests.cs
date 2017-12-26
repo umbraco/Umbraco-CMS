@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Migrations
                         case "DeleteRedirectUrlTable":
                             return new DeleteRedirectUrlTable(c);
                         case "NopMigration":
-                            return new NopMigration();
+                            return new NoopMigration();
                         default:
                             throw new NotSupportedException();
                     }
@@ -49,10 +49,10 @@ namespace Umbraco.Tests.Migrations
             // fixme - NOT a migration collection builder, just a migration builder
             //  done, remove everywhere else, and delete migrationCollection stuff entirely
 
-            var plan = new MigrationPlan("default", scopeProvider, migrationBuilder, logger)
+            var plan = new MigrationPlan("default", migrationBuilder, logger)
                 .From(string.Empty)
                 .Chain<DeleteRedirectUrlTable>("{4A9A1A8F-0DA1-4BCF-AD06-C19D79152E35}")
-                .Chain<NopMigration>("VERSION.33");
+                .Chain<NoopMigration>("VERSION.33");
 
             var kvs = Mock.Of<IKeyValueService>();
             Mock.Get(kvs).Setup(x => x.GetValue(It.IsAny<string>())).Returns<string>(k => k == "Umbraco.Tests.MigrationPlan" ? string.Empty : null);
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CanAddMigrations()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IScopeProvider>(), Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
             plan.Add(string.Empty, "aaa");
             plan.Add("aaa", "bbb");
             plan.Add("bbb", "ccc");
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CannotTransitionToSameState()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IScopeProvider>(), Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
             Assert.Throws<ArgumentException>(() =>
             {
                 plan.Add("aaa", "aaa");
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void OnlyOneTransitionPerState()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IScopeProvider>(), Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
             plan.Add("aaa", "bbb");
             Assert.Throws<InvalidOperationException>(() =>
             {
@@ -111,29 +111,31 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void CannotContainTwoMoreHeads()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IScopeProvider>(), Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
             plan.Add(string.Empty, "aaa");
             plan.Add("aaa", "bbb");
             plan.Add("ccc", "ddd");
-            Assert.Throws<Exception>(plan.Validate);
+            Assert.Throws<Exception>(() => plan.Validate());
         }
 
         [Test]
         public void CannotContainLoops()
         {
-            var plan = new MigrationPlan("default", Mock.Of<IScopeProvider>(), Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var plan = new MigrationPlan("default", Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
             plan.Add(string.Empty, "aaa");
             plan.Add("aaa", "bbb");
             plan.Add("bbb", "ccc");
             plan.Add("ccc", "aaa");
-            Assert.Throws<Exception>(plan.Validate);
+            Assert.Throws<Exception>(() => plan.Validate());
         }
 
         [Test]
         public void ValidateUmbracoPlan()
         {
-            var plan = new UmbracoPlan(Mock.Of<IScopeProvider>(), Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            plan.Validate();
+            var plan = new UmbracoPlan(Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
+            var finalState = plan.Validate();
+            Console.WriteLine(finalState);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(finalState));
         }
 
         public class DeleteRedirectUrlTable : MigrationBase

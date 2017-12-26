@@ -121,6 +121,8 @@ namespace Umbraco.Core
             composition.Container.RegisterCollectionBuilder<PostMigrationCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetTypes<IPostMigration>());
 
+            composition.Container.RegisterSingleton<IMigrationBuilder, MigrationBuilder>();
+
             // by default, register a noop factory
             composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
         }

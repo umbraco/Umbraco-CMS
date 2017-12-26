@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName(Constants.DatabaseSchema.Tables.KeyValue)]
-    [PrimaryKey("key")]
+    [PrimaryKey("key", AutoIncrement = false)]
     [ExplicitColumns]
     internal class KeyValueDto
     {

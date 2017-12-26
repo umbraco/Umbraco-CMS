@@ -15,7 +15,7 @@ namespace Umbraco.Web.Migrations
     {
         public void Execute(string name, IScope scope, SemVersion originVersion, SemVersion targetVersion, ILogger logger)
         {
-            if (name != Constants.System.UmbracoUpgraderName) return;
+            if (name != Constants.System.UmbracoUpgradePlanName) return;
             if (HttpContext.Current == null) return;
 
             var http = new HttpContextWrapper(HttpContext.Current);

@@ -17,8 +17,8 @@ namespace Umbraco.Tests.Migrations
         {
             private readonly MigrationPlan _plan;
 
-            public TestUpgrader(string name, IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger, MigrationPlan plan)
-                : base(name, scopeProvider, migrationBuilder, keyValueService, postMigrations, logger)
+            public TestUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger, MigrationPlan plan)
+                : base(scopeProvider, migrationBuilder, keyValueService, postMigrations, logger)
             {
                 _plan = plan;
             }

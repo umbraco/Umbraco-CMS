@@ -9,25 +9,32 @@ namespace Umbraco.Core.Migrations
 {
     public class MigrationPlan
     {
-        private readonly string _name;
-        private readonly IScopeProvider _scopeProvider;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly ILogger _logger;
         private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
 
         private string _prevState;
 
-        public MigrationPlan(string name, IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, ILogger logger)
+        // initializes a non-executing plan
+        public MigrationPlan(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            _name = name;
-            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
+            Name = name;
+        }
+
+        // initializes a plan
+        public MigrationPlan(string name, IMigrationBuilder migrationBuilder, ILogger logger)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            Name = name;
             _migrationBuilder = migrationBuilder ?? throw new ArgumentNullException(nameof(migrationBuilder));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public string Name { get; }
+
         public MigrationPlan Add(string sourceState, string targetState)
-            => Add<NopMigration>(sourceState, targetState);
+            => Add<NoopMigration>(sourceState, targetState);
 
         public MigrationPlan Add<TMigration>(string sourceState, string targetState)
             where TMigration : IMigration
@@ -70,7 +77,7 @@ namespace Umbraco.Core.Migrations
         }
 
         public MigrationPlan Chain(string targetState)
-            => Chain<NopMigration>(targetState);
+            => Chain<NoopMigration>(targetState);
 
         public MigrationPlan Chain<TMigration>(string targetState)
             where TMigration : IMigration
@@ -85,8 +92,7 @@ namespace Umbraco.Core.Migrations
             return this;
         }
 
-        // internal for tests
-        internal void Validate()
+        public string Validate()
         {
             // quick check for dead ends - a dead end is a transition that has a target state
             // that is not null and does not match any source state. such a target state has
@@ -118,13 +124,18 @@ namespace Umbraco.Core.Migrations
                 }
                 verified.AddRange(visited);
             }
+
+            return finalState;
         }
 
         public string Execute(IScope scope, string fromState)
         {
             Validate();
 
-            _logger.Info<MigrationPlan>("Starting \"{0}\"...", () => _name);
+            if (_migrationBuilder == null || _logger == null)
+                throw new InvalidOperationException("Cannot execute a non-executing plan.");
+
+            _logger.Info<MigrationPlan>("Starting \"{0}\"...", () => Name);
             var origState = fromState; //GetState();
             var info = "At " + (string.IsNullOrWhiteSpace(origState) ? "origin" : ("\"" + origState + "\"")) + ".";
             info = info.Replace("{", "{{").Replace("}", "}}"); // stupid log4net

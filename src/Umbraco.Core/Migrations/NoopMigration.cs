@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Migrations
 {
-    public class NopMigration : IMigration
+    public class NoopMigration : IMigration
     {
         public void Migrate()
         {

@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test",  builder, logger)
                         .Add<CreateTableOfTDtoMigration>(string.Empty, "done"));
 
                 upgrader.Execute();
@@ -71,8 +71,8 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", builder, logger)
                         .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
                         .Add<DeleteKeysAndIndexesMigration>("a", "done"));
 
@@ -106,8 +106,8 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test",  builder, logger)
                         .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
                         .Add<DeleteKeysAndIndexesMigration>("a", "b")
                         .Add<CreateKeysAndIndexesOfTDtoMigration>("b", "done"));
@@ -142,8 +142,8 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test",  builder, logger)
                         .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
                         .Add<DeleteKeysAndIndexesMigration>("a", "b")
                         .Add<CreateKeysAndIndexesMigration>("b", "done"));
@@ -176,8 +176,8 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader("test", ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
-                    new MigrationPlan("test", ScopeProvider, builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), new PostMigrationCollection(Enumerable.Empty<IPostMigration>()), logger,
+                    new MigrationPlan("test", builder, logger)
                         .Add<CreateTableOfTDtoMigration>(string.Empty, "a")
                         .Add<CreateColumnMigration>("a", "done"));
 
