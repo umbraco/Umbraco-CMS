@@ -23,8 +23,6 @@ namespace Umbraco.Tests.Persistence
         private ILogger _logger;
         private SqlCeSyntaxProvider _sqlCeSyntaxProvider;
         private ISqlSyntaxProvider[] _sqlSyntaxProviders;
-        private IRuntimeState _runtime;
-        private IMigrationEntryService _migrationEntryService;
 
         [SetUp]
         public void Setup()
@@ -34,8 +32,6 @@ namespace Umbraco.Tests.Persistence
             _sqlSyntaxProviders = new[] { (ISqlSyntaxProvider) _sqlCeSyntaxProvider };
             _logger = Mock.Of<ILogger>();
             _databaseFactory = new UmbracoDatabaseFactory(_sqlSyntaxProviders, _logger, Mock.Of<IMapperCollection>());
-            _runtime = Mock.Of<IRuntimeState>();
-            _migrationEntryService = Mock.Of<IMigrationEntryService>();
         }
 
         [TearDown]

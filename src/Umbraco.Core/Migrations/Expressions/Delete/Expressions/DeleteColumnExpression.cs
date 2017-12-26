@@ -6,8 +6,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteColumnExpression : MigrationExpressionBase
     {
-        public DeleteColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public DeleteColumnExpression(IMigrationContext context)
+            : base(context)
         {
             ColumnNames = new List<string>();
         }
@@ -17,9 +17,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             var stmts = new StringBuilder();
             foreach (var columnName in ColumnNames)
             {

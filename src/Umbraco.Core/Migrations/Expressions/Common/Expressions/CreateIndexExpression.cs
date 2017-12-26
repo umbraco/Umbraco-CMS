@@ -6,14 +6,14 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
     public class CreateIndexExpression : MigrationExpressionBase
     {
 
-        public CreateIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, IndexDefinition index)
-            : base(context, supportedDatabaseTypes)
+        public CreateIndexExpression(IMigrationContext context, IndexDefinition index)
+            : base(context)
         {
             Index = index;
         }
 
-        public CreateIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public CreateIndexExpression(IMigrationContext context)
+            : base(context)
         {
             Index = new IndexDefinition();
         }

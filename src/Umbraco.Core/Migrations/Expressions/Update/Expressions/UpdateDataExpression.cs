@@ -6,8 +6,8 @@ namespace Umbraco.Core.Migrations.Expressions.Update.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {
-        public UpdateDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public UpdateDataExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public string TableName { get; set; }
@@ -18,9 +18,6 @@ namespace Umbraco.Core.Migrations.Expressions.Update.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             var updateItems = Set.Select(x => $"{SqlSyntax.GetQuotedColumnName(x.Key)} = {GetQuotedValue(x.Value)}");
             var whereClauses = IsAllRows
                 ? null

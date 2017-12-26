@@ -5,14 +5,14 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteIndexExpression : MigrationExpressionBase
     {
-        public DeleteIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public DeleteIndexExpression(IMigrationContext context)
+            : base(context)
         {
             Index = new IndexDefinition();
         }
 
-        public DeleteIndexExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, IndexDefinition index)
-            : base(context, supportedDatabaseTypes)
+        public DeleteIndexExpression(IMigrationContext context, IndexDefinition index)
+            : base(context)
         {
             Index = index;
         }

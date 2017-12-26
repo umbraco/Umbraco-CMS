@@ -6,14 +6,13 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Expressions
 {
     public class CreateConstraintExpression : MigrationExpressionBase
     {
-        public CreateConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, ConstraintType constraint)
-            : base(context, supportedDatabaseTypes)
+        public CreateConstraintExpression(IMigrationContext context, ConstraintType constraint)
+            : base(context)
         {
             Constraint = new ConstraintDefinition(constraint);
         }
 
-
-        public ConstraintDefinition Constraint { get; private set; }
+        public ConstraintDefinition Constraint { get; }
 
         protected override string GetSql()
         {

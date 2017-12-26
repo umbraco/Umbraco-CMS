@@ -7,8 +7,8 @@ namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
     /// </summary>
     public class RenameTableExpression : MigrationExpressionBase
     {
-        public RenameTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public RenameTableExpression(IMigrationContext context)
+            : base(context)
         { }
 
         /// <summary>
@@ -25,9 +25,7 @@ namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
         /// <inheritdoc />
         protected override string GetSql()
         {
-            return IsExpressionSupported() == false
-                ? string.Empty
-                : SqlSyntax.FormatTableRename(OldName, NewName);
+            return SqlSyntax.FormatTableRename(OldName, NewName);
         }
     }
 }

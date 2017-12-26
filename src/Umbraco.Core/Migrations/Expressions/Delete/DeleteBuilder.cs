@@ -15,73 +15,71 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
     public class DeleteBuilder : IDeleteBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public DeleteBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
+        public DeleteBuilder(IMigrationContext context)
         {
             _context = context;
-            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         /// <inheritdoc />
         public IExecutableBuilder Table(string tableName)
         {
-            var expression = new DeleteTableExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
+            var expression = new DeleteTableExpression(_context) { TableName = tableName };
             return new ExecutableBuilder(expression);
         }
 
         /// <inheritdoc />
         public IExecutableBuilder KeysAndIndexes(string tableName = null)
         {
-            return new DeleteKeysAndIndexesBuilder(_context, _supportedDatabaseTypes) { TableName = tableName };
+            return new DeleteKeysAndIndexesBuilder(_context) { TableName = tableName };
         }
 
         /// <inheritdoc />
         public IDeleteColumnBuilder Column(string columnName)
         {
-            var expression = new DeleteColumnExpression(_context, _supportedDatabaseTypes) {ColumnNames = {columnName}};
+            var expression = new DeleteColumnExpression(_context) {ColumnNames = {columnName}};
             return new DeleteColumnBuilder(expression);
         }
 
         /// <inheritdoc />
         public IDeleteForeignKeyFromTableBuilder ForeignKey()
         {
-            var expression = new DeleteForeignKeyExpression(_context, _supportedDatabaseTypes);
+            var expression = new DeleteForeignKeyExpression(_context);
             return new DeleteForeignKeyBuilder(expression);
         }
 
         /// <inheritdoc />
         public IDeleteForeignKeyOnTableBuilder ForeignKey(string foreignKeyName)
         {
-            var expression = new DeleteForeignKeyExpression(_context, _supportedDatabaseTypes) {ForeignKey = {Name = foreignKeyName}};
+            var expression = new DeleteForeignKeyExpression(_context) {ForeignKey = {Name = foreignKeyName}};
             return new DeleteForeignKeyBuilder(expression);
         }
 
         /// <inheritdoc />
         public IDeleteDataBuilder FromTable(string tableName)
         {
-            var expression = new DeleteDataExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
+            var expression = new DeleteDataExpression(_context) { TableName = tableName };
             return new DeleteDataBuilder(expression);
         }
 
         /// <inheritdoc />
         public IDeleteIndexForTableBuilder Index()
         {
-            var expression = new DeleteIndexExpression(_context, _supportedDatabaseTypes);
+            var expression = new DeleteIndexExpression(_context);
             return new DeleteIndexBuilder(expression);
         }
 
         /// <inheritdoc />
         public IDeleteIndexForTableBuilder Index(string indexName)
         {
-            var expression = new DeleteIndexExpression(_context, _supportedDatabaseTypes) { Index = { Name = indexName } };
+            var expression = new DeleteIndexExpression(_context) { Index = { Name = indexName } };
             return new DeleteIndexBuilder(expression);
         }
 
         /// <inheritdoc />
         public IDeleteConstraintBuilder PrimaryKey(string primaryKeyName)
         {
-            var expression = new DeleteConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey)
+            var expression = new DeleteConstraintExpression(_context, ConstraintType.PrimaryKey)
             {
                 Constraint = { ConstraintName = primaryKeyName }
             };
@@ -91,7 +89,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         /// <inheritdoc />
         public IDeleteConstraintBuilder UniqueConstraint(string constraintName)
         {
-            var expression = new DeleteConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.Unique)
+            var expression = new DeleteConstraintExpression(_context, ConstraintType.Unique)
             {
                 Constraint = { ConstraintName = constraintName }
             };
@@ -101,7 +99,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         /// <inheritdoc />
         public IDeleteDefaultConstraintOnTableBuilder DefaultConstraint()
         {
-            var expression = new DeleteDefaultConstraintExpression(_context, _supportedDatabaseTypes);
+            var expression = new DeleteDefaultConstraintExpression(_context);
             return new DeleteDefaultConstraintBuilder(expression);
         }
     }

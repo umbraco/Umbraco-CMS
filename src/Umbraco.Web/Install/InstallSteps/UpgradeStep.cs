@@ -57,12 +57,13 @@ namespace Umbraco.Web.Install.InstallSteps
         /// <returns>A SemVersion of the latest Umbraco DB Migration run</returns>
         private SemVersion CurrentVersion()
         {
-            //Set a default version of 0.0.0
+            // start with a default version of 0.0.0
             var version = new SemVersion(0);
 
             //If we have a db context available, if we don't then we are not installed anyways
-            if (_databaseBuilder.IsDatabaseConfigured && _databaseBuilder.CanConnect)
-                version = _databaseBuilder.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(Current.Services.MigrationEntryService);
+            // fixme DB will not tell the version anymore - only the upgrade state
+            //if (_databaseBuilder.IsDatabaseConfigured && _databaseBuilder.CanConnect)
+            //    version = _databaseBuilder.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(Current.Services.MigrationEntryService);
 
             if (version != new SemVersion(0))
                 return version;

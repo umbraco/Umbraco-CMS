@@ -9,8 +9,8 @@ namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions
 {
     public class InsertDataExpression : MigrationExpressionBase
     {
-        public InsertDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public InsertDataExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public string TableName { get; set; }
@@ -20,9 +20,6 @@ namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             var stmts = new StringBuilder();
 
             if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())

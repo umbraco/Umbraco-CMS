@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Migrations
                 {
                     switch (t.Name)
                     {
-                        case "NopMigration":
+                        case "NoopMigration":
                             return new NoopMigration();
                         default:
                             throw new NotSupportedException();
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Migrations
                 {
                     switch (t.Name)
                     {
-                        case "NopMigration":
+                        case "NoopMigration":
                             return new NoopMigration();
                         default:
                             throw new NotSupportedException();

@@ -9,18 +9,16 @@ namespace Umbraco.Core.Migrations.Expressions.Insert
     public class InsertBuilder : IInsertBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public InsertBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
+        public InsertBuilder(IMigrationContext context)
         {
             _context = context;
-            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         /// <inheritdoc />
         public IInsertIntoBuilder IntoTable(string tableName)
         {
-            var expression = new InsertDataExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
+            var expression = new InsertDataExpression(_context) { TableName = tableName };
             return new InsertIntoBuilder(expression);
         }
     }

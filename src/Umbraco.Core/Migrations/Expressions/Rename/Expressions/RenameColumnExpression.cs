@@ -5,8 +5,8 @@ namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
 {
     public class RenameColumnExpression : MigrationExpressionBase
     {
-        public RenameColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public RenameColumnExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public virtual string TableName { get; set; }
@@ -26,9 +26,7 @@ namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
 
         private string GetBaseSql()
         {
-            return IsExpressionSupported() == false
-                ? string.Empty
-                : SqlSyntax.FormatColumnRename(TableName, OldName, NewName);
+            return SqlSyntax.FormatColumnRename(TableName, OldName, NewName);
         }
 
         private string GetMySql()

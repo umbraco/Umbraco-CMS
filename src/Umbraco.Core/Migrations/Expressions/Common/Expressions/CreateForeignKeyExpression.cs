@@ -5,14 +5,14 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
 {
     public class CreateForeignKeyExpression : MigrationExpressionBase
     {
-        public CreateForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, ForeignKeyDefinition fkDef)
-            : base(context, supportedDatabaseTypes)
+        public CreateForeignKeyExpression(IMigrationContext context, ForeignKeyDefinition fkDef)
+            : base(context)
         {
             ForeignKey = fkDef;
         }
 
-        public CreateForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public CreateForeignKeyExpression(IMigrationContext context)
+            : base(context)
         {
             ForeignKey = new ForeignKeyDefinition();
         }
@@ -21,9 +21,6 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             return SqlSyntax.Format(ForeignKey);
         }
     }

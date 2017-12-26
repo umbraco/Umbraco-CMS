@@ -18,10 +18,9 @@ namespace Umbraco.Core.Migrations
         private bool _executed;
         private List<IMigrationExpression> _expressions;
 
-        protected MigrationExpressionBase(IMigrationContext context, DatabaseType[] supportedDatabaseTypes = null)
+        protected MigrationExpressionBase(IMigrationContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
-            SupportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         protected IMigrationContext Context { get; }
@@ -35,22 +34,6 @@ namespace Umbraco.Core.Migrations
         public DatabaseType DatabaseType => Context.Database.DatabaseType;
 
         public List<IMigrationExpression> Expressions => _expressions ?? (_expressions = new List<IMigrationExpression>());
-
-        public DatabaseType[] SupportedDatabaseTypes { get; }
-
-        public bool IsExpressionSupported() // fixme - do we need this?!
-        {
-            return SupportedDatabaseTypes == null
-                || SupportedDatabaseTypes.Length == 0
-                // beware!
-                // DatabaseType.SqlServer2005 = DatabaseTypes.SqlServerDatabaseType
-                // DatabaseType.SqlServer2012 = DatabaseTypes.SqlServer2012DatabaseType
-                // with cascading inheritance, so if SqlServer2005 is "supported" we
-                // need to accept SqlServer2012 too => cannot simply test with "Contains"
-                // and have to test the types.
-                //|| SupportedDatabaseTypes.Contains(CurrentDatabaseType);
-                || SupportedDatabaseTypes.Any(x => DatabaseType.GetType().Inherits(x.GetType()));
-        }
 
         public virtual string Process(IMigrationContext context)
         {

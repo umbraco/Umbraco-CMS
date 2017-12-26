@@ -6,8 +6,8 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
     public class AlterColumnExpression : MigrationExpressionBase
     {
 
-        public AlterColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public AlterColumnExpression(IMigrationContext context)
+            : base(context)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Alter };
         }

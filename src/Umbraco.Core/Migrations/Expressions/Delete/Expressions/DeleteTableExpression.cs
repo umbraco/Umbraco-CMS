@@ -4,8 +4,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteTableExpression : MigrationExpressionBase
     {
-        public DeleteTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public DeleteTableExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public virtual string TableName { get; set; }

@@ -103,7 +103,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
 
-            var createExpression = new CreateIndexExpression(context, new []{ DatabaseType.SqlServer2005 })
+            var createExpression = new CreateIndexExpression(context)
             {
                 Index = { Name = "IX_A" }
             };
@@ -124,7 +124,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
 
-            var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
+            var createExpression = new CreateIndexExpression(context)
             {
                 Index = { Name = "IX_A" }
             };
@@ -145,7 +145,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
 
-            var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
+            var createExpression = new CreateIndexExpression(context)
             {
                 Index = { Name = "IX_AB" }
             };
@@ -166,7 +166,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
             var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
             var context = new MigrationContext(db, logger);
 
-            var createExpression = new CreateIndexExpression(context, new[] { DatabaseType.SqlServer2005 })
+            var createExpression = new CreateIndexExpression(context)
             {
                 Index = { Name = "IX_A" }
             };

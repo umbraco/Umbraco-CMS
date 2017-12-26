@@ -5,8 +5,8 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
 {
     public class CreateColumnExpression : MigrationExpressionBase
     {
-        public CreateColumnExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public CreateColumnExpression(IMigrationContext context)
+            : base(context)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
@@ -16,9 +16,6 @@ namespace Umbraco.Core.Migrations.Expressions.Common.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             if (string.IsNullOrEmpty(Column.TableName))
                 Column.TableName = TableName;
 

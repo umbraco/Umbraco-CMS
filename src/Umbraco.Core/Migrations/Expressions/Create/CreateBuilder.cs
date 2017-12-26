@@ -16,85 +16,83 @@ namespace Umbraco.Core.Migrations.Expressions.Create
     public class CreateBuilder : ICreateBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public CreateBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
+        public CreateBuilder(IMigrationContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         /// <inheritdoc />
         public IExecutableBuilder Table<TDto>(bool withoutKeysAndIndexes = false)
         {
-            return new CreateTableOfDtoBuilder(_context, _supportedDatabaseTypes) { TypeOfDto = typeof(TDto), WithoutKeysAndIndexes = withoutKeysAndIndexes };
+            return new CreateTableOfDtoBuilder(_context) { TypeOfDto = typeof(TDto), WithoutKeysAndIndexes = withoutKeysAndIndexes };
         }
 
         /// <inheritdoc />
         public IExecutableBuilder KeysAndIndexes<TDto>()
         {
-            return new CreateKeysAndIndexesBuilder(_context, _supportedDatabaseTypes) { TypeOfDto = typeof(TDto) };
+            return new CreateKeysAndIndexesBuilder(_context) { TypeOfDto = typeof(TDto) };
         }
 
         /// <inheritdoc />
         public IExecutableBuilder KeysAndIndexes(Type typeOfDto)
         {
-            return new CreateKeysAndIndexesBuilder(_context, _supportedDatabaseTypes) { TypeOfDto = typeOfDto };
+            return new CreateKeysAndIndexesBuilder(_context) { TypeOfDto = typeOfDto };
         }
 
         /// <inheritdoc />
         public ICreateTableWithColumnBuilder Table(string tableName)
         {
-            var expression = new CreateTableExpression(_context, _supportedDatabaseTypes) { TableName = tableName };
-            return new CreateTableBuilder(_context, _supportedDatabaseTypes, expression);
+            var expression = new CreateTableExpression(_context) { TableName = tableName };
+            return new CreateTableBuilder(_context, expression);
         }
 
         /// <inheritdoc />
         public ICreateColumnOnTableBuilder Column(string columnName)
         {
-            var expression = new CreateColumnExpression(_context, _supportedDatabaseTypes) { Column = { Name = columnName } };
-            return new CreateColumnBuilder(_context, _supportedDatabaseTypes, expression);
+            var expression = new CreateColumnExpression(_context) { Column = { Name = columnName } };
+            return new CreateColumnBuilder(_context, expression);
         }
 
         /// <inheritdoc />
         public ICreateForeignKeyFromTableBuilder ForeignKey()
         {
-            var expression = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes);
+            var expression = new CreateForeignKeyExpression(_context);
             return new CreateForeignKeyBuilder(expression);
         }
 
         /// <inheritdoc />
         public ICreateForeignKeyFromTableBuilder ForeignKey(string foreignKeyName)
         {
-            var expression = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes) { ForeignKey = { Name = foreignKeyName } };
+            var expression = new CreateForeignKeyExpression(_context) { ForeignKey = { Name = foreignKeyName } };
             return new CreateForeignKeyBuilder(expression);
         }
 
         /// <inheritdoc />
         public ICreateIndexForTableBuilder Index()
         {
-            var expression = new CreateIndexExpression(_context, _supportedDatabaseTypes);
+            var expression = new CreateIndexExpression(_context);
             return new CreateIndexBuilder(expression);
         }
 
         /// <inheritdoc />
         public ICreateIndexForTableBuilder Index(string indexName)
         {
-            var expression = new CreateIndexExpression(_context, _supportedDatabaseTypes) { Index = { Name = indexName } };
+            var expression = new CreateIndexExpression(_context) { Index = { Name = indexName } };
             return new CreateIndexBuilder(expression);
         }
 
         /// <inheritdoc />
         public ICreateConstraintOnTableBuilder PrimaryKey()
         {
-            var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey);
+            var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey);
             return new CreateConstraintBuilder(expression);
         }
 
         /// <inheritdoc />
         public ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName)
         {
-            var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey);
+            var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey);
             expression.Constraint.ConstraintName = primaryKeyName;
             return new CreateConstraintBuilder(expression);
         }
@@ -102,14 +100,14 @@ namespace Umbraco.Core.Migrations.Expressions.Create
         /// <inheritdoc />
         public ICreateConstraintOnTableBuilder UniqueConstraint()
         {
-            var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.Unique);
+            var expression = new CreateConstraintExpression(_context, ConstraintType.Unique);
             return new CreateConstraintBuilder(expression);
         }
 
         /// <inheritdoc />
         public ICreateConstraintOnTableBuilder UniqueConstraint(string constraintName)
         {
-            var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.Unique);
+            var expression = new CreateConstraintExpression(_context, ConstraintType.Unique);
             expression.Constraint.ConstraintName = constraintName;
             return new CreateConstraintBuilder(expression);
         }
@@ -117,7 +115,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create
         /// <inheritdoc />
         public ICreateConstraintOnTableBuilder Constraint(string constraintName)
         {
-            var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.NonUnique);
+            var expression = new CreateConstraintExpression(_context, ConstraintType.NonUnique);
             expression.Constraint.ConstraintName = constraintName;
             return new CreateConstraintBuilder(expression);
         }

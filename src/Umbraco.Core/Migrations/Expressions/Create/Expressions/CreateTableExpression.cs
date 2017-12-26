@@ -6,8 +6,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Expressions
 {
     public class CreateTableExpression : MigrationExpressionBase
     {
-        public CreateTableExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public CreateTableExpression(IMigrationContext context)
+            : base(context)
         {
             Columns = new List<ColumnDefinition>();
         }

@@ -40,7 +40,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
 
         private void ExecuteSql(string sql)
         {
-            new ExecuteSqlStatementExpression(_context, _supportedDatabaseTypes) { SqlStatement = sql }
+            new ExecuteSqlStatementExpression(_context) { SqlStatement = sql }
                 .Execute();
         }
     }

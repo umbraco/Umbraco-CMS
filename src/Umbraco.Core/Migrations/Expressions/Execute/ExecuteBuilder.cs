@@ -7,8 +7,8 @@ namespace Umbraco.Core.Migrations.Expressions.Execute
     public class ExecuteBuilder : ExpressionBuilderBase<ExecuteSqlStatementExpression>,
         IExecuteBuilder, IExecutableBuilder
     {
-        public ExecuteBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
-            : base(new ExecuteSqlStatementExpression(context, supportedDatabaseTypes))
+        public ExecuteBuilder(IMigrationContext context)
+            : base(new ExecuteSqlStatementExpression(context))
         { }
 
         /// <inheritdoc />

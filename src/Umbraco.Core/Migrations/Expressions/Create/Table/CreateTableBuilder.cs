@@ -12,13 +12,11 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
         ICreateTableColumnOptionForeignKeyCascadeBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public CreateTableBuilder(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, CreateTableExpression expression)
+        public CreateTableBuilder(IMigrationContext context, CreateTableExpression expression)
             : base(expression)
         {
             _context = context;
-            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         /// <inheritdoc />
@@ -73,7 +71,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
+            var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
@@ -104,7 +102,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
             // it.  For now, this is what I'm doing
             if (Expression.DatabaseType.IsMySql() == false)
             {
-                var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey)
+                var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
                 {
                     Constraint =
                 {
@@ -134,7 +132,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
 
             if (Expression.DatabaseType.IsMySql() == false)
             {
-                var expression = new CreateConstraintExpression(_context, _supportedDatabaseTypes, ConstraintType.PrimaryKey)
+                var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey)
                 {
                     Constraint =
                 {
@@ -174,7 +172,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
+            var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
                 SchemaName = Expression.SchemaName,
@@ -211,7 +209,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
         {
             CurrentColumn.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = primaryTableName,
@@ -252,7 +250,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
         public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                             string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = Expression.TableName,

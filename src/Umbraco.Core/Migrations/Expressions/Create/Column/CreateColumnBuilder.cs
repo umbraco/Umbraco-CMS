@@ -11,13 +11,11 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
                                              ICreateColumnOptionForeignKeyCascadeBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public CreateColumnBuilder(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, CreateColumnExpression expression)
+        public CreateColumnBuilder(IMigrationContext context, CreateColumnExpression expression)
             : base(expression)
         {
             _context = context;
-            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         public void Do() => Expression.Execute();
@@ -61,7 +59,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
         {
             Expression.Column.IsIndexed = true;
 
-            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
+            var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
                 TableName = Expression.TableName
@@ -111,7 +109,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
         {
             Expression.Column.IsUnique = true;
 
-            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
+            var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
                 TableName = Expression.TableName,
@@ -144,7 +142,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
         {
             Expression.Column.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = primaryTableName,
@@ -180,7 +178,7 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Column
         public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                        string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = Expression.TableName,

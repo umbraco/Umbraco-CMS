@@ -112,7 +112,6 @@ namespace Umbraco.Tests.TestHelpers
 
             var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
-            var migrationEntryService = GetLazyService<IMigrationEntryService>(container, c => new MigrationEntryService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMigrationEntryRepository>(c)));
             var externalLoginService = GetLazyService<IExternalLoginService>(container, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(container, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));
             var taskService = GetLazyService<ITaskService>(container, c => new TaskService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITaskTypeRepository>(c), GetRepo<ITaskRepository>(c)));
@@ -185,7 +184,6 @@ namespace Umbraco.Tests.TestHelpers
             var redirectUrlService = GetLazyService<IRedirectUrlService>(container, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
 
             return new ServiceContext(
-                migrationEntryService,
                 publicAccessService,
                 taskService,
                 domainService,

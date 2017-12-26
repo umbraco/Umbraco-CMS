@@ -4,8 +4,8 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
 {
     public class AlterDefaultConstraintExpression : MigrationExpressionBase
     {
-        public AlterDefaultConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public AlterDefaultConstraintExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public virtual string TableName { get; set; }

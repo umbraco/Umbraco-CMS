@@ -4,8 +4,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteDefaultConstraintExpression : MigrationExpressionBase
     {
-        public DeleteDefaultConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public DeleteDefaultConstraintExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public virtual string TableName { get; set; }
@@ -13,9 +13,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             return string.Format(SqlSyntax.DeleteDefaultConstraint,
                 SqlSyntax.GetQuotedTableName(TableName),
                 SqlSyntax.GetQuotedColumnName(ColumnName));

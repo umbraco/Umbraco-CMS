@@ -8,8 +8,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
-        public DeleteForeignKeyExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public DeleteForeignKeyExpression(IMigrationContext context)
+            : base(context)
         {
             ForeignKey = new ForeignKeyDefinition();
         }
@@ -18,9 +18,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 
         protected override string GetSql()
         {
-            if (IsExpressionSupported() == false)
-                return string.Empty;
-
             if (ForeignKey.ForeignTable == null)
                 throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
 

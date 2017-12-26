@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Migrations
                     {
                         case "DeleteRedirectUrlTable":
                             return new DeleteRedirectUrlTable(c);
-                        case "NopMigration":
+                        case "NoopMigration":
                             return new NoopMigration();
                         default:
                             throw new NotSupportedException();

@@ -11,13 +11,11 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
                                                IAlterTableColumnOptionForeignKeyCascadeBuilder
     {
         private readonly IMigrationContext _context;
-        private readonly DatabaseType[] _supportedDatabaseTypes;
 
-        public AlterTableBuilder(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, AlterTableExpression expression)
+        public AlterTableBuilder(IMigrationContext context, AlterTableExpression expression)
             : base(expression)
         {
             _context = context;
-            _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
         public void Do() => Expression.Execute();
@@ -41,7 +39,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         {
             if (CurrentColumn.ModificationType == ModificationType.Alter)
             {
-                var dc = new AlterDefaultConstraintExpression(_context, _supportedDatabaseTypes)
+                var dc = new AlterDefaultConstraintExpression(_context)
                              {
                                  TableName = Expression.TableName,
                                  ColumnName = CurrentColumn.Name,
@@ -70,7 +68,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
+            var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
                 TableName = Expression.TableName
@@ -120,7 +118,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression(_context, _supportedDatabaseTypes, new IndexDefinition
+            var index = new CreateIndexExpression(_context, new IndexDefinition
             {
                 Name = indexName,
                 TableName = Expression.TableName,
@@ -153,7 +151,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         {
             CurrentColumn.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = primaryTableName,
@@ -189,7 +187,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                            string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression(_context, _supportedDatabaseTypes, new ForeignKeyDefinition
+            var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
             {
                 Name = foreignKeyName,
                 PrimaryTable = Expression.TableName,
@@ -208,7 +206,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         public IAlterTableColumnTypeBuilder AddColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Create };
-            var createColumn = new CreateColumnExpression(_context, _supportedDatabaseTypes)
+            var createColumn = new CreateColumnExpression(_context)
                                    {
                                        Column = column,
                                        TableName = Expression.TableName
@@ -223,7 +221,7 @@ namespace Umbraco.Core.Migrations.Expressions.Alter.Table
         public IAlterTableColumnTypeBuilder AlterColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Alter };
-            var alterColumn = new AlterColumnExpression(_context, _supportedDatabaseTypes)
+            var alterColumn = new AlterColumnExpression(_context)
             {
                 Column = column,
                 TableName = Expression.TableName

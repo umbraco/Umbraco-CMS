@@ -6,8 +6,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteConstraintExpression : MigrationExpressionBase
     {
-        public DeleteConstraintExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes, ConstraintType type)
-            : base(context, supportedDatabaseTypes)
+        public DeleteConstraintExpression(IMigrationContext context, ConstraintType type)
+            : base(context)
         {
             Constraint = new ConstraintDefinition(type);
         }

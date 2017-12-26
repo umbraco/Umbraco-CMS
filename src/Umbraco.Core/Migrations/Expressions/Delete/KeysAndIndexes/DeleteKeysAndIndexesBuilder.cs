@@ -51,6 +51,6 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
             }
         }
 
-        private IDeleteBuilder Delete => new DeleteBuilder(_context, _supportedDatabaseTypes);
+        private IDeleteBuilder Delete => new DeleteBuilder(_context);
     }
 }

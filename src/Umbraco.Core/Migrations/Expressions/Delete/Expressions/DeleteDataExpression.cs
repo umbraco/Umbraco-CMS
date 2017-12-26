@@ -8,8 +8,8 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteDataExpression : MigrationExpressionBase
     {
-        public DeleteDataExpression(IMigrationContext context, DatabaseType[] supportedDatabaseTypes)
-            : base(context, supportedDatabaseTypes)
+        public DeleteDataExpression(IMigrationContext context)
+            : base(context)
         { }
 
         public string TableName { get; set; }
