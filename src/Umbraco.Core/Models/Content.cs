@@ -339,6 +339,9 @@ namespace Umbraco.Core.Models
 
             var published = CopyingFromSelf(other);
 
+            // segment is invariant in comparisons
+            segment = segment?.ToLowerInvariant();
+
             // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
 
             // clear all existing properties

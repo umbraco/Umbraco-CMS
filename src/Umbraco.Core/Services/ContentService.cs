@@ -1148,6 +1148,8 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0)
         {
+            segment = segment?.ToLowerInvariant();
+
             bool IsEditing(IContent c, int? l, string s)
                 => c.Properties.Any(x => x.Values.Where(y => y.LanguageId == l && y.Segment == s).Any(y => y.EditedValue != y.PublishedValue));
 

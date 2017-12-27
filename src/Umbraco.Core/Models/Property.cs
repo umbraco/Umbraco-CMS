@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -15,12 +16,11 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Property : Entity
     {
-        private PropertyType _propertyType;
         private List<PropertyTagChange> _tagChanges;
 
         private List<PropertyValue> _values = new List<PropertyValue>();
         private PropertyValue _pvalue;
-        private Dictionary<CompositeKey, PropertyValue> _vvalues;
+        private Dictionary<CompositeIntStringKey, PropertyValue> _vvalues;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -29,51 +29,30 @@ namespace Umbraco.Core.Models
 
         public Property(PropertyType propertyType)
         {
-            _propertyType = propertyType;
+            PropertyType = propertyType;
         }
 
         public Property(int id, PropertyType propertyType)
         {
             Id = id;
-            _propertyType = propertyType;
+            PropertyType = propertyType;
         }
 
         public class PropertyValue
         {
+            private string _segment;
+
             public int? LanguageId { get; internal set; }
-            public string Segment { get; internal set; }
+            public string Segment
+            {
+                get => _segment;
+                internal set => _segment = value?.ToLowerInvariant();
+            }
             public object EditedValue { get; internal set; }
             public object PublishedValue { get; internal set; }
 
             public PropertyValue Clone()
-                => new PropertyValue { LanguageId = LanguageId, Segment = Segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
-        }
-
-        private struct CompositeKey : IEquatable<CompositeKey>
-        {
-            private readonly int _key1;
-            private readonly string _key2;
-
-            public CompositeKey(int? key1, string key2)
-            {
-                _key1 = key1 ?? -1;
-                _key2 = key2?.ToLowerInvariant() ?? "NEUTRAL";
-            }
-
-            public bool Equals(CompositeKey other)
-                => _key2 == other._key2 && _key1 == other._key1;
-
-            public override bool Equals(object obj)
-                => obj is CompositeKey other && _key2 == other._key2 && _key1 == other._key1;
-
-            public override int GetHashCode()
-                => _key2.GetHashCode() * 31 + _key1;
-
-            public static bool operator ==(CompositeKey key1, CompositeKey key2)
-                => key1._key2 == key2._key2 && key1._key1 == key2._key1;
-
-            public static bool operator !=(CompositeKey key1, CompositeKey key2)
-                => key1._key2 != key2._key2 || key1._key1 != key2._key1;
+                => new PropertyValue { LanguageId = LanguageId, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
@@ -106,7 +85,7 @@ namespace Umbraco.Core.Models
         /// Returns the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        public PropertyType PropertyType => _propertyType;
+        public PropertyType PropertyType { get; private set; }
 
         /// <summary>
         /// Gets the list of values.
@@ -119,10 +98,10 @@ namespace Umbraco.Core.Models
             {
                 // make sure we filter out invalid variations
                 // make sure we leave _vvalues null if possible
-                _values = value.Where(x => _propertyType.ValidateVariation(x.LanguageId, x.Segment, false)).ToList();
+                _values = value.Where(x => PropertyType.ValidateVariation(x.LanguageId, x.Segment, false)).ToList();
                 _pvalue = _values.FirstOrDefault(x => !x.LanguageId.HasValue && x.Segment == null);
                 _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
-                    ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeKey(x.LanguageId, x.Segment), x => x)
+                    ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeIntStringKey(x.LanguageId, x.Segment), x => x)
                     : null;
             }
         }
@@ -141,13 +120,13 @@ namespace Umbraco.Core.Models
         /// Returns the Alias of the PropertyType, which this Property is based on
         /// </summary>
         [DataMember]
-        public string Alias => _propertyType.Alias;
+        public string Alias => PropertyType.Alias;
 
         /// <summary>
         /// Returns the Id of the PropertyType, which this Property is based on
         /// </summary>
         [IgnoreDataMember]
-        internal int PropertyTypeId => _propertyType.Id;
+        internal int PropertyTypeId => PropertyType.Id;
 
         /// <summary>
         /// Returns the DatabaseType that the underlaying DataType is using to store its values
@@ -156,17 +135,17 @@ namespace Umbraco.Core.Models
         /// Only used internally when saving the property value.
         /// </remarks>
         [IgnoreDataMember]
-        internal DataTypeDatabaseType DataTypeDatabaseType => _propertyType.DataTypeDatabaseType;
+        internal DataTypeDatabaseType DataTypeDatabaseType => PropertyType.DataTypeDatabaseType;
 
         /// <summary>
         /// Gets the value.
         /// </summary>
         public object GetValue(int? languageId = null, string segment = null, bool published = false)
         {
-            if (!_propertyType.ValidateVariation(languageId, segment, false)) return null;
+            if (!PropertyType.ValidateVariation(languageId, segment, false)) return null;
             if (!languageId.HasValue && segment == null) return GetPropertyValue(_pvalue, published);
             if (_vvalues == null) return null;
-            return _vvalues.TryGetValue(new CompositeKey(languageId, segment), out var pvalue)
+            return _vvalues.TryGetValue(new CompositeIntStringKey(languageId, segment), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
                 : null;
         }
@@ -175,7 +154,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return null;
 
-            return _propertyType.IsPublishing
+            return PropertyType.IsPublishing
                 ? (published ? pvalue.PublishedValue : pvalue.EditedValue)
                 : pvalue.EditedValue;
         }
@@ -185,14 +164,14 @@ namespace Umbraco.Core.Models
         internal void PublishAllValues()
         {
             // if invariant-neutral is supported, publish invariant-neutral
-            if (_propertyType.ValidateVariation(null, null, false))
+            if (PropertyType.ValidateVariation(null, null, false))
                 PublishPropertyValue(_pvalue);
 
             // publish everything not invariant-neutral that is supported
             if (_vvalues != null)
             {
                 var pvalues = _vvalues
-                    .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
+                    .Where(x => PropertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
                     .Select(x => x.Value);
                 foreach (var pvalue in pvalues)
                     PublishPropertyValue(pvalue);
@@ -203,7 +182,7 @@ namespace Umbraco.Core.Models
         // does *not* validate the value - content item must validate first
         internal void PublishValue(int? languageId = null, string segment = null)
         {
-            _propertyType.ValidateVariation(languageId, segment, true);
+            PropertyType.ValidateVariation(languageId, segment, true);
 
             (var pvalue, _) = GetPValue(languageId, segment, false);
             if (pvalue == null) return;
@@ -215,7 +194,7 @@ namespace Umbraco.Core.Models
         internal void PublishCultureValues(int? languageId = null)
         {
             // if invariant and invariant-neutral is supported, publish invariant-neutral
-            if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
+            if (!languageId.HasValue && PropertyType.ValidateVariation(null, null, false))
                 PublishPropertyValue(_pvalue);
 
             // publish everything not invariant-neutral that matches the culture and is supported
@@ -223,7 +202,7 @@ namespace Umbraco.Core.Models
             {
                 var pvalues = _vvalues
                     .Where(x => x.Value.LanguageId == languageId)
-                    .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
+                    .Where(x => PropertyType.ValidateVariation(languageId, x.Value.Segment, false))
                     .Select(x => x.Value);
                 foreach (var pvalue in pvalues)
                     PublishPropertyValue(pvalue);
@@ -233,13 +212,13 @@ namespace Umbraco.Core.Models
         // internal - must be invoked by the content item
         internal void ClearPublishedAllValues()
         {
-            if (_propertyType.ValidateVariation(null, null, false))
+            if (PropertyType.ValidateVariation(null, null, false))
                 ClearPublishedPropertyValue(_pvalue);
 
             if (_vvalues != null)
             {
                 var pvalues = _vvalues
-                    .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
+                    .Where(x => PropertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
                     .Select(x => x.Value);
                 foreach (var pvalue in pvalues)
                     ClearPublishedPropertyValue(pvalue);
@@ -249,7 +228,7 @@ namespace Umbraco.Core.Models
         // internal - must be invoked by the content item
         internal void ClearPublishedValue(int? languageId = null, string segment = null)
         {
-            _propertyType.ValidateVariation(languageId, segment, true);
+            PropertyType.ValidateVariation(languageId, segment, true);
             (var pvalue, _) = GetPValue(languageId, segment, false);
             if (pvalue == null) return;
             ClearPublishedPropertyValue(pvalue);
@@ -258,14 +237,14 @@ namespace Umbraco.Core.Models
         // internal - must be invoked by the content item
         internal void ClearPublishedCultureValues(int? languageId = null)
         {
-            if (!languageId.HasValue && _propertyType.ValidateVariation(null, null, false))
+            if (!languageId.HasValue && PropertyType.ValidateVariation(null, null, false))
                 ClearPublishedPropertyValue(_pvalue);
 
             if (_vvalues != null)
             {
                 var pvalues = _vvalues
                     .Where(x => x.Value.LanguageId == languageId)
-                    .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
+                    .Where(x => PropertyType.ValidateVariation(languageId, x.Value.Segment, false))
                     .Select(x => x.Value);
                 foreach (var pvalue in pvalues)
                     ClearPublishedPropertyValue(pvalue);
@@ -276,7 +255,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!_propertyType.IsPublishing)
+            if (!PropertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = ConvertSetValue(pvalue.EditedValue);
@@ -287,7 +266,7 @@ namespace Umbraco.Core.Models
         {
             if (pvalue == null) return;
 
-            if (!_propertyType.IsPublishing)
+            if (!PropertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
             pvalue.PublishedValue = ConvertSetValue(null);
@@ -299,7 +278,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(object value, int? languageId = null, string segment = null)
         {
-            _propertyType.ValidateVariation(languageId, segment, true);
+            PropertyType.ValidateVariation(languageId, segment, true);
             (var pvalue, var change) = GetPValue(languageId, segment, true);
 
             var origValue = pvalue.EditedValue;
@@ -315,7 +294,7 @@ namespace Umbraco.Core.Models
         {
             (var pvalue, _) = GetPValue(languageId, segment, true);
 
-            if (published && _propertyType.IsPublishing)
+            if (published && PropertyType.IsPublishing)
                 pvalue.PublishedValue = value;
             else
                 pvalue.EditedValue = value;
@@ -343,10 +322,10 @@ namespace Umbraco.Core.Models
             if (_vvalues == null)
             {
                 if (!create) return (null, false);
-                _vvalues = new Dictionary<CompositeKey, PropertyValue>();
+                _vvalues = new Dictionary<CompositeIntStringKey, PropertyValue>();
                 change = true;
             }
-            var k = new CompositeKey(languageId, segment);
+            var k = new CompositeIntStringKey(languageId, segment);
             if (!_vvalues.TryGetValue(k, out var pvalue))
             {
                 if (!create) return (null, false);
@@ -361,7 +340,7 @@ namespace Umbraco.Core.Models
 
         private object ConvertSetValue(object value)
         {
-            var isOfExpectedType = _propertyType.IsPropertyTypeValid(value);
+            var isOfExpectedType = PropertyType.IsPropertyTypeValid(value);
 
             if (isOfExpectedType)
                 return value;
@@ -372,7 +351,7 @@ namespace Umbraco.Core.Models
 
             var s = value.ToString();
 
-            switch (_propertyType.DataTypeDatabaseType)
+            switch (PropertyType.DataTypeDatabaseType)
             {
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
@@ -382,14 +361,14 @@ namespace Umbraco.Core.Models
                     if (s.IsNullOrWhiteSpace())
                         return null; // assume empty means null
                     var convInt = value.TryConvertTo<int>();
-                    if (convInt == false) ThrowTypeException(value, typeof(int), _propertyType.Alias);
+                    if (convInt == false) ThrowTypeException(value, typeof(int), PropertyType.Alias);
                     return convInt.Result;
 
                 case DataTypeDatabaseType.Decimal:
                     if (s.IsNullOrWhiteSpace())
                         return null; // assume empty means null
                     var convDecimal = value.TryConvertTo<decimal>();
-                    if (convDecimal == false) ThrowTypeException(value, typeof(decimal), _propertyType.Alias);
+                    if (convDecimal == false) ThrowTypeException(value, typeof(decimal), PropertyType.Alias);
                     // need to normalize the value (change the scaling factor and remove trailing zeroes)
                     // because the underlying database is going to mess with the scaling factor anyways.
                     return convDecimal.Result.Normalize();
@@ -398,7 +377,7 @@ namespace Umbraco.Core.Models
                     if (s.IsNullOrWhiteSpace())
                         return null; // assume empty means null
                     var convDateTime = value.TryConvertTo<DateTime>();
-                    if (convDateTime == false) ThrowTypeException(value, typeof(DateTime), _propertyType.Alias);
+                    if (convDateTime == false) ThrowTypeException(value, typeof(DateTime), PropertyType.Alias);
                     return convDateTime.Result;
             }
 
@@ -418,7 +397,7 @@ namespace Umbraco.Core.Models
         {
             // invariant-neutral is supported, validate invariant-neutral
             // includes mandatory validation
-            if (_propertyType.ValidateVariation(null, null, false) && !IsValidValue(_pvalue)) return false;
+            if (PropertyType.ValidateVariation(null, null, false) && !IsValidValue(_pvalue)) return false;
 
             // either invariant-neutral is not supported, or it is valid
             // for anything else, validate the existing values (including mandatory),
@@ -427,7 +406,7 @@ namespace Umbraco.Core.Models
             if (_vvalues == null) return true;
 
             var pvalues = _vvalues
-                .Where(x => _propertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
+                .Where(x => PropertyType.ValidateVariation(x.Value.LanguageId, x.Value.Segment, false))
                 .Select(x => x.Value)
                 .ToArray();
 
@@ -442,7 +421,7 @@ namespace Umbraco.Core.Models
         {
             // culture-neutral is supported, validate culture-neutral
             // includes mandatory validation
-            if (_propertyType.ValidateVariation(languageId, null, false) && !IsValidValue(GetValue(languageId)))
+            if (PropertyType.ValidateVariation(languageId, null, false) && !IsValidValue(GetValue(languageId)))
                 return false;
 
             // either culture-neutral is not supported, or it is valid
@@ -453,7 +432,7 @@ namespace Umbraco.Core.Models
 
             var pvalues = _vvalues
                 .Where(x => x.Value.LanguageId == languageId)
-                .Where(x => _propertyType.ValidateVariation(languageId, x.Value.Segment, false))
+                .Where(x => PropertyType.ValidateVariation(languageId, x.Value.Segment, false))
                 .Select(x => x.Value)
                 .ToArray();
 
@@ -477,7 +456,7 @@ namespace Umbraco.Core.Models
         /// <returns>True is property value is valid, otherwise false</returns>
         private bool IsValidValue(object value)
         {
-            return _propertyType.IsValidPropertyValue(value);
+            return PropertyType.IsValidPropertyValue(value);
         }
 
         public override object DeepClone()
@@ -488,7 +467,7 @@ namespace Umbraco.Core.Models
             clone.DisableChangeTracking();
 
             //need to manually assign since this is a readonly property
-            clone._propertyType = (PropertyType) PropertyType.DeepClone();
+            clone.PropertyType = (PropertyType) PropertyType.DeepClone();
 
             //re-enable tracking
             clone.ResetDirtyProperties(false); // not needed really, since we're not tracking
