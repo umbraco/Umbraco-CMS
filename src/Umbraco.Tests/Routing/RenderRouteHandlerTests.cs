@@ -18,6 +18,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Runtime;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Routing

@@ -14,8 +14,8 @@ using LightInject;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -23,8 +23,11 @@ using Umbraco.Core.Macros;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
@@ -34,19 +37,17 @@ using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Search;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
+using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
-using Umbraco.Examine;
-using Umbraco.Web.Composing.CompositionRoots;
-using Umbraco.Web.Search;
-using Umbraco.Web.Trees;
 using Current = Umbraco.Web.Composing.Current;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Runtime
 {
     [RequireComponent(typeof(CoreRuntimeComponent))]
     public class WebRuntimeComponent : UmbracoComponentBase, IRuntimeComponent

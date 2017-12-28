@@ -2,12 +2,13 @@
 using System.Web;
 using LightInject;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Runtime;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Runtime
 {
     /// <summary>
     /// Represents the Web Umbraco runtime.

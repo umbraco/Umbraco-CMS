@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Collections
 {
     /// <summary>
     /// A custom collection similar to HashSet{T} which only contains unique items, however this collection keeps items in order

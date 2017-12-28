@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Runtime;
 
 namespace Umbraco.Tests.Runtimes
 {

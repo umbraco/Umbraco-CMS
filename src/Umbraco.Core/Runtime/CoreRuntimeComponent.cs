@@ -6,10 +6,10 @@ using AutoMapper;
 using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionRoots;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -25,7 +25,7 @@ using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
 using IntegerValidator = Umbraco.Core.PropertyEditors.IntegerValidator;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Runtime
 {
     public class CoreRuntimeComponent : UmbracoComponentBase, IRuntimeComponent
     {

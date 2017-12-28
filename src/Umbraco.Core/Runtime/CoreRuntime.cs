@@ -4,11 +4,10 @@ using System.Configuration;
 using System.Threading;
 using System.Web;
 using LightInject;
-using Semver;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -18,9 +17,8 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Runtime
 {
     /// <summary>
     /// Represents the Core Umbraco runtime.

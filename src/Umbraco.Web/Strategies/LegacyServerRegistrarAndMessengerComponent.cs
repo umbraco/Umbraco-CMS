@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using LightInject;
+using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web.Strategies
 {
