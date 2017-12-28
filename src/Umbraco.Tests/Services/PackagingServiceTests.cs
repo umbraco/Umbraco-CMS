@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;

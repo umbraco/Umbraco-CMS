@@ -16,6 +16,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;

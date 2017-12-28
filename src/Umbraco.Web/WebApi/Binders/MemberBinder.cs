@@ -15,6 +15,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
 
 namespace Umbraco.Web.WebApi.Binders

@@ -8,6 +8,7 @@ using Umbraco.Web.Mvc;
 using System.Collections.Generic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.WebServices
 {

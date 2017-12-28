@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Tests.Services
 {

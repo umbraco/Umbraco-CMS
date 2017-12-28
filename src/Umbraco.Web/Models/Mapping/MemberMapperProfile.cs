@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Trees;
 

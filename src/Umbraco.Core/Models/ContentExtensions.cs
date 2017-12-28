@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Models
 {

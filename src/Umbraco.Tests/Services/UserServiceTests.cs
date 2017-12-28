@@ -11,6 +11,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Web._Legacy.Actions;
 

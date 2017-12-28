@@ -5,6 +5,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Components;
 using Umbraco.Web._Legacy.Actions;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.Strategies
 {

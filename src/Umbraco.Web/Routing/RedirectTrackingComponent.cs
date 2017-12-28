@@ -6,6 +6,7 @@ using Umbraco.Core.Events;
 using System.Collections.Generic;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;

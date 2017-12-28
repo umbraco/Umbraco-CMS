@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.Macros
 {
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Macros
                 Properties.Add(new MacroPropertyModel(prop.Alias, string.Empty, prop.EditorAlias));
 
             // can convert enums
-            MacroType = Core.Services.MacroService.GetMacroType(macro);
+            MacroType = MacroService.GetMacroType(macro);
         }
     }
 }

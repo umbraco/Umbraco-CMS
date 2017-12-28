@@ -4,6 +4,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Examine;
 
 namespace Umbraco.Web.PropertyEditors
