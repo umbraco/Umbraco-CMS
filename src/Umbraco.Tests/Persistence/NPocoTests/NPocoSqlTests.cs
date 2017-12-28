@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using NUnit.Framework;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Tests.TestHelpers;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0

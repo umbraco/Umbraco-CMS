@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Models.Rdbms;
-using System.Linq;
+﻿using System.Linq;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Models.Membership
 {

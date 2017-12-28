@@ -4,7 +4,7 @@ using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.Migrations

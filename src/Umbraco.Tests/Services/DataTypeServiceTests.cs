@@ -4,7 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 

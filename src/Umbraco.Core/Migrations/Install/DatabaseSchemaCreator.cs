@@ -4,9 +4,9 @@ using System.Linq;
 using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations.Install

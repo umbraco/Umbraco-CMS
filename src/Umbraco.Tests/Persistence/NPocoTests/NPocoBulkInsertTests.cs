@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 

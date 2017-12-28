@@ -4,12 +4,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 using LightInject;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 

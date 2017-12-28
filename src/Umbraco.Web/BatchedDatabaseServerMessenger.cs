@@ -6,11 +6,11 @@ using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web

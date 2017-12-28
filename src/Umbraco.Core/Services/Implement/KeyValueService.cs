@@ -3,9 +3,9 @@ using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Expressions.Create;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Services.Implement
 {

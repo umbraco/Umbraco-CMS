@@ -3,8 +3,8 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
 {
