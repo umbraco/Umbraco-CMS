@@ -77,14 +77,14 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
 
     // Return a helper with preserved width of cells
     var fixHelper = function (e, ui) {
-        var h = ui.clone();
-
-        h.children().each(function () {
-            $(this).width($(this).width());            
+        ui.children().each(function () {
+            $(this).width($(this).width());
         });
-        h.css("background-color", "lightgray");
 
-        return h;
+        var row = ui.clone();
+        row.css("background-color", "lightgray");
+
+        return row;
     };
 
     $scope.sortableOptions = {
