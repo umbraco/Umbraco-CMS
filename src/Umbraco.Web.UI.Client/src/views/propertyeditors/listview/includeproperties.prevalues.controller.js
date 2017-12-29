@@ -119,10 +119,11 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
     $scope.addField = function () {
 
         var val = $scope.selectedField;
-        var isSystem = val.startsWith("_system_");
-        if (isSystem) {
-            val = val.trimStart("_system_");
-        }
+        if (val) {
+            var isSystem = val.startsWith("_system_");
+            if (isSystem) {
+                val = val.trimStart("_system_");
+            }
 
         var exists = _.find($scope.model.value, function (i) {
             return i.alias === val;
@@ -132,6 +133,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                 alias: val,
                 isSystem: isSystem ? 1 : 0
             });
+        }
         }
     }
 
