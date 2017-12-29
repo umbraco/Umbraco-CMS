@@ -96,6 +96,10 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         cursor: 'move',
         items: '> tr',
         tolerance: 'pointer',
+        forcePlaceholderSize: true,
+        start: function(e, ui){
+            ui.placeholder.height(ui.item.height());
+        },
         update: function (e, ui) {
             
             // Get the new and old index for the moved element (using the text as the identifier)
