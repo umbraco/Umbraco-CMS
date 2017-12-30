@@ -9,18 +9,18 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
             exp += ".*[\\W].*";
         }
         //replace duplicates
-        exp = exp.replace(".*.*", ".*");            
+        exp = exp.replace(".*.*", ".*");
         $scope.passwordPattern = new RegExp(exp);
-    }
+    };
 
 	$scope.validateAndInstall = function(){
-			installerService.install();
+        installerService.install();
 	};
 
 	$scope.validateAndForward = function(){
-			if(this.myForm.$valid){
-				installerService.forward();
-			}
+		if(this.myForm.$valid){
+			installerService.forward();
+		}
 	};
 	
 });
