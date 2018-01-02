@@ -19,6 +19,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.images = [];
             $scope.ids = [];
 
+            $scope.isMultiPicker = multiPicker;
+
             if ($scope.model.value) {
                 var ids = $scope.model.value.split(',');
 
