@@ -182,6 +182,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public UserDisplay GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
