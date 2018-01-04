@@ -86,6 +86,8 @@
 @param {function} onRemove (<code>expression</code>): Callback function when the remove button is clicked.
 @param {function} onOpen (<code>expression</code>): Callback function when the open button is clicked.
 @param {function} onEdit (<code>expression</code>): Callback function when the edit button is clicked (Added in version 7.7.0).
+@param {string} onEdit (<code>binding</code>): Fallback URL for <code>onOpen</code> (Added in version 7.8.0).
+@param {string} onEdit (<code>binding</code>): Fallback URL for <code>onEdit</code> (Added in version 7.8.0).
 **/
 
 (function () {
@@ -115,7 +117,9 @@
                 allowEdit: "=?",
                 onOpen: "&?",
                 onRemove: "&?",
-                onEdit: "&?"
+                onEdit: "&?",
+                openUrl: '=?',
+                editUrl: '=?'
             },
             link: link
         };
