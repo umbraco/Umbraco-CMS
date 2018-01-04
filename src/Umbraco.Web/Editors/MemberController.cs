@@ -256,6 +256,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>        
         [FileUploadCleanupFilter]
+        [OutgoingEditorModelEvent]
         public MemberDisplay PostSave(
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)
