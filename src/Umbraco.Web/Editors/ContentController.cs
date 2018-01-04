@@ -532,6 +532,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave(
                 [ModelBinder(typeof(ContentItemBinder))]
                                 ContentItemSave contentItem)
@@ -847,6 +848,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'U')]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay PostUnPublish(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
