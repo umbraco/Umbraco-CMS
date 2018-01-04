@@ -3,9 +3,9 @@
     <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
     
-    <div class="flex error">
+    <div data-element="sortable-thumbnails" class="flex error">
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
-            <li class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
+            <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
@@ -20,18 +20,17 @@
                     <small>{{image.name}}</small>
                 </span>
 
-                <div class="umb-sortable-thumbnails__actions">
-                    <a class="umb-sortable-thumbnails__action" href="" ng-click="goToItem(image)">
+                <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
+                    <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="goToItem(image)">
                         <i class="icon icon-edit"></i>
                     </a>
-                    <a class="umb-sortable-thumbnails__action -red" href="" ng-click="remove($index)">
+                    <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove($index)">
                         <i class="icon icon-delete"></i>
                     </a>
                 </div>
-
             </li>
             <li style="border: none;">
-                <a href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" ng-if="showAdd()" prevent-default>
+                <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" ng-if="showAdd()" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>
             </li>
@@ -39,6 +38,7 @@
     </div>
 
     <umb-overlay
+        data-element="overlay-media-picker"
         ng-if="mediaPickerOverlay.show"
         model="mediaPickerOverlay"
         position="right"

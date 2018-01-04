@@ -59,14 +59,8 @@ namespace umbraco.BusinessLogic
         }
 
         #endregion
-        
-        /// <summary>
-        /// Adds the specified log item to the log.
-        /// </summary>
-        /// <param name="type">The log type.</param>
-        /// <param name="user">The user adding the item.</param>
-        /// <param name="nodeId">The affected node id.</param>
-        /// <param name="comment">Comment.</param>
+
+        [Obsolete("Use IAuditService.Add instead")]
         public static void Add(LogTypes type, User user, int nodeId, string comment)
         {
             if (Instance.ExternalLogger != null)
@@ -118,13 +112,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// Adds the specified log item to the Umbraco log no matter if an external logger has been defined.
-        /// </summary>
-        /// <param name="type">The log type.</param>
-        /// <param name="user">The user adding the item.</param>
-        /// <param name="nodeId">The affected node id.</param>
-        /// <param name="comment">Comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void AddLocally(LogTypes type, User user, int nodeId, string comment)
         {
             if (comment.Length > 3999)
@@ -140,24 +128,13 @@ namespace umbraco.BusinessLogic
             AddSynced(type, user == null ? 0 : user.Id, nodeId, comment);
         }
 
-        /// <summary>
-        /// Adds the specified log item to the log without any user information attached.
-        /// </summary>
-        /// <param name="type">The log type.</param>
-        /// <param name="nodeId">The affected node id.</param>
-        /// <param name="comment">Comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void Add(LogTypes type, int nodeId, string comment)
         {
             Add(type, null, nodeId, comment);
         }
 
-        /// <summary>
-        /// Adds a log item to the log immidiately instead of Queuing it as a work item.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="userId">The user id.</param>
-        /// <param name="nodeId">The node id.</param>
-        /// <param name="comment">The comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void AddSynced(LogTypes type, int userId, int nodeId, string comment)
         {
             var logTypeIsAuditType = type.GetType().GetField(type.ToString()).GetCustomAttributes(typeof(AuditTrailLogItem), true).Length != 0;
@@ -193,6 +170,7 @@ namespace umbraco.BusinessLogic
 				() => type.ToString(), () => userId, () => nodeId.ToString(CultureInfo.InvariantCulture), () => comment);            
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetAuditLogItems(int NodeId)
         {
             if (UmbracoConfig.For.UmbracoSettings().Logging.ExternalLoggerEnableAuditTrail && ExternalLogger != null)
@@ -204,6 +182,7 @@ namespace umbraco.BusinessLogic
                     sqlHelper.CreateParameter("@id", NodeId)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)
@@ -216,6 +195,7 @@ namespace umbraco.BusinessLogic
                     sqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(int nodeId)
         {
             if (ExternalLogger != null)
@@ -227,6 +207,7 @@ namespace umbraco.BusinessLogic
                     sqlHelper.CreateParameter("@id", nodeId)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(User user, DateTime sinceDate)
         {
             if (ExternalLogger != null)
@@ -239,6 +220,7 @@ namespace umbraco.BusinessLogic
                     sqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(User user, LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)

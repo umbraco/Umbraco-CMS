@@ -1,10 +1,11 @@
-<div class="clearfix">
+<div data-element="groups-builder" class="clearfix">
 
     <umb-editor-sub-header>
 
         <umb-editor-sub-header-content-right>
 
             <umb-button
+                alias="compositions"
                 ng-if="compositions !== false"
                 type="button"
                 button-style="link"
@@ -14,6 +15,7 @@
             </umb-button>
 
             <umb-button
+                alias="reorder"
                 ng-if="sorting !== false"
                 type="button"
                 button-style="link"
@@ -32,10 +34,10 @@
 
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
-        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}">
+        <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}" data-element="group-{{tab.name}}">
 
             <!-- TAB INIT STATE -->
-            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
+            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode" data-element="group-add">
 
                 <div class="umb-group-builder__group-title-wrapper -placeholder">
                   <div class="umb-group-builder__group-title -placeholder"></div>
@@ -61,10 +63,11 @@
 
                 <div class="umb-group-builder__group-title-wrapper">
 
-                    <ng-form name="groupNameForm">
+                    <ng-form name="groupNameForm" data-element="group-name">
                         <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
                             <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
-                            <input class="umb-group-builder__group-title-input"
+                            <input data-element="group-name-field"
+                                   class="umb-group-builder__group-title-input"
                                    type="text"
                                    localize="placeholder"
                                    placeholder="@placeholders_entername"
@@ -107,10 +110,11 @@
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
 
-                    <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
+                    <li data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
                         <a href=""
+                            data-element="property-add"
                             class="umb-group-builder__property -placeholder"
                             ng-if="property.propertyState=='init' && !sortingMode"
                             ng-class="{'-placeholder': property.propertyState=='init'}"
@@ -284,17 +288,19 @@
     </ul>
 
     <umb-overlay
-            ng-if="compositionsDialogModel.show"
-            model="compositionsDialogModel"
-            position="right"
-            view="compositionsDialogModel.view">
+        data-element="overlay-compositions"
+        ng-if="compositionsDialogModel.show"
+        model="compositionsDialogModel"
+        position="right"
+        view="compositionsDialogModel.view">
     </umb-overlay>
 
     <umb-overlay
-            ng-if="propertySettingsDialogModel.show"
-            model="propertySettingsDialogModel"
-            position="right"
-            view="propertySettingsDialogModel.view">
+        data-element="overlay-property-settings"
+        ng-if="propertySettingsDialogModel.show"
+        model="propertySettingsDialogModel"
+        position="right"
+        view="propertySettingsDialogModel.view">
     </umb-overlay>
 
 </div>

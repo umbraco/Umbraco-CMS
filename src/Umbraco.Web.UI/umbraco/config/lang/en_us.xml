@@ -127,6 +127,7 @@
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
         <key alias="saveAndPublish">Save and publish</key>
+    <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
         <key alias="saveListView">Save list view</key>
         <key alias="showPage">Preview</key>
@@ -186,18 +187,23 @@
         <key alias="membergroup">Member Group</key>
         <key alias="memberrole">Role</key>
         <key alias="membertype">Member Type</key>
+    <key alias="noChanges">No changes have been made</key>
         <key alias="noDate">No date chosen</key>
         <key alias="nodeName">Page title</key>
+    <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
         <key alias="getUrlException">Could not get the url</key>
         <key alias="routeError">This document is published but its url would collide with content %0%</key>
         <key alias="publish">Publish</key>
+        <key alias="published">Published</key>
+        <key alias="publishedPendingChanges">Published (pending changes)</key>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
         <key alias="removeDate">Clear Date</key>
+        <key alias="setDate">Set date</key>
         <key alias="sortDone">Sortorder is updated</key>
         <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
         <key alias="statistics">Statistics</key>
@@ -205,6 +211,7 @@
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Unpublish</key>
+        <key alias="unpublished">Unpublished</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
         <key alias="uploadClear">Remove file(s)</key>
@@ -549,12 +556,15 @@
         <key alias="error">Error</key>
         <key alias="findDocument">Find</key>
         <key alias="first">First</key>
+    <key alias="general">General</key>
         <key alias="groups">Groups</key>
         <key alias="height">Height</key>
         <key alias="help">Help</key>
         <key alias="hide">Hide</key>
+    <key alias="history">History</key>
         <key alias="icon">Icon</key>
         <key alias="import">Import</key>
+    <key alias="info">Info</key>
         <key alias="innerMargin">Inner margin</key>
         <key alias="insert">Insert</key>
         <key alias="install">Install</key>
@@ -564,6 +574,7 @@
         <key alias="language">Language</key>
         <key alias="last">Last</key>
         <key alias="layout">Layout</key>
+    <key alias="links">Links</key>
         <key alias="loading">Loading</key>
         <key alias="locked">Locked</key>
         <key alias="login">Login</key>
@@ -602,6 +613,7 @@
         <key alias="retrieve">Retrieve</key>
         <key alias="retry">Retry</key>
         <key alias="rights">Permissions</key>
+    <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
         <key alias="noItemsInList">No items have been added</key>

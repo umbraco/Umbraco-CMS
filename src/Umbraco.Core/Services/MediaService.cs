@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -12,7 +11,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -731,65 +729,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetMediaByPath(string mediaPath)
         {
-            var umbracoFileValue = mediaPath;
-
-            const string Pattern = ".*[_][0-9]+[x][0-9]+[.].*";
-            var isResized = Regex.IsMatch(mediaPath, Pattern);
-
-            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
-            if (isResized)
-            {
-                var underscoreIndex = mediaPath.LastIndexOf('_');
-                var dotIndex = mediaPath.LastIndexOf('.');
-                umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
-            }
-
-            Func<string, Sql> createSql = url => new Sql().Select("*")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                .Where<PropertyDataDto>(x => x.VarChar == url);
-
-            var sql = createSql(umbracoFileValue);
-
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
-                var propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
-
-                // If the stripped-down url returns null, we try again with the original url.
-                // Previously, the function would fail on e.g. "my_x_image.jpg"
-                if (propertyDataDto == null)
-                {
-                    sql = createSql(mediaPath);
-                    propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
-                }
-
-                // If no reults far, try getting from a json value stored in the ntext column query
-                if (propertyDataDto == null)
-                {
-                    var ntextQuery = new Sql().Select("*")
-                        .From<PropertyDataDto>()
-                        .InnerJoin<PropertyTypeDto>()
-                        .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                        .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                        .Where("dataNtext LIKE @0", "%" + umbracoFileValue + "%");
-                    propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(ntextQuery).FirstOrDefault();
-                }
-
-                // If still no results, try getting from a json value stored in the nvarchar column
-                if (propertyDataDto == null)
-                {
-                    var nvarcharQuery = new Sql().Select("*")
-                        .From<PropertyDataDto>()
-                        .InnerJoin<PropertyTypeDto>()
-                        .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                        .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                        .Where("dataNvarchar LIKE @0", "%" + umbracoFileValue + "%");
-                    propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(nvarcharQuery).FirstOrDefault();
-                }
-
-                return propertyDataDto == null ? null : GetById(propertyDataDto.NodeId);
+                var repository = RepositoryFactory.CreateMediaRepository(uow);
+                return repository.GetMediaByPath(mediaPath);
             }
         }
 

@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web
 {
@@ -22,7 +23,31 @@ namespace Umbraco.Web
     {
         public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : base(appContext, enableDistCalls, options)
-        { }
+        {
+            Scheduler.Initializing += Scheduler_Initializing;
+        }
+
+        /// <summary>
+        /// Occurs when the scheduler initializes all scheduling activity when the app is ready
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Scheduler_Initializing(object sender, List<IBackgroundTask> e)
+        {
+            //if the current resolver is 'this' then we will start the scheduling
+            var isMessenger = ServerMessengerResolver.HasCurrent && ReferenceEquals(ServerMessengerResolver.Current.Messenger, this);
+
+            if (isMessenger)
+            {
+                //start the background task runner for processing instructions
+                const int delayMilliseconds = 60000;
+                var instructionProcessingRunner = new BackgroundTaskRunner<IBackgroundTask>("InstructionProcessing", ApplicationContext.ProfilingLogger.Logger);
+                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, delayMilliseconds, Options.ThrottleSeconds * 1000);
+                instructionProcessingRunner.TryAdd(instructionProcessingTask);
+                e.Add(instructionProcessingTask);
+            }
+        }
+
 
         // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
         // with default "ShouldExecute", so that method will run if app IsConfigured and database
@@ -30,7 +55,6 @@ namespace Umbraco.Web
         internal void Startup()
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
-            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
 
             if (ApplicationContext.DatabaseContext.CanConnect == false)
             {
@@ -43,20 +67,31 @@ namespace Umbraco.Web
             }
         }
 
-        private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
+        /// <summary>
+        /// This will process cache instructions on a background thread and will run every 5 seconds (or whatever is defined in the <see cref="DatabaseServerMessengerOptions.ThrottleSeconds"/>)
+        /// </summary>
+        private class InstructionProcessing : RecurringTaskBase
         {
-            // as long as umbraco is ready & configured, sync
-            switch (e.Outcome)
+            private readonly DatabaseServerMessenger _messenger;
+
+            public InstructionProcessing(IBackgroundTaskRunner<RecurringTaskBase> runner,
+                DatabaseServerMessenger messenger,
+                int delayMilliseconds, int periodMilliseconds)
+                : base(runner, delayMilliseconds, periodMilliseconds)
             {
-                case EnsureRoutableOutcome.IsRoutable:
-                case EnsureRoutableOutcome.NotDocumentRequest:
-                case EnsureRoutableOutcome.NoContent:
-                    Sync();
-                    break;
-                //case EnsureRoutableOutcome.NotReady:
-                //case EnsureRoutableOutcome.NotConfigured:
-                //default:
-                //    break;
+                _messenger = messenger;
+            }
+
+            public override bool PerformRun()
+            {
+                _messenger.Sync();
+                //return true to repeat
+                return true;
+            }
+
+            public override bool IsAsync
+            {
+                get { return false; }
             }
         }
 
@@ -99,7 +134,8 @@ namespace Umbraco.Web
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);

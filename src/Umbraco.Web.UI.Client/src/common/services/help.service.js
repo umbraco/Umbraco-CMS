@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-	.factory('helpService', function ($http, $q){
+	.factory('helpService', function ($http, $q, umbRequestHelper) {
 		var helpTopics = {};
 
 		var defaultUrl = "http://our.umbraco.org/rss/help";
@@ -47,8 +47,6 @@ angular.module('umbraco.services')
 			return deferred.promise;
 		}
 
-
-
 		var service = {
 			findHelp: function (args) {
 				var url = service.getUrl(defaultUrl, args);
@@ -58,6 +56,26 @@ angular.module('umbraco.services')
 			findVideos: function (args) {
 				var url = service.getUrl(tvUrl, args);
 				return fetchUrl(url);
+			},
+
+			getContextHelpForPage: function (section, tree, baseurl) {
+
+			    var qs = "?section=" + section + "&tree=" + tree;
+
+			    if (tree) {
+			        qs += "&tree=" + tree;
+			    }
+
+			    if (baseurl) {
+			        qs += "&baseurl=" + encodeURIComponent(baseurl);
+			    }
+
+			    var url = umbRequestHelper.getApiUrl(
+                        "helpApiBaseUrl",
+                        "GetContextHelpForPage" + qs);
+
+			    return umbRequestHelper.resourcePromise(
+                        $http.get(url), "Failed to get lessons content");
 			},
 
 			getUrl: function(url, args){

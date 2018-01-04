@@ -3,6 +3,7 @@
    <div class="umb-control-group">
        <div class="control-group">
            <textarea class="editor-label"
+               data-element="property-name"
                name="propertyLabel"
                ng-model="model.property.label"
                localize="placeholder"
@@ -22,6 +23,7 @@
 
    <div class="umb-control-group control-group">
       <textarea
+          data-element="property-description"
           class="editor-description"
           ng-model="model.property.description"
           localize="placeholder"
@@ -33,7 +35,7 @@
 
    <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component>
 
-      <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">
+      <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">
           <localize key="shortcuts_addEditor"></localize>
       </a>
 
@@ -103,6 +105,7 @@
    </div>
 
    <umb-overlay
+      data-element="overlay-editor-picker"
       ng-if="vm.editorPickerOverlay.show"
       model="vm.editorPickerOverlay"
       position="right"
@@ -110,6 +113,7 @@
    </umb-overlay>
 
    <umb-overlay
+      data-element="overlay-editor-settings"
       ng-if="vm.editorSettingsOverlay.show"
       model="vm.editorSettingsOverlay"
       position="right"
