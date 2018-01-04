@@ -33,8 +33,6 @@
         vm.unlockUser = unlockUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
-        //a list of methods invoked with promises during the save operation, each must have a key
-        vm.extendedSaveMethods = {};
 
         vm.toggleChangePassword = toggleChangePassword;
 
