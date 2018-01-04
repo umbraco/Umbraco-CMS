@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -137,7 +137,7 @@
                     .then(function (saved) {
 
                         //if the user saved, then try to execute all extended save options
-                        extendedSave().then(function(result) {
+                        extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
                             formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
                         }, function(err) {
@@ -171,26 +171,31 @@
                     });
             }
         }
-        
-        function extendedSave() {
-            //create a promise for each save method
-            var savePromises = {};
-            angular.forEach(vm.extendedSaveMethods, function (val, key) {
-                var deferred = $q.defer();
-                savePromises[key] = deferred;
-            });
-            var allPromises = _.map(savePromises, function (p) {
-                return p.promise;
-            })
 
+        /**
+         * Used to emit the save event and await any async operations being performed by editor extensions
+         * @param {any} savedUser
+         */
+        function extendedSave(savedUser) {
+
+            //used to track any promises added by the event handlers to be awaited
+            var promises = [];
+            
+            var args = {
+                //getPromise: getPromise,
+                user: savedUser,
+                //a promise can be added by the event handler if the handler needs an async operation to be awaited
+                addPromise: function (p) {
+                    promises.push(p);
+                }
+            };
+
+            //emit the event
+            eventsService.emit("editors.user.editController.save", args);
+            
             //await all promises to complete
-            var resultPromise = $q.all(allPromises);
-
-            //execute all promises by passing them to the save methods
-            angular.forEach(vm.extendedSaveMethods, function (func, key) {
-                func(savePromises[key]);
-            });
-
+            var resultPromise = $q.all(promises);
+            
             return resultPromise;
         }
 
