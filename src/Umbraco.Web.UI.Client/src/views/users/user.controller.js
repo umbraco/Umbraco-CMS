@@ -130,6 +130,9 @@
                 vm.page.saveButtonState = "busy";
                 vm.user.resetPasswordValue = null;
 
+                //save current nav to be restored later so that the tabs dont change
+                var currentNav = vm.user.navigation;
+
                 usersResource.saveUser(vm.user)
                     .then(function (saved) {
 
@@ -142,7 +145,9 @@
                             formHelper.showNotifications(saved);
                         });
                         
-                        vm.user = saved;
+                        vm.user = _.omit(saved, "navigation");
+                        //restore
+                        vm.user.navigation = currentNav;
                         setUserDisplayState();
                         formatDatesToLocal(vm.user);
 
