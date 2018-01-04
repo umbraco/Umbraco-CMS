@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -33,6 +33,9 @@
         vm.unlockUser = unlockUser;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
+        //a list of methods invoked with promises during the save operation, each must have a key
+        vm.extendedSaveMethods = {};
+
         vm.toggleChangePassword = toggleChangePassword;
 
         function init() {
@@ -117,38 +120,73 @@
 
         function save() {
 
-            vm.page.saveButtonState = "busy";
-            vm.user.resetPasswordValue = null;
+            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
 
-            //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
-            if(vm.user.changePassword) {
-            vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+                if (vm.user.changePassword) {
+                    vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                }
+
+                vm.page.saveButtonState = "busy";
+                vm.user.resetPasswordValue = null;
+
+                usersResource.saveUser(vm.user)
+                    .then(function (saved) {
+
+                        //if the user saved, then try to execute all extended save options
+                        extendedSave().then(function(result) {
+                            //if all is good, then reset the form
+                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
+                        }, function(err) {
+                            //otherwise show the notifications for the user being saved
+                            formHelper.showNotifications(saved);
+                        });
+                        
+                        vm.user = saved;
+                        setUserDisplayState();
+                        formatDatesToLocal(vm.user);
+
+                        vm.changePasswordModel.isChanging = false;
+                        //the user has a password if they are not states: Invited, NoCredentials
+                        vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+
+                        vm.page.saveButtonState = "success";
+
+                    }, function (err) {
+
+                        contentEditingHelper.handleSaveError({
+                            redirectOnFailure: false,
+                            err: err
+                        });
+                        //show any notifications
+                        if (err.data) {
+                            formHelper.showNotifications(err.data);
+                        }
+                        vm.page.saveButtonState = "error";
+                    });
             }
-
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: vm.labels.saving,
-                saveMethod: usersResource.saveUser,
-                scope: $scope,
-                content: vm.user,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
-                rebindCallback: function (orignal, saved) { }
-            }).then(function (saved) {
-
-                vm.user = saved;
-                setUserDisplayState();
-                formatDatesToLocal(vm.user);
-
-                vm.changePasswordModel.isChanging = false;
-                vm.page.saveButtonState = "success";
-
-                //the user has a password if they are not states: Invited, NoCredentials
-                vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
-            }, function (err) {
-                vm.page.saveButtonState = "error";
+        }
+        
+        function extendedSave() {
+            //create a promise for each save method
+            var savePromises = {};
+            angular.forEach(vm.extendedSaveMethods, function (val, key) {
+                var deferred = $q.defer();
+                savePromises[key] = deferred;
             });
+            var allPromises = _.map(savePromises, function (p) {
+                return p.promise;
+            })
+
+            //await all promises to complete
+            var resultPromise = $q.all(allPromises);
+
+            //execute all promises by passing them to the save methods
+            angular.forEach(vm.extendedSaveMethods, function (func, key) {
+                func(savePromises[key]);
+            });
+
+            return resultPromise;
         }
 
         function goToPage(ancestor) {
