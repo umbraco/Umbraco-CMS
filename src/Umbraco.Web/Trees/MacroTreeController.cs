@@ -53,14 +53,20 @@ namespace Umbraco.Web.Trees
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
                     .ConvertLegacyMenuItem(null, Constants.Trees.Macros, queryStrings.GetValue<string>("application"));
-
-                //menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-
+                
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+            //TODO: This is all hacky ... don't have time to convert the tree, views and dialogs over properly so we'll keep using the legacy dialogs
+            var menuItem = menu.Items.Add(ActionDelete.Instance, Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+            var legacyConfirmView = LegacyTreeDataConverter.GetLegacyConfirmView(ActionDelete.Instance);
+            if (legacyConfirmView == false)
+                throw new InvalidOperationException("Could not resolve the confirmation view for the legacy action " + ActionDelete.Instance.Alias);
+            menuItem.LaunchDialogView(
+                legacyConfirmView.Result,
+                Services.TextService.Localize("general/delete"));
+
             return menu;
         }
     }
