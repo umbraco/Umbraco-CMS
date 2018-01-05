@@ -47,6 +47,74 @@
       // We don't get the info tab from the server from version 7.8 so we need to manually add it
       //contentEditingHelper.addInfoTab($scope.content.tabs);
 
+      // prototype variants
+      $scope.content.variants = [
+        {
+          "culture": "English (United States)",
+          "current": true,
+          "segments" : [
+            {
+              "name": "Mobile"
+            },
+            {
+              "name": "Job campign"
+            }
+          ],
+          "states": [
+            {
+              "name": "Published"
+            }
+          ]
+        },
+        {
+          "culture": "Danish",
+          "current": false,
+          "segments" : [
+            {
+              "name": "Mobile"
+            }
+          ],
+          "states": [
+            {
+              "name": "Published"
+            }
+          ]
+        },
+        {
+            "culture": "Spanish (Spain)",
+            "current": false,
+            "states": [
+              {
+                "name": "Published"
+              },
+              {
+                "name": "Draft"
+              }
+            ]
+        },
+        {
+            "culture": "French (France)",
+            "current": false,
+            "segments" : [
+              {
+                "name": "Mobile"
+              },
+              {
+                "name": "Job campign"
+              }
+            ],
+            "states": [
+              {
+                "name": "Draft"
+              }
+            ]
+        },
+        {
+            "culture": "German (Germany)",
+            "current": false
+        }
+      ];
+
       // prototype content and info apps
       var contentApp = {
         "name": "Content",
@@ -305,6 +373,10 @@
     $scope.backToListView = function() {
       $location.path($scope.page.listViewPath);
     };
+
+    $scope.selectVariant = function(variant) {
+      console.log(variant);
+    }
 
     $scope.restore = function (content) {
 

@@ -3,7 +3,22 @@
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize>
 
-        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6">
+        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container">
+
+            <div ng-if="currentSection === 'content'" class="umb-language-picker" on-outside-click="open = false;" bind-click-on="{{open === true}}">
+                
+                <div class="umb-language-picker__toggle" ng-click="test()">
+                    <div>English (United States)</div>
+                    <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !open, 'icon-navigation-up': open}" class="icon-navigation-right">&nbsp;</ins>                
+                </div>
+
+                <div class="umb-language-picker__dropdown" ng-if="open">
+                    <a href="">Spanish (Spain)</a>
+                    <a href="">French (France)</a>
+                    <a href="">Danish</a>
+                    <a href="">German (Germany)</a>
+                </div>
+            </div>
 
             <!-- the tree -->
             <div id="tree" ng-if="authenticated">

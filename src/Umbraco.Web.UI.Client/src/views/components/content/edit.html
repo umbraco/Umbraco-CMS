@@ -1,85 +1,84 @@
 <div>
 
-   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-   <form name="contentForm"
-      ng-submit="save()"
-      novalidate
-      val-form-manager>
+    <form name="contentForm" ng-submit="save()" novalidate val-form-manager>
 
-      <umb-editor-view ng-if="!page.loading">
+        <umb-editor-view ng-if="!page.loading">
 
-         <umb-editor-header
-            menu="page.menu"
-            name="content.name"
-            hide-icon="true"
-            hide-description="true"
-            hide-alias="true"
-            navigation="content.apps"
-            on-back="backToListView()"
-            show-back-button="{{page.listViewPath}}">
-         </umb-editor-header>
+            <umb-editor-header 
+                menu="page.menu" 
+                name="content.name" 
+                hide-icon="true" 
+                hide-description="true" 
+                hide-alias="true"
+                navigation="content.apps"
+                variants="content.variants"
+                on-select-variant="selectVariant(variant)"
+                on-back="backToListView()" 
+                show-back-button="{{page.listViewPath}}">
+            </umb-editor-header>
 
-         <umb-editor-container>
+            <umb-editor-container>
 
-            <umb-editor-sub-views
-                ng-if="!page.loading"
-                sub-views="content.apps"
-                model="content">
-            </umb-editor-sub-views>
+                <umb-editor-sub-views 
+                    ng-if="!page.loading" 
+                    sub-views="content.apps" 
+                    model="content">
+                </umb-editor-sub-views>
 
-         </umb-editor-container>
+            </umb-editor-container>
 
 
-         <umb-editor-footer>
+            <umb-editor-footer>
 
-            <umb-editor-footer-content-left>
+                <umb-editor-footer-content-left>
 
-               <umb-breadcrumbs
-                  ng-if="ancestors && ancestors.length > 0"
-                  ancestors="ancestors"
-                  entity-type="content">
-               </umb-breadcrumbs>
+                    <umb-breadcrumbs 
+                        ng-if="ancestors && ancestors.length > 0" 
+                        ancestors="ancestors" 
+                        entity-type="content">
+                    </umb-breadcrumbs>
 
-            </umb-editor-footer-content-left>
-            
-            
-            <umb-editor-footer-content-right>
+                </umb-editor-footer-content-left>
 
-                <umb-button
-                    alias="preview"
-                    ng-if="!page.isNew && content.allowPreview"
-                    type="button"
-                    button-style="info"
-                    action="preview(content)"
-                    label="Preview page"
-                    label-key="buttons_showPage">
-                </umb-button>
 
-                <umb-button-group
-                    ng-if="defaultButton && !content.trashed"
-                    default-button="defaultButton"
-                    sub-buttons="subButtons"
-                    state="page.buttonGroupState"
-                    direction="up"
-                    float="right">
-                </umb-button-group>
+                <umb-editor-footer-content-right>
 
-                <umb-button
-                    alias="restore"
-                    ng-if="content.trashed"
-                    type="button"
-                    button-style="primary"
-                    action="restore(content)"
-                    state="page.buttonRestore"
-                    label="Restore">
-                </umb-button>
+                    <umb-button 
+                        alias="preview" 
+                        ng-if="!page.isNew && content.allowPreview" 
+                        type="button" 
+                        button-style="info" 
+                        action="preview(content)"
+                        label="Preview page" 
+                        label-key="buttons_showPage">
+                    </umb-button>
 
-            </umb-editor-footer-content-right>
+                    <umb-button-group 
+                        ng-if="defaultButton && !content.trashed" 
+                        default-button="defaultButton" 
+                        sub-buttons="subButtons" 
+                        state="page.buttonGroupState"
+                        direction="up"
+                        float="right">
+                    </umb-button-group>
 
-         </umb-editor-footer>
+                    <umb-button 
+                        alias="restore" 
+                        ng-if="content.trashed" 
+                        type="button" 
+                        button-style="primary" 
+                        action="restore(content)" 
+                        state="page.buttonRestore"
+                        label="Restore">
+                    </umb-button>
 
-      </umb-editor-view>
+                </umb-editor-footer-content-right>
 
-   </form>
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </form>
 </div>

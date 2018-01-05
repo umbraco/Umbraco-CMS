@@ -27,7 +27,7 @@
 	position: relative;
 	padding: 0 20px;
 	z-index: 1;
-	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.16);
 }
 
 .umb-editor-header__back {
@@ -37,14 +37,87 @@
 
 .umb-editor-header__name-wrapper {
 	position: relative;
+	display: flex;
 }
 
 .umb-editor-header__name-wrapper ng-form {
-	display: block;
+	flex: 1 1 auto;
+}
+
+input.umb-editor-header__name-input {
+	border-color: @gray-8;
+	background-color: @white;
+	font-size: 15px;
+	color: @black;
+	margin-bottom: 0;
+	font-weight: bold;
+	box-sizing: border-box;
+	height: 32px;
+	line-height: 32px;
+	width: 100%;
+	padding: 0 15px;
+	&:hover {
+		background-color: @white;    
+		border: 1px solid @gray-7;
+	}
 }
 
 .umb-editor-header__actions-menu {
 	margin-left: auto;
+}
+
+/* variant switcher */
+.umb-variant-switcher__toggle {
+	display: flex;
+	align-items: center;
+	padding: 0 15px;
+	text-decoration: none !important;
+	font-size: 13px;
+	border: 1px solid @gray-8;
+	border-left: none;
+	color: @gray-4;
+	&:hover {
+		background-color: @gray-10;
+	}
+}
+
+.umb-variant-switcher__expand {
+	color: @gray-7;
+	margin-top: 3px;
+	margin-left: 5px;
+	margin-right: -5px;
+}
+
+.umb-variant-switcher_item:hover .umb-variant-switcher__state {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.umb-variant-switcher_item:hover .umb-variant-switcher__split-view {
+	opacity: 1;
+	visibility: visible;
+}
+
+.umb-variant-switcher__name {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.umb-variant-switcher__state {
+	position: absolute;
+	right: 20px;
+	opacity: 1;
+	transition: opacity 0.2;
+	visibility: visible;
+}
+
+.umb-variant-switcher__split-view {
+	font-size: 13px;
+	position: absolute;
+	right: 20px;
+	opacity: 0;
+	transition: opacity 0.2;
+	visibility: hidden;
 }
 
 // container
@@ -84,7 +157,7 @@
 	padding: 10px 20px;
 	background: @white;
 	flex: 1 0 31px;
-	box-shadow: 0 -3px 6px 0 rgba(0, 0, 0, 0.16);
+	box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.16);
 	z-index: 1;
 }
 

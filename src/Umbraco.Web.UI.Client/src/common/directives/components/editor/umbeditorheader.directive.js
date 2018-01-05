@@ -210,26 +210,36 @@ Use this directive to construct a header inside the main editor window.
 
             scope.vm = {};
 
-            scope.variants = [
-                {
-                    "culture": "English (United States)"
-                },
-                {
-                    "culture": "Spanish (Spain)"
-                },
-                {
-                    "culture": "French (France)"
-                },
-                {
-                    "culture": "German (Germany)"
-                }
-            ];
+            function onInit() {
+                setVariantStatusColor(scope.variants);
+            }
+
+            function setVariantStatusColor(variants) {
+                angular.forEach(variants, function (variant) {
+                    angular.forEach(variant.states, function(state){
+                        switch (state.name) {
+                            case "Published":
+                            case "Published +":
+                                state.stateColor = "success";
+                                break;
+                            default:
+                                state.stateColor = "gray";
+                        }
+                    });
+                });
+            }
 
             scope.goBack = function() {
                 if(scope.onBack) {
                     scope.onBack();
                 }
             };
+
+            scope.selectVariant = function(variant) {
+                if(scope.onSelectVariant) {
+                    scope.onSelectVariant({"variant": variant});
+                }
+            }
 
             scope.openIconPicker = function() {
                 scope.dialogModel = {
@@ -257,6 +267,15 @@ Use this directive to construct a header inside the main editor window.
                     }
                 };
             };
+
+            scope.$watch('variants', function(newValue, oldValue){
+                if(!newValue) return;
+                if(newValue === oldValue) return;
+                setVariantStatusColor(newValue);
+            });
+
+            onInit();
+
         }
 
         var directive = {
@@ -277,6 +296,8 @@ Use this directive to construct a header inside the main editor window.
                 description: "=",
                 hideDescription: "@",
                 descriptionLocked: "@",
+                variants: "=",
+                onSelectVariant: "&",
                 navigation: "=",
                 key: "=",
                 onBack: "&?",

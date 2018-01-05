@@ -26,7 +26,7 @@
                         data-element="editor-name-field"
                         title="{{key}}"
                         type="text"
-                        class="umb-panel-header-name-input"
+                        class="umb-editor-header__name-input"
                         localize="placeholder"
                         placeholder="@placeholders_entername"
                         name="headerName"
@@ -37,20 +37,33 @@
                         val-server-field="Name"
                         required />
                 </ng-form>
-
-                <a style="position: absolute; right: 10px; top: 6px; font-size: 13px; color: #515054;" class="umb-variant-quick-switcher" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                
+                <a ng-if="variants.length > 0" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                     <span>English (United States)</span>
-                    <span class="umb-variant-quick-switcher__toggle">&dtrif;</span>
+                    <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
                 </a>
 
-                <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; height: 250px; overflow: scroll;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                     <umb-dropdown-item ng-repeat="variant in variants">
-                        <a href="" ng-click="vm.select(item)" prevent-default>
+                        <a class="umb-variant-switcher_item" ng-class="{'umb-variant-switcher_item--current': variant.current}" href="#" ng-click="selectVariant(variant)" prevent-default>
                             <span class="flex justify-between">
-                                <span>{{variant.culture}}</span>
-                                <span style="font-size: 13px;">Open in split view</span>
+                                <span class="umb-variant-switcher__name">{{variant.culture}}</span>
+                                <!--
+                                <span class="umb-variant-switcher__state" ng-if="variant.states.length > 0">
+                                    <span ng-repeat="state in variant.states">
+                                        <umb-badge color="{{state.stateColor}}" size="xxs">{{state.name}}</umb-badge>
+                                        <span ng-if="!$last">+</span>
+                                    </span>
+                                </span>
+                                <span class="umb-variant-switcher__split-view">Open in split view</span>
+                                -->
                             </span>
                         </a>
+                        <ul style="margin-left: 0;">
+                            <li style="list-style: none;" ng-repeat="segment in variant.segments">
+                                <a style="padding: 5px 20px; display: block; font-size: 13px; opacity: 0.6;" href="">{{segment.name}}</a>
+                            </li>
+                        </ul>
                     </umb-dropdown-item>
                 </umb-dropdown>
 
