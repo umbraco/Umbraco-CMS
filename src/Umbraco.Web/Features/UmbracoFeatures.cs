@@ -3,7 +3,7 @@ namespace Umbraco.Web.Features
     /// <summary>
     /// Represents Umbraco features that can be toggled
     /// </summary>
-    public class UmbracoFeatures
+    internal class UmbracoFeatures
     {
         public UmbracoFeatures()
         {

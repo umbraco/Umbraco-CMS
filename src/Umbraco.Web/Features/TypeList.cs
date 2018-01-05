@@ -7,7 +7,7 @@ namespace Umbraco.Web.Features
     /// Maintains a list of strongly typed types
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class TypeList<T>
+    internal class TypeList<T>
     {
         private readonly List<Type> _disabled = new List<Type>();
 

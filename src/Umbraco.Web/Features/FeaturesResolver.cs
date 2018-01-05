@@ -2,7 +2,7 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Features
 {
-    public class FeaturesResolver : SingleObjectResolverBase<FeaturesResolver, UmbracoFeatures>
+    internal class FeaturesResolver : SingleObjectResolverBase<FeaturesResolver, UmbracoFeatures>
     {
         public FeaturesResolver(UmbracoFeatures value) : base(value)
         {

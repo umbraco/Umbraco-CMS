@@ -6,7 +6,7 @@ namespace Umbraco.Web.Features
     /// <summary>
     /// Represents Umbraco features that can be disabled
     /// </summary>
-    public class DisabledFeatures
+    internal class DisabledFeatures
     {
         public DisabledFeatures()
         {
