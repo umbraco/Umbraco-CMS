@@ -165,6 +165,8 @@ namespace Umbraco.Web
         {
             if (_isConfigured) return;
 
+            _isConfigured = true;
+
             foreach (var luceneIndexer in ExamineManager.Instance.IndexProviderCollection.OfType<LuceneIndexer>())
             {
                 //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
