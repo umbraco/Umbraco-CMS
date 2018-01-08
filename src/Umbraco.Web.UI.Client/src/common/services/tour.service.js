@@ -218,7 +218,34 @@
             var deferred = $q.defer();
             var tours = getTours();
             setTourStatuses(tours).then(function() {
-                var groupedTours = _.groupBy(tours, "group");
+                var groupedTours = [];
+                var sortedTours = _.sortBy(tours, 'groupOrder');
+
+                sortedTours.forEach(function (item) {
+                    
+                    var groupExists = false;
+                    var newGroup = {
+                        "group": "",
+                        "tours": []
+                    };
+
+                    groupedTours.forEach(function(group){
+                        // extend existing group if it is already added
+                        if(group.group === item.group) {
+                            groupExists = true;
+                            group.tours.push(item)
+                        }
+                    });
+
+                    // push new group to array if it doesn't exist
+                    if(!groupExists) {
+                        newGroup.group = item.group;
+                        newGroup.tours.push(item);
+                        groupedTours.push(newGroup);
+                    }
+
+                });
+
                 deferred.resolve(groupedTours);
             });
             return deferred.promise;
