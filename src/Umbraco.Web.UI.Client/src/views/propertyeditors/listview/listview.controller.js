@@ -50,6 +50,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
    $scope.pagination = [];
    $scope.isNew = false;
+   $scope.isFirstLoad = true;
    $scope.actionInProgress = false;
    $scope.selection = [];
    $scope.folders = [];
@@ -253,8 +254,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        $scope.reloadView($scope.contentId, true);
    }
 
-   $scope.reloadView = function (id, reloadFolders) {
-
+   $scope.reloadView = function (id, reloadFolders, reloadTree) {
       $scope.viewLoaded = false;
 
       listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
@@ -276,15 +276,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             mediaResource.getChildFolders($scope.contentId)
                     .then(function (folders) {
                        $scope.folders = folders;
-                       $scope.viewLoaded = true;
+                       $scope.viewLoaded  = true;
                     });
 
+            //Prevents tree reload on initial page load
+            if ($scope.isFirstLoad === false) {
                 //Reload tree
                 var mediaNode = appState.getTreeState("currentRootNode");
                 if (mediaNode) {
                     navigationService.reloadNode(mediaNode.root);
                 }
-
+            }
          } else {
             $scope.viewLoaded = true;
          }
@@ -299,6 +301,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             $scope.reloadView(id);
          }
 
+         $scope.isFirstLoad = false;
       });
    };
 
