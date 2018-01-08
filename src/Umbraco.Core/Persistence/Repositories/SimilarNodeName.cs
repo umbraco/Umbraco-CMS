@@ -20,6 +20,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var name = Name;
 
+				// cater for instances where node has no name.
+				if(name.Length == 0)
+				{
+					return _numPos;
+ 				}
+
                 if (name[name.Length - 1] != ')')
                     return _numPos = -1;
 

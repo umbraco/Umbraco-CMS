@@ -24,7 +24,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TestCase("Alpha (10)", "Alpha (2)", +1)] // this is the real stuff
         [TestCase("Kilo", "Golf (2)", +1)]
         [TestCase("Kilo (1)", "Golf (2)", +1)]
-        public void ComparerTest(string name1, string name2, int expected)
+		[TestCase("", "", 0)]
+		public void ComparerTest(string name1, string name2, int expected)
         {
             var comparer = new SimilarNodeName.Comparer();
 
