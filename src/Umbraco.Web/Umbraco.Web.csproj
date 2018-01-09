@@ -328,6 +328,7 @@
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
+    <Compile Include="Editors\TourFilterResolver.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
@@ -428,6 +429,8 @@
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
+    <Compile Include="Models\Tour.cs" />
+    <Compile Include="Models\TourStep.cs" />
     <Compile Include="Models\UserTourStatus.cs" />
     <Compile Include="Models\ValidatePasswordResetCodeModel.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
