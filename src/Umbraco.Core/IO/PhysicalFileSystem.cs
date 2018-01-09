@@ -424,13 +424,12 @@ namespace Umbraco.Core.IO
             const int count = 10;
             const int pausems = 100;
 
-            for (var i = 0;i < count; i++)
+            for (var i = 0;; i++)
             {
                 try
                 {
                     action();
-                    // don't retry if the action succeeded
-                    i = count;
+                    break; // done
                 }
                 catch (IOException e)
                 {
@@ -439,16 +438,12 @@ namespace Umbraco.Core.IO
                     // and then we don't want to retry
                     if (e.GetType() != typeof(IOException)) throw;
 
-                    // wait and retry
-                    if (i < count-1)
-                    {
-                        Thread.Sleep(pausems);
-                        continue;
-                    }
-
-                    // throw if out of retries
-                    throw;
+                    // if we have tried enough, throw, else swallow
+                    // the exception and retry after a pause
+                    if (i == count) throw;
                 }
+
+                Thread.Sleep(pausems);
             }
         }
 
