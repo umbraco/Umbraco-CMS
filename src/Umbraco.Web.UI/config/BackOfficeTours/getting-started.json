@@ -3,6 +3,7 @@
         "name": "Introduction",
         "alias": "umbIntroIntroduction",
         "group": "Getting Started",
+        "groupOrder": 100,
         "allowDisable": true,
         "steps": [
             {
@@ -86,6 +87,7 @@
         "name": "Create document type",
         "alias": "umbIntroCreateDocType",
         "group": "Getting Started",
+        "groupOrder": 100,
         "steps": [
             {
                 "title": "Create your first Document Type",
@@ -200,6 +202,7 @@
         "name": "Create Content",
         "alias": "umbIntroCreateContent",
         "group": "Getting Started",
+        "groupOrder": 100,
         "steps": [
             {
                 "title": "Creating your first content node",
@@ -249,6 +252,7 @@
         "name": "Render in template",
         "alias": "umbIntroRenderInTemplate",
         "group": "Getting Started",
+        "groupOrder": 100,
         "steps": [
             {
                 "title": "Render your content in a template",
@@ -294,6 +298,7 @@
         "name": "View Home page",
         "alias": "umbIntroViewHomePage",
         "group": "Getting Started",
+        "groupOrder": 100,
         "steps": [
             {
                 "title": "View your Umbraco site",
@@ -333,6 +338,7 @@
         "name": "The Media library",
         "alias": "umbIntroMediaSection",
         "group": "Getting Started",
+        "groupOrder": 100,
         "steps": [
             {
                 "title": "How to use the media library",
