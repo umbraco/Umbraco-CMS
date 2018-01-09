@@ -12,7 +12,7 @@
 
             <h5 style="margin-bottom: 10px; margin-top: 0;">Tours</h5>
             
-            <div ng-repeat="tourGroup in vm.tours" style="margin-bottom: 5px;">
+            <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'" style="margin-bottom: 5px;">
 
                 <div class="umb-help-list">
 

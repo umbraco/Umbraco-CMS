@@ -219,9 +219,7 @@
             var tours = getTours();
             setTourStatuses(tours).then(function() {
                 var groupedTours = [];
-                var sortedTours = _.sortBy(tours, 'groupOrder');
-
-                sortedTours.forEach(function (item) {
+                tours.forEach(function (item) {
                     
                     var groupExists = false;
                     var newGroup = {
@@ -232,6 +230,9 @@
                     groupedTours.forEach(function(group){
                         // extend existing group if it is already added
                         if(group.group === item.group) {
+                            if(item.groupOrder) {
+                                group.groupOrder = item.groupOrder
+                            }
                             groupExists = true;
                             group.tours.push(item)
                         }
@@ -240,6 +241,9 @@
                     // push new group to array if it doesn't exist
                     if(!groupExists) {
                         newGroup.group = item.group;
+                        if(item.groupOrder) {
+                            newGroup.groupOrder = item.groupOrder
+                        }
                         newGroup.tours.push(item);
                         groupedTours.push(newGroup);
                     }
