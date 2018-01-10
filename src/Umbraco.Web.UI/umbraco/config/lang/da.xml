@@ -1442,7 +1442,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="documentType">Dokumenttype</key>
     <key alias="editors">Redaktør</key>
     <key alias="excerptField">Uddragsfelt</key>
-    <key alias="failedPasswordAttempts">Fejlet loginforsøg</key>
+    <key alias="failedPasswordAttempts">Fejlede loginforsøg</key>
     <key alias="goToProfile">Gå til brugerprofil</key>
     <key alias="groupsHelp">Tilføj grupper for at tildele adgang og tilladelser</key>
     <key alias="inviteAnotherUser">Invitér anden bruger</key>
@@ -1450,7 +1450,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="language">Sprog</key>
     <key alias="languageHelp">Indstil det sprog, du vil se i menuer og dialoger</key>
     <key alias="lastLockoutDate">Seneste låst ude dato</key>
-    <key alias="lastLogin">Senest login</key>
+    <key alias="lastLogin">Seneste login</key>
     <key alias="lastPasswordChangeDate">Kodeord sidst ændret</key>
     <key alias="loginname">Brugernavn</key>
     <key alias="mediastartnode">Startnode i mediearkivet</key>
@@ -1481,7 +1481,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
-    <key alias="startnode">Start node</key>
+    <key alias="startnode">Startnode</key>
     <key alias="stateActive">Aktiv</key>
     <key alias="stateAll">Alle</key>
     <key alias="stateDisabled">Deaktiveret</key>
