@@ -337,7 +337,6 @@
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="ExamineStartup.cs" />
     <Compile Include="Extensions\UdiExtensions.cs" />
-    <Compile Include="Features\TypeList.cs" />
     <Compile Include="Features\UmbracoFeatures.cs" />
     <Compile Include="Features\FeaturesResolver.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />
@@ -799,7 +798,7 @@
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\DisableBrowserCacheAttribute.cs" />
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
-    <Compile Include="WebApi\Filters\FeaturesAuthorizeAttribute.cs" />
+    <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />

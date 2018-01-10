@@ -13,7 +13,7 @@ namespace Umbraco.Web.WebApi
     /// <summary>
     /// The base class for API controllers that expose Umbraco services - THESE ARE NOT AUTO ROUTED
     /// </summary>
-    [FeaturesAuthorize]
+    [FeatureAuthorize]
     public abstract class UmbracoApiControllerBase : ApiController
     {
         protected UmbracoApiControllerBase()

@@ -178,6 +178,7 @@
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="Collections\DeepCloneableList.cs" />
     <Compile Include="Collections\ListCloneBehavior.cs" />
+    <Compile Include="Collections\TypeList.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="Configuration\BaseRest\IBaseRestSection.cs" />
     <Compile Include="Configuration\BaseRest\IExtension.cs" />

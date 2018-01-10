@@ -5,14 +5,15 @@ using Umbraco.Web.Features;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Will return unauthorized for the controller if it's been globally disabled
+    /// Ensures that the controller is an authorized feature.
     /// </summary>
-    public sealed class FeaturesAuthorizeAttribute : AuthorizeAttribute
+    /// <remarks>Else returns unauthorized.</remarks>
+    public sealed class FeatureAuthorizeAttribute : AuthorizeAttribute
     {
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
             var controllerType = actionContext.ControllerContext.ControllerDescriptor.ControllerType;
-            return FeaturesResolver.Current.Features.DisabledFeatures.Controllers.Contains(controllerType) == false;
+            return FeaturesResolver.Current.Features.IsEnabled(controllerType);
         }
     }
 }

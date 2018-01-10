@@ -4,21 +4,21 @@ namespace Umbraco.Web.Features
 {
     internal class FeaturesResolver : SingleObjectResolverBase<FeaturesResolver, UmbracoFeatures>
     {
-        public FeaturesResolver(UmbracoFeatures value) : base(value)
-        {
-        }
+        public FeaturesResolver(UmbracoFeatures value)
+            : base(value)
+        { }
+
         /// <summary>
-        /// Sets the disabled features
+        /// Sets the features.
         /// </summary>
-        /// <param name="finder"></param>
         /// <remarks>For developers, at application startup.</remarks>
-        public void SetFeatures(UmbracoFeatures finder)
+        public void SetFeatures(UmbracoFeatures features)
         {
-            Value = finder;
+            Value = features;
         }
 
         /// <summary>
-        /// Gets the features
+        /// Gets the features.
         /// </summary>
         public UmbracoFeatures Features
         {
