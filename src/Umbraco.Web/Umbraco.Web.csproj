@@ -371,6 +371,8 @@
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
+    <Compile Include="Models\BackOfficeTourFile.cs" />
+    <Compile Include="Models\BackOfficeTourStep.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
@@ -428,6 +430,7 @@
     <Compile Include="Models\SetPasswordModel.cs" />
     <Compile Include="Models\RequestPasswordResetModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
+    <Compile Include="Models\BackOfficeTour.cs" />
     <Compile Include="Models\UserTourStatus.cs" />
     <Compile Include="Models\ValidatePasswordResetCodeModel.cs" />
     <Compile Include="Mvc\ControllerContextExtensions.cs" />
