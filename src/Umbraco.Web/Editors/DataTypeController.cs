@@ -41,7 +41,7 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay GetByName(string name)
         {
             var dataType = Services.DataTypeService.GetDataTypeDefinitionByName(name);
-            return dataType == null ? null : Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
+            return dataType == null ? null : Mapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
+            return Mapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
         /// <summary>
@@ -81,8 +81,8 @@ namespace Umbraco.Web.Editors
 
         public DataTypeDisplay GetEmpty(int parentId)
         {
-            var dt = new DataTypeDefinition(parentId, "");
-            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
+            var dt = new DataType(parentId, "");
+            return Mapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
+            return Mapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -113,12 +113,12 @@ namespace Umbraco.Web.Editors
             //if it doesnt exist yet, we will create it.
             if (dt == null)
             {
-                dt = new DataTypeDefinition(Constants.PropertyEditors.ListViewAlias);
+                dt = new DataType(Constants.PropertyEditors.ListViewAlias);
                 dt.Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
                 Services.DataTypeService.Save(dt);
             }
 
-            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
+            return Mapper.Map<IDataType, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -151,10 +151,10 @@ namespace Umbraco.Web.Editors
             //now, lets check if the data type has the current editor selected, if that is true
             //we will need to wire up it's saved values. Otherwise it's an existing data type
             //that is changing it's underlying property editor, in which case there's no values.
-            if (dataType.PropertyEditorAlias == editorAlias)
+            if (dataType.EditorAlias == editorAlias)
             {
                 //this is the currently assigned pre-value editor, return with values.
-                return Mapper.Map<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>(dataType);
+                return Mapper.Map<IDataType, IEnumerable<PreValueFieldDisplay>>(dataType);
             }
 
             //these are new pre-values, so just return the field editors with default values
@@ -220,7 +220,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            var display = Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType.PersistedDataType);
+            var display = Mapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/dataTypeSaved"), "");
 
             //now return the updated model
@@ -289,7 +289,7 @@ namespace Umbraco.Web.Editors
         {
             return Services.DataTypeService
                      .GetAllDataTypeDefinitions()
-                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
+                     .Select(Mapper.Map<IDataType, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace Umbraco.Web.Editors
         {
             var dataTypes = Services.DataTypeService
                      .GetAllDataTypeDefinitions()
-                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>)
+                     .Select(Mapper.Map<IDataType, DataTypeBasic>)
                      .ToArray();
 
             var propertyEditors = Current.PropertyEditors.ToArray();

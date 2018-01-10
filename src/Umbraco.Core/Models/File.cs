@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class File : Entity, IFile
+    public abstract class File : EntityBase.EntityBase, IFile
     {
         private string _path;
         private string _originalPath;

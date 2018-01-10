@@ -25,7 +25,7 @@ namespace Umbraco.Tests.TestHelpers
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
-            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { }, factory);
+            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 

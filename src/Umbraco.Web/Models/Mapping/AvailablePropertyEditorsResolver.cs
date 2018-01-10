@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.Mapping
             _contentSection = contentSection;
         }
 
-        public IEnumerable<PropertyEditorBasic> Resolve(IDataTypeDefinition source)
+        public IEnumerable<PropertyEditorBasic> Resolve(IDataType source)
         {
             return Current.PropertyEditors
                 .Where(x =>
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
                     // fixme should we support deprecating?
                     //if (_contentSection.ShowDeprecatedPropertyEditors)
                     //    return true;
-                    return source.PropertyEditorAlias == x.Alias || x.IsDeprecated == false;
+                    return source.EditorAlias == x.Alias || x.IsDeprecated == false;
                 })
                 .OrderBy(x => x.Name)
                 .Select(Mapper.Map<PropertyEditorBasic>);

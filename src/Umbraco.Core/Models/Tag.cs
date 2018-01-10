@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Tag : Entity, ITag
+    public class Tag : EntityBase.EntityBase, ITag
     {
         public Tag()
         {

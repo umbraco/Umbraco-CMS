@@ -4,7 +4,7 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models
 {
-    public interface IServerRegistration : IServerAddress, IAggregateRoot, IRememberBeingDirty
+    public interface IServerRegistration : IServerAddress, IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the server unique identity.

@@ -25,12 +25,31 @@ namespace Umbraco.Web.PublishedCache
             _membershipUser = member;
             _publishedMemberType = publishedMemberType ?? throw new ArgumentNullException(nameof(publishedMemberType));
 
-            var properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
+            // fixme
+            // RawValueProperty is used for two things here
+            // - for the 'map properties' thing that we should really get rid of
+            // - for populating properties that every member should always have, and that we force-create
+            //   if they are not part of the member type properties - in which case they are created as
+            //   simple raw properties - which are completely invariant
+
+            var _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
                 (t, v) => new RawValueProperty(t, this, v ?? string.Empty));
-            _properties = WithMemberProperties(properties).ToArray();
+
+            var properties = new List<IPublishedProperty>();
+            foreach (var propertyType in _publishedMemberType.PropertyTypes)
+            {
+                var property = _member.Properties[propertyType.Alias];
+                if (property == null) continue;
+
+                //properties.Add(new FooProperty(propertyType, this, property.Values));
+            }
+            EnsureMemberProperties(properties);
+            _properties = properties.ToArray();
         }
 
         #region Membership provider member properties
+
+        // fixme why this?
 
         public string Email => _membershipUser.Email;
 
@@ -79,36 +98,38 @@ namespace Umbraco.Web.PublishedCache
 
         public override IPublishedProperty GetProperty(string alias)
         {
-            return _properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+            return _properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        private IEnumerable<IPublishedProperty> WithMemberProperties(IEnumerable<IPublishedProperty> properties)
+        private void EnsureMemberProperties(List<IPublishedProperty> properties)
         {
-            var propertiesList = properties.ToList();
-            var aliases = propertiesList.Select(x => x.PropertyTypeAlias).ToList();
+            var aliases = properties.Select(x => x.Alias).ToList();
 
-            if (!aliases.Contains("Email"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("Email"), this, Email));
-            if (!aliases.Contains("UserName"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("UserName"), this, UserName));
-            if (!aliases.Contains("PasswordQuestion"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("PasswordQuestion"), this, PasswordQuestion));
-            if (!aliases.Contains("Comments"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("Comments"), this, Comments));
-            if (!aliases.Contains("IsApproved"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("IsApproved"), this, IsApproved));
-            if (!aliases.Contains("IsLockedOut"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("IsLockedOut"), this, IsLockedOut));
-            if (!aliases.Contains("LastLockoutDate"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("LastLockoutDate"), this, LastLockoutDate));
-            if (!aliases.Contains("CreateDate"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("CreateDate"), this, CreateDate));
-            if (!aliases.Contains("LastLoginDate"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("LastLoginDate"), this, LastLoginDate));
-            if (!aliases.Contains("LastPasswordChangeDate"))
-                propertiesList.Add(new RawValueProperty(ContentType.GetPropertyType("LastPasswordChangeDate"), this, LastPasswordChangeDate));
+            EnsureMemberProperty(properties, aliases, "Email", Email);
+            EnsureMemberProperty(properties, aliases, "UserName", UserName);
+            EnsureMemberProperty(properties, aliases, "PasswordQuestion", PasswordQuestion);
+            EnsureMemberProperty(properties, aliases, "Comments", Comments);
+            EnsureMemberProperty(properties, aliases, "IsApproved", IsApproved);
+            EnsureMemberProperty(properties, aliases, "IsLockedOut", IsLockedOut);
+            EnsureMemberProperty(properties, aliases, "LastLockoutDate", LastLockoutDate);
+            EnsureMemberProperty(properties, aliases, "CreateDate", CreateDate);
+            EnsureMemberProperty(properties, aliases, "LastLoginDate", LastLoginDate);
+            EnsureMemberProperty(properties, aliases, "LastPasswordChangeDate", LastPasswordChangeDate);
+        }
 
-            return propertiesList;
+        private void EnsureMemberProperty(List<IPublishedProperty> properties, List<string> aliases, string alias, object value)
+        {
+            // if the property already has a value, nothing to do
+            if (aliases.Contains(alias)) return;
+
+            // if not a property type, ignore
+            var propertyType = ContentType.GetPropertyType(alias);
+            if (propertyType == null) return;
+
+            // create a raw-value property
+            // note: throws if propertyType variations is not InvariantNeutral
+            var property = new RawValueProperty(propertyType, this, value);
+            properties.Add(property);
         }
 
         public override PublishedContentType ContentType => _publishedMemberType;

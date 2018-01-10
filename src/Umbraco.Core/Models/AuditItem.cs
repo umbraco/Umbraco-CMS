@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Models
 {
-    public sealed class AuditItem : Entity, IAggregateRoot
+    public sealed class AuditItem : EntityBase.EntityBase
     {
         public AuditItem(int objectId, string comment, AuditType type, int userId)
         {

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PublicAccessRule : Entity
+    public class PublicAccessRule : EntityBase.EntityBase
     {
         private string _ruleValue;
         private string _ruleType;

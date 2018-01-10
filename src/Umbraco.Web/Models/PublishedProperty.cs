@@ -30,11 +30,11 @@ namespace Umbraco.Web.Models
 
             return propertyTypes.Select(x =>
                 {
-                    var p = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
+                    var p = properties.SingleOrDefault(xx => xx.Alias == x.Alias);
                     var v = p == null || p.GetValue() == null ? null : p.GetValue();
                     if (v != null)
                     {
-                        var e = propertyEditors[x.PropertyEditorAlias];
+                        var e = propertyEditors[x.EditorAlias];
 
                         // We are converting to string, even for database values which are integer or
                         // DateTime, which is not optimum. Doing differently would require that we have a way to tell

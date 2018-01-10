@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = factory.BuildEntity(macroDto);
 
             // reset dirty initial properties (U4-1946)
-            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
+            ((BeingDirtyBase)entity).ResetDirtyProperties(false);
 
             return entity;
         }
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var entity in dtos.Select(factory.BuildEntity))
             {
                 // reset dirty initial properties (U4-1946)
-                ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
+                ((BeingDirtyBase)entity).ResetDirtyProperties(false);
 
                 yield return entity;
             }
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMacro entity)
         {
-            ((Entity)entity).AddingEntity();
+            ((EntityBase)entity).AddingEntity();
 
             var factory = new MacroFactory();
             var dto = factory.BuildDto(entity);
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMacro entity)
         {
-            ((Entity)entity).UpdatingEntity();
+            ((EntityBase)entity).UpdatingEntity();
 
             var factory = new MacroFactory();
             var dto = factory.BuildDto(entity);

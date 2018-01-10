@@ -698,7 +698,7 @@ AND umbracoNode.id <> @id",
                             }
 
                             // reset dirty initial properties (U4-1946)
-                            ((Entity)contentType).ResetDirtyProperties(false);
+                            ((EntityBase)contentType).ResetDirtyProperties(false);
                         }
                     }
                 }

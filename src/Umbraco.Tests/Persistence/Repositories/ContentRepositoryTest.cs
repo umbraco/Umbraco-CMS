@@ -40,13 +40,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeDefinitionRepository dtdRepository, CacheHelper cacheHelper = null)
+        private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository, CacheHelper cacheHelper = null)
         {
             cacheHelper = cacheHelper ?? CacheHelper;
 
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeDefinitionRepository(scopeAccessor, cacheHelper, Logger);
+            dtdRepository = new DataTypeRepository(scopeAccessor, cacheHelper, Logger);
             return ctRepository;
         }
 
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeDefinitionRepository _);
+                var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeRepository _);
 
                 var versions = new List<int>();
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeDefinitionRepository _);
+                var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeRepository _);
 
                 var emptyContentType = MockedContentTypes.CreateBasicContentType();
                 var hasPropertiesContentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
@@ -343,9 +343,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeDefinitionRepository dataTypeDefinitionRepository);
+                var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeRepository dataTypeDefinitionRepository);
 
-                var dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.DecimalAlias) { Name = "test", DatabaseType = DataTypeDatabaseType.Decimal };
+                var dtd = new DataType(-1, Constants.PropertyEditors.DecimalAlias) { Name = "test", DatabaseType = DataTypeDatabaseType.Decimal };
                 dataTypeDefinitionRepository.Save(dtd);
 
                 const string decimalPropertyAlias = "decimalProperty";

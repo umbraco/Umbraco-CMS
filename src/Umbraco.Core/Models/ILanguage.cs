@@ -1,11 +1,10 @@
 ﻿using System.Globalization;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
-    public interface ILanguage : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface ILanguage : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the Iso Code for the Language

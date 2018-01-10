@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a Macro
     /// </summary>
-    public interface IMacro : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IMacro : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the alias of the Macro

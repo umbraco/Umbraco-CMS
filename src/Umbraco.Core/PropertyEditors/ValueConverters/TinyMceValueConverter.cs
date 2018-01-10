@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class TinyMceValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEAlias;
+            => propertyType.EditorAlias == Constants.PropertyEditors.TinyMCEAlias;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IHtmlString);

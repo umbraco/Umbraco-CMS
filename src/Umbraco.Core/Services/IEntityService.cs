@@ -252,12 +252,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets paths for entities.
         /// </summary>
-        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
+        IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids);
 
         /// <summary>
         /// Gets paths for entities.
         /// </summary>
-        IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
+        IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys);
 
         /// <summary>
         /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.

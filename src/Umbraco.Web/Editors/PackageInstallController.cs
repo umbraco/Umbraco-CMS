@@ -97,7 +97,7 @@ namespace Umbraco.Web.Editors
             var removedMacros = new List<IMacro>();
             var removedContentTypes = new List<IContentType>();
             var removedDictionaryItems = new List<IDictionaryItem>();
-            var removedDataTypes = new List<IDataTypeDefinition>();
+            var removedDataTypes = new List<IDataType>();
             var removedFiles = new List<string>();
 
             //Uninstall templates

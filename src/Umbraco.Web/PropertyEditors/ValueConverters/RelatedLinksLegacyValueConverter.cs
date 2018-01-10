@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => MatchingEditors.Contains(propertyType.PropertyEditorAlias);
+            => MatchingEditors.Contains(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (JArray);
@@ -65,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             {
                                 if (type == "internal")
                                 {
-                                    switch (propertyType.PropertyEditorAlias)
+                                    switch (propertyType.EditorAlias)
                                     {
                                         case Constants.PropertyEditors.RelatedLinksAlias:
                                             var intLinkId = a.Value<int>("link");

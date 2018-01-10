@@ -27,6 +27,16 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <inheritdoc />
         public object GetDataTypeConfiguration(string editorAlias, int id)
         {
+            // fixme - this should all be in IDataTypeService
+            //
+            //  get data type by id / with -or without- configuration
+            //  configuration should just be 1 json field
+            //    could be in uNodeData?
+            //  then, there is no 'get configuration' at all
+            //
+            // and then, could be
+            // if we consider that the published snapshot service in NuCache does a getall
+
             // fixme - we need a more efficient dataTypeService way of getting these
             // fixme - would be nice not to pass editorAlias but annoying for tests?
             //var datatype = _dataTypeService.GetDataTypeDefinitionById(id);

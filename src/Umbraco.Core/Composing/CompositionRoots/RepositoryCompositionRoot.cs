@@ -39,7 +39,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<IAuditRepository, AuditRepository>();
             container.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
             container.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
-            container.RegisterSingleton<IDataTypeDefinitionRepository, DataTypeDefinitionRepository>();
+            container.RegisterSingleton<IDataTypeRepository, DataTypeRepository>();
             container.RegisterSingleton<IDictionaryRepository, DictionaryRepository>();
             container.RegisterSingleton<IDocumentBlueprintRepository, DocumentBlueprintRepository>();
             container.RegisterSingleton<IDocumentRepository, DocumentRepository>();

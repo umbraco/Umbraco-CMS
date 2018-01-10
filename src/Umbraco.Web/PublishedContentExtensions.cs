@@ -1140,7 +1140,7 @@ namespace Umbraco.Web
                         foreach (var p in from IPublishedProperty p in n.Properties where p.GetSourceValue() != null select p)
                         {
                             // probably want the "object value" of the property here...
-                            userVals[p.PropertyTypeAlias] = p.GetValue();
+                            userVals[p.Alias] = p.GetValue();
                         }
                         //add the row data
                         Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);

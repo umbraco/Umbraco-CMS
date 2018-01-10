@@ -342,7 +342,7 @@
     <Compile Include="Models\Collections\OrderItem.cs" />
     <Compile Include="Models\Collections\SimpleOrder.cs" />
     <Compile Include="Models\ContentTypeTests.cs" />
-    <Compile Include="Models\DataTypeDefinitionTests.cs" />
+    <Compile Include="Models\DataTypeTests.cs" />
     <Compile Include="Models\DeepCloneHelperTests.cs" />
     <Compile Include="Models\DictionaryItemTests.cs" />
     <Compile Include="Models\DictionaryTranslationTests.cs" />
@@ -486,7 +486,7 @@
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
-    <Compile Include="Persistence\Mappers\DataTypeDefinitionMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\DataTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\DictionaryMapperTest.cs" />
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapperTest.cs" />

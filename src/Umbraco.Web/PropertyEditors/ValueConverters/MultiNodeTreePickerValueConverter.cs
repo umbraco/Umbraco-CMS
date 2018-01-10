@@ -35,8 +35,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias)
-                || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias);
+            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias)
+                || propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias);
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
+            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
             {
                 var nodeIds = source.ToString()
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     .ToArray();
                 return nodeIds;
             }
-            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
             {
                 var nodeIds = source.ToString()
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -76,11 +76,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
             if (UmbracoContext.Current != null)
             {
-                if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
+                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
                 {
                     var nodeIds = (int[])source;
 
-                    if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
+                    if ((propertyType.Alias != null && PropertiesToExclude.InvariantContains(propertyType.Alias)) == false)
                     {
                         var multiNodeTreePicker = new List<IPublishedContent>();
 
@@ -106,11 +106,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     return nodeIds.FirstOrDefault();
                 }
 
-                if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
                 {
                     var udis = (Udi[])source;
 
-                    if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.InvariantContains(propertyType.PropertyTypeAlias)) == false)
+                    if ((propertyType.Alias != null && PropertiesToExclude.InvariantContains(propertyType.Alias)) == false)
                     {
                         var multiNodeTreePicker = new List<IPublishedContent>();
 

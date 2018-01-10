@@ -14,22 +14,22 @@ using Umbraco.Core.Scoping;
 namespace Umbraco.Core.Services.Implement
 {
     /// <summary>
-    /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/>
+    /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataType"/>
     /// </summary>
     internal class DataTypeService : ScopeRepositoryService, IDataTypeService
     {
-        private readonly IDataTypeDefinitionRepository _dataTypeDefinitionRepository;
+        private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
 
         public DataTypeService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
-            IDataTypeDefinitionRepository dataTypeDefinitionRepository, IDataTypeContainerRepository dataTypeContainerRepository,
+            IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository)
             : base(provider, logger, eventMessagesFactory)
         {
-            _dataTypeDefinitionRepository = dataTypeDefinitionRepository;
+            _dataTypeRepository = dataTypeRepository;
             _dataTypeContainerRepository = dataTypeContainerRepository;
             _auditRepository = auditRepository;
             _entityRepository = entityRepository;
@@ -97,15 +97,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition)
+        public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
         {
-            var ancestorIds = dataTypeDefinition.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = dataType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
                     return asInt ? asInt.Result : int.MinValue;
                 })
-                .Where(x => x != int.MinValue && x != dataTypeDefinition.Id)
+                .Where(x => x != int.MinValue && x != dataType.Id)
                 .ToArray();
 
             return GetContainers(ancestorIds);
@@ -214,82 +214,82 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its Name
+        /// Gets a <see cref="IDataType"/> by its Name
         /// </summary>
-        /// <param name="name">Name of the <see cref="IDataTypeDefinition"/></param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        public IDataTypeDefinition GetDataTypeDefinitionByName(string name)
+        /// <param name="name">Name of the <see cref="IDataType"/></param>
+        /// <returns><see cref="IDataType"/></returns>
+        public IDataType GetDataTypeDefinitionByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeDefinitionRepository.Get(Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
+                return _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name)).FirstOrDefault();
             }
         }
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its Id
+        /// Gets a <see cref="IDataType"/> by its Id
         /// </summary>
-        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/></param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        public IDataTypeDefinition GetDataTypeDefinitionById(int id)
+        /// <param name="id">Id of the <see cref="IDataType"/></param>
+        /// <returns><see cref="IDataType"/></returns>
+        public IDataType GetDataTypeDefinitionById(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeDefinitionRepository.Get(id);
+                return _dataTypeRepository.Get(id);
             }
         }
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its unique guid Id
+        /// Gets a <see cref="IDataType"/> by its unique guid Id
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
+        /// <returns><see cref="IDataType"/></returns>
+        public IDataType GetDataTypeDefinitionById(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var query = Query<IDataTypeDefinition>().Where(x => x.Key == id);
-                return _dataTypeDefinitionRepository.Get(query).FirstOrDefault();
+                var query = Query<IDataType>().Where(x => x.Key == id);
+                return _dataTypeRepository.Get(query).FirstOrDefault();
             }
         }
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
+        /// Gets a <see cref="IDataType"/> by its control Id
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
-        /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
-        public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
+        /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
+        public IEnumerable<IDataType> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var query = Query<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == propertyEditorAlias);
-                return _dataTypeDefinitionRepository.Get(query);
+                var query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
+                return _dataTypeRepository.Get(query);
             }
         }
 
         /// <summary>
-        /// Gets all <see cref="IDataTypeDefinition"/> objects or those with the ids passed in
+        /// Gets all <see cref="IDataType"/> objects or those with the ids passed in
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
-        /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
-        public IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids)
+        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
+        public IEnumerable<IDataType> GetAllDataTypeDefinitions(params int[] ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeDefinitionRepository.GetMany(ids);
+                return _dataTypeRepository.GetMany(ids);
             }
         }
 
         /// <summary>
-        /// Gets all prevalues for an <see cref="IDataTypeDefinition"/>
+        /// Gets all prevalues for an <see cref="IDataType"/>
         /// </summary>
-        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
+        /// <param name="id">Id of the <see cref="IDataType"/> to retrieve prevalues from</param>
         /// <returns>An enumerable list of string values</returns>
         public IEnumerable<string> GetPreValuesByDataTypeId(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var collection = _dataTypeDefinitionRepository.GetPreValuesCollectionByDataTypeId(id);
+                var collection = _dataTypeRepository.GetPreValuesCollectionByDataTypeId(id);
                 //now convert the collection to a string list
                 return collection.FormatAsDictionary()
                     .Select(x => x.Value.Value)
@@ -306,7 +306,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeDefinitionRepository.GetPreValuesCollectionByDataTypeId(id);
+                return _dataTypeRepository.GetPreValuesCollectionByDataTypeId(id);
             }
         }
 
@@ -319,19 +319,19 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _dataTypeDefinitionRepository.GetPreValueAsString(id);
+                return _dataTypeRepository.GetPreValueAsString(id);
             }
         }
 
-        public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId)
+        public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
+            var moveInfo = new List<MoveEventInfo<IDataType>>();
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var moveEventInfo = new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId);
-                var moveEventArgs = new MoveEventArgs<IDataTypeDefinition>(evtMsgs, moveEventInfo);
+                var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
+                var moveEventArgs = new MoveEventArgs<IDataType>(evtMsgs, moveEventInfo);
                 if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs))
                 {
                     scope.Complete();
@@ -347,7 +347,7 @@ namespace Umbraco.Core.Services.Implement
                         if (container == null)
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
-                    moveInfo.AddRange(_dataTypeDefinitionRepository.Move(toMove, container));
+                    moveInfo.AddRange(_dataTypeRepository.Move(toMove, container));
 
                     moveEventArgs.MoveInfoCollection = moveInfo;
                     moveEventArgs.CanCancel = false;
@@ -365,57 +365,57 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Saves an <see cref="IDataTypeDefinition"/>
+        /// Saves an <see cref="IDataType"/>
         /// </summary>
-        /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        public void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0)
+        public void Save(IDataType dataType, int userId = 0)
         {
-            dataTypeDefinition.CreatorId = userId;
+            dataType.CreatorId = userId;
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition);
+                var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(dataTypeDefinition.Name))
+                if (string.IsNullOrWhiteSpace(dataType.Name))
                 {
                     throw new ArgumentException("Cannot save datatype with empty name.");
                 }
 
-                _dataTypeDefinitionRepository.Save(dataTypeDefinition);
+                _dataTypeRepository.Save(dataType);
 
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
-                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);
+                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataType.Id);
                 scope.Complete();
             }
         }
 
         /// <summary>
-        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0)
+        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0)
         {
             Save(dataTypeDefinitions, userId, true);
         }
 
         /// <summary>
-        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
-        public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents)
+        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
         {
             var dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
-            var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitionsA);
+            var saveEventArgs = new SaveEventArgs<IDataType>(dataTypeDefinitionsA);
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -428,7 +428,7 @@ namespace Umbraco.Core.Services.Implement
                 foreach (var dataTypeDefinition in dataTypeDefinitionsA)
                 {
                     dataTypeDefinition.CreatorId = userId;
-                    _dataTypeDefinitionRepository.Save(dataTypeDefinition);
+                    _dataTypeRepository.Save(dataTypeDefinition);
                 }
 
                 if (raiseEvents)
@@ -492,19 +492,19 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Saves/updates the pre-values
         /// </summary>
-        /// <param name="dataTypeDefinition"></param>
+        /// <param name="dataType"></param>
         /// <param name="values"></param>
         /// <remarks>
         /// We need to actually look up each pre-value and maintain it's id if possible - this is because of silly property editors
         /// like 'dropdown list publishing keys'
         /// </remarks>
-        public void SavePreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values)
+        public void SavePreValues(IDataType dataType, IDictionary<string, PreValue> values)
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                _dataTypeDefinitionRepository.AddOrUpdatePreValues(dataTypeDefinition, values);
+                _dataTypeRepository.AddOrUpdatePreValues(dataType, values);
                 scope.Complete();
             }
         }
@@ -512,14 +512,14 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// This will save a data type and it's pre-values in one transaction
         /// </summary>
-        /// <param name="dataTypeDefinition"></param>
+        /// <param name="dataType"></param>
         /// <param name="values"></param>
         /// <param name="userId"></param>
-        public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0)
+        public void SaveDataTypeAndPreValues(IDataType dataType, IDictionary<string, PreValue> values, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition);
+                var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
@@ -528,35 +528,35 @@ namespace Umbraco.Core.Services.Implement
 
                 // if preValues contain the data type, override the data type definition accordingly
                 if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
-                    dataTypeDefinition.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
+                    dataType.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
 
-                dataTypeDefinition.CreatorId = userId;
+                dataType.CreatorId = userId;
 
-                _dataTypeDefinitionRepository.Save(dataTypeDefinition); // definition
-                _dataTypeDefinitionRepository.AddOrUpdatePreValues(dataTypeDefinition, values); //prevalues
+                _dataTypeRepository.Save(dataType); // definition
+                _dataTypeRepository.AddOrUpdatePreValues(dataType, values); //prevalues
 
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Saved, this, saveEventArgs);
-                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);
+                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataType.Id);
 
                 scope.Complete();
             }
         }
 
         /// <summary>
-        /// Deletes an <see cref="IDataTypeDefinition"/>
+        /// Deletes an <see cref="IDataType"/>
         /// </summary>
         /// <remarks>
-        /// Please note that deleting a <see cref="IDataTypeDefinition"/> will remove
-        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataTypeDefinition"/>.
+        /// Please note that deleting a <see cref="IDataType"/> will remove
+        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataType"/>.
         /// </remarks>
-        /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
+        /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
-        public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0)
+        public void Delete(IDataType dataType, int userId = 0)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition);
+                var deleteEventArgs = new DeleteEventArgs<IDataType>(dataType);
                 if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     scope.Complete();
@@ -567,13 +567,13 @@ namespace Umbraco.Core.Services.Implement
                 // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
                 // fixme - media and members?!
                 // fixme - non-group properties?!
-                var query = Query<PropertyType>().Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id);
+                var query = Query<PropertyType>().Where(x => x.DataTypeDefinitionId == dataType.Id);
                 var contentTypes = _contentTypeRepository.GetByQuery(query);
                 foreach (var contentType in contentTypes)
                 {
                     foreach (var propertyGroup in contentType.PropertyGroups)
                     {
-                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id).ToList();
+                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataType.Id).ToList();
                         foreach (var propertyType in types)
                         {
                             propertyGroup.PropertyTypes.Remove(propertyType);
@@ -591,11 +591,11 @@ namespace Umbraco.Core.Services.Implement
                     _contentTypeRepository.Save(contentType);
                 }
 
-                _dataTypeDefinitionRepository.Delete(dataTypeDefinition);
+                _dataTypeRepository.Delete(dataType);
 
                 deleteEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Deleted, this, deleteEventArgs);
-                Audit(AuditType.Delete, "Delete DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);
+                Audit(AuditType.Delete, "Delete DataTypeDefinition performed by user", userId, dataType.Id);
 
                 scope.Complete();
             }
@@ -616,32 +616,32 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleting;
+        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleted;
+        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleted;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saving;
+        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataType>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
+        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataType>> Saved;
 
         /// <summary>
         /// Occurs before Move
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moving;
+        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataType>> Moving;
 
         /// <summary>
         /// Occurs after Move
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moved;
+        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataType>> Moved;
         #endregion
     }
 }

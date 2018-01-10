@@ -216,7 +216,7 @@ namespace Umbraco.Tests.PublishedContent
 
             public IPublishedProperty GetProperty(string alias)
             {
-                return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+                return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
 
             public IPublishedProperty GetProperty(string alias, bool recurse)

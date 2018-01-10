@@ -3,7 +3,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
-    public interface IUserGroup : IAggregateRoot
+    public interface IUserGroup : IEntity
     {
         string Alias { get; set; }
 

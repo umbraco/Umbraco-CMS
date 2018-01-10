@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The real persisted data type
         /// </summary>
         [IgnoreDataMember]
-        internal IDataTypeDefinition PersistedDataType { get; set; }
+        internal IDataType PersistedDataType { get; set; }
 
         /// <summary>
         /// The PropertyEditor assigned

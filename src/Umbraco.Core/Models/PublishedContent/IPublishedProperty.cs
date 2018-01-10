@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets the alias of the property.
         /// </summary>
-        string PropertyTypeAlias { get; }
+        string Alias { get; }
 
         /// <summary>
         /// Gets a value indicating whether the property has a value.

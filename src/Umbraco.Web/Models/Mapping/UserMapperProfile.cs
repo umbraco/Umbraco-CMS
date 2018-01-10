@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<UserGroupSave, IUserGroup>()
                 .ConstructUsing((UserGroupSave save) => new UserGroup { CreateDate = DateTime.Now })
-                .IgnoreDeletableEntityCommonProperties()
+                .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.Condition(source => GetIntId(source.Id) > 0))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(source => GetIntId(source.Id)))
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(source => source.DefaultPermissions))
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //Used for merging existing UserSave to an existing IUser instance - this will not create an IUser instance!
             CreateMap<UserSave, IUser>()
-                .IgnoreDeletableEntityCommonProperties()
+                .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.Condition(src => GetIntId(src.Id) > 0))
                 .ForMember(dest => dest.SessionTimeout, opt => opt.Ignore())
                 .ForMember(dest => dest.EmailConfirmedDate, opt => opt.Ignore())
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             CreateMap<UserInvite, IUser>()
-                .IgnoreDeletableEntityCommonProperties()
+                .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.StartContentIds, opt => opt.Ignore())
                 .ForMember(dest => dest.StartMediaIds, opt => opt.Ignore())

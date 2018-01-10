@@ -50,8 +50,8 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
                 new EventDefinition<ILocalizationService, DeleteEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new DeleteEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
 
-                new EventDefinition<IDataTypeService, SaveEventArgs<IDataTypeDefinition>>(null, serviceContext.DataTypeService, new SaveEventArgs<IDataTypeDefinition>(Enumerable.Empty<IDataTypeDefinition>())),
-                new EventDefinition<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>>(null, serviceContext.DataTypeService, new DeleteEventArgs<IDataTypeDefinition>(Enumerable.Empty<IDataTypeDefinition>())),
+                new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, serviceContext.DataTypeService, new SaveEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
+                new EventDefinition<IDataTypeService, DeleteEventArgs<IDataType>>(null, serviceContext.DataTypeService, new DeleteEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
 
                 new EventDefinition<IFileService, SaveEventArgs<Stylesheet>>(null, serviceContext.FileService, new SaveEventArgs<Stylesheet>(Enumerable.Empty<Stylesheet>())),
                 new EventDefinition<IFileService, DeleteEventArgs<Stylesheet>>(null, serviceContext.FileService, new DeleteEventArgs<Stylesheet>(Enumerable.Empty<Stylesheet>())),

@@ -20,7 +20,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.TagsAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.TagsAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);
@@ -31,7 +31,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // if Json storage type deserialzie and return as string array
-            if (JsonStorageType(propertyType.DataTypeId))
+            if (JsonStorageType(propertyType.DataType.Id))
             {
                 var jArray = JsonConvert.DeserializeObject<JArray>(source.ToString());
                 return jArray.ToObject<string[]>();

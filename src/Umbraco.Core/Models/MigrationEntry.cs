@@ -5,7 +5,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    public class MigrationEntry : Entity, IMigrationEntry
+    public class MigrationEntry : EntityBase.EntityBase, IMigrationEntry
     {
         public MigrationEntry()
         {

@@ -203,7 +203,7 @@ namespace umbraco
         {
             foreach(var p in node.Properties)
             {
-                if (_elements.ContainsKey(p.PropertyTypeAlias) == false)
+                if (_elements.ContainsKey(p.Alias) == false)
                 {
                     // note: legacy used the raw value (see populating from an Xml node below)
                     // so we're doing the same here, using DataValue. If we use Value then every
@@ -213,7 +213,7 @@ namespace umbraco
                     // to properly fix this, we'd need to turn the elements collection into some
                     // sort of collection of lazy values.
 
-                    _elements[p.PropertyTypeAlias] = p.GetSourceValue();
+                    _elements[p.Alias] = p.GetSourceValue();
                 }
             }
         }
@@ -427,12 +427,12 @@ namespace umbraco
                 _creatorName = _inner.GetCreatorProfile().Name;
                 _writerName = _inner.GetWriterProfile().Name;
 
-                _contentType = new PublishedContentType(_inner.ContentType);
+                _contentType = Current.PublishedContentTypeFactory.CreateContentType(_inner.ContentType);
 
                 _properties = _contentType.PropertyTypes
                     .Select(x =>
                     {
-                        var p = _inner.Properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
+                        var p = _inner.Properties.SingleOrDefault(xx => xx.Alias == x.Alias);
                         return p == null ? new PagePublishedProperty(x, this) : new PagePublishedProperty(x, this, p);
                     })
                     .Cast<IPublishedProperty>()
@@ -539,11 +539,6 @@ namespace umbraco
             public bool IsDraft
             {
                 get { throw new NotImplementedException(); }
-            }
-
-            public int GetIndex()
-            {
-                throw new NotImplementedException();
             }
 
             public IPublishedContent Parent

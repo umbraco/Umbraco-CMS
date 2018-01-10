@@ -317,7 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 _masterpagesFileSystem.DeleteFile(masterpageName);
             }
 
-            entity.DeletedDate = DateTime.Now;
+            entity.DeleteDate = DateTime.Now;
         }
 
         #endregion

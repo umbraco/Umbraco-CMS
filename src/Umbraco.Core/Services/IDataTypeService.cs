@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataTypeDefinition"/>
+    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataType"/>
     /// </summary>
     public interface IDataTypeService : IService
     {
@@ -14,83 +14,83 @@ namespace Umbraco.Core.Services
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
-        IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition);
+        IEnumerable<EntityContainer> GetContainers(IDataType dataType);
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
         Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0);
         Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0);
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its Name
+        /// Gets a <see cref="IDataType"/> by its Name
         /// </summary>
-        /// <param name="name">Name of the <see cref="IDataTypeDefinition"/></param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        IDataTypeDefinition GetDataTypeDefinitionByName(string name);
+        /// <param name="name">Name of the <see cref="IDataType"/></param>
+        /// <returns><see cref="IDataType"/></returns>
+        IDataType GetDataTypeDefinitionByName(string name);
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its Id
+        /// Gets a <see cref="IDataType"/> by its Id
         /// </summary>
-        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/></param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        IDataTypeDefinition GetDataTypeDefinitionById(int id);
+        /// <param name="id">Id of the <see cref="IDataType"/></param>
+        /// <returns><see cref="IDataType"/></returns>
+        IDataType GetDataTypeDefinitionById(int id);
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its unique guid Id
+        /// Gets a <see cref="IDataType"/> by its unique guid Id
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        IDataTypeDefinition GetDataTypeDefinitionById(Guid id);
+        /// <returns><see cref="IDataType"/></returns>
+        IDataType GetDataTypeDefinitionById(Guid id);
 
         /// <summary>
-        /// Gets all <see cref="IDataTypeDefinition"/> objects or those with the ids passed in
+        /// Gets all <see cref="IDataType"/> objects or those with the ids passed in
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
-        /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
-        IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids);
+        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
+        IEnumerable<IDataType> GetAllDataTypeDefinitions(params int[] ids);
 
         /// <summary>
-        /// Saves an <see cref="IDataTypeDefinition"/>
+        /// Saves an <see cref="IDataType"/>
         /// </summary>
-        /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0);
+        void Save(IDataType dataType, int userId = 0);
 
         /// <summary>
-        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0);
+        void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0);
 
         /// <summary>
-        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// Saves a collection of <see cref="IDataType"/>
         /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
-        void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId, bool raiseEvents);
+        void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents);
 
         /// <summary>
-        /// Deletes an <see cref="IDataTypeDefinition"/>
+        /// Deletes an <see cref="IDataType"/>
         /// </summary>
         /// <remarks>
-        /// Please note that deleting a <see cref="IDataTypeDefinition"/> will remove
-        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataTypeDefinition"/>.
+        /// Please note that deleting a <see cref="IDataType"/> will remove
+        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataType"/>.
         /// </remarks>
-        /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
+        /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Id of the user issueing the deletion</param>
-        void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0);
+        void Delete(IDataType dataType, int userId = 0);
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
+        /// Gets a <see cref="IDataType"/> by its control Id
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
-        /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
-        IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias);
+        /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
+        IEnumerable<IDataType> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias);
 
         /// <summary>
-        /// Gets all values for an <see cref="IDataTypeDefinition"/>
+        /// Gets all values for an <see cref="IDataType"/>
         /// </summary>
-        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
+        /// <param name="id">Id of the <see cref="IDataType"/> to retrieve prevalues from</param>
         /// <returns>An enumerable list of string values</returns>
         IEnumerable<string> GetPreValuesByDataTypeId(int id);
 
@@ -119,17 +119,17 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a list of PreValues for a given DataTypeDefinition
         /// </summary>
-        /// <param name="dataTypeDefinition">The DataTypeDefinition to save PreValues for</param>
+        /// <param name="dataType">The DataTypeDefinition to save PreValues for</param>
         /// <param name="values">List of key/value pairs to save</param>
-        void SavePreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values);
+        void SavePreValues(IDataType dataType, IDictionary<string, PreValue> values);
 
         /// <summary>
         /// Saves the data type and it's prevalues
         /// </summary>
-        /// <param name="dataTypeDefinition"></param>
+        /// <param name="dataType"></param>
         /// <param name="values"></param>
         /// <param name="userId"></param>
-        void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0);
+        void SaveDataTypeAndPreValues(IDataType dataType, IDictionary<string, PreValue> values, int userId = 0);
 
         /// <summary>
         /// Gets a specific PreValue by its Id
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Services
         /// <returns>PreValue as a string</returns>
         string GetPreValueAsString(int id);
 
-        Attempt<OperationResult<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
+        Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);
 
     }
 }

@@ -6,7 +6,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MockedEntity : Entity
+    public class MockedEntity : EntityBase
     {
         [DataMember]
         public string Alias { get; set; }

@@ -42,7 +42,7 @@ namespace Umbraco.Web.PublishedCache
         // used to cache the CacheValues of this property
         // ReSharper disable InconsistentlySynchronizedField
         internal string ValuesCacheKey => _valuesCacheKey
-            ?? (_valuesCacheKey = PropertyCacheValues(Element.Key, PropertyTypeAlias, IsPreviewing));
+            ?? (_valuesCacheKey = PropertyCacheValues(Element.Key, Alias, IsPreviewing));
         // ReSharper restore InconsistentlySynchronizedField
 
         protected class CacheValues

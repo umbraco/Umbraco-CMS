@@ -147,6 +147,9 @@ namespace Umbraco.Core.Composing
         public static ISqlContext SqlContext
             => Container.GetInstance<ISqlContext>();
 
+        public static IPublishedContentTypeFactory PublishedContentTypeFactory
+            => Container.GetInstance<IPublishedContentTypeFactory>();
+
         #endregion
     }
 }

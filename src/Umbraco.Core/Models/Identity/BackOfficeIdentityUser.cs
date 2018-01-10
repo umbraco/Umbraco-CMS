@@ -424,7 +424,7 @@ namespace Umbraco.Core.Models.Identity
         /// <summary>
         /// internal class used to track changes for properties that have it enabled
         /// </summary>
-        private class ChangeTracker : TracksChangesEntityBase
+        private class ChangeTracker : BeingDirtyBase
         {
             /// <summary>
             /// Make this public so that it's usable

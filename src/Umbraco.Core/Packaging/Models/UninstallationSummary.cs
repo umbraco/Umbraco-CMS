@@ -11,7 +11,7 @@ namespace Umbraco.Core.Packaging.Models
     public class UninstallationSummary
     {
         public MetaData MetaData { get; set; }
-        public IEnumerable<IDataTypeDefinition> DataTypesUninstalled { get; set; }
+        public IEnumerable<IDataType> DataTypesUninstalled { get; set; }
         public IEnumerable<ILanguage> LanguagesUninstalled { get; set; }
         public IEnumerable<IDictionaryItem> DictionaryItemsUninstalled { get; set; }
         public IEnumerable<IMacro> MacrosUninstalled { get; set; }
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Packaging.Models
         {
             summary.ContentUninstalled = new List<IContent>();
             summary.ContentTypesUninstalled = new List<IContentType>();
-            summary.DataTypesUninstalled = new List<IDataTypeDefinition>();
+            summary.DataTypesUninstalled = new List<IDataType>();
             summary.DictionaryItemsUninstalled = new List<IDictionaryItem>();
             summary.FilesUninstalled = new List<string>();
             summary.LanguagesUninstalled = new List<ILanguage>();

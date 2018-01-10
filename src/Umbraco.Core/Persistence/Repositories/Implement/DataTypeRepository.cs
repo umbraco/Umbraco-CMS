@@ -19,13 +19,13 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     /// <summary>
-    /// Represents a repository for doing CRUD operations for <see cref="DataTypeDefinition"/>
+    /// Represents a repository for doing CRUD operations for <see cref="DataType"/>
     /// </summary>
-    internal class DataTypeDefinitionRepository : NPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
+    internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             _preValRepository = new DataTypePreValueRepository(scopeAccessor, CacheHelper.NoCache, logger);
@@ -33,14 +33,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
-        protected override IDataTypeDefinition PerformGet(int id)
+        protected override IDataType PerformGet(int id)
         {
             return GetMany(new[] { id }).FirstOrDefault();
         }
 
-        protected override IEnumerable<IDataTypeDefinition> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IDataType> PerformGetAll(params int[] ids)
         {
-            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+            var factory = new DataTypeFactory(NodeObjectTypeId);
             var dataTypeSql = GetBaseQuery(false);
 
             if (ids.Any())
@@ -56,12 +56,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dtos.Select(factory.BuildEntity).ToArray();
         }
 
-        protected override IEnumerable<IDataTypeDefinition> PerformGetByQuery(IQuery<IDataTypeDefinition> query)
+        protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
         {
-            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+            var factory = new DataTypeFactory(NodeObjectTypeId);
 
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
+            var translator = new SqlTranslator<IDataType>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
@@ -105,9 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Unit of Work Implementation
 
-        protected override void PersistNewItem(IDataTypeDefinition entity)
+        protected override void PersistNewItem(IDataType entity)
         {
-            ((DataTypeDefinition)entity).AddingEntity();
+            ((DataType)entity).AddingEntity();
 
             //ensure a datatype has a unique name before creating it
             entity.Name = EnsureUniqueNodeName(entity.Name);
@@ -122,7 +122,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
 
-            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+            var factory = new DataTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
             //Logic for setting Path, Level and SortOrder
@@ -155,7 +155,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
             entity.ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(IDataTypeDefinition entity)
+        protected override void PersistUpdatedItem(IDataType entity)
         {
 
             entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
@@ -172,7 +172,7 @@ AND umbracoNode.id <> @id",
             }
 
             //Updates Modified date
-            ((DataTypeDefinition)entity).UpdatingEntity();
+            ((DataType)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))
@@ -187,7 +187,7 @@ AND umbracoNode.id <> @id",
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
+            var factory = new DataTypeFactory(NodeObjectTypeId);
             //Look up DataTypeDefinition entry to get Primary for updating the DTO
             var dataTypeDto = Database.SingleOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             factory.SetPrimaryKey(dataTypeDto.PrimaryKey);
@@ -205,7 +205,7 @@ AND umbracoNode.id <> @id",
             entity.ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(IDataTypeDefinition entity)
+        protected override void PersistDeletedItem(IDataType entity)
         {
             //Remove Notifications
             Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { Id = entity.Id });
@@ -234,7 +234,7 @@ AND umbracoNode.id <> @id",
             //Delete (base) node data
             Database.Delete<NodeDto>("WHERE uniqueID = @Id", new { Id = entity.Key });
 
-            entity.DeletedDate = DateTime.Now;
+            entity.DeleteDate = DateTime.Now;
         }
 
         #endregion
@@ -274,7 +274,7 @@ AND umbracoNode.id <> @id",
             AddOrUpdatePreValues(dtd, values);
         }
 
-        public IEnumerable<MoveEventInfo<IDataTypeDefinition>> Move(IDataTypeDefinition toMove, EntityContainer container)
+        public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer container)
         {
             var parentId = -1;
             if (container != null)
@@ -288,9 +288,9 @@ AND umbracoNode.id <> @id",
             }
 
             //used to track all the moved entities to be given to the event
-            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>
+            var moveInfo = new List<MoveEventInfo<IDataType>>
             {
-                new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)
+                new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId)
             };
 
             var origPath = toMove.Path;
@@ -305,12 +305,12 @@ AND umbracoNode.id <> @id",
             Save(toMove);
 
             //update all descendants from the original path, update in order of level
-            var descendants = Get(Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(origPath + ",")));
+            var descendants = Get(Query<IDataType>().Where(type => type.Path.StartsWith(origPath + ",")));
 
             var lastParent = toMove;
             foreach (var descendant in descendants.OrderBy(x => x.Level))
             {
-                moveInfo.Add(new MoveEventInfo<IDataTypeDefinition>(descendant, descendant.Path, descendant.ParentId));
+                moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId));
 
                 descendant.ParentId = lastParent.Id;
                 descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
@@ -322,7 +322,7 @@ AND umbracoNode.id <> @id",
             return moveInfo;
         }
 
-        public void AddOrUpdatePreValues(IDataTypeDefinition dataType, IDictionary<string, PreValue> values)
+        public void AddOrUpdatePreValues(IDataType dataType, IDictionary<string, PreValue> values)
         {
             var currentVals = new DataTypePreValueDto[] { };
             if (dataType.HasIdentity)
@@ -422,11 +422,11 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Private class to handle pre-value crud based on units of work with transactions
         /// </summary>
-        private class PreValueEntity : Entity, IAggregateRoot
+        private class PreValueEntity : EntityBase
         {
             public string Value { get; set; }
             public string Alias { get; set; }
-            public IDataTypeDefinition DataType { get; set; }
+            public IDataType DataType { get; set; }
             public int SortOrder { get; set; }
         }
 
@@ -480,7 +480,7 @@ AND umbracoNode.id <> @id",
             {
                 Database.Execute("DELETE FROM cmsDataTypePreValues WHERE id=@Id", new { Id = entity.Id });
 
-                entity.DeletedDate = DateTime.Now;
+                entity.DeleteDate = DateTime.Now;
             }
 
             protected override void PersistNewItem(PreValueEntity entity)

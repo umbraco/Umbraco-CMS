@@ -50,7 +50,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            CreateMap<IDataTypeDefinition, DataTypeBasic>()
+            CreateMap<IDataType, DataTypeBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.DataType, src.Key)))
                 .ForMember(dest => dest.HasPrevalues, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.IsSystemDataType, opt => opt.MapFrom(src => systemIds.Contains(src.Id)))
                 .AfterMap((src, dest) =>
                 {
-                    var editor = Current.PropertyEditors[src.PropertyEditorAlias];
+                    var editor = Current.PropertyEditors[src.EditorAlias];
                     if (editor != null)
                     {
                         dest.Alias = editor.Alias;
@@ -68,11 +68,11 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            CreateMap<IDataTypeDefinition, DataTypeDisplay>()
+            CreateMap<IDataType, DataTypeDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.DataType, src.Key)))
                 .ForMember(dest => dest.AvailableEditors, opt => opt.ResolveUsing(src => availablePropertyEditorsResolver.Resolve(src)))
                 .ForMember(dest => dest.PreValues, opt => opt.ResolveUsing(src => preValueDisplayResolver.Resolve(src)))
-                .ForMember(dest => dest.SelectedEditor, opt => opt.MapFrom(src => src.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : src.PropertyEditorAlias))
+                .ForMember(dest => dest.SelectedEditor, opt => opt.MapFrom(src => src.EditorAlias.IsNullOrWhiteSpace() ? null : src.EditorAlias))
                 .ForMember(dest => dest.HasPrevalues, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.IsSystemDataType, opt => opt.MapFrom(src => systemIds.Contains(src.Id)))
                 .AfterMap((src, dest) =>
                 {
-                    var editor = Current.PropertyEditors[src.PropertyEditorAlias];
+                    var editor = Current.PropertyEditors[src.EditorAlias];
                     if (editor != null)
                     {
                         dest.Group = editor.Group;
@@ -90,18 +90,18 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             //gets a list of PreValueFieldDisplay objects from the data type definition
-            CreateMap<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>()
+            CreateMap<IDataType, IEnumerable<PreValueFieldDisplay>>()
                   .ConvertUsing(src => preValueDisplayResolver.Resolve(src));
 
-            CreateMap<DataTypeSave, IDataTypeDefinition>()
-                .ConstructUsing(src => new DataTypeDefinition(src.SelectedEditor) {CreateDate = DateTime.Now})
-                .IgnoreDeletableEntityCommonProperties()
+            CreateMap<DataTypeSave, IDataType>()
+                .ConstructUsing(src => new DataType(src.SelectedEditor) {CreateDate = DateTime.Now})
+                .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
                 //we have to ignore the Key otherwise this will reset the UniqueId field which should never change!
                 // http://issues.umbraco.org/issue/U4-3911
                 .ForMember(dest => dest.Key, opt => opt.Ignore())
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
-                .ForMember(dest => dest.PropertyEditorAlias, opt => opt.MapFrom(src => src.SelectedEditor))
+                .ForMember(dest => dest.EditorAlias, opt => opt.MapFrom(src => src.SelectedEditor))
                 .ForMember(dest => dest.DatabaseType, opt => opt.ResolveUsing(src => databaseTypeResolver.Resolve(src)))
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())

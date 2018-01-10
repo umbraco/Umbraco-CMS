@@ -10,44 +10,44 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Basic definition of a property editor
+    /// Provides a base class for property editors.
     /// </summary>
     /// <remarks>
-    /// The Json serialization attributes are required for manifest property editors to work
+    /// <para>Editors can be deserialized from manifests, which is why the Json serialization
+    /// attributes are required, and the properties require an internal setter.</para>
     /// </remarks>
-    [DebuggerDisplay("{DebuggerDisplay(),nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "(),nq}")]
     public class PropertyEditor : IParameterEditor
     {
-        /// <summary>
-        /// Exposes a logger
-        /// </summary>
-        protected ILogger Logger { get; }
-
         private readonly PropertyEditorAttribute _attribute;
 
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="PropertyEditor"/> class.
         /// </summary>
         public PropertyEditor(ILogger logger)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            //defaults
+
+            // defaults
             Icon = Constants.Icons.PropertyEditor;
             Group = "common";
 
-            //assign properties based on the attribute if it is found
+            // assign properties based on the attribute, if it is found
             _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
-            if (_attribute != null)
-            {
-                //set the id/name from the attribute
-                Alias = _attribute.Alias;
-                Name = _attribute.Name;
-                IsParameterEditor = _attribute.IsParameterEditor;
-                Icon = _attribute.Icon;
-                Group = _attribute.Group;
-                IsDeprecated = _attribute.IsDeprecated;
-            }
+            if (_attribute == null) return;
+
+            Alias = _attribute.Alias;
+            Name = _attribute.Name;
+            IsParameterEditor = _attribute.IsParameterEditor;
+            Icon = _attribute.Icon;
+            Group = _attribute.Group;
+            IsDeprecated = _attribute.IsDeprecated;
         }
+
+        /// <summary>
+        /// Gets a logger.
+        /// </summary>
+        protected ILogger Logger { get; }
 
         /// <summary>
         /// These are assigned by default normally based on property editor attributes or manifest definitions,
@@ -62,41 +62,43 @@ namespace Umbraco.Core.PropertyEditors
         internal PreValueEditor ManifestDefinedPreValueEditor = null;
 
         /// <summary>
-        /// Boolean flag determining if this can be used as a parameter editor
+        /// Gets or sets a value indicating whether this editor can be used as a parameter editor.
         /// </summary>
         [JsonProperty("isParameterEditor")]
         public bool IsParameterEditor { get; internal set; }
 
         /// <summary>
-        /// The id  of the property editor
+        /// Gets or sets the unique alias of the property editor.
         /// </summary>
         [JsonProperty("alias", Required = Required.Always)]
         public string Alias { get; internal set; }
 
         /// <summary>
-        /// The name of the property editor
+        /// Gets or sets the name of the property editor.
         /// </summary>
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; internal set; }
 
         /// <summary>
-        /// The icon of the property editor - if not set it uses a default icon
+        /// Gets or sets the icon of the property editor.
         /// </summary>
         [JsonProperty("icon")]
         public string Icon { get; internal set; }
 
         /// <summary>
-        /// The group of the property editor - if not set the editor will list as a generic editor
+        /// Gets or sets the group of the property editor.
         /// </summary>
         [JsonProperty("group")]
         public string Group { get; internal set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the property editor is deprecated.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsDeprecated { get; internal set; } // fixme kill it all in v8
 
         [JsonProperty("editor", Required = Required.Always)]
         public PropertyValueEditor ValueEditor => CreateValueEditor();
-
-        [JsonIgnore]
-        public bool IsDeprecated { get; internal set; } // fixme kill it all in v8
 
         [JsonIgnore]
         IValueEditor IParameterEditor.ValueEditor => ValueEditor;
@@ -113,28 +115,26 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Creates a value editor instance
         /// </summary>
-        /// <returns></returns>
         protected virtual PropertyValueEditor CreateValueEditor()
         {
+            // handle manifest-defined editors
             if (ManifestDefinedPropertyValueEditor != null)
             {
-                //detect if the view is a virtual path (in most cases, yes) then convert it
+                // map view path if virtual
                 if (ManifestDefinedPropertyValueEditor.View.StartsWith("~/"))
-                {
                     ManifestDefinedPropertyValueEditor.View = IOHelper.ResolveUrl(ManifestDefinedPropertyValueEditor.View);
-                }
                 return ManifestDefinedPropertyValueEditor;
             }
 
-            //create a new editor
+            // create a new editor
             var editor = new PropertyValueEditor();
+            var view = _attribute?.EditorView;
+            if (string.IsNullOrWhiteSpace(view))
+                throw new InvalidOperationException("The editor does not specify a view.");
 
-            if (_attribute.EditorView.IsNullOrWhiteSpace())
-            {
-                throw new NotImplementedException("This method must be implemented if a view is not explicitly set");
-            }
-
-            editor.View = _attribute.EditorView.StartsWith("~/") ? IOHelper.ResolveUrl(_attribute.EditorView) : _attribute.EditorView;
+            if (view.StartsWith("~/"))
+                view = IOHelper.ResolveUrl(view);
+            editor.View = view;
             editor.ValueType = _attribute.ValueType;
             editor.HideLabel = _attribute.HideLabel;
             return editor;
@@ -142,26 +142,23 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Creates a pre value editor instance
+        /// Creates a configuration editor instance.
         /// </summary>
-        /// <returns></returns>
         protected virtual PreValueEditor CreatePreValueEditor()
         {
-            //This will not be null if it is a manifest defined editor
+            // handle manifest-defined editors
             if (ManifestDefinedPreValueEditor != null)
             {
-                foreach (var f in ManifestDefinedPreValueEditor.Fields)
+                foreach (var field in ManifestDefinedPreValueEditor.Fields)
                 {
-                    //detect if the view is a virtual path (in most cases, yes) then convert it
-                    if (f.View.StartsWith("~/"))
-                    {
-                        f.View = IOHelper.ResolveUrl(f.View);
-                    }
+                    // map view path if virtual
+                    if (field.View.StartsWith("~/"))
+                        field.View = IOHelper.ResolveUrl(field.View);
                 }
                 return ManifestDefinedPreValueEditor;
             }
 
-            //There's no manifest, just return an empty one
+            // else return an empty one
             return new PreValueEditor();
         }
 
@@ -180,6 +177,9 @@ namespace Umbraco.Core.PropertyEditors
 
         public override int GetHashCode()
         {
+            // an internal setter is required for de-serialization from manifests
+            // but we are never going to change the alias once the editor exists
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
             return Alias.GetHashCode();
         }
 
@@ -214,6 +214,18 @@ namespace Umbraco.Core.PropertyEditors
                 configuration[kvp.Key] = kvp.Value.Value;
 
             return configuration;
+        }
+    }
+
+    public class PropertyEditor<TConfiguration> : PropertyEditor
+    {
+        public PropertyEditor(ILogger logger)
+            : base(logger)
+        { }
+
+        public virtual TConfiguration MapConfiguration(string configuration)
+        {
+            return JsonConvert.DeserializeObject<TConfiguration>(configuration);
         }
     }
 }

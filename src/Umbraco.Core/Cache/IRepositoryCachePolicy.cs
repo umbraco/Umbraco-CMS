@@ -6,7 +6,7 @@ using Umbraco.Core.Scoping;
 namespace Umbraco.Core.Cache
 {
     internal interface IRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         /// <summary>
         /// Gets an entity from the cache, else from the repository.

@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Published
         private class SimpleConverter1 : IPropertyValueConverter
         {
             public bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias.InvariantEquals("editor1");
+                => propertyType.EditorAlias.InvariantEquals("editor1");
 
             public Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof (int);
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Published
             }
 
             public bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias.InvariantEquals("editor2");
+                => propertyType.EditorAlias.InvariantEquals("editor2");
 
             public Type GetPropertyValueType(PublishedPropertyType propertyType)
                 // the first version would be the "generic" version, but say we want to be more precise
@@ -222,7 +222,7 @@ namespace Umbraco.Tests.Published
         public class SimpleConverter3A : PropertyValueConverterBase
         {
             public override bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias == "editor1";
+                => propertyType.EditorAlias == "editor1";
 
             public override Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof (string);
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Published
             }
 
             public override bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias == "editor2";
+                => propertyType.EditorAlias == "editor2";
 
             public override Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1"));

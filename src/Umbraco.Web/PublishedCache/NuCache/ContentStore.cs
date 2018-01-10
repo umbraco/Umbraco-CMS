@@ -361,7 +361,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var contentTypes = _contentTypesById
                     .Where(kvp =>
                         kvp.Value.Value != null &&
-                        kvp.Value.Value.PropertyTypes.Any(p => dataTypeIds.Contains(p.DataTypeId)))
+                        kvp.Value.Value.PropertyTypes.Any(p => dataTypeIds.Contains(p.DataType.Id)))
                     .Select(kvp => kvp.Value.Value)
                     .Select(x => getContentType(x.Id))
                     .Where(x => x != null) // poof, gone, very unlikely and probably an anomaly

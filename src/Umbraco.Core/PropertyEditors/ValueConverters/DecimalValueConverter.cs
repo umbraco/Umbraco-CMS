@@ -8,7 +8,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class DecimalValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => Constants.PropertyEditors.DecimalAlias.Equals(propertyType.PropertyEditorAlias);
+            => Constants.PropertyEditors.DecimalAlias.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (decimal);

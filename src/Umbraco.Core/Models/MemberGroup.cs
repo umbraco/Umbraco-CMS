@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MemberGroup : Entity, IMemberGroup
+    public class MemberGroup : EntityBase.EntityBase, IMemberGroup
     {
         public MemberGroup()
         {

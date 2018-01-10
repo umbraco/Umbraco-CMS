@@ -24,46 +24,51 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region Constructors
 
-        // the first ctor is the default one, used in PublishedContentType to create the property types
-        // the second ctor is the test ctor,
-        //   some parameters are optional, and they are all assumed to be valid and consistent
-
         /// <summary>
-        /// Initialize a new instance of the <see cref="PublishedPropertyType"/> class within a <see cref="PublishedContentType"/>,
-        /// and with a <see cref="PropertyType"/>.
+        /// Initialize a new instance of the <see cref="PublishedPropertyType"/> class with a property type.
         /// </summary>
-        /// <remarks>The new published property type belongs to the published content type and corresponds to the property type.</remarks>
-        public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType, IPublishedModelFactory publishedModelFactory, PropertyValueConverterCollection propertyValueConverters, IPublishedContentTypeFactory factory)
-            : this(propertyType.Alias, propertyType.DataTypeDefinitionId, propertyType.PropertyEditorAlias, false, publishedModelFactory, propertyValueConverters, factory)
+        /// <remarks>
+        /// <para>The new published property type belongs to the published content type.</para>
+        /// </remarks>
+        public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+            : this(propertyType.Alias, propertyType.DataTypeDefinitionId, propertyType.PropertyEditorAlias, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
-            // PropertyEditor [1:n] DataTypeDefinition [1:n] PropertyType
-
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class.
+        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with specific values.
         /// </summary>
         /// <remarks>
-        /// <para>The new published property type does not belong to a published content type. fixme should they?</para>
-        /// <para>The values of parameters are assumed to be valid and consistent.</para>
-        /// <para></para>
+        /// <para>This constructor is for tests and is not intended to be used directly from application code.</para>
+        /// <para>Values are assumed to be consisted and are not checked.</para>
+        /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
-        internal PublishedPropertyType(string propertyTypeAlias, int dataTypeId, string editorAlias, bool umbraco, IPublishedModelFactory publishedModelFactory, PropertyValueConverterCollection propertyValueConverters, IPublishedContentTypeFactory factory)
+        public PublishedPropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, string editorAlias, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+            : this(propertyTypeAlias, dataTypeId, editorAlias, isUserProperty, variations, propertyValueConverters, publishedModelFactory, factory)
         {
-            // ContentType
-            // - in unit tests, to be set by PublishedContentType when creating it
+            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with specific values.
+        /// </summary>
+        /// <remarks>
+        /// <para>This constructor is for tests and is not intended to be used directly from application code.</para>
+        /// <para>Values are assumed to be consisted and are not checked.</para>
+        /// <para>The new published property type does not belong to a published content type.</para>
+        /// </remarks>
+        public PublishedPropertyType(string propertyTypeAlias, int dataTypeId, string editorAlias, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+        {
             _publishedModelFactory = publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));
             _propertyValueConverters = propertyValueConverters ?? throw new ArgumentNullException(nameof(propertyValueConverters));
 
-            PropertyTypeAlias = propertyTypeAlias;
+            Alias = propertyTypeAlias;
 
-            DataTypeId = dataTypeId;
-            PropertyEditorAlias = editorAlias;
-            IsUmbraco = umbraco;
+            IsUserProperty = isUserProperty;
+            Variations = variations;
 
-            DataType = factory.CreateDataType(DataTypeId, PropertyEditorAlias);
+            DataType = factory.CreateDataType(dataTypeId, editorAlias);
         }
 
         #endregion
@@ -72,34 +77,36 @@ namespace Umbraco.Core.Models.PublishedContent
 
         /// <summary>
         /// Gets the published content type containing the property type.
-        /// </summary>
-        // internally set by PublishedContentType constructor
-        public PublishedContentType ContentType { get; internal set; }
+        /// </summary>        
+        public PublishedContentType ContentType { get; internal set; } // internally set by PublishedContentType constructor
 
         /// <summary>
-        /// Gets the data type of the property.
+        /// Gets the data type.
         /// </summary>
         public PublishedDataType DataType { get; }
 
         /// <summary>
-        /// Gets the alias uniquely identifying the property type.
+        /// Gets property type alias.
         /// </summary>
-        public string PropertyTypeAlias { get; } // fixme - should be .ContentType.??
+        public string Alias { get; }
 
         /// <summary>
-        /// Gets the identifier uniquely identifying the data type supporting the property type.
+        /// Gets the property editor alias.
         /// </summary>
-        public int DataTypeId { get; } // fixme - should be .DataType.Id
+        public string EditorAlias => DataType.EditorAlias;
 
         /// <summary>
-        /// Gets the alias uniquely identifying the property editor for the property type.
+        /// Gets a value indicating whether the property is a user content property.
         /// </summary>
-        public string PropertyEditorAlias { get; } // fixme - should be .DataType.EditorAlias
+        /// <remarks>A non-user content property is a property that has been added to a
+        /// published content type by Umbraco but does not corresponds to a user-defined
+        /// published property.</remarks>
+        public bool IsUserProperty { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the property is an Umbraco-defined property.
+        /// Gets the content variations of the property type.
         /// </summary>
-        internal bool IsUmbraco { get; }
+        public ContentVariation Variations { get; }
 
         #endregion
 
@@ -123,7 +130,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
             foreach (var converter in _propertyValueConverters)
             {
-                if (converter.IsConverter(this) == false)
+                if (!converter.IsConverter(this))
                     continue;
 
                 if (_converter == null)
@@ -153,7 +160,7 @@ namespace Umbraco.Core.Models.PublishedContent
                             throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
                                                                               + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
                                                                               + " for that property, and only one converter can exist for a property.",
-                                ContentType.Alias, PropertyTypeAlias,
+                                ContentType.Alias, Alias,
                                 converter.GetType().FullName, _converter.GetType().FullName));
                         }
                     }
@@ -176,7 +183,7 @@ namespace Umbraco.Core.Models.PublishedContent
                         throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
                                                                           + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
                                                                           + " for that property, and only one converter can exist for a property.",
-                            ContentType.Alias, PropertyTypeAlias,
+                            ContentType.Alias, Alias,
                             converter.GetType().FullName, _converter.GetType().FullName));
                     }
                 }

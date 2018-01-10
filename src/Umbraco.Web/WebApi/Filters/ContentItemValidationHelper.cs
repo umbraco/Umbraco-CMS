@@ -119,7 +119,7 @@ namespace Umbraco.Web.WebApi.Filters
                 var editor = p.PropertyEditor;
                 if (editor == null)
                 {
-                    var message = string.Format("The property editor with alias: {0} was not found for property with id {1}", p.DataType.PropertyEditorAlias, p.Id);
+                    var message = string.Format("The property editor with alias: {0} was not found for property with id {1}", p.DataType.EditorAlias, p.Id);
                     Current.Logger.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
                     //actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                     //return false;

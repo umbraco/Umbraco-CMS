@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Cache
             return "succ" + i;
         }
 
-        private class TestClass : TracksChangesEntityBase, IDeepCloneable
+        private class TestClass : BeingDirtyBase, IDeepCloneable
         {
             public TestClass()
             {

@@ -470,7 +470,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             //lets check if the alias does not exist on the document.
             //NOTE: Examine will not index empty values and we do not output empty XML Elements to the cache - either of these situations
             // would mean that the property is missing from the collection whether we are getting the value from Examine or from the library media cache.
-            if (dd.Properties.All(x => x.PropertyTypeAlias.InvariantEquals(alias) == false))
+            if (dd.Properties.All(x => x.Alias.InvariantEquals(alias) == false))
             {
                 return null;
             }
@@ -479,13 +479,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             {
                 //We are going to check for a special field however, that is because in some cases we store a 'Raw'
                 //value in the index such as for xml/html.
-                var rawValue = dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(BaseUmbracoIndexer.RawFieldPrefix + alias));
+                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(BaseUmbracoIndexer.RawFieldPrefix + alias));
                 return rawValue
-                       ?? dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+                       ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
 
             //if its not loaded from examine, then just return the property
-            return dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+            return dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
         /// <summary>
@@ -678,7 +678,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 //make sure we create them even if there's no value
                 foreach (var propertyType in _contentType.PropertyTypes)
                 {
-                    var alias = propertyType.PropertyTypeAlias;
+                    var alias = propertyType.Alias;
                     _keysAdded.Add(alias);
                     string value;
                     const bool isPreviewing = false; // false :: never preview a media

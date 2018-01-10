@@ -316,18 +316,14 @@ namespace Umbraco.Core.Services.Implement
 
         private void CreateMember(IScope scope, Member member, int userId, bool withIdentity)
         {
-            // there's no Creating event for members
-
             member.CreatorId = userId;
 
             if (withIdentity)
             {
+                // if saving is cancelled, media remains without an identity
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
-                {
-                    member.WasCancelled = true;
                     return;
-                }
 
                 _memberRepository.Save(member);
 
@@ -337,10 +333,10 @@ namespace Umbraco.Core.Services.Implement
 
             scope.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, member.ContentType.Alias, -1));
 
-            var msg = withIdentity
-                ? "Member '{0}' was created with Id {1}"
-                : "Member '{0}' was created";
-            Audit(AuditType.New, string.Format(msg, member.Name, member.Id), member.CreatorId, member.Id);
+            if (withIdentity == false)
+                return;
+
+            Audit(AuditType.New, $"Member '{member.Name}' was created with Id {member.Id}", member.CreatorId, member.Id);
         }
 
         #endregion

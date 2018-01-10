@@ -114,7 +114,7 @@ namespace Umbraco.Web.PublishedCache
             {
                 _lock.EnterWriteLock();
 
-                var toRemove = _typesById.Values.Where(x => x.PropertyTypes.Any(xx => xx.DataTypeId == id)).ToArray();
+                var toRemove = _typesById.Values.Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
                 foreach (var type in toRemove)
                 {
                     _typesByAlias.Remove(GetAliasKey(type));
@@ -226,7 +226,7 @@ namespace Umbraco.Web.PublishedCache
             if (contentType == null)
                 throw new Exception($"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with alias \"{alias}\".");
 
-            return _publishedContentTypeFactory.CreateContentType(itemType, contentType);
+            return _publishedContentTypeFactory.CreateContentType(contentType);
         }
 
         private PublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
@@ -253,7 +253,7 @@ namespace Umbraco.Web.PublishedCache
             if (contentType == null)
                 throw new Exception($"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with id {id}.");
 
-            return _publishedContentTypeFactory.CreateContentType(itemType, contentType);
+            return _publishedContentTypeFactory.CreateContentType(contentType);
         }
 
         // for unit tests - changing the callback must reset the cache obviously

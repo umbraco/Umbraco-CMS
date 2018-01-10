@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Models.Identity
 {
-    public interface IIdentityUserLogin : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IIdentityUserLogin : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// The login provider for the login (i.e. facebook, google)

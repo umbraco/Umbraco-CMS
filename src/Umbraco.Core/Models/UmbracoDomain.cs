@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class UmbracoDomain : Entity, IDomain
+    public class UmbracoDomain : EntityBase.EntityBase, IDomain
     {
         public UmbracoDomain(string domainName)
         {

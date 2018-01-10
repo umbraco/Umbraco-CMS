@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Relation : Entity, IAggregateRoot, IRelation
+    public class Relation : EntityBase.EntityBase, IRelation
     {
         //NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
         private int _parentId;

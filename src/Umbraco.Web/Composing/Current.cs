@@ -256,6 +256,8 @@ namespace Umbraco.Web.Composing
 
         public static ISqlContext SqlContext=> CoreCurrent.SqlContext;
 
+        public static IPublishedContentTypeFactory PublishedContentTypeFactory => CoreCurrent.PublishedContentTypeFactory;
+
         #endregion
     }
 }

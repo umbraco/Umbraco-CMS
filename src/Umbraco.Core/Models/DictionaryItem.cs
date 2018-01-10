@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryItem : Entity, IDictionaryItem
+    public class DictionaryItem : EntityBase.EntityBase, IDictionaryItem
     {
         public Func<int, ILanguage> GetLanguage { get; set; }
         private Guid? _parentId;

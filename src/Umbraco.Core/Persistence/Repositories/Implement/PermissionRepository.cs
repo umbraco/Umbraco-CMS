@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// like the normal repository pattern but the standard repository Get commands don't apply and will throw <see cref="NotImplementedException"/>
     /// </remarks>
     internal class PermissionRepository<TEntity> : NPocoRepositoryBase<int, ContentPermissionSet>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         public PermissionRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
@@ -305,8 +305,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="entity"></param>
         protected override void PersistUpdatedItem(ContentPermissionSet entity)
         {
-            var asAggregateRoot = (IAggregateRoot)entity;
-            if (asAggregateRoot.HasIdentity == false)
+            var asIEntity = (IEntity) entity;
+            if (asIEntity.HasIdentity == false)
             {
                 throw new InvalidOperationException("Cannot create permissions for an entity without an Id");
             }

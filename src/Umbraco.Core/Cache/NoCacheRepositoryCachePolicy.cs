@@ -7,7 +7,7 @@ using Umbraco.Core.Scoping;
 namespace Umbraco.Core.Cache
 {
     internal class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         private NoCacheRepositoryCachePolicy() { }
 

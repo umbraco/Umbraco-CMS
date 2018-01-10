@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class UploadPropertyConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.UploadFieldAlias);
+            => propertyType.EditorAlias.Equals(Constants.PropertyEditors.UploadFieldAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (string);

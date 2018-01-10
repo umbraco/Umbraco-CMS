@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Models
             var esmock = new Mock<IEntityService>();
             esmock
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns<UmbracoObjectTypes, int[]>((type, ids) => new[] { new EntityPath { Id = startNodeId, Path = startNodePath } });
+                .Returns<UmbracoObjectTypes, int[]>((type, ids) => new[] { new TreeEntityPath { Id = startNodeId, Path = startNodePath } });
 
             Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object));
         }
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Models
             var esmock = new Mock<IEntityService>();
             esmock
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-                .Returns<UmbracoObjectTypes, int[]>((type, ids) => paths.Where(x => ids.Contains(x.Key)).Select(x => new EntityPath { Id = x.Key, Path = x.Value }));
+                .Returns<UmbracoObjectTypes, int[]>((type, ids) => paths.Where(x => ids.Contains(x.Key)).Select(x => new TreeEntityPath { Id = x.Key, Path = x.Value }));
 
             var comma = new[] { ',' };
 

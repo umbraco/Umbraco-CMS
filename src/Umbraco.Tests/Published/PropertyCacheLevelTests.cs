@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Published
             public int InterConverts { get; private set; }
 
             public bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.PropertyEditorAlias.InvariantEquals("editor1");
+                => propertyType.EditorAlias.InvariantEquals("editor1");
 
             public Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof(int);

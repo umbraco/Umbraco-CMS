@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 // callback to get the children: we're not going to test this so ignore
                 (dd, n) => new List<IPublishedContent>(),
                 // callback to get a property
-                (dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)),
+                (dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)),
                 null, // cache provider
                 ContentTypesCache,
                 // no xpath
@@ -305,7 +305,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             //callback to get the children
             (dd, n) => children,
             // callback to get a property
-            (dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)),
+            (dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)),
             null, // cache provider
             ContentTypesCache,
             // no xpath

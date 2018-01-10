@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using DataType = System.ComponentModel.DataAnnotations.DataType;
 
 namespace Umbraco.Web.Models
 {

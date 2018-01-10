@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath {Path = nodePaths[x], Id = x});
+                    return ids.Select(x => new TreeEntityPath {Path = nodePaths[x], Id = x});
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -210,7 +210,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -286,7 +286,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -324,7 +324,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -362,7 +362,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(
@@ -400,7 +400,7 @@ namespace Umbraco.Tests.Web.Controllers
             entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) =>
                 {
-                    return ids.Select(x => new EntityPath { Path = nodePaths[x], Id = x });
+                    return ids.Select(x => new TreeEntityPath { Path = nodePaths[x], Id = x });
                 });
 
             var authHelper = new UserEditorAuthorizationHelper(

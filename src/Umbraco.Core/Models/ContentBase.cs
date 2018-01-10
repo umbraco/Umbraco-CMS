@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
-    public abstract class ContentBase : Entity, IContentBase
+    public abstract class ContentBase : EntityBase.EntityBase, IContentBase
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 

@@ -278,7 +278,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // content (and types) are read-locked
 
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Content, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _contentStore.UpdateContentTypes(null, contentTypes, null);
 
             _localContentDb?.Clear();
@@ -294,7 +294,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void LoadContentFromLocalDbLocked(IScope scope)
         {
             var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Content, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _contentStore.UpdateContentTypes(null, contentTypes, null);
 
             _logger.Debug<PublishedSnapshotService>("Loading content from local db...");
@@ -346,7 +346,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // locks & notes: see content
 
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Media, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _mediaStore.UpdateContentTypes(null, mediaTypes, null);
 
             _localMediaDb?.Clear();
@@ -362,7 +362,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void LoadMediaFromLocalDbLocked(IScope scope)
         {
             var mediaTypes = _serviceContext.MediaTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(PublishedItemType.Media, x));
+                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _mediaStore.UpdateContentTypes(null, mediaTypes, null);
 
             _logger.Debug<PublishedSnapshotService>("Loading media from local db...");
@@ -848,7 +848,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // some may be missing - not checking here
 
-            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(itemType, x));
+            return contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x));
         }
 
         private PublishedContentType CreateContentType(PublishedItemType itemType, int id)
@@ -869,7 +869,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }
 
-            return contentType == null ? null : _publishedContentTypeFactory.CreateContentType(itemType, contentType);
+            return contentType == null ? null : _publishedContentTypeFactory.CreateContentType(contentType);
         }
 
         private void RefreshContentTypesLocked(IEnumerable<int> removedIds, IEnumerable<int> refreshedIds, IEnumerable<int> otherIds, IEnumerable<int> newIds)

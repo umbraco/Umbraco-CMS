@@ -133,10 +133,10 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
-        public XElement Serialize(IDataTypeService dataTypeService, IDataTypeDefinition dataTypeDefinition)
+        public XElement Serialize(IDataTypeService dataTypeService, IDataType dataType)
         {
             var prevalues = new XElement("PreValues");
-            var prevalueList = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
+            var prevalueList = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id)
                 .FormatAsDictionary();
 
             var sort = 0;
@@ -152,17 +152,17 @@ namespace Umbraco.Core.Services
             }
 
             var xml = new XElement("DataType", prevalues);
-            xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
+            xml.Add(new XAttribute("Name", dataType.Name));
             //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
-            xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
-            xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
-            xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
+            xml.Add(new XAttribute("Id", dataType.EditorAlias));
+            xml.Add(new XAttribute("Definition", dataType.Key));
+            xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
 
             var folderNames = string.Empty;
-            if (dataTypeDefinition.Level != 1)
+            if (dataType.Level != 1)
             {
                 //get url encoded folder names
-                var folders = dataTypeService.GetContainers(dataTypeDefinition)
+                var folders = dataTypeService.GetContainers(dataType)
                     .OrderBy(x => x.Level)
                     .Select(x => HttpUtility.UrlEncode(x.Name));
 

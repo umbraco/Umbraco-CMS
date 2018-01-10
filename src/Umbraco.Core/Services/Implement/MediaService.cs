@@ -274,28 +274,14 @@ namespace Umbraco.Core.Services.Implement
 
         private void CreateMedia(IScope scope, Models.Media media, IMedia parent, int userId, bool withIdentity)
         {
-            // NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
-            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            var newArgs = parent != null
-                ? new NewEventArgs<IMedia>(media, media.ContentType.Alias, parent)
-                : new NewEventArgs<IMedia>(media, media.ContentType.Alias, -1);
-
-            if (scope.Events.DispatchCancelable(Creating, this, newArgs))
-            {
-                media.WasCancelled = true;
-                return;
-            }
-
             media.CreatorId = userId;
 
             if (withIdentity)
             {
+                // if saving is cancelled, media remains without an identity
                 var saveEventArgs = new SaveEventArgs<IMedia>(media);
                 if (Saving.IsRaisedEventCancelled(saveEventArgs, this))
-                {
-                    media.WasCancelled = true;
                     return;
-                }
 
                 _mediaRepository.Save(media);
 
@@ -304,14 +290,12 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
-            newArgs.CanCancel = false;
-            scope.Events.Dispatch(Created, this, newArgs);
+            scope.Events.Dispatch(Created, this, new NewEventArgs<IMedia>(media, false, media.ContentType.Alias, parent));
 
-            var msg = withIdentity
-                ? "Media '{0}' was created with Id {1}"
-                : "Media '{0}' was created";
+            if (withIdentity == false)
+                return;
 
-            Audit(AuditType.New, string.Format(msg, media.Name, media.Id), media.CreatorId, media.Id);
+            Audit(AuditType.New, $"Media '{media.Name}' was created with Id {media.Id}", media.CreatorId, media.Id);
         }
 
         #endregion
@@ -1388,12 +1372,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saved;
-
-        /// <summary>
-        /// Occurs before Create
-        /// </summary>
-        [Obsolete("Use the Created event instead, the Creating and Created events both offer the same functionality, Creating event has been deprecated.")]
-        public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Creating;
 
         /// <summary>
         /// Occurs after Create

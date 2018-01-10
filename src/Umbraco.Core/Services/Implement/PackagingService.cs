@@ -704,7 +704,7 @@ namespace Umbraco.Core.Services.Implement
                         dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
                     }
                 }
-                else if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
+                else if (dataTypeDefinition.EditorAlias != propertyEditorAlias)
                 {
                     var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
@@ -812,7 +812,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="dataTypeDefinitions">List of data types to export</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
-        public XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, bool raiseEvents = true)
+        public XElement Export(IEnumerable<IDataType> dataTypeDefinitions, bool raiseEvents = true)
         {
             var container = new XElement("DataTypes");
             foreach (var dataTypeDefinition in dataTypeDefinitions)
@@ -825,39 +825,39 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Exports a single Data Type
         /// </summary>
-        /// <param name="dataTypeDefinition">Data type to export</param>
+        /// <param name="dataType">Data type to export</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
-        public XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true)
+        public XElement Export(IDataType dataType, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (ExportingDataType.IsRaisedEventCancelled(new ExportEventArgs<IDataTypeDefinition>(dataTypeDefinition, "DataType"), this))
+                if (ExportingDataType.IsRaisedEventCancelled(new ExportEventArgs<IDataType>(dataType, "DataType"), this))
                     return new XElement("DataType");
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_dataTypeService, dataTypeDefinition);
+            var xml = exporter.Serialize(_dataTypeService, dataType);
 
             if (raiseEvents)
-                ExportedDataType.RaiseEvent(new ExportEventArgs<IDataTypeDefinition>(dataTypeDefinition, xml, false), this);
+                ExportedDataType.RaiseEvent(new ExportEventArgs<IDataType>(dataType, xml, false), this);
 
             return xml;
         }
 
         /// <summary>
-        /// Imports and saves package xml as <see cref="IDataTypeDefinition"/>
+        /// Imports and saves package xml as <see cref="IDataType"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional id of the user</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (ImportingDataType.IsRaisedEventCancelled(new ImportEventArgs<IDataTypeDefinition>(element), this))
-                    return Enumerable.Empty<IDataTypeDefinition>();
+                if (ImportingDataType.IsRaisedEventCancelled(new ImportEventArgs<IDataType>(element), this))
+                    return Enumerable.Empty<IDataType>();
             }
 
             var name = element.Name.LocalName;
@@ -866,7 +866,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DataTypes' for multiple imports or 'DataType' for a single import.");
             }
 
-            var dataTypes = new Dictionary<string, IDataTypeDefinition>();
+            var dataTypes = new Dictionary<string, IDataType>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
                                        : new List<XElement> { element };
@@ -893,7 +893,7 @@ namespace Umbraco.Core.Services.Implement
                                            : DataTypeDatabaseType.Ntext;
 
                     //the Id field is actually the string property editor Alias
-                    var dataTypeDefinition = new DataTypeDefinition(dataTypeElement.Attribute("Id").Value.Trim())
+                    var dataTypeDefinition = new DataType(dataTypeElement.Attribute("Id").Value.Trim())
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
@@ -925,7 +925,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             if (raiseEvents)
-                ImportedDataType.RaiseEvent(new ImportEventArgs<IDataTypeDefinition>(list, element, false), this);
+                ImportedDataType.RaiseEvent(new ImportEventArgs<IDataType>(list, element, false), this);
 
             return list;
         }
@@ -988,7 +988,7 @@ namespace Umbraco.Core.Services.Implement
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
         }
 
-        private void SavePrevaluesFromXml(List<IDataTypeDefinition> dataTypes, IEnumerable<XElement> dataTypeElements)
+        private void SavePrevaluesFromXml(List<IDataType> dataTypes, IEnumerable<XElement> dataTypeElements)
         {
             foreach (var dataTypeElement in dataTypeElements)
             {
@@ -1809,22 +1809,22 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Importing DataType
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataTypeDefinition>> ImportingDataType;
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataType>> ImportingDataType;
 
         /// <summary>
         /// Occurs after DataType is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataTypeDefinition>> ImportedDataType;
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataType>> ImportedDataType;
 
         /// <summary>
         /// Occurs before Exporting DataType
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataTypeDefinition>> ExportingDataType;
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataType>> ExportingDataType;
 
         /// <summary>
         /// Occurs after DataType is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataTypeDefinition>> ExportedDataType;
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataType>> ExportedDataType;
 
         /// <summary>
         /// Occurs before Importing DictionaryItem

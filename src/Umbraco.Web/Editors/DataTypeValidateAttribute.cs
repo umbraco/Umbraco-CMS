@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
             dataType.PropertyEditor = propertyEditor;
 
             //Validate the data type exists or create one if required
-            IDataTypeDefinition persisted;
+            IDataType persisted;
             switch (dataType.Action)
             {
                 case ContentSaveAction.Save:
@@ -75,8 +75,8 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.SaveNew:
                     //create the persisted model from mapping the saved model
-                    persisted = Mapper.Map<IDataTypeDefinition>(dataType);
-                    ((DataTypeDefinition)persisted).ResetIdentity();
+                    persisted = Mapper.Map<IDataType>(dataType);
+                    ((DataType)persisted).ResetIdentity();
                     break;
                 default:
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new ArgumentOutOfRangeException());

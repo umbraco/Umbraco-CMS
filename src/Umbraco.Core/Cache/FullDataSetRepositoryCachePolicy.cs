@@ -19,7 +19,7 @@ namespace Umbraco.Core.Cache
     /// keep as a whole in memory.</para>
     /// </remarks>
     internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         private readonly Func<TEntity, TId> _entityGetId;
         private readonly bool _expires;

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Cache
     /// <para>If options.GetAllCacheValidateCount then we check against the db when getting many entities.</para>
     /// </remarks>
     internal class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;

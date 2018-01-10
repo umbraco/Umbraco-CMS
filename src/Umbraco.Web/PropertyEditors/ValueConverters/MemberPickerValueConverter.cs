@@ -19,8 +19,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias)
-                || propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPicker2Alias);
+            return propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPickerAlias)
+                || propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.MemberPicker2Alias);
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)

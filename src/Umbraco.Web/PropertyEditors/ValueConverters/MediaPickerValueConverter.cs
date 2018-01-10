@@ -29,11 +29,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias);
+            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias);
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias)
+            => IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias)
                 ? typeof (IEnumerable<IPublishedContent>)
                 : typeof (IPublishedContent);
 
@@ -102,7 +102,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         mediaItems.Add(item);
                 }
 
-                if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
+                if (IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias))
                     return mediaItems;
                 return mediaItems.FirstOrDefault();
             }

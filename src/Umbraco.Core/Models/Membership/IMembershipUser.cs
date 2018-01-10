@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Membership
     /// <summary>
     /// Defines the base contract for <see cref="IMember"/> and <see cref="IUser"/>
     /// </summary>
-    public interface IMembershipUser : IAggregateRoot
+    public interface IMembershipUser : IEntity
     {
         object ProviderUserKey { get; set; }
         string Username { get; set; }

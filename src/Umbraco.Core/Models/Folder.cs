@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Models
 {
-    internal sealed class Folder : Entity
+    internal sealed class Folder : EntityBase.EntityBase
     {
         public Folder(string folderPath)
         {

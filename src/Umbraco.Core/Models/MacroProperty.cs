@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
+    public class MacroProperty : BeingDirtyBase, IMacroProperty, IRememberBeingDirty, IDeepCloneable
     {
         public MacroProperty()
         {
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
-            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
+            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<EntityBase.EntityBase, int>(x => x.Id);
             public readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
         }
 

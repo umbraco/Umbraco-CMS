@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Task : Entity, IAggregateRoot
+    public class Task : EntityBase.EntityBase
     {
         private bool _closed;
         private TaskType _taskType;

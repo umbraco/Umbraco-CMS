@@ -9,6 +9,9 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     internal abstract class PublishedPropertyBase : IPublishedProperty
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyBase"/> class.
+        /// </summary>
         protected PublishedPropertyBase(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
         {
             PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
@@ -18,6 +21,7 @@ namespace Umbraco.Core.Models.PublishedContent
             ValidateCacheLevel(PropertyType.CacheLevel, false);
         }
 
+        // validates the cache level
         private static void ValidateCacheLevel(PropertyCacheLevel cacheLevel, bool validateUnknown)
         {
             switch (cacheLevel)
@@ -35,14 +39,29 @@ namespace Umbraco.Core.Models.PublishedContent
             }
         }
 
+        /// <summary>
+        /// Gets the property type.
+        /// </summary>
         public PublishedPropertyType PropertyType { get; }
-        public string PropertyTypeAlias => PropertyType.PropertyTypeAlias;
+
+        /// <summary>
+        /// Gets the property reference cache level.
+        /// </summary>
         public PropertyCacheLevel ReferenceCacheLevel { get; }
 
-        // these have to be provided by the actual implementation
+        /// <inheritdoc />
+        public string Alias => PropertyType.Alias;
+
+        /// <inheritdoc />
         public abstract bool HasValue(int? languageId = null, string segment = null);
+
+        /// <inheritdoc />
         public abstract object GetSourceValue(int? languageId = null, string segment = null);
+
+        /// <inheritdoc />
         public abstract object GetValue(int? languageId = null, string segment = null);
+
+        /// <inheritdoc />
         public abstract object GetXPathValue(int? languageId = null, string segment = null);
     }
 }

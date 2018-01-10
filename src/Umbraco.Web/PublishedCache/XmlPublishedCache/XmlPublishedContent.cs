@@ -391,11 +391,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             properties = new Dictionary<string, IPublishedProperty>(StringComparer.OrdinalIgnoreCase);
             foreach (var propertyType in contentType.PropertyTypes)
             {
-                var val = propertyNodes.TryGetValue(propertyType.PropertyTypeAlias.ToLowerInvariant(), out XmlNode n)
+                var val = propertyNodes.TryGetValue(propertyType.Alias.ToLowerInvariant(), out XmlNode n)
                     ? new XmlPublishedProperty(propertyType, node, isPreviewing, n)
                     : new XmlPublishedProperty(propertyType, node, isPreviewing);
 
-                properties[propertyType.PropertyTypeAlias] = val;
+                properties[propertyType.Alias] = val;
             }
         }
 

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserType : Entity, IUserType
+    internal class UserType : EntityBase.EntityBase, IUserType
     {
         private string _alias;
         private string _name;

@@ -296,11 +296,11 @@ namespace Umbraco.Tests.Benchmarks
             properties = contentType.PropertyTypes.Select(p =>
             {
                 XmlNode n;
-                return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
+                return propertyNodes.TryGetValue(p.Alias.ToLowerInvariant(), out n)
                     ? new XmlPublishedProperty(p, null, isPreviewing, n)
                     : new XmlPublishedProperty(p, null, isPreviewing);
             }).Cast<IPublishedProperty>().ToDictionary(
-                x => x.PropertyTypeAlias,
+                x => x.Alias,
                 x => x,
                 StringComparer.OrdinalIgnoreCase);
         }

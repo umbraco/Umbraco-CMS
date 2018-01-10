@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a member type
     /// </summary>
-    public interface IMemberGroup : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface IMemberGroup : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// The name of the member group

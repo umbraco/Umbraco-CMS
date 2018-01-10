@@ -9,7 +9,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class DropdownListMultipleValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListMultipleAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListMultipleAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);

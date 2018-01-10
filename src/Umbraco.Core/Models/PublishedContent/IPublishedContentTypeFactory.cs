@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.PublishedContent
+﻿namespace Umbraco. Core.Models.PublishedContent
 {
     /// <summary>
     /// Creates published content types.
@@ -8,26 +8,28 @@
         /// <summary>
         /// Creates a published content type.
         /// </summary>
-        /// <param name="itemType">The item type.</param>
         /// <param name="contentType">An content type.</param>
         /// <returns>A published content type corresponding to the item type and content type.</returns>
-        PublishedContentType CreateContentType(PublishedItemType itemType, IContentTypeComposition contentType);
-        // fixme could we derive itemType from contentType?
+        PublishedContentType CreateContentType(IContentTypeComposition contentType);
 
         /// <summary>
         /// Creates a published property type.
         /// </summary>
         /// <param name="contentType">The published content type owning the property.</param>
         /// <param name="propertyType">A property type.</param>
-        /// <returns>A published property type corresponding to the property type and owned by the published content type.</returns>
+        /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create property types.</remarks>
         PublishedPropertyType CreatePropertyType(PublishedContentType contentType, PropertyType propertyType);
 
         /// <summary>
         /// Creates a published property type.
         /// </summary>
-        /// <param name="umbraco">A value indicating whether the property is created by Umbraco.</param>
-        /// <returns>fixme xplain.</returns>
-        PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, string editorAlias, bool umbraco = false);
+        /// <param name="contentType">The published content type owning the property.</param>
+        /// <param name="propertyTypeAlias">The property type alias.</param>
+        /// <param name="dataTypeId">The datatype identifier.</param>
+        /// <param name="propertyEditorAlias">The property editor alias.</param> FIXME derive from dataTypeId?
+        /// <param name="variations">The variations.</param>
+        /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create special property types.</remarks>
+        PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, string propertyEditorAlias, ContentVariation variations);
 
         /// <summary>
         /// Creates a published data type.

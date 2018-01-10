@@ -57,7 +57,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
                 {
                     Name = contentType.Alias;
                     FieldTypes = BuiltinProperties
-                        .Union(contentType.PropertyTypes.Select(propertyType => new NavigablePropertyType(propertyType.PropertyTypeAlias)))
+                        .Union(contentType.PropertyTypes.Select(propertyType => new NavigablePropertyType(propertyType.Alias)))
                         .ToArray();
                 }
             }

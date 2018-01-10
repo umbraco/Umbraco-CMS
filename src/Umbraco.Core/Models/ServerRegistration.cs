@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a registered server in a multiple-servers environment.
     /// </summary>
-    public class ServerRegistration : Entity, IServerRegistration
+    public class ServerRegistration : EntityBase.EntityBase, IServerRegistration
     {
         private string _serverAddress;
         private string _serverIdentity;

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PublicAccessEntry : Entity, IAggregateRoot
+    public class PublicAccessEntry : EntityBase.EntityBase
     {
         private readonly ObservableCollection<PublicAccessRule> _ruleCollection;
         private int _protectedNodeId;

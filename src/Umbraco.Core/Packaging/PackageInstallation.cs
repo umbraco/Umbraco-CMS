@@ -147,7 +147,7 @@ namespace Umbraco.Core.Packaging
 
             try
             {
-                var dataTypeDefinitions = EmptyEnumerableIfNull<IDataTypeDefinition>(dataTypes) ?? InstallDataTypes(dataTypes, userId);
+                var dataTypeDefinitions = EmptyEnumerableIfNull<IDataType>(dataTypes) ?? InstallDataTypes(dataTypes, userId);
                 installationSummary.DataTypesInstalled = dataTypeDefinitions;
 
                 var languagesInstalled = EmptyEnumerableIfNull<ILanguage>(languages) ?? InstallLanguages(languages, userId);
@@ -412,7 +412,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportLanguages(languageElement, userId);
         }
 
-        private IEnumerable<IDataTypeDefinition> InstallDataTypes(XElement dataTypeElements, int userId = 0)
+        private IEnumerable<IDataType> InstallDataTypes(XElement dataTypeElements, int userId = 0)
         {
             if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName) == false)
             {

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}")]
-    public class PropertyGroup : Entity, IEquatable<PropertyGroup>
+    public class PropertyGroup : EntityBase.EntityBase, IEquatable<PropertyGroup>
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 

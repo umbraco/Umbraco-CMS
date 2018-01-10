@@ -168,7 +168,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
 
                 //These get persisted as part of the saving procedure, nothing to do with the display model
-                .IgnoreDeletableEntityCommonProperties()
+                .IgnoreEntityCommonProperties()
 
                 .ForMember(dest => dest.AllowedAsRoot, opt => opt.MapFrom(src => src.AllowAsRoot))
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())

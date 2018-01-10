@@ -86,7 +86,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns>The entity identifier of the entity.</returns>
-        public static GuidUdi GetUdi(this IDataTypeDefinition entity)
+        public static GuidUdi GetUdi(this IDataType entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
             return new GuidUdi(Constants.UdiEntityType.DataType, entity.Key).EnsureClosed();
@@ -287,7 +287,7 @@ namespace Umbraco.Core
             var contentTypeComposition = entity as IContentTypeComposition;
             if (contentTypeComposition != null) return contentTypeComposition.GetUdi();
 
-            var dataTypeComposition = entity as IDataTypeDefinition;
+            var dataTypeComposition = entity as IDataType;
             if (dataTypeComposition != null) return dataTypeComposition.GetUdi();
 
             var container = entity as EntityContainer;

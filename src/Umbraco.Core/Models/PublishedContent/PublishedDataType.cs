@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models.PublishedContent
             => _configuration ?? (_configuration = _dataTypeConfigurationSource.GetDataTypeConfiguration(EditorAlias, Id));
 
         /// <summary>
-        /// Gets the data type configuration.
+        /// Gets the data type typed configuration.
         /// </summary>
         /// <typeparam name="TConfiguration">The type of the configuration object.</typeparam>
         /// <returns>The data type configuration.</returns>

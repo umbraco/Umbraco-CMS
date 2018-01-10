@@ -8,12 +8,12 @@ namespace Umbraco.Core.Models.EntityBase
     public interface ICanBeDirty
     {
         /// <summary>
-        /// Gets a value indicating whether the current entity is dirty.
+        /// Determines whether the current entity is dirty.
         /// </summary>
         bool IsDirty();
 
         /// <summary>
-        /// Gets a value indicating whether a specific property is dirty.
+        /// Determines whether a specific property is dirty.
         /// </summary>
         bool IsPropertyDirty(string propName);
 

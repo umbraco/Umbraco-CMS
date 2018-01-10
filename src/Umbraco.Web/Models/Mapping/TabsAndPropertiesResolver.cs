@@ -150,10 +150,10 @@ namespace Umbraco.Web.Models.Mapping
 
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
 
-            var editor = Current.PropertyEditors[dt.PropertyEditorAlias];
+            var editor = Current.PropertyEditors[dt.EditorAlias];
             if (editor == null)
             {
-                throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
+                throw new NullReferenceException("The property editor with alias " + dt.EditorAlias + " does not exist");
             }
 
             var listViewTab = new Tab<ContentPropertyDisplay>

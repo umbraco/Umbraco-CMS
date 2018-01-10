@@ -35,20 +35,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias);
+            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultipleMediaPickerAlias);
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias)
+            => IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias)
                 ? typeof (IEnumerable<IPublishedContent>)
                 : typeof (IPublishedContent);
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
+            if (IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias))
             {
                 return source.ToString()
                         .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -70,7 +70,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (nodeIds.Length > 0)
             {
-                var error = $"Data type \"{_services.DataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeId).Name}\" is not set to allow multiple items but appears to contain multiple items, check the setting and save the data type again";
+                var error = $"Data type \"{_services.DataTypeService.GetDataTypeDefinitionById(propertyType.DataType.Id).Name}\" is not set to allow multiple items but appears to contain multiple items, check the setting and save the data type again";
 
                 _logger.Warn<MediaPickerLegacyValueConverter>(error);
                 throw new Exception(error);
@@ -93,7 +93,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var umbHelper = new UmbracoHelper(_umbracoContextAccessor.UmbracoContext, _services, _appCache);
 
-            if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
+            if (IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias))
             {
                 var nodeIds = (int[])source;
                 var multiMediaPicker = Enumerable.Empty<IPublishedContent>();

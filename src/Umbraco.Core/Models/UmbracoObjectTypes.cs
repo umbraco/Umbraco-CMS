@@ -122,7 +122,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Data Type
         /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.Strings.DataType, typeof(IDataTypeDefinition))]
+        [UmbracoObjectType(Constants.ObjectTypes.Strings.DataType, typeof(IDataType))]
         [FriendlyName("Data Type")]
         [UmbracoUdiType(Constants.UdiEntityType.DataType)]
         DataType,

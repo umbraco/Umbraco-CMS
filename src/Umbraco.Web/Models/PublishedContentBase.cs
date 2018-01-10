@@ -60,7 +60,7 @@ namespace Umbraco.Web.Models
 
                         //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
                         // want to return the normal URL and the cropper stores data as json
-                        switch (propType.PropertyEditorAlias)
+                        switch (propType.EditorAlias)
                         {
                             case Constants.PropertyEditors.UploadFieldAlias:
                                 _url = prop.GetValue().ToString();

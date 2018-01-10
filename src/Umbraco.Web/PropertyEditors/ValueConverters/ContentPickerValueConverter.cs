@@ -24,8 +24,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias)
-            || propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias);
+            => propertyType.EditorAlias.Equals(Constants.PropertyEditors.ContentPickerAlias)
+            || propertyType.EditorAlias.Equals(Constants.PropertyEditors.ContentPicker2Alias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IPublishedContent);
@@ -51,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (inter == null)
                 return null;
 
-            if ((propertyType.PropertyTypeAlias != null && PropertiesToExclude.Contains(propertyType.PropertyTypeAlias.ToLower(CultureInfo.InvariantCulture))) == false)
+            if ((propertyType.Alias != null && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
                 IPublishedContent content;
                 if (inter is int id)

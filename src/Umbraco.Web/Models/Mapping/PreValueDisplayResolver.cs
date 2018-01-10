@@ -43,15 +43,15 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
-        public IEnumerable<PreValueFieldDisplay> Resolve(IDataTypeDefinition source)
+        public IEnumerable<PreValueFieldDisplay> Resolve(IDataType source)
         {
             PropertyEditor propEd = null;
-            if (source.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
+            if (source.EditorAlias.IsNullOrWhiteSpace() == false)
             {
-                propEd = Current.PropertyEditors[source.PropertyEditorAlias];
+                propEd = Current.PropertyEditors[source.EditorAlias];
                 if (propEd == null)
                 {
-                    throw new InvalidOperationException("Could not find property editor with alias " + source.PropertyEditorAlias);
+                    throw new InvalidOperationException("Could not find property editor with alias " + source.EditorAlias);
                 }
             }
 

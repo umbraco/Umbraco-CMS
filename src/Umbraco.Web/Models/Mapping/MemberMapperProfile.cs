@@ -61,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.FailedPasswordAttempts, opt => opt.Ignore())
-                .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
                 .ForMember(dest => dest.WriterId, opt => opt.Ignore())
                 //TODO: Support these eventually
                 .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())

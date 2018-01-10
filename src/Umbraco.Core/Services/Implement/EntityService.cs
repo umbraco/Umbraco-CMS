@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services.Implement
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {
-                {typeof (IDataTypeDefinition).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DataType, dataTypeService.GetDataTypeDefinitionById)},
+                {typeof (IDataType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DataType, dataTypeService.GetDataTypeDefinitionById)},
                 {typeof (IContent).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Document, contentService.GetById)},
                 {typeof (IContentType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.DocumentType, contentTypeService.Get)},
                 {typeof (IMedia).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Media, mediaService.GetById)},
@@ -547,7 +547,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids)
+        public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids)
         {
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;
@@ -561,7 +561,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys)
+        public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys)
         {
             var entityType = GetEntityType(umbracoObjectType);
             var typeFullName = entityType.FullName;

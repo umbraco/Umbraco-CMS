@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
     internal abstract class NPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NPocoRepositoryBase{TId, TEntity}"/> class.
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 Database.Execute(delete, new { id = GetEntityId(entity) });
             }
-            entity.DeletedDate = DateTime.Now;
+            entity.DeleteDate = DateTime.Now;
         }
     }
 }

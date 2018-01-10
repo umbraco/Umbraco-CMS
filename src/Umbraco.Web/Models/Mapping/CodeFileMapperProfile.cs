@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Snippet, opt => opt.Ignore());
 
             CreateMap<CodeFileDisplay, IPartialView>()
-                .IgnoreDeletableEntityCommonProperties()
+                .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Key, opt => opt.Ignore())
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.HasIdentity, opt => opt.Ignore());
 
             CreateMap<CodeFileDisplay, Script>()
-                .IgnoreDeletableEntityCommonProperties()
+                .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Key, opt => opt.Ignore())
                 .ForMember(dest => dest.Path, opt => opt.Ignore())

@@ -19,10 +19,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.SliderAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.SliderAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => IsRangeDataType(propertyType.DataTypeId) ? typeof (Range<decimal>) : typeof (decimal);
+            => IsRangeDataType(propertyType.DataType.Id) ? typeof (Range<decimal>) : typeof (decimal);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
@@ -32,7 +32,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (source == null)
                 return null;
 
-            if (IsRangeDataType(propertyType.DataTypeId))
+            if (IsRangeDataType(propertyType.DataType.Id))
             {
                 var rangeRawValues = source.ToString().Split(',');
                 var minimumAttempt = rangeRawValues[0].TryConvertTo<decimal>();

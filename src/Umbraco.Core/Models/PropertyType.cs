@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
-    public class PropertyType : Entity, IEquatable<PropertyType>
+    public class PropertyType : EntityBase.EntityBase, IEquatable<PropertyType>
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -33,20 +33,20 @@ namespace Umbraco.Core.Models
         private string _validationRegExp;
         private ContentVariation _variations;
 
-        public PropertyType(IDataTypeDefinition dataTypeDefinition)
+        public PropertyType(IDataType dataType)
         {
-            if (dataTypeDefinition == null) throw new ArgumentNullException("dataTypeDefinition");
+            if (dataType == null) throw new ArgumentNullException("dataType");
 
-            if(dataTypeDefinition.HasIdentity)
-                _dataTypeDefinitionId = dataTypeDefinition.Id;
+            if(dataType.HasIdentity)
+                _dataTypeDefinitionId = dataType.Id;
 
-            _propertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
-            _dataTypeDatabaseType = dataTypeDefinition.DatabaseType;
+            _propertyEditorAlias = dataType.EditorAlias;
+            _dataTypeDatabaseType = dataType.DatabaseType;
             _variations = ContentVariation.InvariantNeutral;
         }
 
-        public PropertyType(IDataTypeDefinition dataTypeDefinition, string propertyTypeAlias)
-            : this(dataTypeDefinition)
+        public PropertyType(IDataType dataType, string propertyTypeAlias)
+            : this(dataType)
         {
             _alias = GetAlias(propertyTypeAlias);
         }
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets of Sets the Id of the DataType (Definition), which the PropertyType is "wrapping"
         /// </summary>
-        /// <remarks>This is actually the Id of the <see cref="IDataTypeDefinition"/></remarks>
+        /// <remarks>This is actually the Id of the <see cref="IDataType"/></remarks>
         [DataMember]
         public int DataTypeDefinitionId
         {

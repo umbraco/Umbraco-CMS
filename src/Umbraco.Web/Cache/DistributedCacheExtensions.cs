@@ -125,14 +125,14 @@ namespace Umbraco.Web.Cache
 
         #region DataTypeCache
 
-        public static void RefreshDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
+        public static void RefreshDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
             if (dataType == null) return;
             var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, false) };
             dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
         }
 
-        public static void RemoveDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
+        public static void RemoveDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
             if (dataType == null) return;
             var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, true) };

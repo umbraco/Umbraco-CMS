@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -11,20 +9,26 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Implementation of the <see cref="IUmbracoEntity"/> for internal use.
     /// </summary>
-    public class UmbracoEntity : Entity, IUmbracoEntity
+    public class UmbracoEntity : EntityBase.EntityBase, IUmbracoEntity
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private int _creatorId;
+
         private int _level;
         private string _name;
         private int _parentId;
         private string _path;
         private int _sortOrder;
         private bool _trashed;
+
         private bool _hasChildren;
+
+        // fixme - these are for IContent only - MOVE!
         private bool _published;
         private bool _edited;
+
+        // fixme - these are for IContentBase only - MOVE!
         private string _contentTypeAlias;
         private Guid _nodeObjectTypeId;
 
@@ -189,21 +193,27 @@ namespace Umbraco.Core.Models
         {
             var clone = (UmbracoEntity) base.DeepClone();
 
-            // turn off change tracking
+            // disable change tracking
             clone.DisableChangeTracking();
 
-            // ensure that any value in the dictionary that is deep cloneable is cloned too
+            // deep clone additional data properties
+            // fixme - BUT the values are... only set in EntityRepository to non-deepclonable stuff?!
             foreach (var key in clone.AdditionalData.Keys.ToArray())
             {
                 if (clone.AdditionalData[key] is IDeepCloneable deepCloneable)
                     clone.AdditionalData[key] = deepCloneable.DeepClone();
             }
 
-            // re-enable tracking
-            clone.ResetDirtyProperties(false); // why? were not tracking
+            // enable tracking
             clone.EnableChangeTracking();
+
             return clone;
         }
+
+        // fixme
+        // wtf? is clone.AdditionalData at least shallow cloned?
+        // and, considering the only thing we put in EntityProperty are strings,
+        // what's the point of EntityProperty ???
 
         /// <summary>
         /// A struction that can be contained in the additional data of an UmbracoEntity representing

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class TaskType : Entity, IAggregateRoot
+    public class TaskType : EntityBase.EntityBase
     {
         private string _alias;
 

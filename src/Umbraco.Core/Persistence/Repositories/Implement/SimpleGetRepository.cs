@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>
     internal abstract class SimpleGetRepository<TId, TEntity, TDto> : NPocoRepositoryBase<TId, TEntity>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
         where TDto: class
     {
         protected SimpleGetRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var entity = ConvertToEntity(dto);
 
-            if (entity is Entity dirtyEntity)
+            if (entity is EntityBase dirtyEntity)
             {
                 // reset dirty initial properties (U4-1946)
                 dirtyEntity.ResetDirtyProperties(false);

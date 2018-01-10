@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Misc
                     // AutoPublishedContentType will auto-generate other properties
                     factory.CreatePropertyType("content", 0, "?"),
                 };
-            var type = new AutoPublishedContentType(0, "anything", propertyTypes, factory);
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;
             Debug.Print("INIT LIB {0}",
                 ContentTypesCache.Get(PublishedItemType.Content, "anything")

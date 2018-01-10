@@ -52,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            using (_proflog.DebugDuration<PublishedPropertyType>($"ConvertPropertyToNestedContent ({propertyType.DataTypeId})"))
+            using (_proflog.DebugDuration<PublishedPropertyType>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
                 var value = (string) inter;
                 if (string.IsNullOrWhiteSpace(value)) return null;

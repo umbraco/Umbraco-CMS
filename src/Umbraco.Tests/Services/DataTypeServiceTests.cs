@@ -24,15 +24,15 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.Save(dataTypeDefinition);
+            IDataType dataType = new DataType(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.Save(dataType);
 
             // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+            Assert.That(dataType, Is.Not.Null);
+            Assert.That(dataType.HasIdentity, Is.True);
 
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            Assert.That(dataTypeDefinition, Is.Not.Null);
+            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            Assert.That(dataType, Is.Not.Null);
         }
 
         [Test]
@@ -67,20 +67,20 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.Save(dataTypeDefinition);
-            dataTypeService.SavePreValues(dataTypeDefinition, new Dictionary<string, PreValue>
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.Save(dataType);
+            dataTypeService.SavePreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+            Assert.That(dataType, Is.Not.Null);
+            Assert.That(dataType.HasIdentity, Is.True);
             Assert.AreEqual(true, preVals.IsDictionaryBased);
             Assert.AreEqual(2, preVals.PreValuesAsDictionary.Keys.Count);
             Assert.AreEqual("preVal1", preVals.PreValuesAsDictionary.Keys.First());
@@ -97,19 +97,19 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.SaveDataTypeAndPreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+            Assert.That(dataType, Is.Not.Null);
+            Assert.That(dataType.HasIdentity, Is.True);
             Assert.AreEqual(true, preVals.IsDictionaryBased);
             Assert.AreEqual(2, preVals.PreValuesAsDictionary.Keys.Count);
             Assert.AreEqual("preVal1", preVals.PreValuesAsDictionary.Keys.First());
@@ -126,24 +126,24 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.SaveDataTypeAndPreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             //update them (ensure Ids are there!)
             var asDictionary = preVals.FormatAsDictionary();
             asDictionary["preVal1"].Value = "Hello2";
             asDictionary["preVal2"].Value = "World2";
 
-            dataTypeService.SavePreValues(dataTypeDefinition, asDictionary);
+            dataTypeService.SavePreValues(dataType, asDictionary);
 
-            var preValsAgain = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            var preValsAgain = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
 
@@ -163,23 +163,23 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.SaveDataTypeAndPreValues(dataTypeDefinition, new Dictionary<string, PreValue>
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.SaveDataTypeAndPreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             //update them (ensure Ids are there!)
             var asDictionary = preVals.FormatAsDictionary();
             asDictionary.Remove("preVal2");
 
-            dataTypeService.SavePreValues(dataTypeDefinition, asDictionary);
+            dataTypeService.SavePreValues(dataType, asDictionary);
 
-            var preValsAgain = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            var preValsAgain = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
 
@@ -197,17 +197,17 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
 
             // Act
-            IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
-            dataTypeService.Save(dataTypeDefinition);
-            dataTypeService.SavePreValues(dataTypeDefinition.Id, new[] {"preVal1", "preVal2"});
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            dataTypeService.Save(dataType);
+            dataTypeService.SavePreValues(dataType.Id, new[] {"preVal1", "preVal2"});
 
             //re-get
-            dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dataTypeDefinition.Id);
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id);
+            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
-            Assert.That(dataTypeDefinition, Is.Not.Null);
-            Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+            Assert.That(dataType, Is.Not.Null);
+            Assert.That(dataType.HasIdentity, Is.True);
             Assert.AreEqual(false, preVals.IsDictionaryBased);
             Assert.AreEqual(2, preVals.PreValuesAsArray.Count());
             Assert.AreEqual("preVal1", preVals.PreValuesAsArray.First().Value);
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = DataTypeDatabaseType.Ntext };
+            var dataTypeDefinition = new DataType(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = DataTypeDatabaseType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));

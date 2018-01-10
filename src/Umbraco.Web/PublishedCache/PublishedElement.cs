@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache
                 .PropertyTypes
                 .Select(propertyType =>
                 {
-                    values.TryGetValue(propertyType.PropertyTypeAlias, out var value);
+                    values.TryGetValue(propertyType.Alias, out var value);
                     return (IPublishedProperty) new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
                 })
                 .ToArray();

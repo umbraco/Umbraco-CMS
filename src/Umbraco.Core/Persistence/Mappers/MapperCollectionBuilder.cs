@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Mappers
             Add<AuditItemMapper>();
             Add<ContentMapper>();
             Add<ContentTypeMapper>();
-            Add<DataTypeDefinitionMapper>();
+            Add<DataTypeMapper>();
             Add<DictionaryMapper>();
             Add<DictionaryTranslationMapper>();
             Add<DomainMapper>();

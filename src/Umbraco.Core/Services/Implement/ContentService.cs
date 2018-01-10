@@ -199,35 +199,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Creates an <see cref="IContent"/> object of a specified content type, at root.
-        /// </summary>
-        /// <remarks>This method simply returns a new, non-persisted, IContent without any identity. It
-        /// is intended as a shortcut to creating new content objects that does not invoke a save
-        /// operation against the database.
-        /// </remarks>
-        /// <param name="name">The name of the content object.</param>
-        /// <param name="contentTypeAlias">The alias of the content type.</param>
-        /// <param name="userId">The optional id of the user creating the content.</param>
-        /// <returns>The content object.</returns>
-        public IContent CreateContent(string name, string contentTypeAlias, int userId = 0)
-        {
-            // not locking since not saving anything
-
-            var contentType = GetContentType(contentTypeAlias);
-            if (contentType == null)
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
-
-            var content = new Content(name, -1, contentType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateContent(scope, content, null, userId, false);
-                scope.Complete();
-            }
-
-            return content;
-        }
-
-        /// <summary>
         /// Creates an <see cref="IContent"/> object of a specified content type, under a parent.
         /// </summary>
         /// <remarks>This method simply returns a new, non-persisted, IContent without any identity. It
@@ -323,29 +294,15 @@ namespace Umbraco.Core.Services.Implement
 
         private void CreateContent(IScope scope, Content content, IContent parent, int userId, bool withIdentity)
         {
-            // NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
-            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
-            var newArgs = parent != null
-                ? new NewEventArgs<IContent>(content, content.ContentType.Alias, parent)
-                : new NewEventArgs<IContent>(content, content.ContentType.Alias, -1);
-
-            if (scope.Events.DispatchCancelable(Creating, this, newArgs))
-            {
-                content.WasCancelled = true;
-                return;
-            }
-
             content.CreatorId = userId;
             content.WriterId = userId;
 
             if (withIdentity)
             {
+                // if saving is cancelled, content remains without an identity
                 var saveEventArgs = new SaveEventArgs<IContent>(content);
                 if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                {
-                    content.WasCancelled = true;
                     return;
-                }
 
                 _documentRepository.Save(content);
 
@@ -1902,12 +1859,6 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
-
-        /// <summary>
-        /// Occurs before Create
-        /// </summary>
-        [Obsolete("Use the Created event instead, the Creating and Created events both offer the same functionality, Creating event has been deprecated.")]
-        public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Creating;
 
         /// <summary>
         /// Occurs after Create

@@ -50,7 +50,7 @@ namespace Umbraco.Tests.PublishedContent
                 factory.CreatePropertyType("testRecursive", 0, "?"),
             };
             var compositionAliases = new[] { "MyCompositionAlias" };
-            var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes, factory);
+            var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 

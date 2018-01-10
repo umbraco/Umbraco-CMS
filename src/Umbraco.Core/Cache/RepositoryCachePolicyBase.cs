@@ -11,7 +11,7 @@ namespace Umbraco.Core.Cache
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <typeparam name="TId">The type of the identifier.</typeparam>
     internal abstract class RepositoryCachePolicyBase<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
-        where TEntity : class, IAggregateRoot
+        where TEntity : class, IEntity
     {
         private readonly IRuntimeCacheProvider _globalCache;
         private readonly IScopeAccessor _scopeAccessor;

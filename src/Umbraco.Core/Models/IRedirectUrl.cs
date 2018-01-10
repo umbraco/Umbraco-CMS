@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a redirect url.
     /// </summary>
-    public interface IRedirectUrl : IAggregateRoot, IRememberBeingDirty
+    public interface IRedirectUrl : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the identifier of the content item.

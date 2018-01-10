@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Identity
     /// Entity type for a user's login (i.e. facebook, google)
     ///
     /// </summary>
-    public class IdentityUserLogin : Entity, IIdentityUserLogin
+    public class IdentityUserLogin : EntityBase.EntityBase, IIdentityUserLogin
     {
         public IdentityUserLogin(string loginProvider, string providerKey, int userId)
         {

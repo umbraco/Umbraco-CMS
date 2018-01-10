@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -20,33 +21,39 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public PublishedContentType CreateContentType(PublishedItemType itemType, IContentTypeComposition contentType)
+        public PublishedContentType CreateContentType(IContentTypeComposition contentType)
         {
-            return new PublishedContentType(itemType, contentType, this);
+            return new PublishedContentType(contentType, this);
         }
 
-        // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+        // for tests - fixme what's the point of the factory here?
+        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
-            return new PublishedContentType(id, alias, propertyTypes, this);
+            return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations);
         }
 
-        // for tests
-        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+        // for tests - fixme what's the point of the factory here?
+        internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
-            return new PublishedContentType(id, alias, compositionAliases, propertyTypes, this);
+            return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations);
         }
 
         /// <inheritdoc />
         public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, PropertyType propertyType)
         {
-            return new PublishedPropertyType(contentType, propertyType, _publishedModelFactory, _propertyValueConverters, this);
+            return new PublishedPropertyType(contentType, propertyType, _propertyValueConverters, _publishedModelFactory, this);
         }
 
         /// <inheritdoc />
-        public PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, string editorAlias, bool umbraco = false)
+        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, string propertyEditorAlias, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
-            return new PublishedPropertyType(propertyTypeAlias, dataTypeId, editorAlias, umbraco, _publishedModelFactory, _propertyValueConverters, this);
+            return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, propertyEditorAlias, true, variations, _propertyValueConverters, _publishedModelFactory, this);
+        }
+
+        // for tests
+        internal PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, string propertyEditorAlias, bool umbraco = false, ContentVariation variations = ContentVariation.InvariantNeutral)
+        {
+            return new PublishedPropertyType(propertyTypeAlias, dataTypeId, propertyEditorAlias, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
 
         /// <inheritdoc />

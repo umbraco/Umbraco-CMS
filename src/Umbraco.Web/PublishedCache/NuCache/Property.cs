@@ -89,11 +89,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         // used to cache the recursive *property* for this property
         internal string RecurseCacheKey => _recurseCacheKey
-            ?? (_recurseCacheKey = CacheKeys.PropertyRecurse(_contentUid, PropertyTypeAlias, _isPreviewing));
+            ?? (_recurseCacheKey = CacheKeys.PropertyRecurse(_contentUid, Alias, _isPreviewing));
 
         // used to cache the CacheValues of this property
         internal string ValuesCacheKey => _valuesCacheKey
-            ?? (_valuesCacheKey = CacheKeys.PropertyCacheValues(_contentUid, PropertyTypeAlias, _isPreviewing));
+            ?? (_valuesCacheKey = CacheKeys.PropertyCacheValues(_contentUid, Alias, _isPreviewing));
 
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
         {

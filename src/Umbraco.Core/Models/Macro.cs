@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Macro : Entity, IMacro
+    public class Macro : EntityBase.EntityBase, IMacro
     {
         public Macro()
         {
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Models
             base.ResetDirtyProperties(rememberDirty);
             foreach (var prop in Properties)
             {
-                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberDirty);
+                ((BeingDirtyBase)prop).ResetDirtyProperties(rememberDirty);
             }
         }
 

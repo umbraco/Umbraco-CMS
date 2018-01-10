@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RedirectUrl : Entity, IRedirectUrl
+    public class RedirectUrl : EntityBase.EntityBase, IRedirectUrl
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RedirectUrl"/> class.

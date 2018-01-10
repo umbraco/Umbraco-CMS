@@ -81,7 +81,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private static void AddIf(PublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
         {
             var propertyType = contentType.GetPropertyType(alias);
-            if (propertyType == null || propertyType.IsUmbraco == false) return;
+            if (propertyType == null || propertyType.IsUserProperty) return;
             properties[alias] = new[] { new PropertyData { Value = value } };
         }
 

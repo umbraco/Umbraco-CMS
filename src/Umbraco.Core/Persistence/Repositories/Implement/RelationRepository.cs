@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = factory.BuildEntity(dto);
 
             // reset dirty initial properties (U4-1946)
-            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
+            ((BeingDirtyBase)entity).ResetDirtyProperties(false);
 
             return entity;
         }
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IRelation entity)
         {
-            ((Entity)entity).AddingEntity();
+            ((EntityBase)entity).AddingEntity();
 
             var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IRelation entity)
         {
-            ((Entity)entity).UpdatingEntity();
+            ((EntityBase)entity).UpdatingEntity();
 
             var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);

@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = ConvertFromDto(dto);
 
             // reset dirty initial properties (U4-1946)
-            ((Entity)entity).ResetDirtyProperties(false);
+            ((EntityBase)entity).ResetDirtyProperties(false);
 
             return entity;
         }
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IDictionaryItem entity)
         {
-            ((Entity)entity).UpdatingEntity();
+            ((EntityBase)entity).UpdatingEntity();
 
             foreach (var translation in entity.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
@@ -193,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
             IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
 
-            entity.DeletedDate = DateTime.Now;
+            entity.DeleteDate = DateTime.Now;
         }
 
         private void RecursiveDelete(Guid parentId)

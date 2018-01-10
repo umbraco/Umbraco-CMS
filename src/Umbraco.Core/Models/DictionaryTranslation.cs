@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryTranslation : Entity, IDictionaryTranslation
+    public class DictionaryTranslation : EntityBase.EntityBase, IDictionaryTranslation
     {
         internal Func<int, ILanguage> GetLanguage { get; set; }
 

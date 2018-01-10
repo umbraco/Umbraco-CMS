@@ -57,9 +57,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        private IDataTypeDefinitionRepository CreateRepository()
+        private IDataTypeRepository CreateRepository()
         {
-            return Container.GetInstance<IDataTypeDefinitionRepository>();
+            return Container.GetInstance<IDataTypeRepository>();
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeAccessor scopeAccessor)
@@ -83,14 +83,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
-                var dataType = (IDataTypeDefinition)new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                var dataType = (IDataType)new DataType(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt1"
                 };
                 repository.Save(dataType);
 
                 //create a
-                var dataType2 = (IDataTypeDefinition)new DataTypeDefinition(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                var dataType2 = (IDataType)new DataType(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
                 {
                     Name = "dt2"
                 };
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                var dataTypeDefinition = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var dataTypeDefinition = new DataType(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                IDataTypeDefinition dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                IDataType dataType = new DataType(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataType);
 
                 // Act
@@ -206,19 +206,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                IDataTypeDefinition dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
+                IDataType dataType = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
 
-                repository.Save(dataTypeDefinition);
+                repository.Save(dataType);
 
-                var id = dataTypeDefinition.Id;
+                var id = dataType.Id;
                 Assert.That(id, Is.GreaterThan(0));
 
                 // Act
-                dataTypeDefinition = repository.Get(id);
+                dataType = repository.Get(id);
 
                 // Assert
-                Assert.That(dataTypeDefinition, Is.Not.Null);
-                Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+                Assert.That(dataType, Is.Not.Null);
+                Assert.That(dataType.HasIdentity, Is.True);
             }
         }
 
@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
 
                 // Act
-                var query = scope.SqlContext.Query<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
+                var query = scope.SqlContext.Query<IDataType>().Where(x => x.EditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
                 var result = repository.Get(query);
 
                 // Assert
@@ -316,7 +316,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
 
                 // Act
-                var query = scope.SqlContext.Query<IDataTypeDefinition>().Where(x => x.Name.StartsWith("D"));
+                var query = scope.SqlContext.Query<IDataType>().Where(x => x.Name.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -333,7 +333,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
+                var dataTypeDefinition = new DataType("Test.TestEditor")
                 {
                     DatabaseType = DataTypeDatabaseType.Integer,
                     Name = "AgeDataType",
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataTypeDefinition("Test.blah")
+                var dataTypeDefinition = new DataType("Test.blah")
                 {
                     DatabaseType = DataTypeDatabaseType.Integer,
                     Name = "AgeDataType",
@@ -375,7 +375,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-                definition.PropertyEditorAlias = "Test.TestEditor"; //change
+                definition.EditorAlias = "Test.TestEditor"; //change
                 repository.Save(definition);
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
@@ -383,7 +383,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(definitionUpdated, Is.Not.Null);
                 Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
-                Assert.That(definitionUpdated.PropertyEditorAlias, Is.EqualTo("Test.TestEditor"));
+                Assert.That(definitionUpdated.EditorAlias, Is.EqualTo("Test.TestEditor"));
             }
         }
 
@@ -396,7 +396,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
+                var dataTypeDefinition = new DataType("Test.TestEditor")
                 {
                     DatabaseType = DataTypeDatabaseType.Integer,
                     Name = "AgeDataType",
@@ -447,7 +447,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var dataTypeDefinition = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 var dtid = dataTypeDefinition.Id;
@@ -469,7 +469,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var dataTypeDefinition = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 var dtid = dataTypeDefinition.Id;
@@ -485,15 +485,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_Collection_With_Cache()
         {
-            DataTypeDefinition dtd;
+            DataType dtd;
 
             var provider = TestObjects.GetScopeProvider(Logger);
             var accessor = (IScopeAccessor) provider;
 
             using (var scope = provider.CreateScope())
             {
-                var repository = Container.GetInstance<IDataTypeDefinitionRepository>();
-                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var repository = Container.GetInstance<IDataTypeRepository>();
+                dtd = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dtd);
 
                 scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
@@ -504,7 +504,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             // note: see CreateCacheHelper, this test uses a special cache
-            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
+            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataType>();
             Assert.IsTrue(cache);
             var cached = cache.Result
                 .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_" + dtd.Id);
@@ -517,7 +517,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Pre_Value_As_String_With_Cache()
         {
-            DataTypeDefinition dtd;
+            DataType dtd;
             object id;
 
             var provider = TestObjects.GetScopeProvider(Logger);
@@ -525,8 +525,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = provider.CreateScope())
             {
-                var repository = Container.GetInstance<IDataTypeDefinitionRepository>();
-                dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var repository = Container.GetInstance<IDataTypeRepository>();
+                dtd = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.Save(dtd);
 
                 id = scope.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
@@ -537,7 +537,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             // note: see CreateCacheHelper, this test uses a special cache
-            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>();
+            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IDataType>();
             Assert.IsTrue(cache);
             var cached = cache.Result
                 .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_" + dtd.Id);
@@ -548,7 +548,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = provider.CreateScope())
             {
-                var repository = Container.GetInstance<IDataTypeDefinitionRepository>();
+                var repository = Container.GetInstance<IDataTypeRepository>();
                 //ensure it still gets resolved!
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
                 Assert.AreEqual("test1", val);

@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Property : Entity
+    public class Property : EntityBase.EntityBase
     {
         private List<PropertyTagChange> _tagChanges;
 

@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
@@ -215,7 +216,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public IPublishedProperty GetProperty(string alias)
         {
-            return Properties.FirstOrDefault(p => p.PropertyTypeAlias.InvariantEquals(alias));
+            return Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
         }
 
         public IPublishedProperty GetProperty(string alias, bool recurse)
@@ -247,7 +248,7 @@ namespace Umbraco.Tests.PublishedContent
 
     class SolidPublishedProperty : IPublishedProperty
     {
-        public string PropertyTypeAlias { get; set; }
+        public string Alias { get; set; }
         public object SolidSourceValue { get; set; }
         public object SolidValue { get; set; }
         public bool SolidHasValue { get; set; }
@@ -319,12 +320,12 @@ namespace Umbraco.Tests.PublishedContent
         private static readonly PublishedPropertyType Default
             = Factory.CreatePropertyType("*", 0, "?");
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory publishedContentTypeFactory)
-            : base(id, alias, Enumerable.Empty<string>(), propertyTypes, publishedContentTypeFactory)
+        public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.InvariantNeutral)
         { }
 
-        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, IPublishedContentTypeFactory publishedContentTypeFactory)
-            : base(id, alias, compositionAliases, propertyTypes, publishedContentTypeFactory)
+        public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.InvariantNeutral)
         { }
 
         public override PublishedPropertyType GetPropertyType(string alias)

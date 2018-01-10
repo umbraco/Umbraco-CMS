@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
         {
-            var dataType = new DataTypeDefinition(-1, "Test")
+            var dataType = new DataType(-1, "Test")
             {
                 Id = 12345
             };

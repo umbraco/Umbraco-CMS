@@ -15,7 +15,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => PropertyEditorAliases.Contains(propertyType.PropertyEditorAlias);
+            => PropertyEditorAliases.Contains(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (DateTime);

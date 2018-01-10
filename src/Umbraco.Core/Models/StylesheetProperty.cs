@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class StylesheetProperty : TracksChangesEntityBase, IValueObject
+    public class StylesheetProperty : BeingDirtyBase, IValueObject
     {
         private string _alias;
         private string _value;

@@ -213,25 +213,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return entities;
         }
 
-        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectType, params int[] ids)
+        public virtual IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids)
         {
             return ids.Any()
                 ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
                 : PerformGetAllPaths(objectType);
         }
 
-        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectType, params Guid[] keys)
+        public virtual IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys)
         {
             return keys.Any()
                 ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
                 : PerformGetAllPaths(objectType);
         }
 
-        private IEnumerable<EntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>> filter = null)
+        private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
             var sql = Sql().Select<NodeDto>(x => x.NodeId, x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
             filter?.Invoke(sql);
-            return Database.Fetch<EntityPath>(sql);
+            return Database.Fetch<TreeEntityPath>(sql);
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)

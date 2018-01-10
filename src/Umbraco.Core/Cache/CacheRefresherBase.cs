@@ -100,7 +100,7 @@ namespace Umbraco.Core.Cache
         /// </summary>
         /// <typeparam name="TEntity">The type of the entities.</typeparam>
         protected void ClearAllIsolatedCacheByEntityType<TEntity>()
-            where TEntity : class, IAggregateRoot
+            where TEntity : class, IEntity
         {
             CacheHelper.IsolatedRuntimeCache.ClearCache<TEntity>();
         }

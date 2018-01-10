@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class User : Entity, IUser, IProfile
+    public class User : EntityBase.EntityBase, IUser, IProfile
     {
         /// <summary>
         /// Constructor for creating a new/empty user
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Models.Membership
                         Id = realGroup.Id,
                         Key = realGroup.Key,
                         CreateDate = realGroup.CreateDate,
-                        DeletedDate = realGroup.DeletedDate,
+                        DeletedDate = realGroup.DeleteDate,
                         Name = realGroup.Name,
                         Permissions = realGroup.Permissions,
                         UpdateDate = realGroup.UpdateDate
@@ -338,7 +338,7 @@ namespace Umbraco.Core.Models.Membership
                     Id = realGroup.Id,
                     Key = realGroup.Key,
                     CreateDate = realGroup.CreateDate,
-                    DeletedDate = realGroup.DeletedDate,
+                    DeletedDate = realGroup.DeleteDate,
                     Name = realGroup.Name,
                     Permissions = realGroup.Permissions,
                     UpdateDate = realGroup.UpdateDate

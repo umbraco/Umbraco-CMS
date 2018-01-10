@@ -335,7 +335,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <summary>
         /// used to persist a user group with associated users at once
         /// </summary>
-        private class UserGroupWithUsers : Entity, IAggregateRoot
+        private class UserGroupWithUsers : EntityBase
         {
             public UserGroupWithUsers(IUserGroup userGroup, int[] userIds)
             {
@@ -343,11 +343,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 UserIds = userIds;
             }
 
-            public override bool HasIdentity
-            {
-                get => UserGroup.HasIdentity;
-                protected set => throw new NotSupportedException();
-            }
+            public override bool HasIdentity => UserGroup.HasIdentity;
 
             public IUserGroup UserGroup { get; }
             public int[] UserIds { get; }

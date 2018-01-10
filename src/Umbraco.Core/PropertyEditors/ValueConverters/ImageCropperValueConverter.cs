@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         private readonly IDataTypeService _dataTypeService;
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (JToken);
@@ -115,7 +115,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     return sourceString;
                 }
 
-                MergePreValues(obj, _dataTypeService, propertyType.DataTypeId);
+                MergePreValues(obj, _dataTypeService, propertyType.DataType.Id);
 
                 return obj;
             }

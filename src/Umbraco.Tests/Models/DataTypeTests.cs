@@ -8,12 +8,12 @@ using Umbraco.Core.Serialization;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class DataTypeDefinitionTests
+    public class DataTypeTests
     {
         [Test]
         public void Can_Deep_Clone()
         {
-            var dtd = new DataTypeDefinition(9, Guid.NewGuid().ToString())
+            var dtd = new DataType(9, Guid.NewGuid().ToString())
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Models
                 Trashed = true,
                 UpdateDate = DateTime.Now
             };
-            var clone = (DataTypeDefinition) dtd.DeepClone();
+            var clone = (DataType) dtd.DeepClone();
 
             Assert.AreNotSame(clone, dtd);
             Assert.AreEqual(clone, dtd);
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var dtd = new DataTypeDefinition(9, Guid.NewGuid().ToString())
+            var dtd = new DataType(9, Guid.NewGuid().ToString())
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,

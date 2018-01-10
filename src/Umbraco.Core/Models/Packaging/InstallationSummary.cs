@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Packaging
     public class InstallationSummary
     {
         public MetaData MetaData { get; set; }
-        public IEnumerable<IDataTypeDefinition> DataTypesInstalled { get; set; }
+        public IEnumerable<IDataType> DataTypesInstalled { get; set; }
         public IEnumerable<ILanguage> LanguagesInstalled { get; set; }
         public IEnumerable<IDictionaryItem> DictionaryItemsInstalled { get; set; }
         public IEnumerable<IMacro> MacrosInstalled { get; set; }
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.Packaging
             summary.Actions = new List<PackageAction>();
             summary.ContentInstalled = new List<IContent>();
             summary.ContentTypesInstalled = new List<IContentType>();
-            summary.DataTypesInstalled = new List<IDataTypeDefinition>();
+            summary.DataTypesInstalled = new List<IDataType>();
             summary.DictionaryItemsInstalled = new List<IDictionaryItem>();
             summary.FilesInstalled = new List<string>();
             summary.LanguagesInstalled = new List<ILanguage>();

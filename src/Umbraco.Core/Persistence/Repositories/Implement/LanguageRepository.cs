@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(ILanguage entity)
         {
-            ((Entity)entity).AddingEntity();
+            ((EntityBase)entity).AddingEntity();
 
             var factory = new LanguageFactory();
             var dto = factory.BuildDto(entity);
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(ILanguage entity)
         {
-            ((Entity)entity).UpdatingEntity();
+            ((EntityBase)entity).UpdatingEntity();
 
             var factory = new LanguageFactory();
             var dto = factory.BuildDto(entity);

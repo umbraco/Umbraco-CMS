@@ -7,13 +7,13 @@
     public interface IRememberBeingDirty : ICanBeDirty
     {
         /// <summary>
-        /// Gets a value indicating whether the current entity is dirty.
+        /// Determines whether the current entity is dirty.
         /// </summary>
         /// <remarks>A property was dirty if it had been changed and the changes were committed.</remarks>
         bool WasDirty();
 
         /// <summary>
-        /// Gets a value indicating whether a specific property was dirty.
+        /// Determines whether a specific property was dirty.
         /// </summary>
         /// <remarks>A property was dirty if it had been changed and the changes were committed.</remarks>
         bool WasPropertyDirty(string propertyName);

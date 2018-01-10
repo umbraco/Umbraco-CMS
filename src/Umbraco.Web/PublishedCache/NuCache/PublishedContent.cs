@@ -33,7 +33,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var properties = new List<IPublishedProperty>();
             foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
             {
-                if (contentData.Properties.TryGetValue(propertyType.PropertyTypeAlias, out var pdatas))
+                if (contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas))
                     properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
             }
             PropertiesArray = properties.ToArray();
