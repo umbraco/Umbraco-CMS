@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models
 {
+    /// <summary>
+    /// A model representing the file used to load a tour.
+    /// </summary>
     [DataContract(Name = "tourFile", Namespace = "")]
     public class BackOfficeTourFile
     {

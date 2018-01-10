@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
             _disabledTours.Add(tour);
         }
 
-        public IEnumerable<string> DisabledTours
+        public string[] DisabledTours
         {
             get { return _disabledTours.ToArray(); }
         }
