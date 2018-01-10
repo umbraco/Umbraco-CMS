@@ -18,7 +18,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObject, 
+    public class BackOfficeUserStore : DisposableObjectSlim, 
         IUserStore<BackOfficeIdentityUser, int>, 
         IUserPasswordStore<BackOfficeIdentityUser, int>, 
         IUserEmailStore<BackOfficeIdentityUser, int>, 
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObjectSlim"/> which handles common required locking logic.
         /// </summary>
         protected override void DisposeResources()
         {
