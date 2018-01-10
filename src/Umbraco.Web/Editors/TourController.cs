@@ -75,12 +75,10 @@ namespace Umbraco.Web.Editors
             }
             catch (IOException e)
             {
-                Logger.Error<TourController>("Error while trying to read file: " + tourFile, e);
                 throw new IOException("Error while trying to read file: " + tourFile, e);
             }
             catch (JsonReaderException e)
             {
-                Logger.Error<TourController>("Error while trying to parse content as tour data: " + tourFile, e);
                 throw new JsonReaderException("Error while trying to parse content as tour data: " + tourFile, e);
             }
         }
