@@ -115,7 +115,7 @@
       <Name>Umbraco.Web</Name>
     </ProjectReference>
     <Reference Include="ClientDependency.Core, Version=1.9.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.4-beta03\lib\net45\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\packages\ClientDependency.1.9.4\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
