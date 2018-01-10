@@ -13,7 +13,6 @@ function noDirtyCheck() {
             elm.focus(function () {
                 scope.$watch(function() {
                     ctrl.$pristine = false;
-                    console.log("here");
                 });
             });
 
