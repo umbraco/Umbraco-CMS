@@ -10,9 +10,13 @@ function noDirtyCheck() {
         require: 'ngModel',
         link: function (scope, elm, attrs, ctrl) {
 
-            scope.$watch(function () {
-                ctrl.$pristine = false;
+            elm.focus(function () {
+                scope.$watch(function() {
+                    ctrl.$pristine = false;
+                    console.log("here");
+                });
             });
+
 
         }
     };
