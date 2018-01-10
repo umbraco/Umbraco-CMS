@@ -32,11 +32,6 @@
     <key alias="sort">מיין</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
-    <key alias="DeleteCMSImportAction">מחק</key>
-    <key alias="ExecuteCMSImportWizardAction">בצע</key>
-    <key alias="ScheduleCMSImportWizardAction">תזמן</key>
-    <key alias="StartCMSImportWizardAction">ייבא נתונים</key>
-    <key alias="StartCMSImportChildDefinitionAction">צור הגדרות ילדים</key>
     <key alias="LastRunInfoAction">יומן משימות מתוזמנות</key>
   </area>
   <area alias="assignDomain">

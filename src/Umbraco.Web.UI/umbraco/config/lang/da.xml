@@ -1485,7 +1485,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
-    <key alias="startnode">Start node</key>
+    <key alias="startnode">Startnode</key>
     <key alias="stateActive">Aktiv</key>
     <key alias="stateAll">Alle</key>
     <key alias="stateDisabled">Deaktiveret</key>
