@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web
 {
-    //TODO: find out where this should live
     public class TourFilterResolver
     {
         private static TourFilterResolver _current;

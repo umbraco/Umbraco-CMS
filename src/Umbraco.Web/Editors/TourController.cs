@@ -5,7 +5,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;

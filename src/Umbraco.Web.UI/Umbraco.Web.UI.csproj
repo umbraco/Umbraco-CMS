@@ -548,7 +548,6 @@
       <DependentUpon>HealthChecks.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Config\BackOfficeTours\my-tours.json" />
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
