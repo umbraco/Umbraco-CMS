@@ -3,6 +3,7 @@ using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
@@ -46,8 +47,20 @@ namespace Umbraco.Core.Sync
         // settings: for unit tests only
         internal static void EnsureApplicationUrl(ApplicationContext appContext, HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
         {
+            bool newApplicationUrl = false;
+            if (request != null)
+            {
+                var applicationUrl = GetApplicationUrlFromRequest(request);
+                newApplicationUrl = !appContext._umbracoApplicationDomains.Contains(applicationUrl);
+                if (newApplicationUrl)
+                {
+                    appContext._umbracoApplicationDomains.Add(applicationUrl);
+                    LogHelper.Info(typeof(ApplicationUrlHelper), $"New ApplicationUrl detected: {applicationUrl}");
+                }
+            }
+
             // if initialized, return
-            if (appContext._umbracoApplicationUrl != null) return;
+            if (appContext._umbracoApplicationUrl != null && !newApplicationUrl) return;
 
             var logger = appContext.ProfilingLogger.Logger;
 
@@ -132,6 +145,12 @@ namespace Umbraco.Core.Sync
         {
             var logger = appContext.ProfilingLogger.Logger;
 
+            appContext._umbracoApplicationUrl = GetApplicationUrlFromRequest(request);
+            logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (UmbracoModule request)");
+        }
+
+        private static string GetApplicationUrlFromRequest(HttpRequestBase request)
+        {
             // if (HTTP and SSL not required) or (HTTPS and SSL required),
             //  use ports from request
             // otherwise,
@@ -147,8 +166,7 @@ namespace Umbraco.Core.Sync
             var ssl = useSsl ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            appContext._umbracoApplicationUrl = url.TrimEnd('/');
-            logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (UmbracoModule request)");
+            return url.TrimEnd('/');
         }
     }
 }

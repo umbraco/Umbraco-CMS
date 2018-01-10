@@ -51,6 +51,12 @@ namespace Umbraco.Web.Security.Identity
         /// </summary>
         public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
+        /// <summary>
+        /// A callback executed during every time a user authenticates using an external login.
+        /// returns a boolean indicating if sign in should continue or not.
+        /// </summary>
+        public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Use the overload specifying user groups instead")]
         public string GetDefaultUserType(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)

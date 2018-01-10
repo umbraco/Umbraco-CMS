@@ -36,6 +36,7 @@
 .umb-node-preview__content {
     flex: 1 1 auto;
     margin-right: 25px;
+    overflow: hidden;
 }
 
 .umb-node-preview__name {
@@ -47,6 +48,13 @@
     font-size: 12px;
     line-height: 1.5em;
     color: @gray-3;
+}
+
+.umb-node-preview__name,
+.umb-node-preview__description {
+    /*text-overflow: ellipsis;
+    overflow: hidden;*/
+    word-wrap: break-word;
 }
 
 .umb-node-preview__actions {
