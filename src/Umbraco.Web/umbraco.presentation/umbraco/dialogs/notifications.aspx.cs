@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Globalization;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
+using System.Linq;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.workflow;
+using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace umbraco.dialogs
 {
@@ -21,7 +22,6 @@ namespace umbraco.dialogs
         public notifications()
         {
             CurrentApp = BusinessLogic.DefaultApps.content.ToString();
-
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -40,33 +40,30 @@ namespace umbraco.dialogs
             InitializeComponent();
             base.OnInit(e);
 
-            node = new cms.businesslogic.CMSNode(int.Parse(helper.Request("id")));
+            node = new CMSNode(int.Parse(helper.Request("id")));
 
-            ArrayList actionList = BusinessLogic.Actions.Action.GetAll();
-            
-            foreach (interfaces.IAction a in actionList)
+            var actionList = ActionsResolver.Current.Actions;
+
+            foreach (IAction a in actionList.OrderBy(x=>x.Alias))
             {
                 if (a.ShowInNotifier)
                 {
-                   
                     CheckBox c = new CheckBox();
                     c.ID = a.Letter.ToString(CultureInfo.InvariantCulture);
                     
-                    if (base.getUser().GetNotifications(node.Path).IndexOf(a.Letter) > -1)
+                    if (UmbracoUser.GetNotifications(node.Path).IndexOf(a.Letter) > -1)
                         c.Checked = true;
 
-                    uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
-                    pp.CssClass = "inline";
+                    uicontrols.PropertyPanel pp = new uicontrols.PropertyPanel();
+                    pp.CssClass = "inline notifications";
                     pp.Text = ui.Text("actions", a.Alias);
                     pp.Controls.Add(c);
 
                     pane_form.Controls.Add(pp);
                     
                     actions.Add(c);
-                 
                 }
             }
-          
         }
 
         /// <summary>
@@ -90,18 +87,17 @@ namespace umbraco.dialogs
                 if (c.Checked)
                     notifications += c.ID;
             }
-            Notification.UpdateNotifications(base.getUser(), node, notifications);
-            getUser().resetNotificationCache();
-            base.getUser().initNotifications();
+            Notification.UpdateNotifications(UmbracoUser, node, notifications);
+            UmbracoUser.resetNotificationCache();
+            UmbracoUser.initNotifications();
 
-            var feedback = new umbraco.uicontrols.Feedback();
+            var feedback = new uicontrols.Feedback();
             feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
-            feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
+            feedback.type = uicontrols.Feedback.feedbacktype.success;
 
             pane_form.Controls.Clear();
             pane_form.Controls.Add(feedback);
 
-            //pane_form.Visible = false;
             pl_buttons.Visible = false;
         }
     }
