@@ -298,103 +298,106 @@
         </umb-editor-sub-header>
 
         <div class="flex justify-center">
-            <form name="addUserForm" no-validate val-form-manager style="max-width: 500px;" class="block-form">
-                <div>
-                    <div ng-if="vm.usersViewState === 'inviteUser'">
-                        <h3 class="bold" style="margin-bottom: 0;">
-                            <localize key="user_inviteUser">Invite User</localize>
-                        </h3>
-                        <p style="line-height: 1.6em; margin-bottom: 15px;">
-                            <localize key="user_inviteUserHelp"></localize>
-                        </p>
-                    </div>
-                    <div ng-if="vm.usersViewState === 'createUser'">
-                        <h3 class="bold" style="margin-bottom: 0;">
-                            <localize key="user_createUser">Create user</localize>
-                        </h3>
-                        <p style="line-height: 1.6em; margin-bottom: 15px;">
-                            <localize key="user_createUserHelp"></localize>
-                        </p>
-                    </div>
-                </div>
+            <umb-box style="max-width: 600px;">
+                <umb-box-content>
+                    <form name="addUserForm" no-validate val-form-manager class="block-form">
+                        <div>
+                            <div ng-if="vm.usersViewState === 'inviteUser'">
+                                <h3 class="bold" style="margin-bottom: 0;">
+                                    <localize key="user_inviteUser">Invite User</localize>
+                                </h3>
+                                <p style="line-height: 1.6em; margin-bottom: 15px;">
+                                    <localize key="user_inviteUserHelp"></localize>
+                                </p>
+                            </div>
+                            <div ng-if="vm.usersViewState === 'createUser'">
+                                <h3 class="bold" style="margin-bottom: 0;">
+                                    <localize key="user_createUser">Create user</localize>
+                                </h3>
+                                <p style="line-height: 1.6em; margin-bottom: 15px;">
+                                    <localize key="user_createUserHelp"></localize>
+                                </p>
+                            </div>
+                        </div>
 
-                <umb-control-group label="@general_name" label-for="name" required="true">
-                    <input type="text" name="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
-                        umb-auto-focus required val-server-field="Name" />
-                    <span class="help-inline" val-msg-for="name" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+                        <umb-control-group label="@general_name" label-for="name" required="true">
+                            <input type="text" name="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
+                                umb-auto-focus required val-server-field="Name" />
+                            <span class="help-inline" val-msg-for="name" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
+                        </umb-control-group>
 
-                <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
-                    <input type="text" name="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
-                        ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
-                    <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+                        <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
+                            <input type="text" name="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
+                                ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
+                            <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
+                        </umb-control-group>
 
-                <umb-control-group label="@general_email" label-for="email" required="true">
-                    <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
-                        ng-model="vm.newUser.email" required val-email val-server-field="Email" />
-                    <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+                        <umb-control-group label="@general_email" label-for="email" required="true">
+                            <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
+                                ng-model="vm.newUser.email" required val-email val-server-field="Email" />
+                            <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
+                        </umb-control-group>
 
-                <umb-control-group label="@user_usergroup" description="@user_groupsHelp" required="true">
-                    
-                    <umb-user-group-preview
-                        ng-repeat="group in vm.newUser.userGroups"
-                        icon="group.icon"
-                        name="group.name"
-                        sections="group.sections"
-                        content-start-node="group.contentStartNode"
-                        media-start-node="group.mediaStartNode"
-                        allow-remove="true"
-                        on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
-                    </umb-user-group-preview>
+                        <umb-control-group label="@user_usergroup" description="@user_groupsHelp" required="true">
+                            
+                            <umb-user-group-preview
+                                ng-repeat="group in vm.newUser.userGroups"
+                                icon="group.icon"
+                                name="group.name"
+                                sections="group.sections"
+                                content-start-node="group.contentStartNode"
+                                media-start-node="group.mediaStartNode"
+                                allow-remove="true"
+                                on-remove="vm.removeSelectedUserGroup($index, vm.newUser.userGroups)">
+                            </umb-user-group-preview>
 
-                    <a href="" style="max-width: 100%;" class="umb-node-preview-add" ng-click="vm.openUserGroupPicker($event)" prevent-default>
-                        <localize key="general_add">Add</localize>
-                    </a>
+                            <a href="" style="max-width: 100%;" class="umb-node-preview-add" ng-click="vm.openUserGroupPicker($event)" prevent-default>
+                                <localize key="general_add">Add</localize>
+                            </a>
 
-                </umb-control-group>
+                        </umb-control-group>
 
-                <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">
-                    <textarea
-                        name="message"
-                        type="text"
-                        class="input-block-level"
-                        localize="placeholder"
-                        placeholder="@placeholders_enterMessage"
-                        ng-model="vm.newUser.message"
-                        rows="4"
-                        required val-server-field="Message">
-                    </textarea>
-                    <span class="help-inline" val-msg-for="message" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="message" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+                        <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">
+                            <textarea
+                                name="message"
+                                type="text"
+                                class="input-block-level"
+                                localize="placeholder"
+                                placeholder="@placeholders_enterMessage"
+                                ng-model="vm.newUser.message"
+                                rows="4"
+                                required val-server-field="Message">
+                            </textarea>
+                            <span class="help-inline" val-msg-for="message" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" val-msg-for="message" val-toggle-msg="valServerField"></span>
+                        </umb-control-group>
 
-                <umb-button
-                    ng-if="vm.usersViewState === 'inviteUser'"
-                    button-style="success"
-                    state="vm.page.createButtonState"
-                    type="button"
-                    action="vm.inviteUser(addUserForm)"
-                    label-key="user_sendInvite"
-                    size="m">
-                </umb-button>
+                        <umb-button
+                            ng-if="vm.usersViewState === 'inviteUser'"
+                            button-style="success"
+                            state="vm.page.createButtonState"
+                            type="button"
+                            action="vm.inviteUser(addUserForm)"
+                            label-key="user_sendInvite"
+                            size="m">
+                        </umb-button>
 
-                <umb-button
-                    ng-if="vm.usersViewState === 'createUser'"
-                    button-style="success"
-                    state="vm.page.createButtonState"
-                    type="button"
-                    action="vm.createUser(addUserForm)"
-                    label-key="user_createUser"
-                    size="m">
-                </umb-button>
+                        <umb-button
+                            ng-if="vm.usersViewState === 'createUser'"
+                            button-style="success"
+                            state="vm.page.createButtonState"
+                            type="button"
+                            action="vm.createUser(addUserForm)"
+                            label-key="user_createUser"
+                            size="m">
+                        </umb-button>
 
-            </form>
-
+                    </form>
+                </umb-box-content>
+            </umb-box>
         </div>
     </div>
 
