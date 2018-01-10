@@ -19,7 +19,7 @@
         function registerAllTours() {
             return tourResource.getTours().then(function(tourFiles) {
                 angular.forEach(tourFiles, function (tourFile) {
-                    angular.forEach(tourFile, function(newTour) {
+                    angular.forEach(tourFile.tours, function(newTour) {
                         validateTour(newTour);
                         validateTourRegistration(newTour);
                         tours.push(newTour);    

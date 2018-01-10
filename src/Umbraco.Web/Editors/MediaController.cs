@@ -461,6 +461,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [MediaPostValidate]
+        [OutgoingEditorModelEvent]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
                 MediaItemSave contentItem)
