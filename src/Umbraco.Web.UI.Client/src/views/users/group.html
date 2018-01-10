@@ -10,7 +10,9 @@
                 name="vm.userGroup.name"
                 alias="vm.userGroup.alias"
                 icon="vm.userGroup.icon"
-                hide-description="true">
+                hide-description="true"
+                on-back="vm.goToPage(vm.breadcrumbs[0])"
+                show-back-button="true">
             </umb-editor-header>
 
             <umb-editor-container>
@@ -189,13 +191,6 @@
                 </umb-editor-footer-content-left>
 
                 <umb-editor-footer-content-right>
-
-                    <umb-button
-                        type="button"
-                        action="vm.goToPage(vm.breadcrumbs[0])"
-                        label="Return to list"
-                        label-key="buttons_returnToList">
-                    </umb-button>
 
                     <umb-button
                         type="button"
