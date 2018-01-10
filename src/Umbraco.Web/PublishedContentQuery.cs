@@ -230,7 +230,7 @@ namespace Umbraco.Web
         {
             // todo: in v8, implement in a more efficient way
             var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
-            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@isDoc and @key=$guid]";
+            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@key=$guid]";
             var doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
             return doc;
         }
