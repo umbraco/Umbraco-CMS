@@ -22,7 +22,6 @@ namespace Umbraco.Core
 
         // gets a value indicating whether this instance is disposed.
         // for internal tests only (not thread safe)
-        //TODO make this internal + rename "Disposed" when we can break compatibility
         internal bool Disposed { get { return _disposed; } }
 
         // implements IDisposable
