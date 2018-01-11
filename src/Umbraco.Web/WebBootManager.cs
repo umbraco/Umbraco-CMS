@@ -353,6 +353,8 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
+            TourFilterResolver.Current = new TourFilterResolver(ServiceProvider, LoggerResolver.Current.Logger);
+
             SearchableTreeResolver.Current = new SearchableTreeResolver(ServiceProvider, LoggerResolver.Current.Logger, ApplicationContext.Services.ApplicationTreeService, () => PluginManager.ResolveSearchableTrees());
 
             XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveXsltExtensions());

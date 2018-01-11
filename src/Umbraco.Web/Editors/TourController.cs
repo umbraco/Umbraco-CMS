@@ -23,15 +23,21 @@ namespace Umbraco.Web.Editors
             if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
                 return result;
 
+            var filters = TourFilterResolver.Current.Filters.ToList();
+            
+            //get all filters that will be applied to all tour aliases
+            var aliasOnlyFilters = filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();
+
+            //don't pass in any filters for core tours that have a plugin name assigned
+            var nonPluginFilters = filters.Where(x => x.PluginName == null).ToList();
+
             //add core tour files
             var coreToursPath = Path.Combine(IOHelper.MapPath(SystemDirectories.Config), "BackOfficeTours");
             if (Directory.Exists(coreToursPath))
             {
-                var coreTourFiles = Directory.GetFiles(coreToursPath, "*.json");
-
-                foreach (var tourFile in coreTourFiles)
+                foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
                 {
-                    TryParseTourFile(tourFile, result);
+                    TryParseTourFile(tourFile, result, nonPluginFilters, aliasOnlyFilters);
                 }
             }
 
@@ -39,6 +45,14 @@ namespace Umbraco.Web.Editors
             foreach (var plugin in Directory.EnumerateDirectories(IOHelper.MapPath(SystemDirectories.AppPlugins)))
             {
                 var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
+                var pluginFilters = filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName)).ToList();
+
+                //If there is any filter applied to match the plugin only (no file or tour alias) then ignore the plugin entirely
+                var isPluginFiltered = pluginFilters.Any(x => x.TourFileName == null && x.TourAlias == null);
+                if (isPluginFiltered) continue;
+
+                //combine matched package filters with filters not specific to a package
+                var combinedFilters = nonPluginFilters.Concat(pluginFilters).ToList();
 
                 foreach (var backofficeDir in Directory.EnumerateDirectories(plugin, "backoffice"))
                 {
@@ -46,7 +60,7 @@ namespace Umbraco.Web.Editors
                     {
                         foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
                         {
-                            TryParseTourFile(tourFile, result, pluginName);
+                            TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, pluginName);
                         }
                     }
                 }
@@ -55,22 +69,44 @@ namespace Umbraco.Web.Editors
             return result.OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
         }
 
-        private void TryParseTourFile(string tourFile, List<BackOfficeTourFile> result, string pluginName = null)
+        private void TryParseTourFile(string tourFile,
+            ICollection<BackOfficeTourFile> result,
+            List<BackOfficeTourFilter> filters,
+            List<BackOfficeTourFilter> aliasOnlyFilters,
+            string pluginName = null)
         {
+            var fileName = Path.GetFileNameWithoutExtension(tourFile);
+            if (fileName == null) return;
+
+            //get the filters specific to this file
+            var fileFilters = filters.Where(x => x.TourFileName != null && x.TourFileName.IsMatch(fileName)).ToList();
+            
+            //If there is any filter applied to match the file only (no tour alias) then ignore the file entirely
+            var isFileFiltered = fileFilters.Any(x => x.TourAlias == null);
+            if (isFileFiltered) return;
+
+            //now combine all aliases to filter below
+            var aliasFilters = aliasOnlyFilters.Concat(filters.Where(x => x.TourAlias != null))
+                .Select(x => x.TourAlias)
+                .ToList();
+
             try
             {
                 var contents = File.ReadAllText(tourFile);
                 var tours = JsonConvert.DeserializeObject<BackOfficeTour[]>(contents);
-                var disabledTours = TourFilterResolver.Current.DisabledTours;
 
-                result.Add(new BackOfficeTourFile
+                var tour = new BackOfficeTourFile
                 {
                     FileName = Path.GetFileNameWithoutExtension(tourFile),
                     PluginName = pluginName,
                     Tours = tours
-                        .Where(x => disabledTours.Contains(x.Alias, StringComparer.InvariantCultureIgnoreCase) == false)
+                        .Where(x => aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false)
                         .ToArray()
-                });
+                };
+
+                //don't add if all of the tours are filtered
+                if (tour.Tours.Any())
+                    result.Add(tour);
             }
             catch (IOException e)
             {

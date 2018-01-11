@@ -1,32 +1,79 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
+using Umbraco.Core.ObjectResolution;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web
 {
-    public class TourFilterResolver
+    /// <summary>
+    /// Allows for adding filters for tours during startup
+    /// </summary>
+    public class TourFilterResolver : ManyObjectsResolverBase<TourFilterResolver, BackOfficeTourFilter>
     {
-        private static TourFilterResolver _current;
-
-        private readonly HashSet<string> _disabledTours;
-
-        public TourFilterResolver()
+        public TourFilterResolver(IServiceProvider serviceProvider, ILogger logger) : base(serviceProvider, logger)
         {
-            _disabledTours = new HashSet<string>();
         }
 
-        public static TourFilterResolver Current
+        private readonly HashSet<BackOfficeTourFilter> _instances = new HashSet<BackOfficeTourFilter>();
+
+        public IEnumerable<BackOfficeTourFilter> Filters
         {
-            get { return _current ?? (_current = new TourFilterResolver()); }
+            get { return Values; }
         }
 
-        public void Disable(string tour)
+        /// <summary>
+        /// Adds a filter instance
+        /// </summary>
+        /// <param name="filter"></param>
+        public void AddFilter(BackOfficeTourFilter filter)
         {
-            _disabledTours.Add(tour);
+            using (Resolution.Configuration)
+                _instances.Add(filter);
         }
 
-        public string[] DisabledTours
+        /// <summary>
+        /// Removes a filter instance
+        /// </summary>
+        /// <param name="filter"></param>
+        public void RemoveFilter(BackOfficeTourFilter filter)
         {
-            get { return _disabledTours.ToArray(); }
+            using (Resolution.Configuration)
+                _instances.Remove(filter);
+        }
+
+        /// <summary>
+        /// Removes a filter instance based on callback
+        /// </summary>
+        /// <param name="filter"></param>
+        public void RemoveFilterWhere(Func<BackOfficeTourFilter, bool> filter)
+        {
+            using (Resolution.Configuration)
+                _instances.RemoveWhere(new Predicate<BackOfficeTourFilter>(filter));
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Overridden to return the combined created instances based on the resolved Types and the Concrete values added with AddFilter
+        /// </summary>
+        /// <returns></returns>
+        protected override IEnumerable<BackOfficeTourFilter> CreateInstances()
+        {
+            var createdInstances = base.CreateInstances();
+            return createdInstances.Concat(_instances);
+        }
+
+        public override void Clear()
+        {
+            base.Clear();
+            _instances.Clear();
+        }
+
+        internal override void ResetCollections()
+        {
+            base.ResetCollections();
+            _instances.Clear();
         }
     }
 }
