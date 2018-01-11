@@ -194,20 +194,6 @@
 
         /**
          * @ngdoc method
-         * @name umbraco.services.tourService#getAllTours
-         * @methodOf umbraco.services.tourService
-         *
-         * @description
-         * Returns a promise of all tours with the current user statuses
-         * @returns {Array} All registered tours
-		 */
-        function getAllTours() {
-            var tours = getTours();
-            return setTourStatuses(tours);
-        }
-
-        /**
-         * @ngdoc method
          * @name umbraco.services.tourService#getGroupedTours
          * @methodOf umbraco.services.tourService
          *
@@ -272,38 +258,6 @@
             setTourStatuses(tours).then(function () {
                 var tour = _.findWhere(tours, { alias: tourAlias });
                 deferred.resolve(tour);
-            });
-            return deferred.promise;
-        }
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.tourService#getCompletedTours
-         * @methodOf umbraco.services.tourService
-         *
-         * @description
-         * Returns a promise of completed tours for the user
-         * @returns {Array} Array of completed tour aliases
-		 */
-        function getCompletedTours() {
-            var deferred = $q.defer();
-            currentUserResource.getTours().then(function (storedTours) {
-                var completedTours = _.where(storedTours, { completed: true });
-                var aliases = _.pluck(completedTours, "alias");
-                deferred.resolve(aliases);
-            });
-            return deferred.promise;
-        }
-
-        /**
-         * Returns a promise of disabled tours for the user
-         */
-        function getDisabledTours() {
-            var deferred = $q.defer();
-            currentUserResource.getTours().then(function (storedTours) {
-                var disabledTours = _.where(storedTours, { disabled: true });
-                var aliases = _.pluck(disabledTours, "alias");
-                deferred.resolve(aliases);
             });
             return deferred.promise;
         }
@@ -378,40 +332,6 @@
             return deferred.promise;
         }
 
-        function saveInLocalStorage(tour) {
-            var storedTours = [];
-            var tourFound = false;
-
-            // check if something exists in local storage
-            if (localStorageService.get(localStorageKey)) {
-                storedTours = localStorageService.get(localStorageKey);
-            }
-
-            // update existing tour in localstorage if it's already there
-            if (storedTours.length > 0) {
-                angular.forEach(storedTours, function (storedTour) {
-                    if (storedTour.alias === tour.alias) {
-                        storedTour.completed = storedTour.completed ? storedTour.completed : tour.completed;
-                        storedTour.disabled = storedTour.disabled ? storedTour.disabled : tour.disabled;
-                        tourFound = true;
-                    }
-                });
-            }
-
-            // create new entry in local storage
-            if (!tourFound) {
-                var storageObject = {
-                    "alias": tour.alias,
-                    "completed": tour.completed,
-                    "disabled": tour.disabled
-                };
-                storedTours.push(storageObject);
-            }
-
-            localStorageService.set(localStorageKey, storedTours);
-
-        }
-
         var service = {
             registerAllTours: registerAllTours,
             registerTour: registerTour,
@@ -423,14 +343,8 @@
             disableTour: disableTour,
             completeTour: completeTour,
             getCurrentTour: getCurrentTour,
-            //TODO: Not used
-            getAllTours: getAllTours,
             getGroupedTours: getGroupedTours,
-            getTourByAlias: getTourByAlias,
-            //TODO: Not used
-            getCompletedTours: getCompletedTours,
-            //TODO: Not used
-            getDisabledTours: getDisabledTours,
+            getTourByAlias: getTourByAlias
         };
 
         return service;
