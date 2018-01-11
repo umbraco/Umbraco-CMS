@@ -22,7 +22,8 @@ namespace Umbraco.Core
 
         // gets a value indicating whether this instance is disposed.
         // for internal tests only (not thread safe)
-        internal bool Disposed { get { return _disposed; } }
+        //TODO make this internal + rename "Disposed" when we can break compatibility
+        public bool IsDisposed { get { return _disposed; } }
 
         // implements IDisposable
         public void Dispose()
@@ -37,7 +38,8 @@ namespace Umbraco.Core
             Dispose(false);
         }
 
-        private void Dispose(bool disposing)
+        //TODO make this private, non-virtual when we can break compatibility
+        protected virtual void Dispose(bool disposing)
         {
             lock (_locko)
             {
