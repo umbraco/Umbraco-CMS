@@ -17,6 +17,7 @@
          * Registers all tours from the server and returns a promise
          */
         function registerAllTours() {
+            tours = [];
             return tourResource.getTours().then(function(tourFiles) {
                 angular.forEach(tourFiles, function (tourFile) {
                     angular.forEach(tourFile.tours, function(newTour) {
@@ -218,7 +219,38 @@
             var deferred = $q.defer();
             var tours = getTours();
             setTourStatuses(tours).then(function() {
-                var groupedTours = _.groupBy(tours, "group");
+                var groupedTours = [];
+                tours.forEach(function (item) {
+                    
+                    var groupExists = false;
+                    var newGroup = {
+                        "group": "",
+                        "tours": []
+                    };
+
+                    groupedTours.forEach(function(group){
+                        // extend existing group if it is already added
+                        if(group.group === item.group) {
+                            if(item.groupOrder) {
+                                group.groupOrder = item.groupOrder
+                            }
+                            groupExists = true;
+                            group.tours.push(item)
+                        }
+                    });
+
+                    // push new group to array if it doesn't exist
+                    if(!groupExists) {
+                        newGroup.group = item.group;
+                        if(item.groupOrder) {
+                            newGroup.groupOrder = item.groupOrder
+                        }
+                        newGroup.tours.push(item);
+                        groupedTours.push(newGroup);
+                    }
+
+                });
+
                 deferred.resolve(groupedTours);
             });
             return deferred.promise;
