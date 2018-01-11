@@ -19,7 +19,7 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "elementPreventClick")]
         public bool ElementPreventClick { get; set; }
         [DataMember(Name = "backdropOpacity")]
-        public float BackdropOpacity { get; set; }
+        public float? BackdropOpacity { get; set; }
         [DataMember(Name = "event")]
         public string Event { get; set; }
     }
