@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.Models;
@@ -31,6 +32,36 @@ namespace Umbraco.Web
         {
             using (Resolution.Configuration)
                 _instances.Add(filter);
+        }
+
+        /// <summary>
+        /// Helper method for adding a filter by plugin name
+        /// </summary>
+        /// <param name="pluginName"></param>
+        public void AddFilterByPlugin(string pluginName)
+        {
+            using (Resolution.Configuration)
+                _instances.Add(BackOfficeTourFilter.FilterPlugin(new Regex(pluginName, RegexOptions.IgnoreCase)));
+        }
+
+        /// <summary>
+        /// Helper method for adding a filter by file name
+        /// </summary>
+        /// <param name="file"></param>
+        public void AddFilterByFile(string file)
+        {
+            using (Resolution.Configuration)
+                _instances.Add(BackOfficeTourFilter.FilterFile(new Regex(file, RegexOptions.IgnoreCase)));
+        }
+
+        /// <summary>
+        /// Helper method for adding a filter by tour alias
+        /// </summary>
+        /// <param name="alias"></param>
+        public void AddFilterByAlias(string alias)
+        {
+            using (Resolution.Configuration)
+                _instances.Add(BackOfficeTourFilter.FilterAlias(new Regex(alias, RegexOptions.IgnoreCase)));
         }
 
         /// <summary>
