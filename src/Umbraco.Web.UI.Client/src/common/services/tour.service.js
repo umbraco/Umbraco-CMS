@@ -37,7 +37,7 @@
          *
          * @description
          * Registers a tour in the service
-		 * @param {Object} tour The tour you want to register in the service
+         * @param {Object} tour The tour you want to register in the service
          * @param {String} tour.name The tour name
          * @param {String} tour.alias The tour alias
          * @param {Array} tour.steps Array of tour steps
@@ -46,7 +46,7 @@
          * @param {DomElement} tour.step.element Highlight a DOM-element
          * @param {Boolean} tour.step.elementPreventClick Adds invisible layer on top of highligted element to prevent all clicks and interaction with it
          * @param {Number} tour.step.backdropOpacity Sets the backdrop opacity (default 0.4)
-		 */
+         */
         function registerTour(newTour) {
             validateTour(newTour);
             validateTourRegistration(newTour);
@@ -61,8 +61,8 @@
          *
          * @description
          * Registers an array of tours in the service
-		 * @param {Array} tours The tours to register in the service
-		 */
+         * @param {Array} tours The tours to register in the service
+         */
         function registerTours(newTours) {
             angular.forEach(newTours, function(newTour){
                 validateTour(newTour);
@@ -79,8 +79,8 @@
          *
          * @description
          * Unregisters a tour in the service
-		 * @param {String} tourAlias The tour alias of the tour you want to unregister
-		 */
+         * @param {String} tourAlias The tour alias of the tour you want to unregister
+         */
         function unregisterTour(tourAlias) {
             tours = tours.filter(function( obj ) {
                 return obj.alias !== tourAlias;
@@ -95,8 +95,8 @@
          *
          * @description
          * Unregisters a tour in the service
-		 * @param {String} tourGroupName The name of the tour group you want to unregister
-		 */
+         * @param {String} tourGroupName The name of the tour group you want to unregister
+         */
         function unregisterTourGroup(tourGroup) {
             tours = tours.filter(function( obj ) {
                 return obj.group !== tourGroup;
@@ -118,8 +118,8 @@
          *
          * @description
          * Raises an event to start a tour
-		 * @param {Object} tour The tour which should be started
-		 */
+         * @param {Object} tour The tour which should be started
+         */
         function startTour(tour) {
             validateTour(tour);
             eventsService.emit("appState.tour.start", tour);
@@ -133,7 +133,7 @@
          *
          * @description
          * Raises an event to end the current tour
-		 */
+         */
         function endTour(tour) {
             eventsService.emit("appState.tour.end", tour);
             currentTour = null;
@@ -164,7 +164,7 @@
          * @description
          * Completes a tour for the user, raises an event and returns a promise
          * @param {Object} tour The tour which should be completed
-		 */
+         */
         function completeTour(tour) {
             var deferred = $q.defer();
             tour.completed = true;
@@ -186,7 +186,7 @@
          * @description
          * Returns the current tour
          * @returns {Object} Returns the current tour
-		 */
+         */
         function getCurrentTour() {
             //TODO: This should be reset if a new user logs in
             return currentTour;
@@ -200,7 +200,7 @@
          * @description
          * Returns a promise of grouped tours with the current user statuses
          * @returns {Array} All registered tours grouped by tour group
-		 */
+         */
         function getGroupedTours() {
             var deferred = $q.defer();
             var tours = getTours();
@@ -251,7 +251,7 @@
          * Returns a promise of the tour found by alias with the current user statuses
          * @param {Object} tourAlias The tour alias of the tour which should be returned
          * @returns {Object} Tour object
-		 */
+         */
         function getTourByAlias(tourAlias) {
             var deferred = $q.defer();
             var tours = getTours();
