@@ -4,7 +4,6 @@
     'lib/underscore/underscore-min.js',
 
     'lib/moment/moment-with-locales.js',
-    'lib/angular-moment/angular-moment.min.js',
 
     'lib/jquery-ui/jquery-ui.min.js',
     'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',

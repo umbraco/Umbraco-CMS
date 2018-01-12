@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -86,7 +86,7 @@
                         // get current backoffice user and format dates
                         userService.getCurrentUser().then(function (currentUser) {
                             angular.forEach(data.items, function(item) {
-                                item.timestampFormatted = getLocalDate(item.timestamp, currentUser.locale, 'LLL');
+                                item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
                     
@@ -199,31 +199,24 @@
             
             function ucfirst(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
-            } 
-
-            function getLocalDate(date, culture, format) {
-                if (date) {
-                    var dateVal;
-                    var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-                    var localOffset = new Date().getTimezoneOffset();
-                    var serverTimeNeedsOffsetting = -serverOffset !== localOffset;
-                    if (serverTimeNeedsOffsetting) {
-                        dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
-                    } else {
-                        dateVal = moment(date, 'YYYY-MM-DD HH:mm:ss');
-                    }
-                    return dateVal.locale(culture).format(format);
-                }
             }
 
             function formatDatesToLocal() {
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
-                    scope.node.createDateFormatted = getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
-                    scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
-                    scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
-                    scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
-                    scope.node.removeDateDay = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
+                    
+                    scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
+                    scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
+                    scope.node.releaseDateDayNumber = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'DD')) : null;
+                    scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.releaseDateTime = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'HH:mm')) : null;
+                    
+                    scope.node.removeDateYear = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'YYYY')) : null;
+                    scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
+                    scope.node.removeDateDayNumber = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'DD')) : null;
+                    scope.node.removeDateDay = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.removeDateTime = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'HH:mm')) : null;
                 });
             }
 

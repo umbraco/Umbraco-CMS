@@ -31,8 +31,7 @@
     "moment": "~2.10.3",
     "ace-builds": "^1.2.3",
     "clipboard": "1.7.1",
-    "font-awesome": "~4.2",
-    "angular-moment": "^1.0.1"
+    "font-awesome": "~4.2"
   },
   "install": {
     "path": "lib-bower",
@@ -59,9 +58,6 @@
       "angular-local-storage": [
         "bower_components/angular-local-storage/dist/angular-local-storage.min.js",
         "bower_components/angular-local-storage/dist/angular-local-storage.min.js.map"
-      ],
-      "angular-moment": [
-        "bower_components/angular-moment/angular-moment.min.js"
       ],
       "tinymce": [
         "bower_components/tinymce/tinymce.min.js"
