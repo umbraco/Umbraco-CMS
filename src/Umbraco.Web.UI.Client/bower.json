@@ -69,8 +69,5 @@
       "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
       "clipboard": "bower_components/clipboard/dist/clipboard.min.js"
     }
-  },
-  "resolutions": {
-    "moment": ">=2.19.3 <3.0.0"
   }
 }
