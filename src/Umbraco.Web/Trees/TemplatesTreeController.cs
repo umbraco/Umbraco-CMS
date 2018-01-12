@@ -105,7 +105,7 @@ namespace Umbraco.Web.Trees
                 Id = template.Id,
                 Key = template.Key,
                 Name = template.Name,
-                NodeObjectTypeId = Constants.ObjectTypes.Template,
+                NodeObjectType = Constants.ObjectTypes.Template,
                 //TODO: Fix parent/paths on templates
                 ParentId = -1,
                 Path = template.Path,

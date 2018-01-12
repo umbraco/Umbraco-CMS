@@ -159,6 +159,10 @@ namespace Umbraco.Core.Models
             }
         }
 
+        // fixme - implement that one !!
+        [DataMember]
+        public object Configuration { get; set; }
+
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
         IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData;

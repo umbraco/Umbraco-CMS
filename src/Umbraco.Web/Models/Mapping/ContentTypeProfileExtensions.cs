@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, map => map.Condition(src => src.Id > 0))
                 .ForMember(dest => dest.Key, map => map.Ignore())
                 .ForMember(dest => dest.HasIdentity, map => map.Ignore())
-                .ForMember(dest => dest.DeletedDate, map => map.Ignore())
+                .ForMember(dest => dest.DeleteDate, map => map.Ignore())
                 .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
         }
 

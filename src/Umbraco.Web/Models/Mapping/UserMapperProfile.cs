@@ -157,14 +157,14 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             CreateMap<UmbracoEntity, AssignedContentPermissions>()
-                .ForMember(x => x.Udi, opt => opt.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectTypeId), x.Key)))
+                .ForMember(x => x.Udi, opt => opt.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectType), x.Key)))
                 .ForMember(basic => basic.Icon, opt => opt.MapFrom(entity => entity.ContentTypeIcon))
                 .ForMember(dto => dto.Trashed, opt => opt.Ignore())
                 .ForMember(x => x.Alias, opt => opt.Ignore())
                 .ForMember(x => x.AssignedPermissions, opt => opt.Ignore())
                 .AfterMap((entity, basic) =>
                 {
-                    if (entity.NodeObjectTypeId == Constants.ObjectTypes.Member && basic.Icon.IsNullOrWhiteSpace())
+                    if (entity.NodeObjectType == Constants.ObjectTypes.Member && basic.Icon.IsNullOrWhiteSpace())
                     {
                         basic.Icon = "icon-user";
                     }

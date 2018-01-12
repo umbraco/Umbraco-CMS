@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.EntityBase
 {
@@ -13,15 +14,21 @@ namespace Umbraco.Core.Models.EntityBase
     public interface IUmbracoEntity : ITreeEntity, IRememberBeingDirty
     {
         /// <summary>
-        /// Gets or sets the identifier of the user who created this entity.
-        /// </summary>
-        int CreatorId { get; set; }
-
-        /// <summary>
         /// Gets additional data for this entity.
         /// </summary>
         IDictionary<string, object> AdditionalData { get; }
 
         // fixme AdditionalData is never null, then we need a HasAdditionalData for checking values?
+
+        ///// <summary>
+        ///// Gets a value indicating whether this entity has children.
+        ///// </summary>
+        //bool HasChildren { get; }
+
+        ///// <summary>
+        ///// Gets the node object type of the entity.
+        ///// </summary>
+        //Guid NodeObjectType { get; }
+
     }
 }

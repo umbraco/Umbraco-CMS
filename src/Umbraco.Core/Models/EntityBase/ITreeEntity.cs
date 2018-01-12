@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.EntityBase
+﻿using System;
+
+namespace Umbraco.Core.Models.EntityBase
 {
     /// <summary>
     /// Defines an entity that belongs to a tree.
@@ -38,5 +40,10 @@
         /// <para>Always false for entities that do not support being trashed.</para>
         /// </remarks>
         bool Trashed { get; }
+
+        /// <summary>
+        /// Gets or sets the identifier of the user who created this entity.
+        /// </summary>
+        int CreatorId { get; set; }
     }
 }

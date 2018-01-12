@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Models
                 HasChildren = true,
                 Edited = true,
                 Published = true,
-                NodeObjectTypeId = Guid.NewGuid()
+                NodeObjectType = Guid.NewGuid()
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.HasChildren, item.HasChildren);
             Assert.AreEqual(clone.Edited, item.Edited);
             Assert.AreEqual(clone.Published, item.Published);
-            Assert.AreEqual(clone.NodeObjectTypeId, item.NodeObjectTypeId);
+            Assert.AreEqual(clone.NodeObjectType, item.NodeObjectType);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
             Assert.AreEqual(clone.AdditionalData.Count, item.AdditionalData.Count);
             Assert.AreEqual(clone.AdditionalData, item.AdditionalData);
@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Models
                 HasChildren = true,
                 Edited = true,
                 Published = true,
-                NodeObjectTypeId = Guid.NewGuid()
+                NodeObjectType = Guid.NewGuid()
             };
             item.AdditionalData.Add("test1", 3);
             item.AdditionalData.Add("test2", "valuie");

@@ -6,12 +6,63 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
+    // fixme - changing the name of some properties that were in additionalData => must update corresponding javascript?
+
+    public class UmbracoContentEntity : UmbracoEntity
+    {
+        private static PropertySelectors _selectors;
+        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+
+        private string _contentTypeAlias;
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo ContentTypeAlias = ExpressionHelper.GetPropertyInfo<UmbracoContentEntity, string>(x => x.ContentTypeAlias);
+        }
+
+        public string ContentTypeAlias
+        {
+            get => _contentTypeAlias;
+            set => SetPropertyValueAndDetectChanges(value, ref _contentTypeAlias, Selectors.ContentTypeAlias);
+        }
+    }
+
+    public class UmbracoDocumentEntity : UmbracoContentEntity
+    {
+        private static PropertySelectors _selectors;
+        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+
+        private bool _published;
+        private bool _edited;
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo Published = ExpressionHelper.GetPropertyInfo<UmbracoDocumentEntity, bool>(x => x.Published);
+            public readonly PropertyInfo Edited = ExpressionHelper.GetPropertyInfo<UmbracoDocumentEntity, bool>(x => x.Edited);
+        }
+
+        public bool Published
+        {
+            get => _published;
+            set => SetPropertyValueAndDetectChanges(value, ref _published, Selectors.Published);
+        }
+
+        public bool Edited
+        {
+            get => _edited;
+            set => SetPropertyValueAndDetectChanges(value, ref _edited, Selectors.Edited);
+        }
+    }
+
     /// <summary>
     /// Implementation of the <see cref="IUmbracoEntity"/> for internal use.
     /// </summary>
     public class UmbracoEntity : EntityBase.EntityBase, IUmbracoEntity
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        private static PropertySelectors _selectors;
+        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+
+        private Guid _nodeObjectType;
 
         private int _creatorId;
 
@@ -24,147 +75,100 @@ namespace Umbraco.Core.Models
 
         private bool _hasChildren;
 
-        // fixme - these are for IContent only - MOVE!
-        private bool _published;
-        private bool _edited;
-
-        // fixme - these are for IContentBase only - MOVE!
-        private string _contentTypeAlias;
-        private Guid _nodeObjectTypeId;
-
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class PropertySelectors
-        {
-            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
-            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.Level);
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Name);
-            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.ParentId);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Path);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.SortOrder);
-            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Trashed);
-            public readonly PropertyInfo HasChildrenSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasChildren);
-            public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Published);
-            public readonly PropertyInfo EditedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Edited);
-            public readonly PropertyInfo ContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeAlias);
-            public readonly PropertyInfo ContentTypeIconSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
-            public readonly PropertyInfo ContentTypeThumbnailSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
-            public readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
-        }
-
+        // fixme - usage
         private string _contentTypeIcon;
         private string _contentTypeThumbnail;
 
-        public static readonly UmbracoEntity Root = new UmbracoEntity(false) { Path = "-1", Name = "root", HasChildren = true };
+        // fixme - are we tracking changes on something that's basically READONLY?
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo CreatorId = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
+            public readonly PropertyInfo Level = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.Level);
+            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Name);
+            public readonly PropertyInfo ParentId = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.ParentId);
+            public readonly PropertyInfo Path = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.Path);
+            public readonly PropertyInfo SortOrder = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.SortOrder);
+            public readonly PropertyInfo Trashed = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Trashed);
+            public readonly PropertyInfo HasChildren = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasChildren);
+            public readonly PropertyInfo NodeObjectType = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectType);
+            public readonly PropertyInfo ContentTypeIcon = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeIcon);
+            public readonly PropertyInfo ContentTypeThumbnail = ExpressionHelper.GetPropertyInfo<UmbracoEntity, string>(x => x.ContentTypeThumbnail);
+        }
+
+        public static readonly UmbracoEntity Root = new UmbracoEntity { Path = "-1", Name = "root", HasChildren = true };
 
         public UmbracoEntity()
         {
             AdditionalData = new Dictionary<string, object>();
         }
 
-        public UmbracoEntity(bool trashed)
-        {
-            AdditionalData = new Dictionary<string, object>();
-            Trashed = trashed;
-        }
-
-        // for MySql
-        public UmbracoEntity(UInt64 trashed)
-        {
-            AdditionalData = new Dictionary<string, object>();
-            Trashed = trashed == 1;
-        }
-
         public int CreatorId
         {
             get => _creatorId;
-            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Selectors.CreatorId);
         }
 
         public int Level
         {
             get => _level;
-            set => SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _level, Selectors.Level);
         }
 
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
         }
 
         public int ParentId
         {
             get => _parentId;
-            set => SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _parentId, Selectors.ParentId);
         }
 
         public string Path
         {
             get => _path;
-            set => SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _path, Selectors.Path);
         }
 
         public int SortOrder
         {
             get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Selectors.SortOrder);
         }
 
         public bool Trashed
         {
             get => _trashed;
-            private set => SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _trashed, Selectors.Trashed);
         }
-
-        public IDictionary<string, object> AdditionalData { get; }
-
 
         public bool HasChildren
         {
             get => _hasChildren;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _hasChildren, Ps.Value.HasChildrenSelector);
-                AdditionalData["HasChildren"] = value; // custom and not in IUmbracoEntity
-            }
+            set => SetPropertyValueAndDetectChanges(value, ref _hasChildren, Selectors.HasChildren);
         }
 
-        public bool Published
+        public Guid NodeObjectType
         {
-            get => _published;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector);
-                AdditionalData["IsPublished"] = value; // custom and not in IUmbracoEntity
-            }
+            get => _nodeObjectType;
+            set => SetPropertyValueAndDetectChanges(value, ref _nodeObjectType, Selectors.NodeObjectType);
         }
 
-        public bool Edited
-        {
-            get => _edited;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _edited, Ps.Value.EditedSelector);
-                AdditionalData["IsEdited"] = value; // custom and not in IUmbracoEntity
-            }
-        }
 
-        public string ContentTypeAlias
-        {
-            get => _contentTypeAlias;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _contentTypeAlias, Ps.Value.ContentTypeAliasSelector);
-                AdditionalData["ContentTypeAlias"] = value; // custom and not in IUmbracoEntity
-            }
-        }
+
+
+
+        public IDictionary<string, object> AdditionalData { get; }
+
 
         public string ContentTypeIcon
         {
             get => _contentTypeIcon;
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _contentTypeIcon, Ps.Value.ContentTypeIconSelector);
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeIcon, Selectors.ContentTypeIcon);
                 AdditionalData["ContentTypeIcon"] = value; // custom and not in IUmbracoEntity
             }
         }
@@ -174,18 +178,8 @@ namespace Umbraco.Core.Models
             get => _contentTypeThumbnail;
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _contentTypeThumbnail, Ps.Value.ContentTypeThumbnailSelector);
+                SetPropertyValueAndDetectChanges(value, ref _contentTypeThumbnail, Selectors.ContentTypeThumbnail);
                 AdditionalData["ContentTypeThumbnail"] = value; // custom and not in IUmbracoEntity
-            }
-        }
-
-        public Guid NodeObjectTypeId
-        {
-            get => _nodeObjectTypeId;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _nodeObjectTypeId, Ps.Value.NodeObjectTypeIdSelector);
-                AdditionalData["NodeObjectTypeId"] = value; // custom and not in IUmbracoEntity
             }
         }
 

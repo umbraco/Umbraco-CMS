@@ -642,7 +642,7 @@ namespace Umbraco.Core.Services.Implement
         public virtual UmbracoObjectTypes GetObjectType(IUmbracoEntity entity)
         {
             return entity is UmbracoEntity entityImpl
-                ? UmbracoObjectTypesExtensions.GetUmbracoObjectType(entityImpl.NodeObjectTypeId)
+                ? UmbracoObjectTypesExtensions.GetUmbracoObjectType(entityImpl.NodeObjectType)
                 : GetObjectType(entity.Id);
         }
 

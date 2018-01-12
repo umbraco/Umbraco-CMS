@@ -115,6 +115,8 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public static bool HasChildren(this IUmbracoEntity entity)
         {
+            // fixme
+            //return entity.HasChildren; // but then we would not need this extension method?
             if (entity.AdditionalData.ContainsKey("HasChildren"))
             {
                 var convert = entity.AdditionalData["HasChildren"].TryConvertTo<bool>();

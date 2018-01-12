@@ -21,13 +21,13 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
             CreateMap<UmbracoEntity, EntityBasic>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectTypeId), src.Key)))
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentTypeIcon))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
-                    if (src.NodeObjectTypeId == Constants.ObjectTypes.Member && dest.Icon.IsNullOrWhiteSpace())
+                    if (src.NodeObjectType == Constants.ObjectTypes.Member && dest.Icon.IsNullOrWhiteSpace())
                     {
                         dest.Icon = "icon-user";
                     }
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             CreateMap<UmbracoEntity, SearchResultItem>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectTypeId), src.Key)))
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src=> src.ContentTypeIcon))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
@@ -89,15 +89,15 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     if (basic.Icon.IsNullOrWhiteSpace())
                     {
-                        if (entity.NodeObjectTypeId == Constants.ObjectTypes.Member)
+                        if (entity.NodeObjectType == Constants.ObjectTypes.Member)
                             basic.Icon = "icon-user";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DataType)
+                        else if (entity.NodeObjectType == Constants.ObjectTypes.DataType)
                             basic.Icon = "icon-autofill";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.DocumentType)
+                        else if (entity.NodeObjectType == Constants.ObjectTypes.DocumentType)
                             basic.Icon = "icon-item-arrangement";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.MediaType)
+                        else if (entity.NodeObjectType == Constants.ObjectTypes.MediaType)
                             basic.Icon = "icon-thumbnails";
-                        else if (entity.NodeObjectTypeId == Constants.ObjectTypes.TemplateType)
+                        else if (entity.NodeObjectType == Constants.ObjectTypes.TemplateType)
                             basic.Icon = "icon-newspaper-alt";
                     }
                 });

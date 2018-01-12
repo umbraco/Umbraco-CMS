@@ -314,6 +314,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
+    <Compile Include="Models\EntityBase\BeingDirty.cs" />
     <Compile Include="Models\EntityBase\ITreeEntity.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />

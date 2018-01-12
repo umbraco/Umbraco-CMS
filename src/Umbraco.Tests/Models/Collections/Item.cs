@@ -69,6 +69,12 @@ namespace Umbraco.Tests.Models.Collections
         public DateTime UpdateDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the Deleted Date
+        /// </summary>
+        [DataMember]
+        public DateTime? DeleteDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the WasCancelled flag, which is used to track
         /// whether some action against an entity was cancelled through some event.
         /// This only exists so we have a way to check if an event was cancelled through

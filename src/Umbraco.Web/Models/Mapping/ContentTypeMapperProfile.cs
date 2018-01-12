@@ -183,7 +183,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // see note above - have to do this here?
                 .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
-                .ForMember(dest => dest.DeletedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
 
                 .ForMember(dto => dto.Variations, opt => opt.Ignore()) // fixme - change when UI supports it!
 

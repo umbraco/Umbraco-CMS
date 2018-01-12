@@ -761,96 +761,86 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Factory
 
-        // fixme kill all this
-        //private static void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
-        //{
-        //    var entityProps = typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray();
-
-        //    // figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
-        //    foreach (var k in originalEntityProperties.Keys
-        //        .Select(x => new { orig = x, title = x.ToCleanString(CleanStringType.PascalCase | CleanStringType.Ascii | CleanStringType.ConvertCase) })
-        //        .Where(x => entityProps.InvariantContains(x.title) == false))
-        //    {
-        //        entity.AdditionalData[k.title] = originalEntityProperties[k.orig];
-        //    }
-        //}
-
-        //private static UmbracoEntity BuildEntityFromDynamic(dynamic d)
-        //{
-        //    var asDictionary = (IDictionary<string, object>) d;
-        //    var entity = new UmbracoEntity(d.trashed);
-
-        //    try
-        //    {
-        //        entity.DisableChangeTracking();
-
-        //        entity.CreateDate = d.createDate;
-        //        entity.CreatorId = d.nodeUser == null ? 0 : d.nodeUser;
-        //        entity.Id = d.id;
-        //        entity.Key = d.uniqueID;
-        //        entity.Level = d.level;
-        //        entity.Name = d.text;
-        //        entity.NodeObjectTypeId = d.nodeObjectType;
-        //        entity.ParentId = d.parentID;
-        //        entity.Path = d.path;
-        //        entity.SortOrder = d.sortOrder;
-        //        entity.HasChildren = d.children > 0;
-
-        //        entity.ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty;
-        //        entity.ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty;
-        //        entity.ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty;
-        //        //entity.VersionId = asDictionary.ContainsKey("versionId") ? asDictionary["versionId"] : Guid.Empty;
-
-        //        entity.Published = asDictionary.ContainsKey("published") && (bool) asDictionary["published"];
-        //        entity.Edited = asDictionary.ContainsKey("edited") && (bool) asDictionary["edited"];
-
-        //        // assign the additional data
-        //        AddAdditionalData(entity, asDictionary);
-
-        //        return entity;
-        //    }
-        //    finally
-        //    {
-        //        entity.EnableChangeTracking();
-        //    }
-        //}
-
         private static UmbracoEntity BuildEntity(bool isContent, bool isMedia, BaseDto dto)
         {
-            var entity = new UmbracoEntity(dto.Trashed);
+            if (isContent)
+                return BuildDocumentEntity(dto);
+            if (isMedia)
+                return BuildContentEntity(dto);
+
+            var entity = new UmbracoEntity();
 
             try
             {
                 entity.DisableChangeTracking();
+                BuildEntity(entity, dto);
+            }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
 
-                entity.CreateDate = dto.CreateDate;
-                entity.CreatorId = dto.UserId ?? 0;
-                entity.Id = dto.NodeId;
-                entity.Key = dto.UniqueId;
-                entity.Level = dto.Level;
-                entity.Name = dto.Text;
-                entity.NodeObjectTypeId = dto.NodeObjectType;
-                entity.ParentId = dto.ParentId;
-                entity.Path = dto.Path;
-                entity.SortOrder = dto.SortOrder;
-                entity.HasChildren = dto.Children > 0;
+            return entity;
+        }
 
-                if (isContent)
-                {
-                    entity.Published = dto.Published;
-                    entity.Edited = dto.Edited;
-                }
+        private static void BuildEntity(UmbracoEntity entity, BaseDto dto)
+        {
+            entity.Trashed = dto.Trashed;
+            entity.CreateDate = dto.CreateDate;
+            entity.CreatorId = dto.UserId ?? 0;
+            entity.Id = dto.NodeId;
+            entity.Key = dto.UniqueId;
+            entity.Level = dto.Level;
+            entity.Name = dto.Text;
+            entity.NodeObjectType = dto.NodeObjectType;
+            entity.ParentId = dto.ParentId;
+            entity.Path = dto.Path;
+            entity.SortOrder = dto.SortOrder;
+            entity.HasChildren = dto.Children > 0;
+        }
 
-                // fixme what shall we do with versions?
-                //entity.VersionId = asDictionary.ContainsKey("versionId") ? asDictionary["versionId"] : Guid.Empty;
+        private static void BuildContentEntity(UmbracoContentEntity entity, BaseDto dto)
+        {
+            BuildEntity(entity, dto);
+            entity.ContentTypeAlias = dto.Alias;
 
-                if (isContent || isMedia)
-                {
-                    entity.ContentTypeAlias = dto.Alias;
-                    entity.ContentTypeIcon = dto.Icon;
-                    entity.ContentTypeThumbnail = dto.Thumbnail;
-                    //entity.??? = dto.IsContainer;
-                }
+            // fixme more here...
+            entity.ContentTypeIcon = dto.Icon;
+            entity.ContentTypeThumbnail = dto.Thumbnail;
+        }
+
+        private static void BuildDocumentEntity(UmbracoDocumentEntity entity, BaseDto dto)
+        {
+            BuildContentEntity(entity, dto);
+            entity.Published = dto.Published;
+            entity.Edited = dto.Edited;
+        }
+
+        private static UmbracoEntity BuildContentEntity(BaseDto dto)
+        {
+            var entity = new UmbracoContentEntity();            
+
+            try
+            {
+                entity.DisableChangeTracking();
+                BuildContentEntity(entity, dto);
+            }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
+
+            return entity;
+        }
+
+        private static UmbracoEntity BuildDocumentEntity(BaseDto dto)
+        {
+            var entity = new UmbracoDocumentEntity();
+
+            try
+            {
+                entity.DisableChangeTracking();
+                BuildDocumentEntity(entity, dto);
             }
             finally
             {

@@ -300,7 +300,7 @@ namespace Umbraco.Core.Models.Membership
                         Id = int.MinValue,
                         Key = Guid.Empty,
                         CreateDate = default(DateTime),
-                        DeletedDate = null,
+                        DeleteDate = null,
                         Name = "Temp",
                         Permissions = new List<string>(),
                         UpdateDate = default(DateTime)
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Models.Membership
                         Id = realGroup.Id,
                         Key = realGroup.Key,
                         CreateDate = realGroup.CreateDate,
-                        DeletedDate = realGroup.DeleteDate,
+                        DeleteDate = realGroup.DeleteDate,
                         Name = realGroup.Name,
                         Permissions = realGroup.Permissions,
                         UpdateDate = realGroup.UpdateDate
@@ -338,7 +338,7 @@ namespace Umbraco.Core.Models.Membership
                     Id = realGroup.Id,
                     Key = realGroup.Key,
                     CreateDate = realGroup.CreateDate,
-                    DeletedDate = realGroup.DeleteDate,
+                    DeleteDate = realGroup.DeleteDate,
                     Name = realGroup.Name,
                     Permissions = realGroup.Permissions,
                     UpdateDate = realGroup.UpdateDate
