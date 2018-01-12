@@ -15,7 +15,7 @@ function ColorPickerController($scope) {
 
     $scope.toggleItem = function (color) {
 
-        var currentColor = $scope.model.value.hasOwnProperty("value")
+        var currentColor = ($scope.model.value && $scope.model.value.hasOwnProperty("value"))
             ? $scope.model.value.value
             : $scope.model.value;
 
