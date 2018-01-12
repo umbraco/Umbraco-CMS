@@ -23,6 +23,10 @@ namespace Umbraco.Web.Models
         public float? BackdropOpacity { get; set; }
         [DataMember(Name = "event")]
         public string Event { get; set; }
+        [DataMember(Name = "view")]
+        public string View { get; set; }
+        [DataMember(Name = "eventElement")]
+        public string EventElement { get; set; }
         [DataMember(Name = "customProperties")]
         public JObject CustomProperties { get; set; }
     }
