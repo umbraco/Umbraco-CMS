@@ -67,7 +67,7 @@ namespace Umbraco.Web.Mvc
         // to
         // { RenderModel, RenderModel<TContent>, IPublishedContent }
         //
-        public object BindModel(object source, Type modelType, CultureInfo culture)
+        public static object BindModel(object source, Type modelType, CultureInfo culture)
         {
             // null model, return
             if (source == null) return null;
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Mvc
 
         public static event EventHandler<ModelBindingArgs> ModelBindingException;
 
-	    private void ThrowModelBindingException(bool sourceContent, bool modelContent, Type sourceType, Type modelType)
+	    private static void ThrowModelBindingException(bool sourceContent, bool modelContent, Type sourceType, Type modelType)
 	    {
 	        var msg = new StringBuilder();
 
@@ -173,7 +173,7 @@ namespace Umbraco.Web.Mvc
 
 	        var args = new ModelBindingArgs(sourceType, modelType, msg);
             if (ModelBindingException != null)
-                ModelBindingException(this, args);
+                ModelBindingException(Instance, args);
 
 	        if (args.Restart)
 	        {

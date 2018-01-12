@@ -144,7 +144,7 @@ namespace Umbraco.Web.Mvc
             // bind the model (use context culture as default, if available)
             if (UmbracoContext.PublishedContentRequest != null && UmbracoContext.PublishedContentRequest.Culture != null)
                 culture = UmbracoContext.PublishedContentRequest.Culture;
-            viewData.Model = RenderModelBinder.Instance.BindModel(viewDataModel, typeof (TModel), culture);
+            viewData.Model = RenderModelBinder.BindModel(viewDataModel, typeof (TModel), culture);
 
             // set the view data
             base.SetViewData(viewData);

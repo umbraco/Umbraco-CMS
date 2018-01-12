@@ -41,14 +41,14 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void BindModel_Null_Source_Returns_Null()
         {
-            Assert.IsNull(RenderModelBinder.Instance.BindModel(null, typeof(MyContent), CultureInfo.CurrentCulture));
+            Assert.IsNull(RenderModelBinder.BindModel(null, typeof(MyContent), CultureInfo.CurrentCulture));
         }
 
         [Test]
         public void BindModel_Returns_If_Same_Type()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bound = RenderModelBinder.Instance.BindModel(content, typeof (IPublishedContent), CultureInfo.CurrentCulture);
+            var bound = RenderModelBinder.BindModel(content, typeof (IPublishedContent), CultureInfo.CurrentCulture);
             Assert.AreSame(content, bound);
         }
 
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Web.Mvc
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
             var renderModel = new RenderModel(content, CultureInfo.CurrentCulture);
-            var bound = RenderModelBinder.Instance.BindModel(renderModel, typeof(IPublishedContent), CultureInfo.CurrentCulture);
+            var bound = RenderModelBinder.BindModel(renderModel, typeof(IPublishedContent), CultureInfo.CurrentCulture);
             Assert.AreSame(content, bound);
         }
 
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void BindModel_IPublishedContent_To_RenderModel()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bound = (IRenderModel)RenderModelBinder.Instance.BindModel(content, typeof(RenderModel), CultureInfo.CurrentCulture);
+            var bound = (IRenderModel)RenderModelBinder.BindModel(content, typeof(RenderModel), CultureInfo.CurrentCulture);
             Assert.AreSame(content, bound.Content);
         }
 
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void BindModel_IPublishedContent_To_Generic_RenderModel()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var bound = (IRenderModel)RenderModelBinder.Instance.BindModel(content, typeof(RenderModel<MyContent>), CultureInfo.CurrentCulture);
+            var bound = (IRenderModel)RenderModelBinder.BindModel(content, typeof(RenderModel<MyContent>), CultureInfo.CurrentCulture);
             Assert.AreSame(content, bound.Content);
         }
 
