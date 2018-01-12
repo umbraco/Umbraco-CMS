@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.Models
 {
@@ -22,5 +23,7 @@ namespace Umbraco.Web.Models
         public float? BackdropOpacity { get; set; }
         [DataMember(Name = "event")]
         public string Event { get; set; }
+        [DataMember(Name = "customProperties")]
+        public JObject CustomProperties { get; set; }
     }
 }
