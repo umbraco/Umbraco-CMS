@@ -349,6 +349,7 @@
     <Compile Include="Deploy\Direction.cs" />
     <Compile Include="Deploy\IFileType.cs" />
     <Compile Include="Deploy\IFileTypeCollection.cs" />
+    <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />

@@ -10,7 +10,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class RepositoryBase : DisposableObject
+    internal abstract class RepositoryBase : DisposableObjectSlim
     {
         private readonly IScopeUnitOfWork _work;
         private readonly CacheHelper _globalCache;
