@@ -695,7 +695,7 @@ namespace Umbraco.Core.Services
                 IQuery<IMember> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = Query<IMember>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                    filterQuery = Query<IMember>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter) || x.Email.Contains(filter));
                 }
 
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
