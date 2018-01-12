@@ -2,6 +2,9 @@
 
 namespace Umbraco.Web.Models
 {
+    /// <summary>
+    /// A model representing a step in a tour.
+    /// </summary>
     [DataContract(Name = "step", Namespace = "")]
     public class BackOfficeTourStep
     {
@@ -16,7 +19,7 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "elementPreventClick")]
         public bool ElementPreventClick { get; set; }
         [DataMember(Name = "backdropOpacity")]
-        public float BackdropOpacity { get; set; }
+        public float? BackdropOpacity { get; set; }
         [DataMember(Name = "event")]
         public string Event { get; set; }
     }

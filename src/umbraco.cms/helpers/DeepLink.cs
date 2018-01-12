@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using umbraco.BusinessLogic;
 using System.Web;
@@ -12,14 +13,23 @@ namespace umbraco.cms.helpers
     {
         public static string GetTreePathFromFilePath(string filePath)
         {
+            return GetTreePathFromFilePath(filePath, true, false);
+        }
+
+        internal static string GetTreePathFromFilePath(string filePath, bool includeInit, bool urlEncode)
+        {
             List<string> treePath = new List<string>();
             treePath.Add("-1");
-            treePath.Add("init");
+            if (includeInit)
+                treePath.Add("init");
             string[] pathPaths = filePath.Split('/');
             
             for (int p = 0; p < pathPaths.Length; p++)
             {
-                treePath.Add(string.Join("/", pathPaths.Take(p + 1).ToArray()));
+                var s = string.Join("/", pathPaths.Take(p + 1).ToArray());
+                if (urlEncode)
+                    s = WebUtility.UrlEncode(s);
+                treePath.Add(s);
             }
             string sPath = string.Join(",", treePath.ToArray());
             return sPath;

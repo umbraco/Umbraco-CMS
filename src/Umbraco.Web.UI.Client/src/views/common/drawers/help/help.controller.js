@@ -124,7 +124,7 @@
 
         function showTourButton(index, tourGroup) {
             if(index !== 0) {
-                var prevTour = tourGroup[index - 1];
+                var prevTour = tourGroup.tours[index - 1];
                 if(prevTour.completed) {
                     return true;
                 }
@@ -147,12 +147,12 @@
             // Finding out, how many tours are completed for the progress circle
             angular.forEach(vm.tours, function(group){
                 var completedTours = 0;
-                angular.forEach(group, function(tour){
+                angular.forEach(group.tours, function(tour){
                     if(tour.completed) {
                         completedTours++;
                     }
                 });
-                group.completedPercentage = Math.round((completedTours/group.length)*100);
+                group.completedPercentage = Math.round((completedTours/group.tours.length)*100);
             });
         }
 

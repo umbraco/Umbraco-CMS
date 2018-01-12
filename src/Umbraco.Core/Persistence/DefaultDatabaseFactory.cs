@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence
 	/// it will create one per context, otherwise it will be a global singleton object which is NOT thread safe
 	/// since we need (at least) a new instance of the database object per thread.
 	/// </remarks>
-	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory2
+	internal class DefaultDatabaseFactory : DisposableObjectSlim, IDatabaseFactory2
 	{
 	    private readonly string _connectionStringName;
 	    private readonly ILogger _logger;

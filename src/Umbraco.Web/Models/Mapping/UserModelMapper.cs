@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
@@ -232,11 +233,13 @@ namespace Umbraco.Web.Models.Mapping
 
             //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
+            
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
+                .ForMember(detail => detail.Navigation, opt => opt.MapFrom(user => CreateUserEditorNavigation(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.CalculatedStartContentIds,
                     opt => opt.MapFrom(user => GetStartNodeValues(
@@ -356,6 +359,21 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IProfile, UserProfile>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
+        }
+
+        private IEnumerable<EditorNavigation> CreateUserEditorNavigation(ILocalizedTextService textService)
+        {
+            return new[]
+            {
+                new EditorNavigation
+                {
+                    Active = true,
+                    Alias = "details",
+                    Icon = "icon-umb-users",
+                    Name = textService.Localize("general/user"),
+                    View = "views/users/views/user/details.html"
+                }
+            };
         }
 
         private IEnumerable<EntityBasic> GetStartNodeValues(int[] startNodeIds,

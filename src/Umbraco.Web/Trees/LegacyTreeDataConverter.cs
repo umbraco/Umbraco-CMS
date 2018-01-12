@@ -134,7 +134,7 @@ namespace Umbraco.Web.Trees
                     Attempt
                         .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
                              action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
-                        .OnFailure(() => GetLegacyConfirmView(currentAction, currentSection),
+                        .OnFailure(() => GetLegacyConfirmView(currentAction),
                                    view => menuItem.LaunchDialogView(
                                        view,
                                        ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"))
@@ -164,9 +164,8 @@ namespace Umbraco.Web.Trees
         /// This will look at the legacy IAction's JsFunctionName and convert it to a confirmation dialog view if possible
         /// </summary>
         /// <param name="action"></param>
-        /// <param name="currentSection"></param>
         /// <returns></returns>
-        internal static Attempt<string> GetLegacyConfirmView(IAction action, string currentSection)
+        internal static Attempt<string> GetLegacyConfirmView(IAction action)
         {
             if (action.JsFunctionName.IsNullOrWhiteSpace())
             {

@@ -187,7 +187,7 @@ namespace Umbraco.Web.Models.Trees
                                                                             nodeType,
                                                                             item == null ? "" : item.Name, currentSection),
                      action => LaunchDialogUrl(action.Url, action.DialogTitle))
-                .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(Action, currentSection),
+                .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(Action),
                            view => LaunchDialogView(
                                view,
                                ui.GetText("defaultdialogs", "confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?"));
