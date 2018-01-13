@@ -29,7 +29,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropData_Properties_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             var index = 0;
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropFocalPoint_Properties_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             Assert.AreEqual(sourceObj.FocalPoint.Left, d.FocalPoint.Left);
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropDataSet_Properties_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             Assert.AreEqual(sourceObj.Src, d.Src);
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void ImageCropDataSet_Methods_As_Dynamic()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             dynamic d = sourceObj;
 
             Assert.AreEqual(sourceObj.HasCrop("thumb"), d.HasCrop("thumb"));
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertImageCropperDataSetSrcToString()
         {
             //cropperJson3 - has not crops
-            var sourceObj = cropperJson3.SerializeToCropDataSet();
+            var sourceObj = cropperJson3.DeserializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<string>();
             Assert.IsTrue(destObj.Success);
             Assert.AreEqual(destObj.Result, "/media/1005/img_0672.jpg");
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertImageCropperDataSetJObject()
         {
             //cropperJson3 - has not crops
-            var sourceObj = cropperJson3.SerializeToCropDataSet();
+            var sourceObj = cropperJson3.DeserializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<JObject>();
             Assert.IsTrue(destObj.Success);
             Assert.AreEqual(sourceObj, destObj.Result.ToObject<ImageCropDataSet>());
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void CanConvertImageCropperDataSetJsonToString()
         {
-            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            var sourceObj = cropperJson1.DeserializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<string>();
             Assert.IsTrue(destObj.Success);
             Assert.IsTrue(destObj.Result.DetectIsJson());
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.PropertyEditors
                 var converter = new Umbraco.Web.PropertyEditors.ValueConverters.ImageCropperValueConverter(dataTypeService.Object);
                 var result = converter.ConvertDataToSource(new PublishedPropertyType("test", 0, "test"), val1, false); // does not use type for conversion
 
-                var resultShouldMatch = val2.SerializeToCropDataSet();
+                var resultShouldMatch = val2.DeserializeToCropDataSet();
                 if (expected)
                 {
                     Assert.AreEqual(resultShouldMatch, result);
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetBaseCropUrlFromModelTest()
         {
-            var cropDataSet = cropperJson1.SerializeToCropDataSet();
+            var cropDataSet = cropperJson1.DeserializeToCropDataSet();
             var urlString = cropDataSet.GetCropUrl("thumb");
             Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }

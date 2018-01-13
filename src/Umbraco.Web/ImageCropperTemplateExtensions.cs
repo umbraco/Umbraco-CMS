@@ -232,7 +232,7 @@ namespace Umbraco.Web
             ImageCropDataSet cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                cropDataSet = imageCropperValue.SerializeToCropDataSet();                    
+                cropDataSet = imageCropperValue.DeserializeToCropDataSet();                    
             }
             return GetCropUrl(
                 imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
