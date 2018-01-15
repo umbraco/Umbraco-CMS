@@ -188,11 +188,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select("un.*")
                 .From("umbracoNode AS un")
                 .InnerJoin("cmsMember2MemberGroup")
-                .On("un.id = cmsMember2MemberGroup.MemberGroup")
-                .LeftJoin("(SELECT umbracoNode.id, cmsMember.LoginName FROM umbracoNode INNER JOIN cmsMember ON umbracoNode.id = cmsMember.nodeId) AS member")
-                .On("member.id = cmsMember2MemberGroup.Member")
-                .Where("un.nodeObjectType=@objectType", new {objectType = NodeObjectTypeId })
-                .Where("member.LoginName=@loginName", new {loginName = username});
+                .On("cmsMember2MemberGroup.MemberGroup = un.id")
+                .InnerJoin("cmsMember")
+                .On("cmsMember.nodeId = cmsMember2MemberGroup.Member")
+                .Where("un.nodeObjectType=@objectType", new { objectType = NodeObjectTypeId })
+                .Where("cmsMember.LoginName=@loginName", new { loginName = username });
             
             return Database.Fetch<NodeDto>(sql)
                 .DistinctBy(dto => dto.NodeId)

@@ -182,6 +182,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public UserDisplay GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
@@ -494,6 +495,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public async Task<UserDisplay> PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");

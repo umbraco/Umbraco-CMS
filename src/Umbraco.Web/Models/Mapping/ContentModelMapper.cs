@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
                         .ToDictionary(t => t.Alias, t => t.Name)))
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
-                    new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
+                    new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService), new Lazy<IContentService>(() => applicationContext.Services.ContentService))))
                 .AfterMap((content, display) => AfterMap(content, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
                     applicationContext.Services.ContentTypeService));
 
@@ -154,10 +154,14 @@ namespace Umbraco.Web.Models.Mapping
         private class ActionButtonsResolver : ValueResolver<IContent, IEnumerable<string>>
         {
             private readonly Lazy<IUserService> _userService;
+            private readonly Lazy<IContentService> _contentService;
 
-            public ActionButtonsResolver(Lazy<IUserService> userService)
+            public ActionButtonsResolver(Lazy<IUserService> userService, Lazy<IContentService> contentService)
             {
+                if (userService == null) throw new ArgumentNullException("userService");
+                if (contentService == null) throw new ArgumentNullException("contentService");
                 _userService = userService;
+                _contentService = contentService;
             }
 
             protected override IEnumerable<string> ResolveCore(IContent source)
@@ -169,14 +173,21 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 var svc = _userService.Value;
 
-                var permissions = svc.GetPermissions(
+                string path;
+                if (source.HasIdentity)
+                    path = source.Path;
+                else
+                {
+                    var parent = _contentService.Value.GetById(source.ParentId);
+                    path = parent == null ? "-1" : parent.Path;
+                }
+
+                var permissions = svc.GetPermissionsForPath(
                         //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
                         // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
                         // refrence exception :(
                         UmbracoContext.Current.Security.CurrentUser,
-                        // Here we need to do a special check since this could be new content, in which case we need to get the permissions
-                        // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
-                        source.HasIdentity ? source.Id : source.ParentId)
+                        path)
                     .GetAllPermissions();
 
                 return permissions;

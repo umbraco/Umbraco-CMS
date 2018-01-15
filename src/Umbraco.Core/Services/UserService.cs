@@ -228,9 +228,9 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Deletes an <see cref="IUser"/>
+        /// Disables an <see cref="IUser"/>
         /// </summary>
-        /// <param name="membershipUser"><see cref="IUser"/> to Delete</param>
+        /// <param name="membershipUser"><see cref="IUser"/> to disable</param>
         public void Delete(IUser membershipUser)
         {
             //disable

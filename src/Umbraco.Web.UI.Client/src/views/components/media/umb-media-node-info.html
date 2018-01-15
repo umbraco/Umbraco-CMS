@@ -30,11 +30,11 @@
             <umb-box-content class="block-form">
                 
                 <umb-control-group data-element="node-info-create-date" label="@content_createDate">
-                    {{node.createDate | amDateFormat:'MMMM Do YYYY, HH:mm'}} by {{ node.owner.name }}
+                    {{node.createDateFormatted}} by {{ node.owner.name }}
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-update-date" label="@content_updateDate">
-                    {{node.updateDate | amDateFormat:'MMMM Do YYYY, HH:mm'}}
+                    {{node.updateDateFormatted}}
                 </umb-control-group>
             
                 <umb-control-group data-element="node-info-media-type" label="@content_mediatype">
