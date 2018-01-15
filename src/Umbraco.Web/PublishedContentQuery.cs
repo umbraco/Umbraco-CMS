@@ -527,7 +527,7 @@ namespace Umbraco.Web
             sc = useWildcards == false
                 ? sc.GroupedOr(searchFields, strArray).Compile()
                 : sc.GroupedOr(searchFields, strArray.Select(x => new CustomExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray<IExamineValue>()).Compile();
-            return this.Search(sc);
+            return sc;
         }
 
         private static MethodInfo _examineGetSearchFields;
