@@ -14,24 +14,17 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Delimited")]
     internal sealed class DelimitedManifestValueValidator : ManifestValueValidator
     {
-        /// <summary>
-        /// Performs the validation
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="config">Can be a json formatted string containing properties: 'delimiter' and 'pattern'</param>
-        /// <param name="preValues">The current pre-values stored for the data type</param>
-        /// <param name="editor"></param>
-        /// <returns></returns>
-        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+        /// <inheritdoc />
+        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
         {
             //TODO: localize these!
             if (value != null)
             {
                 var delimiter = ",";
                 Regex regex = null;
-                if (config.IsNullOrWhiteSpace() == false)
+                if (validatorConfiguration.IsNullOrWhiteSpace() == false)
                 {
-                    var json = JsonConvert.DeserializeObject<JObject>(config);
+                    var json = JsonConvert.DeserializeObject<JObject>(validatorConfiguration);
                     if (json["delimiter"] != null)
                     {
                         delimiter = json["delimiter"].ToString();

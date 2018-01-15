@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.DataTypePreValue)]
+    [TableName("cmsDataTypePreValues")]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class DataTypePreValueDto

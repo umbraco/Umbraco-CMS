@@ -67,9 +67,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // GetPreValuesCollectionByDataTypeId is cached at repository level;
             // still, the collection is deep-cloned so this is kinda expensive,
             // better to cache here + trigger refresh in DataTypeCacheRefresher
+            // fixme wtf this should NOT be expensive!
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {
+                var dataType = _dataTypeService.GetDataType(id);
+                var configuration = dataType.Configuration as SliderPropertyEditor.Configuration; // fixme - why is the converter in Core if the editor is in Web?
+                return configuration.IsRange;
                 var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
                     .PreValuesAsDictionary
                     .FirstOrDefault(x => string.Equals(x.Key, "enableRange", StringComparison.InvariantCultureIgnoreCase))

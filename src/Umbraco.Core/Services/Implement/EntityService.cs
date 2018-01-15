@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services.Implement
 
             _objectTypes = new Dictionary<string, (UmbracoObjectTypes, Func<int, IUmbracoEntity>, Func<Guid, IUmbracoEntity>)>
             {
-                { typeof (IDataType).FullName, (UmbracoObjectTypes.DataType, dataTypeService.GetDataTypeDefinitionById, dataTypeService.GetDataTypeDefinitionById) },
+                { typeof (IDataType).FullName, (UmbracoObjectTypes.DataType, dataTypeService.GetDataType, dataTypeService.GetDataType) },
                 { typeof (IContent).FullName, (UmbracoObjectTypes.Document, contentService.GetById, contentService.GetById) },
                 { typeof (IContentType).FullName, (UmbracoObjectTypes.DocumentType, contentTypeService.Get, contentTypeService.Get) },
                 { typeof (IMedia).FullName, (UmbracoObjectTypes.Media, mediaService.GetById, mediaService.GetById) },

@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
@@ -23,24 +24,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
-        private readonly DataTypePreValueRepository _preValRepository;
+        private readonly PropertyEditorCollection _editors;
 
-        public DataTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public DataTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, PropertyEditorCollection editors, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
-            _preValRepository = new DataTypePreValueRepository(scopeAccessor, CacheHelper.NoCache, logger);
+            _editors = editors;
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
         protected override IDataType PerformGet(int id)
         {
-            return GetMany(new[] { id }).FirstOrDefault();
+            return GetMany(id).FirstOrDefault();
         }
 
         protected override IEnumerable<IDataType> PerformGetAll(params int[] ids)
         {
-            var factory = new DataTypeFactory(NodeObjectTypeId);
             var dataTypeSql = GetBaseQuery(false);
 
             if (ids.Any())
@@ -53,20 +53,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(factory.BuildEntity).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors[x.EditorAlias])).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
         {
-            var factory = new DataTypeFactory(NodeObjectTypeId);
-
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDataType>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(factory.BuildEntity).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors[x.EditorAlias])).ToArray();
         }
 
         #endregion
@@ -84,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql
                .From<DataTypeDto>()
                .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .On<DataTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -122,8 +120,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
 
-            var factory = new DataTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
+            var dto = DataTypeFactory.BuildDto(entity);
 
             //Logic for setting Path, Level and SortOrder
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
@@ -149,7 +146,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
             entity.SortOrder = sortOrder;
             entity.Level = level;
 
-            dto.DataTypeId = nodeDto.NodeId;
+            dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
             entity.ResetDirtyProperties();
@@ -187,20 +184,12 @@ AND umbracoNode.id <> @id",
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new DataTypeFactory(NodeObjectTypeId);
-            //Look up DataTypeDefinition entry to get Primary for updating the DTO
-            var dataTypeDto = Database.SingleOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
-            factory.SetPrimaryKey(dataTypeDto.PrimaryKey);
-            var dto = factory.BuildDto(entity);
+            var dto = DataTypeFactory.BuildDto(entity);
 
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;
             Database.Update(nodeDto);
             Database.Update(dto);
-
-            //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
-            // are querying for them in the Saved event (before the distributed call cache is clearing it)
-            IsolatedCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
 
             entity.ResetDirtyProperties();
         }
@@ -225,9 +214,6 @@ AND umbracoNode.id <> @id",
                 Database.Delete<PropertyTypeDto>("WHERE id = @Id", new { Id = dto.Id });
             }
 
-            //Delete the pre-values
-            Database.Delete<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = entity.Id });
-
             //Delete Content specific data
             Database.Delete<DataTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
 
@@ -238,41 +224,6 @@ AND umbracoNode.id <> @id",
         }
 
         #endregion
-
-        public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
-        {
-            return GetCachedPreValueCollection(dataTypeId);
-        }
-
-        public string GetPreValueAsString(int preValueId)
-        {
-            var collections = IsolatedCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + "_");
-
-            var preValue = collections.SelectMany(x => x.FormatAsDictionary().Values).FirstOrDefault(x => x.Id == preValueId);
-            if (preValue != null)
-                return preValue.Value;
-
-            var dto = Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @preValueId", new { preValueId });
-            if (dto == null)
-                return string.Empty;
-
-            var collection = GetCachedPreValueCollection(dto.DataTypeNodeId);
-            if (collection == null)
-                return string.Empty;
-
-            preValue = collection.FormatAsDictionary().Values.FirstOrDefault(x => x.Id == preValueId);
-            return preValue == null ? string.Empty : preValue.Value;
-        }
-
-        public void AddOrUpdatePreValues(int dataTypeId, IDictionary<string, PreValue> values)
-        {
-            var dtd = Get(dataTypeId);
-            if (dtd == null)
-            {
-                throw new InvalidOperationException("No data type found with id " + dataTypeId);
-            }
-            AddOrUpdatePreValues(dtd, values);
-        }
 
         public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer container)
         {
@@ -322,90 +273,6 @@ AND umbracoNode.id <> @id",
             return moveInfo;
         }
 
-        public void AddOrUpdatePreValues(IDataType dataType, IDictionary<string, PreValue> values)
-        {
-            var currentVals = new DataTypePreValueDto[] { };
-            if (dataType.HasIdentity)
-            {
-                //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
-                var sql = Sql()
-                    .SelectAll()
-                    .From<DataTypePreValueDto>()
-                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
-                    .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
-                currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
-            }
-
-            //already existing, need to be updated
-            var valueIds = values.Where(x => x.Value.Id > 0).Select(x => x.Value.Id).ToArray();
-            var existingByIds = currentVals.Where(x => valueIds.Contains(x.Id)).ToArray();
-
-            //These ones need to be removed from the db, they no longer exist in the new values
-            var deleteById = currentVals.Where(x => valueIds.Contains(x.Id) == false);
-
-            foreach (var d in deleteById)
-            {
-                _preValRepository.Delete(new PreValueEntity
-                {
-                    Alias = d.Alias,
-                    Id = d.Id,
-                    Value = d.Value,
-                    DataType = dataType,
-                    SortOrder = d.SortOrder
-                });
-            }
-
-            var sortOrder = 1;
-
-            foreach (var pre in values)
-            {
-                var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
-                if (existing != null)
-                {
-                    _preValRepository.Save(new PreValueEntity
-                    {
-                        //setting an id will update it
-                        Id = existing.Id,
-                        DataType = dataType,
-                        //These are the new values to update
-                        Alias = pre.Key,
-                        SortOrder = sortOrder,
-                        Value = pre.Value.Value
-                    });
-                }
-                else
-                {
-                    _preValRepository.Save(new PreValueEntity
-                    {
-                        Alias = pre.Key,
-                        SortOrder = sortOrder,
-                        Value = pre.Value.Value,
-                        DataType = dataType,
-                    });
-                }
-
-                sortOrder++;
-            }
-
-        }
-
-        private static string GetPrefixedCacheKey(int dataTypeId)
-        {
-            return CacheKeys.DataTypePreValuesCacheKey + "_" + dataTypeId;
-        }
-
-        private PreValueCollection GetCachedPreValueCollection(int dataTypeId)
-        {
-            var key = GetPrefixedCacheKey(dataTypeId);
-            return IsolatedCache.GetCacheItem<PreValueCollection>(key, () =>
-            {
-                var dtos = Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = dataTypeId });
-                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
-                var collection = PreValueConverter.ConvertToPreValuesCollection(list);
-                return collection;
-            }, TimeSpan.FromMinutes(20), isSliding: true);
-        }
-
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName", tsql => tsql
@@ -417,155 +284,6 @@ AND umbracoNode.id <> @id",
             var names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
-        }
-
-        /// <summary>
-        /// Private class to handle pre-value crud based on units of work with transactions
-        /// </summary>
-        private class PreValueEntity : EntityBase
-        {
-            public string Value { get; set; }
-            public string Alias { get; set; }
-            public IDataType DataType { get; set; }
-            public int SortOrder { get; set; }
-        }
-
-        /// <summary>
-        /// Private class to handle pre-value crud based on standard principles and units of work with transactions
-        /// </summary>
-        private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
-        {
-            public DataTypePreValueRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
-                : base(scopeAccessor, cache, logger)
-            { }
-
-            #region Not implemented (don't need to for the purposes of this repo)
-            protected override PreValueEntity PerformGet(int id)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<PreValueEntity> PerformGetAll(params int[] ids)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<PreValueEntity> PerformGetByQuery(IQuery<PreValueEntity> query)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<string> GetDeleteClauses()
-            {
-                return Array.Empty<string>();
-            }
-
-            protected override Guid NodeObjectTypeId
-            {
-                get { throw new NotImplementedException(); }
-            }
-            #endregion
-
-            protected override void PersistDeletedItem(PreValueEntity entity)
-            {
-                Database.Execute("DELETE FROM cmsDataTypePreValues WHERE id=@Id", new { Id = entity.Id });
-
-                entity.DeleteDate = DateTime.Now;
-            }
-
-            protected override void PersistNewItem(PreValueEntity entity)
-            {
-                if (entity.DataType.HasIdentity == false)
-                {
-                    throw new InvalidOperationException("Cannot insert a pre value for a data type that has no identity");
-                }
-
-                //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
-                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is
-                // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
-                // must have unique aliases by definition, so there is no need for this additional check
-
-                var dto = new DataTypePreValueDto
-                {
-                    DataTypeNodeId = entity.DataType.Id,
-                    Value = entity.Value,
-                    SortOrder = entity.SortOrder,
-                    Alias = entity.Alias
-                };
-                Database.Insert(dto);
-            }
-
-            protected override void PersistUpdatedItem(PreValueEntity entity)
-            {
-                if (entity.DataType.HasIdentity == false)
-                {
-                    throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
-                }
-
-                //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
-                // this causes issues when sorting the pre-values (http://issues.umbraco.org/issue/U4-5670) but in reality
-                // there is no need to check the uniqueness of this alias because the only way that this code executes is
-                // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
-                // must have unique aliases by definition, so there is no need for this additional check
-
-                var dto = new DataTypePreValueDto
-                {
-                    DataTypeNodeId = entity.DataType.Id,
-                    Id = entity.Id,
-                    Value = entity.Value,
-                    SortOrder = entity.SortOrder,
-                    Alias = entity.Alias
-                };
-                Database.Update(dto);
-            }
-
-
-        }
-
-        internal static class PreValueConverter
-        {
-            /// <summary>
-            /// Converts the tuple to a pre-value collection
-            /// </summary>
-            /// <param name="list"></param>
-            /// <returns></returns>
-            internal static PreValueCollection ConvertToPreValuesCollection(IEnumerable<Tuple<PreValue, string, int>> list)
-            {
-                //now we need to determine if they are dictionary based, otherwise they have to be array based
-                var dictionary = new Dictionary<string, PreValue>();
-
-                //need to check all of the keys, if there's only one and it is empty then it's an array
-                var keys = list.Select(x => x.Item2).Distinct().ToArray();
-                if (keys.Length == 1 && keys[0].IsNullOrWhiteSpace())
-                {
-                    return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item1));
-                }
-
-                foreach (var item in list
-                    .OrderBy(x => x.Item3) //we'll order them first so we maintain the order index in the dictionary
-                    .GroupBy(x => x.Item2)) //group by alias
-                {
-                    if (item.Count() > 1)
-                    {
-                        //if there's more than 1 item per key, then it cannot be a dictionary, just return the array
-                        return new PreValueCollection(list.OrderBy(x => x.Item3).Select(x => x.Item1));
-                    }
-
-                    dictionary.Add(item.Key, item.First().Item1);
-                }
-
-                return new PreValueCollection(dictionary);
-            }
         }
     }
 }

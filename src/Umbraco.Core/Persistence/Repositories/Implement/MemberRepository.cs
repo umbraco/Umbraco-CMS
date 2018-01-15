@@ -161,7 +161,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<MemberDto>().On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId)
 
                 .LeftJoin<PropertyTypeDto>().On<ContentDto, PropertyTypeDto>(left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
 
                 .LeftJoin<PropertyDataDto>().On(x => x
                     .Where<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)

@@ -24,28 +24,28 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataTypeDefinitionByName(string name);
+        IDataType GetDataType(string name);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataTypeDefinitionById(int id);
+        IDataType GetDataType(int id);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its unique guid Id
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataTypeDefinitionById(Guid id);
+        IDataType GetDataType(Guid id);
 
         /// <summary>
         /// Gets all <see cref="IDataType"/> objects or those with the ids passed in
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        IEnumerable<IDataType> GetAllDataTypeDefinitions(params int[] ids);
+        IEnumerable<IDataType> GetAll(params int[] ids);
 
         /// <summary>
         /// Saves an <see cref="IDataType"/>
@@ -85,60 +85,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
-        IEnumerable<IDataType> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias);
-
-        /// <summary>
-        /// Gets all values for an <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IDataType"/> to retrieve prevalues from</param>
-        /// <returns>An enumerable list of string values</returns>
-        IEnumerable<string> GetPreValuesByDataTypeId(int id);
-
-        /// <summary>
-        /// Gets a pre-value collection by data type id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        PreValueCollection GetPreValuesCollectionByDataTypeId(int id);
-
-        /// <summary>
-        /// Saves a list of PreValues for a given DataTypeDefinition
-        /// </summary>
-        /// <param name="dataTypeId">Id of the DataTypeDefinition to save PreValues for</param>
-        /// <param name="values">List of string values to save</param>
-        [Obsolete("This should no longer be used, use the alternative SavePreValues or SaveDataTypeAndPreValues methods instead. This will only insert pre-values without keys")]
-        void SavePreValues(int dataTypeId, IEnumerable<string> values);
-
-        /// <summary>
-        /// Saves a list of PreValues for a given DataTypeDefinition
-        /// </summary>
-        /// <param name="dataTypeId">Id of the DataTypeDefinition to save PreValues for</param>
-        /// <param name="values">List of key/value pairs to save</param>
-        void SavePreValues(int dataTypeId, IDictionary<string, PreValue> values);
-
-        /// <summary>
-        /// Saves a list of PreValues for a given DataTypeDefinition
-        /// </summary>
-        /// <param name="dataType">The DataTypeDefinition to save PreValues for</param>
-        /// <param name="values">List of key/value pairs to save</param>
-        void SavePreValues(IDataType dataType, IDictionary<string, PreValue> values);
-
-        /// <summary>
-        /// Saves the data type and it's prevalues
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <param name="values"></param>
-        /// <param name="userId"></param>
-        void SaveDataTypeAndPreValues(IDataType dataType, IDictionary<string, PreValue> values, int userId = 0);
-
-        /// <summary>
-        /// Gets a specific PreValue by its Id
-        /// </summary>
-        /// <param name="id">Id of the PreValue to retrieve the value from</param>
-        /// <returns>PreValue as a string</returns>
-        string GetPreValueAsString(int id);
+        IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
         Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);
-
     }
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class DateTimeValidator : IPropertyValidator
     {
-        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
         {
             //don't validate if empty
             if (value == null || value.ToString().IsNullOrWhiteSpace())

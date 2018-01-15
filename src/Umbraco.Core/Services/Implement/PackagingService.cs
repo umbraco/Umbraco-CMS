@@ -684,7 +684,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 var dataTypeDefinitionId = new Guid(property.Element("Definition").Value);//Unique Id for a DataTypeDefinition
 
-                var dataTypeDefinition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
+                var dataTypeDefinition = _dataTypeService.GetDataType(dataTypeDefinitionId);
 
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
@@ -698,7 +698,7 @@ namespace Umbraco.Core.Services.Implement
 
                 if (dataTypeDefinition == null)
                 {
-                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                    var dataTypeDefinitions = _dataTypeService.GetByEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
                         dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
@@ -706,7 +706,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 else if (dataTypeDefinition.EditorAlias != propertyEditorAlias)
                 {
-                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                    var dataTypeDefinitions = _dataTypeService.GetByEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
                         dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
@@ -724,7 +724,7 @@ namespace Umbraco.Core.Services.Implement
                                       property.Element("Type").Value.Trim()));
 
                     //convert to a label!
-                    dataTypeDefinition = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(Constants.PropertyEditors.NoEditAlias).FirstOrDefault();
+                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.NoEditAlias).FirstOrDefault();
                     //if for some odd reason this isn't there then ignore
                     if (dataTypeDefinition == null) continue;
                 }
@@ -884,7 +884,7 @@ namespace Umbraco.Core.Services.Implement
                 if (importedFolders.ContainsKey(dataTypeDefinitionName))
                     parentId = importedFolders[dataTypeDefinitionName];
 
-                var definition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
+                var definition = _dataTypeService.GetDataType(dataTypeDefinitionId);
                 //If the datatypedefinition doesn't already exist we create a new new according to the one in the package xml
                 if (definition == null)
                 {

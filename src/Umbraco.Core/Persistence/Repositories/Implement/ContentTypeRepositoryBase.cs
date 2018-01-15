@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .RightJoin<PropertyTypeDto>()
                 .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                 .InnerJoin<DataTypeDto>()
-                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             // fixme v8 are we sorting only for 7.6 relators?
@@ -472,7 +472,7 @@ AND umbracoNode.id <> @id",
                 .LeftJoin<PropertyTypeDto>()
                 .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                 .LeftJoin<DataTypeDto>()
-                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
                 .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
                 .OrderBy<PropertyTypeGroupDto>(x => x.Id);
 
@@ -491,7 +491,7 @@ AND umbracoNode.id <> @id",
                 .SelectAll()
                 .From<PropertyTypeDto>()
                 .InnerJoin<DataTypeDto>()
-                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
                 .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
 
             var dtos = Database.Fetch<PropertyTypeDto>(sql);
@@ -554,12 +554,12 @@ AND umbracoNode.id <> @id",
                     .SelectAll()
                     .From<DataTypeDto>()
                     .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
-                    .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
+                    .OrderBy<DataTypeDto>(typeDto => typeDto.NodeId);
                 var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
                 //we cannot assign a data type if one was not found
                 if (datatype != null)
                 {
-                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                    propertyType.DataTypeDefinitionId = datatype.NodeId;
                 }
                 else
                 {

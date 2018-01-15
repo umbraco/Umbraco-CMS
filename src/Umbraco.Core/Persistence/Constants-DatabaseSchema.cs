@@ -21,8 +21,7 @@ namespace Umbraco.Core
                 public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
                 public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType"; // fixme dbfixmust rename corresponding DTO
                 public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType"; // fixme dbfixwhy can't we just use uNode for this?
-                public const string DataType = /*TableNamePrefix*/ "cms" + "DataType";
-                public const string DataTypePreValue = /*TableNamePrefix*/ "cms" + "DataTypePreValues"; // fixme dbfixkill merge with uDataType
+                public const string DataType = TableNamePrefix + "DataType";
                 public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 
                 public const string Content = TableNamePrefix + "Content";

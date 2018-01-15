@@ -26,51 +26,49 @@ namespace Umbraco.Core.PropertyEditors
             var fields = new List<PreValueField>();
 
             //the ctor checks if we have PreValueFieldAttributes applied and if so we construct our fields from them
-            var props = TypeHelper.CachedDiscoverableProperties(GetType())
-                .Where(x => x.Name != "Fields");
+            var props = TypeHelper.CachedDiscoverableProperties(GetType()).Where(x => x.Name != "Fields");
             foreach (var p in props)
             {
                 var att = p.GetCustomAttributes(typeof (PreValueFieldAttribute), false).OfType<PreValueFieldAttribute>().SingleOrDefault();
-                if (att != null)
+                if (att == null) continue;
+
+                if (att.PreValueFieldType != null)
                 {
-                    if (att.PreValueFieldType != null)
+                    //try to create it
+                    try
                     {
-                        //try to create it
-                        try
-                        {
-                            var instance = (PreValueField) Activator.CreateInstance(att.PreValueFieldType);
-                            //overwrite values if they are assigned
-                            if (!att.Key.IsNullOrWhiteSpace())
-                            {
-                                instance.Key = att.Key;
-                            }
-                            //if the key is still empty then assign it to be the property name
-                            if (instance.Key.IsNullOrWhiteSpace())
-                            {
-                                instance.Key = p.Name;
-                            }
+                        // instanciate and add custom field
+                        var instance = (PreValueField) Activator.CreateInstance(att.PreValueFieldType);
+                        fields.Add(instance);
 
-                            if (!att.Name.IsNullOrWhiteSpace())
-                                instance.Name = att.Name;
-                            if (!att.View.IsNullOrWhiteSpace())
-                                instance.View = att.View;
-                            if (!att.Description.IsNullOrWhiteSpace())
-                                instance.Description = att.Description;
-                            if (att.HideLabel)
-                                instance.HideLabel = att.HideLabel;
+                        // overwrite values if they are assigned
+                        if (!att.Key.IsNullOrWhiteSpace())
+                            instance.Key = att.Key;
 
-                            //add the custom field
-                            fields.Add(instance);
-                        }
-                        catch (Exception ex)
-                        {
-                            Current.Logger.Warn<PreValueEditor>(ex, "Could not create an instance of " + att.PreValueFieldType);
-                        }
+                        // if the key is still empty then assign it to be the property name
+                        if (instance.Key.IsNullOrWhiteSpace())
+                            instance.Key = p.Name;
+
+                        if (!att.Name.IsNullOrWhiteSpace())
+                            instance.Name = att.Name;
+
+                        if (!att.View.IsNullOrWhiteSpace())
+                            instance.View = att.View;
+
+                        if (!att.Description.IsNullOrWhiteSpace())
+                            instance.Description = att.Description;
+
+                        if (att.HideLabel)
+                            instance.HideLabel = att.HideLabel;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        fields.Add(MapAttributeToField(att, p));
+                        Current.Logger.Warn<PreValueEditor>(ex, "Could not create an instance of " + att.PreValueFieldType);
                     }
+                }
+                else
+                {
+                    fields.Add(MapAttributeToField(att, p));
                 }
             }
 
@@ -117,7 +115,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
             //convert to a string based value to be saved in the db
-            return editorValue.ToDictionary(x => x.Key, x => new PreValue(x.Value == null ? null : x.Value.ToString()));
+            return editorValue.ToDictionary(x => x.Key, x => new PreValue(x.Value?.ToString()));
         }
 
         /// <summary>

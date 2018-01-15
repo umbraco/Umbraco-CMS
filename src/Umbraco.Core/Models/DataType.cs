@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {
@@ -14,10 +13,14 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class DataType : TreeEntityBase, IDataType
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        private static PropertySelectors _selectors;
 
-        private string _propertyEditorAlias;
+        private string _editorAlias;
         private DataTypeDatabaseType _databaseType;
+        private object _configuration;
+        private bool _hasConfiguration;
+        private string _configurationJson;
+        private PropertyEditor _editor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
@@ -25,7 +28,7 @@ namespace Umbraco.Core.Models
         public DataType(int parentId, string propertyEditorAlias)
         {
             ParentId = parentId;
-            _propertyEditorAlias = propertyEditorAlias;
+            _editorAlias = propertyEditorAlias;
         }
 
         /// <summary>
@@ -34,22 +37,25 @@ namespace Umbraco.Core.Models
         public DataType(string propertyEditorAlias)
         {
             ParentId = -1;
-            _propertyEditorAlias = propertyEditorAlias;
+            _editorAlias = propertyEditorAlias;
         }
+
+        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.EditorAlias);
-            public readonly PropertyInfo DatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<DataType, DataTypeDatabaseType>(x => x.DatabaseType);
+            public readonly PropertyInfo EditorAlias = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.EditorAlias);
+            public readonly PropertyInfo DatabaseType = ExpressionHelper.GetPropertyInfo<DataType, DataTypeDatabaseType>(x => x.DatabaseType);
+            public readonly PropertyInfo Configuration = ExpressionHelper.GetPropertyInfo<DataType, object>(x => x.Configuration);
         }
 
         /// <inheritdoc />
         [DataMember]
         public string EditorAlias
         {
-            get => _propertyEditorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
+            get => _editorAlias;
+            set => SetPropertyValueAndDetectChanges(value, ref _editorAlias, Selectors.EditorAlias);
         }
 
         /// <inheritdoc />
@@ -57,11 +63,39 @@ namespace Umbraco.Core.Models
         public DataTypeDatabaseType DatabaseType
         {
             get => _databaseType;
-            set => SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _databaseType, Selectors.DatabaseType);
         }
 
-        // fixme - implement that one !!
+        /// <inheritdoc />
         [DataMember]
-        public object Configuration { get; set; }
+        public object Configuration
+        {
+            get
+            {
+                if (_hasConfiguration) return _configuration;
+
+                _configuration = _editor.DeserializeConfiguration(_configurationJson);
+                _hasConfiguration = true;
+                _configurationJson = null;
+                return _configuration;
+            }
+            set
+            {
+                // fixme detect changes? if it's the same object?
+                SetPropertyValueAndDetectChanges(value, ref _configuration, Selectors.Configuration);
+                _hasConfiguration = true;
+                _configurationJson = null;
+            }
+        }
+
+        /// <inheritdoc /> // fixme on interface!?
+        public void SetConfiguration(string configurationJson, PropertyEditor editor)
+        {
+            _hasConfiguration = false;
+            _configuration = null;
+            _configurationJson = configurationJson;
+            _editor = editor;
+            OnPropertyChanged(Selectors.Configuration);
+        }
     }
 }

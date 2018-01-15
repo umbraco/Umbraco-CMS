@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Services
             Assert.That(dataType, Is.Not.Null);
             Assert.That(dataType.HasIdentity, Is.True);
 
-            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            dataType = dataTypeService.GetDataType(dataType.Id);
             Assert.That(dataType, Is.Not.Null);
         }
 
@@ -41,14 +41,14 @@ namespace Umbraco.Tests.Services
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
             var textfieldId = "Umbraco.Textbox";
-            var dataTypeDefinitions = dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(textfieldId);
+            var dataTypeDefinitions = dataTypeService.GetByEditorAlias(textfieldId);
 
             // Act
             var definition = dataTypeDefinitions.First();
             var definitionId = definition.Id;
             dataTypeService.Delete(definition);
 
-            var deletedDefinition = dataTypeService.GetDataTypeDefinitionById(definitionId);
+            var deletedDefinition = dataTypeService.GetDataType(definitionId);
 
             // Assert
             Assert.That(deletedDefinition, Is.Null);
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Services
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            dataType = dataTypeService.GetDataType(dataType.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Services
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            dataType = dataTypeService.GetDataType(dataType.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Services
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            dataType = dataTypeService.GetDataType(dataType.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             //update them (ensure Ids are there!)
@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Services
                     {"preVal2", new PreValue("World")}
                 });
             //re-get
-            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            dataType = dataTypeService.GetDataType(dataType.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             //update them (ensure Ids are there!)
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Services
             dataTypeService.SavePreValues(dataType.Id, new[] {"preVal1", "preVal2"});
 
             //re-get
-            dataType = dataTypeService.GetDataTypeDefinitionById(dataType.Id);
+            dataType = dataTypeService.GetDataType(dataType.Id);
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
 
             // Assert

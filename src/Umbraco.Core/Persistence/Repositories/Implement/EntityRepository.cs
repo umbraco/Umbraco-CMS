@@ -370,7 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.DataTypeId)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .Where<PropertyDataDto>(x => x.VersionId == versionId);
         }
 
@@ -380,7 +380,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Select<PropertyDataDto>(r => r.Select(x => x.PropertyTypeDto, r1 => r1.Select(x => x.DataTypeDto)))
                 .From<PropertyDataDto>()
                 .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
-                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.DataTypeId)
+                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .WhereIn<PropertyDataDto>(x => x.VersionId, versionIds)
                 .OrderBy<PropertyDataDto>(x => x.VersionId);
         }

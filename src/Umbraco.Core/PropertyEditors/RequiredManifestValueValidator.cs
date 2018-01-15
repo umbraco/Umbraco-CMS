@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Required")]
     internal sealed class RequiredManifestValueValidator : ManifestValueValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
         {
             //TODO: localize these!
 

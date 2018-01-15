@@ -140,8 +140,8 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //first try to get the custom one if there is one
-            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName)
-                ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
+            var dt = dataTypeService.GetDataType(customDtdName)
+                ?? dataTypeService.GetDataType(dtdId);
 
             if (dt == null)
             {

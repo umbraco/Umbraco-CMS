@@ -70,7 +70,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (nodeIds.Length > 0)
             {
-                var error = $"Data type \"{_services.DataTypeService.GetDataTypeDefinitionById(propertyType.DataType.Id).Name}\" is not set to allow multiple items but appears to contain multiple items, check the setting and save the data type again";
+                var error = $"Data type \"{_services.DataTypeService.GetDataType(propertyType.DataType.Id).Name}\" is not set to allow multiple items but appears to contain multiple items, check the setting and save the data type again";
 
                 _logger.Warn<MediaPickerLegacyValueConverter>(error);
                 throw new Exception(error);

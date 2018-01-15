@@ -10,7 +10,8 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Email")]
     internal sealed class EmailValidator : ManifestValueValidator, IPropertyValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+        /// <inheritdoc />
+        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
         {
             var asString = value.ToString();
 
@@ -23,9 +24,10 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
-        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
         {
-            return this.Validate(value, null, preValues, editor);
+            return this.Validate(value, null, dataTypeConfiguration, editor);
         }
     }
 }

@@ -54,13 +54,9 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Validates the object with the resolved ValueValidator found for this type
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="preValues">The current pre-values stored for the data type</param>
-        /// <param name="editor">The property editor instance that we are validating for</param>
-        /// <returns></returns>
-        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
         {
-            return ValidatorInstance.Validate(value, Config, preValues, editor);
+            return ValidatorInstance.Validate(value, Config, dataTypeConfiguration, editor);
         }
     }
 }

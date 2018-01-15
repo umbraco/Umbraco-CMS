@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
             Assert.AreEqual(p.PropertyType.Description, pDto.Description);
             Assert.AreEqual(p.PropertyType.Name, pDto.Label);
-            Assert.AreEqual(Current.Services.DataTypeService.GetDataTypeDefinitionById(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
+            Assert.AreEqual(Current.Services.DataTypeService.GetDataType(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
             Assert.AreEqual(Current.PropertyEditors[p.PropertyType.PropertyEditorAlias], pDto.PropertyEditor);
         }
 

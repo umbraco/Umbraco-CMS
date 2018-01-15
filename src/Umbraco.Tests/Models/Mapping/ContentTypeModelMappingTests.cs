@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(Mock.Of<IDataType>(
                     definition =>
                         definition.Id == 555
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(Mock.Of<IDataType>(
                     definition =>
                         definition.Id == 555
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(Mock.Of<IDataType>(
                     definition =>
                         definition.Id == 555
@@ -280,7 +280,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(Mock.Of<IDataType>(
                     definition =>
                         definition.Id == 555
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(Mock.Of<IDataType>(
                     definition =>
                         definition.Id == 555
@@ -516,7 +516,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
         {
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(new DataType("test"));
 
             var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
@@ -585,7 +585,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyGroupBasic_To_PropertyGroup()
         {
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(new DataType("test"));
 
             var basic = new PropertyGroupBasic<PropertyTypeBasic>
@@ -651,7 +651,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void MemberPropertyTypeBasic_To_PropertyType()
         {
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(new DataType("test"));
 
             var basic = new MemberPropertyTypeBasic()
@@ -685,7 +685,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyTypeBasic_To_PropertyType()
         {
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(new DataType("test"));
 
             var basic = new PropertyTypeBasic()
@@ -907,7 +907,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void MemberPropertyTypeBasic_To_MemberPropertyTypeDisplay()
         {
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(new DataType("test"));
 
             var basic = new MemberPropertyTypeBasic()
@@ -945,7 +945,7 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyTypeBasic_To_PropertyTypeDisplay()
         {
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+            _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(new DataType("test"));
 
             var basic = new PropertyTypeBasic()

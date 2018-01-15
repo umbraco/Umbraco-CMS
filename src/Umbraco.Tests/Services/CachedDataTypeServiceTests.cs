@@ -24,9 +24,9 @@ namespace Umbraco.Tests.Services
             dataTypeService.Save(dataType);
 
             //Get all the first time (no cache)
-            var all = dataTypeService.GetAllDataTypeDefinitions();
+            var all = dataTypeService.GetAll();
             //Get all a second time (with cache)
-            all = dataTypeService.GetAllDataTypeDefinitions();
+            all = dataTypeService.GetAll();
 
             Assert.Pass();
         }

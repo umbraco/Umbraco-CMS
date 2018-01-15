@@ -16,7 +16,7 @@ namespace Umbraco.Core.Migrations
     /// <summary>
     /// Provides a base class to all migrations.
     /// </summary>
-    public abstract class MigrationBase : IMigration
+    public abstract partial class MigrationBase : IMigration
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationBase"/> class.

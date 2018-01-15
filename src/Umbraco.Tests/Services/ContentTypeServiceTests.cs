@@ -470,7 +470,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var cs = ServiceContext.ContentService;
             var cts = ServiceContext.ContentTypeService;
-            var dtdYesNo = ServiceContext.DataTypeService.GetDataTypeDefinitionById(-49);
+            var dtdYesNo = ServiceContext.DataTypeService.GetDataType(-49);
             var ctBase = new ContentType(-1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
             ctBase.AddPropertyType(new PropertyType(dtdYesNo, Constants.Conventions.Content.NaviHide)
             {

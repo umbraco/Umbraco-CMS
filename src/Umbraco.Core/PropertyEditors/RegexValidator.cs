@@ -27,18 +27,17 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="regex"></param>
         public RegexValidator(string regex)
         {
-            if (regex == null) throw new ArgumentNullException("regex");
-            _regex = regex;
+            _regex = regex ?? throw new ArgumentNullException(nameof(regex));
         }
 
-        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
         {
             //TODO: localize these!
-            if (config.IsNullOrWhiteSpace() == false && value != null)
+            if (validatorConfiguration.IsNullOrWhiteSpace() == false && value != null)
             {
                 var asString = value.ToString();
 
-                var regex = new Regex(config);
+                var regex = new Regex(validatorConfiguration);
 
                 if (regex.IsMatch(asString) == false)
                 {
@@ -55,13 +54,13 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="preValues"></param>
         /// <param name="editor"></param>
         /// <returns></returns>
-        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
         {
             if (_regex == null)
             {
                 throw new InvalidOperationException("This validator is not configured as a " + typeof(IPropertyValidator));
             }
-            return Validate(value, _regex, preValues, editor);
+            return Validate(value, _regex, dataTypeConfiguration, editor);
         }
     }
 }

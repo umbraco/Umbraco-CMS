@@ -66,9 +66,6 @@ namespace Umbraco.Core.Migrations.Install
             if (tableName.Equals(Constants.DatabaseSchema.Tables.DataType))
                 CreateDataTypeData();
 
-            if (tableName.Equals(Constants.DatabaseSchema.Tables.DataTypePreValue))
-                CreateDataTypePreValueData();
-
             if (tableName.Equals(Constants.DatabaseSchema.Tables.RelationType))
                 CreateRelationTypeData();
 
@@ -223,64 +220,48 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateDataTypeData()
         {
+            //layouts for the list view
+            const string cardLayout = "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": 1, \"selected\": true}";
+            const string listLayout = "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": 1,\"selected\": true}";
+            const string layouts = "[" + cardLayout + "," + listLayout + "]";
+
             //TODO Check which of the DataTypeIds below doesn't exist in umbracoNode, which results in a foreign key constraint errors.
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 1, DataTypeId = -49, EditorAlias = Constants.PropertyEditors.TrueFalseAlias, DbType = "Integer" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 2, DataTypeId = -51, EditorAlias = Constants.PropertyEditors.IntegerAlias, DbType = "Integer" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 3, DataTypeId = -87, EditorAlias = Constants.PropertyEditors.TinyMCEAlias, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 4, DataTypeId = -88, EditorAlias = Constants.PropertyEditors.TextboxAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 5, DataTypeId = -89, EditorAlias = Constants.PropertyEditors.TextboxMultipleAlias, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 6, DataTypeId = -90, EditorAlias = Constants.PropertyEditors.UploadFieldAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 7, DataTypeId = -92, EditorAlias = Constants.PropertyEditors.NoEditAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 8, DataTypeId = -36, EditorAlias = Constants.PropertyEditors.DateTimeAlias, DbType = "Date" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 9, DataTypeId = -37, EditorAlias = Constants.PropertyEditors.ColorPickerAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 11, DataTypeId = -39, EditorAlias = Constants.PropertyEditors.DropDownListMultipleAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 12, DataTypeId = -40, EditorAlias = Constants.PropertyEditors.RadioButtonListAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 13, DataTypeId = -41, EditorAlias = Constants.PropertyEditors.DateAlias, DbType = "Date" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 14, DataTypeId = -42, EditorAlias = Constants.PropertyEditors.DropDownListAlias, DbType = "Integer" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 15, DataTypeId = -43, EditorAlias = Constants.PropertyEditors.CheckBoxListAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 22, DataTypeId = 1041, EditorAlias = Constants.PropertyEditors.TagsAlias, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 24, DataTypeId = 1043, EditorAlias = Constants.PropertyEditors.ImageCropperAlias, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -26, DataTypeId = Constants.DataTypes.DefaultContentListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -27, DataTypeId = Constants.DataTypes.DefaultMediaListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -28, DataTypeId = Constants.DataTypes.DefaultMembersListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -49, EditorAlias = Constants.PropertyEditors.TrueFalseAlias, DbType = "Integer" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -51, EditorAlias = Constants.PropertyEditors.IntegerAlias, DbType = "Integer" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -87, EditorAlias = Constants.PropertyEditors.TinyMCEAlias, DbType = "Ntext",
+                Configuration = "{\"value\":\",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|\"}" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -88, EditorAlias = Constants.PropertyEditors.TextboxAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -89, EditorAlias = Constants.PropertyEditors.TextboxMultipleAlias, DbType = "Ntext" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -90, EditorAlias = Constants.PropertyEditors.UploadFieldAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -92, EditorAlias = Constants.PropertyEditors.NoEditAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -36, EditorAlias = Constants.PropertyEditors.DateTimeAlias, DbType = "Date" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -37, EditorAlias = Constants.PropertyEditors.ColorPickerAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -39, EditorAlias = Constants.PropertyEditors.DropDownListMultipleAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -40, EditorAlias = Constants.PropertyEditors.RadioButtonListAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -41, EditorAlias = Constants.PropertyEditors.DateAlias, DbType = "Date" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -42, EditorAlias = Constants.PropertyEditors.DropDownListAlias, DbType = "Integer" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = -43, EditorAlias = Constants.PropertyEditors.CheckBoxListAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1041, EditorAlias = Constants.PropertyEditors.TagsAlias, DbType = "Ntext",
+                Configuration = "{\"group\":\"default\"}" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1043, EditorAlias = Constants.PropertyEditors.ImageCropperAlias, DbType = "Ntext" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultContentListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultMediaListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar",
+                Configuration = "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" + layouts + ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]}" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultMembersListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar",
+                Configuration = "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]}" });
 
             //New UDI pickers with newer Ids
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 26, DataTypeId = 1046, EditorAlias = Constants.PropertyEditors.ContentPicker2Alias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 27, DataTypeId = 1047, EditorAlias = Constants.PropertyEditors.MemberPicker2Alias, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 28, DataTypeId = 1048, EditorAlias = Constants.PropertyEditors.MediaPicker2Alias, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 29, DataTypeId = 1049, EditorAlias = Constants.PropertyEditors.MediaPicker2Alias, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 30, DataTypeId = 1050, EditorAlias = Constants.PropertyEditors.RelatedLinks2Alias, DbType = "Ntext" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1046, EditorAlias = Constants.PropertyEditors.ContentPicker2Alias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1047, EditorAlias = Constants.PropertyEditors.MemberPicker2Alias, DbType = "Nvarchar" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1048, EditorAlias = Constants.PropertyEditors.MediaPicker2Alias, DbType = "Ntext" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1049, EditorAlias = Constants.PropertyEditors.MediaPicker2Alias, DbType = "Ntext",
+                Configuration = "{\"multiPicker\":1}" });
+            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1050, EditorAlias = Constants.PropertyEditors.RelatedLinks2Alias, DbType = "Ntext" });
 
             //TODO: We're not creating these for 7.0
-            //_database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 19, DataTypeId = 1038, PropertyEditorAlias = Constants.PropertyEditors.MarkdownEditorAlias, DbType = "Ntext" });
-            //_database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 20, DataTypeId = 1039, PropertyEditorAlias = Constants.PropertyEditors.UltimatePickerAlias, DbType = "Ntext" });
-            //_database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 23, DataTypeId = 1042, PropertyEditorAlias = Constants.PropertyEditors.MacroContainerAlias, DbType = "Ntext" });
-        }
-
-        private void CreateDataTypePreValueData()
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = 3, Alias = "", SortOrder = 0, DataTypeNodeId = -87, Value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = 4, Alias = "group", SortOrder = 0, DataTypeNodeId = 1041, Value = "default" });
-
-            //defaults for the member list
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -1, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "10" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -2, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "username" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -3, Alias = "orderDirection", SortOrder = 3, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "asc" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -4, Alias = "includeProperties", SortOrder = 4, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "[{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]" });
-
-            //layouts for the list view
-            var cardLayout = "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": 1, \"selected\": true}";
-            var listLayout = "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": 1,\"selected\": true}";
-
-            //defaults for the media list
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -5, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.DataTypes.DefaultMediaListView, Value = "100" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -6, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.DataTypes.DefaultMediaListView, Value = "updateDate" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -7, Alias = "orderDirection", SortOrder = 3, DataTypeNodeId = Constants.DataTypes.DefaultMediaListView, Value = "desc" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -8, Alias = "layouts", SortOrder = 4, DataTypeNodeId = Constants.DataTypes.DefaultMediaListView, Value = "[" + cardLayout + "," + listLayout + "]" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = -9, Alias = "includeProperties", SortOrder = 5, DataTypeNodeId = Constants.DataTypes.DefaultMediaListView, Value = "[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]" });
-
-            //default's for MultipleMediaPickerAlias picker
-            _database.Insert(Constants.DatabaseSchema.Tables.DataTypePreValue, "id", false, new DataTypePreValueDto { Id = 6, Alias = "multiPicker", SortOrder = 0, DataTypeNodeId = 1049, Value = "1" });
+            //_database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { DataTypeId = 1038, PropertyEditorAlias = Constants.PropertyEditors.MarkdownEditorAlias, DbType = "Ntext" });
+            //_database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { DataTypeId = 1039, PropertyEditorAlias = Constants.PropertyEditors.UltimatePickerAlias, DbType = "Ntext" });
+            //_database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { DataTypeId = 1042, PropertyEditorAlias = Constants.PropertyEditors.MacroContainerAlias, DbType = "Ntext" });
         }
 
         private void CreateRelationTypeData()

@@ -67,7 +67,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             //
             // when installing, the source state is empty, and the target state should be the final state.
 
-            Add(string.Empty, "{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
+            Add(string.Empty, "{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
 
             // UPGRADE FROM 7
             //
@@ -83,7 +83,8 @@ namespace Umbraco.Core.Migrations.Upgrade
                 .Chain<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}")
                 .Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}")
                 .Chain<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}")
-                .Chain<DropMigrationsTable>("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
+                .Chain<DropMigrationsTable>("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}")
+                .Chain<RefactorDataType>("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
 
             // 7.8.1 = same as 7.8.0
             From("{init-7.8.1}")
@@ -92,7 +93,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // 7.9.0 = requires its own chain
             From("{init-7.9.0}")
                 // chain...
-                .Chain("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
+                .Chain("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
 
             // UPGRADE 8
             //
@@ -151,6 +152,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // 8.0.0
             Chain<VariantsMigration>("{6550C7E8-77B7-4DE3-9B58-E31C81CB9504}");
             Chain<DropMigrationsTable>("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
+            Chain<RefactorDataType>("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
         }
     }
 }

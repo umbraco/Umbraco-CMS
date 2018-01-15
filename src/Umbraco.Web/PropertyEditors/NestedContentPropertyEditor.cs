@@ -90,7 +90,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region DataType Configuration
 
-        public class DataTypeConfiguration
+        public class Configuration
         {
             public NestedContentType[] ContentTypes { get; set; }
             public int? MinItems { get; set; }
@@ -110,20 +110,23 @@ namespace Umbraco.Web.PropertyEditors
             }
         }
 
-        public override object MapDataTypeConfiguration(PreValueCollection preValues)
+        public override object DeserializeConfiguration(string json)
         {
-            var d = preValues.PreValuesAsDictionary;
-            return new DataTypeConfiguration
-            {
-                ContentTypes = d.TryGetValue("contentTypes", out var preValue)
-                    ? JsonConvert.DeserializeObject<DataTypeConfiguration.NestedContentType[]>(preValue.Value)
-                    : Array.Empty<DataTypeConfiguration.NestedContentType>(),
-                MinItems = d.TryGetValue("minItems", out preValue) && int.TryParse(preValue.Value, out var minItems) ? (int?) minItems : null,
-                MaxItems = d.TryGetValue("maxItems", out preValue) && int.TryParse(preValue.Value, out var maxItems) ? (int?) maxItems : null,
-                ConfirmDeletes = d.TryGetValue("confirmDeletes", out preValue) && preValue.Value == "1",
-                ShowIcons = d.TryGetValue("showIcons", out preValue) && preValue.Value == "1",
-                HideLabel = d.TryGetValue("hideLabel", out preValue) && preValue.Value == "1"
-            };
+            return JsonConvert.DeserializeObject<Configuration>(json);
+
+            // fixme - can we have issues converting true/1 and false/0?
+            //var d = preValues.PreValuesAsDictionary;
+            //return new Configuration
+            //{
+            //    ContentTypes = d.TryGetValue("contentTypes", out var preValue)
+            //        ? JsonConvert.DeserializeObject<Configuration.NestedContentType[]>(preValue.Value)
+            //        : Array.Empty<Configuration.NestedContentType>(),
+            //    MinItems = d.TryGetValue("minItems", out preValue) && int.TryParse(preValue.Value, out var minItems) ? (int?) minItems : null,
+            //    MaxItems = d.TryGetValue("maxItems", out preValue) && int.TryParse(preValue.Value, out var maxItems) ? (int?) maxItems : null,
+            //    ConfirmDeletes = d.TryGetValue("confirmDeletes", out preValue) && preValue.Value == "1",
+            //    ShowIcons = d.TryGetValue("showIcons", out preValue) && preValue.Value == "1",
+            //    HideLabel = d.TryGetValue("hideLabel", out preValue) && preValue.Value == "1"
+            //};
         }
 
         #endregion

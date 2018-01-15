@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
             Constants.Trees.MemberTypes, Constants.Trees.Members)]
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
-            var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
+            var dataTypeDiff = Services.DataTypeService.GetDataType(id);
 
             if (dataTypeDiff == null)
             {

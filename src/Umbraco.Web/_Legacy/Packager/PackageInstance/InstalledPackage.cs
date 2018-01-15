@@ -145,7 +145,7 @@ namespace umbraco.cms.businesslogic.packager {
             var macros = TryGetIntegerIds(Data.Macros).Select(macroService.GetById).ToList();
             var templates = TryGetIntegerIds(Data.Templates).Select(fileService.GetTemplate).ToList();
             var contentTypes = TryGetIntegerIds(Data.Documenttypes).Select(contentTypeService.Get).ToList(); // fixme - media types?
-            var dataTypes = TryGetIntegerIds(Data.DataTypes).Select(dataTypeService.GetDataTypeDefinitionById).ToList();
+            var dataTypes = TryGetIntegerIds(Data.DataTypes).Select(dataTypeService.GetDataType).ToList();
             var dictionaryItems = TryGetIntegerIds(Data.DictionaryItems).Select(localizationService.GetDictionaryItemById).ToList();
             var languages = TryGetIntegerIds(Data.Languages).Select(localizationService.GetLanguageById).ToList();
 

@@ -21,7 +21,6 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class SliderPreValueEditor : PreValueEditor
         {
-
             [PreValueField("enableRange", "Enable range", "boolean")]
             public string Range { get; set; }
 

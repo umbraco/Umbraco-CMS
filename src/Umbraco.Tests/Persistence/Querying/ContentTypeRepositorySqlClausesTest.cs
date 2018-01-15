@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Querying
                .RightJoin<PropertyTypeDto>()
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Persistence.Querying
                .RightJoin<PropertyTypeDto>()
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
                .Where<PropertyTypeDto>(x => x.ContentTypeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));

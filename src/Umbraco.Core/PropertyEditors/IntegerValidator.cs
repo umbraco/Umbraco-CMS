@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     [ValueValidator("Integer")]
     internal sealed class IntegerValidator : ManifestValueValidator, IPropertyValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
         {
             if (value != null && value.ToString() != string.Empty)
             {
@@ -22,9 +22,9 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
-        public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
         {
-            return Validate(value, "", preValues, editor);
+            return Validate(value, "", dataTypeConfiguration, editor);
         }
     }
 }

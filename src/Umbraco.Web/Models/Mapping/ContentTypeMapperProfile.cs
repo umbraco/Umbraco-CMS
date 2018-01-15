@@ -127,7 +127,7 @@ namespace Umbraco.Web.Models.Mapping
                      if (string.IsNullOrEmpty(source.Name) == false)
                      {
                          var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
-                         if (_dataTypeService.GetDataTypeDefinitionByName(name) != null)
+                         if (_dataTypeService.GetDataType(name) != null)
                              dest.ListViewEditorName = name;
                      }
                  });
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (string.IsNullOrEmpty(source.Alias) == false)
                     {
                         var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Alias;
-                        if (_dataTypeService.GetDataTypeDefinitionByName(name) != null)
+                        if (_dataTypeService.GetDataType(name) != null)
                             dest.ListViewEditorName = name;
                     }
 
@@ -172,7 +172,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ConstructUsing(propertyTypeBasic =>
                 {
-                    var dataType = _dataTypeService.GetDataTypeDefinitionById(propertyTypeBasic.DataTypeId);
+                    var dataType = _dataTypeService.GetDataType(propertyTypeBasic.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
                     return new PropertyType(dataType, propertyTypeBasic.Alias);
                 })

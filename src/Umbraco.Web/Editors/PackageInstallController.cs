@@ -173,7 +173,7 @@ namespace Umbraco.Web.Editors
             {
                 int nId;
                 if (int.TryParse(item, out nId) == false) continue;
-                var dtd = Services.DataTypeService.GetDataTypeDefinitionById(nId);
+                var dtd = Services.DataTypeService.GetDataType(nId);
                 if (dtd != null)
                 {
                     removedDataTypes.Add(dtd);

@@ -329,51 +329,5 @@ WHERE v1.propertyTypeId=v2.propertyTypeId AND v1.languageId=v2.languageId AND v1
             public const string TaskType = "cmsTaskType";
             // ReSharper restore UnusedMember.Local
         }
-
-        private void AddColumn<T>(string tableName, string columnName)
-        {
-            AddColumn<T>(tableName, columnName, out var sqls);
-            foreach (var sql in sqls) Database.Execute(sql);
-        }
-
-        private void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
-        {
-            //if (ColumnExists(tableName, columnName))
-            //    throw new InvalidOperationException($"Column {tableName}.{columnName} already exists.");
-
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            var column = table.Columns.First(x => x.Name == columnName);
-            var createSql = SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out sqls);
-            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
-        }
-
-        private void ReplaceColumn<T>(string tableName, string currentName, string newName)
-        {
-            AddColumn<T>(tableName, newName, out var sqls);
-            Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}");
-            foreach (var sql in sqls) Database.Execute(sql);
-            Delete.Column(currentName).FromTable(tableName).Do();
-        }
-
-        private bool TableExists(string tableName)
-        {
-            var tables = SqlSyntax.GetTablesInSchema(Context.Database);
-            return tables.Any(x => x.InvariantEquals(tableName));
-        }
-
-        private bool ColumnExists(string tableName, string columnName)
-        {
-            // that's ok even on MySql
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
-            return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
-        }
-
-        private string ColumnType(string tableName, string columnName)
-        {
-            // that's ok even on MySql
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
-            var column = columns.FirstOrDefault(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
-            return column?.DataType;
-        }
     }
 }

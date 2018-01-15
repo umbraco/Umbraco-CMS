@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public DataTypeDisplay GetByName(string name)
         {
-            var dataType = Services.DataTypeService.GetDataTypeDefinitionByName(name);
+            var dataType = Services.DataTypeService.GetDataType(name);
             return dataType == null ? null : Mapper.Map<IDataType, DataTypeDisplay>(dataType);
         }
 
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public DataTypeDisplay GetById(int id)
         {
-            var dataType = Services.DataTypeService.GetDataTypeDefinitionById(id);
+            var dataType = Services.DataTypeService.GetDataType(id);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundType = Services.DataTypeService.GetDataTypeDefinitionById(id);
+            var foundType = Services.DataTypeService.GetDataType(id);
             if (foundType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
         /// <returns>a DataTypeDisplay</returns>
         public DataTypeDisplay GetCustomListView(string contentTypeAlias)
         {
-            var dt = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
+            var dt = Services.DataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
             if (dt == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -108,7 +108,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public DataTypeDisplay PostCreateCustomListView(string contentTypeAlias)
         {
-            var dt = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
+            var dt = Services.DataTypeService.GetDataType(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
 
             //if it doesnt exist yet, we will create it.
             if (dt == null)
@@ -142,7 +142,7 @@ namespace Umbraco.Web.Editors
             }
 
             //we have a data type associated
-            var dataType = Services.DataTypeService.GetDataTypeDefinitionById(dataTypeId);
+            var dataType = Services.DataTypeService.GetDataType(dataTypeId);
             if (dataType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -234,7 +234,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
-            var toMove = Services.DataTypeService.GetDataTypeDefinitionById(move.Id);
+            var toMove = Services.DataTypeService.GetDataType(move.Id);
             if (toMove == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -288,7 +288,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<DataTypeBasic> GetAll()
         {
             return Services.DataTypeService
-                     .GetAllDataTypeDefinitions()
+                     .GetAll()
                      .Select(Mapper.Map<IDataType, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
         }
 
@@ -305,7 +305,7 @@ namespace Umbraco.Web.Editors
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
             var dataTypes = Services.DataTypeService
-                     .GetAllDataTypeDefinitions()
+                     .GetAll()
                      .Select(Mapper.Map<IDataType, DataTypeBasic>)
                      .ToArray();
 

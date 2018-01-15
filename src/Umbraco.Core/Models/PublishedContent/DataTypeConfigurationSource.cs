@@ -40,9 +40,13 @@ namespace Umbraco.Core.Models.PublishedContent
             // fixme - we need a more efficient dataTypeService way of getting these
             // fixme - would be nice not to pass editorAlias but annoying for tests?
             //var datatype = _dataTypeService.GetDataTypeDefinitionById(id);
-            var collection = _dataTypeService.GetPreValuesCollectionByDataTypeId(id);
-            var editor = _propertyEditors[editorAlias /*datatype.PropertyEditorAlias*/];
-            return editor.MapDataTypeConfiguration(collection);
+            //var collection = _dataTypeService.GetPreValuesCollectionByDataTypeId(id);
+            var dataType = _dataTypeService.GetDataType(id);
+            return dataType.Configuration;
+
+            // fixme - mapping done in dataTypeService? or should it be on-demand in DataType?
+            //var editor = _propertyEditors[editorAlias /*datatype.PropertyEditorAlias*/];
+            //return editor.MapDataTypeConfiguration(dataType.Configuration);
         }
     }
 }

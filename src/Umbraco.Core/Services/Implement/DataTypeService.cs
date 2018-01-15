@@ -223,7 +223,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataTypeDefinitionByName(string name)
+        public IDataType GetDataType(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataTypeDefinitionById(int id)
+        public IDataType GetDataType(int id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -249,7 +249,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType GetDataTypeDefinitionById(Guid id)
+        public IDataType GetDataType(Guid id)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -263,7 +263,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching contorl id</returns>
-        public IEnumerable<IDataType> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias)
+        public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        public IEnumerable<IDataType> GetAllDataTypeDefinitions(params int[] ids)
+        public IEnumerable<IDataType> GetAll(params int[] ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -285,48 +285,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Gets all prevalues for an <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IDataType"/> to retrieve prevalues from</param>
-        /// <returns>An enumerable list of string values</returns>
-        public IEnumerable<string> GetPreValuesByDataTypeId(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                var collection = _dataTypeRepository.GetPreValuesCollectionByDataTypeId(id);
-                //now convert the collection to a string list
-                return collection.FormatAsDictionary()
-                    .Select(x => x.Value.Value)
-                    .ToList();
-            }
-        }
-
-        /// <summary>
-        /// Returns the PreValueCollection for the specified data type
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public PreValueCollection GetPreValuesCollectionByDataTypeId(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _dataTypeRepository.GetPreValuesCollectionByDataTypeId(id);
-            }
-        }
-
-        /// <summary>
-        /// Gets a specific PreValue by its Id
-        /// </summary>
-        /// <param name="id">Id of the PreValue to retrieve the value from</param>
-        /// <returns>PreValue as a string</returns>
-        public string GetPreValueAsString(int id)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _dataTypeRepository.GetPreValueAsString(id);
-            }
-        }
 
         public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
         {
@@ -442,107 +400,6 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
                 Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, -1);
-
-                scope.Complete();
-            }
-        }
-
-        /// <summary>
-        /// Saves a list of PreValues for a given DataTypeDefinition
-        /// </summary>
-        /// <param name="dataTypeId">Id of the DataTypeDefinition to save PreValues for</param>
-        /// <param name="values">List of string values to save</param>
-        [Obsolete("This should no longer be used, use the alternative SavePreValues or SaveDataTypeAndPreValues methods instead. This will only insert pre-values without keys")]
-        public void SavePreValues(int dataTypeId, IEnumerable<string> values)
-        {
-            //TODO: Should we raise an event here since we are really saving values for the data type?
-
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var sortOrderObj = scope.Database.ExecuteScalar<object>(
-                    "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeId });
-
-                if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out int sortOrder) == false)
-                    sortOrder = 1;
-
-                foreach (var value in values)
-                {
-                    var dto = new DataTypePreValueDto { DataTypeNodeId = dataTypeId, Value = value, SortOrder = sortOrder };
-                    scope.Database.Insert(dto);
-                    sortOrder++;
-                }
-
-                scope.Complete();
-            }
-        }
-
-        /// <summary>
-        /// Saves/updates the pre-values
-        /// </summary>
-        /// <param name="dataTypeId"></param>
-        /// <param name="values"></param>
-        /// <remarks>
-        /// We need to actually look up each pre-value and maintain it's id if possible - this is because of silly property editors
-        /// like 'dropdown list publishing keys'
-        /// </remarks>
-        public void SavePreValues(int dataTypeId, IDictionary<string, PreValue> values)
-        {
-            var dtd = GetDataTypeDefinitionById(dataTypeId);
-            if (dtd == null)
-                throw new InvalidOperationException("No data type found for id " + dataTypeId);
-
-            SavePreValues(dtd, values);
-        }
-
-        /// <summary>
-        /// Saves/updates the pre-values
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <param name="values"></param>
-        /// <remarks>
-        /// We need to actually look up each pre-value and maintain it's id if possible - this is because of silly property editors
-        /// like 'dropdown list publishing keys'
-        /// </remarks>
-        public void SavePreValues(IDataType dataType, IDictionary<string, PreValue> values)
-        {
-            //TODO: Should we raise an event here since we are really saving values for the data type?
-
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _dataTypeRepository.AddOrUpdatePreValues(dataType, values);
-                scope.Complete();
-            }
-        }
-
-        /// <summary>
-        /// This will save a data type and it's pre-values in one transaction
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <param name="values"></param>
-        /// <param name="userId"></param>
-        public void SaveDataTypeAndPreValues(IDataType dataType, IDictionary<string, PreValue> values, int userId = 0)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
-                {
-                    scope.Complete();
-                    return;
-                }
-
-                // if preValues contain the data type, override the data type definition accordingly
-                if (values != null && values.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
-                    dataType.DatabaseType = PropertyValueEditor.GetDatabaseType(values[Constants.PropertyEditors.PreValueKeys.DataValueType].Value);
-
-                dataType.CreatorId = userId;
-
-                _dataTypeRepository.Save(dataType); // definition
-                _dataTypeRepository.AddOrUpdatePreValues(dataType, values); //prevalues
-
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
-                Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataType.Id);
 
                 scope.Complete();
             }

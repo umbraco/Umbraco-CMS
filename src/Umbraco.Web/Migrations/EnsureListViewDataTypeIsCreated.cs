@@ -54,9 +54,9 @@ namespace Umbraco.Web.Migrations
                 if (syntax.SupportsIdentityInsert())
                     scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", syntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
 
-                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -26, DataTypeId = Constants.DataTypes.DefaultContentListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
-                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -27, DataTypeId = Constants.DataTypes.DefaultMediaListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
-                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -28, DataTypeId = Constants.DataTypes.DefaultMembersListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -26, NodeId = Constants.DataTypes.DefaultContentListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -27, NodeId = Constants.DataTypes.DefaultMediaListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
+                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = -28, NodeId = Constants.DataTypes.DefaultMembersListView, EditorAlias = Constants.PropertyEditors.ListViewAlias, DbType = "Nvarchar" });
             }
             finally
             {
