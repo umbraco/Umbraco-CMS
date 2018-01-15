@@ -35,6 +35,7 @@ using Umbraco.Web.UI;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.Editors;
 
 namespace Umbraco.Web.Editors
 {
@@ -792,7 +793,7 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        tempFiles.UploadedFiles.Add(new ContentItemFile
+                        tempFiles.UploadedFiles.Add(new ContentPropertyFile
                         {
                             FileName = fileName,
                             PropertyAlias = Constants.Conventions.Media.File,

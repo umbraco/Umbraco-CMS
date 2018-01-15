@@ -18,6 +18,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Editors
                 userService.Save(user);
 
                 //track the temp file so the cleanup filter removes it
-                tempFiles.UploadedFiles.Add(new ContentItemFile
+                tempFiles.UploadedFiles.Add(new ContentPropertyFile
                 {
                     TempFilePath = file.LocalFileName
                 });

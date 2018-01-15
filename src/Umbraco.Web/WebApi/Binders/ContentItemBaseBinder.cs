@@ -18,6 +18,7 @@ using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
@@ -148,7 +149,7 @@ namespace Umbraco.Web.WebApi.Binders
 
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new char[] {'\"'});
 
-                model.UploadedFiles.Add(new ContentItemFile
+                model.UploadedFiles.Add(new ContentPropertyFile
                     {
                         TempFilePath = file.LocalFileName,
                         PropertyAlias = propAlias,

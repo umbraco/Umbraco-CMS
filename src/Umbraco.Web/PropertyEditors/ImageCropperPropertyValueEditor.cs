@@ -89,25 +89,18 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             // ensure we have the required guids
-            if (editorValue.AdditionalData.ContainsKey("cuid") == false // for the content item
-                || editorValue.AdditionalData.ContainsKey("puid") == false) // and the property type
-                throw new Exception("Missing cuid/puid additional data.");
-            var cuido = editorValue.AdditionalData["cuid"];
-            var puido = editorValue.AdditionalData["puid"];
-            if ((cuido is Guid) == false || (puido is Guid) == false)
-                throw new Exception("Invalid cuid/puid additional data.");
-            var cuid = (Guid)cuido;
-            var puid = (Guid)puido;
-            if (cuid == Guid.Empty || puid == Guid.Empty)
-                throw new Exception("Invalid cuid/puid additional data.");
+            var cuid = editorValue.ContentKey;
+            if (cuid == Guid.Empty) throw new Exception("Invalid content key.");
+            var puid = editorValue.PropertyTypeKey;
+            if (puid == Guid.Empty) throw new Exception("Invalid property type key.");
 
             // editorFile is empty whenever a new file is being uploaded
             // or when the file is cleared (in which case editorJson is null)
             // else editorFile contains the unchanged value
 
-            var uploads = editorValue.AdditionalData.ContainsKey("files") && editorValue.AdditionalData["files"] is IEnumerable<ContentItemFile>;
-            var files = uploads ? ((IEnumerable<ContentItemFile>)editorValue.AdditionalData["files"]).ToArray() : new ContentItemFile[0];
-            var file = uploads ? files.FirstOrDefault() : null;
+            var uploads = editorValue.Files;
+            if (uploads == null) throw new Exception("Invalid files.");
+            var file = uploads.Length > 0 ? uploads[0] : null;
 
             if (file == null) // not uploading a file
             {
@@ -127,7 +120,7 @@ namespace Umbraco.Web.PropertyEditors
             var filepath = editorJson == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
 
             // remove all temp files
-            foreach (var f in files)
+            foreach (var f in uploads)
                 File.Delete(f.TempFilePath);
 
             // remove current file if replaced
@@ -140,7 +133,7 @@ namespace Umbraco.Web.PropertyEditors
             return editorJson.ToString();
         }
 
-        private string ProcessFile(ContentPropertyData editorValue, ContentItemFile file, string currentPath, Guid cuid, Guid puid)
+        private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change

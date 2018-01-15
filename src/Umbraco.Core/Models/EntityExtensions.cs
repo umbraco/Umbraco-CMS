@@ -6,24 +6,21 @@ namespace Umbraco.Core.Models
     {
 
         /// <summary>
-        /// Returns true if this entity has just been created and persisted to the data store
+        /// Determines whether the entity was just created and persisted.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is useful when handling events to determine if an entity is a brand new entity or was
-        /// already existing.
-        /// </remarks>
         public static bool IsNewEntity(this IRememberBeingDirty entity)
         {
             return entity.WasPropertyDirty("Id");
         }
 
-        // fixme - MOVE!
-        public static object GetAdditionalDataValueIgnoreCase(this IMember entity, string key, object defaultVal)
+        /// <summary>
+        /// Gets additional data.
+        /// </summary>
+        public static object GetAdditionalDataValueIgnoreCase(this IHaveAdditionalData entity, string key, object defaultValue)
         {
-            if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultVal;
-            return entity.AdditionalData.GetValueIgnoreCase(key, defaultVal);
+            if (!entity.HasAdditionalData) return defaultValue;
+            if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultValue;
+            return entity.AdditionalData.GetValueIgnoreCase(key, defaultValue);
         }
     }
 }

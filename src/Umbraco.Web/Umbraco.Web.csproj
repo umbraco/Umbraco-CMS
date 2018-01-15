@@ -857,7 +857,6 @@
     <Compile Include="Models\ContentEditing\ContentItemBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDto.cs" />
-    <Compile Include="Models\ContentEditing\ContentItemFile.cs" />
     <Compile Include="Models\ContentEditing\ContentItemSave.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDisplay.cs" />

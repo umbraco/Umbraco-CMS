@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models
@@ -12,11 +13,11 @@ namespace Umbraco.Web.Models
     {
         public LocalPackageInstallModel()
         {
-            UploadedFiles = new List<ContentItemFile>();
+            UploadedFiles = new List<ContentPropertyFile>();
             Notifications = new List<Notification>();
         }
 
-        public List<ContentItemFile> UploadedFiles { get; }
+        public List<ContentPropertyFile> UploadedFiles { get; }
 
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; }

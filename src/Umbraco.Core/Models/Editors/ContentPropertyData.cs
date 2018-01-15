@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
 
 namespace Umbraco.Core.Models.Editors
 {
@@ -13,14 +12,9 @@ namespace Umbraco.Core.Models.Editors
     public class ContentPropertyData
     {
         public ContentPropertyData(object value, PreValueCollection preValues)
-            : this(value, preValues, new Dictionary<string, object>())
-        { }
-
-        public ContentPropertyData(object value, PreValueCollection preValues, IDictionary<string, object> additionalData)
         {
             Value = value;
             PreValues = preValues;
-            AdditionalData = new ReadOnlyDictionary<string, object>(additionalData);
         }
 
         /// <summary>
@@ -34,9 +28,18 @@ namespace Umbraco.Core.Models.Editors
         public PreValueCollection PreValues { get; }
 
         /// <summary>
-        /// A dictionary containing any additional objects that are related to this property when saving
+        /// Gets or sets the unique identifier of the content owning the property.
         /// </summary>
-        public ReadOnlyDictionary<string, object> AdditionalData { get; }
+        public Guid ContentKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique identifier of the property type.
+        /// </summary>
+        public Guid PropertyTypeKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the uploaded files.
+        /// </summary>
+        public ContentPropertyFile[] Files { get; set; }
     }
 }

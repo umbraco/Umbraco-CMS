@@ -78,21 +78,18 @@ namespace Umbraco.Web.Editors
                 var dboProperty = contentItem.PersistedContent.Properties[property.Alias];
 
                 //create the property data to send to the property editor
-                var dictionary = new Dictionary<string, object>();
+
                 //add the files if any
                 var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
-                if (files.Length > 0)
-                {
-                    dictionary.Add("files", files);
-                }
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
-                // add extra things needed to figure out where to put the files
-                dictionary.Add("cuid", contentItem.PersistedContent.Key);
-                dictionary.Add("puid", dboProperty.PropertyType.Key);
-
-                var data = new ContentPropertyData(property.Value, property.PreValues, dictionary);
+                var data = new ContentPropertyData(property.Value, property.PreValues)
+                {
+                    ContentKey = contentItem.PersistedContent.Key,
+                    PropertyTypeKey = dboProperty.PropertyType.Key,
+                    Files =  files
+                };
 
                 //get the deserialized value from the property editor
                 if (property.PropertyEditor == null)

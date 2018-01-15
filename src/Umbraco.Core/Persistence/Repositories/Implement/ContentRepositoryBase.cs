@@ -466,7 +466,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId).ToList();
 
                 // deal with tags
-                Dictionary<string, object> additionalData = null;
                 foreach (var property in properties)
                 {
                     // test for support and cache
@@ -484,9 +483,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     // build and set tags
                     var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
                     var preVals = new PreValueCollection(asDictionary);
-                    if (additionalData == null) additionalData = new Dictionary<string, object>(); // reduce allocs
                     // fixme this is totally borked of course for variants
-                    var contentPropData = new ContentPropertyData(property.GetValue(), preVals, additionalData);
+                    var contentPropData = new ContentPropertyData(property.GetValue(), preVals);
                     TagExtractor.SetPropertyTags(property, contentPropData, property.GetValue(), tagSupport);
                 }
 

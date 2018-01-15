@@ -593,13 +593,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
         [DataMember]
         [DoNotClone]
         public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
 
         /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
         [IgnoreDataMember]
         public bool HasAdditionalData => _additionalData != null;
     }

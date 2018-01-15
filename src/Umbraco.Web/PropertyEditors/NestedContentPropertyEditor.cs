@@ -321,9 +321,7 @@ namespace Umbraco.Web.PropertyEditors
                             var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                             // Create a fake content property data object
-                            var contentPropData = new ContentPropertyData(
-                                propValues[propKey], propPreValues,
-                                new Dictionary<string, object>());
+                            var contentPropData = new ContentPropertyData(propValues[propKey], propPreValues);
 
                             // Get the property editor to do it's conversion
                             var newValue = propEditor.ValueEditor.ConvertEditorToDb(contentPropData, propValues[propKey]);

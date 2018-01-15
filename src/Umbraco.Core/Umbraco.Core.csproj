@@ -314,8 +314,10 @@
     <Compile Include="Constants.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
+    <Compile Include="Models\Editors\ContentPropertyFile.cs" />
     <Compile Include="Models\Entities\BeingDirty.cs" />
     <Compile Include="Models\Entities\IEntitySlim.cs" />
+    <Compile Include="Models\Entities\IHaveAdditionalData.cs" />
     <Compile Include="Models\Entities\ITreeEntity.cs" />
     <Compile Include="Models\Entities\IContentEntitySlim.cs" />
     <Compile Include="Models\Entities\IDocumentEntitySlim.cs" />

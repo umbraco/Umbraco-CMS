@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         protected ContentBaseItemSave()
         {
-            UploadedFiles = new List<ContentItemFile>();
+            UploadedFiles = new List<ContentPropertyFile>();
         }
 
         /// <summary>
@@ -25,6 +26,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentSaveAction Action { get; set; }
 
         [IgnoreDataMember]
-        public List<ContentItemFile> UploadedFiles { get; private set; }
+        public List<ContentPropertyFile> UploadedFiles { get; private set; }
     }
 }

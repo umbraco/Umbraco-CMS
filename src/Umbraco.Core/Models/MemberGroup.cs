@@ -13,26 +13,32 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberGroup : EntityBase, IMemberGroup
     {
-        public MemberGroup()
-        {
-            AdditionalData = new Dictionary<string, object>();
-        }
-
+        private static PropertySelectors _selectors;
+        private IDictionary<string, object> _additionalData;
         private string _name;
         private int _creatorId;
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
 
         private class PropertySelectors
         {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
-            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
+            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
+            public readonly PropertyInfo CreatorId = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
         }
+
+        /// <inheritdoc />
+        [DataMember]
+        [DoNotClone]
+        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public bool HasAdditionalData => _additionalData != null;
 
         [DataMember]
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (_name != value)
@@ -43,16 +49,15 @@ namespace Umbraco.Core.Models
                     AdditionalData["previousName"] = _name;
                 }
 
-                SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+                SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
             }
         }
 
+        [DataMember]
         public int CreatorId
         {
-            get { return _creatorId; }
-            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
+            get => _creatorId;
+            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Selectors.CreatorId);
         }
-
-        public IDictionary<string, object> AdditionalData { get; private set; }
     }
 }
