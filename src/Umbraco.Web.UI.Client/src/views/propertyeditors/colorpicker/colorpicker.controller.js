@@ -13,28 +13,39 @@ function ColorPickerController($scope) {
         initActiveColor();
     }
 
-    $scope.toggleItem = function (color) {
+     $scope.toggleItem = function (color) {
+           
 
-        var currentColor = $scope.model.value.hasOwnProperty("value")
-            ? $scope.model.value.value
-            : $scope.model.value;
+            var currentColor = $scope.model.hasOwnProperty('value') ?
+               ( $scope.model.value.hasOwnProperty('value') ? $scope.model.value.value : $scope.model.value)
+                : "";
+            var newColor;
+            if (currentColor === color.value) {
+               // deselect
+                $scope.model.value = $scope.model.useLabel ? {
+                    value: '',
+                    label: ''
+                } : '';
+                newColor = '';
+            } else {
+                
+                // select
+                $scope.model.value = $scope.model.useLabel
+                    ? {
+                        value: color.value,
+                        label: color.label
+                    }
+                    : (color.hasOwnProperty('value') ? color.value : color);
+                newColor = color.hasOwnProperty('value') ? color.value : color;
+            }
+       
 
-        var newColor;
-        if (currentColor === color.value) {
-            // deselect
-            $scope.model.value = $scope.model.useLabel ? { value: "", label: "" } : "";
-            newColor = "";
-        }
-        else {
-            // select
-            $scope.model.value = $scope.model.useLabel ? { value: color.value, label: color.label } : color.value;
-            newColor = color.value;
-        }
+             if ($scope.propertyForm.hasOwnProperty('modelValue')) {
+                // this is required to re-validate
+                $scope.propertyForm.modelValue.$setViewValue(newColor);
+            }
 
-        // this is required to re-validate
-        $scope.propertyForm.modelValue.$setViewValue(newColor);
-    };
-
+         };
     // Method required by the valPropertyValidator directive (returns true if the property editor has at least one color selected)
     $scope.validateMandatory = function () {
         var isValid = !$scope.model.validation.mandatory || (
