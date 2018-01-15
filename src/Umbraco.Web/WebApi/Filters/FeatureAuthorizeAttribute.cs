@@ -12,6 +12,10 @@ namespace Umbraco.Web.WebApi.Filters
     {
         protected override bool IsAuthorized(HttpActionContext actionContext)
         {
+            //if no features resolver has been set then return true, this will occur in unit tests and we don't want users to have to set a resolver
+            //just so their unit tests work.
+            if (FeaturesResolver.HasCurrent == false) return true;
+
             var controllerType = actionContext.ControllerContext.ControllerDescriptor.ControllerType;
             return FeaturesResolver.Current.Features.IsEnabled(controllerType);
         }

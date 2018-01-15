@@ -47,6 +47,7 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
+[assembly: InternalsVisibleTo("Umbraco.Headless")]
 
 //allow custom unit-testing code to access internals through custom adapters
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]          // backwards compat.
