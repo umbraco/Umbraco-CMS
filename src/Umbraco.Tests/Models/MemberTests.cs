@@ -45,8 +45,8 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
+            member.AdditionalData.Add("test1", 123);
+            member.AdditionalData.Add("test2", "hello");
 
             // Act
             var clone = (Member)member.DeepClone();
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone, member);
             Assert.AreEqual(clone.Id, member.Id);
             Assert.AreEqual(clone.VersionId, member.VersionId);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)member).AdditionalData);
+            Assert.AreEqual(clone.AdditionalData, member.AdditionalData);
             Assert.AreNotSame(clone.ContentType, member.ContentType);
             Assert.AreEqual(clone.ContentType, member.ContentType);
             Assert.AreEqual(clone.ContentType.PropertyGroups.Count, member.ContentType.PropertyGroups.Count);
@@ -144,8 +144,8 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
+            member.AdditionalData.Add("test1", 123);
+            member.AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(member);
             var json = result.ResultStream.ToJsonString();

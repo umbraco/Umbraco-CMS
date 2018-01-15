@@ -21,7 +21,6 @@ namespace Umbraco.Core.Models
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        private IDictionary<string, object> _additionalData;
         private string _alias;
         private string _description;
         private string _icon = "icon-folder";
@@ -70,17 +69,6 @@ namespace Umbraco.Core.Models
 
             _variations = ContentVariation.InvariantNeutral;
         }
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DataMember]
-        [DoNotClone]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [IgnoreDataMember]
-        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
 
         /// <summary>
         /// Gets a value indicating whether the content type is publishing.

@@ -212,9 +212,6 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
-
             var runtimeCache = new ObjectCacheRuntimeCacheProvider();
             runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
@@ -274,9 +271,6 @@ namespace Umbraco.Tests.Models
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
 
-            ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
-
             // Act
             var clone = (Content)content.DeepClone();
 
@@ -285,7 +279,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone, content);
             Assert.AreEqual(clone.Id, content.Id);
             Assert.AreEqual(clone.VersionId, content.VersionId);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)content).AdditionalData);
             Assert.AreNotSame(clone.ContentType, content.ContentType);
             Assert.AreEqual(clone.ContentType, content.ContentType);
             Assert.AreEqual(clone.ContentType.PropertyGroups.Count, content.ContentType.PropertyGroups.Count);
@@ -379,9 +372,6 @@ namespace Umbraco.Tests.Models
             content.Trashed = false;
             content.UpdateDate = DateTime.Now;
             content.WriterId = 23;
-
-            ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(content);
             var json = result.ResultStream.ToJsonString();

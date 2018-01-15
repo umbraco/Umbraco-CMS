@@ -137,9 +137,6 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
-
             var proflog = GetTestProfilingLogger();
 
             using (proflog.DebugDuration<ContentTypeTests>("STARTING PERF TEST"))
@@ -190,9 +187,6 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
-
             // Act
             var clone = (ContentType)contentType.DeepClone();
 
@@ -200,7 +194,6 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
             Assert.AreEqual(clone.AllowedTemplates.Count(), contentType.AllowedTemplates.Count());
             for (var index = 0; index < contentType.AllowedTemplates.Count(); index++)
             {
@@ -291,9 +284,6 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
-
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
             Debug.Print(json);
@@ -325,9 +315,6 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
-
             // Act
             var clone = (MediaType)contentType.DeepClone();
 
@@ -335,7 +322,6 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
             {
@@ -396,9 +382,6 @@ namespace Umbraco.Tests.Models
             contentType.Trashed = false;
             contentType.UpdateDate = DateTime.Now;
 
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
-
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();
             Debug.Print(json);
@@ -431,8 +414,6 @@ namespace Umbraco.Tests.Models
             contentType.UpdateDate = DateTime.Now;
             contentType.SetMemberCanEditProperty("title", true);
             contentType.SetMemberCanViewProperty("bodyText", true);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
             // Act
             var clone = (MemberType)contentType.DeepClone();
@@ -441,7 +422,6 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, contentType);
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
             {
@@ -504,8 +484,6 @@ namespace Umbraco.Tests.Models
             contentType.UpdateDate = DateTime.Now;
             contentType.SetMemberCanEditProperty("title", true);
             contentType.SetMemberCanViewProperty("bodyText", true);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)contentType).AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(contentType);
             var json = result.ResultStream.ToJsonString();

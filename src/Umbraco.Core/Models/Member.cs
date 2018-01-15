@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -16,6 +18,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Member : ContentBase, IMember
     {
+        private IDictionary<string, object> _additionalData;
         private IMemberType _contentType;
         private readonly string _contentTypeAlias;
         private string _username;
@@ -588,5 +591,16 @@ namespace Umbraco.Core.Models
             return clone;
 
         }
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DataMember]
+        [DoNotClone]
+        public IDictionary<string, object> AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [IgnoreDataMember]
+        public bool HasAdditionalData => _additionalData != null;
     }
 }

@@ -21,7 +21,6 @@ namespace Umbraco.Core.Models
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        private IDictionary<string, object> _additionalData;
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
@@ -73,17 +72,6 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
         }
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DataMember]
-        [DoNotClone]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [IgnoreDataMember]
-        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

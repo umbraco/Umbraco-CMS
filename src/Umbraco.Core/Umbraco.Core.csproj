@@ -773,7 +773,6 @@
     <Compile Include="Models\TemplateOnDisk.cs" />
     <Compile Include="Models\UmbracoDomain.cs" />
     <Compile Include="Models\Entities\EntitySlim.cs" />
-    <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Models\UmbracoObjectTypes.cs" />
     <Compile Include="Models\ObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />

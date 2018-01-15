@@ -13,7 +13,6 @@ namespace Umbraco.Core.Models
     public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     {
         private readonly Guid _containedObjectType;
-        private IDictionary<string, object> _additionalData;
 
         private static readonly Dictionary<Guid, Guid> ObjectTypeMap = new Dictionary<Guid, Guid>
         {
@@ -87,16 +86,5 @@ namespace Umbraco.Core.Models
                 throw new ArgumentException("Not a container object type.", nameof(containerObjectType));
             return contained;
         }
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DataMember]
-        [DoNotClone]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [IgnoreDataMember]
-        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
     }
 }

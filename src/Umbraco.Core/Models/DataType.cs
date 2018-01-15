@@ -15,7 +15,6 @@ namespace Umbraco.Core.Models
     public class DataType : TreeEntityBase, IDataType
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-        private IDictionary<string, object> _additionalData;
 
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _databaseType;
@@ -44,17 +43,6 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.EditorAlias);
             public readonly PropertyInfo DatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<DataType, DataTypeDatabaseType>(x => x.DatabaseType);
         }
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DataMember]
-        [DoNotClone]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [IgnoreDataMember]
-        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
 
         /// <inheritdoc />
         [DataMember]

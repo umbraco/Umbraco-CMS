@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models
 
             if (entity.ValidatePath() == false)
             {
-                logger.Warn(typeof(UmbracoEntityExtensions), $"The content item {entity.Id} has an invalid path: {entity.Path} with parentID: {entity.ParentId}");
+                logger.Warn(typeof(PathValidationExtensions), $"The content item {entity.Id} has an invalid path: {entity.Path} with parentID: {entity.ParentId}");
                 if (entity.ParentId == -1)
                 {
                     entity.Path = string.Concat("-1,", entity.Id);

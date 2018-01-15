@@ -18,5 +18,12 @@ namespace Umbraco.Core.Models
         {
             return entity.WasPropertyDirty("Id");
         }
+
+        // fixme - MOVE!
+        public static object GetAdditionalDataValueIgnoreCase(this IMember entity, string key, object defaultVal)
+        {
+            if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultVal;
+            return entity.AdditionalData.GetValueIgnoreCase(key, defaultVal);
+        }
     }
 }

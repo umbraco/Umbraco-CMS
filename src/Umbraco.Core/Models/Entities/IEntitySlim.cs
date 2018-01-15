@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.Entities
 {
@@ -21,5 +22,19 @@ namespace Umbraco.Core.Models.Entities
         /// Gets a value indicating whether the entity is a container.
         /// </summary>
         bool IsContainer { get; }
+
+        /// <summary>
+        /// Gets additional data for this entity.
+        /// </summary>
+        /// <remarks>Can be empty, but never null. To avoid allocating, do not
+        /// test for emptyness, but use <see cref="HasAdditionalData"/> instead.</remarks>
+        IDictionary<string, object> AdditionalData { get; }
+
+        /// <summary>
+        /// Determines whether this entity has additional data.
+        /// </summary>
+        /// <remarks>Use this property to check for additional data without
+        /// getting <see cref="AdditionalData"/>, to avoid allocating.</remarks>
+        bool HasAdditionalData { get; }
     }
 }
