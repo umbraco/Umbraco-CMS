@@ -13,7 +13,7 @@ namespace Umbraco.Web
 {
     internal static class ImageCropperBaseExtensions
     {
-        internal static ImageCropDataSet SerializeToCropDataSet(this string json)
+        internal static ImageCropDataSet DeserializeToCropDataSet(this string json)
         {
             var imageCrops = new ImageCropDataSet();
             if (json.DetectIsJson())
