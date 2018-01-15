@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;

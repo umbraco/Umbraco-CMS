@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RelationType : EntityBase.EntityBase, IRelationType
+    public class RelationType : EntityBase, IRelationType
     {
         private string _name;
         private string _alias;

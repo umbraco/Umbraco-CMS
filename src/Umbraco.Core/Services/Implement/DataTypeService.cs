@@ -161,9 +161,14 @@ namespace Umbraco.Core.Services.Implement
                 var container = _dataTypeContainerRepository.Get(containerId);
                 if (container == null) return OperationResult.Attempt.NoOperation(evtMsgs);
 
+                // 'container' here does not know about its children, so we need
+                // to get it again from the entity repository, as a light entity
                 var entity = _entityRepository.Get(container.Id);
-                if (entity.HasChildren()) // because container.HasChildren() does not work?
-                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs)); // causes rollback
+                if (entity.HasChildren)
+                {
+                    scope.Complete();
+                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
+                }
 
                 if (scope.Events.DispatchCancelable(DeletingContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
                 {

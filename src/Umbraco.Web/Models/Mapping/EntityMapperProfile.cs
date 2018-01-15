@@ -7,6 +7,7 @@ using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Examine;
@@ -15,14 +16,17 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class EntityMapperProfile : Profile
     {
+        private static string GetContentTypeIcon(EntitySlim entity)
+            => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+
         public EntityMapperProfile()
         {
             // create, capture, cache
             var contentTypeUdiResolver = new ContentTypeUdiResolver();
 
-            CreateMap<UmbracoEntity, EntityBasic>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectType), src.Key)))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentTypeIcon))
+            CreateMap<EntitySlim, EntityBasic>()
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => GetContentTypeIcon(src)))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
@@ -79,9 +83,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            CreateMap<UmbracoEntity, SearchResultItem>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(src.NodeObjectType), src.Key)))
-                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src=> src.ContentTypeIcon))
+            CreateMap<EntitySlim, SearchResultItem>()
+                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src=> GetContentTypeIcon(src)))
                 .ForMember(dest => dest.Trashed, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.Score, opt => opt.Ignore())

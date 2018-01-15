@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace Umbraco.Core.Models.EntityBase
+namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Provides a concrete implementation of <see cref="BeingDirtyBase"/>.

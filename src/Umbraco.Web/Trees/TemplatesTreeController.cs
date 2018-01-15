@@ -7,6 +7,7 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Trees
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
                 template.IsMasterTemplate,
                 GetEditorPath(template, queryStrings),
-                Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
+                Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
             )));
 
             return nodes;
@@ -97,9 +98,9 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
-        private UmbracoEntity FromTemplate(ITemplate template)
+        private EntitySlim FromTemplate(ITemplate template)
         {
-            return new UmbracoEntity
+            return new EntitySlim
             {
                 CreateDate = template.CreateDate,
                 Id = template.Id,
@@ -125,7 +126,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.Template, pageIndex, pageSize, out totalFound, filter: query);
             return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }

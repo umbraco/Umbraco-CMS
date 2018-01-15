@@ -5,7 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
@@ -878,10 +878,11 @@ namespace Umbraco.Core.Services.Implement
                 var container = _containerRepository.Get(containerId);
                 if (container == null) return OperationResult.Attempt.NoOperation(evtMsgs);
 
+                // 'container' here does not know about its children, so we need
+                // to get it again from the entity repository, as a light entity
                 var entity = _entityRepository.Get(container.Id);
-                if (entity.HasChildren()) // fixme because container.HasChildren() does not work?
+                if (entity.HasChildren)
                 {
-                    // fixme - here and everywhere, original v8 would not Complete, thus causing rollback = ?
                     scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
                 }

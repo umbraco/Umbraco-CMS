@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Persistence.Repositories

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -12,18 +12,11 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DataType : EntityBase.EntityBase, IDataType
+    public class DataType : TreeEntityBase, IDataType
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-        private readonly IDictionary<string, object> _additionalData;
+        private IDictionary<string, object> _additionalData;
 
-        private int _parentId;
-        private string _name;
-        private int _sortOrder;
-        private int _level;
-        private string _path;
-        private int _creatorId;
-        private bool _trashed;
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _databaseType;
 
@@ -32,10 +25,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public DataType(int parentId, string propertyEditorAlias)
         {
-            _parentId = parentId;
+            ParentId = parentId;
             _propertyEditorAlias = propertyEditorAlias;
-
-            _additionalData = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -43,106 +34,34 @@ namespace Umbraco.Core.Models
         /// </summary>
         public DataType(string propertyEditorAlias)
         {
-            _parentId = -1;
+            ParentId = -1;
             _propertyEditorAlias = propertyEditorAlias;
-
-            _additionalData = new Dictionary<string, object>();
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.Name);
-            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DataType, int>(x => x.ParentId);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<DataType, int>(x => x.SortOrder);
-            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<DataType, int>(x => x.Level);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.Path);
-            public readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<DataType, int>(x => x.CreatorId);
-            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<DataType, bool>(x => x.Trashed);
             public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.EditorAlias);
             public readonly PropertyInfo DatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<DataType, DataTypeDatabaseType>(x => x.DatabaseType);
         }
 
         /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [DataMember]
-        public int ParentId
-        {
-            get => _parentId;
-            set => SetPropertyValueAndDetectChanges(value, ref _parentId, Ps.Value.ParentIdSelector);
-        }
+        [DoNotClone]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
 
         /// <inheritdoc />
-        [DataMember]
-        public string Name
-        {
-            get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
-        }
-
-        /// <inheritdoc />
-        [DataMember]
-        public int SortOrder
-        {
-            get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
-        }
-
-        /// <inheritdoc />
-        [DataMember]
-        public int Level
-        {
-            get => _level;
-            set => SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector);
-        }
-
-        /// <inheritdoc />
-        // fixme - setting this value should be handled by the class not the user
-        [DataMember]
-        public string Path
-        {
-            get => _path;
-            set => SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector);
-        }
-
-        /// <inheritdoc />
-        [DataMember]
-        public int CreatorId
-        {
-            get => _creatorId;
-            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.UserIdSelector);
-        }
-
-        /// <inheritdoc />
-        // fixme - data types cannot be trashed?
-        [DataMember]
-        public bool Trashed
-        {
-            get => _trashed;
-            internal set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector);
-
-                // this is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
-                _additionalData["Trashed"] = value;
-            }
-        }
-
-        // fixme - what exactly are we doing with _additionalData?
-        // are we allocating 1 dictionary for *every* entity?
-        // not doing it for other entities?
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [IgnoreDataMember]
+        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
 
         /// <inheritdoc />
         [DataMember]
         public string EditorAlias
         {
             get => _propertyEditorAlias;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
-
-                // this is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
-                _additionalData["DatabaseType"] = value;
-            }
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
         }
 
         /// <inheritdoc />
@@ -150,21 +69,11 @@ namespace Umbraco.Core.Models
         public DataTypeDatabaseType DatabaseType
         {
             get => _databaseType;
-            set
-            {
-                SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);
-
-                // this is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
-                _additionalData["DatabaseType"] = value;
-            }
+            set => SetPropertyValueAndDetectChanges(value, ref _databaseType, Ps.Value.DatabaseTypeSelector);
         }
 
         // fixme - implement that one !!
         [DataMember]
         public object Configuration { get; set; }
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData;
     }
 }

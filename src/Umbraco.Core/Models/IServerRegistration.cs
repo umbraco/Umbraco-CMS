@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models

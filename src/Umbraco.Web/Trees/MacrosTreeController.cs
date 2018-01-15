@@ -2,6 +2,7 @@
 using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -67,7 +68,7 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
                 //Since we haven't implemented anything for macros in angular, this needs to be converted to
                 //use the legacy format
-                .ConvertLegacyMenuItem(new UmbracoEntity
+                .ConvertLegacyMenuItem(new EntitySlim
                 {
                     Id = macro.Id,
                     Level = 1,

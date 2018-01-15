@@ -10,7 +10,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -228,7 +228,7 @@ AND umbracoNode.nodeObjectType = @objectType",
 
                 //Update the current PropertyType with correct PropertyEditorAlias and DatabaseType
                 var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
-                propertyType.PropertyEditorAlias = dataTypeDto.PropertyEditorAlias;
+                propertyType.PropertyEditorAlias = dataTypeDto.EditorAlias;
                 propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
             }
         }
@@ -500,7 +500,7 @@ AND umbracoNode.id <> @id",
             var list = new List<PropertyType>();
             foreach (var dto in dtos.Where(x => x.PropertyTypeGroupId <= 0))
             {
-                var propType = CreatePropertyType(dto.DataTypeDto.PropertyEditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
+                var propType = CreatePropertyType(dto.DataTypeDto.EditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
                 propType.DataTypeDefinitionId = dto.DataTypeId;
                 propType.Description = dto.Description;
                 propType.Id = dto.Id;

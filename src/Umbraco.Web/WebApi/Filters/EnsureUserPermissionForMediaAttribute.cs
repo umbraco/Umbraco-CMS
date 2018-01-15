@@ -70,7 +70,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             if (guidId != Guid.Empty)
             {
-                var found =  Current.Services.EntityService.GetIdForKey(guidId, UmbracoObjectTypes.Media);
+                var found =  Current.Services.EntityService.GetId(guidId, UmbracoObjectTypes.Media);
                 if (found)
                     return found.Result;
             }

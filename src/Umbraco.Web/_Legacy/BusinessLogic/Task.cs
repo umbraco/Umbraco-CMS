@@ -1,6 +1,6 @@
 using System;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web._Legacy.BusinessLogic

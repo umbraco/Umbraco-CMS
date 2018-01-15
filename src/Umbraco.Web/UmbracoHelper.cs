@@ -404,13 +404,13 @@ namespace Umbraco.Web
                     return Content(guidUdi.Guid);
                 case UmbracoObjectTypes.Media:
                     // fixme - need to implement Media(guid)!
-                    var mediaAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
+                    var mediaAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
                     if (mediaAttempt.Success)
                         return Media(mediaAttempt.Result);
                     break;
                 case UmbracoObjectTypes.Member:
                     // fixme - need to implement Member(guid)!
-                    var memberAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
+                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return Member(memberAttempt.Result);
                     break;
@@ -711,7 +711,7 @@ namespace Umbraco.Web
             // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
 
             var entityService = Current.Services.EntityService; // fixme inject
-            var mediaAttempt = entityService.GetIdForKey(id, UmbracoObjectTypes.Media);
+            var mediaAttempt = entityService.GetId(id, UmbracoObjectTypes.Media);
             return mediaAttempt.Success ? ContentQuery.Media(mediaAttempt.Result) : null;
         }
 

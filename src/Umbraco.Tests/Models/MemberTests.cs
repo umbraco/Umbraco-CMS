@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers.Entities;
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Persistence.Querying
 {

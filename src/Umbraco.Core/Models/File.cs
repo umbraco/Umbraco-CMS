@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class File : EntityBase.EntityBase, IFile
+    public abstract class File : EntityBase, IFile
     {
         private string _path;
         private string _originalPath;

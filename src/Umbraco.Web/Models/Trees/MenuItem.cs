@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Trees;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;

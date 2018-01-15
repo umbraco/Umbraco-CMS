@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.EntityBase
+namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Provides a base class for entities.

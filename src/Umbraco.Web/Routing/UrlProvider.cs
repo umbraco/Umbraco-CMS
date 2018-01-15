@@ -76,7 +76,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id)
         {
-            var intId = Current.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1);
         }
 
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, bool absolute)
         {
-            var intId = Current.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, absolute);
         }
 
@@ -111,7 +111,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, Uri current, bool absolute)
         {
-            var intId = Current.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, current, absolute);
         }
 
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, UrlProviderMode mode)
         {
-            var intId = Current.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, mode);
         }
 

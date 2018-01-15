@@ -10,7 +10,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;

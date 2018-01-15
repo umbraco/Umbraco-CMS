@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Tag : EntityBase.EntityBase, ITag
+    public class Tag : EntityBase, ITag
     {
         public Tag()
         {

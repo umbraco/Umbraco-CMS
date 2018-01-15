@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public int DataTypeId { get; set; }
 
         [Column("propertyEditorAlias")]
-        public string PropertyEditorAlias { get; set; }
+        public string EditorAlias { get; set; }
 
         [Column("dbType")]
         [Length(50)]

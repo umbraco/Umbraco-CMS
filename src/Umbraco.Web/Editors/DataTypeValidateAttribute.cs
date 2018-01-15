@@ -8,7 +8,6 @@ using System.Web.Http.Filters;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;

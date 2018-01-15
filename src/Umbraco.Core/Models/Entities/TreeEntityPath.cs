@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.EntityBase
+﻿namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Represents the path of a tree entity.

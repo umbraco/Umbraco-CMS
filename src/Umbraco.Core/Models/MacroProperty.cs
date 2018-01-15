@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
-            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<EntityBase.EntityBase, int>(x => x.Id);
+            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<EntityBase, int>(x => x.Id);
             public readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
         }
 

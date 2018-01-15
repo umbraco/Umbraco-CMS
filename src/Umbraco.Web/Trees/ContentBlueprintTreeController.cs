@@ -3,7 +3,7 @@ using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //get all blueprint content types
-                var contentTypeAliases = entities.Select(x => ((UmbracoEntity) x).ContentTypeAlias).Distinct();
+                var contentTypeAliases = entities.Select(x => ((ContentEntitySlim) x).ContentTypeAlias).Distinct();
                 //get the ids
                 var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
@@ -73,7 +73,7 @@ namespace Umbraco.Web.Trees
             var ct = Services.ContentTypeService.Get(intId.Result);
             if (ct == null) return nodes;
 
-            var blueprintsForDocType = entities.Where(x => ct.Alias == ((UmbracoEntity) x).ContentTypeAlias);
+            var blueprintsForDocType = entities.Where(x => ct.Alias == ((ContentEntitySlim) x).ContentTypeAlias);
             nodes.AddRange(blueprintsForDocType
                 .Select(entity =>
                 {

@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
@@ -48,7 +49,7 @@ namespace Umbraco.Web.UI.Pages
             //check path access
 
             var entity = entityId == Constants.System.Root
-                ? UmbracoEntity.Root
+                ? EntitySlim.Root
                 : Services.EntityService.Get(entityId, objectType);
             var hasAccess = Security.CurrentUser.HasPathAccess(entity, Services.EntityService, objectType == UmbracoObjectTypes.Document ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia);
             if (hasAccess == false)

@@ -226,6 +226,7 @@
     <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
+    <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -357,7 +358,7 @@
     <Compile Include="Models\TaskTests.cs" />
     <Compile Include="Models\TaskTypeTests.cs" />
     <Compile Include="Models\TemplateTests.cs" />
-    <Compile Include="Models\UmbracoEntityTests.cs" />
+    <Compile Include="Models\LightEntityTest.cs" />
     <Compile Include="Models\UserTests.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />

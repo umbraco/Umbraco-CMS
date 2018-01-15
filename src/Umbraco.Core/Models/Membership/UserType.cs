@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserType : EntityBase.EntityBase, IUserType
+    internal class UserType : EntityBase, IUserType
     {
         private string _alias;
         private string _name;

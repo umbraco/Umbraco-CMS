@@ -6,7 +6,7 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
@@ -49,26 +49,28 @@ namespace Umbraco.Web.Trees
         /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            var entity = (UmbracoEntity) e;
-
             //Special check to see if it ia a container, if so then we'll hide children.
-            var isContainer = e.IsContainer(); // && (queryStrings.Get("isDialog") != "true");
+            var isContainer = entity.IsContainer; // && (queryStrings.Get("isDialog") != "true");
 
             var node = CreateTreeNode(
                 entity,
                 Constants.ObjectTypes.Media,
                 parentId,
                 queryStrings,
-                entity.HasChildren && (isContainer == false));
+                entity.HasChildren && !isContainer);
 
-            node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
-
+            // entity is either a container, or a media
             if (isContainer)
             {
                 node.SetContainerStyle();
                 node.AdditionalData.Add("isContainer", true);
+            }
+            else
+            {
+                var contentEntity = (IContentEntitySlim) entity;
+                node.AdditionalData.Add("contentType", contentEntity.ContentTypeAlias);
             }
 
             return node;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.Models.EntityBase
+﻿namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Defines an entity that belongs to a tree.
@@ -13,9 +11,23 @@ namespace Umbraco.Core.Models.EntityBase
         string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the identifier of the user who created this entity.
+        /// </summary>
+        int CreatorId { get; set; }
+
+        /// <summary>
         /// Gets or sets the identifier of the parent entity.
         /// </summary>
         int ParentId { get; set; }
+
+        /// <summary>
+        /// Sets the parent entity.
+        /// </summary>
+        /// <remarks>Use this method to set the parent entity when the parent entity is known, but has not
+        /// been persistent and does not yet have an identity. The parent identifier will we retrieved
+        /// from the parent entity when needed. If the parent entity still does not have an entity by that
+        /// time, an exception will be thrown by <see cref="ParentId"/> getter.</remarks>
+        void SetParent(ITreeEntity parent);
 
         /// <summary>
         /// Gets or sets the level of the entity.
@@ -40,10 +52,5 @@ namespace Umbraco.Core.Models.EntityBase
         /// <para>Always false for entities that do not support being trashed.</para>
         /// </remarks>
         bool Trashed { get; }
-
-        /// <summary>
-        /// Gets or sets the identifier of the user who created this entity.
-        /// </summary>
-        int CreatorId { get; set; }
     }
 }

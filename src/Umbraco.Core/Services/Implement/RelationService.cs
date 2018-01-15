@@ -4,7 +4,7 @@ using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
 
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public IUmbracoEntity GetChildEntityFromRelation(IRelation relation, bool loadBaseType = false)
         {
-            var objectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
+            var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
             return _entityService.Get(relation.ChildId, objectType, loadBaseType);
         }
 
@@ -302,7 +302,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public IUmbracoEntity GetParentEntityFromRelation(IRelation relation, bool loadBaseType = false)
         {
-            var objectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+            var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
             return _entityService.Get(relation.ParentId, objectType, loadBaseType);
         }
 
@@ -314,8 +314,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>Returns a Tuple with Parent (item1) and Child (item2)</returns>
         public Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation, bool loadBaseType = false)
         {
-            var childObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
-            var parentObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+            var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
+            var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
 
             var child = _entityService.Get(relation.ChildId, childObjectType, loadBaseType);
             var parent = _entityService.Get(relation.ParentId, parentObjectType, loadBaseType);
@@ -333,7 +333,7 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var relation in relations)
             {
-                var objectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
+                var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
                 yield return _entityService.Get(relation.ChildId, objectType, loadBaseType);
             }
         }
@@ -348,7 +348,7 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var relation in relations)
             {
-                var objectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+                var objectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
                 yield return _entityService.Get(relation.ParentId, objectType, loadBaseType);
             }
         }
@@ -363,8 +363,8 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var relation in relations)
             {
-                var childObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
-                var parentObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
+                var childObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ChildObjectType);
+                var parentObjectType = ObjectTypes.GetUmbracoObjectType(relation.RelationType.ParentObjectType);
 
                 var child = _entityService.Get(relation.ChildId, childObjectType, loadBaseType);
                 var parent = _entityService.Get(relation.ParentId, parentObjectType, loadBaseType);

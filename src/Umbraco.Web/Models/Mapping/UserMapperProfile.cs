@@ -7,7 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web._Legacy.Actions;
@@ -16,6 +16,9 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class UserMapperProfile : Profile
     {
+        private static string GetContentTypeIcon(EntitySlim entity)
+            => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+
         public UserMapperProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
             IRuntimeCacheProvider runtimeCache,
             ActionCollection actions)
@@ -156,9 +159,9 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
-            CreateMap<UmbracoEntity, AssignedContentPermissions>()
-                .ForMember(x => x.Udi, opt => opt.MapFrom(x => Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(x.NodeObjectType), x.Key)))
-                .ForMember(basic => basic.Icon, opt => opt.MapFrom(entity => entity.ContentTypeIcon))
+            CreateMap<EntitySlim, AssignedContentPermissions>()
+                .ForMember(x => x.Udi, opt => opt.MapFrom(x => Udi.Create(ObjectTypes.GetUdiType(x.NodeObjectType), x.Key)))
+                .ForMember(basic => basic.Icon, opt => opt.MapFrom(entity => GetContentTypeIcon(entity)))
                 .ForMember(dto => dto.Trashed, opt => opt.Ignore())
                 .ForMember(x => x.Alias, opt => opt.Ignore())
                 .ForMember(x => x.AssignedPermissions, opt => opt.Ignore())
@@ -198,7 +201,7 @@ namespace Umbraco.Web.Models.Mapping
                         .ToDictionary(x => x.EntityId, x => x);
 
                     var contentEntities = allContentPermissions.Keys.Count == 0
-                        ? new IUmbracoEntity[0]
+                        ? Array.Empty<IEntitySlim>()
                         : entityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
 
                     var allAssignedPermissions = new List<AssignedContentPermissions>();

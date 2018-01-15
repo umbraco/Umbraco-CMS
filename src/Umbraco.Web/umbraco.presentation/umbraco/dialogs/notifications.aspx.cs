@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;

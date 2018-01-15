@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<DataType, NodeDto>(src => src.Trashed, dto => dto.Trashed);
             CacheMap<DataType, NodeDto>(src => src.Key, dto => dto.UniqueId);
             CacheMap<DataType, NodeDto>(src => src.CreatorId, dto => dto.UserId);
-            CacheMap<DataType, DataTypeDto>(src => src.EditorAlias, dto => dto.PropertyEditorAlias);
+            CacheMap<DataType, DataTypeDto>(src => src.EditorAlias, dto => dto.EditorAlias);
             CacheMap<DataType, DataTypeDto>(src => src.DatabaseType, dto => dto.DbType);
 
         }

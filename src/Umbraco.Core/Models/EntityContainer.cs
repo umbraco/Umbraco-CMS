@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents a folder for organizing entities such as content types and data types.
     /// </summary>
-    public sealed class EntityContainer : UmbracoEntity
+    public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     {
         private readonly Guid _containedObjectType;
+        private IDictionary<string, object> _additionalData;
 
         private static readonly Dictionary<Guid, Guid> ObjectTypeMap = new Dictionary<Guid, Guid>
         {
@@ -24,7 +28,7 @@ namespace Umbraco.Core.Models
         public EntityContainer(Guid containedObjectType)
         {
             if (ObjectTypeMap.ContainsKey(containedObjectType) == false)
-                throw new ArgumentException("Not a contained object type.", "containedObjectType");
+                throw new ArgumentException("Not a contained object type.", nameof(containedObjectType));
             _containedObjectType = containedObjectType;
 
             ParentId = -1;
@@ -52,18 +56,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the node object type of the contained objects.
         /// </summary>
-        public Guid ContainedObjectType
-        {
-            get { return _containedObjectType; }
-        }
+        public Guid ContainedObjectType => _containedObjectType;
 
         /// <summary>
         /// Gets the node object type of the container objects.
         /// </summary>
-        public Guid ContainerObjectType
-        {
-            get { return ObjectTypeMap[_containedObjectType]; }
-        }
+        public Guid ContainerObjectType => ObjectTypeMap[_containedObjectType];
 
         /// <summary>
         /// Gets the container object type corresponding to a contained object type.
@@ -73,7 +71,7 @@ namespace Umbraco.Core.Models
         public static Guid GetContainerObjectType(Guid containedObjectType)
         {
             if (ObjectTypeMap.ContainsKey(containedObjectType) == false)
-                throw new ArgumentException("Not a contained object type.", "containedObjectType");
+                throw new ArgumentException("Not a contained object type.", nameof(containedObjectType));
             return ObjectTypeMap[containedObjectType];
         }
 
@@ -86,8 +84,19 @@ namespace Umbraco.Core.Models
         {
             var contained = ObjectTypeMap.FirstOrDefault(x => x.Value == containerObjectType).Key;
             if (contained == null)
-                throw new ArgumentException("Not a container object type.", "containerObjectType");
+                throw new ArgumentException("Not a container object type.", nameof(containerObjectType));
             return contained;
         }
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DataMember]
+        [DoNotClone]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [IgnoreDataMember]
+        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
     }
 }

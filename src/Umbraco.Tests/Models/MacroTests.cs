@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models

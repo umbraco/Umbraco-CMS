@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,11 +10,10 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using System.Globalization;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
@@ -71,7 +69,7 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        protected abstract TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings);
+        protected abstract TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings);
 
         /// <summary>
         /// Returns a <see cref="TreeNode"/> for the <see cref="IUmbracoEntity"/> and
@@ -81,10 +79,9 @@ namespace Umbraco.Web.Trees
         /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        internal TreeNode GetSingleTreeNodeWithAccessCheck(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        internal TreeNode GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormDataCollection queryStrings)
         {
-            bool hasPathAccess;
-            var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out hasPathAccess);
+            var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out var hasPathAccess);
             if (entityIsAncestorOfStartNodes == false)
                 return null;
 
@@ -188,7 +185,7 @@ namespace Umbraco.Web.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected IEnumerable<IUmbracoEntity> GetChildEntities(string id)
+        protected IEnumerable<IEntitySlim> GetChildEntities(string id)
         {
             // use helper method to ensure we support both integer and guid lookups
 
@@ -207,7 +204,7 @@ namespace Umbraco.Web.Trees
             {
                 return UserStartNodes.Length > 0
                     ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
-                    : Enumerable.Empty<IUmbracoEntity>();
+                    : Enumerable.Empty<IEntitySlim>();
             }
 
             return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
@@ -297,7 +294,7 @@ namespace Umbraco.Web.Trees
             //before we get the children we need to see if this is a container node
 
             //test if the parent is a listview / container
-            if (current != null && current.IsContainer())
+            if (current != null && current.IsContainer)
             {
                 //no children!
                 return new TreeNodeCollection();
@@ -411,34 +408,34 @@ namespace Umbraco.Web.Trees
         /// <remarks>
         /// This object has it's own contextual cache for these lookups
         /// </remarks>
-        internal IUmbracoEntity GetEntityFromId(string id)
+        internal IEntitySlim GetEntityFromId(string id)
         {
             return _entityCache.GetOrAdd(id, s =>
             {
-                IUmbracoEntity entity;
+                IEntitySlim entity;
 
-                if (Guid.TryParse(s, out Guid idGuid))
+                if (Guid.TryParse(s, out var idGuid))
                 {
-                    entity = Services.EntityService.GetByKey(idGuid, UmbracoObjectType);
+                    entity = Services.EntityService.Get(idGuid, UmbracoObjectType);
                 }
-                else if (int.TryParse(s, out int idInt))
+                else if (int.TryParse(s, out var idInt))
                 {
                     entity = Services.EntityService.Get(idInt, UmbracoObjectType);
                 }
-                else if (Udi.TryParse(s, out Udi idUdi))
+                else if (Udi.TryParse(s, out var idUdi))
                 {
                     var guidUdi = idUdi as GuidUdi;
-                    entity = guidUdi != null ? Services.EntityService.GetByKey(guidUdi.Guid, UmbracoObjectType) : null;
+                    entity = guidUdi != null ? Services.EntityService.Get(guidUdi.Guid, UmbracoObjectType) : null;
                 }
                 else
                 {
-                    return null;
+                    entity = null;
                 }
 
                 return entity;
             });
         }
 
-        private readonly ConcurrentDictionary<string, IUmbracoEntity> _entityCache = new ConcurrentDictionary<string, IUmbracoEntity>();
+        private readonly ConcurrentDictionary<string, IEntitySlim> _entityCache = new ConcurrentDictionary<string, IEntitySlim>();
     }
 }

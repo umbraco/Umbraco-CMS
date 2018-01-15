@@ -217,15 +217,16 @@ namespace Umbraco.Core.PropertyEditors
         }
     }
 
-    public class PropertyEditor<TConfiguration> : PropertyEditor
-    {
-        public PropertyEditor(ILogger logger)
-            : base(logger)
-        { }
+    // fixme clear that one! breaking everything!
+    //public class PropertyEditor<TConfiguration> : PropertyEditor
+    //{
+    //    public PropertyEditor(ILogger logger)
+    //        : base(logger)
+    //    { }
 
-        public virtual TConfiguration MapConfiguration(string configuration)
-        {
-            return JsonConvert.DeserializeObject<TConfiguration>(configuration);
-        }
-    }
+    //    public virtual TConfiguration MapConfiguration(string configuration)
+    //    {
+    //        return JsonConvert.DeserializeObject<TConfiguration>(configuration);
+    //    }
+    //}
 }

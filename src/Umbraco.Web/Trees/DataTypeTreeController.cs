@@ -35,7 +35,7 @@ namespace Umbraco.Web.Trees
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
-                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren());
+                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren);
                        node.Path = dt.Path;
                        node.NodeType = "container";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Trees
                     Icon = "icon icon-edit"
                 });
 
-                if (container.HasChildren() == false)
+                if (container.HasChildren == false)
                 {
                     //can delete data type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
@@ -129,7 +129,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DataType, pageIndex, pageSize, out totalFound, filter: query);
             return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }

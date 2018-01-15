@@ -12,6 +12,8 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
@@ -73,6 +75,9 @@ namespace Umbraco.Tests.Scoping
             runtimeStateMock.Setup(x => x.Level).Returns(() => RuntimeLevel.Run);
 
             var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+            var documentRepository = Mock.Of<IDocumentRepository>();
+            var mediaRepository = Mock.Of<IMediaRepository>();
+            var memberRepository = Mock.Of<IMemberRepository>();
 
             return new PublishedSnapshotService(
                 options,
@@ -83,7 +88,7 @@ namespace Umbraco.Tests.Scoping
                 publishedSnapshotAccessor,
                 Logger,
                 ScopeProvider,
-                null, null, null);
+                documentRepository, mediaRepository, memberRepository);
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

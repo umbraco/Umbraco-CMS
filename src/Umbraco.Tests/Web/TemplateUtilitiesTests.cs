@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Web
             // fixme - now UrlProvider depends on EntityService for GetUrl(guid) - this is bad
             // should not depend on more than IdkMap maybe - fix this!
             var entityService = new Mock<IEntityService>();
-            entityService.Setup(x => x.GetIdForKey(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
+            entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>())).Returns(Attempt<int>.Fail());
             var serviceContext = new ServiceContext(entityService: entityService.Object);
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Web
 
             //setup a mock entity service from the service context to return an integer for a GUID
             var entityService = Mock.Get(serviceCtxMock.EntityService);
-            entityService.Setup(x => x.GetIdForKey(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>()))
+            entityService.Setup(x => x.GetId(It.IsAny<Guid>(), It.IsAny<UmbracoObjectTypes>()))
                 .Returns((Guid id, UmbracoObjectTypes objType) =>
                 {
                     return Attempt.Succeed(1234);

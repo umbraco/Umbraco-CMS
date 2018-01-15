@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}")]
-    public class PropertyGroup : EntityBase.EntityBase, IEquatable<PropertyGroup>
+    public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Permissions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Events
 {

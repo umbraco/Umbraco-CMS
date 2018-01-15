@@ -1,8 +1,8 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public sealed class AuditItem : EntityBase.EntityBase
+    public sealed class AuditItem : EntityBase
     {
         public AuditItem(int objectId, string comment, AuditType type, int userId)
         {

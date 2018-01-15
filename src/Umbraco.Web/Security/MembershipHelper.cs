@@ -369,7 +369,7 @@ namespace Umbraco.Web.Security
             {
                 case UmbracoObjectTypes.Member:
                     // fixme - need to implement Get(guid)!
-                    var memberAttempt = entityService.GetIdForKey(guidUdi.Guid, umbracoType);
+                    var memberAttempt = entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
                         return GetById(memberAttempt.Result);
                     break;

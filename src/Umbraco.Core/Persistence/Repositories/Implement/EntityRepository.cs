@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -14,10 +14,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     // fixme - use sql templates everywhere!
 
     /// <summary>
-    /// Represents the EntityRepository used to query <see cref="IUmbracoEntity"/> objects.
+    /// Represents the EntityRepository used to query entity objects.
     /// </summary>
     /// <remarks>
-    /// This is limited to objects that are based in the umbracoNode-table.
+    /// <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
+    /// <para>Returns <see cref="IEntitySlim"/> objects, i.e. lightweight representation of entities.</para>
     /// </remarks>
     internal class EntityRepository : IEntityRepository
     {
@@ -33,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Repository
 
         // get a page of entities
-        public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
+        public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null)
         {
             var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
@@ -134,14 +135,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return entities;
         }
 
-        public IUmbracoEntity GetByKey(Guid key)
+        public IEntitySlim Get(Guid key)
         {
             var sql = GetBaseWhere(false, false, false, key);
             var dto = Database.FirstOrDefault<BaseDto>(sql);
             return dto == null ? null : BuildEntity(false, false, dto);
         }
 
-        public IUmbracoEntity GetByKey(Guid key, Guid objectTypeId)
+        public IEntitySlim Get(Guid key, Guid objectTypeId)
         {
             var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
@@ -158,14 +159,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return entity;
         }
 
-        public virtual IUmbracoEntity Get(int id)
+        public virtual IEntitySlim Get(int id)
         {
             var sql = GetBaseWhere(false, false, false, id);
             var dto = Database.FirstOrDefault<BaseDto>(sql);
             return dto == null ? null : BuildEntity(false, false, dto);
         }
 
-        public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
+        public virtual IEntitySlim Get(int id, Guid objectTypeId)
         {
             var isContent = objectTypeId == Constants.ObjectTypes.Document || objectTypeId == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
@@ -182,28 +183,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return entity;
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectType, params int[] ids)
+        public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
         {
             return ids.Length > 0
                 ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
                 : PerformGetAll(objectType);
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectType, params Guid[] keys)
+        public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
         {
             return keys.Length > 0
                 ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
                 : PerformGetAll(objectType);
         }
 
-        private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectType, Action<Sql<ISqlContext>> filter = null)
+        private IEnumerable<IEntitySlim> PerformGetAll(Guid objectType, Action<Sql<ISqlContext>> filter = null)
         {
             var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectType == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectType, filter);
             var dtos = Database.Fetch<BaseDto>(sql);
-            if (dtos.Count == 0) return Enumerable.Empty<IUmbracoEntity>();
+            if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
             var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
@@ -234,7 +235,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.Fetch<TreeEntityPath>(sql);
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
+        public virtual IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query)
         {
             var sqlClause = GetBase(false, false, null);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
@@ -244,7 +245,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return dtos.Select(x => BuildEntity(false, false, x)).ToList();
         }
 
-        public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
+        public virtual IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
         {
             var isContent = objectType == Constants.ObjectTypes.Document || objectType == Constants.ObjectTypes.DocumentBlueprint;
             var isMedia = objectType == Constants.ObjectTypes.Media;
@@ -254,7 +255,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql = translator.Translate();
             sql = AddGroupBy(isContent, isMedia, sql);
             var dtos = Database.Fetch<BaseDto>(sql);
-            if (dtos.Count == 0) return Enumerable.Empty<IUmbracoEntity>();
+            if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
             var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
@@ -267,13 +268,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public UmbracoObjectTypes GetObjectType(int id)
         {
             var sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
-            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+            return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
         }
 
         public UmbracoObjectTypes GetObjectType(Guid key)
         {
             var sql = Sql().Select<NodeDto>(x => x.NodeObjectType).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
-            return UmbracoObjectTypesExtensions.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
+            return ObjectTypes.GetUmbracoObjectType(Database.ExecuteScalar<Guid>(sql));
         }
 
         public bool Exists(Guid key)
@@ -288,14 +289,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
-        private void BuildProperties(UmbracoEntity entity, BaseDto dto)
+        private void BuildProperties(EntitySlim entity, BaseDto dto)
         {
             var pdtos = Database.Fetch<PropertyDataDto>(GetPropertyData(dto.VersionId));
             foreach (var pdto in pdtos)
                 BuildProperty(entity, pdto);
         }
 
-        private void BuildProperties(UmbracoEntity[] entities, List<BaseDto> dtos)
+        private void BuildProperties(EntitySlim[] entities, List<BaseDto> dtos)
         {
             var versionIds = dtos.Select(x => x.VersionId).Distinct().ToArray();
             var pdtos = Database.FetchByGroups<PropertyDataDto, int>(versionIds, 2000, GetPropertyData);
@@ -310,18 +311,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        private void BuildProperty(UmbracoEntity entity, PropertyDataDto pdto)
+        private void BuildProperty(EntitySlim entity, PropertyDataDto pdto)
         {
             // explain ?!
             var value = string.IsNullOrWhiteSpace(pdto.TextValue)
                 ? pdto.VarcharValue
                 : pdto.TextValue.ConvertToJsonIfPossible();
 
-            entity.AdditionalData[pdto.PropertyTypeDto.Alias] = new UmbracoEntity.EntityProperty
-            {
-                PropertyEditorAlias = pdto.PropertyTypeDto.DataTypeDto.PropertyEditorAlias,
-                Value = value
-            };
+            entity.AdditionalData[pdto.PropertyTypeDto.Alias] = new EntitySlim.PropertySlim(pdto.PropertyTypeDto.DataTypeDto.EditorAlias, value);
         }
 
         #endregion
@@ -761,29 +758,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Factory
 
-        private static UmbracoEntity BuildEntity(bool isContent, bool isMedia, BaseDto dto)
+        private static EntitySlim BuildEntity(bool isContent, bool isMedia, BaseDto dto)
         {
             if (isContent)
                 return BuildDocumentEntity(dto);
             if (isMedia)
                 return BuildContentEntity(dto);
 
-            var entity = new UmbracoEntity();
-
-            try
-            {
-                entity.DisableChangeTracking();
-                BuildEntity(entity, dto);
-            }
-            finally
-            {
-                entity.EnableChangeTracking();
-            }
-
+            // EntitySlim does not track changes
+            var entity = new EntitySlim();
+            BuildEntity(entity, dto);
             return entity;
         }
 
-        private static void BuildEntity(UmbracoEntity entity, BaseDto dto)
+        private static void BuildEntity(EntitySlim entity, BaseDto dto)
         {
             entity.Trashed = dto.Trashed;
             entity.CreateDate = dto.CreateDate;
@@ -797,56 +785,37 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Path = dto.Path;
             entity.SortOrder = dto.SortOrder;
             entity.HasChildren = dto.Children > 0;
+            entity.IsContainer = dto.IsContainer;
         }
 
-        private static void BuildContentEntity(UmbracoContentEntity entity, BaseDto dto)
+        private static void BuildContentEntity(ContentEntitySlim entity, BaseDto dto)
         {
             BuildEntity(entity, dto);
             entity.ContentTypeAlias = dto.Alias;
-
-            // fixme more here...
             entity.ContentTypeIcon = dto.Icon;
             entity.ContentTypeThumbnail = dto.Thumbnail;
         }
 
-        private static void BuildDocumentEntity(UmbracoDocumentEntity entity, BaseDto dto)
+        private static void BuildDocumentEntity(DocumentEntitySlim entity, BaseDto dto)
         {
             BuildContentEntity(entity, dto);
             entity.Published = dto.Published;
             entity.Edited = dto.Edited;
         }
 
-        private static UmbracoEntity BuildContentEntity(BaseDto dto)
+        private static EntitySlim BuildContentEntity(BaseDto dto)
         {
-            var entity = new UmbracoContentEntity();            
-
-            try
-            {
-                entity.DisableChangeTracking();
-                BuildContentEntity(entity, dto);
-            }
-            finally
-            {
-                entity.EnableChangeTracking();
-            }
-
+            // EntitySlim does not track changes
+            var entity = new ContentEntitySlim();
+            BuildContentEntity(entity, dto);
             return entity;
         }
 
-        private static UmbracoEntity BuildDocumentEntity(BaseDto dto)
+        private static EntitySlim BuildDocumentEntity(BaseDto dto)
         {
-            var entity = new UmbracoDocumentEntity();
-
-            try
-            {
-                entity.DisableChangeTracking();
-                BuildDocumentEntity(entity, dto);
-            }
-            finally
-            {
-                entity.EnableChangeTracking();
-            }
-
+            // EntitySlim does not track changes
+            var entity = new DocumentEntitySlim();
+            BuildDocumentEntity(entity, dto);
             return entity;
         }
 

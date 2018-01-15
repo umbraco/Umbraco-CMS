@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
-    public class PropertyType : EntityBase.EntityBase, IEquatable<PropertyType>
+    public class PropertyType : EntityBase, IEquatable<PropertyType>
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 

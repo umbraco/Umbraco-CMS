@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryTranslation : EntityBase.EntityBase, IDictionaryTranslation
+    public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
         internal Func<int, ILanguage> GetLanguage { get; set; }
 

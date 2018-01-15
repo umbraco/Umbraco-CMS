@@ -10,11 +10,11 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
 using System.Net.Http;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using System.Web.Http.Controllers;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
@@ -563,7 +563,7 @@ namespace Umbraco.Web.Editors
                     }
 
                     entities = aids == null || aids.Contains(Constants.System.Root)
-                        ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
+                        ? Services.EntityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
                         : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
                 }
                 else
@@ -772,7 +772,7 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var found = Services.EntityService.GetByKey(key, objectType.Value);
+                var found = Services.EntityService.Get(key, objectType.Value);
                 if (found == null)
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);

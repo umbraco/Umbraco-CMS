@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Core.Components;
 using Umbraco.Web._Legacy.Actions;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.Strategies

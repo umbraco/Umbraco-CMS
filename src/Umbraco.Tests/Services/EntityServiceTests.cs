@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -153,7 +154,7 @@ namespace Umbraco.Tests.Services
 
             long total;
             //search at root to see if it returns recycled
-            var entities = service.GetPagedDescendantsFromRoot(UmbracoObjectTypes.Document, 0, 1000, out total, includeTrashed: false)
+            var entities = service.GetPagedDescendants(UmbracoObjectTypes.Document, 0, 1000, out total, includeTrashed: false)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -333,7 +334,7 @@ namespace Umbraco.Tests.Services
 
             long total;
             //search at root to see if it returns recycled
-            var entities = service.GetPagedDescendantsFromRoot(UmbracoObjectTypes.Media, 0, 1000, out total, includeTrashed: false)
+            var entities = service.GetPagedDescendants(UmbracoObjectTypes.Media, 0, 1000, out total, includeTrashed: false)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -443,7 +444,7 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-            var entities = service.GetDescendents(folderId);
+            var entities = service.GetDescendants(folderId);
 
             Assert.That(entities.Any(), Is.True);
             Assert.That(entities.Count(), Is.EqualTo(4));
@@ -457,8 +458,8 @@ namespace Umbraco.Tests.Services
             var objectTypeId = Constants.ObjectTypes.ContentItem;
 
             Assert.Throws<NotSupportedException>(() => service.GetAll<IContentBase>());
-            Assert.Throws<NullReferenceException>(() => service.GetAll(UmbracoObjectTypes.ContentItem));
-            Assert.Throws<NullReferenceException>(() => service.GetAll(objectTypeId));
+            Assert.Throws<NotSupportedException>(() => service.GetAll(UmbracoObjectTypes.ContentItem));
+            Assert.Throws<NotSupportedException>(() => service.GetAll(objectTypeId));
         }
 
         [Test]
@@ -510,12 +511,12 @@ namespace Umbraco.Tests.Services
                 Console.WriteLine();
                 foreach (var data in entity.AdditionalData)
                 {
-                    Console.WriteLine($"{entity.Id} {data.Key} {data.Value} {(data.Value is UmbracoEntity.EntityProperty p ? p.PropertyEditorAlias : "")}");
+                    Console.WriteLine($"{entity.Id} {data.Key} {data.Value} {(data.Value is EntitySlim.PropertySlim p ? p.PropertyEditorAlias : "")}");
                 }
             }
 
             Assert.That(entities.Any(x =>
-                x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty && ((UmbracoEntity.EntityProperty) y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
+                x.AdditionalData.Any(y => y.Value is EntitySlim.PropertySlim && ((EntitySlim.PropertySlim) y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
         [Test]
@@ -532,7 +533,7 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Key_For_Id()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetKeyForId(1061, UmbracoObjectTypes.DocumentType);
+            var result = service.GetKey(1061, UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -542,8 +543,8 @@ namespace Umbraco.Tests.Services
         public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
         {
             var service = ServiceContext.EntityService;
-            var result1 = service.GetKeyForId(1061, UmbracoObjectTypes.DocumentType);
-            var result2 = service.GetKeyForId(1061, UmbracoObjectTypes.MediaType);
+            var result1 = service.GetKey(1061, UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetKey(1061, UmbracoObjectTypes.MediaType);
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);
@@ -553,7 +554,7 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Id_For_Key()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+            var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(1061, result.Result);
@@ -563,8 +564,8 @@ namespace Umbraco.Tests.Services
         public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
         {
             var service = ServiceContext.EntityService;
-            var result1 = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
-            var result2 = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
+            var result1 = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);

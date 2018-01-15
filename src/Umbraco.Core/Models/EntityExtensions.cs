@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -14,10 +14,9 @@ namespace Umbraco.Core.Models
         /// This is useful when handling events to determine if an entity is a brand new entity or was
         /// already existing.
         /// </remarks>
-        public static bool IsNewEntity(this IEntity entity)
+        public static bool IsNewEntity(this IRememberBeingDirty entity)
         {
-            var dirty = (IRememberBeingDirty) entity;
-            return dirty.WasPropertyDirty("Id");
+            return entity.WasPropertyDirty("Id");
         }
     }
 }

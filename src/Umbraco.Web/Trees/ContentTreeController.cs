@@ -6,7 +6,7 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.Trees;
@@ -44,47 +44,40 @@ namespace Umbraco.Web.Trees
         protected override int[] UserStartNodes
             => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService));
 
-        /// <summary>
-        /// Creates a tree node for a content item based on an UmbracoEntity
-        /// </summary>
-        /// <param name="e"></param>
-        /// <param name="parentId"></param>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        /// <inheritdoc />
+        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            var entity = (UmbracoEntity)e;
-
-            var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
-            if (CanUserAccessNode(e, allowedUserOptions))
+            var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
+            if (CanUserAccessNode(entity, allowedUserOptions))
             {
 
                 //Special check to see if it ia a container, if so then we'll hide children.
-                var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
+                var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.Document,
                     parentId,
                     queryStrings,
-                    entity.HasChildren && isContainer == false);
+                    entity.HasChildren && !isContainer);
 
-                node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
-
+                // entity is either a container, or a document
                 if (isContainer)
                 {
                     node.AdditionalData.Add("isContainer", true);
                     node.SetContainerStyle();
                 }
+                else
+                {
+                    var documentEntity = (IDocumentEntitySlim) entity;
+                    if (!documentEntity.Published)
+                        node.SetNotPublishedStyle();
+                    if (documentEntity.Edited)
+                        node.SetHasUnpublishedVersionStyle();
+                    node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
+                }
 
-
-                if (entity.Published == false)
-                    node.SetNotPublishedStyle();
-
-                if (entity.Edited)
-                    node.SetHasUnpublishedVersionStyle();
-
-                if (Services.PublicAccessService.IsProtected(e.Path))
+                if (Services.PublicAccessService.IsProtected(entity.Path))
                     node.SetProtectedStyle();
 
                 return node;

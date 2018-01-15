@@ -8,7 +8,6 @@ using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 

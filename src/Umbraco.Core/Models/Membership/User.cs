@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class User : EntityBase.EntityBase, IUser, IProfile
+    public class User : EntityBase, IUser, IProfile
     {
         /// <summary>
         /// Constructor for creating a new/empty user

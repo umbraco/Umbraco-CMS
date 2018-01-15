@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;

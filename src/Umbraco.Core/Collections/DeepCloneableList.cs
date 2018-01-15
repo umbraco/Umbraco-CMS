@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Collections
 {

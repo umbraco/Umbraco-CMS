@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache

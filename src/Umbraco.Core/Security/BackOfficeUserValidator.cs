@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security

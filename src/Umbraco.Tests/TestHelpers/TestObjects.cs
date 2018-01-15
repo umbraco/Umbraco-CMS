@@ -172,8 +172,6 @@ namespace Umbraco.Tests.TestHelpers
                 scopeProvider, logger, eventMessagesFactory,
                     contentService.Value, contentTypeService.Value, mediaService.Value, mediaTypeService.Value, dataTypeService.Value, memberService.Value, memberTypeService.Value,
                     idkMap,
-                    //TODO: Consider making this an isolated cache instead of using the global one
-                    cache.RuntimeCache,
                     GetRepo<IEntityRepository>(c)));
 
             var macroService = GetLazyService<IMacroService>(container, c => new MacroService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMacroRepository>(c), GetRepo<IAuditRepository>(c)));

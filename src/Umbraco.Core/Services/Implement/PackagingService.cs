@@ -14,7 +14,7 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Packaging.Models;
@@ -579,7 +579,7 @@ namespace Umbraco.Core.Services.Implement
                     ? _importedContentTypes[masterAlias]
                     : _contentTypeService.Get(masterAlias);
 
-                contentType.SetLazyParentId(new Lazy<int>(() => parent.Id));
+                contentType.SetParent(parent);
             }
 
             //Update Compositions on the ContentType to ensure that they are as is defined in the package xml

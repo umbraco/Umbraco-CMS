@@ -6,10 +6,10 @@ using System.Web.Http.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
@@ -229,10 +229,11 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(UmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
+        public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
         {
-            var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, entity.ContentTypeIcon);
-            treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
+            var contentTypeIcon = entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+            var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, contentTypeIcon);
+            treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
         }
@@ -250,7 +251,7 @@ namespace Umbraco.Web.Trees
         public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, string icon, bool hasChildren)
         {
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
-            treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
+            treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
         }

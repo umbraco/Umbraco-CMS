@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence.Factories
                     foreach (var typeDto in typeDtos)
                     {
                         var tempGroupDto = groupDto;
-                        var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.PropertyEditorAlias,
+                        var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.EditorAlias,
                             typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
                             typeDto.Alias);
 

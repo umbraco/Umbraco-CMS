@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Macro : EntityBase.EntityBase, IMacro
+    public class Macro : EntityBase, IMacro
     {
         public Macro()
         {

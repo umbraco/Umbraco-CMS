@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -17,23 +17,17 @@ namespace Umbraco.Core.Models
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
-    public abstract class ContentTypeBase : EntityBase.EntityBase, IContentTypeBase
+    public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
-        private Lazy<int> _parentId;
-        private string _name;
-        private int _level;
-        private string _path;
+        private IDictionary<string, object> _additionalData;
         private string _alias;
         private string _description;
-        private int _sortOrder;
         private string _icon = "icon-folder";
         private string _thumbnail = "folder.png";
-        private int _creatorId;
         private bool _allowedAsRoot; // note: only one that's not 'pure element type'
         private bool _isContainer;
-        private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _propertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
@@ -43,11 +37,10 @@ namespace Umbraco.Core.Models
         protected ContentTypeBase(int parentId)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
+            ParentId = parentId;
 
-            _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
-            _additionalData = new Dictionary<string, object>();
 
             // actually OK as IsPublishing is constant
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -64,12 +57,11 @@ namespace Umbraco.Core.Models
         protected ContentTypeBase(IContentTypeBase parent, string alias)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
+            SetParent(parent);
 
             _alias = alias;
-            _parentId = new Lazy<int>(() => parent.Id);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
-            _additionalData = new Dictionary<string, object>();
 
             // actually OK as IsPublishing is constant
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -78,6 +70,17 @@ namespace Umbraco.Core.Models
 
             _variations = ContentVariation.InvariantNeutral;
         }
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DataMember]
+        [DoNotClone]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData ?? (_additionalData = new Dictionary<string, object>());
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [IgnoreDataMember]
+        bool IUmbracoEntity.HasAdditionalData => _additionalData != null;
 
         /// <summary>
         /// Gets a value indicating whether the content type is publishing.
@@ -95,19 +98,12 @@ namespace Umbraco.Core.Models
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
-            public readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.SortOrder);
-            public readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.Level);
-            public readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Path);
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Alias);
             public readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Description);
             public readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
             public readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
-            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.CreatorId);
             public readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
             public readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
-            public readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
             public readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
             public readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
             public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
@@ -129,59 +125,6 @@ namespace Umbraco.Core.Models
         protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(Ps.Value.PropertyTypeCollectionSelector);
-        }
-
-        /// <summary>
-        /// Gets or sets the Id of the Parent entity
-        /// </summary>
-        /// <remarks>Might not be necessary if handled as a relation?</remarks>
-        [DataMember]
-        public virtual int ParentId
-        {
-            get
-            {
-                var val = _parentId.Value;
-                if (val == 0)
-                {
-                    throw new InvalidOperationException("The ParentId cannot be a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
-                }
-                return val;
-            }
-            set
-            {
-                _parentId = new Lazy<int>(() => value);
-                OnPropertyChanged(Ps.Value.ParentIdSelector);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name of the current entity
-        /// </summary>
-        [DataMember]
-        public virtual string Name
-        {
-            get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
-        }
-
-        /// <summary>
-        /// Gets or sets the level of the content entity
-        /// </summary>
-        [DataMember]
-        public virtual int Level //NOTE Is this relevant for a ContentType?
-        {
-            get => _level;
-            set => SetPropertyValueAndDetectChanges(value, ref _level, Ps.Value.LevelSelector);
-        }
-
-        /// <summary>
-        /// Gets of sets the path
-        /// </summary>
-        [DataMember]
-        public virtual string Path //NOTE Is this relevant for a ContentType?
-        {
-            get => _path;
-            set => SetPropertyValueAndDetectChanges(value, ref _path, Ps.Value.PathSelector);
         }
 
         /// <summary>
@@ -208,16 +151,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the sort order of the content entity
-        /// </summary>
-        [DataMember]
-        public virtual int SortOrder
-        {
-            get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
-        }
-
-        /// <summary>
         /// Name of the icon (sprite class) used to identify the ContentType
         /// </summary>
         [DataMember]
@@ -235,16 +168,6 @@ namespace Umbraco.Core.Models
         {
             get => _thumbnail;
             set => SetPropertyValueAndDetectChanges(value, ref _thumbnail, Ps.Value.ThumbnailSelector);
-        }
-
-        /// <summary>
-        /// Gets or sets the Id of the user who created this ContentType
-        /// </summary>
-        [DataMember]
-        public virtual int CreatorId
-        {
-            get => _creatorId;
-            set => SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector);
         }
 
         /// <summary>
@@ -269,24 +192,6 @@ namespace Umbraco.Core.Models
             get => _isContainer;
             set => SetPropertyValueAndDetectChanges(value, ref _isContainer, Ps.Value.IsContainerSelector);
         }
-
-        /// <summary>
-        /// Boolean indicating whether this ContentType is Trashed or not.
-        /// If ContentType is Trashed it will be located in the Recyclebin.
-        /// </summary>
-        [DataMember]
-        public virtual bool Trashed //NOTE Is this relevant for a ContentType?
-        {
-            get => _trashed;
-            set => SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector);
-        }
-
-        private readonly IDictionary<string, object> _additionalData;
-        /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IDictionary<string, object> IUmbracoEntity.AdditionalData => _additionalData;
 
         /// <summary>
         /// Gets or sets a list of integer Ids for allowed ContentTypes
@@ -491,15 +396,6 @@ namespace Umbraco.Core.Models
             // actually remove the group
             PropertyGroups.RemoveItem(propertyGroupName);
             OnPropertyChanged(Ps.Value.PropertyGroupCollectionSelector);
-        }
-
-        /// <summary>
-        /// Sets the ParentId from the lazy integer id
-        /// </summary>
-        /// <param name="id">Id of the Parent</param>
-        public void SetLazyParentId(Lazy<int> id)
-        {
-            _parentId = id;
         }
 
         /// <summary>

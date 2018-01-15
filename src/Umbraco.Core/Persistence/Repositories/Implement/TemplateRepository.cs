@@ -10,7 +10,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // later to populate the template item's properties
             var childIds = (ids.Any()
                 ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new UmbracoEntity
+                : dtos.Select(x => new EntitySlim
                 {
                     Id = x.NodeId,
                     ParentId = x.NodeDto.ParentId,
@@ -336,7 +336,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
             var childIds = Database.Fetch<dynamic>(childIdsSql)
-                .Select(x => new UmbracoEntity
+                .Select(x => new EntitySlim
                 {
                     Id = x.nodeId,
                     ParentId = x.parentID,

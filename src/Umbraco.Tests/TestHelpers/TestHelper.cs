@@ -11,7 +11,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers

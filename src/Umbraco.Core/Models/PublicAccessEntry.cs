@@ -5,13 +5,13 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    public class PublicAccessEntry : EntityBase.EntityBase
+    public class PublicAccessEntry : EntityBase
     {
         private readonly ObservableCollection<PublicAccessRule> _ruleCollection;
         private int _protectedNodeId;

@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Identity
 {
@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Identity
     /// Entity type for a user's login (i.e. facebook, google)
     ///
     /// </summary>
-    public class IdentityUserLogin : EntityBase.EntityBase, IIdentityUserLogin
+    public class IdentityUserLogin : EntityBase, IIdentityUserLogin
     {
         public IdentityUserLogin(string loginProvider, string providerKey, int userId)
         {

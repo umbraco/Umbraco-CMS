@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserGroup : EntityBase.EntityBase, IUserGroup, IReadOnlyUserGroup
+    internal class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         private int? _startContentId;
         private int? _startMediaId;

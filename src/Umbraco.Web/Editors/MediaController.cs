@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
            bool orderBySystemField = true,
            string filter = "")
         {
-            var entity = Services.EntityService.GetByKey(id);
+            var entity = Services.EntityService.Get(id);
             if (entity != null)
             {
                 return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
@@ -360,7 +360,7 @@ namespace Umbraco.Web.Editors
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
-                var entity = Services.EntityService.GetByKey(guidUdi.Guid);
+                var entity = Services.EntityService.Get(guidUdi.Guid);
                 if (entity != null)
                 {
                     return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
@@ -648,7 +648,7 @@ namespace Umbraco.Web.Editors
                 Guid idGuid;
                 if (Guid.TryParse(currentFolderId, out idGuid))
                 {
-                    var entity = Services.EntityService.GetByKey(idGuid);
+                    var entity = Services.EntityService.Get(idGuid);
                     if (entity != null)
                     {
                         entityFound = true;

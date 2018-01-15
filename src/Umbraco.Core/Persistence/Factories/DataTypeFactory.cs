@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDataType BuildEntity(DataTypeDto dto)
         {
-            var dataTypeDefinition = new DataType(dto.PropertyEditorAlias);
+            var dataTypeDefinition = new DataType(dto.EditorAlias);
 
 
             try
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dataTypeDto = new DataTypeDto
                                   {
-                                      PropertyEditorAlias = entity.EditorAlias,
+                                      EditorAlias = entity.EditorAlias,
                                       DataTypeId = entity.Id,
                                       DbType = entity.DatabaseType.ToString(),
                                       NodeDto = BuildNodeDto(entity)

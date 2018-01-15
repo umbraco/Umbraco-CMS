@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Collections;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache

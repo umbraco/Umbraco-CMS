@@ -11,7 +11,6 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Services;
-using Umbraco.Core.Models.EntityBase;
 using System;
 using System.ComponentModel;
 using System.Web.Http.Controllers;
@@ -233,7 +232,7 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
-            var entity = Current.Services.EntityService.GetByKey(contentId);
+            var entity = Current.Services.EntityService.Get(contentId);
             if (entity != null)
             {
                 return GetAllowedChildren(entity.Id);
@@ -252,7 +251,7 @@ namespace Umbraco.Web.Editors
             var guidUdi = contentId as GuidUdi;
             if (guidUdi != null)
             {
-                var entity = Current.Services.EntityService.GetByKey(guidUdi.Guid);
+                var entity = Current.Services.EntityService.Get(guidUdi.Guid);
                 if (entity != null)
                 {
                     return GetAllowedChildren(entity.Id);
