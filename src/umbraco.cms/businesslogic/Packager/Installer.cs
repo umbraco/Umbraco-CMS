@@ -831,7 +831,9 @@ namespace umbraco.cms.businesslogic.packager
             var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
             installationSummary.PackageInstalled = true;
 
-            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, false);
+            var metadata = insPack.GetMetaData();
+
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, metadata, false);
             PackagingService.OnImportedPackage(args);
         }
     }

@@ -1748,9 +1748,10 @@ namespace Umbraco.Core.Services
 
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
+            var metaData = GetPackageMetaData(packageFilePath);
+
             if (raiseEvents)
-            {
-                var metaData = GetPackageMetaData(packageFilePath);
+            {                
                 if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
                 {
                     var initEmpty = new InstallationSummary().InitEmpty();
@@ -1762,7 +1763,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
             {
-                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, false), this);
+                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, metaData, false), this);
             }
 
             return installationSummary;
