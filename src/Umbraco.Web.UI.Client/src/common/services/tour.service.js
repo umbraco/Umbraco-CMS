@@ -31,80 +31,6 @@
         }
 
         /**
-         * @ngdoc method
-         * @name umbraco.services.tourService#registerTour
-         * @methodOf umbraco.services.tourService
-         *
-         * @description
-         * Registers a tour in the service
-         * @param {Object} tour The tour you want to register in the service
-         * @param {String} tour.name The tour name
-         * @param {String} tour.alias The tour alias
-         * @param {Array} tour.steps Array of tour steps
-         * @param {String} tour.step.title Step title
-         * @param {DomElement} tour.step.content Step content (pass in any HTML markup)
-         * @param {DomElement} tour.step.element Highlight a DOM-element
-         * @param {Boolean} tour.step.elementPreventClick Adds invisible layer on top of highligted element to prevent all clicks and interaction with it
-         * @param {Number} tour.step.backdropOpacity Sets the backdrop opacity (default 0.4)
-         */
-        function registerTour(newTour) {
-            validateTour(newTour);
-            validateTourRegistration(newTour);
-            tours.push(newTour);
-            eventsService.emit("appState.tour.updatedTours", tours);
-        }
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.tourService#registerTours
-         * @methodOf umbraco.services.tourService
-         *
-         * @description
-         * Registers an array of tours in the service
-         * @param {Array} tours The tours to register in the service
-         */
-        function registerTours(newTours) {
-            angular.forEach(newTours, function(newTour){
-                validateTour(newTour);
-                validateTourRegistration(newTour);
-                tours.push(newTour);
-            });
-            eventsService.emit("appState.tour.updatedTours", tours);
-        }
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.tourService#unregisterTour
-         * @methodOf umbraco.services.tourService
-         *
-         * @description
-         * Unregisters a tour in the service
-         * @param {String} tourAlias The tour alias of the tour you want to unregister
-         */
-        function unregisterTour(tourAlias) {
-            tours = tours.filter(function( obj ) {
-                return obj.alias !== tourAlias;
-            });
-            eventsService.emit("appState.tour.updatedTours", tours);
-        }
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.tourService#unregisterTourGroup
-         * @methodOf umbraco.services.tourService
-         *
-         * @description
-         * Unregisters a tour in the service
-         * @param {String} tourGroupName The name of the tour group you want to unregister
-         */
-        function unregisterTourGroup(tourGroup) {
-            tours = tours.filter(function( obj ) {
-                return obj.group !== tourGroup;
-            });
-            eventsService.emit("appState.tour.updatedTours", tours);
-        }
-
-        /**
          * Method to return all of the tours as a new instance
          */
         function getTours() {
@@ -334,10 +260,6 @@
 
         var service = {
             registerAllTours: registerAllTours,
-            registerTour: registerTour,
-            registerTours: registerTours,
-            unregisterTour: unregisterTour,
-            unregisterTourGroup: unregisterTourGroup,
             startTour: startTour,
             endTour: endTour,
             disableTour: disableTour,
