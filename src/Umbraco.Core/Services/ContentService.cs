@@ -912,7 +912,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(Constants.System.RecycleBinContent.ToInvariantString()));
+                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
                 return repository.GetByQuery(query);
             }
         }

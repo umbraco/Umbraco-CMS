@@ -389,7 +389,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.Level == level && x.Path.StartsWith(Constants.System.RecycleBinMedia.ToString()) == false);
+                var query = Query<IMedia>.Builder.Where(x => x.Level == level && x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix) == false);
                 return repository.GetByQuery(query);
             }
         }
@@ -440,7 +440,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetAncestors(IMedia media)
         {
-            var ids = media.Path.Split(',').Where(x => x != Constants.System.Root.ToString() && x != media.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
+            var ids = media.Path.Split(',').Where(x => x != Constants.System.RootString && x != media.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
                 return new List<IMedia>();
 
@@ -717,7 +717,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMedia.ToString()));
+                var query = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
                 return repository.GetByQuery(query);
             }
         }
@@ -868,7 +868,7 @@ namespace Umbraco.Core.Services
 
             var repository = RepositoryFactory.CreateMediaRepository(uow);
             repository.Delete(media);
-            deleteEventArgs.CanCancel = false;            
+            deleteEventArgs.CanCancel = false;
             uow.Events.Dispatch(Deleted, this, deleteEventArgs);
 
             Audit(uow, AuditType.Delete, "Delete Media performed by user", userId, media.Id);
