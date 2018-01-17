@@ -117,7 +117,7 @@
             {
                 "element": "[data-element='editor-name-field']",
                 "title": "Enter a name",
-                "content": "<p>Your Document Type needs a name. Enter <code>My Home Page</code> in the field and click <b>Next</b>.",
+                "content": "<p>Your Document Type needs a name. Enter <code>Home Page</code> in the field and click <b>Next</b>.",
                 "view": "doctypename"
             },
             {
@@ -368,7 +368,8 @@
             {
                 "element": "[data-element='editor-media'] [data-element='editor-name-field']",
                 "title": "Enter a name",
-                "content": "<p>Enter <code>My Images</code> in the field.</p>"
+                "content": "<p>Enter <code>My Images</code> in the field.</p>",
+                "view": "foldername"
             },
             {
                 "element": "[data-element='editor-media'] [data-element='button-save']",
@@ -391,6 +392,7 @@
             },
             {
                 "element": "[data-element='editor-media'] [data-element='property-umbracoFile']",
+                "elementPreventClick": true,
                 "title": "The uploaded image",
                 "content": "<p>Here you can see the image you have uploaded.</p>"
             },
@@ -417,6 +419,7 @@
             },
             {
                 "element": "[data-element='editor-container']",
+                "elementPreventClick": true,
                 "title": "Using media items",
                 "content": "You can reference a media item directly in a template by using the path or try adding a Media Picker to a document type property so you can select media items from the content section."
             }
