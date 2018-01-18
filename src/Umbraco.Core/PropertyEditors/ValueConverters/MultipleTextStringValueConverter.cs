@@ -53,7 +53,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Fall back on normal behaviour
             if (values.Any() == false)
             {
-                return sourceString.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                return sourceString.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             }
 
             return values.ToArray();
