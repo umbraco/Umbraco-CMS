@@ -85,6 +85,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
+            if (source == null)
+                return null;
+
             if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
             {
                 var nodeIds =
