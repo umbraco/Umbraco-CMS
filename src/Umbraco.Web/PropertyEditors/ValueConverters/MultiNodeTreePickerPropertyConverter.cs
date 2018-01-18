@@ -8,16 +8,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Extensions;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -32,6 +34,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.XPath, PropertyCacheLevel.Content)]
     public class MultiNodeTreePickerPropertyConverter : PropertyValueConverterBase
     {
+        private readonly IDataTypeService _dataTypeService;
+
+        //TODO: Remove this ctor in v8 since the other one will use IoC
+        public MultiNodeTreePickerPropertyConverter()
+            : this(ApplicationContext.Current.Services.DataTypeService)
+        { }
+
+        public MultiNodeTreePickerPropertyConverter(IDataTypeService dataTypeService)
+            : base()
+        {
+            if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            _dataTypeService = dataTypeService;
+        }
+
         /// <summary>
         /// The properties to exclude.
         /// </summary>
@@ -125,6 +141,24 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var umbHelper = new UmbracoHelper(UmbracoContext.Current);
 
+            Func<object, IPublishedContent> contentFetcher;
+
+            switch (GetPublishedContentType(propertyType.DataTypeId))
+            {
+                case PublishedItemType.Media:
+                    contentFetcher = umbHelper.TypedMember;
+                    break;
+
+                case PublishedItemType.Member:
+                    contentFetcher = umbHelper.TypedMedia;
+                    break;
+
+                case PublishedItemType.Content:
+                default:
+                    contentFetcher = umbHelper.TypedContent;
+                    break;
+            }
+
             if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias))
             {
                 var nodeIds = (int[])source;
@@ -133,14 +167,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var multiNodeTreePicker = new List<IPublishedContent>();
 
-                    var objectType = UmbracoObjectTypes.Unknown;
-
                     foreach (var nodeId in nodeIds)
                     {
-                        var multiNodeTreePickerItem =
-                            GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
-                            ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
-                            ?? GetPublishedContent(nodeId, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+                        var multiNodeTreePickerItem = contentFetcher(nodeId);
 
                         if (multiNodeTreePickerItem != null)
                         {
@@ -163,14 +192,9 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var multiNodeTreePicker = new List<IPublishedContent>();
 
-                    var objectType = UmbracoObjectTypes.Unknown;
-
                     foreach (var udi in udis)
                     {
-                        var multiNodeTreePickerItem =
-                            GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, umbHelper.TypedContent)
-                            ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, umbHelper.TypedMedia)
-                            ?? GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, umbHelper.TypedMember);
+                        var multiNodeTreePickerItem = contentFetcher(udi);
                         if (multiNodeTreePickerItem != null)
                         {
                             multiNodeTreePicker.Add(multiNodeTreePickerItem);
@@ -186,31 +210,50 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return source;
         }
 
-        /// <summary>
-        /// Attempt to get an IPublishedContent instance based on ID and content type
-        /// </summary>
-        /// <param name="nodeId">The content node ID</param>
-        /// <param name="actualType">The type of content being requested</param>
-        /// <param name="expectedType">The type of content expected/supported by <paramref name="contentFetcher"/></param>
-        /// <param name="contentFetcher">A function to fetch content of type <paramref name="expectedType"/></param>
-        /// <returns>The requested content, or null if either it does not exist or <paramref name="actualType"/> does not match <paramref name="expectedType"/></returns>
-        private IPublishedContent GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent> contentFetcher)
+        private PublishedItemType GetPublishedContentType(int dataTypeId)
         {
-            // is the actual type supported by the content fetcher?
-            if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)
-            {
-                // no, return null
-                return null;
-            }
+            // GetPreValuesCollectionByDataTypeId is cached at repository level;
+            // still, the collection is deep-cloned so this is kinda expensive,
+            // better to cache here + trigger refresh in DataTypeCacheRefresher
+            // e.g. https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/src/Umbraco.Web/Cache/DataTypeCacheRefresher.cs#L116-L119
 
-            // attempt to get the content
-            var content = contentFetcher(nodeId);
-            if (content != null)
+            return Storages.GetOrAdd(dataTypeId, id =>
             {
-                // if we found the content, assign the expected type to the actual type so we don't have to keep looking for other types of content
-                actualType = expectedType;
-            }
-            return content;
+                var preValue = _dataTypeService
+                    .GetPreValuesCollectionByDataTypeId(id)
+                    .PreValuesAsDictionary
+                    .FirstOrDefault(x => string.Equals(x.Key, "startNode", StringComparison.InvariantCultureIgnoreCase))
+                    .Value;
+
+                if (preValue != null && string.IsNullOrWhiteSpace(preValue.Value) == false)
+                {
+                    var data = JsonConvert.DeserializeAnonymousType(preValue.Value, new { type = string.Empty });
+                    if (data != null)
+                    {
+                        switch (data.type.ToUpperInvariant())
+                        {
+                            case "MEDIA":
+                                return PublishedItemType.Media;
+
+                            case "MEMBER":
+                                return PublishedItemType.Member;
+
+                            case "CONTENT":
+                            default:
+                                return PublishedItemType.Content;
+                        }
+                    }
+                }
+
+                return PublishedItemType.Content;
+            });
+        }
+
+        private static readonly ConcurrentDictionary<int, PublishedItemType> Storages = new ConcurrentDictionary<int, PublishedItemType>();
+
+        internal static void ClearCaches()
+        {
+            Storages.Clear();
         }
     }
 }
