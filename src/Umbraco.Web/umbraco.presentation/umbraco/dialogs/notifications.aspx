@@ -15,4 +15,12 @@
         <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>  
        <asp:Button ID="Button1" runat="server" CssClass="btn btn-primary" OnClick="Button1_Click"></asp:Button>
 </div>
+
+<style>
+    .notifications label {
+        float: right !important;
+        width: 93% !important;
+    }
+</style>
+
 </asp:Content>
