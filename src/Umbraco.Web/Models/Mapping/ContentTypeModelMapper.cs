@@ -65,6 +65,8 @@ namespace Umbraco.Web.Models.Mapping
 
                     if (source.DefaultTemplate != null)
                         dest.SetDefaultTemplate(applicationContext.Services.FileService.GetTemplate(source.DefaultTemplate));
+                    else
+                        dest.SetDefaultTemplate(null);
 
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
