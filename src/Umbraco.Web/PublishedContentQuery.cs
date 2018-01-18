@@ -243,9 +243,7 @@ namespace Umbraco.Web
                 // If not, then we perform an inefficient XPath for the GUID
 
                 // todo: in v8, implement in a more efficient way
-                var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
-                var xpath = legacyXml ? "//node[@key=$guid]" : "//*[@key=$guid]";
-                doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
+                doc = cache.GetSingleByXPath("//*[@key=$guid]", new XPathVariable("guid", id.ToString()));
 
                 // When we have the node, we add the GUID/INT value to the lookup
                 if (doc != null)
