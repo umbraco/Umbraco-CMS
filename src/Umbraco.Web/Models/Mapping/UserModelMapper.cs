@@ -201,10 +201,24 @@ namespace Umbraco.Web.Models.Mapping
 
                     var allContentPermissions = applicationContext.Services.UserService.GetPermissions(@group, true)
                         .ToDictionary(x => x.EntityId, x => x);
-                    
-                    var contentEntities = allContentPermissions.Keys.Count == 0
-                        ? new IUmbracoEntity[0]
-                        : applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
+
+                    IEnumerable<IUmbracoEntity> contentEntities;
+                    if (allContentPermissions.Keys.Count == 0)
+                    {
+                        contentEntities = new IUmbracoEntity[0];
+                    }
+                    else
+                    {
+                        // a group can end up with way more than 2000 assigned permissions,
+                        // so we need to break them into groups in order to avoid breaking
+                        // the entity service due to too many Sql parameters.
+
+                        var list = new List<IUmbracoEntity>();
+                        contentEntities = list;
+                        var entityService = applicationContext.Services.EntityService;
+                        foreach (var idGroup in allContentPermissions.Keys.InGroupsOf(2000))
+                            list.AddRange(entityService.GetAll(UmbracoObjectTypes.Document, idGroup.ToArray()));
+                    }
 
                     var allAssignedPermissions = new List<AssignedContentPermissions>();
                     foreach (var entity in contentEntities)
