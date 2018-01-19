@@ -60,7 +60,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create User
-                var createMenuItem = menu.Items.CreateMenuItem<ActionNew>(Services.TextService.Localize("user/createUser"));
+                var createMenuItem = menu.Items.CreateMenuItem<ActionNew>(Services.TextService.Localize("actions/create"));
                 createMenuItem.Icon = "add";
                 createMenuItem.NavigateToRoute("users/users/overview?subview=users&create=true");
                 menu.Items.Add(createMenuItem);
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
                 if (EmailSender.CanSendRequiredEmail)
                 {
                     //Invite User (Action import closest type of action to an invite user)
-                    var inviteMenuItem = menu.Items.CreateMenuItem<ActionImport>(Services.TextService.Localize("user/inviteUser"));
+                    var inviteMenuItem = menu.Items.CreateMenuItem<ActionImport>(Services.TextService.Localize("user/invite"));
                     inviteMenuItem.Icon = "message-unopened";
                     inviteMenuItem.NavigateToRoute("users/users/overview?subview=users&invite=true");
 
