@@ -13,6 +13,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
     {
+        private static readonly string[] NewLineDelimiters = new[] { "\r\n", "\r", "\n" };
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.PropertyEditorAlias);
@@ -53,7 +55,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Fall back on normal behaviour
             if (values.Any() == false)
             {
-                return sourceString.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                return sourceString.Split(NewLineDelimiters, StringSplitOptions.None);
             }
 
             return values.ToArray();
