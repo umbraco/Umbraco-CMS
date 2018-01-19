@@ -97,7 +97,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If fields are specified then the master View and Validators will be ignored
         /// </remarks>
         [JsonProperty("fields")]
-        public List<PreValueField> Fields { get; private set; }
+        public List<PreValueField> Fields { get; internal set; }
 
         /// <summary>
         /// A method to format the posted values from the editor to the values to be persisted

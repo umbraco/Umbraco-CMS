@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.PropertyEditors
+﻿using Umbraco.Core.IO;
+
+namespace Umbraco.Core.PropertyEditors
 {
     // fixme - can we kill this and use "ValueEditor" for both macro and all?
 
@@ -7,6 +9,8 @@
     /// </summary>
     public class ParameterValueEditor : IValueEditor
     {
+        private string _view;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterValueEditor"/> class.
         /// </summary>
@@ -25,6 +29,10 @@
         /// <summary>
         /// Gets or sets the editor view.
         /// </summary>
-        public string View { get; set; }
+        public string View
+        {
+            get => _view;
+            set => _view = IOHelper.ResolveVirtualUrl(value);
+        }
     }
 }

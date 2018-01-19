@@ -6,13 +6,13 @@ using Umbraco.Core.Serialization;
 namespace Umbraco.Core.Manifest
 {
     /// <summary>
-    /// Used when deserialing the validation collection, any serialized property editors are from a manifest and thus the
-    /// validators are manifest validators.
+    /// Implements a json read converter for <see cref="IPropertyValidator"/>.
     /// </summary>
-    internal class ManifestValidatorConverter : JsonCreationConverter<IPropertyValidator>
+    internal class ManifestValidatorConverter : JsonReadConverter<IPropertyValidator>
     {
         protected override IPropertyValidator Create(Type objectType, JObject jObject)
         {
+            // all validators coming from manifests are ManifestPropertyValidator instances
             return new ManifestPropertyValidator();
         }
     }

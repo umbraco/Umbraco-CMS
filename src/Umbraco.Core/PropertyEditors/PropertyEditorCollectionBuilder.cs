@@ -8,19 +8,19 @@ namespace Umbraco.Core.PropertyEditors
 {
     public class PropertyEditorCollectionBuilder : LazyCollectionBuilderBase<PropertyEditorCollectionBuilder, PropertyEditorCollection, PropertyEditor>
     {
-        public PropertyEditorCollectionBuilder(IServiceContainer container)
-            : base(container)
-        { }
+        private readonly ManifestParser _manifestParser;
 
-        // have to property-inject that one as it is internal & the builder is public
-        [Inject]
-        internal ManifestBuilder ManifestBuilder { get; set; }
+        public PropertyEditorCollectionBuilder(IServiceContainer container, ManifestParser manifestParser)
+            : base(container)
+        {
+            _manifestParser = manifestParser;
+        }
 
         protected override PropertyEditorCollectionBuilder This => this;
 
         protected override IEnumerable<PropertyEditor> CreateItems(params object[] args)
         {
-            return base.CreateItems(args).Union(ManifestBuilder.PropertyEditors);
+            return base.CreateItems(args).Union(_manifestParser.Manifest.PropertyEditors);
         }
     }
 }

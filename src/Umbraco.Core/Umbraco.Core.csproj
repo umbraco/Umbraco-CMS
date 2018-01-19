@@ -489,14 +489,11 @@
     <Compile Include="Macros\XsltExtensionCollection.cs" />
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="MainDom.cs" />
-    <Compile Include="Manifest\GridEditorConverter.cs" />
-    <Compile Include="Manifest\ManifestBuilder.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ManifestValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\ParameterEditorConverter.cs" />
-    <Compile Include="Manifest\PreValueFieldConverter.cs" />
     <Compile Include="Manifest\PropertyEditorConverter.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -1286,7 +1283,7 @@
     <Compile Include="Serialization\IFormatter.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
     <Compile Include="Serialization\IStreamedResult.cs" />
-    <Compile Include="Serialization\JsonCreationConverter.cs" />
+    <Compile Include="Serialization\JsonReadConverter.cs" />
     <Compile Include="Serialization\JsonNetSerializer.cs" />
     <Compile Include="Serialization\JsonToStringConverter.cs" />
     <Compile Include="Serialization\KnownTypeUdiJsonConverter.cs" />

@@ -44,6 +44,12 @@ namespace Umbraco.Core.IO
             return retval;
         }
 
+        public static string ResolveVirtualUrl(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+            return path.StartsWith("~/") ? ResolveUrl(path) : path;
+        }
+
         //Replaces tildes with the root dir
         public static string ResolveUrl(string virtualPath)
         {

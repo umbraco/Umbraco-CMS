@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Services;
@@ -18,6 +17,8 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class PropertyValueEditor : IValueEditor
     {
+        private string _view;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyValueEditor"/> class.
         /// </summary>
@@ -61,8 +62,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         public virtual void ConfigureForDisplay(PreValueCollection preValues)
         {
-            if (preValues == null) throw new ArgumentNullException("preValues");
-            _preVals = preValues;
+            _preVals = preValues ?? throw new ArgumentNullException(nameof(preValues));
         }
 
         /// <summary>
@@ -73,7 +73,11 @@ namespace Umbraco.Core.PropertyEditors
         /// folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.</para>
         /// </remarks>
         [JsonProperty("view", Required = Required.Always)]
-        public string View { get; set; }
+        public string View
+        {
+            get => _view;
+            set => _view = IOHelper.ResolveVirtualUrl(value);
+        }
 
         /// <summary>
         /// The value type which reflects how it is validated and stored in the database
@@ -84,8 +88,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// A collection of validators for the pre value editor
         /// </summary>
-        [JsonProperty("validation", ItemConverterType = typeof(ManifestValidatorConverter))]
+        [JsonProperty("validation")]
         public List<IPropertyValidator> Validators { get; private set; }
+
+        // fixme - need to explain and understand these two + what is "overridable pre-values"
 
         /// <summary>
         /// Returns the validator used for the required field validation which is specified on the PropertyType
@@ -96,10 +102,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
-        public virtual ManifestValueValidator RequiredValidator
-        {
-            get { return new RequiredManifestValueValidator(); }
-        }
+        public virtual ManifestValueValidator RequiredValidator => new RequiredManifestValueValidator();
 
         /// <summary>
         /// Returns the validator used for the regular expression field validation which is specified on the PropertyType
@@ -110,10 +113,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The default validator used is the RegexValueValidator but this can be overridden by property editors
         /// if they need to do some custom validation, or if the value being validated is a json object.
         /// </remarks>
-        public virtual ManifestValueValidator RegexValidator
-        {
-            get { return new RegexValidator(); }
-        }
+        public virtual ManifestValueValidator RegexValidator => new RegexValidator();
 
         /// <summary>
         /// Returns the true DataTypeDatabaseType from the string representation ValueType.
@@ -144,7 +144,7 @@ namespace Umbraco.Core.PropertyEditors
                 case PropertyEditorValueTypes.Time:
                     return DataTypeDatabaseType.Date;
                 default:
-                    throw new ArgumentException("Not a valid value type.", "valueType");
+                    throw new ArgumentException("Not a valid value type.", nameof(valueType));
             }
         }
 
@@ -157,10 +157,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Set this to true if the property editor is for display purposes only
         /// </summary>
-        public virtual bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public virtual bool IsReadOnly => false;
 
         /// <summary>
         /// Used to try to convert the string value to the correct CLR type based on the DatabaseDataType specified for this value editor
@@ -170,14 +167,8 @@ namespace Umbraco.Core.PropertyEditors
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
-            var s = value as string;
-            if (s != null)
-            {
-                if (s.IsNullOrWhiteSpace())
-                {
-                    value = null;
-                }
-            }
+            if (value is string s && string.IsNullOrWhiteSpace(s))
+                value = null;
 
             Type valueType;
             //convert the string to a known type

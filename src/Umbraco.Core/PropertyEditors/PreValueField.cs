@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
@@ -9,6 +10,8 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class PreValueField
     {
+        private string _view;
+
         /// <summary>
         /// Standard constructor
         /// </summary>
@@ -73,7 +76,11 @@ namespace Umbraco.Core.PropertyEditors
         /// * a simple view name which will map to the views/prevalueeditors/{view}.html
         /// </summary>
         [JsonProperty("view", Required = Required.Always)]
-        public string View { get; set; }
+        public string View
+        {
+            get => _view;
+            set => _view = IOHelper.ResolveVirtualUrl(value);
+        }
 
         /// <summary>
         /// A collection of validators for the pre value field

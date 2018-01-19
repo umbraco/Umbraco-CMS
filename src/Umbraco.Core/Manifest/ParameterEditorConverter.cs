@@ -7,25 +7,33 @@ using Umbraco.Core.Serialization;
 namespace Umbraco.Core.Manifest
 {
     /// <summary>
-    /// Used to convert a parameter editor manifest to a property editor object
+    /// Implements a json read converter for <see cref="ParameterEditor"/>.
     /// </summary>
-    internal class ParameterEditorConverter : JsonCreationConverter<ParameterEditor>
+    internal class ParameterEditorConverter : JsonReadConverter<ParameterEditor>
     {
+        /// <inheritdoc />
         protected override ParameterEditor Create(Type objectType, JObject jObject)
         {
             return new ParameterEditor();
+
         }
-
-        protected override void Deserialize(JObject jObject, ParameterEditor target, JsonSerializer serializer)
+        /// <inheritdoc />
+        protected override void Deserialize(JObject jobject, ParameterEditor target, JsonSerializer serializer)
         {
-            //since it's a manifest editor, we need to create it's instance.
-            //we need to specify the view value for the editor here otherwise we'll get an exception.
-            target.ManifestDefinedParameterValueEditor = new ParameterValueEditor
+            if (jobject.Property("view") != null)
             {
-                View = jObject["view"].ToString()
-            };
+                // the deserializer will first try to get the property, and that would throw since
+                // the editor would try to create a new value editor, so we have to set a
+                // value editor by ourselves, which will then be populated by the deserializer.
+                target.ValueEditor = new ParameterValueEditor();
 
-            base.Deserialize(jObject, target, serializer);
+                // the 'view' property in the manifest is at top-level, and needs to be moved
+                // down one level to the actual value editor.
+                jobject["editor"] = new JObject { ["view"] = jobject["view"] };
+                jobject.Property("view").Remove();
+            }
+
+            base.Deserialize(jobject, target, serializer);
         }
     }
 }

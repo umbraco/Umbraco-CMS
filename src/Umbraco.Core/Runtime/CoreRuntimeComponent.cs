@@ -55,9 +55,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().XsltFileSystem, Constants.Composing.FileSystems.XsltFileSystem);
 
             // register manifest builder, will be injected in eg PropertyEditorCollectionBuilder
-            composition.Container.RegisterSingleton(factory
-                => new ManifestParser(factory.GetInstance<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), factory.GetInstance<IRuntimeCacheProvider>()));
-            composition.Container.RegisterSingleton<ManifestBuilder>();
+            composition.Container.RegisterSingleton<ManifestParser>();
 
             composition.Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
                 .Add(factory => factory.GetInstance<TypeLoader>().GetPropertyEditors());

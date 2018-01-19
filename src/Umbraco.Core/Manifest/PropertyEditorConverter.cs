@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
@@ -10,89 +8,74 @@ using Umbraco.Core.Serialization;
 namespace Umbraco.Core.Manifest
 {
     /// <summary>
-    /// Used to convert a property editor manifest to a property editor object
+    /// Implements a json read converter for <see cref="PropertyEditor"/>.
     /// </summary>
-    internal class PropertyEditorConverter : JsonCreationConverter<PropertyEditor>
+    internal class PropertyEditorConverter : JsonReadConverter<PropertyEditor>
     {
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyEditorConverter"/> class.
+        /// </summary>
         public PropertyEditorConverter(ILogger logger)
         {
             _logger = logger;
         }
 
+        /// <inheritdoc />
         protected override PropertyEditor Create(Type objectType, JObject jObject)
         {
             return new PropertyEditor(_logger);
         }
 
-        protected override void Deserialize(JObject jObject, PropertyEditor target, JsonSerializer serializer)
+        /// <inheritdoc />
+        protected override void Deserialize(JObject jobject, PropertyEditor target, JsonSerializer serializer)
         {
-            if (jObject["editor"] != null)
+            if (jobject["editor"] != null)
             {
-                //since it's a manifest editor, we need to create it's instance.
-                //we need to specify the view value for the editor here otherwise we'll get an exception.
-                target.ManifestDefinedPropertyValueEditor = new PropertyValueEditor
-                    {
-                        View = jObject["editor"]["view"].ToString()
-                    };
+                // the deserializer will first try to get the property, and that would throw since
+                // the editor would try to create a new value editor, so we have to set a
+                // value editor by ourselves, which will then be populated by the deserializer.
+                target.ValueEditor = new PropertyValueEditor();
 
-                //the manifest JSON is a simplified json for the validators which is actually a dictionary, however, the
-                //c# model requires an array of validators not a dictionary so we need to change the json to an array
-                //to deserialize properly.
-                JArray converted;
-                if (TryConvertValidatorDictionaryToArray(jObject["editor"]["validation"] as JObject, out converted))
-                {
-                    jObject["editor"]["validation"] = converted;
-                }
-
+                // in the manifest, validators are a simple dictionary eg
+                // {
+                //   required: true,
+                //   regex: '\\d*'
+                // }
+                // and we need to turn this into a list of IPropertyValidator
+                // so, rewrite the json structure accordingly
+                if (jobject["editor"]["validation"] is JObject validation)
+                    jobject["editor"]["validation"] = RewriteValidators(validation);
             }
-            if (jObject["prevalues"] != null)
-            {
-                target.ManifestDefinedPreValueEditor = new PreValueEditor();
 
-                //the manifest JSON is a simplified json for the validators which is actually a dictionary, however, the
-                //c# model requires an array of validators not a dictionary so we need to change the json to an array
-                //to deserialize properly.
-                var fields = jObject["prevalues"]["fields"] as JArray;
-                if (fields != null)
+            // see note about validators, above - same applies to field validators
+            if (jobject["prevalues"]?["fields"] is JArray jarray)
+            {
+                foreach (var field in jarray)
                 {
-                    foreach (var f in fields)
-                    {
-                        JArray converted;
-                        if (TryConvertValidatorDictionaryToArray(f["validation"] as JObject, out converted))
-                        {
-                            f["validation"] = converted;
-                        }
-                    }
+                    // see note above, for editor
+                    if (field["validation"] is JObject validation)
+                        field["validation"] = RewriteValidators(validation);
                 }
             }
 
-            base.Deserialize(jObject, target, serializer);
+            base.Deserialize(jobject, target, serializer);
         }
 
-        private bool TryConvertValidatorDictionaryToArray(JObject validation, out JArray result)
+        private static JArray RewriteValidators(JObject validation)
         {
-            if (validation == null)
+            var jarray = new JArray();
+
+            foreach (var v in validation)
             {
-                result = null;
-                return false;
+                var key = v.Key;
+                var val = v.Value?.Type == JTokenType.Boolean ? string.Empty : v.Value;
+                var jo = new JObject { { "type", key }, { "config", val } };
+                jarray.Add(jo);
             }
 
-            result = new JArray();
-            foreach (var entry in validation)
-            {
-                //in a special case if the value is simply 'true' (boolean) this just indicates that the
-                // validator is enabled, the config should just be empty.
-                var formattedItem = JObject.FromObject(new { type = entry.Key, config = entry.Value });
-                if (entry.Value.Type == JTokenType.Boolean)
-                {
-                    formattedItem["config"] = "";
-                }
-
-                result.Add(formattedItem);
-            }
-            return true;
+            return jarray;
         }
     }
 }

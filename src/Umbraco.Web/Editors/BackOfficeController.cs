@@ -32,6 +32,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
+using JArray = Newtonsoft.Json.Linq.JArray;
 
 namespace Umbraco.Web.Editors
 {
@@ -47,7 +48,7 @@ namespace Umbraco.Web.Editors
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
-        private readonly IRuntimeState _runtime;
+        private readonly ManifestParser _manifestParser;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
@@ -55,9 +56,9 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(IRuntimeState runtime)
+        public BackOfficeController(ManifestParser manifestParser)
         {
-            _runtime = runtime;
+            _manifestParser = manifestParser;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -184,12 +185,12 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var parser = GetManifestParser();
+            var parser = _manifestParser;
             var initJs = new JsInitialization(parser);
             var initCss = new CssInitialization(parser);
 
             //get the legacy ActionJs file references to append as well
-            var legacyActionJsRef = new JArray(GetLegacyActionJs(LegacyJsActionType.JsUrl));
+            var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
 
             var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
             result += initCss.GetStylesheetInitialization(HttpContext);
@@ -205,24 +206,24 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetManifestAssetList()
         {
-            Func<JArray> getResult = () =>
+            JArray GetAssetList()
             {
-                var parser = GetManifestParser();
+                var parser = _manifestParser;
                 var initJs = new JsInitialization(parser);
                 var initCss = new CssInitialization(parser);
-                var jsResult = initJs.GetJavascriptInitializationArray(HttpContext, new JArray());
-                var cssResult = initCss.GetStylesheetInitializationArray(HttpContext);
-                ManifestParser.MergeJArrays(jsResult, cssResult);
-                return jsResult;
-            };
+                var assets = new List<string>();
+                assets.AddRange(initJs.GetScriptFiles(HttpContext, Enumerable.Empty<string>()));
+                assets.AddRange(initCss.GetStylesheetFiles(HttpContext));
+                return new JArray(assets);
+            }
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
+                ? GetAssetList()
                 : ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
-                    typeof(BackOfficeController) + "GetManifestAssetList",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
+                    "Umbraco.Web.Editors.BackOfficeController.GetManifestAssetList",
+                    GetAssetList,
+                    new TimeSpan(0, 2, 0));
 
             return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
         }
@@ -331,13 +332,6 @@ namespace Umbraco.Web.Editors
             //Add errors and redirect for it to be displayed
             TempData[TokenExternalSignInError] = result.Errors;
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
-        }
-
-        private ManifestParser GetManifestParser()
-        {
-            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-            var parser = new ManifestParser(Logger, plugins, ApplicationCache.RuntimeCache);
-            return parser;
         }
 
         /// <summary>

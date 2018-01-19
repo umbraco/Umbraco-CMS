@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -10,8 +9,10 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class ParameterEditor : IParameterEditor
     {
-
         private readonly ParameterEditorAttribute _attribute;
+
+        private ParameterValueEditor _valueEditor;
+        private ParameterValueEditor _valueEditorAssigned;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -19,21 +20,14 @@ namespace Umbraco.Core.PropertyEditors
         public ParameterEditor()
         {
             Configuration = new Dictionary<string, object>();
-            //assign properties based on the attribute if it is found
-            _attribute = GetType().GetCustomAttribute<ParameterEditorAttribute>(false);
-            if (_attribute != null)
-            {
-                //set the id/name from the attribute
-                Alias = _attribute.Alias;
-                Name = _attribute.Name;
-            }
-        }
 
-        /// <summary>
-        /// These are assigned by default normally based on parameter editor attributes or manifest definitions,
-        /// developers have the chance to override CreateValueEditor if they don't want to use the pre-defined instance
-        /// </summary>
-        internal ParameterValueEditor ManifestDefinedParameterValueEditor = null;
+            // assign properties based on the attribute, if it is found
+            _attribute = GetType().GetCustomAttribute<ParameterEditorAttribute>(false);
+            if (_attribute == null) return;
+
+            Alias = _attribute.Alias;
+            Name = _attribute.Name;
+        }
 
         /// <summary>
         /// The id  of the property editor
@@ -53,17 +47,19 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("config")]
         public IDictionary<string, object> Configuration { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty("editor")]
         public ParameterValueEditor ValueEditor
         {
-            get { return CreateValueEditor(); }
+            get => _valueEditor ?? (_valueEditor = CreateValueEditor());
+            set
+            {
+                _valueEditorAssigned = value;
+                _valueEditor = null;
+            }
         }
 
         [JsonIgnore]
-        IValueEditor IParameterEditor.ValueEditor
-        {
-            get { return ValueEditor; }
-        }
+        IValueEditor IParameterEditor.ValueEditor => ValueEditor; // fixme - because we must, but - bah
 
         /// <summary>
         /// Creates a value editor instance
@@ -71,25 +67,18 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         protected virtual ParameterValueEditor CreateValueEditor()
         {
-            if (ManifestDefinedParameterValueEditor != null)
-            {
-                //detect if the view is a virtual path (in most cases, yes) then convert it
-                if (ManifestDefinedParameterValueEditor.View.StartsWith("~/"))
-                {
-                    ManifestDefinedParameterValueEditor.View = IOHelper.ResolveUrl(ManifestDefinedParameterValueEditor.View);
-                }
-                return ManifestDefinedParameterValueEditor;
-            }
+            // handle assigned editor
+            if (_valueEditorAssigned != null)
+                return _valueEditorAssigned;
 
-            //create a new editor
+            // create a new editor
             var editor = new ParameterValueEditor();
 
-            if (_attribute.EditorView.IsNullOrWhiteSpace())
-            {
-                throw new NotImplementedException("This method must be implemented if a view is not explicitly set");
-            }
+            var view = _attribute?.EditorView;
+            if (string.IsNullOrWhiteSpace(view))
+                throw new InvalidOperationException("The editor does not specify a view.");
+            editor.View = view;
 
-            editor.View = _attribute.EditorView;
             return editor;
         }
     }

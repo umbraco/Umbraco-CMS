@@ -20,10 +20,7 @@ namespace Umbraco.Core.Configuration
 
         private static readonly Lazy<UmbracoConfig> Lazy = new Lazy<UmbracoConfig>(() => new UmbracoConfig());
 
-        public static UmbracoConfig For
-        {
-            get { return Lazy.Value; }
-        }
+        public static UmbracoConfig For => Lazy.Value;
 
         #endregion
 

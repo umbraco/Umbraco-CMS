@@ -303,10 +303,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
-            Container.RegisterSingleton(f => new ManifestBuilder(
-                f.GetInstance<IRuntimeCacheProvider>(),
-                new ManifestParser(f.GetInstance<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), f.GetInstance<IRuntimeCacheProvider>())
-            ));
+            Container.RegisterSingleton<ManifestParser>();
 
             // note - don't register collections, use builders
             Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>();

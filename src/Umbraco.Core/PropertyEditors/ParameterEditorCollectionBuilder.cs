@@ -6,14 +6,14 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    internal class ParameterEditorCollectionBuilder : LazyCollectionBuilderBase<ParameterEditorCollectionBuilder, ParameterEditorCollection, IParameterEditor>
+    public class ParameterEditorCollectionBuilder : LazyCollectionBuilderBase<ParameterEditorCollectionBuilder, ParameterEditorCollection, IParameterEditor>
     {
-        private readonly ManifestBuilder _manifestBuilder;
+        private readonly ManifestParser _manifestParser;
 
-        public ParameterEditorCollectionBuilder(IServiceContainer container, ManifestBuilder manifestBuilder)
+        public ParameterEditorCollectionBuilder(IServiceContainer container, ManifestParser manifestParser)
             : base(container)
         {
-            _manifestBuilder = manifestBuilder;
+            _manifestParser = manifestParser;
         }
 
         protected override ParameterEditorCollectionBuilder This => this;
@@ -33,8 +33,9 @@ namespace Umbraco.Core.PropertyEditors
 
             return base.CreateItems(args)
                 .Where(x => (x is PropertyEditor) == false || ((PropertyEditor) x).IsParameterEditor)
-                .Union(_manifestBuilder.ParameterEditors)
-                .Union(_manifestBuilder.PropertyEditors.Where(x => x.IsParameterEditor));
+                .Union(_manifestParser.Manifest.ParameterEditors)
+                .Union(_manifestParser.Manifest.PropertyEditors.Where(x => x.IsParameterEditor))
+                .ToList();
         }
     }
 }

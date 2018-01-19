@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -20,6 +19,11 @@ namespace Umbraco.Core.PropertyEditors
     public class PropertyEditor : IParameterEditor
     {
         private readonly PropertyEditorAttribute _attribute;
+
+        private PropertyValueEditor _valueEditor;
+        private PropertyValueEditor _valueEditorAssigned;
+        private PreValueEditor _preValueEditor;
+        private PreValueEditor _preValueEditorAssigned;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyEditor"/> class.
@@ -50,22 +54,10 @@ namespace Umbraco.Core.PropertyEditors
         protected ILogger Logger { get; }
 
         /// <summary>
-        /// These are assigned by default normally based on property editor attributes or manifest definitions,
-        /// developers have the chance to override CreateValueEditor if they don't want to use the pre-defined instance
-        /// </summary>
-        internal PropertyValueEditor ManifestDefinedPropertyValueEditor = null;
-
-        /// <summary>
-        /// These are assigned by default normally based on property editor attributes or manifest definitions,
-        /// developers have the chance to override CreatePreValueEditor if they don't want to use the pre-defined instance
-        /// </summary>
-        internal PreValueEditor ManifestDefinedPreValueEditor = null;
-
-        /// <summary>
         /// Gets or sets a value indicating whether this editor can be used as a parameter editor.
         /// </summary>
         [JsonProperty("isParameterEditor")]
-        public bool IsParameterEditor { get; internal set; }
+        public bool IsParameterEditor { get; internal set; } // fixme understand + explain
 
         /// <summary>
         /// Gets or sets the unique alias of the property editor.
@@ -95,50 +87,61 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets a value indicating whether the property editor is deprecated.
         /// </summary>
         [JsonIgnore]
-        public bool IsDeprecated { get; internal set; } // fixme kill it all in v8
+        public bool IsDeprecated { get; internal set; } // fixme - kill it all in v8
 
         [JsonProperty("editor", Required = Required.Always)]
-        public PropertyValueEditor ValueEditor => CreateValueEditor();
+        public PropertyValueEditor ValueEditor
+        {
+            get => _valueEditor ?? (_valueEditor = CreateValueEditor());
+            set
+            {
+                _valueEditorAssigned = value;
+                _valueEditor = null;
+            }
+        }
 
         [JsonIgnore]
-        IValueEditor IParameterEditor.ValueEditor => ValueEditor;
+        IValueEditor IParameterEditor.ValueEditor => ValueEditor; // fixme - because we must, but - bah
 
         [JsonProperty("prevalues")]
-        public PreValueEditor PreValueEditor => CreatePreValueEditor();
+        public PreValueEditor PreValueEditor
+        {
+            get => _preValueEditor ?? (_preValueEditor = CreatePreValueEditor());
+            set
+            {
+                _preValueEditorAssigned = value;
+                _preValueEditor = null;
+            }
+        }
 
         [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultPreValues { get; set; }
 
         [JsonIgnore]
-        IDictionary<string, object> IParameterEditor.Configuration => DefaultPreValues;
+        IDictionary<string, object> IParameterEditor.Configuration => DefaultPreValues; // fixme - because we must, but - bah
 
         /// <summary>
-        /// Creates a value editor instance
+        /// Creates a value editor instance.
         /// </summary>
         protected virtual PropertyValueEditor CreateValueEditor()
         {
-            // handle manifest-defined editors
-            if (ManifestDefinedPropertyValueEditor != null)
-            {
-                // map view path if virtual
-                if (ManifestDefinedPropertyValueEditor.View.StartsWith("~/"))
-                    ManifestDefinedPropertyValueEditor.View = IOHelper.ResolveUrl(ManifestDefinedPropertyValueEditor.View);
-                return ManifestDefinedPropertyValueEditor;
-            }
+            // handle assigned editor
+            if (_valueEditorAssigned != null)
+                return _valueEditorAssigned;
 
             // create a new editor
             var editor = new PropertyValueEditor();
+
             var view = _attribute?.EditorView;
             if (string.IsNullOrWhiteSpace(view))
                 throw new InvalidOperationException("The editor does not specify a view.");
-
             if (view.StartsWith("~/"))
                 view = IOHelper.ResolveUrl(view);
             editor.View = view;
+
             editor.ValueType = _attribute.ValueType;
             editor.HideLabel = _attribute.HideLabel;
             return editor;
-
         }
 
         /// <summary>
@@ -146,17 +149,9 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         protected virtual PreValueEditor CreatePreValueEditor()
         {
-            // handle manifest-defined editors
-            if (ManifestDefinedPreValueEditor != null)
-            {
-                foreach (var field in ManifestDefinedPreValueEditor.Fields)
-                {
-                    // map view path if virtual
-                    if (field.View.StartsWith("~/"))
-                        field.View = IOHelper.ResolveUrl(field.View);
-                }
-                return ManifestDefinedPreValueEditor;
-            }
+            // handle assigned editor
+            if (_preValueEditorAssigned != null)
+                return _preValueEditorAssigned;
 
             // else return an empty one
             return new PreValueEditor();
@@ -216,17 +211,4 @@ namespace Umbraco.Core.PropertyEditors
             return configuration;
         }
     }
-
-    // fixme clear that one! breaking everything!
-    //public class PropertyEditor<TConfiguration> : PropertyEditor
-    //{
-    //    public PropertyEditor(ILogger logger)
-    //        : base(logger)
-    //    { }
-
-    //    public virtual TConfiguration MapConfiguration(string configuration)
-    //    {
-    //        return JsonConvert.DeserializeObject<TConfiguration>(configuration);
-    //    }
-    //}
 }

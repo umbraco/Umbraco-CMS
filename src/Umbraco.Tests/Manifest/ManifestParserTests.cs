@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using Moq;
 using System.Text;
@@ -7,11 +6,9 @@ using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Cache;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -24,20 +21,105 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            _parser = new ManifestParser(Mock.Of<ILogger>(), new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), NullCacheProvider.Instance);
+            _parser = new ManifestParser(NullCacheProvider.Instance, Mock.Of<ILogger>());
         }
 
         [Test]
-        public void Parse_Property_Editors_With_Pre_Vals()
+        public void CanParseComments()
         {
 
-            var a = JsonConvert.DeserializeObject<JArray>(@"[
+            const string json1 = @"
+// this is a single-line comment
+{
+    ""x"": 2, // this is an end-of-line comment
+    ""y"": 3, /* this is a single line comment block
+/* comment */ ""z"": /* comment */ 4,
+    ""t"": ""this is /* comment */ a string"",
+    ""u"": ""this is // more comment in a string""
+}
+";
+
+            var jobject = (JObject) JsonConvert.DeserializeObject(json1);
+            Assert.AreEqual("2", jobject.Property("x").Value.ToString());
+            Assert.AreEqual("3", jobject.Property("y").Value.ToString());
+            Assert.AreEqual("4", jobject.Property("z").Value.ToString());
+            Assert.AreEqual("this is /* comment */ a string", jobject.Property("t").Value.ToString());
+            Assert.AreEqual("this is // more comment in a string", jobject.Property("u").Value.ToString());
+        }
+
+        [Test]
+        public void ThrowOnJsonError()
+        {
+            // invalid json, missing the final ']' on javascript
+            const string json = @"{
+propertyEditors: []/*we have empty property editors**/,
+javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js' }";
+
+            // parsing fails
+            Assert.Throws<JsonReaderException>(() => _parser.ParseManifest(json));
+        }
+
+        [Test]
+        public void CanParseManifest_ScriptsAndStylesheets()
+        {
+            var json = "{}";
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(0, manifest.Scripts.Length);
+
+            json = "{javascript: []}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(0, manifest.Scripts.Length);
+
+            json = "{javascript: ['~/test.js', '~/test2.js']}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Scripts.Length);
+
+            json = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Scripts.Length);
+
+            Assert.AreEqual("/test.js", manifest.Scripts[0]);
+            Assert.AreEqual("/test2.js", manifest.Scripts[1]);
+
+            // kludge is gone - must filter before parsing
+            json = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble()) + "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
+            Assert.Throws<JsonReaderException>(() => _parser.ParseManifest(json));
+
+            json = "{}";
+             manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(0, manifest.Stylesheets.Length);
+
+            json = "{css: []}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(0, manifest.Stylesheets.Length);
+
+            json = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Stylesheets.Length);
+
+            json = "{propertyEditors: [], css: ['~/stylesheet.css', '~/random-long-name.css']}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Stylesheets.Length);
+
+
+
+            json = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js'], css: ['~/stylesheet.css', '~/random-long-name.css']}";
+            manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.Scripts.Length);
+            Assert.AreEqual(2, manifest.Stylesheets.Length);
+        }
+
+        [Test]
+        public void CanParseManifest_PropertyEditors()
+        {
+            const string json = @"{'propertyEditors': [
     {
         alias: 'Test.Test1',
         name: 'Test 1',
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
+            hideLabel: true,
             validation: {
                 'required': true,
                 'Regex': '\\d*'
@@ -60,147 +142,10 @@ namespace Umbraco.Tests.Manifest
                     }
                 ]
             }
-    }
-]");
-            var parser = _parser.GetPropertyEditors(a);
-
-            Assert.AreEqual(1, parser.Count());
-            Assert.AreEqual(2, parser.ElementAt(0).PreValueEditor.Fields.Count);
-            Assert.AreEqual("key1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Key);
-            Assert.AreEqual("Some config 1", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Name);
-            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).View);
-            Assert.AreEqual(1, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(0).Validators.Count);
-
-            Assert.AreEqual("key2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Key);
-            Assert.AreEqual("Some config 2", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Name);
-            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html", parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).View);
-            Assert.AreEqual(0, parser.ElementAt(0).PreValueEditor.Fields.ElementAt(1).Validators.Count());
-        }
-
-        [Test]
-        public void Parse_Grid_Editors()
-        {
-            var a = JsonConvert.DeserializeObject<JArray>(@"[
-    {
-        alias: 'Test.Test1',
-        name: 'Test 1',
-        view: 'blah',
-        icon: 'hello'
     },
     {
         alias: 'Test.Test2',
         name: 'Test 2',
-        config: { key1: 'some default val' },
-        view: '~/hello/world.cshtml',
-        icon: 'helloworld'
-    },
-    {
-        alias: 'Test.Test3',
-        name: 'Test 3',
-        config: { key1: 'some default val' },
-        view: '/hello/world.html',
-        render: '~/hello/world.cshtml',
-        icon: 'helloworld'
-    }
-]");
-            var parser = _parser.GetGridEditors(a).ToArray();
-
-            Assert.AreEqual(3, parser.Count());
-
-            Assert.AreEqual("Test.Test1", parser.ElementAt(0).Alias);
-            Assert.AreEqual("Test 1", parser.ElementAt(0).Name);
-            Assert.AreEqual("blah", parser.ElementAt(0).View);
-            Assert.AreEqual("hello", parser.ElementAt(0).Icon);
-            Assert.IsNull(parser.ElementAt(0).Render);
-            Assert.AreEqual(0, parser.ElementAt(0).Config.Count);
-
-            Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);
-            Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
-            Assert.AreEqual("/hello/world.cshtml", parser.ElementAt(1).View);
-            Assert.AreEqual("helloworld", parser.ElementAt(1).Icon);
-            Assert.IsNull(parser.ElementAt(1).Render);
-            Assert.AreEqual(1, parser.ElementAt(1).Config.Count);
-            Assert.AreEqual("some default val", parser.ElementAt(1).Config["key1"]);
-
-            Assert.AreEqual("Test.Test3", parser.ElementAt(2).Alias);
-            Assert.AreEqual("Test 3", parser.ElementAt(2).Name);
-            Assert.AreEqual("/hello/world.html", parser.ElementAt(2).View);
-            Assert.AreEqual("helloworld", parser.ElementAt(2).Icon);
-            Assert.AreEqual("/hello/world.cshtml", parser.ElementAt(2).Render);
-            Assert.AreEqual(1, parser.ElementAt(2).Config.Count);
-            Assert.AreEqual("some default val", parser.ElementAt(2).Config["key1"]);
-
-        }
-
-        [Test]
-        public void Parse_Property_Editors()
-        {
-
-            var a = JsonConvert.DeserializeObject<JArray>(@"[
-    {
-        alias: 'Test.Test1',
-        name: 'Test 1',
-        icon: 'icon-war',
-        editor: {
-            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
-            valueType: 'int',
-            validation: {
-                required : true,
-                regex : '\\d*'
-            }
-        }
-    },
-    {
-        alias: 'Test.Test2',
-        name: 'Test 2',
-        group: 'customgroup',
-        defaultConfig: { key1: 'some default pre val' },
-        editor: {
-            view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html',
-            hideLabel: true
-        }
-    }
-]");
-            var parser = _parser.GetPropertyEditors(a);
-
-            Assert.AreEqual(2, parser.Count());
-
-            Assert.AreEqual(false, parser.ElementAt(0).ValueEditor.HideLabel);
-            Assert.AreEqual("Test.Test1", parser.ElementAt(0).Alias);
-            Assert.AreEqual("Test 1", parser.ElementAt(0).Name);
-            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
-            Assert.AreEqual("int", parser.ElementAt(0).ValueEditor.ValueType);
-            Assert.AreEqual(2, parser.ElementAt(0).ValueEditor.Validators.Count());
-            var manifestValidator1 = parser.ElementAt(0).ValueEditor.Validators.ElementAt(0) as ManifestPropertyValidator;
-            Assert.IsNotNull(manifestValidator1);
-            Assert.AreEqual("required", manifestValidator1.Type);
-            var manifestValidator2 = parser.ElementAt(0).ValueEditor.Validators.ElementAt(1) as ManifestPropertyValidator;
-            Assert.IsNotNull(manifestValidator2);
-            Assert.AreEqual("regex", manifestValidator2.Type);
-
-            //groups and icons
-            Assert.AreEqual("common", parser.ElementAt(0).Group);
-            Assert.AreEqual("customgroup", parser.ElementAt(1).Group);
-
-            Assert.AreEqual("icon-war", parser.ElementAt(0).Icon);
-            Assert.AreEqual("icon-autofill", parser.ElementAt(1).Icon);
-
-
-            Assert.AreEqual(true, parser.ElementAt(1).ValueEditor.HideLabel);
-            Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);
-            Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
-            Assert.IsTrue(parser.ElementAt(1).DefaultPreValues.ContainsKey("key1"));
-            Assert.AreEqual("some default pre val", parser.ElementAt(1).DefaultPreValues["key1"]);
-        }
-
-        [Test]
-        public void Property_Editors_Can_Be_Parameter_Editor()
-        {
-
-            var a = JsonConvert.DeserializeObject<JArray>(@"[
-    {
-        alias: 'Test.Test1',
-        name: 'Test 1',
         isParameterEditor: true,
         defaultConfig: { key1: 'some default val' },
         editor: {
@@ -211,31 +156,76 @@ namespace Umbraco.Tests.Manifest
                 regex : '\\d*'
             }
         }
-    },
-    {
-        alias: 'Test.Test2',
-        name: 'Test 2',
-        defaultConfig: { key1: 'some default pre val' },
-        editor: {
-            view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
-        }
     }
-]");
-            var parser = _parser.GetPropertyEditors(a);
+]}";
 
-            Assert.AreEqual(1, parser.Count(x => x.IsParameterEditor));
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.PropertyEditors.Length);
 
-            IParameterEditor parameterEditor = parser.First();
-            Assert.AreEqual(1, parameterEditor.Configuration.Count);
-            Assert.IsTrue(parameterEditor.Configuration.ContainsKey("key1"));
-            Assert.AreEqual("some default val", parameterEditor.Configuration["key1"]);
+            var editor = manifest.PropertyEditors[1];
+            Assert.IsTrue(editor.IsParameterEditor);
+
+            editor = manifest.PropertyEditors[0];
+            Assert.AreEqual("Test.Test1", editor.Alias);
+            Assert.AreEqual("Test 1", editor.Name);
+            Assert.IsFalse(editor.IsParameterEditor);
+
+            var valueEditor = editor.ValueEditor;
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", valueEditor.View);
+            Assert.AreEqual("int", valueEditor.ValueType);
+            Assert.IsTrue(valueEditor.HideLabel);
+
+            // these two don't make much sense here
+            // valueEditor.RegexValidator;
+            // valueEditor.RequiredValidator;
+
+            var validators = valueEditor.Validators;
+            Assert.AreEqual(2, validators.Count);
+            var validator = validators[0];
+            var v = validator as ManifestPropertyValidator;
+            Assert.IsNotNull(v);
+            Assert.AreEqual("required", v.Type);
+            Assert.AreEqual("", v.Config);
+            validator = validators[1];
+            v = validator as ManifestPropertyValidator;
+            Assert.IsNotNull(v);
+            Assert.AreEqual("Regex", v.Type);
+            Assert.AreEqual("\\d*", v.Config);
+
+            // this is not part of the manifest
+            var preValues = editor.DefaultPreValues;
+            Assert.IsNull(preValues);
+
+            var preValueEditor = editor.PreValueEditor;
+            Assert.IsNotNull(preValueEditor);
+            Assert.IsNotNull(preValueEditor.Fields);
+            Assert.AreEqual(2, preValueEditor.Fields.Count);
+
+            var f = preValueEditor.Fields[0];
+            Assert.AreEqual("key1", f.Key);
+            Assert.AreEqual("Some config 1", f.Name);
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html", f.View);
+            var fvalidators = f.Validators;
+            Assert.IsNotNull(fvalidators);
+            Assert.AreEqual(1, fvalidators.Count);
+            var fv = fvalidators[0] as ManifestPropertyValidator;
+            Assert.IsNotNull(fv);
+            Assert.AreEqual("required", fv.Type);
+            Assert.AreEqual("", fv.Config);
+
+            f = preValueEditor.Fields[1];
+            Assert.AreEqual("key2", f.Key);
+            Assert.AreEqual("Some config 2", f.Name);
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html", f.View);
+            fvalidators = f.Validators;
+            Assert.IsNotNull(fvalidators);
+            Assert.AreEqual(0, fvalidators.Count);
         }
 
         [Test]
-        public void Parse_Parameter_Editors()
+        public void CanParseManifest_ParameterEditors()
         {
-
-            var a = JsonConvert.DeserializeObject<JArray>(@"[
+            const string json = @"{'parameterEditors': [
     {
         alias: 'parameter1',
         name: 'My Parameter',
@@ -246,116 +236,47 @@ namespace Umbraco.Tests.Manifest
         name: 'Another parameter',
         config: { key1: 'some config val' },
         view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
+    },
+    {
+        alias: 'parameter3',
+        name: 'Yet another parameter'
     }
-]");
-            var parser = _parser.GetParameterEditors(a);
+]}";
 
-            Assert.AreEqual(2, parser.Count());
-            Assert.AreEqual("parameter1", parser.ElementAt(0).Alias);
-            Assert.AreEqual("My Parameter", parser.ElementAt(0).Name);
-            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(3, manifest.ParameterEditors.Length);
 
-            Assert.AreEqual("parameter2", parser.ElementAt(1).Alias);
-            Assert.AreEqual("Another parameter", parser.ElementAt(1).Name);
-            Assert.IsTrue(parser.ElementAt(1).Configuration.ContainsKey("key1"));
-            Assert.AreEqual("some config val", parser.ElementAt(1).Configuration["key1"]);
-        }
+            var editor = manifest.ParameterEditors[1];
+            Assert.AreEqual("parameter2", editor.Alias);
+            Assert.AreEqual("Another parameter", editor.Name);
 
-        [Test]
-        public void Merge_JArrays()
-        {
-            var obj1 = JArray.FromObject(new[] { "test1", "test2", "test3" });
-            var obj2 = JArray.FromObject(new[] { "test1", "test2", "test3", "test4" });
+            var config = editor.Configuration;
+            Assert.AreEqual(1, config.Count);
+            Assert.IsTrue(config.ContainsKey("key1"));
+            Assert.AreEqual("some config val", config["key1"]);
 
-            ManifestParser.MergeJArrays(obj1, obj2);
+            var valueEditor = editor.ValueEditor;
+            Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html", valueEditor.View);
 
-            Assert.AreEqual(4, obj1.Count());
-        }
-
-        [Test]
-        public void Merge_JObjects_Replace_Original()
-        {
-            var obj1 = JObject.FromObject(new
-                {
-                    Property1 = "Value1",
-                    Property2 = "Value2",
-                    Property3 = "Value3"
-                });
-
-            var obj2 = JObject.FromObject(new
+            editor = manifest.ParameterEditors[2];
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                Property3 = "Value3/2",
-                Property4 = "Value4",
-                Property5 = "Value5"
+                var _ = editor.ValueEditor;
             });
-
-            ManifestParser.MergeJObjects(obj1, obj2);
-
-            Assert.AreEqual(5, obj1.Properties().Count());
-            Assert.AreEqual("Value3/2", obj1.Properties().ElementAt(2).Value.Value<string>());
         }
 
         [Test]
-        public void Merge_JObjects_Keep_Original()
+        public void CanParseManifest_GridEditors()
         {
-            var obj1 = JObject.FromObject(new
-            {
-                Property1 = "Value1",
-                Property2 = "Value2",
-                Property3 = "Value3"
-            });
-
-            var obj2 = JObject.FromObject(new
-            {
-                Property3 = "Value3/2",
-                Property4 = "Value4",
-                Property5 = "Value5"
-            });
-
-            ManifestParser.MergeJObjects(obj1, obj2, true);
-
-            Assert.AreEqual(5, obj1.Properties().Count());
-            Assert.AreEqual("Value3", obj1.Properties().ElementAt(2).Value.Value<string>());
-        }
-
-
-        [TestCase("C:\\Test", "C:\\Test\\MyFolder\\AnotherFolder", 2)]
-        [TestCase("C:\\Test", "C:\\Test\\MyFolder\\AnotherFolder\\YetAnother", 3)]
-        [TestCase("C:\\Test", "C:\\Test\\", 0)]
-        public void Get_Folder_Depth(string baseFolder, string currFolder, int expected)
-        {
-            Assert.AreEqual(expected,
-                _parser.FolderDepth(
-                new DirectoryInfo(baseFolder),
-                new DirectoryInfo(currFolder)));
-        }
-
-
-
-        //[Test]
-        //public void Parse_Property_Editor()
-        //{
-
-        //}
-
-        [Test]
-        public void Create_Manifests_Editors()
-        {
-            var package1 = @"{
-propertyEditors: [],
-javascript: ['~/test.js', '~/test2.js']}";
-
-            var package2 = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
-
-            var package3 = @"{
+            const string json = @"{
     'javascript': [    ],
     'css': [     ],
     'gridEditors': [
         {
             'name': 'Small Hero',
             'alias': 'small-hero',
-            'view': '/App_Plugins/MyPlugin/small-hero/editortemplate.html',
-            'render': '/Views/Partials/Grid/Editors/SmallHero.cshtml',
+            'view': '~/App_Plugins/MyPlugin/small-hero/editortemplate.html',
+            'render': '~/Views/Partials/Grid/Editors/SmallHero.cshtml',
             'icon': 'icon-presentation',
             'config': {
                 'image': {
@@ -373,144 +294,32 @@ javascript: ['~/test.js', '~/test2.js']}";
         {
             'name': 'Document Links By Category',
             'alias': 'document-links-by-category',
-            'view': '/App_Plugins/MyPlugin/document-links-by-category/editortemplate.html',
-            'render': '/Views/Partials/Grid/Editors/DocumentLinksByCategory.cshtml',
+            'view': '~/App_Plugins/MyPlugin/document-links-by-category/editortemplate.html',
+            'render': '~/Views/Partials/Grid/Editors/DocumentLinksByCategory.cshtml',
             'icon': 'icon-umb-members'
         }
     ]
 }";
-            var package4 = @"{'propertyEditors': [
-    {
-        alias: 'Test.Test1',
-        name: 'Test 1',
-        editor: {
-            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
-            valueType: 'int',
-            validation: {
-                'required': true,
-                'Regex': '\\d*'
-            }
-        },
-        prevalues: {
-                fields: [
-                    {
-                        label: 'Some config 1',
-                        key: 'key1',
-                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
-                        validation: {
-                            required: true
-                        }
-                    },
-                    {
-                        label: 'Some config 2',
-                        key: 'key2',
-                        view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
-                    }
-                ]
-            }
-    }
-]}";
+            var manifest = _parser.ParseManifest(json);
+            Assert.AreEqual(2, manifest.GridEditors.Length);
 
-            var package5 = @"{'parameterEditors': [
-    {
-        alias: 'parameter1',
-        name: 'My Parameter',
-        view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html'
-    },
-    {
-        alias: 'parameter2',
-        name: 'Another parameter',
-        config: { key1: 'some config val' },
-        view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
-    }
-]}";
+            var editor = manifest.GridEditors[0];
+            Assert.AreEqual("small-hero", editor.Alias);
+            Assert.AreEqual("Small Hero", editor.Name);
+            Assert.AreEqual("/App_Plugins/MyPlugin/small-hero/editortemplate.html", editor.View);
+            Assert.AreEqual("/Views/Partials/Grid/Editors/SmallHero.cshtml", editor.Render);
+            Assert.AreEqual("icon-presentation", editor.Icon);
 
-            var result = _parser.CreateManifests(package1, package2, package3, package4, package5).ToArray();
+            var config = editor.Config;
+            Assert.AreEqual(2, config.Count);
+            Assert.IsTrue(config.ContainsKey("image"));
+            var c = config["image"];
+            Assert.IsInstanceOf<JObject>(c); // fixme - is this what we want?
+            Assert.IsTrue(config.ContainsKey("link"));
+            c = config["link"];
+            Assert.IsInstanceOf<JObject>(c); // fixme - is this what we want?
 
-            var paramEditors = result.SelectMany(x => _parser.GetParameterEditors(x.ParameterEditors)).ToArray();
-            var propEditors = result.SelectMany(x => _parser.GetPropertyEditors(x.PropertyEditors)).ToArray();
-            var gridEditors = result.SelectMany(x => _parser.GetGridEditors(x.GridEditors)).ToArray();
-
-            Assert.AreEqual(2, gridEditors.Count());
-            Assert.AreEqual(2, paramEditors.Count());
-            Assert.AreEqual(1, propEditors.Count());
-
+            // fixme - should we resolveUrl in configs?
         }
-
-        [Test]
-        public void Create_Manifest_With_Line_Comments()
-        {
-            var content4 = @"{
-//here's the property editors
-propertyEditors: [],
-//and here's the javascript
-javascript: ['~/test.js', '~/test2.js']}";
-
-            var result = _parser.CreateManifests(null, content4);
-
-            Assert.AreEqual(1, result.Count());
-        }
-
-        [Test]
-        public void Create_Manifest_With_Surround_Comments()
-        {
-            var content4 = @"{
-propertyEditors: []/*we have empty property editors**/,
-javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js']}";
-
-            var result = _parser.CreateManifests(null, content4);
-
-            Assert.AreEqual(1, result.Count());
-        }
-
-        [Test]
-        public void Create_Manifest_With_Error()
-        {
-            //NOTE: This is missing the final closing ]
-            var content4 = @"{
-propertyEditors: []/*we have empty property editors**/,
-javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js' }";
-
-            var result = _parser.CreateManifests(null, content4);
-
-            //an error has occurred and been logged but processing continues
-            Assert.AreEqual(0, result.Count());
-        }
-
-        [Test]
-        public void Create_Manifest_From_File_Content()
-        {
-            var content1 = "{}";
-            var content2 = "{javascript: []}";
-            var content3 = "{javascript: ['~/test.js', '~/test2.js']}";
-            var content4 = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
-            var content5 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble()) + "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
-
-            var result = _parser.CreateManifests(null, content1, content2, content3, content4, content5);
-
-            Assert.AreEqual(5, result.Count());
-            Assert.AreEqual(0, result.ElementAt(1).JavaScriptInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(2).JavaScriptInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(3).JavaScriptInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(4).JavaScriptInitialize.Count);
-        }
-
-        [Test]
-        public void Parse_Stylesheet_Initialization()
-        {
-            var content1 = "{}";
-            var content2 = "{css: []}";
-            var content3 = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
-            var content4 = "{propertyEditors: [], css: ['~/stylesheet.css', '~/random-long-name.css']}";
-
-            var result = _parser.CreateManifests(null, content1, content2, content3, content4);
-
-            Assert.AreEqual(4, result.Count());
-            Assert.AreEqual(0, result.ElementAt(1).StylesheetInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(2).StylesheetInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(3).StylesheetInitialize.Count);
-        }
-
-
     }
 }
