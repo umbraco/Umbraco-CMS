@@ -247,7 +247,7 @@ namespace Umbraco.Web
 
                 // When we have the node, we add the GUID/INT value to the lookup
                 if (doc != null)
-                    _guidToIntLoopkup.TryAdd(id, doc.Id);
+                    _guidToIntLoopkup[id] = doc.Id;
             }
             else
             {
