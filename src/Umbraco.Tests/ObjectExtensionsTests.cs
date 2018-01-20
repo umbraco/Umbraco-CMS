@@ -161,9 +161,9 @@ namespace Umbraco.Tests
             var obj = new MyTestObject();
             var result = obj.TryConvertTo<object>();
 
-            Assert.AreEqual(obj, result.Result);            
+            Assert.AreEqual(obj, result.Result);
         }
-		
+
 		private CultureInfo savedCulture;
 
 	    /// <summary>
