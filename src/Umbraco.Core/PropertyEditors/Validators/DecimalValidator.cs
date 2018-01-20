@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates that the value is a valid decimal

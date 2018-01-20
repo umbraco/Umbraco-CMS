@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors

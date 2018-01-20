@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.ImageCropper, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
     public class ImageCropperPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
@@ -61,7 +61,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new ImageCropperPreValueEditor();
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>A value indicating whether a property is an image cropper field, and (optionaly) has a non-empty value.</returns>
         private static bool IsCropperField(Property property, bool ensureValue)
         {
-            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.ImageCropperAlias)
+            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.Aliases.ImageCropper)
                 return false;
             if (ensureValue == false)
                 return true;
@@ -220,6 +220,8 @@ namespace Umbraco.Web.PropertyEditors
                         continue;
                     }
 
+                    var v = JsonConvert.DeserializeObject<ImageCropperValue>()
+
                     var jo = GetJObject(svalue, false);
                     string src;
                     if (jo == null)
@@ -250,7 +252,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ImageCropperPreValueEditor : PreValueEditor
         {
-            [PreValueField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
+            [DataTypeConfigurationField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
             public string Crops { get; set; }
         }
     }

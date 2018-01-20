@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
             };
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new SingleMediaPickerPreValueEditor();
         }
@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             public SingleMediaPickerPreValueEditor()
             {
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "startNodeId",
                     View = "mediapicker",

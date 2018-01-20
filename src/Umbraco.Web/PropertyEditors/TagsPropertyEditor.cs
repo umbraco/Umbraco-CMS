@@ -11,7 +11,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     [SupportTags(typeof(TagPropertyEditorTagDefinition), ValueType = TagValueType.CustomTagList)]
-    [PropertyEditor(Constants.PropertyEditors.TagsAlias, "Tags", "tags", Icon="icon-tags")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
     public class TagsPropertyEditor : PropertyEditor
     {
         public TagsPropertyEditor(ILogger logger) : base(logger)
@@ -39,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
             return new TagPropertyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new TagPreValueEditor();
         }
@@ -48,19 +48,14 @@ namespace Umbraco.Web.PropertyEditors
         {
             public TagPropertyValueEditor(PropertyValueEditor wrapped)
                 : base(wrapped)
-            {
-            }
+            { }
 
-            /// <summary>
-            /// This needs to return IEnumerable{string}
-            /// </summary>
-            /// <param name="editorValue"></param>
-            /// <param name="currentValue"></param>
-            /// <returns></returns>
+            /// <inheritdoc />
             public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {
-                var json = editorValue.Value as JArray;
-                return json == null ? null : json.Select(x => x.Value<string>());
+                return editorValue.Value is JArray json
+                    ? json.Select(x => x.Value<string>())
+                    : null;
             }
 
             /// <summary>
@@ -87,15 +82,8 @@ namespace Umbraco.Web.PropertyEditors
             [ValueValidator("Required")]
             private class RequiredTagsValueValidator : ManifestValueValidator
             {
-                /// <summary>
-                /// Validates a null value or an empty json value
-                /// </summary>
-                /// <param name="value"></param>
-                /// <param name="config"></param>
-                /// <param name="preValues"></param>
-                /// <param name="editor"></param>
-                /// <returns></returns>
-                public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
+                /// <inheritdoc />
+                public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
                 {
                     if (value == null)
                     {
@@ -123,7 +111,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             public TagPreValueEditor()
             {
-                Fields.Add(new PreValueField(new ManifestPropertyValidator { Type = "Required" })
+                Fields.Add(new DataTypeConfigurationField(new ManifestPropertyValidator { Type = "Required" })
                 {
                     Description = "Define a tag group",
                     Key = "group",
@@ -131,7 +119,7 @@ namespace Umbraco.Web.PropertyEditors
                     View = "requiredfield"
                 });
 
-                Fields.Add(new PreValueField(new ManifestPropertyValidator {Type = "Required"})
+                Fields.Add(new DataTypeConfigurationField(new ManifestPropertyValidator {Type = "Required"})
                 {
                     Description = "Select whether to store the tags in cache as CSV (default) or as JSON. The only benefits of storage as JSON is that you are able to have commas in a tag value but this will require parsing the json in your views or using a property value converter",
                     Key = "storageType",

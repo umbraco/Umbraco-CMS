@@ -41,7 +41,7 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
             {
                 // AutoPublishedContentType will auto-generate other properties
-                publishedContentTypeFactory.CreatePropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
+                publishedContentTypeFactory.CreatePropertyType("content", 0, Constants.PropertyEditors.Aliases.TinyMce),
             };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;

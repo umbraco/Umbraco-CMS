@@ -30,7 +30,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias == Constants.PropertyEditors.MacroContainerAlias;
+            => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.MacroContainer;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IHtmlString);

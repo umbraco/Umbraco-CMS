@@ -83,14 +83,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
-                var dataType = (IDataType)new DataType(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                var dataType = (IDataType)new DataType(container2.Id, Constants.PropertyEditors.Aliases.RadioButtonList)
                 {
                     Name = "dt1"
                 };
                 repository.Save(dataType);
 
                 //create a
-                var dataType2 = (IDataType)new DataType(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                var dataType2 = (IDataType)new DataType(dataType.Id, Constants.PropertyEditors.Aliases.RadioButtonList)
                 {
                     Name = "dt2"
                 };
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                var dataTypeDefinition = new DataType(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var dataTypeDefinition = new DataType(container.Id, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                IDataType dataType = new DataType(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                IDataType dataType = new DataType(container.Id, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
                 repository.Save(dataType);
 
                 // Act
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                IDataType dataType = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) {Name = "test"};
+                IDataType dataType = new DataType(-1, Constants.PropertyEditors.Aliases.RadioButtonList) {Name = "test"};
 
                 repository.Save(dataType);
 
@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
 
                 // Act
-                var query = scope.SqlContext.Query<IDataType>().Where(x => x.EditorAlias == Constants.PropertyEditors.RadioButtonListAlias);
+                var query = scope.SqlContext.Query<IDataType>().Where(x => x.EditorAlias == Constants.PropertyEditors.Aliases.RadioButtonList);
                 var result = repository.Get(query);
 
                 // Assert
@@ -447,7 +447,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var dataTypeDefinition = new DataType(-1, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 var dtid = dataTypeDefinition.Id;
@@ -469,7 +469,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                var dataTypeDefinition = new DataType(-1, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 var dtid = dataTypeDefinition.Id;
@@ -493,7 +493,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = Container.GetInstance<IDataTypeRepository>();
-                dtd = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                dtd = new DataType(-1, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
                 repository.Save(dtd);
 
                 scope.Database.Insert(new DataTypePreValueDto { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });
@@ -526,7 +526,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = Container.GetInstance<IDataTypeRepository>();
-                dtd = new DataType(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                dtd = new DataType(-1, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
                 repository.Save(dtd);
 
                 id = scope.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 0, Value = "test1" });

@@ -12,10 +12,10 @@ namespace Umbraco.Web.Models.Mapping
     {
         public DataTypeDatabaseType Resolve(DataTypeSave source)
         {
-            var propertyEditor = Current.PropertyEditors[source.SelectedEditor];
+            var propertyEditor = Current.PropertyEditors[source.EditorAlias];
             if (propertyEditor == null)
             {
-                throw new InvalidOperationException("Could not find property editor with id " + source.SelectedEditor);
+                throw new InvalidOperationException("Could not find property editor with id " + source.EditorAlias);
             }
             return propertyEditor.ValueEditor.GetDatabaseType();
         }

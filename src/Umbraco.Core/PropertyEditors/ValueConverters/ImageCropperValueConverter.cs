@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 
@@ -13,13 +14,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// <summary>
     /// This ensures that the cropper config (pre-values/crops) are merged in with the front-end value.
     /// </summary>
-    [DefaultPropertyValueConverter(typeof (JsonValueConverter))] //this shadows the JsonValueConverter
-    public class ImageCropperValueConverter : JsonValueConverter
+    [DefaultPropertyValueConverter]
+    public class ImageCropperValueConverter : PropertyValueConverterBase
     {
         private readonly IDataTypeService _dataTypeService;
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ImageCropper);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (JToken);
@@ -37,60 +38,37 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
         }
 
-        internal static void MergePreValues(JObject currentValue, IDataTypeService dataTypeService, int dataTypeId)
+        // represents the editor value (the one that is serialized to Json)
+        internal class ImageCropperValue : ImageCropperEditorConfiguration
         {
-            //need to lookup the pre-values for this data type
-            //TODO: Change all singleton access to use ctor injection in v8!!!
-            var dt = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
+            [JsonProperty("src")]
+            public string Src { get; set; }
+        }
 
-            if (dt != null && dt.IsDictionaryBased && dt.PreValuesAsDictionary.ContainsKey("crops"))
+        internal static void MergeConfiguration(ImageCropperValue value, IDataTypeService dataTypeService, int dataTypeId)
+        {
+            // merge the crop values - the alias + width + height comes from
+            // configuration, but each crop can store its own coordinates
+
+            var configuration = dataTypeService.GetDataType(dataTypeId).ConfigurationAs<ImageCropperEditorConfiguration>();
+            var configuredCrops = configuration.Crops;
+            var crops = value.Crops.ToList();
+
+            foreach (var configuredCrop in configuredCrops)
             {
-                var cropsString = dt.PreValuesAsDictionary["crops"].Value;
-                JArray preValueCrops;
-                try
+                var crop = crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+                if (crop != null)
                 {
-                    preValueCrops = JsonConvert.DeserializeObject<JArray>(cropsString);
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
-                    return;
-                }
-
-                //now we need to merge the crop values - the alias + width + height comes from pre-configured pre-values,
-                // however, each crop can store it's own coordinates
-
-                JArray existingCropsArray;
-                if (currentValue["crops"] != null)
-                {
-                    existingCropsArray = (JArray)currentValue["crops"];
+                    crop.Width = configuredCrop.Width;
+                    crop.Height = configuredCrop.Height;
                 }
                 else
                 {
-                    currentValue["crops"] = existingCropsArray = new JArray();
-                }
-
-                foreach (var preValueCrop in preValueCrops.Where(x => x.HasValues))
-                {
-                    var found = existingCropsArray.FirstOrDefault(x =>
-                    {
-                        if (x.HasValues && x["alias"] != null)
-                        {
-                            return x["alias"].Value<string>() == preValueCrop["alias"].Value<string>();
-                        }
-                        return false;
-                    });
-                    if (found != null)
-                    {
-                        found["width"] = preValueCrop["width"];
-                        found["height"] = preValueCrop["height"];
-                    }
-                    else
-                    {
-                        existingCropsArray.Add(preValueCrop);
-                    }
+                    crops.Add(configuredCrop);
                 }
             }
+
+            value.Crops = crops.ToArray();
         }
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
@@ -98,30 +76,28 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (source == null) return null;
             var sourceString = source.ToString();
 
-            if (sourceString.DetectIsJson())
+            // not json, just return the string
+            // fixme how can that even work?
+            if (!sourceString.DetectIsJson())
+                return sourceString;
+
+            ImageCropperValue value;
+            try
             {
-                JObject obj;
-                try
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, new JsonSerializerSettings
                 {
-                    obj = JsonConvert.DeserializeObject<JObject>(sourceString, new JsonSerializerSettings
-                    {
-                        Culture = CultureInfo.InvariantCulture,
-                        FloatParseHandling = FloatParseHandling.Decimal
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Current.Logger.Error<ImageCropperValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
-                    return sourceString;
-                }
-
-                MergePreValues(obj, _dataTypeService, propertyType.DataType.Id);
-
-                return obj;
+                    Culture = CultureInfo.InvariantCulture,
+                    FloatParseHandling = FloatParseHandling.Decimal
+                });
+            }
+            catch (Exception ex)
+            {
+                Current.Logger.Error<ImageCropperValueConverter>($"Could not deserialize string \"{sourceString}\" into an image cropper value.", ex);
+                return sourceString;
             }
 
-            //it's not json, just return the string
-            return sourceString;
+            MergeConfiguration(value, _dataTypeService, propertyType.DataType.Id);
+            return value;
         }
     }
 }

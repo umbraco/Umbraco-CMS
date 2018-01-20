@@ -116,9 +116,9 @@ namespace Umbraco.Tests.Published
             var source = new DataTypeConfigurationSource(dataTypeService.Object, editors);
             var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, source);
 
-            var propertyType1 = factory.CreatePropertyType("property1", 1, Constants.PropertyEditors.NestedContentAlias);
-            var propertyType2 = factory.CreatePropertyType("property2", 2, Constants.PropertyEditors.NestedContentAlias);
-            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 0, Constants.PropertyEditors.TextboxAlias);
+            var propertyType1 = factory.CreatePropertyType("property1", 1, Constants.PropertyEditors.Aliases.NestedContent);
+            var propertyType2 = factory.CreatePropertyType("property2", 2, Constants.PropertyEditors.Aliases.NestedContent);
+            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 0, Constants.PropertyEditors.Aliases.Textbox);
 
             var contentType1 = factory.CreateContentType(1, "content1", new[] { propertyType1 });
             var contentType2 = factory.CreateContentType(2, "content2", new[] { propertyType2 });

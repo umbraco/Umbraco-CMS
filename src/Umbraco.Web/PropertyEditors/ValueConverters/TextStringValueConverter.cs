@@ -12,8 +12,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private static readonly string[] PropertyTypeAliases =
         {
-            Constants.PropertyEditors.TextboxAlias,
-            Constants.PropertyEditors.TextboxMultipleAlias
+            Constants.PropertyEditors.Aliases.Textbox,
+            Constants.PropertyEditors.Aliases.TextboxMultiple
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)

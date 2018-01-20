@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.ListView, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
     public class ListViewPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
         {
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new ListViewPreValueEditor();
         }
@@ -59,30 +59,30 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ListViewPreValueEditor : PreValueEditor
         {
-            [PreValueField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
+            [DataTypeConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
             public int TabName { get; set; }
 
-            [PreValueField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
+            [DataTypeConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
             public int DisplayAtTabNumber { get; set; }
 
-            [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
+            [DataTypeConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
-            [PreValueField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
+            [DataTypeConfigurationField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
             public int Layouts { get; set; }
 
-            [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
+            [DataTypeConfigurationField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
                 Description = "The properties that will be displayed for each column")]
             public object IncludeProperties { get; set; }
 
-            [PreValueField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
+            [DataTypeConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
                 Description = "The default sort order for the list")]
             public int OrderBy { get; set; }
 
-            [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
+            [DataTypeConfigurationField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
 
-            [PreValueField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
+            [DataTypeConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
                 Description = "The bulk actions that are allowed from the list view")]
             public BulkActionPermissionSettings BulkActionPermissions { get; set; }
 

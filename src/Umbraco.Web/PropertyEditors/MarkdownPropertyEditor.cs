@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MarkdownEditorAlias, "Markdown editor", "markdowneditor", ValueType = PropertyEditorValueTypes.Text, Icon="icon-code", Group="rich content")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.MarkdownEditor, "Markdown editor", "markdowneditor", ValueType = PropertyEditorValueTypes.Text, Icon="icon-code", Group="rich content")]
     public class MarkdownPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -14,17 +14,17 @@ namespace Umbraco.Web.PropertyEditors
         {
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new MarkdownPreValueEditor();
         }
 
         internal class MarkdownPreValueEditor : PreValueEditor
         {
-            [PreValueField("preview", "Preview", "boolean", Description = "Display a live preview")]
+            [DataTypeConfigurationField("preview", "Preview", "boolean", Description = "Display a live preview")]
             public bool DisplayLivePreview { get; set; }
 
-            [PreValueField("defaultValue", "Default value", "textarea", Description = "If value is blank, the editor will show this")]
+            [DataTypeConfigurationField("defaultValue", "Default value", "textarea", Description = "If value is blank, the editor will show this")]
             public string DefaultValue { get; set; }
         }
     }

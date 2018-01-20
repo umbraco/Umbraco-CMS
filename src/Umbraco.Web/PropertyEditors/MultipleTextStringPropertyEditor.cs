@@ -8,11 +8,12 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleTextstringAlias, "Repeatable textstrings", "multipletextbox", ValueType = PropertyEditorValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = PropertyEditorValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
     public class MultipleTextStringPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -26,7 +27,7 @@ namespace Umbraco.Web.PropertyEditors
             return new MultipleTextStringPropertyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new MultipleTextStringPreValueEditor(Logger);
         }
@@ -42,14 +43,14 @@ namespace Umbraco.Web.PropertyEditors
             {
                 _logger = logger;
                 //create the fields
-                Fields.Add(new PreValueField(new IntegerValidator())
+                Fields.Add(new DataTypeConfigurationField(new IntegerValidator())
                 {
                     Description = "Enter the minimum amount of text boxes to be displayed",
                     Key = "min",
                     View = "requiredfield",
                     Name = "Minimum"
                 });
-                Fields.Add(new PreValueField(new IntegerValidator())
+                Fields.Add(new DataTypeConfigurationField(new IntegerValidator())
                 {
                     Description = "Enter the maximum amount of text boxes to be displayed, enter 0 for unlimited",
                     Key = "max",

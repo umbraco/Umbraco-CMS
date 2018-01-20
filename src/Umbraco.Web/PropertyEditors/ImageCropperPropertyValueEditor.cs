@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors
             var json = val as JObject;
             if (json != null)
             {
-                ImageCropperValueConverter.MergePreValues(json, dataTypeService, propertyType.DataTypeDefinitionId);
+                ImageCropperValueConverter.MergeConfiguration(json, dataTypeService, propertyType.DataTypeDefinitionId);
                 return json;
             }
 

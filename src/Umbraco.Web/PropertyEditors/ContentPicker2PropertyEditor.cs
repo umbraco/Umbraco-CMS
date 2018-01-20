@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Content property editor that stores UDI
     /// </summary>
-    [PropertyEditor(Constants.PropertyEditors.ContentPicker2Alias, "Content Picker", PropertyEditorValueTypes.String, "contentpicker", IsParameterEditor = true, Group = "Pickers")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.ContentPicker2Alias, "Content Picker", PropertyEditorValueTypes.String, "contentpicker", IsParameterEditor = true, Group = "Pickers")]
     public class ContentPicker2PropertyEditor : PropertyEditor
     {
         public ContentPicker2PropertyEditor(ILogger logger)
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
             set => InternalPreValues = value;
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new ContentPickerPreValueEditor();
         }
@@ -42,14 +42,14 @@ namespace Umbraco.Web.PropertyEditors
             public ContentPickerPreValueEditor()
             {
                 //create the fields
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "showOpenButton",
                     View = "boolean",
                     Name = "Show open button (this feature is in preview!)",
                     Description = "Opens the node in a dialog"
                 });
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "startNodeId",
                     View = "treepicker",

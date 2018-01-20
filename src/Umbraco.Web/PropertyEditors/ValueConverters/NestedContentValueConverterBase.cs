@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public static bool IsNested(PublishedPropertyType publishedProperty)
         {
-            return publishedProperty.EditorAlias.InvariantEquals(Constants.PropertyEditors.NestedContentAlias);
+            return publishedProperty.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.NestedContent);
         }
 
         public static bool IsNestedSingle(PublishedPropertyType publishedProperty)

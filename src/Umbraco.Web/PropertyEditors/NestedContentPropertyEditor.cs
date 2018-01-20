@@ -15,7 +15,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.NestedContentAlias, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.NestedContent, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
     public class NestedContentPropertyEditor : PropertyEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Pre Value Editor
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new NestedContentPreValueEditor();
         }
@@ -67,22 +67,22 @@ namespace Umbraco.Web.PropertyEditors
         {
             internal const string ContentTypesPreValueKey = "contentTypes";
 
-            [PreValueField(ContentTypesPreValueKey, "Doc Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
+            [DataTypeConfigurationField(ContentTypesPreValueKey, "Doc Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
             public string[] ContentTypes { get; set; }
 
-            [PreValueField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
+            [DataTypeConfigurationField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
             public string MinItems { get; set; }
 
-            [PreValueField("maxItems", "Max Items", "number", Description = "Set the maximum number of items allowed.")]
+            [DataTypeConfigurationField("maxItems", "Max Items", "number", Description = "Set the maximum number of items allowed.")]
             public string MaxItems { get; set; }
 
-            [PreValueField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
+            [DataTypeConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
             public string ConfirmDeletes { get; set; }
 
-            [PreValueField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
+            [DataTypeConfigurationField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
             public string ShowIcons { get; set; }
 
-            [PreValueField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
+            [DataTypeConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
             public string HideLabel { get; set; }
         }
 
@@ -317,14 +317,13 @@ namespace Umbraco.Web.PropertyEditors
                         else
                         {
                             // Fetch the property types prevalue
-                            var propPreValues = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(
-                                propType.DataTypeDefinitionId);
+                            var propConfiguration = Services.DataTypeService.GetDataType(propType.DataTypeDefinitionId).Configuration;
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                             // Create a fake content property data object
-                            var contentPropData = new ContentPropertyData(propValues[propKey], propPreValues);
+                            var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
 
                             // Get the property editor to do it's conversion
                             var newValue = propEditor.ValueEditor.ConvertEditorToDb(contentPropData, propValues[propKey]);
@@ -351,7 +350,7 @@ namespace Umbraco.Web.PropertyEditors
                 _propertyEditors = propertyEditors;
             }
 
-            public IEnumerable<ValidationResult> Validate(object rawValue, PreValueCollection preValues, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object rawValue, object dataTypeConfiguration, PropertyEditor editor)
             {
                 var value = JsonConvert.DeserializeObject<List<object>>(rawValue.ToString());
                 if (value == null)
@@ -364,10 +363,7 @@ namespace Umbraco.Web.PropertyEditors
                     var propValues = (JObject) o;
 
                     var contentType = GetElementType(propValues);
-                    if (contentType == null)
-                    {
-                        continue;
-                    }
+                    if (contentType == null) continue;
 
                     var propValueKeys = propValues.Properties().Select(x => x.Name).ToArray();
 
@@ -376,12 +372,12 @@ namespace Umbraco.Web.PropertyEditors
                         var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
                         if (propType != null)
                         {
-                            var propPrevalues = dataTypeService.GetPreValuesCollectionByDataTypeId(propType.DataTypeDefinitionId);
-                            PropertyEditor propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
+                            var config = dataTypeService.GetDataType(propType.DataTypeDefinitionId).Configuration;
+                            var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                             foreach (var validator in propertyEditor.ValueEditor.Validators)
                             {
-                                foreach (var result in validator.Validate(propValues[propKey], propPrevalues, propertyEditor))
+                                foreach (var result in validator.Validate(propValues[propKey], config, propertyEditor))
                                 {
                                     result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
                                     yield return result;

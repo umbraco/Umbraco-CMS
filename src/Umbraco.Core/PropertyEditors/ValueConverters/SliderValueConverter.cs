@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.SliderAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Slider);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => IsRangeDataType(propertyType.DataType.Id) ? typeof (Range<decimal>) : typeof (decimal);
@@ -72,14 +72,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return Storages.GetOrAdd(dataTypeId, id =>
             {
                 var dataType = _dataTypeService.GetDataType(id);
-                var configuration = dataType.Configuration as SliderPropertyEditor.Configuration; // fixme - why is the converter in Core if the editor is in Web?
-                return configuration.IsRange;
-                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
-                    .PreValuesAsDictionary
-                    .FirstOrDefault(x => string.Equals(x.Key, "enableRange", StringComparison.InvariantCultureIgnoreCase))
-                    .Value;
-
-                return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
+                var configuration = dataType.ConfigurationAs<SliderPropertyEditorConfiguration>();
+                return configuration.EnableRange;
             });
         }
 

@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
         private static readonly string[] MatchingEditors = {
             Constants.PropertyEditors.RelatedLinksAlias,
-            Constants.PropertyEditors.RelatedLinks2Alias
+            Constants.PropertyEditors.Aliases.RelatedLinks2
         };
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -72,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                             var intLink = helper.NiceUrl(intLinkId);
                                             a["link"] = intLink;
                                             break;
-                                        case Constants.PropertyEditors.RelatedLinks2Alias:
+                                        case Constants.PropertyEditors.Aliases.RelatedLinks2:
                                             var strLinkId = a.Value<string>("link");
                                             var udiAttempt = strLinkId.TryConvertTo<Udi>();
                                             if (udiAttempt)

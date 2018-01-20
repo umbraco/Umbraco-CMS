@@ -11,10 +11,10 @@ namespace Umbraco.Core.Models.Editors
     /// </remarks>
     public class ContentPropertyData
     {
-        public ContentPropertyData(object value, PreValueCollection preValues)
+        public ContentPropertyData(object value, object dataTypeConfiguration)
         {
             Value = value;
-            PreValues = preValues;
+            DataTypeConfiguration = dataTypeConfiguration;
         }
 
         /// <summary>
@@ -23,9 +23,9 @@ namespace Umbraco.Core.Models.Editors
         public object Value { get; }
 
         /// <summary>
-        /// The pre-value collection for the content property
+        /// The data type configuration for the property.
         /// </summary>
-        public PreValueCollection PreValues { get; }
+        public object DataTypeConfiguration { get; }
 
         /// <summary>
         /// Gets or sets the unique identifier of the content owning the property.

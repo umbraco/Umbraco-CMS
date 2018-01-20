@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
                     "No property editor found, converting to a Label",
                     new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"));
 
-                editor = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias];
+                editor = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
             }
             var result = new TDestination
                 {

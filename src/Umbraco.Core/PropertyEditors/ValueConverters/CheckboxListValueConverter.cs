@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         private static readonly char[] Comma = { ',' };
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.CheckBoxListAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.CheckBoxList);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);

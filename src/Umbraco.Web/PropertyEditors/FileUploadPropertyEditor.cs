@@ -13,7 +13,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
     public class FileUploadPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
@@ -43,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new FileUploadPreValueEditor(_textService, Logger);
         }
@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>A value indicating whether a property is an upload field, and (optionaly) has a non-empty value.</returns>
         private static bool IsUploadField(Property property, bool ensureValue)
         {
-            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.UploadFieldAlias)
+            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.Aliases.UploadField)
                 return false;
             if (ensureValue == false)
                 return true;
@@ -232,7 +232,7 @@ namespace Umbraco.Web.PropertyEditors
 
             internal class ThumbnailListValidator : IPropertyValidator
             {
-                public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+                public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
                 {
                     if (!(value is JArray json)) yield break;
 

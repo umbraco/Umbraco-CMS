@@ -23,11 +23,11 @@ namespace Umbraco.Web.Models.Mapping
             var display = base.Convert(originalProp, dest, context);
 
             var dataTypeService = DataTypeService.Value;
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
+            var config = dataTypeService.GetDataType(originalProp.PropertyType.DataTypeDefinitionId).Configuration;
 
             //configure the editor for display with the pre-values
             var valEditor = display.PropertyEditor.ValueEditor;
-            valEditor.ConfigureForDisplay(preVals);
+            valEditor.ConfigureForDisplay(config);
 
             //set the display properties after mapping
             display.Alias = originalProp.Alias;

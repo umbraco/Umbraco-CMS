@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     /// as INT and we have logic in here to ensure it is formatted correctly including ensuring that the string value is published
     /// in cache and not the int ID.
     /// </remarks>
-    [PropertyEditor(Constants.PropertyEditors.CheckBoxListAlias, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.CheckBoxList, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
     public class CheckBoxListPropertyEditor : PropertyEditor
     {
         private readonly ILocalizedTextService _textService;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// We are just going to re-use the ValueListPreValueEditor
         /// </remarks>
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new ValueListPreValueEditor(_textService, Logger);
         }

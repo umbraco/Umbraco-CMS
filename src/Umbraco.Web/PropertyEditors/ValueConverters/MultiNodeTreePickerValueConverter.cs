@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePickerAlias)
-                || propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias);
+                || propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2);
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     .ToArray();
                 return nodeIds;
             }
-            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2))
             {
                 var nodeIds = source.ToString()
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -106,7 +106,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     return nodeIds.FirstOrDefault();
                 }
 
-                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.MultiNodeTreePicker2Alias))
+                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2))
                 {
                     var udis = (Udi[])source;
 

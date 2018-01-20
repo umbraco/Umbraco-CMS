@@ -36,11 +36,11 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the pre-value fields
         /// </summary>
         /// <returns></returns>
-        protected List<PreValueField> CreatePreValueFields()
+        protected List<DataTypeConfigurationField> CreatePreValueFields()
         {
-            return new List<PreValueField>
+            return new List<DataTypeConfigurationField>
                 {
-                    new PreValueField(new EnsureUniqueValuesValidator())
+                    new DataTypeConfigurationField(new EnsureUniqueValuesValidator())
                         {
                             Description = "Add and remove values for the list",
                             //we're going to call this 'items' because we are going to override the
@@ -140,7 +140,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class EnsureUniqueValuesValidator : IPropertyValidator
         {
-            public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
             {
                 var json = value as JArray;
                 if (json == null) yield break;

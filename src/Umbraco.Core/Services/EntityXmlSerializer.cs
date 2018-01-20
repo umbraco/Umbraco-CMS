@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Strings;
@@ -135,28 +136,13 @@ namespace Umbraco.Core.Services
 
         public XElement Serialize(IDataTypeService dataTypeService, IDataType dataType)
         {
-            var prevalues = new XElement("PreValues");
-            var prevalueList = dataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id)
-                .FormatAsDictionary();
-
-            var sort = 0;
-            foreach (var pv in prevalueList)
-            {
-                var prevalue = new XElement("PreValue");
-                prevalue.Add(new XAttribute("Id", pv.Value.Id));
-                prevalue.Add(new XAttribute("Value", pv.Value.Value ?? ""));
-                prevalue.Add(new XAttribute("Alias", pv.Key));
-                prevalue.Add(new XAttribute("SortOrder", sort));
-                prevalues.Add(prevalue);
-                sort++;
-            }
-
-            var xml = new XElement("DataType", prevalues);
+            var xml = new XElement("DataType");
             xml.Add(new XAttribute("Name", dataType.Name));
             //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
             xml.Add(new XAttribute("Id", dataType.EditorAlias));
             xml.Add(new XAttribute("Definition", dataType.Key));
             xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
+            xml.Add(new XAttribute("Configuration", JsonConvert.SerializeObject(dataType.Configuration)));
 
             var folderNames = string.Empty;
             if (dataType.Level != 1)

@@ -21,6 +21,7 @@ using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Strings;
 using Content = Umbraco.Core.Models.Content;
@@ -49,6 +50,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IUserService _userService;
         private readonly IAuditRepository _auditRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly PropertyEditorCollection _propertyEditors;
 
         public PackagingService(
             ILogger logger,
@@ -63,7 +65,8 @@ namespace Umbraco.Core.Services.Implement
             IUserService userService,
             IScopeProvider scopeProvider,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository)
+            IAuditRepository auditRepository, IContentTypeRepository contentTypeRepository
+            , PropertyEditorCollection propertyEditors)
         {
             _logger = logger;
             _contentService = contentService;
@@ -78,6 +81,7 @@ namespace Umbraco.Core.Services.Implement
             _urlSegmentProviders = urlSegmentProviders;
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
+            _propertyEditors = propertyEditors;
             _userService = userService;
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
@@ -270,7 +274,7 @@ namespace Umbraco.Core.Services.Implement
 
                         if (propertyType != null)
                         {
-                            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
+                            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList)
                             {
 
                                 //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
@@ -724,7 +728,7 @@ namespace Umbraco.Core.Services.Implement
                                       property.Element("Type").Value.Trim()));
 
                     //convert to a label!
-                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.NoEditAlias).FirstOrDefault();
+                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.NoEdit).FirstOrDefault();
                     //if for some odd reason this isn't there then ignore
                     if (dataTypeDefinition == null) continue;
                 }
@@ -992,33 +996,31 @@ namespace Umbraco.Core.Services.Implement
         {
             foreach (var dataTypeElement in dataTypeElements)
             {
-                var prevaluesElement = dataTypeElement.Element("PreValues");
-                if (prevaluesElement == null) continue;
+                var configurationAttribute = dataTypeElement.Attribute("Configuration");
+                if (string.IsNullOrWhiteSpace(configurationAttribute?.Value)) continue;
+                
+                var dataTypeName = dataTypeElement.Attribute("Name")?.Value;
+                var dataType = dataTypes.FirstOrDefault(x => x.Name == dataTypeName);
 
-                var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
-                var dataTypeDefinition = dataTypes.FirstOrDefault(x => x.Name == dataTypeDefinitionName);
-
-                if (dataTypeDefinition != null)
+                if (dataType == null)
                 {
-                    var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
-                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
-                        .Select(x => x.Attribute("Value").Value);
-
-                    var valuesWithKeys = prevaluesElement.Elements("PreValue")
-                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
-                        .ToDictionary(
-                            key => (string) key.Attribute("Alias"),
-                            val => new PreValue((string) val.Attribute("Value")));
-
-                    //save the values with keys
-                    _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
-
-                    //save the values without keys (this is legacy)
-                    _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
+                    _logger.Warn<PackagingService>($"No data type found with name \"{dataTypeName}\",  configuration will not be saved.");
+                    continue;
                 }
-                else
+
+                if (!_propertyEditors.TryGet(dataType.EditorAlias, out var editor))
                 {
-                    _logger.Warn<PackagingService>("No data type found with name " + dataTypeDefinitionName + " data type pre-values will not be saved");
+                    _logger.Warn<PackagingService>($"Failed to find an editor with alias \"{dataType.EditorAlias}\",  configuration will not be saved.");
+                    continue;
+                }
+
+                try
+                {
+                    dataType.Configuration = editor.DeserializeConfiguration(configurationAttribute.Value);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn<PackagingService>($"Failed to deserialize string \"{configurationAttribute.Value}\" as configuration for editor of type \"{editor.GetType().Name}\".", ex);
                 }
             }
         }

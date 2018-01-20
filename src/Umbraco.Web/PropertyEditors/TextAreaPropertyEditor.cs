@@ -4,7 +4,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.TextboxMultipleAlias, "Textarea", "textarea", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.Text, Icon="icon-application-window-alt")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.TextboxMultiple, "Textarea", "textarea", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.Text, Icon="icon-application-window-alt")]
     public class TextAreaPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -19,14 +19,14 @@ namespace Umbraco.Web.PropertyEditors
             return new TextOnlyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new TextAreaPreValueEditor();
         }
 
         internal class TextAreaPreValueEditor : PreValueEditor
         {
-            [PreValueField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
+            [DataTypeConfigurationField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
             public bool MaxChars { get; set; }
         }
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 
@@ -20,7 +21,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.TagsAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Tags);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);
@@ -61,18 +62,15 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </returns>
         private bool JsonStorageType(int dataTypeId)
         {
+            // fixme
             // GetPreValuesCollectionByDataTypeId is cached at repository level;
             // still, the collection is deep-cloned so this is kinda expensive,
             // better to cache here + trigger refresh in DataTypeCacheRefresher
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var preValue = _dataTypeService.GetPreValuesCollectionByDataTypeId(id)
-                    .PreValuesAsDictionary
-                    .FirstOrDefault(x => string.Equals(x.Key, "storageType", StringComparison.InvariantCultureIgnoreCase))
-                    .Value;
-
-                return preValue != null && preValue.Value.InvariantEquals("json");
+                var configuration = _dataTypeService.GetDataType(id).ConfigurationAs<TagsPropertyEditorConfiguration>();
+                return configuration.StorageType == TagCacheStorageType.Json;
             });
         }
 

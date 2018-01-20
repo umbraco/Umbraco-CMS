@@ -429,7 +429,7 @@
     <Compile Include="Mvc\UmbracoRequireHttpsAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="OwinMiddlewareConfiguredEventArgs.cs" />
-    <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
+    <Compile Include="PropertyEditors\DateConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DateTimePreValueEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
@@ -650,14 +650,14 @@
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
-    <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DataTypeConfigurationFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
     <Compile Include="Models\Mapping\AvailablePropertyEditorsResolver.cs" />
     <Compile Include="Models\Mapping\DatabaseTypeResolver.cs" />
     <Compile Include="Models\Mapping\DataTypeMapperProfile.cs" />
     <Compile Include="Models\Mapping\EntityMapperProfile.cs" />
-    <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
+    <Compile Include="Models\Mapping\DataTypeConfigurationFieldDisplayResolver.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />

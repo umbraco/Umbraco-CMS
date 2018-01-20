@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using System;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 
 namespace Umbraco.Core.PropertyEditors
@@ -32,15 +33,15 @@ namespace Umbraco.Core.PropertyEditors
             ReplaceTags = tagsAttribute.ReplaceTags;
             TagGroup = tagsAttribute.TagGroup;
 
-            var preValues = propertySaving.PreValues.PreValuesAsDictionary;
-            StorageType =  preValues.ContainsKey("storageType") && preValues["storageType"].Value == TagCacheStorageType.Json.ToString() ?
-                TagCacheStorageType.Json : TagCacheStorageType.Csv;
+            if (!(propertySaving.DataTypeConfiguration is TagsPropertyEditorConfiguration configuration))
+                throw new InvalidCastException($"Cannot cast configuration of type {propertySaving.DataTypeConfiguration.GetType().Name} to {typeof(TagsPropertyEditorConfiguration).Name}.");
+            StorageType = configuration.StorageType;
         }
 
         /// <summary>
         /// Defines how to store the tags in cache (CSV or Json)
         /// </summary>
-        public virtual TagCacheStorageType StorageType { get; private set; }
+        public virtual TagCacheStorageType StorageType { get; }
 
         /// <summary>
         /// Defines a custom delimiter, the default is a comma

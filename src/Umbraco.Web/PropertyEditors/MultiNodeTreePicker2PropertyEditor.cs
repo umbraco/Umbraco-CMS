@@ -6,7 +6,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePicker2Alias, "Multinode Treepicker", PropertyEditorValueTypes.Text, "contentpicker", Group = "pickers", Icon = "icon-page-add")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2, "Multinode Treepicker", PropertyEditorValueTypes.Text, "contentpicker", Group = "pickers", Icon = "icon-page-add")]
     public class MultiNodeTreePicker2PropertyEditor : PropertyEditor
     {
         public MultiNodeTreePicker2PropertyEditor(ILogger logger)
@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
             };
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new MultiNodePickerPreValueEditor();
         }
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
             public MultiNodePickerPreValueEditor()
             {
                 //create the fields
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "startNode",
                     View = "treesource",
@@ -50,26 +50,26 @@ namespace Umbraco.Web.PropertyEditors
                         {"idType", "udi"}
                     }
                 });
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "filter",
                     View = "textstring",
                     Name = "Allow items of type",
                     Description = "Separate with comma"
                 });
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "minNumber",
                     View = "number",
                     Name = "Minimum number of items"
                 });
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "maxNumber",
                     View = "number",
                     Name = "Maximum number of items"
                 });
-                Fields.Add(new PreValueField()
+                Fields.Add(new DataTypeConfigurationField()
                 {
                     Key = "showOpenButton",
                     View = "boolean",

@@ -43,10 +43,10 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
             {
                 // AutoPublishedContentType will auto-generate other properties
-                factory.CreatePropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias),
+                factory.CreatePropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.Aliases.Boolean),
                 factory.CreatePropertyType("selectedNodes", 0, "?"),
                 factory.CreatePropertyType("umbracoUrlAlias", 0, "?"),
-                factory.CreatePropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias),
+                factory.CreatePropertyType("content", 0, Constants.PropertyEditors.Aliases.TinyMce),
                 factory.CreatePropertyType("testRecursive", 0, "?"),
             };
             var compositionAliases = new[] { "MyCompositionAlias" };
@@ -553,7 +553,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt = factory.CreatePropertyType("detached", 0, Constants.PropertyEditors.IntegerAlias);
+            var pt = factory.CreatePropertyType("detached", 0, Constants.PropertyEditors.Aliases.Integer);
             var ct = factory.CreateContentType(0, "alias", new[] { pt });
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.GetValue());
@@ -572,9 +572,9 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt1 = factory.CreatePropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
+            var pt1 = factory.CreatePropertyType("legend", 0, Constants.PropertyEditors.Aliases.Textbox);
             var pt2 = factory.CreatePropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
-            var pt3 = factory.CreatePropertyType("size", 0, Constants.PropertyEditors.IntegerAlias);
+            var pt3 = factory.CreatePropertyType("size", 0, Constants.PropertyEditors.Aliases.Integer);
             const string val1 = "boom bam";
             const int val2 = 0;
             const int val3 = 666;

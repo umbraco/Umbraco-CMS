@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Factories
 
             if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
             {
-                if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TrueFalseAlias)
+                if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
                 {
                     dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
                 }

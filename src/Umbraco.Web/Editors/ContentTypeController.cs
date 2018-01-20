@@ -124,7 +124,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var preVals = Current.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
+            var configuration = Current.Services.DataTypeService.GetDataType(id).Configuration;
             var editor = Current.PropertyEditors[dataTypeDiff.EditorAlias];
 
             return new ContentPropertyDisplay()
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Editors
                 Editor = dataTypeDiff.EditorAlias,
                 Validation = new PropertyTypeValidation() { },
                 View = editor.ValueEditor.View,
-                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals)
+                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, configuration)
             };
         }
 

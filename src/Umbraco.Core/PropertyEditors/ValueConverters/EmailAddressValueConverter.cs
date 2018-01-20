@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class EmailAddressValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.EmailAddressAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.EmailAddress);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (string);

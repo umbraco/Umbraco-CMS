@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => Constants.PropertyEditors.MarkdownEditorAlias == propertyType.EditorAlias;
+            => Constants.PropertyEditors.Aliases.MarkdownEditor == propertyType.EditorAlias;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IHtmlString);

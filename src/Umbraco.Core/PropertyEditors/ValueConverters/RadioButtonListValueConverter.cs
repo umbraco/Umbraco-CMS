@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class RadioButtonListValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.RadioButtonListAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.RadioButtonList);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (int);

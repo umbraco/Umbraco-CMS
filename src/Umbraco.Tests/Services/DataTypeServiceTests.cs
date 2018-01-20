@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
+            var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
             IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
+            var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
             IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
+            var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
             IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
+            var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
             IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var dataTypeService = ServiceContext.DataTypeService;
-            var textBoxAlias = Constants.PropertyEditors.TextboxAlias;
+            var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
             IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };

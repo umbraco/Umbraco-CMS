@@ -57,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
             //store the current props to append to the newly inserted ones
             var currProps = genericProps.Properties.ToArray();
 
-            var labelEditor = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View;
+            var labelEditor = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].ValueEditor.View;
 
             var contentProps = new List<ContentPropertyDisplay>
             {
@@ -148,8 +148,6 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException("No list view data type was found for this document type, ensure that the default list view data types exists and/or that your custom list view data type exists");
             }
 
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
-
             var editor = Current.PropertyEditors[dt.EditorAlias];
             if (editor == null)
             {
@@ -164,7 +162,7 @@ namespace Umbraco.Web.Models.Mapping
                 IsActive = true
             };
 
-            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
+            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, dt.Configuration);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
 

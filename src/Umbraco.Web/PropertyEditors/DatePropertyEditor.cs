@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DateAlias, "Date", PropertyEditorValueTypes.Date, "datepicker", Icon="icon-calendar")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Date, "Date", PropertyEditorValueTypes.Date, "datepicker", Icon="icon-calendar")]
     public class DatePropertyEditor : PropertyEditor
     {
         public DatePropertyEditor(ILogger logger): base(logger)
@@ -59,9 +59,9 @@ namespace Umbraco.Web.PropertyEditors
 
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
-            return new DatePreValueEditor();
+            return new DateConfigurationEditor();
         }
     }
 }

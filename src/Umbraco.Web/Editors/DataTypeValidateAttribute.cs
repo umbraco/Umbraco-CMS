@@ -46,10 +46,10 @@ namespace Umbraco.Web.Editors
             dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
 
             //Validate that the property editor exists
-            var propertyEditor = Current.PropertyEditors[dataType.SelectedEditor];
+            var propertyEditor = Current.PropertyEditors[dataType.EditorAlias];
             if (propertyEditor == null)
             {
-                var message = string.Format("Property editor with id: {0} was not found", dataType.SelectedEditor);
+                var message = string.Format("Property editor with id: {0} was not found", dataType.EditorAlias);
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                 return;
             }
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Editors
             dataType.PersistedDataType = persisted;
 
             //Validate each field
-            foreach (var preVal in dataType.PreValues)
+            foreach (var preVal in dataType.ConfigurationFields)
             {
                 var postedValue = preVal.Value;
 

@@ -16,14 +16,14 @@ namespace Umbraco.Web.PropertyEditors
             // see below for examples.
 
             //use a custom editor too
-            Fields.Add(new PreValueField()
+            Fields.Add(new DataTypeConfigurationField()
             {
                 View = "views/propertyeditors/rte/rte.prevalues.html",
                 HideLabel = true,
                 Key = "editor"
             });
 
-            Fields.Add(new PreValueField()
+            Fields.Add(new DataTypeConfigurationField()
             {
                 Name = "Hide Label",
                 View = "boolean",

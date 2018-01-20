@@ -111,6 +111,11 @@ namespace Umbraco.Core.IO
             return MapPath(path, true);
         }
 
+        public static string MapPathIfVirtual(string path)
+        {
+            return path.StartsWith("~/") ? MapPath(path) : path;
+        }
+
         //use a tilde character instead of the complete path
         internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {

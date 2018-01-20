@@ -385,7 +385,7 @@ namespace Umbraco.Core.Services.Implement
 
                 // make sure to only highlight changes done using TinyMCE editor... other changes will be displayed using default summary
                 // TODO: We should probably allow more than just tinymce??
-                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEAlias)
+                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.TinyMce)
                     && string.CompareOrdinal(oldText, newText) != 0)
                 {
                     summary.Append("<tr>");

@@ -24,10 +24,10 @@ namespace Umbraco.Core.Models
             var jsonString = val.GetValue() as string;
             if (jsonString == null) return string.Empty;
 
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)
+            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)
                 return jsonString;
 
-            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias)
+            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper)
             {
                 if (jsonString.DetectIsJson() == false)
                     return jsonString;

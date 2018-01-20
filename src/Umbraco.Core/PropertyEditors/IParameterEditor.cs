@@ -6,17 +6,17 @@ namespace Umbraco.Core.PropertyEditors
     public interface IParameterEditor : IDiscoverable
     {
         /// <summary>
-        /// The id  of the property editor
+        /// Gets the unique identifier of the editor.
         /// </summary>
         string Alias { get; }
 
         /// <summary>
-        /// The name of the property editor
+        /// Gets the name of the editor.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Allows a parameter editor to be re-used based on the configuration specified.
+        /// Allows a parameter editor to be re-used based on the configuration specified. FIXME WTF?!
         /// </summary>
         IDictionary<string, object> Configuration { get; }
 

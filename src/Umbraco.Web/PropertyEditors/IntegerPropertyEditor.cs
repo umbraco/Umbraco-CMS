@@ -1,10 +1,11 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.IntegerAlias, "Numeric", "integer", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.IntegerAlternative)]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Integer, "Numeric", "integer", IsParameterEditor = true, ValueType = PropertyEditorValueTypes.IntegerAlternative)]
     public class IntegerPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -25,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new IntegerPreValueEditor();
         }
@@ -38,21 +39,21 @@ namespace Umbraco.Web.PropertyEditors
             public IntegerPreValueEditor()
             {
                 //create the fields
-                Fields.Add(new PreValueField(new IntegerValidator())
+                Fields.Add(new DataTypeConfigurationField(new IntegerValidator())
                 {
                     Description = "Enter the minimum amount of number to be entered",
                     Key = "min",
                     View = "number",
                     Name = "Minimum"
                 });
-                Fields.Add(new PreValueField(new IntegerValidator())
+                Fields.Add(new DataTypeConfigurationField(new IntegerValidator())
                 {
                     Description = "Enter the intervals amount between each step of number to be entered",
                     Key = "step",
                     View = "number",
                     Name = "Step Size"
                 });
-                Fields.Add(new PreValueField(new IntegerValidator())
+                Fields.Add(new DataTypeConfigurationField(new IntegerValidator())
                 {
                     Description = "Enter the maximum amount of number to be entered",
                     Key = "max",

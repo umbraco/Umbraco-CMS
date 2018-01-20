@@ -320,7 +320,7 @@ namespace Umbraco.Tests.Services.Importing
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
-            Assert.AreEqual(Constants.PropertyEditors.CheckBoxListAlias, dataTypeDefinitions.First().EditorAlias);
+            Assert.AreEqual(Constants.PropertyEditors.Aliases.CheckBoxList, dataTypeDefinitions.First().EditorAlias);
             Assert.That(contents, Is.Not.Null);
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);

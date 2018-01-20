@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class MemberGroupPickerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.MemberGroupPickerAlias);
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.MemberGroupPicker);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (string);

@@ -91,13 +91,13 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap("contentTree", Constants.PropertyEditors.ContentPickerAlias);
             CreateMap("contentAll", Constants.PropertyEditors.ContentPickerAlias);
 
-            CreateMap("textMultiLine", Constants.PropertyEditors.TextboxMultipleAlias);
-            CreateMap("text", Constants.PropertyEditors.TextboxAlias);
-            CreateMap("bool", Constants.PropertyEditors.TrueFalseAlias);
+            CreateMap("textMultiLine", Constants.PropertyEditors.Aliases.TextboxMultiple);
+            CreateMap("text", Constants.PropertyEditors.Aliases.Textbox);
+            CreateMap("bool", Constants.PropertyEditors.Aliases.Boolean);
 
             CreateMap("mediaCurrent", Constants.PropertyEditors.MediaPickerAlias);
 
-            CreateMap("number", Constants.PropertyEditors.IntegerAlias);
+            CreateMap("number", Constants.PropertyEditors.Aliases.Integer);
         }
     }
 }

@@ -1052,15 +1052,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Prevalues
-
-        public string GetPreValueAsString(int id)
-        {
-            return DataTypeService.GetPreValueAsString(id);
-        }
-
-        #endregion
-
         #region canvasdesigner
 
         [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]

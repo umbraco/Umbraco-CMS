@@ -516,7 +516,7 @@ namespace Umbraco.Tests.Services
             }
 
             Assert.That(entities.Any(x =>
-                x.AdditionalData.Any(y => y.Value is EntitySlim.PropertySlim && ((EntitySlim.PropertySlim) y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
+                x.AdditionalData.Any(y => y.Value is EntitySlim.PropertySlim && ((EntitySlim.PropertySlim) y.Value).PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)), Is.True);
         }
 
         [Test]

@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.EditorAlias);
+            => Constants.PropertyEditors.Aliases.MultipleTextstring.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IEnumerable<string>);

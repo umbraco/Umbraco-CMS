@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Represents an editor for values.
+    /// Represents an editor for editing values.
     /// </summary>
     public interface IValueEditor
     {

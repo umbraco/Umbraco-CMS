@@ -7,7 +7,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class YesNoValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias == Constants.PropertyEditors.TrueFalseAlias;
+            => propertyType.EditorAlias == Constants.PropertyEditors.Aliases.Boolean;
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (bool);

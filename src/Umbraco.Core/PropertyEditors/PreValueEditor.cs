@@ -23,13 +23,13 @@ namespace Umbraco.Core.PropertyEditors
     {
         public PreValueEditor()
         {
-            var fields = new List<PreValueField>();
+            var fields = new List<DataTypeConfigurationField>();
 
             //the ctor checks if we have PreValueFieldAttributes applied and if so we construct our fields from them
             var props = TypeHelper.CachedDiscoverableProperties(GetType()).Where(x => x.Name != "Fields");
             foreach (var p in props)
             {
-                var att = p.GetCustomAttributes(typeof (PreValueFieldAttribute), false).OfType<PreValueFieldAttribute>().SingleOrDefault();
+                var att = p.GetCustomAttributes(typeof (DataTypeConfigurationFieldAttribute), false).OfType<DataTypeConfigurationFieldAttribute>().SingleOrDefault();
                 if (att == null) continue;
 
                 if (att.PreValueFieldType != null)
@@ -38,7 +38,7 @@ namespace Umbraco.Core.PropertyEditors
                     try
                     {
                         // instanciate and add custom field
-                        var instance = (PreValueField) Activator.CreateInstance(att.PreValueFieldType);
+                        var instance = (DataTypeConfigurationField) Activator.CreateInstance(att.PreValueFieldType);
                         fields.Add(instance);
 
                         // overwrite values if they are assigned
@@ -75,9 +75,9 @@ namespace Umbraco.Core.PropertyEditors
             Fields = fields;
         }
 
-        private static PreValueField MapAttributeToField(PreValueFieldAttribute att, PropertyInfo prop)
+        private static DataTypeConfigurationField MapAttributeToField(DataTypeConfigurationFieldAttribute att, PropertyInfo prop)
         {
-            return new PreValueField
+            return new DataTypeConfigurationField
                 {
                     //set the key to the property name if it is empty
                     Key = att.Key.IsNullOrWhiteSpace() ? prop.Name : att.Key,
@@ -95,7 +95,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If fields are specified then the master View and Validators will be ignored
         /// </remarks>
         [JsonProperty("fields")]
-        public List<PreValueField> Fields { get; internal set; }
+        public List<DataTypeConfigurationField> Fields { get; internal set; }
 
         /// <summary>
         /// A method to format the posted values from the editor to the values to be persisted

@@ -93,7 +93,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/mediatype"),
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = Current.PropertyEditors[Constants.PropertyEditors.NoEditAlias].ValueEditor.View
+                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].ValueEditor.View
                 }
             };
 

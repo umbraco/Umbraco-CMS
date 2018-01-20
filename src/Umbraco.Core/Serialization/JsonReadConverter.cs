@@ -1,10 +1,14 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Serialization
 {
-
+    /// <summary>
+    /// Provides a base class for custom <see cref="JsonConverter"/> implementations.
+    /// </summary>
+    /// <typeparam name="T">The type of the converted object.</typeparam>
     internal abstract class JsonReadConverter<T> : JsonConverter
     {
         /// <summary>
@@ -15,11 +19,13 @@ namespace Umbraco.Core.Serialization
         /// <returns></returns>
         protected abstract T Create(Type objectType, JObject jObject);
 
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
-            return typeof(T).IsAssignableFrom(objectType);
+            return typeof (T).IsAssignableFrom(objectType);
         }
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             // Load JObject from stream
@@ -39,9 +45,10 @@ namespace Umbraco.Core.Serialization
             serializer.Populate(jobject.CreateReader(), target);
         }
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("JsonReadConverter instances do not support writing.");
         }
     }
 }

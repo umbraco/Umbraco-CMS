@@ -186,16 +186,16 @@ namespace umbraco.developer
             switch (baseTypeName)
             {
                 case "Int32":
-                    return Constants.PropertyEditors.IntegerAlias;
+                    return Constants.PropertyEditors.Aliases.Integer;
                 case "Decimal":
                     //we previously only had an integer editor too! - this would of course
                     // fail if someone enters a real long number
-                    return Constants.PropertyEditors.IntegerAlias;
+                    return Constants.PropertyEditors.Aliases.Integer;
                 case "Boolean":
-                    return Constants.PropertyEditors.TrueFalseAlias;
+                    return Constants.PropertyEditors.Aliases.Boolean;
                 case "String":
                 default:
-                    return Constants.PropertyEditors.TextboxAlias;
+                    return Constants.PropertyEditors.Aliases.Textbox;
             }
         }
 

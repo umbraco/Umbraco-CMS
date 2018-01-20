@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using LightInject;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -185,9 +186,8 @@ namespace Umbraco.Web.Editors
         [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
         public JavaScriptResult Application()
         {
-            var parser = _manifestParser;
-            var initJs = new JsInitialization(parser);
-            var initCss = new CssInitialization(parser);
+            var initJs = new JsInitialization(_manifestParser);
+            var initCss = new CssInitialization(_manifestParser);
 
             //get the legacy ActionJs file references to append as well
             var legacyActionJsRef = GetLegacyActionJs(LegacyJsActionType.JsUrl);
@@ -208,9 +208,8 @@ namespace Umbraco.Web.Editors
         {
             JArray GetAssetList()
             {
-                var parser = _manifestParser;
-                var initJs = new JsInitialization(parser);
-                var initCss = new CssInitialization(parser);
+                var initJs = new JsInitialization(_manifestParser);
+                var initCss = new CssInitialization(_manifestParser);
                 var assets = new List<string>();
                 assets.AddRange(initJs.GetScriptFiles(HttpContext, Enumerable.Empty<string>()));
                 assets.AddRange(initCss.GetStylesheetFiles(HttpContext));

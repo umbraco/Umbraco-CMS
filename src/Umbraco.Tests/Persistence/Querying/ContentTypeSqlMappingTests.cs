@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Persistence.Querying
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName("umbracoNode"))));
 
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
-                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 44444, NodeId = 55555, EditorAlias = Constants.PropertyEditors.TextboxAlias, DbType = "Nvarchar" });
+                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { PrimaryKey = 44444, NodeId = 55555, EditorAlias = Constants.PropertyEditors.Aliases.Textbox, DbType = "Nvarchar" });
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
 
                 scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntax.GetQuotedTableName("cmsContentType"))));

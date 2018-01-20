@@ -88,16 +88,16 @@ namespace Umbraco.Core.Models.PublishedContent
         // fixme - this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
         private static readonly Dictionary<string, (int, string)> BuiltinMemberProperties = new Dictionary<string, (int, string)>
         {
-            { "Email", (Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
-            { "Username", (Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
-            { "PasswordQuestion", (Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
-            { "Comments", (Constants.DataTypes.Textbox, Constants.PropertyEditors.TextboxAlias) },
-            { "IsApproved", (Constants.DataTypes.Boolean, Constants.PropertyEditors.BooleanAlias) },
-            { "IsLockedOut", (Constants.DataTypes.Boolean, Constants.PropertyEditors.BooleanAlias) },
-            { "LastLockoutDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
-            { "CreateDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
-            { "LastLoginDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
-            { "LastPasswordChangeDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.DateTimeAlias) },
+            { "Email", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
+            { "Username", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
+            { "PasswordQuestion", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
+            { "Comments", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
+            { "IsApproved", (Constants.DataTypes.Boolean, Constants.PropertyEditors.Aliases.Boolean) },
+            { "IsLockedOut", (Constants.DataTypes.Boolean, Constants.PropertyEditors.Aliases.Boolean) },
+            { "LastLockoutDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "CreateDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "LastLoginDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
+            { "LastPasswordChangeDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },
         };
 
         #region Content type

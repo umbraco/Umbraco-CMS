@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Due to maintaining backwards compatibility this data type stores the value as a string which is a comma separated value of the
     /// ids of the individual items so we have logic in here to deal with that.
     /// </remarks>
-    [PropertyEditor(Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.DropdownlistMultiplePublishKeys, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list")]
     public class DropDownMultipleWithKeysPropertyEditor : DropDownPropertyEditor
     {
         private readonly ILocalizedTextService _textService;
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
             return new PublishValuesMultipleValueEditor(true, base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new DropDownMultiplePreValueEditor(_textService, Logger);
         }
@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
                 : base(textService, logger)
             {
                 //add the multiple field, we'll make it hidden so it is not seen in the pre-value editor
-                Fields.Add(new PreValueField
+                Fields.Add(new DataTypeConfigurationField
                     {
                         Key = "multiple",
                         Name = "multiple",

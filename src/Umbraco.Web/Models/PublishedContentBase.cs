@@ -62,10 +62,10 @@ namespace Umbraco.Web.Models
                         // want to return the normal URL and the cropper stores data as json
                         switch (propType.EditorAlias)
                         {
-                            case Constants.PropertyEditors.UploadFieldAlias:
+                            case Constants.PropertyEditors.Aliases.UploadField:
                                 _url = prop.GetValue().ToString();
                                 break;
-                            case Constants.PropertyEditors.ImageCropperAlias:
+                            case Constants.PropertyEditors.Aliases.ImageCropper:
                                 //get the url from the json format
 
                                 var stronglyTyped = prop.GetValue() as ImageCropDataSet;

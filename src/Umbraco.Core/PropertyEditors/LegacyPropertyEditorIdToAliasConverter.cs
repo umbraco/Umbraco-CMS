@@ -105,47 +105,47 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         internal static void CreateMappingsForCoreEditors()
         {
-            CreateMap(Guid.Parse(Constants.PropertyEditors.CheckBoxList), Constants.PropertyEditors.CheckBoxListAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.ColorPicker), Constants.PropertyEditors.ColorPickerAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.CheckBoxList), Constants.PropertyEditors.Aliases.CheckBoxList);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.ColorPicker), Constants.PropertyEditors.Aliases.ColorPicker);
             CreateMap(Guid.Parse(Constants.PropertyEditors.ContentPicker), Constants.PropertyEditors.ContentPickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.Date), Constants.PropertyEditors.DateAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DateTime), Constants.PropertyEditors.DateTimeAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DropDownList), Constants.PropertyEditors.DropDownListAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DropDownListMultiple), Constants.PropertyEditors.DropDownListMultipleAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistMultiplePublishKeys), Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistPublishingKeys), Constants.PropertyEditors.DropdownlistPublishingKeysAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.FolderBrowser), Constants.PropertyEditors.FolderBrowserAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.Integer), Constants.PropertyEditors.IntegerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.ListView), Constants.PropertyEditors.ListViewAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.MacroContainer), Constants.PropertyEditors.MacroContainerAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.Date), Constants.PropertyEditors.Aliases.Date);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.DateTime), Constants.PropertyEditors.Aliases.DateTime);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.DropDownList), Constants.PropertyEditors.Aliases.DropDownList);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.DropDownListMultiple), Constants.PropertyEditors.Aliases.DropDownListMultiple);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.DropdownlistMultiplePublishKeys), Constants.PropertyEditors.Aliases.DropdownlistMultiplePublishKeys);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistPublishingKeys), Constants.PropertyEditors.Aliases.DropdownlistPublishKeys);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.FolderBrowser), Constants.PropertyEditors.Aliases.FolderBrowser);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.Integer), Constants.PropertyEditors.Aliases.Integer);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.ListView), Constants.PropertyEditors.Aliases.ListView);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.MacroContainer), Constants.PropertyEditors.Aliases.MacroContainer);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MediaPicker), Constants.PropertyEditors.MediaPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MemberPicker), Constants.PropertyEditors.MemberPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MultiNodeTreePicker), Constants.PropertyEditors.MultiNodeTreePickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.MultipleTextstring), Constants.PropertyEditors.MultipleTextstringAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.NoEdit), Constants.PropertyEditors.NoEditAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.RadioButtonList), Constants.PropertyEditors.RadioButtonListAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.MultipleTextstring), Constants.PropertyEditors.Aliases.MultipleTextstring);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.NoEdit), Constants.PropertyEditors.Aliases.NoEdit);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.RadioButtonList), Constants.PropertyEditors.Aliases.RadioButtonList);
             CreateMap(Guid.Parse(Constants.PropertyEditors.RelatedLinks), Constants.PropertyEditors.RelatedLinksAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.Slider), Constants.PropertyEditors.SliderAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.Tags), Constants.PropertyEditors.TagsAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.Textbox), Constants.PropertyEditors.TextboxAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.TextboxMultiple), Constants.PropertyEditors.TextboxMultipleAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), Constants.PropertyEditors.TinyMCEAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.TrueFalseAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UserPicker), Constants.PropertyEditors.UserPickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UploadField), Constants.PropertyEditors.UploadFieldAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.XPathCheckBoxList), Constants.PropertyEditors.XPathCheckBoxListAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.XPathDropDownList), Constants.PropertyEditors.XPathDropDownListAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.ImageCropper), Constants.PropertyEditors.ImageCropperAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.Slider), Constants.PropertyEditors.Aliases.Slider);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.Tags), Constants.PropertyEditors.Aliases.Tags);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.Textbox), Constants.PropertyEditors.Aliases.Textbox);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.TextboxMultiple), Constants.PropertyEditors.Aliases.TextboxMultiple);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), Constants.PropertyEditors.Aliases.TinyMce);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.Aliases.Boolean);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.UserPicker), Constants.PropertyEditors.Aliases.UserPicker);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.UploadField), Constants.PropertyEditors.Aliases.UploadField);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.XPathCheckBoxList), Constants.PropertyEditors.Aliases.XPathCheckBoxList);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.XPathDropDownList), Constants.PropertyEditors.Aliases.XPathDropDownList);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.ImageCropper), Constants.PropertyEditors.Aliases.ImageCropper);
 
             //Being mapped to different editors
             //TODO: Map this somewhere!
-            CreateMap(Guid.Parse(Constants.PropertyEditors.PickerRelations), Constants.PropertyEditors.PickerRelationsAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.Aliases.PickerRelations), Constants.PropertyEditors.Aliases.PickerRelations);
             CreateMap(Guid.Parse(Constants.PropertyEditors.UltimatePicker), Constants.PropertyEditors.ContentPickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UltraSimpleEditor), Constants.PropertyEditors.MarkdownEditorAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UltraSimpleEditor), Constants.PropertyEditors.Aliases.MarkdownEditor);
 
             //Not being converted - convert to label
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.NoEditAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.NoEditAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.Aliases.NoEdit);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.Aliases.NoEdit);
 
 
         }

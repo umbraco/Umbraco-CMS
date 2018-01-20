@@ -10,7 +10,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.TextboxAlias, "Textbox", "textbox", IsParameterEditor = true, Group = "Common")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Textbox, "Textbox", "textbox", IsParameterEditor = true, Group = "Common")]
     public class TextboxPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -25,14 +25,14 @@ namespace Umbraco.Web.PropertyEditors
             return new TextOnlyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new TextboxPreValueEditor();
         }
 
         internal class TextboxPreValueEditor : PreValueEditor
         {
-            [PreValueField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
+            [DataTypeConfigurationField("maxChars", "Maximum allowed characters", "number", Description = "If empty - no character limit")]
             public bool MaxChars { get; set; }
         }
     }

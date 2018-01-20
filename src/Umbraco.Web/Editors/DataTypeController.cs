@@ -113,7 +113,7 @@ namespace Umbraco.Web.Editors
             //if it doesnt exist yet, we will create it.
             if (dt == null)
             {
-                dt = new DataType(Constants.PropertyEditors.ListViewAlias);
+                dt = new DataType(Constants.PropertyEditors.Aliases.ListView);
                 dt.Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
                 Services.DataTypeService.Save(dt);
             }
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Editors
         /// <param name="editorAlias"></param>
         /// <param name="dataTypeId">The data type id for the pre-values, -1 if it is a new data type</param>
         /// <returns></returns>
-        public IEnumerable<PreValueFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
+        public IEnumerable<DataTypeConfigurationFieldDisplay> GetPreValues(string editorAlias, int dataTypeId = -1)
         {
             var propEd = Current.PropertyEditors[editorAlias];
             if (propEd == null)
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
             if (dataTypeId == -1)
             {
                 //this is a new data type, so just return the field editors with default values
-                return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);
+                return Mapper.Map<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
             }
 
             //we have a data type associated
@@ -154,11 +154,11 @@ namespace Umbraco.Web.Editors
             if (dataType.EditorAlias == editorAlias)
             {
                 //this is the currently assigned pre-value editor, return with values.
-                return Mapper.Map<IDataType, IEnumerable<PreValueFieldDisplay>>(dataType);
+                return Mapper.Map<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(dataType);
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);
+            return Mapper.Map<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
         }
 
         /// <summary>
@@ -194,25 +194,21 @@ namespace Umbraco.Web.Editors
         {
             //If we've made it here, then everything has been wired up and validated by the attribute
 
-            //finally we need to save the data type and it's pre-vals
-            var dtService = Services.DataTypeService;
-
             //TODO: Check if the property editor has changed, if it has ensure we don't pass the
             // existing values to the new property editor!
 
             //get the prevalues, current and new
-            var preValDictionary = dataType.PreValues.ToDictionary(x => x.Key, x => x.Value);
-            var currVal = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.PersistedDataType.Id);
+            var preValDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
+            var currentConfiguration = dataType.PersistedDataType.Configuration;
 
             //we need to allow for the property editor to deserialize the prevalues
-            var formattedVal = dataType.PropertyEditor.PreValueEditor.ConvertEditorToDb(
-                preValDictionary,
-                currVal);
+            var formattedVal = dataType.PropertyEditor.PreValueEditor.ConvertEditorToDb(preValDictionary, currentConfiguration);
+            // fixme and then re-assign to datatype?
 
             try
             {
                 //save the data type
-                dtService.SaveDataTypeAndPreValues(dataType.PersistedDataType, formattedVal, (int)Security.CurrentUser.Id);
+                Services.DataTypeService.Save(dataType.PersistedDataType, Security.CurrentUser.Id);
             }
             catch (DuplicateNameException ex)
             {

@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// </returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
             => propertyType.EditorAlias.Equals(Constants.PropertyEditors.RelatedLinksAlias)
-            || propertyType.EditorAlias.Equals(Constants.PropertyEditors.RelatedLinks2Alias);
+            || propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.RelatedLinks2);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (JArray);

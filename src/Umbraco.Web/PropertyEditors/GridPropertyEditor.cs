@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     using Examine = global::Examine;
 
-    [PropertyEditor(Constants.PropertyEditors.GridAlias, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Grid, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
     public class GridPropertyEditor : PropertyEditor
     {
         public GridPropertyEditor(ILogger logger)
@@ -115,7 +115,7 @@ namespace Umbraco.Web.PropertyEditors
             return new GridPropertyValueEditor(baseEditor);
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new GridPreValueEditor();
         }
@@ -131,10 +131,10 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class GridPreValueEditor : PreValueEditor
         {
-            [PreValueField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
+            [DataTypeConfigurationField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
             public string Items { get; set; }
 
-            [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
+            [DataTypeConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
             public string Rte { get; set; }
         }
     }

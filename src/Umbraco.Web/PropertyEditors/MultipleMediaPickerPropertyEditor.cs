@@ -17,9 +17,9 @@ namespace Umbraco.Web.PropertyEditors
             InternalPreValues["idType"] = "int";
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
-            var preValEditor = base.CreatePreValueEditor();
+            var preValEditor = base.CreateConfigurationEditor();
             preValEditor.Fields.Single(x => x.Key == "startNodeId").Config["idType"] = "int";
             return preValEditor;
         }

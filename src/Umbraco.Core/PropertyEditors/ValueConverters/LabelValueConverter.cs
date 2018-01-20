@@ -16,7 +16,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     public class LabelValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => Constants.PropertyEditors.NoEditAlias.Equals(propertyType.EditorAlias);
+            => Constants.PropertyEditors.Aliases.NoEdit.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (string);

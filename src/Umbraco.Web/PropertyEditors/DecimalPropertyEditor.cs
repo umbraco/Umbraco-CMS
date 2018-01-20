@@ -1,10 +1,11 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DecimalAlias, "Decimal", PropertyEditorValueTypes.Decimal, "decimal", IsParameterEditor = true)]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Decimal, "Decimal", PropertyEditorValueTypes.Decimal, "decimal", IsParameterEditor = true)]
     public class DecimalPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -25,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new DecimalPreValueEditor();
         }
@@ -38,21 +39,21 @@ namespace Umbraco.Web.PropertyEditors
             public DecimalPreValueEditor()
             {
                 //create the fields
-                Fields.Add(new PreValueField(new DecimalValidator())
+                Fields.Add(new DataTypeConfigurationField(new DecimalValidator())
                 {
                     Description = "Enter the minimum amount of number to be entered",
                     Key = "min",
                     View = "decimal",
                     Name = "Minimum"
                 });
-                Fields.Add(new PreValueField(new DecimalValidator())
+                Fields.Add(new DataTypeConfigurationField(new DecimalValidator())
                 {
                     Description = "Enter the intervals amount between each step of number to be entered",
                     Key = "step",
                     View = "decimal",
                     Name = "Step Size"
                 });
-                Fields.Add(new PreValueField(new DecimalValidator())
+                Fields.Add(new DataTypeConfigurationField(new DecimalValidator())
                 {
                     Description = "Enter the maximum amount of number to be entered",
                     Key = "max",

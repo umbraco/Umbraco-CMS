@@ -1,10 +1,11 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.EmailAddressAlias, "Email address", "email", Icon="icon-message")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.EmailAddress, "Email address", "email", Icon="icon-message")]
     public class EmailAddressPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -22,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new EmailAddressePreValueEditor();
         }
@@ -31,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             //TODO: This doesn't seem necessary since it can be specified at the property type level - this will however be useful if/when
             // we support overridden property value pre-value options.
-            [PreValueField("Required?", "boolean")]
+            [DataTypeConfigurationField("Required?", "boolean")]
             public bool IsRequired { get; set; }
         }
 

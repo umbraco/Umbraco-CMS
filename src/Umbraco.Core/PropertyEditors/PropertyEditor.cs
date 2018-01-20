@@ -147,7 +147,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Creates a configuration editor instance.
         /// </summary>
-        protected virtual PreValueEditor CreatePreValueEditor()
+        protected virtual PreValueEditor CreateConfigurationEditor()
         {
             // handle assigned editor
             if (_preValueEditorAssigned != null)
@@ -189,7 +189,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Maps configuration to a strongly typed object.
         /// </summary>
-        public virtual object DeserializeConfiguration(string json)
+        public virtual object DeserializeConfiguration(string json) // fixme
         {
             return JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
         }

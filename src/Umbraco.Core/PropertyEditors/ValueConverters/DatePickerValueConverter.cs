@@ -10,8 +10,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         private static readonly string[] PropertyEditorAliases =
         {
-            Constants.PropertyEditors.DateTimeAlias,
-            Constants.PropertyEditors.DateAlias
+            Constants.PropertyEditors.Aliases.DateTime,
+            Constants.PropertyEditors.Aliases.Date
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)

@@ -8,61 +8,69 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.NoEditAlias, "Label", "readonlyvalue", Icon = "icon-readonly")]
+    /// <summary>
+    /// Represents a property editor for label properties.
+    /// </summary>
+    [PropertyEditor(Constants.PropertyEditors.Aliases.NoEdit, "Label", "readonlyvalue", Icon = "icon-readonly")]
     public class LabelPropertyEditor : PropertyEditor
     {
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="LabelPropertyEditor"/> class.
         /// </summary>
-        public LabelPropertyEditor(ILogger logger) : base(logger)
-        {
-        }
+        /// <param name="logger"></param>
+        public LabelPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
+
+        /// <inheritdoc />
         protected override PropertyValueEditor CreateValueEditor()
         {
             return new LabelPropertyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreatePreValueEditor()
+        /// <inheritdoc />
+        protected override PreValueEditor CreateConfigurationEditor()
         {
             return new LabelPreValueEditor();
         }
 
-        /// <summary>
-        /// Custom value editor to mark it as readonly
-        /// </summary>
+        // provides the property value editor
         internal class LabelPropertyValueEditor : PropertyValueEditorWrapper
         {
             public LabelPropertyValueEditor(PropertyValueEditor wrapped)
                 : base(wrapped)
-            {
-            }
+            { }
 
-            /// <summary>
-            /// This editor is for display purposes only, any values bound to it will not be saved back to the database
-            /// </summary>
-            public override bool IsReadOnly
-            {
-                get { return true; }
-            }
+            /// <inheritdoc />
+            public override bool IsReadOnly => true;
         }
 
+        // provides the datatype configuration editor
         internal class LabelPreValueEditor : PreValueEditor
         {
-            private const string LegacyPropertyEditorValuesKey = "values";
+            private const string LegacyPropertyEditorValuesKey = "values"; // fixme wtf is this?!
 
             public LabelPreValueEditor()
             {
-                Fields.Add(new PreValueField()
+                //Fields.Add(new DataTypeConfigurationField
+                //{
+                //    Key = Constants.PropertyEditors.PreValueKeys.DataValueType,
+                //    Name = "Value type",
+                //    View = "valuetype"
+                //});
+                Fields.Add(new DataTypeConfigurationField
                 {
                     HideLabel = true,
                     View = "readonlykeyvalues",
                     Key = LegacyPropertyEditorValuesKey
                 });
 
+                // fixme what 
                 ValueType = PropertyEditorValueTypes.String;
             }
 
-            [PreValueField(Constants.PropertyEditors.PreValueKeys.DataValueType, "Value type", "valuetype")]
+            // fixme - mixing declarative and code fields, what a mess?!
+            [DataTypeConfigurationField(Constants.PropertyEditors.ConfigurationKeys.DataValueType, "Value type", "valuetype")]
             public string ValueType { get; set; }
 
             /// <summary>
@@ -78,19 +86,19 @@ namespace Umbraco.Web.PropertyEditors
 
                 // Check for a saved value type.  If not found set to default string type.
                 var valueType = PropertyEditorValueTypes.String;
-                if (existing.ContainsKey(Constants.PropertyEditors.PreValueKeys.DataValueType))
+                if (existing.ContainsKey(Constants.PropertyEditors.ConfigurationKeys.DataValueType))
                 {
-                    valueType = (string)existing[Constants.PropertyEditors.PreValueKeys.DataValueType];
+                    valueType = (string)existing[Constants.PropertyEditors.ConfigurationKeys.DataValueType];
                 }
 
                 // Convert any other values from a legacy property editor to a list, easier to enumerate on the editor.
                 // Make sure to exclude values defined on the label property editor itself.
                 var asList = existing
                     .Select(e => new KeyValuePair<string, object>(e.Key, e.Value))
-                    .Where(e => e.Key != Constants.PropertyEditors.PreValueKeys.DataValueType)
+                    .Where(e => e.Key != Constants.PropertyEditors.ConfigurationKeys.DataValueType)
                     .ToList();
 
-                var result = new Dictionary<string, object> { { Constants.PropertyEditors.PreValueKeys.DataValueType, valueType } };
+                var result = new Dictionary<string, object> { { Constants.PropertyEditors.ConfigurationKeys.DataValueType, valueType } };
                 if (asList.Any())
                 {
                     result.Add(LegacyPropertyEditorValuesKey, asList);

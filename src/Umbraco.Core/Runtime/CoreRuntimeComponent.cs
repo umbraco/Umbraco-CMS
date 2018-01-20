@@ -18,12 +18,13 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Core._Legacy.PackageActions;
-using IntegerValidator = Umbraco.Core.PropertyEditors.IntegerValidator;
+using IntegerValidator = Umbraco.Core.PropertyEditors.Validators.IntegerValidator;
 
 namespace Umbraco.Core.Runtime
 {
@@ -54,7 +55,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, Constants.Composing.FileSystems.ViewFileSystem);
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().XsltFileSystem, Constants.Composing.FileSystems.XsltFileSystem);
 
-            // register manifest builder, will be injected in eg PropertyEditorCollectionBuilder
+            // register manifest parser, will be injected in collection builders where needed
             composition.Container.RegisterSingleton<ManifestParser>();
 
             composition.Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
