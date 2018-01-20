@@ -152,7 +152,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Umbraco.ModelsBuilder, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.8.0.0-alpha.13\lib\Umbraco.ModelsBuilder.dll</HintPath>
+      <HintPath>..\packages\Umbraco.ModelsBuilder.8.0.0-alpha.14\lib\Umbraco.ModelsBuilder.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -248,7 +248,6 @@
         <PrivateAssets>All</PrivateAssets> <!-/- development dependency -/->
     </PackageReference>
     -->
-    <Folder Include="App_Data\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
@@ -1009,7 +1008,6 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-
   <!-- go figure where WebPublishingTasks live -->
   <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
     <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
@@ -1026,34 +1024,26 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
   <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
     <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
-
   <!-- load TransformXml task from WebPublishingtasks -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
-
   <Target Name="BeforeBuild">
     <Message Text="-BeforeBuild-" Importance="high" />
     <Message Text="MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="high" />
     <Message Text="WebPublishingTasks: $(WebPublishingTasks)" Importance="high" />
-    
     <!-- Create web.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
-    
     <!-- Transform the local Web.config file in Visual Studio -->
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
-    
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
     <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
-    
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
-    
     <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
     <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip Belle because $(ProjectDir)Umbraco\lib exists." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib')" />
     <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
   </Target>
-
   <!-- Clean Belle when cleaning and rebuilding, but only in Visual Studio -->
   <Target Name="CleanBelle" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
     <Message Text="-CleanBelle-" Importance="high" />
@@ -1064,19 +1054,16 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
     </ItemGroup>
     <RemoveDir Directories="@(BelleLib)" />
   </Target>
-
   <Target Name="AfterBuild">
     <Message Text="-AfterBuild-" Importance="high" />
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
     <Copy Condition="'$(BuildingInsideVisualStudio)' == 'true'" SourceFiles="$(ProjectDir)..\Umbraco.Compat7\bin\$(Configuration)\Umbraco.Compat7.dll" DestinationFolder="$(ProjectDir)bin" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
-
-  <Target Name="BelleBuild" >
+  <Target Name="BelleBuild">
     <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = &amp;&quot;$pwd\build\build.ps1&quot; -get ; $ubuild.CompileBelle() }&quot;" />
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.2.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.5\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.5\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
-
   <ItemGroup>
     <!-- every *.config (recursive) files xcept web[.*].config -->
     <!-- beware! includes any rogue git-ignored or temp config file -->
@@ -1084,8 +1071,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
     <!-- and the UI file -->
     <ConfigFiles Include="$(ProjectDir)umbraco\config\create\UI.xml" />
   </ItemGroup>
-
- <Target Name="ResetConfigFiles" Condition="'$(WebProjectOutputDir)' != ''" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">    
+  <Target Name="ResetConfigFiles" Condition="'$(WebProjectOutputDir)' != ''" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
     <PropertyGroup>
       <!-- the original file eg src/.../umbracoSettings.config -->
       <OriginalFileName>@(ConfigFiles)</OriginalFileName>
@@ -1094,18 +1080,12 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
       <!-- the target file eg webapp/.../umbracoSettings.config -->
       <OutputFileName>$(OriginalFileName.Replace("$(ProjectDir)", "$(WebProjectOutputDir)"))</OutputFileName>
     </PropertyGroup>
-
     <!-- 
       for each whatever.config file,
       if there is a whatever.(Release|Debug).config file,
       copy it over as whatever.config 
     -->
     <Message Text="ConfigFile: $(OriginalFileName) -&gt; $(OutputFileName)" Importance="high" Condition="Exists('$(ModifiedFileName)')" />
-
-    <Copy SourceFiles="$(ModifiedFileName)"
-      DestinationFiles="$(OutputFileName)"
-      OverwriteReadOnlyFiles="true"
-      SkipUnchangedFiles="false"
-      Condition="Exists('$(ModifiedFileName)')"/>
+    <Copy SourceFiles="$(ModifiedFileName)" DestinationFiles="$(OutputFileName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="Exists('$(ModifiedFileName)')" />
   </Target>
 </Project>
