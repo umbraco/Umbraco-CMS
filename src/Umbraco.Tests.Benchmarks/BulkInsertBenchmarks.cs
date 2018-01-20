@@ -15,7 +15,7 @@ using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [QuickRunWithMemoryDiagnoser]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class BulkInsertBenchmarks
     {
         private static byte[] _initDbBytes = null;

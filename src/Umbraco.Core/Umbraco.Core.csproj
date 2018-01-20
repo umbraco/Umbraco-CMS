@@ -1531,7 +1531,7 @@
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
     <Compile Include="TypeHelper.cs" />
-    <Compile Include="TypePair.cs" />
+    <Compile Include="Collections\CompositeTypeTypeKey.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
     <Compile Include="UdiEntityType.cs" />

@@ -11,7 +11,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [QuickRunWithMemoryDiagnoser]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class XmlPublishedContentInitBenchmarks
     {
         public XmlPublishedContentInitBenchmarks()

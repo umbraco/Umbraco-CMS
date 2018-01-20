@@ -162,8 +162,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\QuickRunAttribute.cs" />
-    <Compile Include="Config\QuickRunWithMemoryDiagnoserAttribute.cs" />
+    <Compile Include="Config\QuickRunConfigAttribute.cs" />
+    <Compile Include="Config\QuickRunWithMemoryDiagnoserConfigAttribute.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="BulkInsertBenchmarks.cs" />

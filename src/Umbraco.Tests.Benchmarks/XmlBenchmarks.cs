@@ -5,7 +5,7 @@ using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [QuickRunWithMemoryDiagnoser]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class XmlBenchmarks
     {
         [GlobalSetup]

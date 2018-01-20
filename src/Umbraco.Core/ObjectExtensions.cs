@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Core
 {
@@ -15,11 +16,11 @@ namespace Umbraco.Core
 	/// </summary>
 	public static class ObjectExtensions
 	{
-        // Used for caching the various type lookups
+        // Cache the various type lookups
         private static readonly Dictionary<Type, Type> NullableGenericCache = new Dictionary<Type, Type>();
-        private static readonly Dictionary<TypePair, TypeConverter> InputTypeConverterCache = new Dictionary<TypePair, TypeConverter>();
-        private static readonly Dictionary<TypePair, TypeConverter> DestinationTypeConverterCache = new Dictionary<TypePair, TypeConverter>();
-        private static readonly Dictionary<TypePair, IConvertible> AssignableTypeCache = new Dictionary<TypePair, IConvertible>();
+        private static readonly Dictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new Dictionary<CompositeTypeTypeKey, TypeConverter>();
+        private static readonly Dictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new Dictionary<CompositeTypeTypeKey, TypeConverter>();
+        private static readonly Dictionary<CompositeTypeTypeKey, IConvertible> AssignableTypeCache = new Dictionary<CompositeTypeTypeKey, IConvertible>();
         private static readonly Dictionary<Type, bool> BoolConvertCache = new Dictionary<Type, bool>();
 
         private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
@@ -71,22 +72,20 @@ namespace Umbraco.Core
         /// <returns>The <see cref="Attempt{T}"/></returns>
         public static Attempt<T> TryConvertTo<T>(this object input)
         {
-            Attempt<object> result = TryConvertTo(input, typeof(T));
-            if (!result.Success)
-            {
-                // Just try a straight up conversion
-                try
-                {
-                    var converted = (T)input;
-                    return Attempt<T>.Succeed(converted);
-                }
-                catch (Exception e)
-                {
-                    return Attempt<T>.Fail(e);
-                }
-            }
+            var result = TryConvertTo(input, typeof(T));
 
-            return Attempt<T>.Succeed((T)result.Result);
+            if (result.Success)
+                return Attempt<T>.Succeed((T) result.Result);
+
+            // just try to cast
+            try
+            {
+                return Attempt<T>.Succeed((T) input);
+            }
+            catch (Exception e)
+            {
+                return Attempt<T>.Fail(e);
+            }
         }
 
         /// <summary>
@@ -94,39 +93,39 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
         /// <param name="input">The input.</param>
-        /// <param name="destinationType">The type to convert to</param>
+        /// <param name="target">The type to convert to</param>
         /// <returns>The <see cref="Attempt{Object}"/></returns>
-        public static Attempt<object> TryConvertTo(this object input, Type destinationType)
+        public static Attempt<object> TryConvertTo(this object input, Type target)
         {
+            if (target == null)
+            {
+                return Attempt<object>.Fail();
+            }
+
             try
             {
-                if (destinationType == null)
-                {
-                    return Attempt<object>.Fail();
-                }
-
                 if (input == null)
                 {
                     // Nullable is ok
-                    if (destinationType.IsGenericType && GetCachedGenericNullableType(destinationType) != null)
+                    if (target.IsGenericType && GetCachedGenericNullableType(target) != null)
                     {
                         return Attempt<object>.Succeed(null);
                     }
 
                     // Reference types are ok
-                    return Attempt<object>.SucceedIf(!destinationType.IsValueType, null);
+                    return Attempt<object>.SucceedIf(target.IsValueType == false, null);
                 }
 
-                Type inputType = input.GetType();
+                var inputType = input.GetType();
 
                 // Easy
-                if (destinationType == typeof(object) || inputType == destinationType)
+                if (target == typeof(object) || inputType == target)
                 {
                     return Attempt.Succeed(input);
                 }
 
                 // Check for string so that overloaders of ToString() can take advantage of the conversion.
-                if (destinationType == typeof(string))
+                if (target == typeof(string))
                 {
                     return Attempt<object>.Succeed(input.ToString());
                 }
@@ -134,42 +133,44 @@ namespace Umbraco.Core
                 // If we've got a nullable of something, we try to convert directly to that thing.
                 // We cache the destination type and underlying nullable types
                 // Any other generic types need to fall through
-                if (destinationType.IsGenericType)
+                if (target.IsGenericType)
                 {
-                    Type underlyingGenericType = GetCachedGenericNullableType(destinationType);
-                    if (underlyingGenericType != null)
+                    var underlying = GetCachedGenericNullableType(target);
+                    if (underlying != null)
                     {
                         // Special case for empty strings for bools/dates which should return null if an empty string.
-                        if (input is string asString)
+                        if (input is string inputString)
                         {
-                            if (string.IsNullOrEmpty(asString) && (underlyingGenericType == typeof(DateTime) || underlyingGenericType == typeof(bool)))
+                            if (string.IsNullOrEmpty(inputString) && (underlying == typeof(DateTime) || underlying == typeof(bool)))
                             {
                                 return Attempt<object>.Succeed(null);
                             }
                         }
 
                         // Recursively call into this method with the inner (not-nullable) type and handle the outcome
-                        Attempt<object> nonNullable = input.TryConvertTo(underlyingGenericType);
+                        var inner = input.TryConvertTo(underlying);
 
                         // And if sucessful, fall on through to rewrap in a nullable; if failed, pass on the exception
-                        if (nonNullable.Success)
+                        if (inner.Success)
                         {
-                            input = nonNullable.Result; // Now fall on through...
+                            input = inner.Result; // Now fall on through...
                         }
                         else
                         {
-                            return Attempt<object>.Fail(nonNullable.Exception);
+                            return Attempt<object>.Fail(inner.Exception);
                         }
                     }
                 }
                 else
                 {
-                    if (input is string asString)
+                    // target is not a generic type
+
+                    if (input is string inputString)
                     {
                         // Try convert from string, returns an Attempt if the string could be
                         // processed (either succeeded or failed), else null if we need to try
                         // other methods
-                        Attempt<object>? result = TryConvertToFromString(asString, destinationType);
+                        var result = TryConvertToFromString(inputString, target);
                         if (result.HasValue)
                         {
                             return result.Value;
@@ -178,14 +179,14 @@ namespace Umbraco.Core
 
                     // TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
                     // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
-                    IConvertible convertible = GetCachedAssignableConvertibleResult(input, inputType, destinationType);
+                    var convertible = GetCachedAssignableConvertibleResult(input, inputType, target);
                     if (convertible != null)
                     {
-                        return Attempt.Succeed(Convert.ChangeType(convertible, destinationType));
+                        return Attempt.Succeed(Convert.ChangeType(convertible, target));
                     }
                 }
 
-                if (destinationType == typeof(bool))
+                if (target == typeof(bool))
                 {
                     if (GetCanConvertToBooleanResult(inputType))
                     {
@@ -193,13 +194,13 @@ namespace Umbraco.Core
                     }
                 }
 
-                TypeConverter inputConverter = GetCachedInputTypeConverter(inputType, destinationType);
+                var inputConverter = GetCachedSourceTypeConverter(inputType, target);
                 if (inputConverter != null)
                 {
-                    return Attempt.Succeed(inputConverter.ConvertTo(input, destinationType));
+                    return Attempt.Succeed(inputConverter.ConvertTo(input, target));
                 }
 
-                TypeConverter outputConverter = GetCachedDestinationTypeConverter(inputType, destinationType);
+                var outputConverter = GetCachedTargetTypeConverter(inputType, target);
                 if (outputConverter != null)
                 {
                     return Attempt.Succeed(outputConverter.ConvertFrom(input));
@@ -208,7 +209,7 @@ namespace Umbraco.Core
                 // Re-check convertables since we altered the input through recursion
                 if (input is IConvertible convertible2)
                 {
-                    return Attempt.Succeed(Convert.ChangeType(convertible2, destinationType));
+                    return Attempt.Succeed(Convert.ChangeType(convertible2, target));
                 }
             }
             catch (Exception e)
@@ -224,12 +225,12 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>This code is an optimized version of the original Umbraco method</remarks>
         /// <param name="input">The input.</param>
-        /// <param name="destinationType">The type to convert to</param>
+        /// <param name="target">The type to convert to</param>
         /// <returns>The <see cref="Nullable{Attempt}"/></returns>
-        private static Attempt<object>? TryConvertToFromString(this string input, Type destinationType)
+        private static Attempt<object>? TryConvertToFromString(this string input, Type target)
         {
             // Easy
-            if (destinationType == typeof(string))
+            if (target == typeof(string))
             {
                 return Attempt<object>.Succeed(input);
             }
@@ -237,13 +238,13 @@ namespace Umbraco.Core
             // Null, empty, whitespaces
             if (string.IsNullOrWhiteSpace(input))
             {
-                if (destinationType == typeof(bool))
+                if (target == typeof(bool))
                 {
                     // null/empty = bool false
                     return Attempt<object>.Succeed(false);
                 }
 
-                if (destinationType == typeof(DateTime))
+                if (target == typeof(DateTime))
                 {
                     // null/empty = min DateTime value
                     return Attempt<object>.Succeed(DateTime.MinValue);
@@ -260,37 +261,38 @@ namespace Umbraco.Core
             // By using a mixture of ordered if statements and switches we can optimize both for
             // fast conditional checking for most frequently used types and the branching
             // that does not depend on previous values available to switch statements.
-            if (destinationType.IsPrimitive)
+            if (target.IsPrimitive)
             {
-                if (destinationType == typeof(int))
+                if (target == typeof(int))
                 {
-                    if (int.TryParse(input, out int value))
+                    if (int.TryParse(input, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
 
                     // Because decimal 100.01m will happily convert to integer 100, it
                     // makes sense that string "100.01" *also* converts to integer 100.
-                    string input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out decimal value2), Convert.ToInt32(value2));
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out var value2), Convert.ToInt32(value2));
                 }
 
-                if (destinationType == typeof(long))
+                if (target == typeof(long))
                 {
-                    if (long.TryParse(input, out long value))
+                    if (long.TryParse(input, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
 
                     // Same as int
-                    string input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out decimal value2), Convert.ToInt64(value2));
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out var value2), Convert.ToInt64(value2));
                 }
 
                 // TODO: Should we do the decimal trick for short, byte, unsigned?
-                if (destinationType == typeof(bool))
+
+                if (target == typeof(bool))
                 {
-                    if (bool.TryParse(input, out bool value))
+                    if (bool.TryParse(input, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -300,45 +302,45 @@ namespace Umbraco.Core
                 }
 
                 // Calling this method directly is faster than any attempt to cache it.
-                switch (Type.GetTypeCode(destinationType))
+                switch (Type.GetTypeCode(target))
                 {
                     case TypeCode.Int16:
-                        return Attempt<object>.SucceedIf(short.TryParse(input, out short value), value);
+                        return Attempt<object>.SucceedIf(short.TryParse(input, out var value), value);
 
                     case TypeCode.Double:
-                        string input2 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.SucceedIf(double.TryParse(input2, out double valueD), valueD);
+                        var input2 = NormalizeNumberDecimalSeparator(input);
+                        return Attempt<object>.SucceedIf(double.TryParse(input2, out var valueD), valueD);
 
                     case TypeCode.Single:
-                        string input3 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.SucceedIf(float.TryParse(input3, out float valueF), valueF);
+                        var input3 = NormalizeNumberDecimalSeparator(input);
+                        return Attempt<object>.SucceedIf(float.TryParse(input3, out var valueF), valueF);
 
                     case TypeCode.Char:
-                        return Attempt<object>.SucceedIf(char.TryParse(input, out char valueC), valueC);
+                        return Attempt<object>.SucceedIf(char.TryParse(input, out var valueC), valueC);
 
                     case TypeCode.Byte:
-                        return Attempt<object>.SucceedIf(byte.TryParse(input, out byte valueB), valueB);
+                        return Attempt<object>.SucceedIf(byte.TryParse(input, out var valueB), valueB);
 
                     case TypeCode.SByte:
-                        return Attempt<object>.SucceedIf(sbyte.TryParse(input, out sbyte valueSb), valueSb);
+                        return Attempt<object>.SucceedIf(sbyte.TryParse(input, out var valueSb), valueSb);
 
                     case TypeCode.UInt32:
-                        return Attempt<object>.SucceedIf(uint.TryParse(input, out uint valueU), valueU);
+                        return Attempt<object>.SucceedIf(uint.TryParse(input, out var valueU), valueU);
 
                     case TypeCode.UInt16:
-                        return Attempt<object>.SucceedIf(ushort.TryParse(input, out ushort valueUs), valueUs);
+                        return Attempt<object>.SucceedIf(ushort.TryParse(input, out var valueUs), valueUs);
 
                     case TypeCode.UInt64:
-                        return Attempt<object>.SucceedIf(ulong.TryParse(input, out ulong valueUl), valueUl);
+                        return Attempt<object>.SucceedIf(ulong.TryParse(input, out var valueUl), valueUl);
                 }
             }
-            else if (destinationType == typeof(Guid))
+            else if (target == typeof(Guid))
             {
-                return Attempt<object>.SucceedIf(Guid.TryParse(input, out Guid value), value);
+                return Attempt<object>.SucceedIf(Guid.TryParse(input, out var value), value);
             }
-            else if (destinationType == typeof(DateTime))
+            else if (target == typeof(DateTime))
             {
-                if (DateTime.TryParse(input, out DateTime value))
+                if (DateTime.TryParse(input, out var value))
                 {
                     switch (value.Kind)
                     {
@@ -356,22 +358,22 @@ namespace Umbraco.Core
 
                 return Attempt<object>.Fail();
             }
-            else if (destinationType == typeof(DateTimeOffset))
+            else if (target == typeof(DateTimeOffset))
             {
-                return Attempt<object>.SucceedIf(DateTimeOffset.TryParse(input, out DateTimeOffset value), value);
+                return Attempt<object>.SucceedIf(DateTimeOffset.TryParse(input, out var value), value);
             }
-            else if (destinationType == typeof(TimeSpan))
+            else if (target == typeof(TimeSpan))
             {
-                return Attempt<object>.SucceedIf(TimeSpan.TryParse(input, out TimeSpan value), value);
+                return Attempt<object>.SucceedIf(TimeSpan.TryParse(input, out var value), value);
             }
-            else if (destinationType == typeof(decimal))
+            else if (target == typeof(decimal))
             {
-                string input2 = NormalizeNumberDecimalSeparator(input);
-                return Attempt<object>.SucceedIf(decimal.TryParse(input2, out decimal value), value);
+                var input2 = NormalizeNumberDecimalSeparator(input);
+                return Attempt<object>.SucceedIf(decimal.TryParse(input2, out var value), value);
             }
-            else if (input != null && destinationType == typeof(Version))
+            else if (input != null && target == typeof(Version))
             {
-                return Attempt<object>.SucceedIf(Version.TryParse(input, out Version value), value);
+                return Attempt<object>.SucceedIf(Version.TryParse(input, out var value), value);
             }
 
             // E_NOTIMPL IPAddress, BigInteger
@@ -650,106 +652,91 @@ namespace Umbraco.Core
             return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
         }
 
+        // gets a converter for source, that can convert to target, or null if none exists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static TypeConverter GetCachedInputTypeConverter(Type inputType, Type destinationType)
+        private static TypeConverter GetCachedSourceTypeConverter(Type source, Type target)
         {
-            var key = new TypePair(inputType, destinationType);
-            if (!InputTypeConverterCache.ContainsKey(key))
+            var key = new CompositeTypeTypeKey(source, target);
+            if (InputTypeConverterCache.TryGetValue(key, out var cached))
+                return cached;
+
+            var converter = TypeDescriptor.GetConverter(source);
+            if (converter.CanConvertTo(target))
             {
-                TypeConverter converter = TypeDescriptor.GetConverter(inputType);
-                if (converter.CanConvertTo(destinationType))
-                {
-                    InputTypeConverterCache[key] = converter;
-                    return converter;
-                }
-                else
-                {
-                    InputTypeConverterCache[key] = null;
-                    return null;
-                }
+                InputTypeConverterCache[key] = converter;
+                return converter;
             }
 
-            return InputTypeConverterCache[key];
+            InputTypeConverterCache[key] = null;
+            return null;
         }
 
+        // gets a converter for target, that can convert from source, or null if none exists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static TypeConverter GetCachedDestinationTypeConverter(Type inputType, Type destinationType)
+        private static TypeConverter GetCachedTargetTypeConverter(Type source, Type target)
         {
-            var key = new TypePair(inputType, destinationType);
-            if (!DestinationTypeConverterCache.ContainsKey(key))
+            var key = new CompositeTypeTypeKey(source, target);
+            if (DestinationTypeConverterCache.TryGetValue(key, out var cached))
+                return cached;
+
+            var converter = TypeDescriptor.GetConverter(target);
+            if (converter.CanConvertFrom(source))
             {
-                TypeConverter converter = TypeDescriptor.GetConverter(destinationType);
-                if (converter.CanConvertFrom(inputType))
-                {
-                    DestinationTypeConverterCache[key] = converter;
-                    return converter;
-                }
-                else
-                {
-                    DestinationTypeConverterCache[key] = null;
-                    return null;
-                }
+                DestinationTypeConverterCache[key] = converter;
+                return converter;
             }
 
-            return DestinationTypeConverterCache[key];
+            DestinationTypeConverterCache[key] = null;
+            return null;
         }
 
+        // gets the underlying type of a nullable type, or null if the type is not nullable
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static Type GetCachedGenericNullableType(Type destinationType)
+        private static Type GetCachedGenericNullableType(Type type)
         {
-            if (!NullableGenericCache.ContainsKey(destinationType))
+            if (NullableGenericCache.TryGetValue(type, out var cached))
+                return cached;
+
+            if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                if (destinationType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    Type underlying = Nullable.GetUnderlyingType(destinationType);
-                    NullableGenericCache[destinationType] = underlying;
-                    return underlying;
-                }
-                else
-                {
-                    NullableGenericCache[destinationType] = null;
-                    return null;
-                }
+                var underlying = Nullable.GetUnderlyingType(type);
+                NullableGenericCache[type] = underlying;
+                return underlying;
             }
 
-            return NullableGenericCache[destinationType];
+            NullableGenericCache[type] = null;
+            return null;
+
         }
 
+        // gets an IConvertible from source to target type, or null if none exists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IConvertible GetCachedAssignableConvertibleResult(object input, Type inputType, Type destinationType)
+        private static IConvertible GetCachedAssignableConvertibleResult(object input, Type source, Type target)
         {
-            var key = new TypePair(inputType, destinationType);
-            if (!AssignableTypeCache.ContainsKey(key))
+            var key = new CompositeTypeTypeKey(source, target);
+            if (AssignableTypeCache.TryGetValue(key, out var cached))
+                return cached;
+
+            if (target.IsAssignableFrom(source) && input is IConvertible convertible)
             {
-                if (destinationType.IsAssignableFrom(inputType))
-                {
-                    if (input is IConvertible convertable)
-                    {
-                        AssignableTypeCache[key] = convertable;
-                        return convertable;
-                    }
-                }
-                else
-                {
-                    AssignableTypeCache[key] = null;
-                    return null;
-                }
+                AssignableTypeCache[key] = convertible;
+                return convertible;
             }
 
-            return AssignableTypeCache[key];
+            AssignableTypeCache[key] = null;
+            return null;
         }
 
+        // determines whether a type can be converted to boolean
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool GetCanConvertToBooleanResult(Type inputType)
+        private static bool GetCanConvertToBooleanResult(Type type)
         {
-            if (!BoolConvertCache.ContainsKey(inputType))
-            {
-                bool canConvert = CustomBooleanTypeConverter.CanConvertFrom(inputType);
-                BoolConvertCache[inputType] = canConvert;
-                return canConvert;
-            }
+            if (BoolConvertCache.TryGetValue(type, out var cached))
+                return cached;
 
-            return BoolConvertCache[inputType];
+            var canConvert = CustomBooleanTypeConverter.CanConvertFrom(type);
+            BoolConvertCache[type] = canConvert;
+            return canConvert;
         }
     }
 }
