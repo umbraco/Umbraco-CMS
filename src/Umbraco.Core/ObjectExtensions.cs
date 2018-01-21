@@ -21,7 +21,7 @@ namespace Umbraco.Core
         private static readonly ConcurrentDictionary<Type, Type> NullableGenericCache = new ConcurrentDictionary<Type, Type>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
         private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
-        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, IConvertible> AssignableTypeCache = new ConcurrentDictionary<CompositeTypeTypeKey, IConvertible>();
+        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> AssignableTypeCache = new ConcurrentDictionary<CompositeTypeTypeKey, bool>();
         private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new ConcurrentDictionary<Type, bool>();
 
         private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
@@ -180,16 +180,15 @@ namespace Umbraco.Core
 
                     // TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
                     // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
-                    var convertible = GetCachedAssignableConvertibleResult(input, inputType, target);
-                    if (convertible != null)
+                    if (GetCachedCanAssign(inputType, target))
                     {
-                        return Attempt.Succeed(Convert.ChangeType(convertible, target));
+                        return Attempt.Succeed(Convert.ChangeType(input, target));
                     }
                 }
 
                 if (target == typeof(bool))
                 {
-                    if (GetCanConvertToBooleanResult(inputType))
+                    if (GetCachedCanConvertToBoolean(inputType))
                     {
                         return Attempt.Succeed(CustomBooleanTypeConverter.ConvertFrom(input));
                     }
@@ -657,8 +656,7 @@ namespace Umbraco.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TypeConverter GetCachedSourceTypeConverter(Type source, Type target)
         {
-            var key = new CompositeTypeTypeKey(source, target);
-            return InputTypeConverterCache.GetOrAdd(key, k =>
+            return InputTypeConverterCache.GetOrAdd(new CompositeTypeTypeKey(source, target), k =>
             {
                 var ksource = k.Type1;
                 var ktarget = k.Type2;
@@ -672,8 +670,7 @@ namespace Umbraco.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TypeConverter GetCachedTargetTypeConverter(Type source, Type target)
         {
-            var key = new CompositeTypeTypeKey(source, target);
-            return DestinationTypeConverterCache.GetOrAdd(key, k =>
+            return DestinationTypeConverterCache.GetOrAdd(new CompositeTypeTypeKey(source, target), k =>
             {
                 var ksource = k.Type1;
                 var ktarget = k.Type2;
@@ -693,36 +690,20 @@ namespace Umbraco.Core
 
         // gets an IConvertible from source to target type, or null if none exists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IConvertible GetCachedAssignableConvertibleResult(object input, Type source, Type target)
+        private static bool GetCachedCanAssign(Type source, Type target)
         {
-            var key = new CompositeTypeTypeKey(source, target);
-            return AssignableTypeCache.GetOrAdd(key, k =>
+            return AssignableTypeCache.GetOrAdd(new CompositeTypeTypeKey(source, target), k =>
             {
                 var ksource = k.Type1;
                 var ktarget = k.Type2;
 
-                // FIXME the value we are caching does not depend on the key - WHAT IS THIS?
-                return ktarget.IsAssignableFrom(ksource) && input is IConvertible convertible ? convertible : null;
+                return ktarget.IsAssignableFrom(ksource) && typeof(IConvertible).IsAssignableFrom(ksource);
             });
-
-            /*
-            if (AssignableTypeCache.TryGetValue(key, out var cached))
-                return cached;
-
-            if (target.IsAssignableFrom(source) && input is IConvertible convertible)
-            {
-                AssignableTypeCache[key] = convertible;
-                return convertible;
-            }
-
-            AssignableTypeCache[key] = null;
-            return null;
-            */
         }
 
         // determines whether a type can be converted to boolean
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool GetCanConvertToBooleanResult(Type type)
+        private static bool GetCachedCanConvertToBoolean(Type type)
         {
             return BoolConvertCache.GetOrAdd(type, t
                 => CustomBooleanTypeConverter.CanConvertFrom(t));
