@@ -70,7 +70,7 @@ namespace Umbraco.Core.Strings
         {
             foreach (var node in _umbracoSettings.RequestHandler.CharCollection)
             {
-                if(string.IsNullOrEmpty(node.Char) == false)
+                if (string.IsNullOrEmpty(node.Char) == false)
                     _urlReplaceCharacters[node.Char] = node.Replacement;
             }
         }
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Strings
         private void EnsureNotFrozen()
         {
             if (_frozen)
-                throw new InvalidOperationException("Cannot configure the helper once it is frozen.");            
+                throw new InvalidOperationException("Cannot configure the helper once it is frozen.");
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Strings
             }).WithConfig(CleanStringType.Alias, new Config
             {
                 PreFilter = ApplyUrlReplaceCharacters,
-                IsTerm = (c, leading) => leading 
+                IsTerm = (c, leading) => leading
                     ? char.IsLetter(c) // only letters
                     : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
                 StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
@@ -215,12 +215,12 @@ namespace Umbraco.Core.Strings
                 return new Config
                 {
                     PreFilter = PreFilter,
-                    PostFilter =  PostFilter,
+                    PostFilter = PostFilter,
                     IsTerm = IsTerm,
                     StringType = StringType,
                     BreakTermsOnUpper = BreakTermsOnUpper,
-                    CutAcronymOnNonUpper =  CutAcronymOnNonUpper,
-                    GreedyAcronyms =  GreedyAcronyms,
+                    CutAcronymOnNonUpper = CutAcronymOnNonUpper,
+                    GreedyAcronyms = GreedyAcronyms,
                     Separator = Separator
                 };
             }
@@ -339,8 +339,8 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// </summary>
         public string GetShortStringServicesJavaScript(string controllerPath)
         {
-                return string.Format(SssjsFormat,
-                    _umbracoSettings.Content.ForceSafeAliases ? "true" : "false", controllerPath);
+            return string.Format(SssjsFormat,
+                _umbracoSettings.Content.ForceSafeAliases ? "true" : "false", controllerPath);
         }
 
         #endregion
@@ -467,7 +467,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// Cleans a string.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
@@ -480,7 +480,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// Cleans a string, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
@@ -494,7 +494,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// Cleans a string in the context of a specified culture.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
@@ -507,7 +507,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// Cleans a string in the context of a specified culture, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
@@ -554,7 +554,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     text = Utf8ToAsciiConverter.ToAsciiString(text);
                     break;
                 case CleanStringType.TryAscii:
-                    const char ESC = (char) 27;
+                    const char ESC = (char)27;
                     var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
                     if (ctext.Contains(ESC) == false) text = ctext;
                     break;
@@ -569,7 +569,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
             // apply post-filter
             if (config.PostFilter != null)
                 text = config.PostFilter(text);
-            
+
             return text;
         }
 
@@ -839,7 +839,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     {
                         term = term.Substring(i);
                         term.CopyTo(0, output, opos, term.Length);
-                        opos += term.Length;                        
+                        opos += term.Length;
                     }
                     break;
 
@@ -914,21 +914,22 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public virtual string ReplaceMany(string text, IDictionary<string, string> replacements)
         {
-            // be safe
             if (text == null)
+            {
                 throw new ArgumentNullException("text");
+            }
+
             if (replacements == null)
+            {
                 throw new ArgumentNullException("replacements");
+            }
 
-            // Have done various tests, implementing my own "super fast" state machine to handle 
-            // replacement of many items, or via regexes, but on short strings and not too
-            // many replacements (which prob. is going to be our case) nothing can beat this...
-            // (at least with safe and checked code -- we don't want unsafe/unchecked here)
+            foreach (KeyValuePair<string, string> item in replacements)
+            {
+                text = text.Replace(item.Key, item.Value);
+            }
 
-            // Note that it will do chained-replacements ie replaced items can be replaced
-            // in turn by another replacement (ie the order of replacements is important)
-
-            return replacements.Aggregate(text, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
+            return text;
         }
 
         /// <summary>
@@ -940,15 +941,22 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public virtual string ReplaceMany(string text, char[] chars, char replacement)
         {
-            // be safe
             if (text == null)
+            {
                 throw new ArgumentNullException("text");
+            }
+
             if (chars == null)
+            {
                 throw new ArgumentNullException("chars");
+            }
 
-            // see note above
+            for (int i = 0; i < chars.Length; i++)
+            {
+                text = text.Replace(chars[i], replacement);
+            }
 
-            return chars.Aggregate(text, (current, c) => current.Replace(c, replacement));
+            return text;
         }
 
         #endregion

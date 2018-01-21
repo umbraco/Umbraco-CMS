@@ -1,25 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnostics.Windows;
+using BenchmarkDotNet.Diagnosers;
 
 namespace Umbraco.Tests.Benchmarks
 {
     /// <summary>
     /// Want to check what is faster OfType or Cast when a enurable all has the same items
     /// </summary>
-    [Config(typeof(Config))]
+    [MemoryDiagnoser]
     public class LinqCastBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-            }
-        }
-
         public LinqCastBenchmarks()
         {
             _array = new List<object>();
