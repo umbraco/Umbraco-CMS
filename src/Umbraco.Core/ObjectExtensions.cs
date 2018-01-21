@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -17,11 +18,11 @@ namespace Umbraco.Core
 	public static class ObjectExtensions
 	{
         // Cache the various type lookups
-        private static readonly Dictionary<Type, Type> NullableGenericCache = new Dictionary<Type, Type>();
-        private static readonly Dictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new Dictionary<CompositeTypeTypeKey, TypeConverter>();
-        private static readonly Dictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new Dictionary<CompositeTypeTypeKey, TypeConverter>();
-        private static readonly Dictionary<CompositeTypeTypeKey, IConvertible> AssignableTypeCache = new Dictionary<CompositeTypeTypeKey, IConvertible>();
-        private static readonly Dictionary<Type, bool> BoolConvertCache = new Dictionary<Type, bool>();
+        private static readonly ConcurrentDictionary<Type, Type> NullableGenericCache = new ConcurrentDictionary<Type, Type>();
+        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> InputTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
+        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter> DestinationTypeConverterCache = new ConcurrentDictionary<CompositeTypeTypeKey, TypeConverter>();
+        private static readonly ConcurrentDictionary<CompositeTypeTypeKey, IConvertible> AssignableTypeCache = new ConcurrentDictionary<CompositeTypeTypeKey, IConvertible>();
+        private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new ConcurrentDictionary<Type, bool>();
 
         private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
         private static readonly CustomBooleanTypeConverter CustomBooleanTypeConverter = new CustomBooleanTypeConverter();
@@ -657,18 +658,14 @@ namespace Umbraco.Core
         private static TypeConverter GetCachedSourceTypeConverter(Type source, Type target)
         {
             var key = new CompositeTypeTypeKey(source, target);
-            if (InputTypeConverterCache.TryGetValue(key, out var cached))
-                return cached;
-
-            var converter = TypeDescriptor.GetConverter(source);
-            if (converter.CanConvertTo(target))
+            return InputTypeConverterCache.GetOrAdd(key, k =>
             {
-                InputTypeConverterCache[key] = converter;
-                return converter;
-            }
+                var ksource = k.Type1;
+                var ktarget = k.Type2;
 
-            InputTypeConverterCache[key] = null;
-            return null;
+                var converter = TypeDescriptor.GetConverter(ksource);
+                return converter.CanConvertTo(ktarget) ? converter : null;
+            });
         }
 
         // gets a converter for target, that can convert from source, or null if none exists
@@ -676,37 +673,22 @@ namespace Umbraco.Core
         private static TypeConverter GetCachedTargetTypeConverter(Type source, Type target)
         {
             var key = new CompositeTypeTypeKey(source, target);
-            if (DestinationTypeConverterCache.TryGetValue(key, out var cached))
-                return cached;
-
-            var converter = TypeDescriptor.GetConverter(target);
-            if (converter.CanConvertFrom(source))
+            return DestinationTypeConverterCache.GetOrAdd(key, k =>
             {
-                DestinationTypeConverterCache[key] = converter;
-                return converter;
-            }
+                var ksource = k.Type1;
+                var ktarget = k.Type2;
 
-            DestinationTypeConverterCache[key] = null;
-            return null;
+                var converter = TypeDescriptor.GetConverter(ktarget);
+                return converter.CanConvertFrom(ksource) ? converter : null;
+            });
         }
 
         // gets the underlying type of a nullable type, or null if the type is not nullable
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Type GetCachedGenericNullableType(Type type)
         {
-            if (NullableGenericCache.TryGetValue(type, out var cached))
-                return cached;
-
-            if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                var underlying = Nullable.GetUnderlyingType(type);
-                NullableGenericCache[type] = underlying;
-                return underlying;
-            }
-
-            NullableGenericCache[type] = null;
-            return null;
-
+            return NullableGenericCache.GetOrAdd(type, t
+                => t.GetGenericTypeDefinition() == typeof(Nullable<>) ? Nullable.GetUnderlyingType(type) : null;
         }
 
         // gets an IConvertible from source to target type, or null if none exists
@@ -714,6 +696,16 @@ namespace Umbraco.Core
         private static IConvertible GetCachedAssignableConvertibleResult(object input, Type source, Type target)
         {
             var key = new CompositeTypeTypeKey(source, target);
+            return AssignableTypeCache.GetOrAdd(key, k =>
+            {
+                var ksource = k.Type1;
+                var ktarget = k.Type2;
+
+                // FIXME the value we are caching does not depend on the key - WHAT IS THIS?
+                return ktarget.IsAssignableFrom(ksource) && input is IConvertible convertible ? convertible : null;
+            });
+
+            /*
             if (AssignableTypeCache.TryGetValue(key, out var cached))
                 return cached;
 
@@ -725,18 +717,15 @@ namespace Umbraco.Core
 
             AssignableTypeCache[key] = null;
             return null;
+            */
         }
 
         // determines whether a type can be converted to boolean
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool GetCanConvertToBooleanResult(Type type)
         {
-            if (BoolConvertCache.TryGetValue(type, out var cached))
-                return cached;
-
-            var canConvert = CustomBooleanTypeConverter.CanConvertFrom(type);
-            BoolConvertCache[type] = canConvert;
-            return canConvert;
+            return BoolConvertCache.GetOrAdd(type, t
+                => CustomBooleanTypeConverter.CanConvertFrom(t));
         }
     }
 }
