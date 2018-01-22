@@ -190,7 +190,7 @@
                         <a href=""
                            class="umb-user-group-preview__action"
                            ngf-select ng-model="filesHolder"
-                           ngf-change="changeAvatar($files, $event)"
+                           ngf-change="model.changeAvatar($files, $event)"
                            ngf-multiple="false"
                            ngf-pattern="{{model.acceptedFileTypes}}"
                            ngf-max-size="{{ model.maxFileSize }}">
