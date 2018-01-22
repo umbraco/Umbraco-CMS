@@ -1953,7 +1953,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 			</body>
     </html>]]>
         </key>
-
+        <key alias="invite">Invite</key>
     </area>
 
     <area alias="validation">
