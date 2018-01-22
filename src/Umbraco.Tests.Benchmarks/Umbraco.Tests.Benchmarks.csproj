@@ -162,6 +162,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentDictionaryBenchmarks.cs" />
     <Compile Include="Config\QuickRunConfigAttribute.cs" />
     <Compile Include="Config\QuickRunWithMemoryDiagnoserConfigAttribute.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
@@ -175,7 +176,9 @@
     <Compile Include="XmlPublishedContentInitBenchmarks.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
