@@ -31,6 +31,7 @@
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
         vm.unlockUser = unlockUser;
+        vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
 
@@ -356,7 +357,7 @@
             });
         }
 
-        $scope.changeAvatar = function (files, event) {
+        function changeAvatar(files, event) {
             if (files && files.length > 0) {
                 upload(files[0]);
             }
