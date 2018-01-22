@@ -720,6 +720,8 @@ namespace Umbraco.Core
                 return canConvert;
             }
 
+            // "object is" is faster than "Type.IsAssignableFrom.
+            // We can use it to very quickly determine whether true/false
             if (input is IConvertible && target.IsAssignableFrom(source))
             {
                 return AssignableTypeCache[key] = true;
