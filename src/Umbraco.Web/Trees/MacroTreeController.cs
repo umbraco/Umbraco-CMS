@@ -65,7 +65,7 @@ namespace Umbraco.Web.Trees
                 throw new InvalidOperationException("Could not resolve the confirmation view for the legacy action " + ActionDelete.Instance.Alias);
             menuItem.LaunchDialogView(
                 legacyConfirmView.Result,
-                Services.TextService.Localize("general/delete"));
+                Services.TextService.Localize(string.Format("general/{0}", ActionDelete.Instance.Alias)));
 
             return menu;
         }
