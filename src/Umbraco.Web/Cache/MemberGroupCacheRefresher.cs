@@ -108,11 +108,10 @@ namespace Umbraco.Web.Cache
             {
                 if (payload != null && memberGroupCache)
                 {
-                    memberGroupCache.Result.ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
                     memberGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMemberGroup>(payload.Id));
-                }                
+                }
             });
-            
+
         }
     }
 }

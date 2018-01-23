@@ -131,18 +131,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMemberGroup GetByName(string name)
         {
-            return IsolatedCache.GetCacheItem<IMemberGroup>(
-                string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
-                () =>
-                {
-                    var qry = new Query<IMemberGroup>().Where(group => group.Name.Equals(name));
-                    var result = GetByQuery(qry);
-                    return result.FirstOrDefault();
-                },
-                //cache for 5 mins since that is the default in the RuntimeCacheProvider
-                TimeSpan.FromMinutes(5), 
-                //sliding is true
-                true);
+            // cannot use name in the cache key, 'cos when clearing the cache for a given
+            // member group that has been renamed, we clear the new name but not the old
+            // name - it just cannot work - and we cannot use the dirty props 'cos it won't
+            // work on distributed cache - and besides, we end up caching both by name and
+            // by id
+            // disabling the cache entirely for now - if we want to cache we'd need to
+            // implement some sort of cross-reference name/id cache
+
+            var qry = new Query<IMemberGroup>().Where(group => group.Name.Equals(name));
+            var result = GetByQuery(qry);
+            return result.FirstOrDefault();
         }
 
         public IMemberGroup CreateIfNotExists(string roleName)
