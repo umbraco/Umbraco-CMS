@@ -13,7 +13,6 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Constants.Applications.Content)]
     public class TourController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<BackOfficeTourFile> GetTours()
