@@ -215,6 +215,8 @@
 
             $scope.page.buttonGroupState = "success";
 
+          }, function(err) {
+            $scope.page.buttonGroupState = 'error';
           });
       }
 

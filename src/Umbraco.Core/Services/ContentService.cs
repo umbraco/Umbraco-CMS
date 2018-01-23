@@ -1342,6 +1342,40 @@ namespace Umbraco.Core.Services
             return content;
         }
 
+        public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        {
+            using (new WriteLock(Locker))
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
+
+                var contentTypeIdsA = contentTypeIds.ToArray();
+                var query = new Query<IContent>();
+                if (contentTypeIdsA.Length > 0)
+                {
+                    query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
+                }
+                var blueprints = repository.GetByQuery(query).Select(x =>
+                {
+                    ((Content) x).IsBlueprint = true;
+                    return x;
+                }).ToArray();
+
+                foreach (var blueprint in blueprints)
+                {
+                    repository.Delete(blueprint);
+                }
+
+                uow.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(blueprints), "DeletedBlueprint");
+                uow.Commit();
+            }
+        }
+
+        public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
+        {
+            DeleteBlueprintsOfTypes(new[] {contentTypeId}, userId);
+        }
+
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>

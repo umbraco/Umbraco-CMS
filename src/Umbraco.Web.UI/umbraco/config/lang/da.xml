@@ -252,7 +252,7 @@
     <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
-    <key alias="newJavascriptFile">Ny javascript fil</key>
+    <key alias="newJavascriptFile">Ny JavaScript-fil</key>
     <key alias="newEmptyPartialView">Ny tom partial view</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newPartialViewMacro">Ny partial view makro</key>

@@ -1,5 +1,8 @@
 ﻿using System.Net.Http.Formatting;
 using umbraco;
+using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -53,6 +56,31 @@ namespace Umbraco.Web.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
+
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                //Create User
+                var createMenuItem = menu.Items.CreateMenuItem<ActionNew>(Services.TextService.Localize("actions/create"));
+                createMenuItem.Icon = "add";
+                createMenuItem.NavigateToRoute("users/users/overview?subview=users&create=true");
+                menu.Items.Add(createMenuItem);
+                
+                //This is the same setting used in the global JS for 'showUserInvite'
+                if (EmailSender.CanSendRequiredEmail)
+                {
+                    //Invite User (Action import closest type of action to an invite user)
+                    var inviteMenuItem = menu.Items.CreateMenuItem<ActionImport>(Services.TextService.Localize("user/invite"));
+                    inviteMenuItem.Icon = "message-unopened";
+                    inviteMenuItem.NavigateToRoute("users/users/overview?subview=users&invite=true");
+
+                    menu.Items.Add(inviteMenuItem);
+                }
+
+                return menu;
+            }
+
+            //There is no context menu options for editing a specific user
+            //Also we no longer list each user in the tree & in theory never hit this
             return menu;
         }
     }
