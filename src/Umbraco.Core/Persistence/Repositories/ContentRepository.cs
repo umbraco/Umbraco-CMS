@@ -693,11 +693,27 @@ namespace Umbraco.Core.Persistence.Repositories
             // else if unpublished then clear published version infos
             if (entity.Published)
             {
+                dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
+                {
+                    VersionId = dto.VersionId,
+                    VersionDate = dto.UpdateDate,
+                    Newest = true,
+                    NodeId = dto.NodeId,
+                    Published = true
+                };
                 ((Content) entity).PublishedVersionGuid = dto.VersionId;
                 ((Content) entity).PublishedDate = dto.UpdateDate;
             }
-            else
+            else if (publishedStateChanged)
             {
+                dto.DocumentPublishedReadOnlyDto = new DocumentPublishedReadOnlyDto
+                {
+                    VersionId = default (Guid),
+                    VersionDate = default (DateTime),
+                    Newest = false,
+                    NodeId = dto.NodeId,
+                    Published = false
+                };
                 ((Content) entity).PublishedVersionGuid = default(Guid);
                 ((Content) entity).PublishedDate = default (DateTime);
             }
