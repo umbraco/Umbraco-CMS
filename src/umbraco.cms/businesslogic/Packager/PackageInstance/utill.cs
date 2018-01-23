@@ -283,8 +283,8 @@ namespace umbraco.cms.businesslogic.packager
             // find number of chars to remove from orginal file path
 
             using (var memoryStream = new MemoryStream())
-            {
-                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create))
+            {   
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                 {
                     foreach (string file in ar)
                     {
