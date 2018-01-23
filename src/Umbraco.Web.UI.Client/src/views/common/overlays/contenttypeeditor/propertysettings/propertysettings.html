@@ -90,8 +90,8 @@
 
    <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
 
-       <h5><localize key="general_rights"></localize></h5>
-
+       <h5><localize key="general_options"></localize></h5>
+       
        <label class="checkbox no-indent">
           <input type="checkbox" ng-model="model.property.showOnMemberProfile">
           <localize key="contentTypeEditor_showOnMemberProfile"></localize>
@@ -101,6 +101,11 @@
          <input type="checkbox" ng-model="model.property.memberCanEdit">
          <localize key="contentTypeEditor_memberCanEdit"></localize>
       </label>
+
+       <label class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.isSensitiveData">
+           <localize key="contentTypeEditor_isSensitiveData"></localize>
+       </label>
 
    </div>
 

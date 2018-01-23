@@ -516,6 +516,7 @@
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
+        <key alias="options">Options</key>
         <key alias="about">About</key>
         <key alias="action">Action</key>
         <key alias="actions">Actions</key>
@@ -1613,6 +1614,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
         <key alias="memberCanEdit">Member can edit</key>
+        <key alias="isSensitiveData">Is sensitive data</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
     </area>

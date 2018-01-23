@@ -13,5 +13,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "memberCanEdit")]
         public bool MemberCanEditProperty { get; set; }
+
+        [DataMember(Name = "isSensitiveData")]
+        public bool IsSensitiveData { get; set; }
     }
 }
