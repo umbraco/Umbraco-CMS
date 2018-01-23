@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -13,8 +12,10 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// Allows for Model Binding any IPublishedContent or IRenderModel
     /// </summary>
-	public class RenderModelBinder : DefaultModelBinder, IModelBinder, IModelBinderProvider
+	public class RenderModelBinder : DefaultModelBinder, IModelBinderProvider
     {
+        public static RenderModelBinder Instance = new RenderModelBinder();
+
 		/// <summary>
 		/// Binds the model to a value by using the specified controller context and binding context.
 		/// </summary>
@@ -132,10 +133,30 @@ namespace Umbraco.Web.Mvc
             return null;
         }
 
+        public class ModelBindingArgs : EventArgs
+        {
+            public ModelBindingArgs(Type sourceType, Type modelType, StringBuilder message)
+            {
+                SourceType = sourceType;
+                ModelType = modelType;
+                Message = message;
+            }
+
+            public bool SourceIsContent;
+            public bool ViewModelIsContent;
+            public Type SourceType { get; set; }
+            public Type ModelType { get; set; }
+            public StringBuilder Message { get; private set; }
+            public bool Restart { get; set; }
+        }
+
+        public static event EventHandler<ModelBindingArgs> ModelBindingException;
+
 	    private static void ThrowModelBindingException(bool sourceContent, bool modelContent, Type sourceType, Type modelType)
 	    {
 	        var msg = new StringBuilder();
 
+            // prepare message
 	        msg.Append("Cannot bind source");
 	        if (sourceContent) msg.Append(" content");
 	        msg.Append(" type ");
@@ -146,28 +167,24 @@ namespace Umbraco.Web.Mvc
             msg.Append(modelType.FullName);
             msg.Append(".");
 
-            // compare FullName for the time being because when upgrading ModelsBuilder,
-            // Umbraco does not know about the new attribute type - later on, can compare
-            // on type directly (ie after v7.4.2).
-	        var sourceAttr = sourceType.Assembly.CustomAttributes.FirstOrDefault(x =>
-                x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
-	        var modelAttr = modelType.Assembly.CustomAttributes.FirstOrDefault(x =>
-                x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
+            // raise event, to give model factories a chance at reporting
+            // the error with more details, and optionally request that
+            // the application restarts.
 
-            // bah.. names are App_Web_all.generated.cs.8f9494c4.jjuvxz55 so they ARE different, fuck!
-            // we cannot compare purely on type.FullName 'cos we might be trying to map Sub to Main = fails!
-            if (sourceAttr != null && modelAttr != null
-                && sourceType.Assembly.GetName().Version.Revision != modelType.Assembly.GetName().Version.Revision)
+	        var args = new ModelBindingArgs(sourceType, modelType, msg);
+            if (ModelBindingException != null)
+                ModelBindingException(Instance, args);
+
+	        if (args.Restart)
 	        {
-	            msg.Append(" Types come from two PureLive assemblies with different versions,");
-                msg.Append(" this usually indicates that the application is in an unstable state.");
-                msg.Append(" The application is restarting now, reload the page and it should work.");
-                var context = HttpContext.Current;
-                if (context == null)
-                    AppDomain.Unload(AppDomain.CurrentDomain);
-                else
-                    ApplicationContext.Current.RestartApplicationPool(new HttpContextWrapper(context));
-            }
+	            msg.Append(" The application is restarting now.");
+
+	            var context = HttpContext.Current;
+	            if (context == null)
+	                AppDomain.Unload(AppDomain.CurrentDomain);
+	            else
+	                ApplicationContext.Current.RestartApplicationPool(new HttpContextWrapper(context));
+	        }
 
 	        throw new ModelBindingException(msg.ToString());
 	    }
