@@ -8,6 +8,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.UrlListController"
 	                return {
 	                    url: item.url,
 	                    linkText: item.linkText,
+	                    linkDescription: item.linkDescription,
 	                    urlTarget: (item.target) ? item.target : "_blank",
 	                    icon: (item.icon) ? item.icon : "icon-out"
 	                };

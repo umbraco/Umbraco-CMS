@@ -1,3 +1,5 @@
 ﻿<div class="umb-editor umb-readonlyvalue" ng-controller="Umbraco.PropertyEditors.ReadOnlyValueController">
-    <span ng-bind-html="displayvalue"></span>
+  <span ng-bind-html="displayvalue"></span>
+  <br ng-if="valueDescription"/>
+  <small ng-if="valueDescription" class="muted">{{valueDescription}}</small>
 </div>

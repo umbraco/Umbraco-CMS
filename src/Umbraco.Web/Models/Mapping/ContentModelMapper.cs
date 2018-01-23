@@ -119,14 +119,22 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
 
+            var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
+            var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
+            var currentDocumentTypeDescription = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Description);
+
             var properties = new List<ContentPropertyDisplay>
             {
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                     Label = localizedText.Localize("content/documentType"),
-                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    Value = currentDocumentTypeName,
+                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View,
+                    Config = new Dictionary<string, object>
+                    {
+                        { "valueDescription", currentDocumentTypeDescription}
+                    }
                 },
                 new ContentPropertyDisplay
                 {
@@ -179,9 +187,6 @@ namespace Umbraco.Web.Models.Mapping
                     if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
-                        var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : localizedText.UmbracoDictionaryTranslate(currentDocumentType.Name);
-
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good
                         var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
@@ -193,6 +198,7 @@ namespace Umbraco.Web.Models.Mapping
                             new
                             {
                                 linkText = currentDocumentTypeName,
+                                linkDescription = currentDocumentTypeDescription,
                                 url = docTypeLink,
                                 target = "_self",
                                 icon = "icon-item-arrangement"

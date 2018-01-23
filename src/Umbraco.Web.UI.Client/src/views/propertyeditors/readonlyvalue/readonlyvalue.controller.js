@@ -30,6 +30,10 @@ function ReadOnlyValueController($rootScope, $scope, $filter) {
             $scope.displayvalue = $scope.model.value;
         }
 
+        //displays a small block beneath the value, used for the guid and doctype description.
+        if ($scope.model.config && $scope.model.config.valueDescription) {
+            $scope.valueDescription = $scope.model.config.valueDescription;
+        }
     }
 
     //format the display value on init:
