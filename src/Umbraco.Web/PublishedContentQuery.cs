@@ -227,13 +227,10 @@ namespace Umbraco.Web
             return doc;
         }
 
-        private static ConcurrentDictionary<Guid, int> _guidToIntLoopkup;
+        private static readonly ConcurrentDictionary<Guid, int> _guidToIntLoopkup = new ConcurrentDictionary<Guid, int>();
 
         private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
         {
-            // We create the lookup when we first need it
-            if (_guidToIntLoopkup == null)
-                _guidToIntLoopkup = new ConcurrentDictionary<Guid, int>();
 
             IPublishedContent doc;
 
