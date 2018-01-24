@@ -3,31 +3,71 @@
 */
 
 .umb-editor-wrapper {
-	background: @white;
+	background: @gray-10;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+    > form {
+        height: 100%;
+    }
+}
+
+.umb-split-views {
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
 	display: flex;
-	flex-direction: column;
+}
 
-    > form {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
+.umb-split-view {
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: auto;
+	position: relative;
+	background: transparent;
+	//transition: width 0.4s ease-in-out;
+}
+
+.umb-split-view:first-of-type {
+	border-right: 2px solid @gray-9;
+}
+
+.umb-split-view__content {
+	animation: fadein 0.5s ease-in-out;
+}
+
+@keyframes fadein {
+	from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.umb-split-view--left {
+	left: 0;
+	right: auto;
+	border-right: 1px solid @gray-10;
+}
+
+.umb-split-view--right {
+	left: auto;
+	right: 0;
 }
 
 // header
 
 .umb-editor-header {
 	background: @white;
-	flex: 1 1 60px;
-	position: relative;
+	// flex: 1 1 60px;
+	position: absolute;
 	padding: 0 20px;
 	z-index: 1;
-	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.16);
+	box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.16);
+	width: 100%;
+	box-sizing: border-box;
+	height: 60px;
 }
 
 .umb-editor-header__back {
@@ -45,7 +85,7 @@
 }
 
 input.umb-editor-header__name-input {
-	border-color: @gray-8;
+	border-color: transparent;
 	background-color: @white;
 	font-size: 15px;
 	color: @black;
@@ -56,9 +96,11 @@ input.umb-editor-header__name-input {
 	line-height: 32px;
 	width: 100%;
 	padding: 0 15px;
+	background: @gray-10;
+	border-radius: 3px;
 	&:hover {
-		background-color: @white;    
-		border: 1px solid @gray-7;
+		background-color: @gray-10;
+		border: 1px solid @gray-8;
 	}
 }
 
@@ -73,11 +115,12 @@ input.umb-editor-header__name-input {
 	padding: 0 15px;
 	text-decoration: none !important;
 	font-size: 13px;
-	border: 1px solid @gray-8;
 	border-left: none;
 	color: @gray-4;
+	background-color: @gray-10;
+	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 	&:hover {
-		background-color: @gray-10;
+		background-color: @gray-9;
 	}
 }
 
@@ -100,7 +143,6 @@ input.umb-editor-header__name-input {
 
 .umb-variant-switcher__name {
 	font-size: 14px;
-	font-weight: bold;
 }
 
 .umb-variant-switcher__state {
@@ -123,13 +165,12 @@ input.umb-editor-header__name-input {
 // container
 
 .umb-editor-container {
-	position: relative;
-	top: 0;
+	position: absolute;
+	top: @editorHeaderHeight;
 	right: 0;
-	bottom: 0;
+	bottom: @editorFooterHeight;
 	left: 0;
 	overflow: auto;
-	flex: 1 1 100%;
 	background: @gray-10;
 }
 
@@ -153,12 +194,16 @@ input.umb-editor-header__name-input {
 // editor footer
 
 .umb-editor-footer {
+	position: absolute;
+	width: 100%;
+	box-sizing: border-box;
 	margin: 0;
+	height: @editorFooterHeight;
 	padding: 10px 20px;
 	background: @white;
-	flex: 1 0 31px;
 	box-shadow: 0 -1px 3px 0 rgba(0, 0, 0, 0.16);
 	z-index: 1;
+	bottom: 0;
 }
 
 .umb-editor-footer-content {

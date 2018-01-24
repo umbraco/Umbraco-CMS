@@ -5,30 +5,42 @@
     <form name="contentForm" ng-submit="save()" novalidate val-form-manager>
 
         <umb-editor-view ng-if="!page.loading">
+            
+            <div class="umb-split-views">
+                <div class="umb-split-view" ng-repeat="editor in editors">
 
-            <umb-editor-header 
-                menu="page.menu" 
-                name="content.name" 
-                hide-icon="true" 
-                hide-description="true" 
-                hide-alias="true"
-                navigation="content.apps"
-                variants="content.variants"
-                on-select-variant="selectVariant(variant)"
-                on-back="backToListView()" 
-                show-back-button="{{page.listViewPath}}">
-            </umb-editor-header>
+                    <umb-load-indicator
+                        ng-if="editor.loading">
+                    </umb-load-indicator>
 
-            <umb-editor-container>
+                    <div class="umb-split-view__content" ng-if="!editor.loading">
+                        <umb-editor-header 
+                            menu="page.menu"
+                            name="editor.content.name"
+                            hide-icon="true"
+                            hide-description="true" 
+                            hide-alias="true"
+                            navigation="editor.content.apps"
+                            variants="editor.content.variants"
+                            on-select-variant="selectVariant(variant)"
+                            on-back="backToListView()"
+                            show-back-button="{{page.listViewPath}}"
+                            split-view-open="editors.length > 1"
+                            on-open-in-split-view="openInSplitView()"
+                            on-close-split-view="closeSplitView($index, editor)">
+                        </umb-editor-header>
 
-                <umb-editor-sub-views 
-                    ng-if="!page.loading" 
-                    sub-views="content.apps" 
-                    model="content">
-                </umb-editor-sub-views>
+                        <umb-editor-container>
+                            <umb-editor-sub-views 
+                                ng-if="!page.loading" 
+                                sub-views="editor.content.apps" 
+                                model="editor.content">
+                            </umb-editor-sub-views>    
+                        </umb-editor-container>
+                    </div>
 
-            </umb-editor-container>
-
+                </div>
+            </div>
 
             <umb-editor-footer>
 

@@ -1,14 +1,14 @@
 ﻿<div data-element="editor-header" class="umb-editor-header">
     
-    <div class="flex items-center">
+    <div class="flex items-center" style="height: 100%;">
 
-        <div ng-if="showBackButton" style="margin-right: 15px;">
+        <div ng-if="showBackButton && splitViewOpen !== true" style="margin-right: 15px;">
             <a class="umb-editor-header__back" href="#" ng-click="goBack()" prevent-default>
                 <i class="fa fa-arrow-left" aria-hidden="true"></i>
             </a>
         </div>
 
-        <div style="flex: 1; margin-right: 20px;">
+        <div style="flex: 1;">
 
             <ng-form data-element="editor-icon" name="iconForm">
                 <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
@@ -43,7 +43,7 @@
                     <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
                 </a>
 
-                <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; height: 250px; overflow: scroll;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                     <umb-dropdown-item ng-repeat="variant in variants">
                         <a class="umb-variant-switcher_item" ng-class="{'umb-variant-switcher_item--current': variant.current}" href="#" ng-click="selectVariant(variant)" prevent-default>
                             <span class="flex justify-between">
@@ -55,15 +55,17 @@
                                         <span ng-if="!$last">+</span>
                                     </span>
                                 </span>
-                                <span class="umb-variant-switcher__split-view">Open in split view</span>
                                 -->
+                                <span ng-if="splitViewOpen !== true" class="umb-variant-switcher__split-view" ng-click="openInSplitView()">Open in split view</span>
                             </span>
                         </a>
+                        <!--
                         <ul style="margin-left: 0;">
                             <li style="list-style: none;" ng-repeat="segment in variant.segments">
                                 <a style="padding: 5px 20px; display: block; font-size: 13px; opacity: 0.6;" href="">{{segment.name}}</a>
                             </li>
                         </ul>
+                        -->
                     </umb-dropdown-item>
                 </umb-dropdown>
 
@@ -73,18 +75,20 @@
 
         </div>
 
-        <div style="margin-left: auto; margin-right: 20px;">
+        <div ng-if="splitViewOpen">
+            <a href="" ng-click="closeSplitView()">Close</a>
+        </div>
+
+        <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
             <umb-editor-navigation
                 data-element="editor-sub-views"
-                ng-if="navigation"
                 navigation="navigation">
             </umb-editor-navigation>
         </div>
 
-        <div style="margin-left: auto;">
+        <div ng-if="menu.currentNode && splitViewOpen !== true" style="margin-left: 20px;">
             <umb-editor-menu
                 data-element="editor-actions"
-                ng-if="menu.currentNode"
                 current-node="menu.currentNode"
                 current-section="{{menu.currentSection}}">
             </umb-editor-menu>

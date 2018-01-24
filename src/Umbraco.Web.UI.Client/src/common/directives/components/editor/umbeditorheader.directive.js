@@ -268,6 +268,18 @@ Use this directive to construct a header inside the main editor window.
                 };
             };
 
+            scope.closeSplitView = function() {
+                if(scope.onCloseSplitView) {
+                    scope.onCloseSplitView();
+                }
+            };
+
+            scope.openInSplitView = function(variant) {
+                if(scope.onOpenInSplitView) {
+                    scope.onOpenInSplitView(variant);
+                }
+            };
+
             scope.$watch('variants', function(newValue, oldValue){
                 if(!newValue) return;
                 if(newValue === oldValue) return;
@@ -301,7 +313,10 @@ Use this directive to construct a header inside the main editor window.
                 navigation: "=",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "@?"
+                showBackButton: "@?",
+                splitViewOpen: "=?",
+                onOpenInSplitView: "&?",
+                onCloseSplitView: "&?"
             },
             link: link
         };

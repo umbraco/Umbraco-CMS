@@ -18,7 +18,13 @@
     $scope.page.isNew = $scope.isNew ? true : false;
     $scope.page.buttonGroupState = "init";    
     $scope.allowOpen = true;
-
+    
+    // add all editors to an editors array to support split view 
+    $scope.editors = [];
+    $scope.splitView = {
+      "leftIsOpen": true,
+      "rightIsOpen": false
+    };
 
     function init(content) {
 
@@ -157,6 +163,11 @@
       
       // set first app to active
       $scope.content.apps[0].active = true;
+
+      // create new editor for split view
+      var editor = {};
+      editor.content = $scope.content;
+      $scope.editors.push(editor);
 
     }
 
@@ -423,6 +434,26 @@
         notificationsService.error(error.headline, error.content);
       });
 
+
+    };
+
+    $scope.closeSplitView = function(index, editor) {
+      $scope.editors.splice(index, 1);
+    };
+
+    $scope.openInSplitView = function() {
+
+      var editor = {};
+      editor.loading = true;
+      $scope.editors.push(editor);
+      var editorIndex = $scope.editors.length - 1;
+
+      // fake loading of content
+      $timeout(function(){
+        $scope.editors[editorIndex].content = angular.copy($scope.content);
+        $scope.editors[editorIndex].content.name = "What a variant";
+        $scope.editors[editorIndex].loading = false;
+      }, 500);
 
     };
 
