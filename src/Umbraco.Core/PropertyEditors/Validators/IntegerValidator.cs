@@ -6,10 +6,17 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value is a valid integer
     /// </summary>
-    [ValueValidator("Integer")]
-    internal sealed class IntegerValidator : ManifestValueValidator, IPropertyValidator
+    internal sealed class IntegerValidator : ManifestValidator, IValueValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
+        /// <inheritdoc />
+        public override string ValidationName => "Integer";
+
+        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
+        {
+            return Validate(value, valueType, dataTypeConfiguration);
+        }
+
+        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
             if (value != null && value.ToString() != string.Empty)
             {
@@ -19,11 +26,6 @@ namespace Umbraco.Core.PropertyEditors.Validators
                     yield return new ValidationResult("The value " + value + " is not a valid integer", new[] { "value" });
                 }
             }
-        }
-
-        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
-        {
-            return Validate(value, "", dataTypeConfiguration, editor);
         }
     }
 }

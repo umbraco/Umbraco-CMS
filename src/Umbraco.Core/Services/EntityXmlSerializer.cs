@@ -249,7 +249,7 @@ namespace Umbraco.Core.Services
             var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in mediaType.PropertyTypes)
             {
-                var definition = dataTypeService.GetDataType(propertyType.DataTypeDefinitionId);
+                var definition = dataTypeService.GetDataType(propertyType.DataTypeId);
 
                 var propertyGroup = propertyType.PropertyGroupId == null // true generic property
                     ? null
@@ -360,7 +360,7 @@ namespace Umbraco.Core.Services
             var genericProperties = new XElement("GenericProperties"); // actually, all of them
             foreach (var propertyType in contentType.PropertyTypes)
             {
-                var definition = dataTypeService.GetDataType(propertyType.DataTypeDefinitionId);
+                var definition = dataTypeService.GetDataType(propertyType.DataTypeId);
 
                 var propertyGroup = propertyType.PropertyGroupId == null // true generic property
                     ? null

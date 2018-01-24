@@ -132,7 +132,7 @@ namespace Umbraco.Web.Editors
                 Editor = dataTypeDiff.EditorAlias,
                 Validation = new PropertyTypeValidation() { },
                 View = editor.ValueEditor.View,
-                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, configuration)
+                Config = editor.ConfigurationEditor.ToEditor(null, configuration)
             };
         }
 

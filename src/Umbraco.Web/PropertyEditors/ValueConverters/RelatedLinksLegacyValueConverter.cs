@@ -18,7 +18,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class RelatedLinksLegacyValueConverter : PropertyValueConverterBase
     {
         private static readonly string[] MatchingEditors = {
-            Constants.PropertyEditors.RelatedLinksAlias,
             Constants.PropertyEditors.Aliases.RelatedLinks2
         };
 
@@ -67,11 +66,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                                 {
                                     switch (propertyType.EditorAlias)
                                     {
-                                        case Constants.PropertyEditors.RelatedLinksAlias:
-                                            var intLinkId = a.Value<int>("link");
-                                            var intLink = helper.NiceUrl(intLinkId);
-                                            a["link"] = intLink;
-                                            break;
                                         case Constants.PropertyEditors.Aliases.RelatedLinks2:
                                             var strLinkId = a.Value<string>("link");
                                             var udiAttempt = strLinkId.TryConvertTo<Udi>();

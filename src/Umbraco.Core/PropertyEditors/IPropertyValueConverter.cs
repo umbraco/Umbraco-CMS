@@ -4,6 +4,9 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    // fixme rename PropertyValueConverter to ValueConverter everywhere
+    // fixme rename the "intermediate" value to "temp" value
+
     /// <summary>
     /// Provides published content properties conversion service.
     /// </summary>

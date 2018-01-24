@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Core.Models;
 
@@ -7,10 +8,12 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// A validator that validates that the value is not null or empty (if it is a string)
     /// </summary>
-    [ValueValidator("Required")]
-    internal sealed class RequiredManifestValueValidator : ManifestValueValidator
+    internal sealed class RequiredManifestValueValidator : ManifestValidator
     {
-        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
+        /// <inheritdoc />
+        public override string ValidationName => "Required";
+
+        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
         {
             //TODO: localize these!
 
@@ -22,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 var asString = value.ToString();
 
-                if (editor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json))
+                if (valueType.InvariantEquals(ValueTypes.Json))
                 {
                     if (asString.DetectIsEmptyJson())
                     {

@@ -214,13 +214,13 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var mediaType = repository.Get(NodeDto.NodeIdSeed);
 
                 mediaType.Thumbnail = "Doc2.png";
-                mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+                mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "subtitle")
                     {
                         Name = "Subtitle",
                         Description = "Optional Subtitle",
                         Mandatory = false,
                         SortOrder = 1,
-                        DataTypeDefinitionId = -88
+                        DataTypeId = -88
                     });
                 repository.Save(mediaType);
                 

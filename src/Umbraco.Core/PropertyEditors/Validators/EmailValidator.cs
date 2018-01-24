@@ -6,11 +6,19 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates an email address
     /// </summary>
-    [ValueValidator("Email")]
-    internal sealed class EmailValidator : ManifestValueValidator, IPropertyValidator
+    internal sealed class EmailValidator : ManifestValidator, IValueValidator
     {
         /// <inheritdoc />
-        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
+        public override string ValidationName => "Email";
+
+        /// <inheritdoc />
+        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
+        {
+            return Validate(value, valueType, dataTypeConfiguration);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
             var asString = value.ToString();
 
@@ -21,12 +29,6 @@ namespace Umbraco.Core.PropertyEditors.Validators
                 // TODO: localize these!
                 yield return new ValidationResult("Email is invalid", new[] { "value" });
             }
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
-        {
-            return this.Validate(value, null, dataTypeConfiguration, editor);
         }
     }
 }

@@ -6,11 +6,19 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value is a valid decimal
     /// </summary>
-    [ValueValidator("Decimal")]
-    internal sealed class DecimalValidator : ManifestValueValidator, IPropertyValidator
+    internal sealed class DecimalValidator : ManifestValidator, IValueValidator
     {
         /// <inheritdoc />
-        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
+        public override string ValidationName => "Decimal";
+
+        /// <inheritdoc />
+        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
+        {
+            return Validate(value, valueType, dataTypeConfiguration);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
             if (value == null || value.ToString() == string.Empty)
                 yield break;
@@ -18,12 +26,6 @@ namespace Umbraco.Core.PropertyEditors.Validators
             var result = value.TryConvertTo<decimal>();
             if (result.Success == false)
                 yield return new ValidationResult("The value " + value + " is not a valid decimal", new[] { "value" });
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
-        {
-            return Validate(value, "", dataTypeConfiguration, editor);
         }
     }
 }

@@ -130,13 +130,13 @@ namespace Umbraco.Web.WebApi.Filters
                 var postedValue = postedItem.Properties.Single(x => x.Alias == p.Alias).Value;
 
                 //get the pre-values for this property
-                var preValues = p.PreValues;
+                var preValues = p.DataType.Configuration;
 
                 //TODO: when we figure out how to 'override' certain pre-value properties we'll either need to:
                 // * Combine the preValues with the overridden values stored with the document type property (but how to combine?)
                 // * Or, pass in the overridden values stored with the doc type property separately
 
-                foreach (var result in editor.ValueEditor.Validators.SelectMany(v => v.Validate(postedValue, preValues, editor)))
+                foreach (var result in editor.ValueEditor.Validators.SelectMany(v => v.Validate(postedValue, editor.ValueEditor.ValueType, preValues)))
                 {
                     actionContext.ModelState.AddPropertyError(result, p.Alias);
                 }
@@ -145,7 +145,7 @@ namespace Umbraco.Web.WebApi.Filters
                 // NOTE: These will become legacy once we have pre-value overrides.
                 if (p.IsRequired)
                 {
-                    foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, "", preValues, editor))
+                    foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, editor.ValueEditor.ValueType, preValues, null))
                     {
                         actionContext.ModelState.AddPropertyError(result, p.Alias);
                     }

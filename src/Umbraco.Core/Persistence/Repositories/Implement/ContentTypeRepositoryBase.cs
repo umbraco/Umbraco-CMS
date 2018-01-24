@@ -112,7 +112,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Select(x => x.ContentTypeNodeId).Distinct();
         }
 
-        protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType dbType, string propertyTypeAlias)
         {
             return new PropertyType(propertyEditorAlias, dbType, propertyTypeAlias);
         }
@@ -218,7 +218,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             {
                 var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
                 //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
-                if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
+                if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default(int))
                 {
                     AssignDataTypeFromPropertyEditor(propertyType);
                 }
@@ -229,7 +229,7 @@ AND umbracoNode.nodeObjectType = @objectType",
                 //Update the current PropertyType with correct PropertyEditorAlias and DatabaseType
                 var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
                 propertyType.PropertyEditorAlias = dataTypeDto.EditorAlias;
-                propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
+                propertyType.ValueStorageType = dataTypeDto.DbType.EnumParse<ValueStorageType>(true);
             }
         }
 
@@ -412,7 +412,7 @@ AND umbracoNode.id <> @id",
             {
                 var groupId = propertyType.PropertyGroupId?.Value ?? default(int);
                 // if the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
-                if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
+                if (propertyType.DataTypeId == 0 || propertyType.DataTypeId == default(int))
                     AssignDataTypeFromPropertyEditor(propertyType);
 
                 // validate the alias
@@ -500,8 +500,8 @@ AND umbracoNode.id <> @id",
             var list = new List<PropertyType>();
             foreach (var dto in dtos.Where(x => x.PropertyTypeGroupId <= 0))
             {
-                var propType = CreatePropertyType(dto.DataTypeDto.EditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
-                propType.DataTypeDefinitionId = dto.DataTypeId;
+                var propType = CreatePropertyType(dto.DataTypeDto.EditorAlias, dto.DataTypeDto.DbType.EnumParse<ValueStorageType>(true), dto.Alias);
+                propType.DataTypeId = dto.DataTypeId;
                 propType.Description = dto.Description;
                 propType.Id = dto.Id;
                 propType.Key = dto.UniqueId;
@@ -559,7 +559,7 @@ AND umbracoNode.id <> @id",
                 //we cannot assign a data type if one was not found
                 if (datatype != null)
                 {
-                    propertyType.DataTypeDefinitionId = datatype.NodeId;
+                    propertyType.DataTypeId = datatype.NodeId;
                 }
                 else
                 {
@@ -1151,10 +1151,10 @@ ORDER BY contentTypeId, groupId, id";
 
             private static void AddPropertyType(PropertyTypeCollection propertyTypes, dynamic prop, PropertyGroup propertyGroup = null)
             {
-                var propertyType = new PropertyType(prop.editorAlias, Enum<DataTypeDatabaseType>.Parse(prop.dbType), prop.alias)
+                var propertyType = new PropertyType(prop.editorAlias, Enum<ValueStorageType>.Parse(prop.dbType), prop.alias)
                 {
                     Description = prop.desc,
-                    DataTypeDefinitionId = prop.dataTypeId,
+                    DataTypeId = prop.dataTypeId,
                     Id = prop.id,
                     Key = prop.key,
                     Mandatory = Convert.ToBoolean(prop.mandatory),

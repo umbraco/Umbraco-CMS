@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Factories
             if (segment != null)
                 dto.Segment = segment;
 
-            if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
+            if (property.ValueStorageType == ValueStorageType.Integer)
             {
                 if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
                 {
@@ -62,25 +62,25 @@ namespace Umbraco.Core.Persistence.Factories
                     dto.IntegerValue = val;
                 }
             }
-            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Decimal && value != null)
+            else if (property.ValueStorageType == ValueStorageType.Decimal && value != null)
             {
                 if (decimal.TryParse(value.ToString(), out var val))
                 {
                     dto.DecimalValue = val; // property value should be normalized already
                 }
             }
-            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && value != null && string.IsNullOrWhiteSpace(value.ToString()) == false)
+            else if (property.ValueStorageType == ValueStorageType.Date && value != null && string.IsNullOrWhiteSpace(value.ToString()) == false)
             {
                 if (DateTime.TryParse(value.ToString(), out var date))
                 {
                     dto.DateValue = date;
                 }
             }
-            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && value != null)
+            else if (property.ValueStorageType == ValueStorageType.Ntext && value != null)
             {
                 dto.TextValue = value.ToString();
             }
-            else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && value != null)
+            else if (property.ValueStorageType == ValueStorageType.NVarChar && value != null)
             {
                 dto.VarcharValue = value.ToString();
             }

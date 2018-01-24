@@ -15,9 +15,9 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class UploadFileTypeValidator : IPropertyValidator
+    internal class UploadFileTypeValidator : IValueValidator
     {
-        public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
+        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
 
             //now check the file type

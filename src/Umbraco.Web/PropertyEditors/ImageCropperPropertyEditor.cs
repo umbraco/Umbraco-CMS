@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.ImageCropper, "Image Cropper", "imagecropper", ValueType = PropertyEditorValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.ImageCropper, "Image Cropper", "imagecropper", ValueType = ValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
     public class ImageCropperPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
@@ -51,7 +51,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             var baseEditor = base.CreateValueEditor();
             return new ImageCropperPropertyValueEditor(baseEditor, Logger, _mediaFileSystem);
@@ -61,9 +61,9 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new ImageCropperPreValueEditor();
+            return new ImageCropperConfigurationEditor();
         }
 
         /// <summary>
@@ -220,6 +220,10 @@ namespace Umbraco.Web.PropertyEditors
                         continue;
                     }
 
+                    // FIXME VERY TEMP
+                    // we should kill all auto-fill properties
+                    // BUT that being said what would be the right way to do this?
+                    /*
                     var v = JsonConvert.DeserializeObject<ImageCropperValue>()
 
                     var jo = GetJObject(svalue, false);
@@ -246,14 +250,9 @@ namespace Umbraco.Web.PropertyEditors
                         _autoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
                     else
                         _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src), pvalue.LanguageId, pvalue.Segment);
+                    */
                 }
             }
-        }
-
-        internal class ImageCropperPreValueEditor : PreValueEditor
-        {
-            [DataTypeConfigurationField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
-            public string Crops { get; set; }
         }
     }
 }

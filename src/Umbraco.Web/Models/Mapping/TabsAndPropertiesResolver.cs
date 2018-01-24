@@ -162,7 +162,7 @@ namespace Umbraco.Web.Models.Mapping
                 IsActive = true
             };
 
-            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, dt.Configuration);
+            var listViewConfig = editor.ConfigurationEditor.ConvertDbToEditor(editor.DefaultPreValues, dt.Configuration);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
 

@@ -23,10 +23,10 @@ namespace Umbraco.Core.Models
         private string _name;
         private string _alias;
         private string _description;
-        private int _dataTypeDefinitionId;
+        private int _dataTypeId;
         private Lazy<int> _propertyGroupId;
         private string _propertyEditorAlias;
-        private DataTypeDatabaseType _dataTypeDatabaseType;
+        private ValueStorageType _valueStorageType;
         private bool _mandatory;
         private string _helpText;
         private int _sortOrder;
@@ -38,10 +38,10 @@ namespace Umbraco.Core.Models
             if (dataType == null) throw new ArgumentNullException("dataType");
 
             if(dataType.HasIdentity)
-                _dataTypeDefinitionId = dataType.Id;
+                _dataTypeId = dataType.Id;
 
             _propertyEditorAlias = dataType.EditorAlias;
-            _dataTypeDatabaseType = dataType.DatabaseType;
+            _valueStorageType = dataType.DatabaseType;
             _variations = ContentVariation.InvariantNeutral;
         }
 
@@ -51,25 +51,25 @@ namespace Umbraco.Core.Models
             _alias = GetAlias(propertyTypeAlias);
         }
 
-        public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
-            : this(propertyEditorAlias, dataTypeDatabaseType, false)
+        public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType)
+            : this(propertyEditorAlias, valueStorageType, false)
         { }
 
-        public PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, string propertyTypeAlias)
-            : this(propertyEditorAlias, dataTypeDatabaseType, false, propertyTypeAlias)
+        public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
+            : this(propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
         { }
 
         /// <summary>
         /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
         /// </summary>
         /// <param name="propertyEditorAlias"></param>
-        /// <param name="dataTypeDatabaseType"></param>
+        /// <param name="valueStorageType"></param>
         /// <param name="isExplicitDbType"></param>
-        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType)
+        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool isExplicitDbType)
         {
             _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
-            _dataTypeDatabaseType = dataTypeDatabaseType;
+            _valueStorageType = valueStorageType;
             _variations = ContentVariation.InvariantNeutral;
         }
 
@@ -77,14 +77,14 @@ namespace Umbraco.Core.Models
         /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
         /// </summary>
         /// <param name="propertyEditorAlias"></param>
-        /// <param name="dataTypeDatabaseType"></param>
+        /// <param name="valueStorageType"></param>
         /// <param name="isExplicitDbType"></param>
         /// <param name="propertyTypeAlias"></param>
-        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType, string propertyTypeAlias)
+        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool isExplicitDbType, string propertyTypeAlias)
         {
             _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
-            _dataTypeDatabaseType = dataTypeDatabaseType;
+            _valueStorageType = valueStorageType;
             _alias = GetAlias(propertyTypeAlias);
             _variations = ContentVariation.InvariantNeutral;
         }
@@ -95,9 +95,9 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
             public readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-            public readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeDefinitionId);
+            public readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
             public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
-            public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
+            public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, ValueStorageType>(x => x.ValueStorageType);
             public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
             public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
             public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
@@ -143,10 +143,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>This is actually the Id of the <see cref="IDataType"/></remarks>
         [DataMember]
-        public int DataTypeDefinitionId
+        public int DataTypeId
         {
-            get => _dataTypeDefinitionId;
-            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeDefinitionId, Ps.Value.DataTypeDefinitionIdSelector);
+            get => _dataTypeId;
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, Ps.Value.DataTypeDefinitionIdSelector);
         }
 
         [DataMember]
@@ -157,32 +157,17 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets of Sets the Id of the DataType control
-        /// </summary>
-        /// <remarks>This is the Id of the actual DataType control</remarks>
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the PropertyEditorAlias property instead. This method will return a generated GUID for any property editor alias not explicitly mapped to a legacy ID")]
-        public Guid DataTypeId
-        {
-            get => LegacyPropertyEditorIdToAliasConverter.GetLegacyIdFromAlias(_propertyEditorAlias, LegacyPropertyEditorIdToAliasConverter.NotFoundLegacyIdResponseBehavior.GenerateId).Value;
-            set
-            {
-                var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(value, true);
-                PropertyEditorAlias = alias;
-            }
-        }
-
-        /// <summary>
         /// Gets or Sets the DatabaseType for which the DataType's value is saved as
         /// </summary>
         [DataMember]
-        internal DataTypeDatabaseType DataTypeDatabaseType
+        internal ValueStorageType ValueStorageType
         {
-            get => _dataTypeDatabaseType;
+            get => _valueStorageType;
             set
             {
                 //don't allow setting this if an explicit declaration has been made in the ctor
                 if (_isExplicitDbType) return;
-                SetPropertyValueAndDetectChanges(value, ref _dataTypeDatabaseType, Ps.Value.DataTypeDatabaseTypeSelector);
+                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Ps.Value.DataTypeDatabaseTypeSelector);
             }
         }
 
@@ -328,18 +313,18 @@ namespace Umbraco.Core.Models
             {
                 // simple validation using the DatabaseType from the DataTypeDefinition
                 // and the Type of the passed in value
-                switch (DataTypeDatabaseType)
+                switch (ValueStorageType)
                 {
                     // fixme breaking!
-                    case DataTypeDatabaseType.Integer:
+                    case ValueStorageType.Integer:
                         return valueType == typeof(int);
-                    case DataTypeDatabaseType.Decimal:
+                    case ValueStorageType.Decimal:
                         return valueType == typeof(decimal);
-                    case DataTypeDatabaseType.Date:
+                    case ValueStorageType.Date:
                         return valueType == typeof(DateTime);
-                    case DataTypeDatabaseType.Nvarchar:
+                    case ValueStorageType.NVarChar:
                         return valueType == typeof(string);
-                    case DataTypeDatabaseType.Ntext:
+                    case ValueStorageType.Ntext:
                         return valueType == typeof(string);
                 }
             }

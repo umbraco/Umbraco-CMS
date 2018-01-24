@@ -385,9 +385,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
 
@@ -456,9 +456,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
 
@@ -528,9 +528,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
 
@@ -606,9 +606,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
 
@@ -653,9 +653,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
 
@@ -706,9 +706,9 @@ namespace Umbraco.Tests.Services
             });
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
@@ -757,7 +757,7 @@ namespace Umbraco.Tests.Services
 
             // create content type with a tag property
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
-            contentType.PropertyGroups.First().PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "tags") { DataTypeDefinitionId = 1041 });
+            contentType.PropertyGroups.First().PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "tags") { DataTypeId = 1041 });
             contentTypeService.Save(contentType);
 
             // create a content with tags and publish
@@ -792,9 +792,9 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                     {
-                        DataTypeDefinitionId = 1041
+                        DataTypeId = 1041
                     });
             contentTypeService.Save(contentType);
 
@@ -827,9 +827,9 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
@@ -863,9 +863,9 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
@@ -2316,7 +2316,7 @@ namespace Umbraco.Tests.Services
 
             var properties = new PropertyTypeCollection(true)
             {
-                new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Mandatory = false, DataTypeDefinitionId = -88 },
+                new PropertyType("test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Mandatory = false, DataTypeId = -88 },
             };
 
             contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "content" });

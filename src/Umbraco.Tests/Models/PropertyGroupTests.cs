@@ -16,11 +16,11 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
-                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
+                    new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
-                        DataTypeDefinitionId = 5,
+                        DataTypeId = 5,
                         PropertyEditorAlias = "propTest",
                         Description = "testing",
                         Key = Guid.NewGuid(),
@@ -30,13 +30,13 @@ namespace Umbraco.Tests.Models
                         SortOrder = 9,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "xxxx",
-                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                        ValueStorageType = ValueStorageType.NVarChar
                     },
-                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test2")
+                    new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
-                        DataTypeDefinitionId = 6,
+                        DataTypeId = 6,
                         PropertyEditorAlias = "propTest",
                         Description = "testing2",
                         Key = Guid.NewGuid(),
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Models
                         SortOrder = 10,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "yyyy",
-                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                        ValueStorageType = ValueStorageType.NVarChar
                     }
                 }))
             {
@@ -93,11 +93,11 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
-                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
+                    new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
-                        DataTypeDefinitionId = 5,
+                        DataTypeId = 5,
                         PropertyEditorAlias = "propTest",
                         Description = "testing",
                         Key = Guid.NewGuid(),
@@ -107,13 +107,13 @@ namespace Umbraco.Tests.Models
                         SortOrder = 9,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "xxxx",
-                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                        ValueStorageType = ValueStorageType.NVarChar
                     },
-                    new PropertyType("TestPropertyEditor2", DataTypeDatabaseType.Nvarchar, "test2")
+                    new PropertyType("TestPropertyEditor2", ValueStorageType.NVarChar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
-                        DataTypeDefinitionId = 6,
+                        DataTypeId = 6,
                         PropertyEditorAlias = "propTest",
                         Description = "testing2",
                         Key = Guid.NewGuid(),
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Models
                         SortOrder = 10,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "yyyy",
-                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                        ValueStorageType = ValueStorageType.NVarChar
                     }
                 }))
             {

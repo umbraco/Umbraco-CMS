@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
         public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
-            : this(propertyType.Alias, propertyType.DataTypeDefinitionId, propertyType.PropertyEditorAlias, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
+            : this(propertyType.Alias, propertyType.DataTypeId, propertyType.PropertyEditorAlias, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }

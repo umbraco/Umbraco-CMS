@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -11,7 +9,6 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
 using File = System.IO.File;
 
 namespace Umbraco.Web.PropertyEditors
@@ -24,7 +21,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILogger _logger;
         private readonly MediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(PropertyValueEditor wrapped, ILogger logger, MediaFileSystem mediaFileSystem)
+        public ImageCropperPropertyValueEditor(ValueEditor wrapped, ILogger logger, MediaFileSystem mediaFileSystem)
             : base(wrapped)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -37,16 +34,22 @@ namespace Umbraco.Web.PropertyEditors
 
         public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            var val = base.ConvertDbToEditor(property, propertyType, dataTypeService);
-
-            var json = val as JObject;
-            if (json != null)
+            ImageCropperValue value;
+            try
             {
-                ImageCropperValueConverter.MergeConfiguration(json, dataTypeService, propertyType.DataTypeDefinitionId);
-                return json;
+                // fixme - ignoring variants here?!
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(property.GetValue().ToString());
+            }
+            catch
+            {
+                value = new ImageCropperValue { Src = property.GetValue().ToString() };
             }
 
-            return val;
+            var dataType = dataTypeService.GetDataType(propertyType.DataTypeId);
+            // fixme nullref?
+            ImageCropperValueConverter.MergeConfiguration(value, dataType);
+
+            return value;
         }
         /// <summary>
         /// Converts the value received from the editor into the value can be stored in the database.
@@ -164,7 +167,7 @@ namespace Umbraco.Web.PropertyEditors
                 return val;
 
             // more magic here ;-(
-            var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId).FirstOrDefault();
+            var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeId).FirstOrDefault();
             var crops = string.IsNullOrEmpty(config) ? "[]" : config;
             var newVal = "{src: '" + val + "', crops: " + crops + "}";
             return newVal;

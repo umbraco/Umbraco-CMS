@@ -36,7 +36,7 @@ namespace Umbraco.Core.Manifest
                 // the deserializer will first try to get the property, and that would throw since
                 // the editor would try to create a new value editor, so we have to set a
                 // value editor by ourselves, which will then be populated by the deserializer.
-                target.ValueEditor = new PropertyValueEditor();
+                target.ValueEditor = new ValueEditor();
 
                 // in the manifest, validators are a simple dictionary eg
                 // {

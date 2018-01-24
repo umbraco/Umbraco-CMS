@@ -224,7 +224,7 @@ namespace Umbraco.Web.Composing
 
         public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;
 
-        internal static ValidatorCollection Validators => CoreCurrent.Validators;
+        internal static ManifestValidatorCollection ManifestValidators => CoreCurrent.ManifestValidators;
 
         internal static PackageActionCollection PackageActions => CoreCurrent.PackageActions;
 

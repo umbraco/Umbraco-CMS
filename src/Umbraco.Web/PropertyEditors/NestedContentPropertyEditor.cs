@@ -37,7 +37,7 @@ namespace Umbraco.Web.PropertyEditors
             // Setup default values
             _defaultPreValues = new Dictionary<string, object>
             {
-                {NestedContentPreValueEditor.ContentTypesPreValueKey, ""},
+                {NestedContentConfigurationEditor.ContentTypesPreValueKey, ""},
                 {"minItems", 0},
                 {"maxItems", 0},
                 {"confirmDeletes", "1"},
@@ -58,32 +58,9 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Pre Value Editor
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new NestedContentPreValueEditor();
-        }
-
-        internal class NestedContentPreValueEditor : PreValueEditor
-        {
-            internal const string ContentTypesPreValueKey = "contentTypes";
-
-            [DataTypeConfigurationField(ContentTypesPreValueKey, "Doc Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
-            public string[] ContentTypes { get; set; }
-
-            [DataTypeConfigurationField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
-            public string MinItems { get; set; }
-
-            [DataTypeConfigurationField("maxItems", "Max Items", "number", Description = "Set the maximum number of items allowed.")]
-            public string MaxItems { get; set; }
-
-            [DataTypeConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
-            public string ConfirmDeletes { get; set; }
-
-            [DataTypeConfigurationField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
-            public string ShowIcons { get; set; }
-
-            [DataTypeConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
-            public string HideLabel { get; set; }
+            return new NestedContentConfigurationEditor();
         }
 
         #endregion
@@ -133,7 +110,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             return new NestedContentPropertyValueEditor(base.CreateValueEditor(), PropertyEditors);
         }
@@ -142,7 +119,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly PropertyEditorCollection _propertyEditors;
 
-            public NestedContentPropertyValueEditor(PropertyValueEditor wrapped, PropertyEditorCollection propertyEditors)
+            public NestedContentPropertyValueEditor(ValueEditor wrapped, PropertyEditorCollection propertyEditors)
                 : base(wrapped)
             {
                 _propertyEditors = propertyEditors;
@@ -317,7 +294,7 @@ namespace Umbraco.Web.PropertyEditors
                         else
                         {
                             // Fetch the property types prevalue
-                            var propConfiguration = Services.DataTypeService.GetDataType(propType.DataTypeDefinitionId).Configuration;
+                            var propConfiguration = Services.DataTypeService.GetDataType(propType.DataTypeId).Configuration;
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[propType.PropertyEditorAlias];
@@ -341,7 +318,7 @@ namespace Umbraco.Web.PropertyEditors
             #endregion
         }
 
-        internal class NestedContentValidator : IPropertyValidator
+        internal class NestedContentValidator : IValueValidator
         {
             private readonly PropertyEditorCollection _propertyEditors;
 
@@ -350,7 +327,7 @@ namespace Umbraco.Web.PropertyEditors
                 _propertyEditors = propertyEditors;
             }
 
-            public IEnumerable<ValidationResult> Validate(object rawValue, object dataTypeConfiguration, PropertyEditor editor)
+            public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
             {
                 var value = JsonConvert.DeserializeObject<List<object>>(rawValue.ToString());
                 if (value == null)
@@ -372,12 +349,12 @@ namespace Umbraco.Web.PropertyEditors
                         var propType = contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == propKey);
                         if (propType != null)
                         {
-                            var config = dataTypeService.GetDataType(propType.DataTypeDefinitionId).Configuration;
+                            var config = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                             var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
 
                             foreach (var validator in propertyEditor.ValueEditor.Validators)
                             {
-                                foreach (var result in validator.Validate(propValues[propKey], config, propertyEditor))
+                                foreach (var result in validator.Validate(propValues[propKey], propertyEditor.ValueEditor.ValueType, config))
                                 {
                                     result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
                                     yield return result;

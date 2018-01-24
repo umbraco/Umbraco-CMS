@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Date, "Date", PropertyEditorValueTypes.Date, "datepicker", Icon="icon-calendar")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Date, "Date", "datepicker", ValueTypes.Date, Icon="icon-calendar")]
     public class DatePropertyEditor : PropertyEditor
     {
         public DatePropertyEditor(ILogger logger): base(logger)
@@ -30,7 +30,7 @@ namespace Umbraco.Web.PropertyEditors
             set { _defaultPreVals = value; }
         }
 
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             return new DatePropertyValueEditor(base.CreateValueEditor());
         }
@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class DatePropertyValueEditor : PropertyValueEditorWrapper
         {
-            public DatePropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
+            public DatePropertyValueEditor(ValueEditor wrapped) : base(wrapped)
             {
                 Validators.Add(new DateTimeValidator());
             }
@@ -59,7 +59,7 @@ namespace Umbraco.Web.PropertyEditors
 
         }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
             return new DateConfigurationEditor();
         }

@@ -8,11 +8,11 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// A property editor to allow multiple selection of pre-defined items
+    /// Represents a property editor that allows multiple selection of pre-defined items.
     /// </summary>
     /// <remarks>
-    /// Due to maintaining backwards compatibility this data type stores the value as a string which is a comma separated value of the
-    /// ids of the individual items so we have logic in here to deal with that.
+    /// Due to backwards compatibility, this editor stores the value as a CSV string listing
+    /// the ids of individual items.
     /// </remarks>
     [PropertyEditor(Constants.PropertyEditors.Aliases.DropdownlistMultiplePublishKeys, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list")]
     public class DropDownMultipleWithKeysPropertyEditor : DropDownPropertyEditor
@@ -20,59 +20,24 @@ namespace Umbraco.Web.PropertyEditors
         private readonly ILocalizedTextService _textService;
 
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="DropDownMultiplePropertyEditor"/> class.
         /// </summary>
-        public DropDownMultipleWithKeysPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
+        public DropDownMultipleWithKeysPropertyEditor(ILogger logger, ILocalizedTextService textService)
+            : base(logger, textService)
         {
             _textService = textService;
         }
 
-        protected override PropertyValueEditor CreateValueEditor()
+        /// <inheritdoc />
+        protected override ValueEditor CreateValueEditor()
         {
             return new PublishValuesMultipleValueEditor(true, base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        /// <inheritdoc />
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new DropDownMultiplePreValueEditor(_textService, Logger);
+            return new DropDownMultipleConfigurationEditor(_textService, Logger);
         }
-
-        /// <summary>
-        /// A pre-value editor for the 'drop down list multiple' property editor that ensures that 'multiple' is saved for the config in the db but is not
-        /// rendered as a pre-value field.
-        /// </summary>
-        /// <remarks>
-        /// This is mostly to maintain backwards compatibility with old property editors. Devs can now simply use the Drop down property editor and check the multiple pre-value checkbox
-        /// </remarks>
-        internal class DropDownMultiplePreValueEditor : ValueListPreValueEditor
-        {
-            public DropDownMultiplePreValueEditor(ILocalizedTextService textService, ILogger logger)
-                : base(textService, logger)
-            {
-                //add the multiple field, we'll make it hidden so it is not seen in the pre-value editor
-                Fields.Add(new DataTypeConfigurationField
-                    {
-                        Key = "multiple",
-                        Name = "multiple",
-                        View = "hidden",
-                        HideLabel = true
-                    });
-            }
-
-            /// <summary>
-            /// Always
-            /// </summary>
-            /// <param name="defaultPreVals"></param>
-            /// <param name="persistedPreVals"></param>
-            /// <returns></returns>
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
-            {
-                var returnVal = base.ConvertDbToEditor(defaultPreVals, persistedPreVals);
-                //always add the multiple param to true
-                returnVal["multiple"] = "1";
-                return returnVal;
-            }
-        }
-
     }
 }

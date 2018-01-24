@@ -111,7 +111,7 @@ namespace Umbraco.Core.Persistence.Factories
                     //what the underlying data type is
                     var propDbType = MemberTypeRepository.GetDbTypeForBuiltInProperty(
                         typeDto.Alias,
-                        typeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                        typeDto.DbType.EnumParse<ValueStorageType>(true),
                         standardProps);
 
                     var propertyType = new PropertyType(
@@ -122,7 +122,7 @@ namespace Umbraco.Core.Persistence.Factories
                         propDbType.Success,
                         typeDto.Alias)
                     {
-                        DataTypeDefinitionId = typeDto.DataTypeId,
+                        DataTypeId = typeDto.DataTypeId,
                         Description = typeDto.Description,
                         Id = typeDto.Id.Value,
                         Name = typeDto.Name,
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Factories
                 //what the underlying data type is
                 var propDbType = MemberTypeRepository.GetDbTypeForBuiltInProperty(
                     typeDto.Alias,
-                    typeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                    typeDto.DbType.EnumParse<ValueStorageType>(true),
                     standardProps);
 
                 var propertyType = new PropertyType(
@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence.Factories
                     propDbType.Success,
                     typeDto.Alias)
                 {
-                    DataTypeDefinitionId = typeDto.DataTypeId,
+                    DataTypeId = typeDto.DataTypeId,
                     Description = typeDto.Description,
                     Id = typeDto.Id.Value,
                     Mandatory = typeDto.Mandatory,

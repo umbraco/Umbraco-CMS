@@ -14,8 +14,12 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
     public class TagsPropertyEditor : PropertyEditor
     {
-        public TagsPropertyEditor(ILogger logger) : base(logger)
+        private ManifestValidatorCollection _validators;
+
+        public TagsPropertyEditor(ManifestValidatorCollection validators, ILogger logger)
+            : base(logger)
         {
+            _validators = validators;
             _defaultPreVals = new Dictionary<string, object>
                 {
                     {"group", "default"},
@@ -34,19 +38,19 @@ namespace Umbraco.Web.PropertyEditors
             set { _defaultPreVals = value; }
         }
 
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             return new TagPropertyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new TagPreValueEditor();
+            return new TagConfigurationEditor(_validators);
         }
 
         internal class TagPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public TagPropertyValueEditor(PropertyValueEditor wrapped)
+            public TagPropertyValueEditor(ValueEditor wrapped)
                 : base(wrapped)
             { }
 
@@ -67,7 +71,7 @@ namespace Umbraco.Web.PropertyEditors
             /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
             /// if they need to do some custom validation, or if the value being validated is a json object.
             /// </remarks>
-            public override ManifestValueValidator RequiredValidator
+            public override ManifestValidator RequiredValidator
             {
                 get { return new RequiredTagsValueValidator(); }
             }
@@ -79,11 +83,13 @@ namespace Umbraco.Web.PropertyEditors
             /// This is required because the Tags property editor is not of type 'JSON', it's just string so the underlying
             /// validator does not validate against an empty json string
             /// </remarks>
-            [ValueValidator("Required")]
-            private class RequiredTagsValueValidator : ManifestValueValidator
+            private class RequiredTagsValueValidator : ManifestValidator
             {
                 /// <inheritdoc />
-                public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
+                public override string ValidationName => "Required";
+
+                /// <inheritdoc />
+                public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
                 {
                     if (value == null)
                     {
@@ -104,41 +110,6 @@ namespace Umbraco.Web.PropertyEditors
                         }
                     }
                 }
-            }
-        }
-
-        internal class TagPreValueEditor : PreValueEditor
-        {
-            public TagPreValueEditor()
-            {
-                Fields.Add(new DataTypeConfigurationField(new ManifestPropertyValidator { Type = "Required" })
-                {
-                    Description = "Define a tag group",
-                    Key = "group",
-                    Name = "Tag group",
-                    View = "requiredfield"
-                });
-
-                Fields.Add(new DataTypeConfigurationField(new ManifestPropertyValidator {Type = "Required"})
-                {
-                    Description = "Select whether to store the tags in cache as CSV (default) or as JSON. The only benefits of storage as JSON is that you are able to have commas in a tag value but this will require parsing the json in your views or using a property value converter",
-                    Key = "storageType",
-                    Name = "Storage Type",
-                    View = "views/propertyeditors/tags/tags.prevalues.html"
-                });
-            }
-
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
-            {
-                var result = base.ConvertDbToEditor(defaultPreVals, persistedPreVals);
-
-                //This is required because we've added this pre-value so old installs that don't have it will need to have a default.
-                if (result.ContainsKey("storageType") == false || result["storageType"] == null || result["storageType"].ToString().IsNullOrWhiteSpace())
-                {
-                    result["storageType"] = TagCacheStorageType.Csv.ToString();
-                }
-
-                return result;
             }
         }
     }

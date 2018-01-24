@@ -202,7 +202,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.DataTypeId, opt => opt.Ignore())
                 .ForMember(dest => dest.Mandatory, opt => opt.MapFrom(source => source.Validation.Mandatory))
                 .ForMember(dest => dest.ValidationRegExp, opt => opt.MapFrom(source => source.Validation.Pattern))
-                .ForMember(dest => dest.DataTypeDefinitionId, opt => opt.MapFrom(source => source.DataTypeId))
+                .ForMember(dest => dest.DataTypeId, opt => opt.MapFrom(source => source.DataTypeId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(source => source.Label));
 
             #region *** Used for mapping on top of an existing display object from a save object ***

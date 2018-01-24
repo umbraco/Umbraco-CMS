@@ -25,9 +25,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// ColorListPreValueEditor uses the ValueListPreValueEditor with a custom view and controller.
         /// </remarks>
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new ColorListPreValueEditor(_textService, Logger);
+            return new ColorListConfigurationEditor(_textService, Logger);
         }
 
     }

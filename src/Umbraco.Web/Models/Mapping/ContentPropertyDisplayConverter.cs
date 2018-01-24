@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
             var display = base.Convert(originalProp, dest, context);
 
             var dataTypeService = DataTypeService.Value;
-            var config = dataTypeService.GetDataType(originalProp.PropertyType.DataTypeDefinitionId).Configuration;
+            var config = dataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
             //configure the editor for display with the pre-values
             var valEditor = display.PropertyEditor.ValueEditor;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.PreValueEditor.ConvertDbToEditor(display.PropertyEditor.DefaultPreValues, preVals);
+                display.Config = display.PropertyEditor.ConfigurationEditor.ConvertDbToEditor(display.PropertyEditor.DefaultPreValues, preVals);
                 display.View = valEditor.View;
             }
 

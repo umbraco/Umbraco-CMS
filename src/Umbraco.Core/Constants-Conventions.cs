@@ -225,63 +225,63 @@ namespace Umbraco.Core
                         {
                             {
                                 Comments,
-                                new PropertyType(PropertyEditors.Aliases.TextboxMultiple, DataTypeDatabaseType.Ntext, true, Comments)
+                                new PropertyType(PropertyEditors.Aliases.TextboxMultiple, ValueStorageType.Ntext, true, Comments)
                                     {
                                         Name = CommentsLabel
                                     }
                             },
                             {
                                 FailedPasswordAttempts,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, DataTypeDatabaseType.Integer, true, FailedPasswordAttempts)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Integer, true, FailedPasswordAttempts)
                                     {
                                         Name = FailedPasswordAttemptsLabel
                                     }
                             },
                             {
                                 IsApproved,
-                                new PropertyType(PropertyEditors.Aliases.Boolean, DataTypeDatabaseType.Integer, true, IsApproved)
+                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
                                     {
                                         Name = IsApprovedLabel
                                     }
                             },
                             {
                                 IsLockedOut,
-                                new PropertyType(PropertyEditors.Aliases.Boolean, DataTypeDatabaseType.Integer, true, IsLockedOut)
+                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
                                     {
                                         Name = IsLockedOutLabel
                                     }
                             },
                             {
                                 LastLockoutDate,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, DataTypeDatabaseType.Date, true, LastLockoutDate)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastLockoutDate)
                                     {
                                         Name = LastLockoutDateLabel
                                     }
                             },
                             {
                                 LastLoginDate,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, DataTypeDatabaseType.Date, true, LastLoginDate)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastLoginDate)
                                     {
                                         Name = LastLoginDateLabel
                                     }
                             },
                             {
                                 LastPasswordChangeDate,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, DataTypeDatabaseType.Date, true, LastPasswordChangeDate)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Date, true, LastPasswordChangeDate)
                                     {
                                         Name = LastPasswordChangeDateLabel
                                     }
                             },
                             {
                                 PasswordAnswer,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, DataTypeDatabaseType.Nvarchar, true, PasswordAnswer)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.NVarChar, true, PasswordAnswer)
                                     {
                                         Name = PasswordAnswerLabel
                                     }
                             },
                             {
                                 PasswordQuestion,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, DataTypeDatabaseType.Nvarchar, true, PasswordQuestion)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.NVarChar, true, PasswordQuestion)
                                     {
                                         Name = PasswordQuestionLabel
                                     }

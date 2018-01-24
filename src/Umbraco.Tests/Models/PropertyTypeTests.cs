@@ -13,11 +13,11 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var pt = new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
+            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
-                DataTypeDefinitionId = 5,
+                DataTypeId = 5,
                 PropertyEditorAlias = "propTest",
                 Description = "testing",
                 Key = Guid.NewGuid(),
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                ValueStorageType = ValueStorageType.NVarChar
             };
 
             var clone = (PropertyType)pt.DeepClone();
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Id, pt.Id);
             Assert.AreEqual(clone.Alias, pt.Alias);
             Assert.AreEqual(clone.CreateDate, pt.CreateDate);
-            Assert.AreEqual(clone.DataTypeDefinitionId, pt.DataTypeDefinitionId);
+            Assert.AreEqual(clone.DataTypeId, pt.DataTypeId);
             Assert.AreEqual(clone.DataTypeId, pt.DataTypeId);
             Assert.AreEqual(clone.Description, pt.Description);
             Assert.AreEqual(clone.Key, pt.Key);
@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.SortOrder, pt.SortOrder);
             Assert.AreEqual(clone.UpdateDate, pt.UpdateDate);
             Assert.AreEqual(clone.ValidationRegExp, pt.ValidationRegExp);
-            Assert.AreEqual(clone.DataTypeDatabaseType, pt.DataTypeDatabaseType);
+            Assert.AreEqual(clone.ValueStorageType, pt.ValueStorageType);
 
             //This double verifies by reflection
             var allProps = clone.GetType().GetProperties();
@@ -62,11 +62,11 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var pt = new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
+            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
-                DataTypeDefinitionId = 5,
+                DataTypeId = 5,
                 PropertyEditorAlias = "propTest",
                 Description = "testing",
                 Key = Guid.NewGuid(),
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                ValueStorageType = ValueStorageType.NVarChar
             };
 
             var result = ss.ToStream(pt);

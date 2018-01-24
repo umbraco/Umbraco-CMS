@@ -5,19 +5,24 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
+    /// <summary>
+    /// Represents a list-view editor.
+    /// </summary>
     [PropertyEditor(Constants.PropertyEditors.Aliases.ListView, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
     public class ListViewPropertyEditor : PropertyEditor
     {
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
         /// </summary>
-        public ListViewPropertyEditor(ILogger logger) : base(logger)
-        {
-        }
+        /// <param name="logger"></param>
+        public ListViewPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        /// <inheritdoc />
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new ListViewPreValueEditor();
+            return new ListViewConfigurationEditor();
         }
 
         public override IDictionary<string, object> DefaultPreValues
@@ -54,49 +59,6 @@ namespace Umbraco.Web.PropertyEditors
                             allowBulkDelete = true
                         }}
                 };
-            }
-        }
-
-        internal class ListViewPreValueEditor : PreValueEditor
-        {
-            [DataTypeConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
-            public int TabName { get; set; }
-
-            [DataTypeConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
-            public int DisplayAtTabNumber { get; set; }
-
-            [DataTypeConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
-            public int PageSize { get; set; }
-
-            [DataTypeConfigurationField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
-            public int Layouts { get; set; }
-
-            [DataTypeConfigurationField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
-                Description = "The properties that will be displayed for each column")]
-            public object IncludeProperties { get; set; }
-
-            [DataTypeConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
-                Description = "The default sort order for the list")]
-            public int OrderBy { get; set; }
-
-            [DataTypeConfigurationField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
-            public int OrderDirection { get; set; }
-
-            [DataTypeConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
-                Description = "The bulk actions that are allowed from the list view")]
-            public BulkActionPermissionSettings BulkActionPermissions { get; set; }
-
-            internal class BulkActionPermissionSettings
-            {
-                public bool AllowBulkPublish { get; set; }
-
-                public bool AllowBulkUnpublish { get; set; }
-
-                public bool AllowBulkCopy { get; set; }
-
-                public bool AllowBulkMove { get; set; }
-
-                public bool AllowBulkDelete { get; set; }
             }
         }
     }

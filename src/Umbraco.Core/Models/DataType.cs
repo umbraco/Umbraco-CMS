@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Models
         private static PropertySelectors _selectors;
 
         private string _editorAlias;
-        private DataTypeDatabaseType _databaseType;
+        private ValueStorageType _databaseType;
         private object _configuration;
         private bool _hasConfiguration;
         private string _configurationJson;
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Models
         private class PropertySelectors
         {
             public readonly PropertyInfo EditorAlias = ExpressionHelper.GetPropertyInfo<DataType, string>(x => x.EditorAlias);
-            public readonly PropertyInfo DatabaseType = ExpressionHelper.GetPropertyInfo<DataType, DataTypeDatabaseType>(x => x.DatabaseType);
+            public readonly PropertyInfo DatabaseType = ExpressionHelper.GetPropertyInfo<DataType, ValueStorageType>(x => x.DatabaseType);
             public readonly PropertyInfo Configuration = ExpressionHelper.GetPropertyInfo<DataType, object>(x => x.Configuration);
         }
 
@@ -60,7 +61,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public DataTypeDatabaseType DatabaseType
+        public ValueStorageType DatabaseType
         {
             get => _databaseType;
             set => SetPropertyValueAndDetectChanges(value, ref _databaseType, Selectors.DatabaseType);
@@ -68,20 +69,33 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public object Configuration
+        public object Configuration // fixme is this OK if null? should!
         {
             get
             {
                 if (_hasConfiguration) return _configuration;
 
-                _configuration = _editor.DeserializeConfiguration(_configurationJson);
+                _configuration = _editor.ConfigurationEditor.ParseConfiguration(_configurationJson);
                 _hasConfiguration = true;
                 _configurationJson = null;
                 return _configuration;
             }
             set
             {
-                // fixme detect changes? if it's the same object?
+                if (value == null) throw new ArgumentNullException(); // or is this ok?
+
+                // fixme - do it HERE
+                // fixme - BUT then we have a problem, what if it's changed?
+                // can't we treat configurations as plain immutable objects?!
+                // also it means that we just cannot work with dictionaries?
+                if (value is IConfigureValueType valueTypeConfiguration)
+                    DatabaseType = ValueTypes.ToStorageType(valueTypeConfiguration.ValueType);
+                if (value is IDictionary<string, object> dictionaryConfiguration
+                    && dictionaryConfiguration.TryGetValue("", out var valueTypeObject)
+                    && valueTypeObject is string valueTypeString)
+                    DatabaseType = ValueTypes.ToStorageType(valueTypeString);
+
+                // fixme detect changes? if it's the same object? need a special comparer!
                 SetPropertyValueAndDetectChanges(value, ref _configuration, Selectors.Configuration);
                 _hasConfiguration = true;
                 _configurationJson = null;
@@ -91,6 +105,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc /> // fixme on interface!?
         public void SetConfiguration(string configurationJson, PropertyEditor editor)
         {
+            // fixme this is lazy, BUT then WHEN are we figuring out the valueType?
             _hasConfiguration = false;
             _configuration = null;
             _configurationJson = configurationJson;

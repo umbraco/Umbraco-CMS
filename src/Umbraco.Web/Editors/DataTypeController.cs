@@ -197,13 +197,16 @@ namespace Umbraco.Web.Editors
             //TODO: Check if the property editor has changed, if it has ensure we don't pass the
             // existing values to the new property editor!
 
-            //get the prevalues, current and new
-            var preValDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
+            //get the configuration, current and new
+            var newConfiguration = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
             var currentConfiguration = dataType.PersistedDataType.Configuration;
 
+            // fixme FromEditor should accept a dictionary
+            // then ToEditor should return a dictionary!
+
             //we need to allow for the property editor to deserialize the prevalues
-            var formattedVal = dataType.PropertyEditor.PreValueEditor.ConvertEditorToDb(preValDictionary, currentConfiguration);
-            // fixme and then re-assign to datatype?
+            var configuration = dataType.PropertyEditor.ConfigurationEditor.FromEditor(newConfiguration, currentConfiguration);
+            dataType.PersistedDataType.Configuration = configuration;
 
             try
             {
@@ -311,7 +314,7 @@ namespace Umbraco.Web.Editors
             {
                 var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
                 if (propertyEditor != null)
-                    dataType.HasPrevalues = propertyEditor.PreValueEditor.Fields.Any(); ;
+                    dataType.HasPrevalues = propertyEditor.ConfigurationEditor.Fields.Any(); ;
             }
 
             var grouped = dataTypes
@@ -338,7 +341,7 @@ namespace Umbraco.Web.Editors
             var propertyEditors = Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
-                var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
+                var hasPrevalues = propertyEditor.ConfigurationEditor.Fields.Any();
                 var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
                 basic.HasPrevalues = hasPrevalues;
                 datatypes.Add(basic);

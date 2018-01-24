@@ -4,24 +4,23 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Boolean, "True/False", PropertyEditorValueTypes.Integer, "boolean", IsParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
+    /// <summary>
+    /// Represents a boolean editor.
+    /// </summary>
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Boolean, "True/False", "boolean", ValueTypes.Integer, IsMacroParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
     public class TrueFalsePropertyEditor : PropertyEditor
     {
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
         /// </summary>
-        public TrueFalsePropertyEditor(ILogger logger) : base(logger)
-        {
-        }
-        protected override PreValueEditor CreateConfigurationEditor()
-        {
-            return new TrueFalsePreValueEditor();
-        }
+        public TrueFalsePropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        internal class TrueFalsePreValueEditor : PreValueEditor
+        /// <inheritdoc />
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            [DataTypeConfigurationField("default", "Default Value", "boolean")]
-            public string Default { get; set; }
+            return new TrueFalseConfigurationEditor();
         }
     }
 }

@@ -48,8 +48,8 @@ namespace Umbraco.Tests.Models
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType("test", ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -332,7 +332,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "blah");
+            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "blah");
             var newProperty = new Property(1, propertyType);
             newProperty.SetValue("blah");
             clone.Properties.Add(newProperty);
@@ -471,13 +471,13 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", ValueStorageType.Ntext, "subtitle")
                                                                         {
                                                                             Name = "Subtitle",
                                                                             Description = "Optional subtitle",
                                                                             Mandatory = false,
                                                                             SortOrder = 3,
-                                                                            DataTypeDefinitionId = -88
+                                                                            DataTypeId = -88
                                                                         });
 
             // Assert
@@ -493,9 +493,9 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "subtitle")
                                    {
-                                        Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
+                                        Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             var newProperty = new Property(propertyType);
@@ -515,13 +515,13 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "subtitle")
                                    {
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
                                        Mandatory = false,
                                        SortOrder = 3,
-                                       DataTypeDefinitionId = -88
+                                       DataTypeId = -88
                                    };
             var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3};
             propertyGroup.PropertyTypes.Add(propertyType);
@@ -546,9 +546,9 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "title")
+            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "title")
                                    {
-                                        Name = "Title", Description = "Title description added", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
+                                        Name = "Title", Description = "Title description added", Mandatory = false, SortOrder = 10, DataTypeId = -88
                                    };
             content.Properties.Add(new Property(propertyType));
 
@@ -764,13 +764,13 @@ namespace Umbraco.Tests.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            var propertyType = new PropertyType("test", ValueStorageType.Ntext, "subtitle")
                                    {
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
                                        Mandatory = false,
                                        SortOrder = 3,
-                                       DataTypeDefinitionId = -88
+                                       DataTypeId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
 
@@ -789,13 +789,13 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
+                                                                                            new PropertyType("test", ValueStorageType.Ntext, "coauthor")
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeDefinitionId = -88
+                                                                                                    DataTypeId = -88
                                                                                                 }
                                                                                         }));
 
@@ -820,13 +820,13 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
+                                                                                            new PropertyType("test", ValueStorageType.Ntext, "coauthor")
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeDefinitionId = -88
+                                                                                                    DataTypeId = -88
                                                                                                 }
                                                                                         }));
 
@@ -853,25 +853,25 @@ namespace Umbraco.Tests.Models
             var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
+                                                                                            new PropertyType("test", ValueStorageType.Ntext, "coauthor")
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeDefinitionId = -88
+                                                                                                    DataTypeId = -88
                                                                                                 }
                                                                                         }));
             var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(true,
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "author")
+                                                                                            new PropertyType("test", ValueStorageType.Ntext, "author")
                                                                                                 {
                                                                                                     Name = "Author",
                                                                                                     Description = "Name of the Author",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeDefinitionId = -88
+                                                                                                    DataTypeId = -88
                                                                                                 }
                                                                                         }));
 

@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            IDataType dataType = new DataType(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
 
             // Assert
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
-            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
             dataTypeService.SavePreValues(dataType, new Dictionary<string, PreValue>
                 {
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
-            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.SaveDataTypeAndPreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
-            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.SaveDataTypeAndPreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
-            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.SaveDataTypeAndPreValues(dataType, new Dictionary<string, PreValue>
                 {
                     {"preVal1", new PreValue("Hello")},
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Services
             var textBoxAlias = Constants.PropertyEditors.Aliases.Textbox;
 
             // Act
-            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, textBoxAlias) { Name = "Testing prevals", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
             dataTypeService.SavePreValues(dataType.Id, new[] {"preVal1", "preVal2"});
 
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            var dataTypeDefinition = new DataType(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = DataTypeDatabaseType.Ntext };
+            var dataTypeDefinition = new DataType(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -20,10 +19,10 @@ namespace Umbraco.Core.PropertyEditors
     {
         private readonly PropertyEditorAttribute _attribute;
 
-        private PropertyValueEditor _valueEditor;
-        private PropertyValueEditor _valueEditorAssigned;
-        private PreValueEditor _preValueEditor;
-        private PreValueEditor _preValueEditorAssigned;
+        private ValueEditor _valueEditor;
+        private ValueEditor _valueEditorAssigned;
+        private ConfigurationEditor _configurationEditor;
+        private ConfigurationEditor _configurationEditorAssigned;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyEditor"/> class.
@@ -42,7 +41,7 @@ namespace Umbraco.Core.PropertyEditors
 
             Alias = _attribute.Alias;
             Name = _attribute.Name;
-            IsParameterEditor = _attribute.IsParameterEditor;
+            IsParameterEditor = _attribute.IsMacroParameterEditor;
             Icon = _attribute.Icon;
             Group = _attribute.Group;
             IsDeprecated = _attribute.IsDeprecated;
@@ -80,6 +79,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets or sets the group of the property editor.
         /// </summary>
+        /// <remarks>The group can be used to group editors by categories.</remarks>
         [JsonProperty("group")]
         public string Group { get; internal set; }
 
@@ -90,7 +90,7 @@ namespace Umbraco.Core.PropertyEditors
         public bool IsDeprecated { get; internal set; } // fixme - kill it all in v8
 
         [JsonProperty("editor", Required = Required.Always)]
-        public PropertyValueEditor ValueEditor
+        public ValueEditor ValueEditor
         {
             get => _valueEditor ?? (_valueEditor = CreateValueEditor());
             set
@@ -103,14 +103,14 @@ namespace Umbraco.Core.PropertyEditors
         [JsonIgnore]
         IValueEditor IParameterEditor.ValueEditor => ValueEditor; // fixme - because we must, but - bah
 
-        [JsonProperty("prevalues")]
-        public PreValueEditor PreValueEditor
+        [JsonProperty("prevalues")] // change, breaks manifests
+        public ConfigurationEditor ConfigurationEditor
         {
-            get => _preValueEditor ?? (_preValueEditor = CreatePreValueEditor());
+            get => _configurationEditor ?? (_configurationEditor = CreateConfigurationEditor());
             set
             {
-                _preValueEditorAssigned = value;
-                _preValueEditor = null;
+                _configurationEditorAssigned = value;
+                _configurationEditor = null;
             }
         }
 
@@ -123,16 +123,16 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Creates a value editor instance.
         /// </summary>
-        protected virtual PropertyValueEditor CreateValueEditor()
+        protected virtual ValueEditor CreateValueEditor()
         {
             // handle assigned editor
             if (_valueEditorAssigned != null)
                 return _valueEditorAssigned;
 
             // create a new editor
-            var editor = new PropertyValueEditor();
+            var editor = new ValueEditor();
 
-            var view = _attribute?.EditorView;
+            var view = _attribute?.View;
             if (string.IsNullOrWhiteSpace(view))
                 throw new InvalidOperationException("The editor does not specify a view.");
             if (view.StartsWith("~/"))
@@ -147,14 +147,14 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Creates a configuration editor instance.
         /// </summary>
-        protected virtual PreValueEditor CreateConfigurationEditor()
+        protected virtual ConfigurationEditor CreateConfigurationEditor()
         {
             // handle assigned editor
-            if (_preValueEditorAssigned != null)
-                return _preValueEditorAssigned;
+            if (_configurationEditorAssigned != null)
+                return _configurationEditorAssigned;
 
             // else return an empty one
-            return new PreValueEditor();
+            return new ConfigurationEditor();
         }
 
         protected bool Equals(PropertyEditor other)

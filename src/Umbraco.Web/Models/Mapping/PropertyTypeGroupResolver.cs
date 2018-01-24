@@ -196,10 +196,10 @@ namespace Umbraco.Web.Models.Mapping
         {
             var mappedProperties = new List<TPropertyType>();
 
-            foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0).OrderBy(x => x.SortOrder))
+            foreach (var p in properties.Where(x => x.DataTypeId != 0).OrderBy(x => x.SortOrder))
             {
                 var propertyEditor = _propertyEditors[p.PropertyEditorAlias];
-                var configuration = _dataTypeService.GetDataType(p.DataTypeDefinitionId).Configuration;
+                var configuration = _dataTypeService.GetDataType(p.DataTypeId).Configuration;
 
                 if (propertyEditor == null)
                     throw new InvalidOperationException("No property editor could be resolved with the alias: " + p.PropertyEditorAlias + ", ensure all packages are installed correctly.");
@@ -213,11 +213,11 @@ namespace Umbraco.Web.Models.Mapping
                     Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
                     Label = p.Name,
                     View = propertyEditor.ValueEditor.View,
-                    Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, configuration),
+                    Config = propertyEditor.ConfigurationEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, configuration),
                     //Value = "",
                     GroupId = groupId,
                     Inherited = inherited,
-                    DataTypeId = p.DataTypeDefinitionId,
+                    DataTypeId = p.DataTypeId,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name

@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
-            propertyDto.DataType = dataTypeService.GetDataType(originalProperty.PropertyType.DataTypeDefinitionId);
+            propertyDto.DataType = dataTypeService.GetDataType(originalProperty.PropertyType.DataTypeId);
 
             return propertyDto;
         }

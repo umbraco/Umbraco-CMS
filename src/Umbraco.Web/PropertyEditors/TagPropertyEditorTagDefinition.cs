@@ -1,6 +1,4 @@
-﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 
@@ -13,15 +11,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         public TagPropertyEditorTagDefinition(ContentPropertyData propertySaving, SupportTagsAttribute tagsAttribute)
             : base(propertySaving, tagsAttribute)
-        {
-        }
+        { }
 
         public override string TagGroup
         {
             get
             {
-                var preVals = PropertySaving.PreValues.FormatAsDictionary();
-                return preVals.ContainsKey("group") ? preVals["group"].Value : "default";
+                var config = ConfigurationEditor.ConfigurationAs<TagConfiguration>(PropertySaving.DataTypeConfiguration);
+                return string.IsNullOrWhiteSpace(config.Group) ? "default" : config.Group;
             }
         }
 
@@ -29,10 +26,8 @@ namespace Umbraco.Web.PropertyEditors
         {
             get
             {
-                var preVals = PropertySaving.PreValues.FormatAsDictionary();
-                return preVals.ContainsKey("storageType")
-                    ? Enum<TagCacheStorageType>.Parse(preVals["storageType"].Value)
-                    : TagCacheStorageType.Csv;
+                var config = ConfigurationEditor.ConfigurationAs<TagConfiguration>(PropertySaving.DataTypeConfiguration);
+                return config.StorageType;
             }
         }
     }

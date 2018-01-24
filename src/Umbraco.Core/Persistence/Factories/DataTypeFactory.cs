@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.DisableChangeTracking();
 
                 dataType.CreateDate = dto.NodeDto.CreateDate;
-                dataType.DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true);
+                dataType.DatabaseType = dto.DbType.EnumParse<ValueStorageType>(true);
                 dataType.Id = dto.NodeId;
                 dataType.Key = dto.NodeDto.UniqueId;
                 dataType.Level = dto.NodeDto.Level;

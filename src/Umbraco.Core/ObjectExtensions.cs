@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -498,6 +499,28 @@ namespace Umbraco.Core
                 return d;
             }
             return new Dictionary<string, TVal>();
+        }
+
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, Func<object, object>>> ToObjectTypes
+            = new ConcurrentDictionary<Type, Dictionary<string, Func<object, object>>>();
+
+        /// <summary>
+        /// Converts an object's properties into a dictionary.
+        /// </summary>
+        /// <param name="obj">The object to convert.</param>
+        /// <returns>A dictionary containing each properties.</returns>
+        public static Dictionary<string, object> ToObjectDictionary(object obj)
+        {
+            var t = obj.GetType();
+
+            if (!ToObjectTypes.TryGetValue(t, out var properties))
+            {
+                ToObjectTypes[t] = properties = t
+                    .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
+                    .ToDictionary(x => x.Name, ReflectionUtilities.EmitPropertyGetter<object, object>);
+            }
+
+            return properties.ToDictionary(x => x.Key, x => x.Value(obj));
         }
 
         internal static string ToDebugString(this object obj, int levels = 0)

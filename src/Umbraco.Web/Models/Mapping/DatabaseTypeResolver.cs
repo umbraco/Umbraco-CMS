@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class DatabaseTypeResolver
     {
-        public DataTypeDatabaseType Resolve(DataTypeSave source)
+        public ValueStorageType Resolve(DataTypeSave source)
         {
             var propertyEditor = Current.PropertyEditors[source.EditorAlias];
             if (propertyEditor == null)

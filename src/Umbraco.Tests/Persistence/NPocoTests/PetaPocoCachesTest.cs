@@ -180,9 +180,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             }
             contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory" + Guid.NewGuid().ToString("N"), "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);

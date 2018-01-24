@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             var baseEditor = base.CreateValueEditor();
             baseEditor.Validators.Add(new UploadFileTypeValidator());
@@ -43,9 +43,9 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new FileUploadPreValueEditor(_textService, Logger);
+            return new FileUploadConfigurationEditor(_textService, Logger);
         }
 
         /// <summary>
@@ -171,9 +171,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in
         /// </summary>
-        internal class FileUploadPreValueEditor : ValueListPreValueEditor
+        internal class FileUploadConfigurationEditor : ValueListConfigurationEditor
         {
-            public FileUploadPreValueEditor(ILocalizedTextService textService, ILogger logger)
+            public FileUploadConfigurationEditor(ILocalizedTextService textService, ILogger logger)
                 : base(textService, logger)
             {
                 var field = Fields.First();
@@ -230,9 +230,9 @@ namespace Umbraco.Web.PropertyEditors
                 return result;
             }
 
-            internal class ThumbnailListValidator : IPropertyValidator
+            internal class ThumbnailListValidator : IValueValidator
             {
-                public IEnumerable<ValidationResult> Validate(object value, object dataTypeConfiguration, PropertyEditor editor)
+                public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
                 {
                     if (!(value is JArray json)) yield break;
 

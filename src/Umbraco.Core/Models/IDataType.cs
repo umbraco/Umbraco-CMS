@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>In most cases this is imposed by the property editor, but some editors
         /// may support storing different types.</remarks>
-        DataTypeDatabaseType DatabaseType { get; set; }
+        ValueStorageType DatabaseType { get; set; }
 
         /// <summary>
         /// Gets or sets the configuration object.

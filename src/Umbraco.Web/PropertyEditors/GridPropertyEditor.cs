@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     using Examine = global::Examine;
 
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Grid, "Grid layout", "grid", HideLabel = true, IsParameterEditor = false, ValueType = PropertyEditorValueTypes.Json, Group="rich content", Icon="icon-layout")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.Grid, "Grid layout", "grid", HideLabel = true, IsMacroParameterEditor = false, ValueType = ValueTypes.Json, Group="rich content", Icon="icon-layout")]
     public class GridPropertyEditor : PropertyEditor
     {
         public GridPropertyEditor(ILogger logger)
@@ -109,33 +109,24 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             var baseEditor = base.CreateValueEditor();
             return new GridPropertyValueEditor(baseEditor);
         }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new GridPreValueEditor();
+            return new GridConfigurationEditor();
         }
 
         internal class GridPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public GridPropertyValueEditor(PropertyValueEditor wrapped)
+            public GridPropertyValueEditor(ValueEditor wrapped)
                 : base(wrapped)
             {
             }
 
-        }
-
-        internal class GridPreValueEditor : PreValueEditor
-        {
-            [DataTypeConfigurationField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
-            public string Items { get; set; }
-
-            [DataTypeConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
-            public string Rte { get; set; }
         }
     }
 }

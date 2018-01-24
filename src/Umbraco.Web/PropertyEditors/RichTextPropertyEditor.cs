@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = PropertyEditorValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
+    [PropertyEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
     public class RichTextPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -22,14 +22,14 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             return new RichTextPropertyValueEditor(base.CreateValueEditor());
         }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new RichTextPreValueEditor();
+            return new RichTextConfigurationEditor();
         }
 
 
@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class RichTextPropertyValueEditor : PropertyValueEditorWrapper
         {
-            public RichTextPropertyValueEditor(PropertyValueEditor wrapped)
+            public RichTextPropertyValueEditor(ValueEditor wrapped)
                 : base(wrapped)
             {
             }

@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Persistence.Querying
             {
                 Id = 12345
             };
-            Expression<Func<PropertyType, bool>> predicate = p => p.DataTypeDefinitionId == dataType.Id;
+            Expression<Func<PropertyType, bool>> predicate = p => p.DataTypeId == dataType.Id;
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<PropertyType>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);
 

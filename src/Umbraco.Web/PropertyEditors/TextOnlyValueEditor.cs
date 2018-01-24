@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TextOnlyValueEditor : PropertyValueEditorWrapper
     {
-        public TextOnlyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
+        public TextOnlyValueEditor(ValueEditor wrapped) : base(wrapped)
         {
         }
 
@@ -31,12 +31,12 @@ namespace Umbraco.Web.PropertyEditors
 
             switch (GetDatabaseType())
             {
-                case DataTypeDatabaseType.Ntext:
-                case DataTypeDatabaseType.Nvarchar:
+                case ValueStorageType.Ntext:
+                case ValueStorageType.NVarChar:
                     return property.GetValue().ToString();
-                case DataTypeDatabaseType.Integer:
-                case DataTypeDatabaseType.Decimal:
-                case DataTypeDatabaseType.Date:
+                case ValueStorageType.Integer:
+                case ValueStorageType.Decimal:
+                case ValueStorageType.Date:
                 default:
                     throw new InvalidOperationException("The " + typeof(TextOnlyValueEditor) + " can only be used with string based property editors");
             }

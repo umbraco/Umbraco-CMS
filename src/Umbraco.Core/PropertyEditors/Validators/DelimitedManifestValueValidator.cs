@@ -10,27 +10,28 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates a delimited set of values against a common regex
     /// </summary>
-    [ValueValidator("Delimited")]
-    internal sealed class DelimitedManifestValueValidator : ManifestValueValidator
+    internal sealed class DelimitedManifestValueValidator : ManifestValidator
     {
         /// <inheritdoc />
-        public override IEnumerable<ValidationResult> Validate(object value, string validatorConfiguration, object dataTypeConfiguration, PropertyEditor editor)
+        public override string ValidationName => "Delimited";
+
+        /// <inheritdoc />
+        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
         {
             //TODO: localize these!
             if (value != null)
             {
                 var delimiter = ",";
                 Regex regex = null;
-                if (validatorConfiguration.IsNullOrWhiteSpace() == false)
+                if (validatorConfiguration is JObject jobject)
                 {
-                    var json = JsonConvert.DeserializeObject<JObject>(validatorConfiguration);
-                    if (json["delimiter"] != null)
+                    if (jobject["delimiter"] != null)
                     {
-                        delimiter = json["delimiter"].ToString();
+                        delimiter = jobject["delimiter"].ToString();
                     }
-                    if (json["pattern"] != null)
+                    if (jobject["pattern"] != null)
                     {
-                        var regexPattern = json["pattern"].ToString();
+                        var regexPattern = jobject["pattern"].ToString();
                         regex = new Regex(regexPattern);
                     }
                 }

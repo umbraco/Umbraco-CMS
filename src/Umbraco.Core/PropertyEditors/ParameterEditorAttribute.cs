@@ -1,37 +1,30 @@
 ﻿using System;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// An attribute used to define all of the basic properties of a parameter editor
-    /// on the server side.
+    /// Marks a class that represents a data editor.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class ParameterEditorAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)] // fixme allow multiple?!
+    public sealed class ParameterEditorAttribute : DataEditorAttribute
     {
-        public ParameterEditorAttribute(string alias, string name, string editorView)
-        {
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            if (string.IsNullOrWhiteSpace(editorView)) throw new ArgumentNullOrEmptyException(nameof(editorView));
-
-            Alias = alias;
-            Name = name;
-            EditorView = editorView;
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterEditorAttribute"/> class.
+        /// </summary>
+        /// <param name="alias">The unique identifier of the editor.</param>
+        /// <param name="name">The friendly name of the editor.</param>
         public ParameterEditorAttribute(string alias, string name)
-        {
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            : this(alias, name, NullView)
+        { }
 
-            Alias = alias;
-            Name = name;
-        }
-
-        public string Alias { get; }
-        public string Name { get; }
-        public string EditorView { get; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterEditorAttribute"/> class.
+        /// </summary>
+        /// <param name="alias">The unique identifier of the editor.</param>
+        /// <param name="name">The friendly name of the editor.</param>
+        /// <param name="view">The view to use to render the editor.</param>
+        public ParameterEditorAttribute(string alias, string name, string view)
+            : base(alias, name, view)
+        { }
     }
 }

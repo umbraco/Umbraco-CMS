@@ -31,14 +31,6 @@ namespace Umbraco.Core.Models
             _name = name;
             _sortOrder = sortOrder;
             _key = Guid.NewGuid();
-
-            //try to get the new mapped parameter editor
-            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
-            if (mapped.IsNullOrWhiteSpace() == false)
-            {
-                editorAlias = mapped;
-            }
-
             _editorAlias = editorAlias;
         }
 
@@ -58,14 +50,6 @@ namespace Umbraco.Core.Models
             _name = name;
             _sortOrder = sortOrder;
             _key = key;
-
-            //try to get the new mapped parameter editor
-            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
-            if (mapped.IsNullOrWhiteSpace() == false)
-            {
-                editorAlias = mapped;
-            }
-
             _editorAlias = editorAlias;
         }
 
@@ -151,10 +135,7 @@ namespace Umbraco.Core.Models
             get { return _editorAlias; }
             set
             {
-                //try to get the new mapped parameter editor
-                var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
-                var newVal = mapped.IsNullOrWhiteSpace() == false ? mapped : value;
-                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);
+                SetPropertyValueAndDetectChanges(value, ref _editorAlias, Ps.Value.PropertyTypeSelector);
             }
         }
 

@@ -25,9 +25,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeDefinitionId = 1041
+                    DataTypeId = 1041
                 });
             contentTypeService.Save(contentType);
 

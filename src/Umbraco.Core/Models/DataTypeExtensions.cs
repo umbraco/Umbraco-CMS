@@ -30,7 +30,7 @@ namespace Umbraco.Core.Models
                     return configurationAsT;
             }
 
-            throw new InvalidCastException($"Cannot cast dataType {dataType.GetType().Name} configuration, of type {configuration.GetType().Name}, to {typeof(T).Name}.");
+            throw new InvalidCastException($"Cannot cast dataType configuration, of type {configuration.GetType().Name}, to {typeof(T).Name}.");
         }
     }
 }

@@ -330,11 +330,6 @@ namespace Umbraco.Tests.Testing
             if (withApplication == false) return;
 
             TestHelper.InitializeContentDirectories();
-
-            // initialize legacy mapings for core editors
-            // create the legacy prop-eds mapping
-            if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
-                LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
         }
 
         #endregion

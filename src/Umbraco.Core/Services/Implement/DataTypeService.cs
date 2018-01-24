@@ -285,7 +285,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-
         public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -429,13 +428,13 @@ namespace Umbraco.Core.Services.Implement
                 // find ContentTypes using this IDataTypeDefinition on a PropertyType, and delete
                 // fixme - media and members?!
                 // fixme - non-group properties?!
-                var query = Query<PropertyType>().Where(x => x.DataTypeDefinitionId == dataType.Id);
+                var query = Query<PropertyType>().Where(x => x.DataTypeId == dataType.Id);
                 var contentTypes = _contentTypeRepository.GetByQuery(query);
                 foreach (var contentType in contentTypes)
                 {
                     foreach (var propertyGroup in contentType.PropertyGroups)
                     {
-                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataType.Id).ToList();
+                        var types = propertyGroup.PropertyTypes.Where(x => x.DataTypeId == dataType.Id).ToList();
                         foreach (var propertyType in types)
                         {
                             propertyGroup.PropertyTypes.Remove(propertyType);

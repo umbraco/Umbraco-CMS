@@ -33,16 +33,16 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// We are just going to re-use the ValueListPreValueEditor
         /// </remarks>
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new ValueListPreValueEditor(_textService, Logger);
+            return new ValueListConfigurationEditor(_textService, Logger);
         }
 
         /// <summary>
         /// We need to override the value editor so that we can ensure the string value is published in cache and not the integer ID value.
         /// </summary>
         /// <returns></returns>
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             return new PublishValuesMultipleValueEditor(false, base.CreateValueEditor());
         }

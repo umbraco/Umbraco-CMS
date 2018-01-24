@@ -335,7 +335,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
                 var dataTypeDefinition = new DataType("Test.TestEditor")
                 {
-                    DatabaseType = DataTypeDatabaseType.Integer,
+                    DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
                     CreatorId = 0
                 };
@@ -366,7 +366,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
                 var dataTypeDefinition = new DataType("Test.blah")
                 {
-                    DatabaseType = DataTypeDatabaseType.Integer,
+                    DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
                     CreatorId = 0
                 };
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository();
                 var dataTypeDefinition = new DataType("Test.TestEditor")
                 {
-                    DatabaseType = DataTypeDatabaseType.Integer,
+                    DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
                     CreatorId = 0
                 };

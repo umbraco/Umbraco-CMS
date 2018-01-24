@@ -2,9 +2,12 @@
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text;
+using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web
@@ -131,7 +134,7 @@ namespace Umbraco.Web
             var cropperValue = mediaItem.Value(propertyAlias);
 
             //is it strongly typed?
-            var stronglyTyped = cropperValue as ImageCropDataSet;
+            var stronglyTyped = cropperValue as ImageCropperValue;
             string mediaItemUrl;
             if (stronglyTyped != null)
             {
@@ -145,7 +148,7 @@ namespace Umbraco.Web
             var jobj = cropperValue as JObject;
             if (jobj != null)
             {
-                stronglyTyped = jobj.ToObject<ImageCropDataSet>();
+                stronglyTyped = jobj.ToObject<ImageCropperValue>();
                 mediaItemUrl = stronglyTyped.Src;
                 return GetCropUrl(
                     mediaItemUrl, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
@@ -230,7 +233,7 @@ namespace Umbraco.Web
         {
             if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
 
-            ImageCropDataSet cropDataSet = null;
+            ImageCropperValue cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
                 cropDataSet = imageCropperValue.SerializeToCropDataSet();
@@ -293,7 +296,7 @@ namespace Umbraco.Web
         /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
-            ImageCropDataSet cropDataSet,
+            ImageCropperValue cropDataSet,
             int? width = null,
             int? height = null,
             string cropAlias = null,
@@ -315,17 +318,11 @@ namespace Umbraco.Web
                 {
                     var crop = cropDataSet.GetCrop(cropAlias);
 
-                    imageProcessorUrl.Append(cropDataSet.Src);
+                    if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
+                        return null; // fixme is this ok? compared to what we had?
 
-                    var cropBaseUrl = cropDataSet.GetCropBaseUrl(cropAlias, preferFocalPoint);
-                    if (cropBaseUrl != null)
-                    {
-                        imageProcessorUrl.Append(cropBaseUrl);
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    imageProcessorUrl.Append(cropDataSet.Src);
+                    cropDataSet.AppendCropBaseUrl(imageProcessorUrl, crop, preferFocalPoint);
 
                     if (crop != null & useCropDimensions)
                     {
@@ -432,6 +429,29 @@ namespace Umbraco.Web
             }
 
             return string.Empty;
+        }
+
+        // fixme this is DEserialize !! arf!
+        internal static ImageCropperValue SerializeToCropDataSet(this string json)
+        {
+            var imageCrops = new ImageCropperValue();
+            if (json.DetectIsJson())
+            {
+                try
+                {
+                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, new JsonSerializerSettings
+                    {
+                        Culture = CultureInfo.InvariantCulture,
+                        FloatParseHandling = FloatParseHandling.Decimal
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), "Could not parse the json string: " + json, ex);
+                }
+            }
+
+            return imageCrops;
         }
     }
 }

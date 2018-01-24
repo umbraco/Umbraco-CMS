@@ -59,22 +59,22 @@ namespace Umbraco.Web
         /// <param name="propertyAlias"></param>
         internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, ValidationResult result, string propertyAlias)
         {
-            //if there are no member names supplied then we assume that the validation message is for the overall property
-            // not a sub field on the property editor
-            if (result.MemberNames.Any() == false)
+            modelState.AddValidationError(result, "_Properties", propertyAlias);
+        }
+
+        internal static void AddValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, ValidationResult result, string prefix, string owner)
+        {
+            // if there are assigned member names, we combine the member name with the owner name
+            // so that we can try to match it up to a real field. otherwise, we assume that the
+            // validation message is for the overall owner.
+            var withNames = false;
+            foreach (var memberName in result.MemberNames)
             {
-                //add a model state error for the entire property
-                modelState.AddModelError(string.Format("{0}.{1}", "_Properties", propertyAlias), result.ErrorMessage);
+                modelState.AddModelError($"{prefix}.{owner}.{memberName}", result.ErrorMessage);
+                withNames = true;
             }
-            else
-            {
-                //there's assigned field names so we'll combine the field name with the property name
-                // so that we can try to match it up to a real sub field of this editor
-                foreach (var field in result.MemberNames)
-                {
-                    modelState.AddModelError(string.Format("{0}.{1}.{2}", "_Properties", propertyAlias, field), result.ErrorMessage);
-                }
-            }
+            if (!withNames)
+                modelState.AddModelError($"{prefix}.{owner}", result.ErrorMessage);
         }
 
         public static IDictionary<string, object> ToErrorDictionary(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)

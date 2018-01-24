@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<PropertyEditor, PropertyEditorBasic>();
 
             // map the standard properties, not the values
-            CreateMap<DataTypeConfigurationField, DataTypeConfigurationFieldDisplay>()
+            CreateMap<ConfigurationField, DataTypeConfigurationFieldDisplay>()
                 .ForMember(dest => dest.Value, opt => opt.Ignore());
 
             var systemIds = new[]
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         //this is a new data type, so just return the field editors, there are no values yet
                         var defaultVals = src.DefaultPreValues;
-                        var fields = src.PreValueEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+                        var fields = src.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
                         if (defaultVals != null)
                         {
                             DataTypeConfigurationFieldDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultVals);

@@ -25,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             var propertyEditor = Current.PropertyEditors[propertyType.EditorAlias];
             if (propertyEditor == null) return false;
-            return propertyEditor.ValueEditor.ValueType.InvariantEquals(PropertyEditorValueTypes.Json);
+            return propertyEditor.ValueEditor.ValueType.InvariantEquals(ValueTypes.Json);
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)

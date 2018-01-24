@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
@@ -33,7 +34,7 @@ namespace Umbraco.Core.Configuration.Grid
                 Func<List<GridEditor>> getResult = () =>
                 {
                     // fixme - should use the common one somehow! + ignoring _appPlugins here!
-                    var parser = new ManifestParser(_runtimeCache, _logger);
+                    var parser = new ManifestParser(_runtimeCache, Current.ManifestValidators, _logger);
 
                     var editors = new List<GridEditor>();
                     var gridConfig = Path.Combine(_configFolder.FullName, "grid.editors.config.js");

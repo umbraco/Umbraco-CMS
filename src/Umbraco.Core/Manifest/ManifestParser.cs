@@ -20,22 +20,24 @@ namespace Umbraco.Core.Manifest
         private readonly IRuntimeCacheProvider _cache;
         private readonly string _path;
         private readonly ILogger _logger;
+        private readonly ManifestValidatorCollection _validators;
 
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ILogger logger) // fixme is LightInject going to pick that one?
-            : this(cache, "~/App_Plugins", logger)
+        public ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, ILogger logger) // fixme is LightInject going to pick that one?
+            : this(cache, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, string path, ILogger logger)
+        public ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, string path, ILogger logger)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
             _path = path.StartsWith("~/") ? IOHelper.MapPath(path) : path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -133,7 +135,7 @@ namespace Umbraco.Core.Manifest
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new PropertyEditorConverter(_logger),
                 new ParameterEditorConverter(),
-                new ManifestValidatorConverter());
+                new ManifestValidatorConverter(_validators));
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)

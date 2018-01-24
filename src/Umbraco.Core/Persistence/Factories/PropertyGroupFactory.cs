@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
         private readonly DateTime _createDate;
         private readonly DateTime _updateDate;
         //a callback to create a property type which can be injected via a contructor
-        private readonly Func<string, DataTypeDatabaseType, string, PropertyType> _propertyTypeCtor;
+        private readonly Func<string, ValueStorageType, string, PropertyType> _propertyTypeCtor;
 
         public PropertyGroupFactory(int contentTypeId)
         {
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Factories
             _propertyTypeCtor = (propertyEditorAlias, dbType, alias) => new PropertyType(propertyEditorAlias, dbType);
         }
 
-        public PropertyGroupFactory(int contentTypeId, DateTime createDate, DateTime updateDate, Func<string, DataTypeDatabaseType, string, PropertyType> propertyTypeCtor)
+        public PropertyGroupFactory(int contentTypeId, DateTime createDate, DateTime updateDate, Func<string, ValueStorageType, string, PropertyType> propertyTypeCtor)
         {
             _contentTypeId = contentTypeId;
             _createDate = createDate;
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence.Factories
                     {
                         var tempGroupDto = groupDto;
                         var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.EditorAlias,
-                            typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                            typeDto.DataTypeDto.DbType.EnumParse<ValueStorageType>(true),
                             typeDto.Alias);
 
                         try
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyType.DisableChangeTracking();
 
                             propertyType.Alias = typeDto.Alias;
-                            propertyType.DataTypeDefinitionId = typeDto.DataTypeId;
+                            propertyType.DataTypeId = typeDto.DataTypeId;
                             propertyType.Description = typeDto.Description;
                             propertyType.Id = typeDto.Id;
                             propertyType.Key = typeDto.UniqueId;
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 Alias = propertyType.Alias,
                 ContentTypeId = _contentTypeId,
-                DataTypeId = propertyType.DataTypeDefinitionId,
+                DataTypeId = propertyType.DataTypeId,
                 Description = propertyType.Description,
                 Mandatory = propertyType.Mandatory,
                 Name = propertyType.Name,

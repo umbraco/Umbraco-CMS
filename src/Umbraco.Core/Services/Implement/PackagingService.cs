@@ -279,7 +279,7 @@ namespace Umbraco.Core.Services.Implement
 
                                 //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
                                 var database = scope.Database;
-                                var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
+                                var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeId });
 
                                 var propertyValueList = new List<string>();
                                 foreach (var preValue in propertyValue.Split(','))
@@ -893,8 +893,8 @@ namespace Umbraco.Core.Services.Implement
                 if (definition == null)
                 {
                     var databaseType = databaseTypeAttribute != null
-                                           ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
-                                           : DataTypeDatabaseType.Ntext;
+                                           ? databaseTypeAttribute.Value.EnumParse<ValueStorageType>(true)
+                                           : ValueStorageType.Ntext;
 
                     //the Id field is actually the string property editor Alias
                     var dataTypeDefinition = new DataType(dataTypeElement.Attribute("Id").Value.Trim())

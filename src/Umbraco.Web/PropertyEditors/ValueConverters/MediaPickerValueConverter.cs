@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -16,14 +14,10 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MediaPickerValueConverter : PropertyValueConverterBase
     {
-        private readonly ServiceContext _services;
-        private readonly PropertyEditorCollection _propertyEditors;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public MediaPickerValueConverter(ServiceContext services, PropertyEditorCollection propertyEditors, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public MediaPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
-            _propertyEditors = propertyEditors ?? throw new ArgumentException(nameof(propertyEditors));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         }
 
@@ -33,44 +27,17 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias)
+            => IsMultipleDataType(propertyType.DataType)
                 ? typeof (IEnumerable<IPublishedContent>)
                 : typeof (IPublishedContent);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
-        private bool IsMultipleDataType(int dataTypeId, string propertyEditorAlias)
+        private bool IsMultipleDataType(PublishedDataType dataType)
         {
-            // GetPreValuesCollectionByDataTypeId is cached at repository level;
-            // still, the collection is deep-cloned so this is kinda expensive,
-            // better to cache here + trigger refresh in DataTypeCacheRefresher
-
-            return Storages.GetOrAdd(dataTypeId, id =>
-            {
-                var preVals = _services.DataTypeService.GetPreValuesCollectionByDataTypeId(id).PreValuesAsDictionary;
-
-                if (preVals.ContainsKey("multiPicker"))
-                {
-                    var preValue = preVals
-                        .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
-                        .Value;
-
-                    return preValue != null && preValue.Value.TryConvertTo<bool>().Result;
-                }
-
-                //in some odd cases, the pre-values in the db won't exist but their default pre-values contain this key so check there
-                if (_propertyEditors.TryGet(propertyEditorAlias, out PropertyEditor propertyEditor))
-                {
-                    var preValue = propertyEditor.DefaultPreValues
-                        .FirstOrDefault(x => string.Equals(x.Key, "multiPicker", StringComparison.InvariantCultureIgnoreCase))
-                        .Value;
-
-                    return preValue != null && preValue.TryConvertTo<bool>().Result;
-                }
-
-                return false;
-            });
+            var config = ConfigurationEditor.ConfigurationAs<MediaPickerConfiguration>(dataType.Configuration);
+            return config.Multiple;
         }
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
@@ -102,19 +69,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         mediaItems.Add(item);
                 }
 
-                if (IsMultipleDataType(propertyType.DataType.Id, propertyType.EditorAlias))
+                if (IsMultipleDataType(propertyType.DataType))
                     return mediaItems;
                 return mediaItems.FirstOrDefault();
             }
 
             return source;
-        }
-
-        private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();
-
-        internal static void ClearCaches()
-        {
-            Storages.Clear();
         }
     }
 }

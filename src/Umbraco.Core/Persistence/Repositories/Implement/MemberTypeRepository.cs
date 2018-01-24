@@ -270,7 +270,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="dbType"></param>
         /// <param name="propertyTypeAlias"></param>
         /// <returns></returns>
-        protected override PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType dbType, string propertyTypeAlias)
         {
             //custom property type constructor logic to set explicit dbtype's for built in properties
             var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
@@ -292,12 +292,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var propertyType in memberType.PropertyTypes)
             {
-                var dbTypeAttempt = GetDbTypeForBuiltInProperty(propertyType.Alias, propertyType.DataTypeDatabaseType, stdProps);
+                var dbTypeAttempt = GetDbTypeForBuiltInProperty(propertyType.Alias, propertyType.ValueStorageType, stdProps);
                 if (dbTypeAttempt)
                 {
                     //this reset's it's current data type reference which will be re-assigned based on the property editor assigned on the next line
-                    propertyType.DataTypeDefinitionId = 0;
-                    propertyType.DataTypeId = GetPropertyEditorForBuiltInProperty(propertyType.Alias, propertyType.DataTypeId, stdProps).Result;
+                    propertyType.DataTypeId = 0;
                 }
             }
         }
@@ -332,9 +331,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <returns>
         /// Successful attempt if it was a built in property
         /// </returns>
-        internal static Attempt<DataTypeDatabaseType> GetDbTypeForBuiltInProperty(
+        internal static Attempt<ValueStorageType> GetDbTypeForBuiltInProperty(
             string propAlias,
-            DataTypeDatabaseType dbType,
+            ValueStorageType dbType,
             Dictionary<string, PropertyType> standardProps)
         {
             var aliases = standardProps.Select(x => x.Key).ToArray();
@@ -343,36 +342,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (aliases.Contains(propAlias))
             {
                 //return the pre-determined db type for this property
-                return Attempt<DataTypeDatabaseType>.Succeed(standardProps.Single(x => x.Key == propAlias).Value.DataTypeDatabaseType);
+                return Attempt<ValueStorageType>.Succeed(standardProps.Single(x => x.Key == propAlias).Value.ValueStorageType);
             }
 
-            return Attempt<DataTypeDatabaseType>.Fail(dbType);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="propAlias"></param>
-        /// <param name="propertyEditor"></param>
-        /// <param name="standardProps"></param>
-        /// <returns>
-        /// Successful attempt if it was a built in property
-        /// </returns>
-        internal static Attempt<Guid> GetPropertyEditorForBuiltInProperty(
-            string propAlias,
-            Guid propertyEditor,
-            Dictionary<string, PropertyType> standardProps)
-        {
-            var aliases = standardProps.Select(x => x.Key).ToArray();
-
-            //check if it is built in
-            if (aliases.Contains(propAlias))
-            {
-                //return the pre-determined db type for this property
-                return Attempt<Guid>.Succeed(standardProps.Single(x => x.Key == propAlias).Value.DataTypeId);
-            }
-
-            return Attempt<Guid>.Fail(propertyEditor);
+            return Attempt<ValueStorageType>.Fail(dbType);
         }
     }
 }

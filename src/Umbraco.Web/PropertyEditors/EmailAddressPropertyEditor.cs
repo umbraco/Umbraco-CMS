@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
         {
         }
 
-        protected override PropertyValueEditor CreateValueEditor()
+        protected override ValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             //add an email address validator
@@ -23,18 +23,9 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        protected override PreValueEditor CreateConfigurationEditor()
+        protected override ConfigurationEditor CreateConfigurationEditor()
         {
-            return new EmailAddressePreValueEditor();
+            return new EmailAddressConfigurationEditor();
         }
-
-        internal class EmailAddressePreValueEditor : PreValueEditor
-        {
-            //TODO: This doesn't seem necessary since it can be specified at the property type level - this will however be useful if/when
-            // we support overridden property value pre-value options.
-            [DataTypeConfigurationField("Required?", "boolean")]
-            public bool IsRequired { get; set; }
-        }
-
     }
 }

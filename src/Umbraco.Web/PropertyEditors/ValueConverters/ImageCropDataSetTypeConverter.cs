@@ -4,12 +4,14 @@ using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// Used to do some type conversions from ImageCropDataSet to string and JObject
+    /// fixme WHY?
     /// </summary>
     public class ImageCropDataSetTypeConverter : TypeConverter
     {
@@ -23,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var cropDataSet = value as ImageCropDataSet;
+            var cropDataSet = value as ImageCropperValue;
             if (cropDataSet == null)
                 return null;
 

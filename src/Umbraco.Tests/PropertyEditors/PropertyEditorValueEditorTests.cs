@@ -40,12 +40,12 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("hello world", false)]
         public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
         {
-            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Nvarchar));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.NVarChar));
             prop.SetValue(value);
 
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.String
+                    ValueType = ValueTypes.String
             };
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
@@ -60,7 +60,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("DATETIME", "", null)] //test empty string for date
         public void Value_Editor_Can_Convert_To_Clr_Type(string valueType, string val, object expected)
         {
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
                     ValueType = valueType
                 };
@@ -75,9 +75,9 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Decimal_Clr_Type()
         {
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
             {
-                ValueType = PropertyEditorValueTypes.Decimal
+                ValueType = ValueTypes.Decimal
             };
 
             var result = valueEditor.TryConvertValueToCrlType("12.34");
@@ -88,9 +88,9 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Decimal_Clr_Type_With_Other_Separator()
         {
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
             {
-                ValueType = PropertyEditorValueTypes.Decimal
+                ValueType = ValueTypes.Decimal
             };
 
             var result = valueEditor.TryConvertValueToCrlType("12,34");
@@ -101,9 +101,9 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Decimal_Clr_Type_With_Empty_String()
         {
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
             {
-                ValueType = PropertyEditorValueTypes.Decimal
+                ValueType = ValueTypes.Decimal
             };
 
             var result = valueEditor.TryConvertValueToCrlType(string.Empty);
@@ -114,9 +114,9 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Date_Clr_Type()
         {
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.Date
+                    ValueType = ValueTypes.Date
             };
 
             var result = valueEditor.TryConvertValueToCrlType("2010-02-05");
@@ -124,18 +124,17 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(new DateTime(2010, 2, 5), result.Result);
         }
 
-        [TestCase(PropertyEditorValueTypes.String, "hello", "hello")]
-        [TestCase(PropertyEditorValueTypes.Text, "hello", "hello")]
-        [TestCase(PropertyEditorValueTypes.Integer, 123, "123")]
-        [TestCase(PropertyEditorValueTypes.IntegerAlternative, 123, "123")]
-        [TestCase(PropertyEditorValueTypes.Integer, "", "")] //test empty string for int
-        [TestCase(PropertyEditorValueTypes.DateTime, "", "")] //test empty string for date
+        [TestCase(ValueTypes.String, "hello", "hello")]
+        [TestCase(ValueTypes.Text, "hello", "hello")]
+        [TestCase(ValueTypes.Integer, 123, "123")]
+        [TestCase(ValueTypes.Integer, "", "")] //test empty string for int
+        [TestCase(ValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
-            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Nvarchar));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.NVarChar));
             prop.SetValue(val);
 
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
                     ValueType = valueType
                 };
@@ -148,12 +147,12 @@ namespace Umbraco.Tests.PropertyEditors
         public void Value_Editor_Can_Serialize_Decimal_Value()
         {
             var value = 12.34M;
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.Decimal
+                    ValueType = ValueTypes.Decimal
             };
 
-            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Decimal));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.Decimal));
             prop.SetValue(value);
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
@@ -163,12 +162,12 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Serialize_Decimal_Value_With_Empty_String()
         {
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.Decimal
+                    ValueType = ValueTypes.Decimal
             };
 
-            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Decimal));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.Decimal));
             prop.SetValue(string.Empty);
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
@@ -179,12 +178,12 @@ namespace Umbraco.Tests.PropertyEditors
         public void Value_Editor_Can_Serialize_Date_Value()
         {
             var now = DateTime.Now;
-            var valueEditor = new PropertyValueEditor
+            var valueEditor = new ValueEditor
                 {
-                    ValueType = PropertyEditorValueTypes.Date
+                    ValueType = ValueTypes.Date
             };
 
-            var prop = new Property(1, new PropertyType("test", DataTypeDatabaseType.Date));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.Date));
             prop.SetValue(now);
 
             var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);

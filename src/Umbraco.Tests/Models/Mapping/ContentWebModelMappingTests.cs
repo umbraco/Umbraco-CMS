@@ -125,8 +125,8 @@ namespace Umbraco.Tests.Models.Mapping
             var idSeed = 1;
             var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
             //set ids or it wont work
             contentType.Id = idSeed;
             foreach (var p in contentType.PropertyTypes)
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.PropertyType.ValidationRegExp, pDto.ValidationRegExp);
             Assert.AreEqual(p.PropertyType.Description, pDto.Description);
             Assert.AreEqual(p.PropertyType.Name, pDto.Label);
-            Assert.AreEqual(Current.Services.DataTypeService.GetDataType(p.PropertyType.DataTypeDefinitionId), pDto.DataType);
+            Assert.AreEqual(Current.Services.DataTypeService.GetDataType(p.PropertyType.DataTypeId), pDto.DataType);
             Assert.AreEqual(Current.PropertyEditors[p.PropertyType.PropertyEditorAlias], pDto.PropertyEditor);
         }
 

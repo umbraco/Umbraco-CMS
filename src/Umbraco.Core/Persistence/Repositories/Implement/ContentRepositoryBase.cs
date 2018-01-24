@@ -476,7 +476,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                     //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
                     // fixme - optimize with index
-                    var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeDefinitionId)
+                    var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeId)
                         .Distinct()
                         .ToArray();
 

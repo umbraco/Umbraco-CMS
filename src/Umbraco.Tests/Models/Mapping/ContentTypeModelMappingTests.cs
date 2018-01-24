@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+                        && definition.DatabaseType == ValueStorageType.NVarChar));
 
             var display = CreateMemberTypeSave();
 
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Models.Mapping
                 for (var j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
                     Assert.AreEqual(propTypes.ElementAt(j).MemberCanViewProperty, result.MemberCanViewProperty(result.PropertyTypes.ElementAt(j).Alias));
                     Assert.AreEqual(propTypes.ElementAt(j).MemberCanEditProperty, result.MemberCanEditProperty(result.PropertyTypes.ElementAt(j).Alias));
                 }
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+                        && definition.DatabaseType == ValueStorageType.NVarChar));
 
             var display = CreateMediaTypeSave();
 
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Models.Mapping
                 for (var j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
                 }
             }
 
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+                        && definition.DatabaseType == ValueStorageType.NVarChar));
 
 
             _fileService.Setup(x => x.GetTemplate(It.IsAny<string>()))
@@ -252,7 +252,7 @@ namespace Umbraco.Tests.Models.Mapping
                 for (var j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
                 }
             }
 
@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+                        && definition.DatabaseType == ValueStorageType.NVarChar));
 
 
             var display = CreateCompositionMediaTypeSave();
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+                        && definition.DatabaseType == ValueStorageType.NVarChar));
 
 
             var display = CreateCompositionContentTypeSave();
@@ -375,7 +375,7 @@ namespace Umbraco.Tests.Models.Mapping
                 for (var j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
 
                     Assert.AreEqual(memberType.MemberCanViewProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanViewProperty);
                     Assert.AreEqual(memberType.MemberCanEditProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanEditProperty);
@@ -436,7 +436,7 @@ namespace Umbraco.Tests.Models.Mapping
                 for (var j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
                 }
             }
 
@@ -495,7 +495,7 @@ namespace Umbraco.Tests.Models.Mapping
                 for (var j = 0; j < propTypes.Count(); j++)
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
                 }
             }
 
@@ -676,7 +676,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
             Assert.AreEqual(basic.Alias, result.Alias);
             Assert.AreEqual(basic.Description, result.Description);
-            Assert.AreEqual(basic.DataTypeId, result.DataTypeDefinitionId);
+            Assert.AreEqual(basic.DataTypeId, result.DataTypeId);
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
@@ -710,7 +710,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
             Assert.AreEqual(basic.Alias, result.Alias);
             Assert.AreEqual(basic.Description, result.Description);
-            Assert.AreEqual(basic.DataTypeId, result.DataTypeDefinitionId);
+            Assert.AreEqual(basic.DataTypeId, result.DataTypeId);
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
@@ -733,37 +733,37 @@ namespace Umbraco.Tests.Models.Mapping
 
             var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
             //not assigned to tab
-            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext)
+            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlName",
                 Name = "Slug",
                 Description = "",
                 Mandatory = false,
                 SortOrder = 1,
-                DataTypeDefinitionId = -88
+                DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(ctMain, 8888);
             var ctChild1 = MockedContentTypes.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
-            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext)
+            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
                 Name = "Some Property",
                 Description = "",
                 Mandatory = false,
                 SortOrder = 1,
-                DataTypeDefinitionId = -88
+                DataTypeId = -88
             }, "Another tab");
             MockedContentTypes.EnsureAllIds(ctChild1, 7777);
             var contentType = MockedContentTypes.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext)
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext)
             {
                 Alias = "umbracoUrlAlias",
                 Name = "AltUrl",
                 Description = "",
                 Mandatory = false,
                 SortOrder = 1,
-                DataTypeDefinitionId = -88
+                DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(contentType, 6666);
 
@@ -829,27 +829,27 @@ namespace Umbraco.Tests.Models.Mapping
 
             var ctMain = MockedContentTypes.CreateSimpleContentType();
             //not assigned to tab
-            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext)
+            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext)
             {
-                Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+                Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(ctMain, 8888);
             var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
-            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext)
+            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext)
             {
                 Alias = "someProperty",
                 Name = "Some Property",
                 Description = "",
                 Mandatory = false,
                 SortOrder = 1,
-                DataTypeDefinitionId = -88
+                DataTypeId = -88
             }, "Another tab");
             MockedContentTypes.EnsureAllIds(ctChild1, 7777);
             var contentType = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true, "CustomGroup");
             //not assigned to tab
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, DataTypeDatabaseType.Ntext)
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext)
             {
-                Alias = "umbracoUrlAlias", Name = "AltUrl", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+                Alias = "umbracoUrlAlias", Name = "AltUrl", Description = "", Mandatory = false, SortOrder = 1, DataTypeId = -88
             });
             MockedContentTypes.EnsureAllIds(contentType, 6666);
 

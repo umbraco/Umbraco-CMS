@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Services
         {
             var dataTypeService = ServiceContext.DataTypeService;
 
-            IDataType dataType = new DataType(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = DataTypeDatabaseType.Ntext };
+            IDataType dataType = new DataType(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
 
             //Get all the first time (no cache)

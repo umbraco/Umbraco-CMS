@@ -65,7 +65,7 @@ namespace Umbraco.Core.Runtime
                 .Add(factory => factory.GetInstance<TypeLoader>().GetParameterEditors());
 
             // register our predefined validators
-            composition.Container.RegisterCollectionBuilder<ValidatorCollectionBuilder>()
+            composition.Container.RegisterCollectionBuilder<ManifestValidatorCollectionBuilder>()
                 .Add<RequiredManifestValueValidator>()
                 .Add<RegexValidator>()
                 .Add<DelimitedManifestValueValidator>()
@@ -128,10 +128,6 @@ namespace Umbraco.Core.Runtime
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)
         {
-            //TODO: Remove these for v8!
-            LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
-            LegacyParameterEditorAliasConverter.CreateMappingsForCoreEditors();
-
             // mapper profiles have been registered & are created by the container
             Mapper.Initialize(configuration =>
             {

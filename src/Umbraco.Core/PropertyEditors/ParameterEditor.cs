@@ -21,6 +21,12 @@ namespace Umbraco.Core.PropertyEditors
         {
             Configuration = new Dictionary<string, object>();
 
+            // fixme ParameterEditorAttribute is AllowMultiple
+            // then how can this ever make sense?
+            // only DropDownMultiplePropertyEditor has multiple [ParameterEditor]
+            // is exactly the same in v7 now
+            // makes no sense at all?!
+
             // assign properties based on the attribute, if it is found
             _attribute = GetType().GetCustomAttribute<ParameterEditorAttribute>(false);
             if (_attribute == null) return;
@@ -74,7 +80,7 @@ namespace Umbraco.Core.PropertyEditors
             // create a new editor
             var editor = new ParameterValueEditor();
 
-            var view = _attribute?.EditorView;
+            var view = _attribute?.View;
             if (string.IsNullOrWhiteSpace(view))
                 throw new InvalidOperationException("The editor does not specify a view.");
             editor.View = view;

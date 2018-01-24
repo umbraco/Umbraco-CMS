@@ -43,20 +43,23 @@ namespace Umbraco.Core.Models.PublishedContent
             => _configuration ?? (_configuration = _dataTypeConfigurationSource.GetDataTypeConfiguration(EditorAlias, Id));
 
         /// <summary>
-        /// Gets the data type typed configuration.
+        /// Gets the configuration object.
         /// </summary>
-        /// <typeparam name="TConfiguration">The type of the configuration object.</typeparam>
-        /// <returns>The data type configuration.</returns>
-        public TConfiguration GetConfiguration<TConfiguration>()
-            where TConfiguration : class
+        /// <typeparam name="T">The expected type of the configuration object.</typeparam>
+        /// <param name="dataType">This datatype.</param>
+        /// <exception cref="InvalidCastException">When the datatype configuration is not of the expected type.</exception>
+        public T ConfigurationAs<T>()
+            where T : class
         {
-            var configuration = Configuration;
-            if (configuration == null) return default;
+            switch (Configuration)
+            {
+                case null:
+                    return null;
+                case T configurationAsT:
+                    return configurationAsT;
+            }
 
-            if (!(configuration is TConfiguration asTConfiguration))
-                throw new InvalidCastException($"Cannot cast data type configuration of type {configuration.GetType()} to {typeof(TConfiguration)}.");
-
-            return asTConfiguration;
+            throw new InvalidCastException($"Cannot cast dataType configuration, of type {Configuration.GetType().Name}, to {typeof(T).Name}.");
         }
     }
 }

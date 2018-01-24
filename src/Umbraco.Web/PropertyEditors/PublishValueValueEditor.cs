@@ -21,14 +21,14 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly ILogger _logger;
 
-        internal PublishValueValueEditor(IDataTypeService dataTypeService, PropertyValueEditor wrapped, ILogger logger)
+        internal PublishValueValueEditor(IDataTypeService dataTypeService, ValueEditor wrapped, ILogger logger)
             : base(wrapped)
         {
             _dataTypeService = dataTypeService;
             _logger = logger;
         }
 
-        public PublishValueValueEditor(PropertyValueEditor wrapped, ILogger logger)
+        public PublishValueValueEditor(ValueEditor wrapped, ILogger logger)
             : this(Current.Services.DataTypeService, wrapped, logger)
         {
         }
@@ -67,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected IDictionary<string, PreValue> GetPreValues(PropertyType propertyType)
         {
-            var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeDefinitionId);
+            var config = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
             if (preVals != null)
             {
                 var dictionary = preVals.FormatAsDictionary();

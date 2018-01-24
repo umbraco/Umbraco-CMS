@@ -15,13 +15,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static PropertyType CreateDecimalProperty(string alias, string name, int dtdId)
         {
             return
-                new PropertyType("test", DataTypeDatabaseType.Decimal, alias)
+                new PropertyType("test", ValueStorageType.Decimal, alias)
                 {
                     Name = name,
                     Description = "Decimal property type",
                     Mandatory = false,
                     SortOrder = 4,
-                    DataTypeDefinitionId = dtdId
+                    DataTypeId = dtdId
                 };
         }
 
@@ -34,13 +34,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static PropertyType CreateIntegerProperty(string alias, string name)
         {
             return
-                new PropertyType("test", DataTypeDatabaseType.Integer, alias)
+                new PropertyType("test", ValueStorageType.Integer, alias)
                 {
                     Name = name,
                     Description = "Integer property type",
                     Mandatory = false,
                     SortOrder = 4,
-                    DataTypeDefinitionId = -51
+                    DataTypeId = -51
                 };
         }
 
@@ -53,13 +53,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
         public static PropertyType CreateDateTimeProperty(string alias, string name)
         {
             return
-                new PropertyType("test", DataTypeDatabaseType.Date, alias)
+                new PropertyType("test", ValueStorageType.Date, alias)
                 {
                     Name = name,
                     Description = "DateTime property type",
                     Mandatory = false,
                     SortOrder = 4,
-                    DataTypeDefinitionId = -36
+                    DataTypeId = -36
                 };
         }
     }

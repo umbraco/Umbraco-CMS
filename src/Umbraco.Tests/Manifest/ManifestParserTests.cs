@@ -182,21 +182,21 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var validators = valueEditor.Validators;
             Assert.AreEqual(2, validators.Count);
             var validator = validators[0];
-            var v = validator as ManifestPropertyValidator;
+            var v = validator as ManifestValueValidator;
             Assert.IsNotNull(v);
-            Assert.AreEqual("required", v.Type);
+            Assert.AreEqual("required", v.ValidationName);
             Assert.AreEqual("", v.Config);
             validator = validators[1];
-            v = validator as ManifestPropertyValidator;
+            v = validator as ManifestValueValidator;
             Assert.IsNotNull(v);
-            Assert.AreEqual("Regex", v.Type);
+            Assert.AreEqual("Regex", v.ValidationName);
             Assert.AreEqual("\\d*", v.Config);
 
             // this is not part of the manifest
             var preValues = editor.DefaultPreValues;
             Assert.IsNull(preValues);
 
-            var preValueEditor = editor.PreValueEditor;
+            var preValueEditor = editor.ConfigurationEditor;
             Assert.IsNotNull(preValueEditor);
             Assert.IsNotNull(preValueEditor.Fields);
             Assert.AreEqual(2, preValueEditor.Fields.Count);
@@ -208,9 +208,9 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var fvalidators = f.Validators;
             Assert.IsNotNull(fvalidators);
             Assert.AreEqual(1, fvalidators.Count);
-            var fv = fvalidators[0] as ManifestPropertyValidator;
+            var fv = fvalidators[0] as ManifestValueValidator;
             Assert.IsNotNull(fv);
-            Assert.AreEqual("required", fv.Type);
+            Assert.AreEqual("required", fv.ValidationName);
             Assert.AreEqual("", fv.Config);
 
             f = preValueEditor.Fields[1];

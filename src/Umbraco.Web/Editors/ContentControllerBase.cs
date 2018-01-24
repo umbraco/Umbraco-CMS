@@ -84,7 +84,7 @@ namespace Umbraco.Web.Editors
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
-                var data = new ContentPropertyData(property.Value, property.PreValues)
+                var data = new ContentPropertyData(property.Value, property.DataType.Configuration)
                 {
                     ContentKey = contentItem.PersistedContent.Key,
                     PropertyTypeKey = dboProperty.PropertyType.Key,

@@ -109,22 +109,23 @@ namespace Umbraco.Web.Install.InstallSteps
             }
             foreach (var item in list)
             {
-                Guid legacyId = item.controlId;
-                //check for a map entry
-                var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(legacyId);
-                if (alias != null)
-                {
-                    //check that the new property editor exists with that alias
-                    var editor = Current.PropertyEditors[alias];
-                    if (editor == null)
-                    {
-                        errorReport.Add($"Property Editor with ID '{item.controlId}' (assigned to Data Type '{item.text}') has a valid GUID -> Alias map but no property editor was found. It will be replaced with a Readonly/Label property editor.");
-                    }
-                }
-                else
-                {
-                    errorReport.Add($"Property Editor with ID '{item.controlId}' (assigned to Data Type '{item.text}') does not have a valid GUID -> Alias map. It will be replaced with a Readonly/Label property editor.");
-                }
+                // TODO - kill all this in v8
+                //Guid legacyId = item.controlId;
+                ////check for a map entry
+                //var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(legacyId);
+                //if (alias != null)
+                //{
+                //    //check that the new property editor exists with that alias
+                //    var editor = Current.PropertyEditors[alias];
+                //    if (editor == null)
+                //    {
+                //        errorReport.Add($"Property Editor with ID '{item.controlId}' (assigned to Data Type '{item.text}') has a valid GUID -> Alias map but no property editor was found. It will be replaced with a Readonly/Label property editor.");
+                //    }
+                //}
+                //else
+                //{
+                //    errorReport.Add($"Property Editor with ID '{item.controlId}' (assigned to Data Type '{item.text}') does not have a valid GUID -> Alias map. It will be replaced with a Readonly/Label property editor.");
+                //}
             }
 
             return errorReport;

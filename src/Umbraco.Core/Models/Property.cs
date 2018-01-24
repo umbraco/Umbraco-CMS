@@ -135,7 +135,7 @@ namespace Umbraco.Core.Models
         /// Only used internally when saving the property value.
         /// </remarks>
         [IgnoreDataMember]
-        internal DataTypeDatabaseType DataTypeDatabaseType => PropertyType.DataTypeDatabaseType;
+        internal ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
 
         /// <summary>
         /// Gets the value.
@@ -351,20 +351,20 @@ namespace Umbraco.Core.Models
 
             var s = value.ToString();
 
-            switch (PropertyType.DataTypeDatabaseType)
+            switch (PropertyType.ValueStorageType)
             {
-                case DataTypeDatabaseType.Nvarchar:
-                case DataTypeDatabaseType.Ntext:
+                case ValueStorageType.NVarChar:
+                case ValueStorageType.Ntext:
                     return s;
 
-                case DataTypeDatabaseType.Integer:
+                case ValueStorageType.Integer:
                     if (s.IsNullOrWhiteSpace())
                         return null; // assume empty means null
                     var convInt = value.TryConvertTo<int>();
                     if (convInt == false) ThrowTypeException(value, typeof(int), PropertyType.Alias);
                     return convInt.Result;
 
-                case DataTypeDatabaseType.Decimal:
+                case ValueStorageType.Decimal:
                     if (s.IsNullOrWhiteSpace())
                         return null; // assume empty means null
                     var convDecimal = value.TryConvertTo<decimal>();
@@ -373,7 +373,7 @@ namespace Umbraco.Core.Models
                     // because the underlying database is going to mess with the scaling factor anyways.
                     return convDecimal.Result.Normalize();
 
-                case DataTypeDatabaseType.Date:
+                case ValueStorageType.Date:
                     if (s.IsNullOrWhiteSpace())
                         return null; // assume empty means null
                     var convDateTime = value.TryConvertTo<DateTime>();
