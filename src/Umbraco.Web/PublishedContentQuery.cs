@@ -231,6 +231,24 @@ namespace Umbraco.Web
 
         private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
         {
+            // Check if the loopkup is empty, if so populate it [LK]
+            if (_guidToIntLoopkup.Count == 0)
+            {
+                // TODO: Remove the debug profile logger
+                using (ApplicationContext.Current.ProfilingLogger.DebugDuration<PublishedContentQuery>("Populate GUID/INT lookup"))
+                {
+                    // NOTE, using the `@nodeTypeAlias` attribute in the XPath as this was support in both legacy & new schemas
+                    var tmpNodes = cache.GetXPathNavigator().Select("//*[@nodeTypeAlias]");
+                    foreach (XPathNavigator tmpNode in tmpNodes)
+                    {
+                        if (int.TryParse(tmpNode.GetAttribute("id", string.Empty), out int tmpNodeId)
+                            && Guid.TryParse(tmpNode.GetAttribute("key", string.Empty), out Guid tmpNodeKey))
+                        {
+                            _guidToIntLoopkup[tmpNodeKey] = tmpNodeId;
+                        }
+                    }
+                }
+            }
 
             IPublishedContent doc;
 
