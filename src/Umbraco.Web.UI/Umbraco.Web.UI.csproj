@@ -332,8 +332,8 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.9.101, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.9\lib\Umbraco.ModelsBuilder.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.10.102, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.10\lib\Umbraco.ModelsBuilder.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
