@@ -36,9 +36,14 @@
 
                     <umb-load-indicator ng-if="isSearching"></umb-load-indicator>
 
-                    <umb-empty-state ng-if="!hasResults && !isSearching"
-                                     position="center">
+                    <umb-empty-state ng-if="!hasResults && !isSearching" position="center">
                         <localize key="general_searchNoResult"></localize>
+                        <br />
+                        <button type="button" class="btn umb-button__button btn-info umb-button--" ng-click="clearSearch()" hotkey="" hotkey-when-hidden="">
+                            <span class="umb-button__content">
+                                <localize key="general_clearSearch" class="ng-isolate-scope ng-scope ng-binding">Clear Search</localize>
+                            </span>
+                        </button>
                     </umb-empty-state>
 
                     <ul class="umb-tree" ng-if="!isSearching && hasResults">
