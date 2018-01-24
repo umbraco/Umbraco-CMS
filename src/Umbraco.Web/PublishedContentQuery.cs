@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
@@ -226,12 +227,49 @@ namespace Umbraco.Web
             return doc;
         }
 
+        private static readonly ConcurrentDictionary<Guid, int> _guidToIntLoopkup = new ConcurrentDictionary<Guid, int>();
+
         private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
         {
-            // todo: in v8, implement in a more efficient way
-            var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
-            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@key=$guid]";
-            var doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
+            // Check if the loopkup is empty, if so populate it [LK]
+            if (_guidToIntLoopkup.Count == 0)
+            {
+                // TODO: Remove the debug profile logger
+                using (ApplicationContext.Current.ProfilingLogger.DebugDuration<PublishedContentQuery>("Populate GUID/INT lookup"))
+                {
+                    // NOTE, using the `@nodeTypeAlias` attribute in the XPath as this was support in both legacy & new schemas
+                    var tmpNodes = cache.GetXPathNavigator().Select("//*[@nodeTypeAlias]");
+                    foreach (XPathNavigator tmpNode in tmpNodes)
+                    {
+                        if (int.TryParse(tmpNode.GetAttribute("id", string.Empty), out int tmpNodeId)
+                            && Guid.TryParse(tmpNode.GetAttribute("key", string.Empty), out Guid tmpNodeKey))
+                        {
+                            _guidToIntLoopkup[tmpNodeKey] = tmpNodeId;
+                        }
+                    }
+                }
+            }
+
+            IPublishedContent doc;
+
+            // Check if the lookup contains the GUID/INT value
+            if (_guidToIntLoopkup.TryGetValue(id, out int nodeId) == false)
+            {
+                // If not, then we perform an inefficient XPath for the GUID
+
+                // todo: in v8, implement in a more efficient way
+                doc = cache.GetSingleByXPath("//*[@key=$guid]", new XPathVariable("guid", id.ToString()));
+
+                // When we have the node, we add the GUID/INT value to the lookup
+                if (doc != null)
+                    _guidToIntLoopkup[id] = doc.Id;
+            }
+            else
+            {
+                // Otherwise we have the node id (INT) and can perform an efficient retrieval
+                doc = cache.GetById(nodeId);
+            }
+
             return doc;
         }
 
