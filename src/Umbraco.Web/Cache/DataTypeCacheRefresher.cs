@@ -61,9 +61,7 @@ namespace Umbraco.Web.Cache
 
             // fixme - not sure I like these?
             TagsValueConverter.ClearCaches();
-            MediaPickerLegacyValueConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
-            MediaPickerValueConverter.ClearCaches();
 
             // notify
             _publishedSnapshotService.Notify(payloads);

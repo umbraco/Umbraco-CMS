@@ -16,20 +16,20 @@ namespace Umbraco.Web.PropertyEditors
     /// This is required for legacy/backwards compatibility, otherwise we'd just store the string version and cache the string version without
     /// needing additional lookups.
     /// </remarks>
-    internal class PublishValueValueEditor : PropertyValueEditorWrapper
+    internal class PublishValueValueEditor : ValueEditor
     {
         private readonly IDataTypeService _dataTypeService;
         private readonly ILogger _logger;
 
-        internal PublishValueValueEditor(IDataTypeService dataTypeService, ValueEditor wrapped, ILogger logger)
-            : base(wrapped)
+        internal PublishValueValueEditor(IDataTypeService dataTypeService, ValueEditorAttribute attribute, ILogger logger)
+            : base(attribute)
         {
             _dataTypeService = dataTypeService;
             _logger = logger;
         }
 
-        public PublishValueValueEditor(ValueEditor wrapped, ILogger logger)
-            : this(Current.Services.DataTypeService, wrapped, logger)
+        public PublishValueValueEditor(ValueEditorAttribute attribute, ILogger logger)
+            : this(Current.Services.DataTypeService, attribute, logger)
         {
         }
 

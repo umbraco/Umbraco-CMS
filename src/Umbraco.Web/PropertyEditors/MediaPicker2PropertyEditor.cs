@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Media picker property editors that stores UDI
     /// </summary>
-    [PropertyEditor(Constants.PropertyEditors.Aliases.MediaPicker2, "Media Picker", "mediapicker", ValueTypes.Text, IsMacroParameterEditor = true, Group = "media", Icon = "icon-picture")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.MediaPicker2, "Media Picker", "mediapicker", ValueTypes.Text, IsMacroParameterEditor = true, Group = "media", Icon = "icon-picture")]
     public class MediaPicker2PropertyEditor : PropertyEditor
     {
         public MediaPicker2PropertyEditor(ILogger logger)

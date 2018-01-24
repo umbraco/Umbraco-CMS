@@ -11,7 +11,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     [SupportTags(typeof(TagPropertyEditorTagDefinition), ValueType = TagValueType.CustomTagList)]
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
     public class TagsPropertyEditor : PropertyEditor
     {
         private ManifestValidatorCollection _validators;
@@ -38,20 +38,14 @@ namespace Umbraco.Web.PropertyEditors
             set { _defaultPreVals = value; }
         }
 
-        protected override ValueEditor CreateValueEditor()
-        {
-            return new TagPropertyValueEditor(base.CreateValueEditor());
-        }
+        protected override ValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new TagConfigurationEditor(_validators);
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
 
-        internal class TagPropertyValueEditor : PropertyValueEditorWrapper
+        internal class TagPropertyValueEditor : ValueEditor
         {
-            public TagPropertyValueEditor(ValueEditor wrapped)
-                : base(wrapped)
+            public TagPropertyValueEditor(ValueEditorAttribute attribute)
+                : base(attribute)
             { }
 
             /// <inheritdoc />

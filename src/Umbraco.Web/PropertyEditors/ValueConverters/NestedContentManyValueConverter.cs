@@ -62,14 +62,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 if (objects.Count == 0)
                     return Enumerable.Empty<IPublishedElement>();
 
-                // fixme
-                var x = propertyType.DataType.Configuration as NestedContentConfiguration;
-                var y = NestedContentPropertyEditor.CastConfiguration(propertyType.DataType.Configuration);
-                #error
-                var contentTypes = propertyType.DataType.GetConfiguration<NestedContentPropertyEditor.Configuration>().ContentTypes;
+                var configuration = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>();
+                var contentTypes = configuration.ContentTypes;
                 var elements = contentTypes.Length > 1
                     ? new List<IPublishedElement>()
-                    : PublishedModelFactory.CreateModelList(contentTypes[0].Alias);
+                    : PublishedModelFactory.CreateModelList(contentTypes[0]);
 
                 foreach (var sourceObject in objects)
                 {

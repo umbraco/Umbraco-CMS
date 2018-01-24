@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 
@@ -12,8 +11,8 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class ColorListConfigurationEditor : ValueListConfigurationEditor
     {
-        public ColorListConfigurationEditor(ILocalizedTextService textService, ILogger logger)
-            : base(textService, logger)
+        public ColorListConfigurationEditor(ILocalizedTextService textService)
+            : base(textService)
         {
             var field = Fields.First();
 
@@ -27,13 +26,6 @@ namespace Umbraco.Web.PropertyEditors
             field.Validators.Add(new ColorListValidator());
         }
 
-        public override object ToEditor(object defaultConfiguration, object configuration)
-        {
-            var dictionary = persistedPreVals.FormatAsDictionary();
-            var arrayOfVals = dictionary.Select(item => item.Value).ToList();
-            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => x.Value) } };
-        }
-
         internal class ColorListValidator : IValueValidator
         {
             public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
@@ -44,8 +36,7 @@ namespace Umbraco.Web.PropertyEditors
                 for (var index = 0; index < json.Count; index++)
                 {
                     var i = json[index];
-                    var jItem = i as JObject;
-                    if (jItem == null || jItem["value"] == null) continue;
+                    if (!(i is JObject jItem) || jItem["value"] == null) continue;
 
                     //NOTE: we will be removing empty values when persisting so no need to validate
                     var asString = jItem["value"].ToString();

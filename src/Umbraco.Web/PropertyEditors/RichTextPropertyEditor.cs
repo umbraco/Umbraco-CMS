@@ -8,7 +8,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
     public class RichTextPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -22,26 +22,19 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor()
-        {
-            return new RichTextPropertyValueEditor(base.CreateValueEditor());
-        }
+        protected override ValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new RichTextConfigurationEditor();
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
 
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
-        internal class RichTextPropertyValueEditor : PropertyValueEditorWrapper
+        internal class RichTextPropertyValueEditor : ValueEditor
         {
-            public RichTextPropertyValueEditor(ValueEditor wrapped)
-                : base(wrapped)
-            {
-            }
+            public RichTextPropertyValueEditor(ValueEditorAttribute attribute)
+                : base(attribute)
+            { }
 
             /// <summary>
             /// override so that we can hide the label based on the pre-value

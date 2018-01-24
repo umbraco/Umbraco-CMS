@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Decimal, "Decimal", "decimal", ValueTypes.Decimal, IsMacroParameterEditor = true)]
+    [ValueEditor(Constants.PropertyEditors.Aliases.Decimal, "Decimal", "decimal", ValueTypes.Decimal, IsMacroParameterEditor = true)]
     public class DecimalPropertyEditor : PropertyEditor
     {
         /// <summary>

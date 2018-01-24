@@ -265,6 +265,7 @@
     <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultipleTestStringConfiguration.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentConfiguration.cs" />
     <Compile Include="PropertyEditors\NestedContentConfigurationEditor.cs" />
@@ -709,7 +710,6 @@
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />

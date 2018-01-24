@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.Models
 {
@@ -58,6 +59,7 @@ namespace Umbraco.Web.Models
 
                         var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
 
+                        // fixme this is horrible we need url providers for media too
                         //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
                         // want to return the normal URL and the cropper stores data as json
                         switch (propType.EditorAlias)
@@ -68,21 +70,13 @@ namespace Umbraco.Web.Models
                             case Constants.PropertyEditors.Aliases.ImageCropper:
                                 //get the url from the json format
 
-                                var stronglyTyped = prop.GetValue() as ImageCropDataSet;
+                                var stronglyTyped = prop.GetValue() as ImageCropperValue;
                                 if (stronglyTyped != null)
                                 {
                                     _url = stronglyTyped.Src;
                                     break;
                                 }
-
-                                var json = prop.GetValue() as JObject;
-                                if (json != null)
-                                {
-                                    _url = json.ToObject<ImageCropDataSet>(new JsonSerializer { Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal }).Src;
-                                    break;
-                                }
-
-                                _url = prop.GetValue().ToString();
+                                _url = prop.GetValue()?.ToString();
                                 break;
                         }
                         break;

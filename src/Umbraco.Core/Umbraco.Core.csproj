@@ -1200,7 +1200,7 @@
     <Compile Include="PropertyEditors\ConfigurationFieldAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyCacheLevel.cs" />
     <Compile Include="PropertyEditors\PropertyEditor.cs" />
-    <Compile Include="PropertyEditors\PropertyEditorAttribute.cs" />
+    <Compile Include="PropertyEditors\ValueEditorAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValueTypes.cs" />

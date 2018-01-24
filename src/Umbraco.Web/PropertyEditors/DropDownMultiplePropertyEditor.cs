@@ -16,24 +16,17 @@ namespace Umbraco.Web.PropertyEditors
     [ParameterEditor("propertyTypePickerMultiple", "Name", "textbox")]
     [ParameterEditor("contentTypeMultiple", "Name", "textbox")]
     [ParameterEditor("tabPickerMultiple", "Name", "textbox")]
-    [PropertyEditor(Constants.PropertyEditors.Aliases.DropDownListMultiple, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.DropDownListMultiple, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list")]
     public class DropDownMultiplePropertyEditor : DropDownMultipleWithKeysPropertyEditor
     {
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public DropDownMultiplePropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger, textService)
-        {
-        }
+        public DropDownMultiplePropertyEditor(ILogger logger, ILocalizedTextService textService)
+            : base(logger, textService)
+        { }
 
-        protected override ValueEditor CreateValueEditor()
-        {
-            return new PublishValuesMultipleValueEditor(false, base.CreateValueEditor());
-        }
-
+        /// <inheritdoc />
+        protected override ValueEditor CreateValueEditor() => new PublishValuesMultipleValueEditor(false, Attribute);
     }
-
-
-
-
 }

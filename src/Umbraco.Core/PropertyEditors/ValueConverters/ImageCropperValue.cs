@@ -47,7 +47,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        // fixme was defined in web project, extension methods?
+        // fixme was defined in web project, extension methods? why internal?
         internal void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool preferFocalPoint)
         {
             if (preferFocalPoint && HasFocalPoint()
@@ -139,6 +139,45 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         /// </summary>
         public bool HasImage()
             => !string.IsNullOrWhiteSpace(Src);
+
+        /// <summary>
+        /// Applies a configuration.
+        /// </summary>
+        /// <remarks>Ensures that all crops defined in the configuration exists in the value.</remarks>
+        internal void ApplyConfiguration(ImageCropperEditorConfiguration configuration)
+        {
+            // merge the crop values - the alias + width + height comes from
+            // configuration, but each crop can store its own coordinates
+
+            var configuredCrops = configuration.Crops;
+            var crops = Crops.ToList();
+
+            foreach (var configuredCrop in configuredCrops)
+            {
+                var crop = crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+                if (crop != null)
+                {
+                    // found, apply the height & width
+                    crop.Width = configuredCrop.Width;
+                    crop.Height = configuredCrop.Height;
+                }
+                else
+                {
+                    // not found, add
+                    crops.Add(new ImageCropperCrop
+                    {
+                        Alias = configuredCrop.Alias,
+                        Width = configuredCrop.Width,
+                        Height = configuredCrop.Height
+                    });
+                }
+            }
+
+            // assume we don't have to remove the crops in value, that
+            // are not part of configuration anymore?
+
+            Crops = crops;
+        }
 
         #region IEquatable
 

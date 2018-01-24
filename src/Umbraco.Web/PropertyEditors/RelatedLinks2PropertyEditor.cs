@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.RelatedLinks2, "Related links", "relatedlinks", ValueType = ValueTypes.Json, Icon = "icon-thumbnail-list", Group = "pickers")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.RelatedLinks2, "Related links", "relatedlinks", ValueType = ValueTypes.Json, Icon = "icon-thumbnail-list", Group = "pickers")]
     public class RelatedLinks2PropertyEditor : PropertyEditor
     {
         public RelatedLinks2PropertyEditor(ILogger logger)

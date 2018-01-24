@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = ValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = ValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
     public class MultipleTextStringPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -20,24 +20,18 @@ namespace Umbraco.Web.PropertyEditors
         public MultipleTextStringPropertyEditor(ILogger logger) : base(logger)
         { }
 
-        protected override ValueEditor CreateValueEditor()
-        {
-            return new MultipleTextStringPropertyValueEditor(base.CreateValueEditor());
-        }
+        protected override ValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new MultipleTextStringConfigurationEditor(Logger);
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
 
         /// <summary>
         /// Custom value editor so we can format the value for the editor and the database
         /// </summary>
-        internal class MultipleTextStringPropertyValueEditor : PropertyValueEditorWrapper
+        internal class MultipleTextStringPropertyValueEditor : ValueEditor
         {
-            public MultipleTextStringPropertyValueEditor(ValueEditor wrapped) : base(wrapped)
-            {
-            }
+            public MultipleTextStringPropertyValueEditor(ValueEditorAttribute attribute)
+                : base(attribute)
+            { }
 
             /// <summary>
             /// The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the string

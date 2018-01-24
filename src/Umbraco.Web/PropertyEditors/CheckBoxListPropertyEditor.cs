@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     /// as INT and we have logic in here to ensure it is formatted correctly including ensuring that the string value is published
     /// in cache and not the int ID.
     /// </remarks>
-    [PropertyEditor(Constants.PropertyEditors.Aliases.CheckBoxList, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.CheckBoxList, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
     public class CheckBoxListPropertyEditor : PropertyEditor
     {
         private readonly ILocalizedTextService _textService;
@@ -21,31 +21,16 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger)
+        public CheckBoxListPropertyEditor(ILogger logger, ILocalizedTextService textService)
+            : base(logger)
         {
             _textService = textService;
         }
 
-        /// <summary>
-        /// Return a custom pre-value editor
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// We are just going to re-use the ValueListPreValueEditor
-        /// </remarks>
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new ValueListConfigurationEditor(_textService, Logger);
-        }
+        /// <inheritdoc />
+        protected override ConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService);
 
-        /// <summary>
-        /// We need to override the value editor so that we can ensure the string value is published in cache and not the integer ID value.
-        /// </summary>
-        /// <returns></returns>
-        protected override ValueEditor CreateValueEditor()
-        {
-            return new PublishValuesMultipleValueEditor(false, base.CreateValueEditor());
-        }
-
+        /// <inheritdoc />
+        protected override ValueEditor CreateValueEditor() => new PublishValuesMultipleValueEditor(false, Attribute);
     }
 }

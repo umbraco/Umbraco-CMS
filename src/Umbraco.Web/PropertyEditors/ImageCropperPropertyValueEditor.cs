@@ -16,13 +16,13 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// The value editor for the image cropper property editor.
     /// </summary>
-    internal class ImageCropperPropertyValueEditor : PropertyValueEditorWrapper
+    internal class ImageCropperPropertyValueEditor : ValueEditor // fixme core vs web?
     {
         private readonly ILogger _logger;
         private readonly MediaFileSystem _mediaFileSystem;
 
-        public ImageCropperPropertyValueEditor(ValueEditor wrapped, ILogger logger, MediaFileSystem mediaFileSystem)
-            : base(wrapped)
+        public ImageCropperPropertyValueEditor(ValueEditorAttribute attribute, ILogger logger, MediaFileSystem mediaFileSystem)
+            : base(attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -46,8 +46,8 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             var dataType = dataTypeService.GetDataType(propertyType.DataTypeId);
-            // fixme nullref?
-            ImageCropperValueConverter.MergeConfiguration(value, dataType);
+            if (dataType?.Configuration != null)
+                value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperEditorConfiguration>());
 
             return value;
         }
@@ -161,16 +161,19 @@ namespace Umbraco.Web.PropertyEditors
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
 
-            // if we dont have a json structure, we will get it from the property type
-            var val = value.ToString();
-            if (val.DetectIsJson())
-                return val;
+            // fixme - no idea of what we should do here, and ConvertDbToString should die anyways
+            throw new NotImplementedException();
 
-            // more magic here ;-(
-            var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeId).FirstOrDefault();
-            var crops = string.IsNullOrEmpty(config) ? "[]" : config;
-            var newVal = "{src: '" + val + "', crops: " + crops + "}";
-            return newVal;
+            //// if we dont have a json structure, we will get it from the property type
+            //var val = value.ToString();
+            //if (val.DetectIsJson())
+            //    return val;
+
+            //// more magic here ;-(
+            //var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeId).FirstOrDefault();
+            //var crops = string.IsNullOrEmpty(config) ? "[]" : config;
+            //var newVal = "{src: '" + val + "', crops: " + crops + "}";
+            //return newVal;
         }
     }
 }

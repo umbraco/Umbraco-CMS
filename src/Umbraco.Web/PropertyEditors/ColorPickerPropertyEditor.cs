@@ -5,7 +5,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
     public class ColorPickerPropertyEditor : PropertyEditor
     {
         private readonly ILocalizedTextService _textService;
@@ -13,22 +13,13 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public ColorPickerPropertyEditor(ILogger logger, ILocalizedTextService textService) : base(logger)
+        public ColorPickerPropertyEditor(ILogger logger, ILocalizedTextService textService)
+            : base(logger)
         {
             _textService = textService;
         }
 
-        /// <summary>
-        /// Return a custom pre-value editor
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// ColorListPreValueEditor uses the ValueListPreValueEditor with a custom view and controller.
-        /// </remarks>
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new ColorListConfigurationEditor(_textService, Logger);
-        }
-
+        /// <inheritdoc />
+        protected override ConfigurationEditor CreateConfigurationEditor() => new ColorListConfigurationEditor(_textService);
     }
 }

@@ -21,14 +21,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly bool _publishIds;
 
-        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ILogger logger, ValueEditor wrapped)
-            : base(dataTypeService, wrapped, logger)
+        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ILogger logger, ValueEditorAttribute attribute)
+            : base(dataTypeService, attribute, logger)
         {
             _publishIds = publishIds;
         }
 
-        public PublishValuesMultipleValueEditor(bool publishIds, ValueEditor wrapped)
-            : this(publishIds, Current.Services.DataTypeService, Current.Logger, wrapped)
+        public PublishValuesMultipleValueEditor(bool publishIds, ValueEditorAttribute attribute)
+            : this(publishIds, Current.Services.DataTypeService, Current.Logger, attribute)
         { }
 
         /// <summary>

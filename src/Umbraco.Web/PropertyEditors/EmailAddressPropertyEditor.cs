@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.EmailAddress, "Email address", "email", Icon="icon-message")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.EmailAddress, "Email address", "email", Icon="icon-message")]
     public class EmailAddressPropertyEditor : PropertyEditor
     {
         /// <summary>

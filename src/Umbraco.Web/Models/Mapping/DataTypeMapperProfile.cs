@@ -6,7 +6,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -17,11 +16,11 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class DataTypeMapperProfile : Profile
     {
-        public DataTypeMapperProfile(IDataTypeService dataTypeService)
+        public DataTypeMapperProfile()
         {
             // create, capture, cache
             var availablePropertyEditorsResolver = new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content);
-            var preValueDisplayResolver = new DataTypeConfigurationFieldDisplayResolver(dataTypeService);
+            var preValueDisplayResolver = new DataTypeConfigurationFieldDisplayResolver();
             var databaseTypeResolver = new DatabaseTypeResolver();
 
             CreateMap<PropertyEditor, PropertyEditorBasic>();

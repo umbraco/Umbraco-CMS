@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a textarea editor.
     /// </summary>
-    [PropertyEditor(Constants.PropertyEditors.Aliases.TextboxMultiple, "Textarea", "textarea", IsMacroParameterEditor = true, ValueType = ValueTypes.Text, Icon="icon-application-window-alt")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.TextboxMultiple, "Textarea", "textarea", IsMacroParameterEditor = true, ValueType = ValueTypes.Text, Icon="icon-application-window-alt")]
     public class TextAreaPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ValueEditor CreateValueEditor() => new TextOnlyValueEditor(base.CreateValueEditor());
+        protected override ValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
 
         /// <inheritdoc />
         protected override ConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor();

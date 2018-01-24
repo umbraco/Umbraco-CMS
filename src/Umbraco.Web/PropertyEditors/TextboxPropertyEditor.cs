@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a textbox editor.
     /// </summary>
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Textbox, "Textbox", "textbox", IsMacroParameterEditor = true, Group = "Common")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.Textbox, "Textbox", "textbox", IsMacroParameterEditor = true, Group = "Common")]
     public class TextboxPropertyEditor : PropertyEditor
     {
         /// <summary>
@@ -18,15 +18,9 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc/>
-        protected override ValueEditor CreateValueEditor()
-        {
-            return new TextOnlyValueEditor(base.CreateValueEditor());
-        }
+        protected override ValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
 
         /// <inheritdoc/>
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new TextboxConfigurationEditor();
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor();
     }
 }

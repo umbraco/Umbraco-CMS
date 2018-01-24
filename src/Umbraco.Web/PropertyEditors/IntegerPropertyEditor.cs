@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Integer, "Numeric", "integer", IsMacroParameterEditor = true, ValueType = ValueTypes.Integer)]
+    [ValueEditor(Constants.PropertyEditors.Aliases.Integer, "Numeric", "integer", IsMacroParameterEditor = true, ValueType = ValueTypes.Integer)]
     public class IntegerPropertyEditor : PropertyEditor
     {
         public IntegerPropertyEditor(ILogger logger)

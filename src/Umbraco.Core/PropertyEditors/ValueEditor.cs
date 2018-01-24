@@ -39,6 +39,23 @@ namespace Umbraco.Core.PropertyEditors
             Validators.AddRange(validators);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValueEditor"/> class.
+        /// </summary>
+        public ValueEditor(ValueEditorAttribute attribute)
+            : this()
+        {
+            if (attribute == null) return;
+
+            var view = attribute.View;
+            if (string.IsNullOrWhiteSpace(view))
+                throw new ArgumentException("The attribute does not specify a view.", nameof(attribute));
+
+            View = view;
+            ValueType = attribute.ValueType;
+            HideLabel = attribute.HideLabel;
+        }
+
         private PreValueCollection _preVals;
         protected PreValueCollection PreValues
         {

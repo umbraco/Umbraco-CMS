@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,17 +12,15 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
     public class FileUploadPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly ILocalizedTextService _textService;
 
-        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, ILocalizedTextService textService)
+        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem,ILocalizedTextService textService)
             : base(logger)
         {
-            if (contentSettings == null) throw new ArgumentNullException(nameof(contentSettings)); // fixme wtf?
-
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
@@ -34,19 +31,16 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override ValueEditor CreateValueEditor()
         {
-            var baseEditor = base.CreateValueEditor();
-            baseEditor.Validators.Add(new UploadFileTypeValidator());
-            return new FileUploadPropertyValueEditor(baseEditor, _mediaFileSystem);
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem);
+            editor.Validators.Add(new UploadFileTypeValidator());
+            return editor;
         }
 
         /// <summary>
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new FileUploadConfigurationEditor(_textService, Logger);
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor(_textService);
 
         /// <summary>
         /// Gets a value indicating whether a property is an upload field.
@@ -173,8 +167,8 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         internal class FileUploadConfigurationEditor : ValueListConfigurationEditor
         {
-            public FileUploadConfigurationEditor(ILocalizedTextService textService, ILogger logger)
-                : base(textService, logger)
+            public FileUploadConfigurationEditor(ILocalizedTextService textService)
+                : base(textService)
             {
                 var field = Fields.First();
                 field.Description = "Enter a max width/height for each thumbnail";
@@ -183,18 +177,13 @@ namespace Umbraco.Web.PropertyEditors
                 field.Validators.Add(new ThumbnailListValidator());
             }
 
-            /// <summary>
-            /// Format the persisted value to work with our multi-val editor.
-            /// </summary>
-            /// <param name="defaultPreVals"></param>
-            /// <param name="persistedPreVals"></param>
-            /// <returns></returns>
-            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+            /// <inheritdoc />
+            public override Dictionary<string, object> ToEditor(ValueListConfiguration defaultConfiguration, ValueListConfiguration configuration)
             {
                 var result = new List<PreValue>();
 
                 //the pre-values just take up one field with a semi-colon delimiter so we'll just parse
-                var dictionary = persistedPreVals.FormatAsDictionary();
+                var dictionary = configuration.FormatAsDictionary();
                 if (dictionary.Any())
                 {
                     //there should only be one val
@@ -215,11 +204,11 @@ namespace Umbraco.Web.PropertyEditors
             /// Take the posted values and convert them to a semi-colon separated list so that its backwards compatible
             /// </summary>
             /// <param name="editorValue"></param>
-            /// <param name="currentValue"></param>
+            /// <param name="configuration"></param>
             /// <returns></returns>
-            public override IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+            public override ValueListConfiguration FromEditor(Dictionary<string, object> editorValue, ValueListConfiguration configuration)
             {
-                var result = base.ConvertEditorToDb(editorValue, currentValue);
+                var result = base.ConvertEditorToDb(editorValue, configuration);
 
                 //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is
                 // semi-colon delimited

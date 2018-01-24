@@ -17,8 +17,6 @@ namespace Umbraco.Core.PropertyEditors
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "(),nq}")]
     public class PropertyEditor : IParameterEditor
     {
-        private readonly PropertyEditorAttribute _attribute;
-
         private ValueEditor _valueEditor;
         private ValueEditor _valueEditorAssigned;
         private ConfigurationEditor _configurationEditor;
@@ -36,16 +34,21 @@ namespace Umbraco.Core.PropertyEditors
             Group = "common";
 
             // assign properties based on the attribute, if it is found
-            _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
-            if (_attribute == null) return;
+            Attribute = GetType().GetCustomAttribute<ValueEditorAttribute>(false);
+            if (Attribute == null) return;
 
-            Alias = _attribute.Alias;
-            Name = _attribute.Name;
-            IsParameterEditor = _attribute.IsMacroParameterEditor;
-            Icon = _attribute.Icon;
-            Group = _attribute.Group;
-            IsDeprecated = _attribute.IsDeprecated;
+            Alias = Attribute.Alias;
+            Name = Attribute.Name;
+            IsParameterEditor = Attribute.IsMacroParameterEditor;
+            Icon = Attribute.Icon;
+            Group = Attribute.Group;
+            IsDeprecated = Attribute.IsDeprecated;
         }
+
+        /// <summary>
+        /// Gets the editor attribute.
+        /// </summary>
+        protected ValueEditorAttribute Attribute { get; }
 
         /// <summary>
         /// Gets a logger.
@@ -126,22 +129,8 @@ namespace Umbraco.Core.PropertyEditors
         protected virtual ValueEditor CreateValueEditor()
         {
             // handle assigned editor
-            if (_valueEditorAssigned != null)
-                return _valueEditorAssigned;
-
-            // create a new editor
-            var editor = new ValueEditor();
-
-            var view = _attribute?.View;
-            if (string.IsNullOrWhiteSpace(view))
-                throw new InvalidOperationException("The editor does not specify a view.");
-            if (view.StartsWith("~/"))
-                view = IOHelper.ResolveUrl(view);
-            editor.View = view;
-
-            editor.ValueType = _attribute.ValueType;
-            editor.HideLabel = _attribute.HideLabel;
-            return editor;
+            // or create a new editor
+            return _valueEditorAssigned ?? new ValueEditor(Attribute);
         }
 
         /// <summary>

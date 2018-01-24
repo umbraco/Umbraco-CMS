@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a boolean editor.
     /// </summary>
-    [PropertyEditor(Constants.PropertyEditors.Aliases.Boolean, "True/False", "boolean", ValueTypes.Integer, IsMacroParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
+    [ValueEditor(Constants.PropertyEditors.Aliases.Boolean, "True/False", "boolean", ValueTypes.Integer, IsMacroParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
     public class TrueFalsePropertyEditor : PropertyEditor
     {
         /// <summary>
