@@ -17,13 +17,16 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<BackOfficeTourFile> GetTours()
         {
+            //Check if it has admin group
+            var isAdmin = UmbracoContext.Current.Security.CurrentUser.Groups.Any(x => x.Alias == "admin");
+
             var result = new List<BackOfficeTourFile>();
 
             if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
                 return result;
 
             var filters = TourFilterResolver.Current.Filters.ToList();
-            
+
             //get all filters that will be applied to all tour aliases
             var aliasOnlyFilters = filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();
 
@@ -36,6 +39,10 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
                 {
+                    var tourFileName = Path.GetFileName(tourFile.TrimEnd('\\'));
+                    //We brake if isAdmin is false as we don't want to show getting-started tour to non-admins
+                    if (tourFileName.Equals("getting-started.json") && isAdmin == false) break;
+
                     TryParseTourFile(tourFile, result, nonPluginFilters, aliasOnlyFilters);
                 }
             }
@@ -79,7 +86,7 @@ namespace Umbraco.Web.Editors
 
             //get the filters specific to this file
             var fileFilters = filters.Where(x => x.TourFileName != null && x.TourFileName.IsMatch(fileName)).ToList();
-            
+
             //If there is any filter applied to match the file only (no tour alias) then ignore the file entirely
             var isFileFiltered = fileFilters.Any(x => x.TourAlias == null);
             if (isFileFiltered) return;
