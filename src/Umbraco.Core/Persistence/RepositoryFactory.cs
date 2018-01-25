@@ -397,5 +397,10 @@ namespace Umbraco.Core.Persistence
                 _logger,
                 _sqlSyntax);
         }
+
+        public IConsentRepository CreateConsentRepository(IScopeUnitOfWork uow)
+        {
+            return new ConsentRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+        }
     }
 }
