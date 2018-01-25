@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IMemberGroup GetByName(string name)
         {
             return IsolatedCache.GetCacheItem<IMemberGroup>(
-                string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
+                string.Format("{0}.{1}", typeof(IMemberGroup).FullName, name),
                 () =>
                 {
                     var qry = new Query<IMemberGroup>().Where(group => group.Name.Equals(name));
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     return result.FirstOrDefault();
                 },
                 //cache for 5 mins since that is the default in the RuntimeCacheProvider
-                TimeSpan.FromMinutes(5), 
+                TimeSpan.FromMinutes(5),
                 //sliding is true
                 true);
         }
