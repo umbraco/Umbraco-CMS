@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver<IMedia>(applicationContext.Services.TextService)))
                 .ForMember(display => display.ContentType, expression => expression.ResolveUsing<MediaTypeBasicResolver>())
                 .ForMember(display => display.MediaLink, expression => expression.ResolveUsing(
                     content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, applicationContext.ProfilingLogger.Logger))))
@@ -70,6 +70,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());            
         }
 
+        //TODO: All of this logic should be moved to the TabsAndPropertiesResolver and not in AfterMap
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
         {
             // Adapted from ContentModelMapper
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Models.Mapping
             
             if (media.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
+                TabsAndPropertiesResolver<IMedia>.AddListView(display, "media", dataTypeService, localizedText);
             }
         }
 

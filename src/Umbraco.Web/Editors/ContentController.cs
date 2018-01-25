@@ -219,7 +219,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinContent
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver<IContent>.AddListView(display, "content", Services.DataTypeService, Services.TextService);
 
             return display;
         }

@@ -217,7 +217,7 @@ namespace Umbraco.Web.Models.Mapping
         /// 
         /// This also ensures that the IsSensitive property display value is set based on the configured IMemberType property type
         /// </remarks>
-        internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver, IValueResolver
+        internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver<IMember>
         {
             private readonly ILocalizedTextService _localizedTextService;
             private readonly IMemberService _memberService;
@@ -238,45 +238,23 @@ namespace Umbraco.Web.Models.Mapping
                 _memberService = memberService;
                 _userService = userService;
             }
-
+            
             /// <summary>
-            /// Explicitly implement to override behavior
+            /// Overridden to deal with custom member properties and permissions
             /// </summary>
-            /// <param name="source"></param>
-            /// <returns></returns>
-            /// <remarks>
-            /// This is required to get access to the <see cref="ResolutionResult"/> object which allows us access to the mapping options
-            /// </remarks>
-            ResolutionResult IValueResolver.Resolve(ResolutionResult source)
-            {
-                //call the base class logic
-                var result = base.Resolve(source);
-
-                var member = (IMember)source.Value;
-                //now we can customize the result and use the ResolutionResult options to get the UmbracoContext
-                var tabs = (List<Tab<ContentPropertyDisplay>>) result.Value;
-
-                //now we can customize the result with the current context, we can get the UmbracoContext from the options
-                CustomizeProperties(source.Context.GetUmbracoContext(), member, tabs);
-
-                return result;
-            }
-
-            /// <summary>
-            /// Overridden to deal with custom member properties
-            /// </summary>
+            /// <param name="umbracoContext"></param>
             /// <param name="content"></param>
             /// <returns></returns>
-            protected override List<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
+            protected override List<Tab<ContentPropertyDisplay>> ResolveCore(UmbracoContext umbracoContext, IMember content)
             {
                 var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
+                
                 IgnoreProperties = content.PropertyTypes
                     .Where(x => x.HasIdentity == false)
                     .Select(x => x.Alias)
                     .ToArray();
 
-                var result = base.ResolveCore(content);
+                var result = base.ResolveCore(umbracoContext, content);
 
                 if (provider.IsUmbracoMembershipProvider() == false)
                 {
@@ -300,6 +278,39 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
+                    }
+                }
+
+                if (umbracoContext != null && umbracoContext.Security.CurrentUser != null
+                    && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+                {
+                    var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", content.ContentTypeId);
+
+                    //Replace the doctype property
+                    var docTypeProperty = result.SelectMany(x => x.Properties)
+                        .First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    docTypeProperty.Value = new List<object>
+                    {
+                        new
+                        {
+                            linkText = content.ContentType.Name,
+                            url = memberTypeLink,
+                            target = "_self",
+                            icon = "icon-item-arrangement"
+                        }
+                    };
+                    docTypeProperty.View = "urllist";
+                }
+
+                //check if there's an approval field
+                var legacyProvider = provider as global::umbraco.providers.members.UmbracoMembershipProvider;
+                if (content.HasIdentity == false && legacyProvider != null)
+                {
+                    var approvedField = legacyProvider.ApprovedPropertyTypeAlias;
+                    var prop = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == approvedField);
+                    if (prop != null)
+                    {
+                        prop.Value = 1;
                     }
                 }
 
@@ -362,63 +373,17 @@ namespace Umbraco.Web.Models.Mapping
 
                 return genericProperties;
             }
-
-            /// <summary>
-            /// Performs some customizations for the properties based on the current context
-            /// </summary>         
-            /// <param name="umbracoContext"></param>
-            /// <param name="member"></param>
-            /// <param name="tabs">The current tab collection</param>
-            /// <remarks>
-            /// If this is a new entity and there is an approved field then we'll set it to true by default.
-            /// </remarks>
-            private void CustomizeProperties(UmbracoContext umbracoContext, IMember member, List<Tab<ContentPropertyDisplay>> tabs)
-            {
-                var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
-                if (umbracoContext != null && umbracoContext.Security.CurrentUser != null
-                    && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-                {
-                    var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", member.ContentTypeId);
-
-                    //Replace the doctype property
-                    var docTypeProperty = tabs.SelectMany(x => x.Properties)
-                        .First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    docTypeProperty.Value = new List<object>
-                    {
-                        new
-                        {
-                            linkText = member.ContentType.Name,
-                            url = memberTypeLink,
-                            target = "_self",
-                            icon = "icon-item-arrangement"
-                        }
-                    };
-                    docTypeProperty.View = "urllist";
-                }
-
-                //check if there's an approval field
-                var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
-                if (member.HasIdentity == false && provider != null)
-                {
-                    var approvedField = provider.ApprovedPropertyTypeAlias;
-                    var prop = tabs.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == approvedField);
-                    if (prop != null)
-                    {
-                        prop.Value = 1;
-                    }
-                }
-            }
-
+            
             /// <summary>
             /// Overridden to assign the IsSensitive property values
             /// </summary>
+            /// <param name="umbracoContext"></param>
             /// <param name="content"></param>
             /// <param name="properties"></param>
             /// <returns></returns>
-            protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties)
+            protected override List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties)
             {
-                var result = base.MapProperties(content, properties);
+                var result = base.MapProperties(umbracoContext, content, properties);
                 var member = (IMember)content;
                 var memberType = member.ContentType;
                 var labelPropEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
@@ -427,8 +392,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     prop.IsSensitive = memberType.IsSensitiveProperty(prop.Alias);
                     //check permissions for viewing sensitive data
-
-                    if (prop.IsSensitive)
+                    if (prop.IsSensitive && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                     {
                         //replace this editor with a label
                         prop.View = labelPropEditor;

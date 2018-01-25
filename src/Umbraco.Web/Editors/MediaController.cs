@@ -115,7 +115,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinMedia
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "media", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver<IMedia>.AddListView(display, "media", Services.DataTypeService, Services.TextService);
 
             return display;
         }

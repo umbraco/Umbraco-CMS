@@ -56,7 +56,7 @@ namespace Umbraco.Web.Models.Mapping
                     expression.MapFrom(content => content.ContentType.AllowedTemplates
                         .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
                         .ToDictionary(t => t.Alias, t => t.Name)))
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver<IContent>(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService), new Lazy<IContentService>(() => applicationContext.Services.ContentService))))
                 .AfterMap((content, display) => AfterMap(content, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
@@ -100,6 +100,8 @@ namespace Umbraco.Web.Models.Mapping
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService,
             ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
+            //TODO: All of this logic should be moved to the TabsAndPropertiesResolver and not in AfterMap
+
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
             //TODO: STOP using these extension methods, they are not testable and require singletons to be setup
             var parent = content.Parent();
@@ -113,7 +115,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (content.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
+                TabsAndPropertiesResolver<IContent>.AddListView(display, "content", dataTypeService, localizedText);
             }
         }
 
