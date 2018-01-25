@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             return Mapper.Map<TIn, TOut>(obj, opt => opt.Items["UmbracoContext"] = umbCtx);
         }
-
+        
         /// <summary>
         /// Returns an <see cref="UmbracoContext"/> from the mapping options
         /// </summary>
@@ -32,11 +32,11 @@ namespace Umbraco.Web.Models.Mapping
         /// <remarks>
         /// If an UmbracoContext is not found in the mapping options, it will try to retrieve it from the singleton
         /// </remarks>
-        public static UmbracoContext GetUmbracoContext(this ResolutionResult res)
+        public static UmbracoContext GetUmbracoContext(this ResolutionContext res)
         {
             //get the context from the mapping options set during a mapping operation
             object umbCtx;
-            if (res.Context.Options.Items.TryGetValue("UmbracoContext", out umbCtx))
+            if (res.Options.Items.TryGetValue("UmbracoContext", out umbCtx))
             {
                 var umbracoContext = umbCtx as UmbracoContext;
                 if (umbracoContext != null) return umbracoContext;

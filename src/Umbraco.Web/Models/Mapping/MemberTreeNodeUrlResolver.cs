@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
 
         private string ResolveCore(ResolutionResult res, IMember source)
         {
-            var umbCtx = res.GetUmbracoContext();
+            var umbCtx = res.Context.GetUmbracoContext();
             //map the tree node url
             if (umbCtx != null)
             {

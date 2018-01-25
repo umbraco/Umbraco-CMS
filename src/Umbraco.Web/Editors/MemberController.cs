@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
                     {
                         HandleContentNotFound(key);
                     }
-                    return Mapper.Map<IMember, MemberDisplay>(foundMember);
+                    return AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(foundMember, UmbracoContext);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
 
                 //TODO: Support editing custom properties for members with a custom membership provider here.
@@ -238,7 +238,7 @@ namespace Umbraco.Web.Editors
 
                     emptyContent = new Member(contentType);
                     emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(provider.MinRequiredPasswordLength, provider.MinRequiredNonAlphanumericCharacters);
-                    return Mapper.Map<IMember, MemberDisplay>(emptyContent);
+                    return AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(emptyContent, UmbracoContext);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 //TODO: Support editing custom properties for members with a custom membership provider here.
 
@@ -247,7 +247,7 @@ namespace Umbraco.Web.Editors
                     //we need to return a scaffold of a 'simple' member - basically just what a membership provider can edit
                     emptyContent = MemberService.CreateGenericMembershipProviderMember("", "", "", "");
                     emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
-                    return Mapper.Map<IMember, MemberDisplay>(emptyContent);
+                    return AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(emptyContent, UmbracoContext);
             }
         }
 
@@ -287,7 +287,7 @@ namespace Umbraco.Web.Editors
             //Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
             if (ModelState.IsValid == false)
             {
-                var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+                var forDisplay = AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(contentItem.PersistedContent, UmbracoContext);
                 forDisplay.Errors = ModelState.ToErrorDictionary();
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
@@ -329,7 +329,7 @@ namespace Umbraco.Web.Editors
             //If we've had problems creating/updating the user with the provider then return the error
             if (ModelState.IsValid == false)
             {
-                var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+                var forDisplay = AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(contentItem.PersistedContent, UmbracoContext);
                 forDisplay.Errors = ModelState.ToErrorDictionary();
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
@@ -367,7 +367,7 @@ namespace Umbraco.Web.Editors
             contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
 
             //return the updated model
-            var display = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+            var display = AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(contentItem.PersistedContent, UmbracoContext);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);

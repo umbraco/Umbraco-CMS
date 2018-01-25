@@ -25,12 +25,7 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
-            config.CreateMap<MembershipUser, MemberDisplay>()
-                .ConvertUsing(user =>
-                {
-                    var member = Mapper.Map<MembershipUser, IMember>(user);
-                    return Mapper.Map<IMember, MemberDisplay>(member);
-                });
+            config.CreateMap<MembershipUser, MemberDisplay>().ConvertUsing<MembershipUserTypeConverter>();
 
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
@@ -262,7 +257,7 @@ namespace Umbraco.Web.Models.Mapping
                 var tabs = (List<Tab<ContentPropertyDisplay>>) result.Value;
 
                 //now we can customize the result with the current context, we can get the UmbracoContext from the options
-                CustomizeProperties(source.GetUmbracoContext(), member, tabs);
+                CustomizeProperties(source.Context.GetUmbracoContext(), member, tabs);
 
                 return result;
             }
@@ -498,6 +493,21 @@ namespace Umbraco.Web.Models.Mapping
                         {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
                     };
                 }
+            }
+        }
+
+        /// <summary>
+        /// A converter to go from a <see cref="MembershipUser"/> to a <see cref="MemberDisplay"/>
+        /// </summary>
+        internal class MembershipUserTypeConverter : ITypeConverter<MembershipUser, MemberDisplay>
+        {
+            public MemberDisplay Convert(ResolutionContext context)
+            {
+                var source = (MembershipUser)context.SourceValue;
+                //first convert to IMember
+                var member = Mapper.Map<MembershipUser, IMember>(source);
+                //then convert to MemberDisplay
+                return AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(member, context.GetUmbracoContext());
             }
         }
     }
