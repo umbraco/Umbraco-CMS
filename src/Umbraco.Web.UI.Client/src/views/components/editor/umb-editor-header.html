@@ -75,8 +75,10 @@
 
         </div>
 
-        <div ng-if="splitViewOpen">
-            <a href="" ng-click="closeSplitView()">Close</a>
+        <div ng-if="splitViewOpen" style="margin-left: 20px;">
+            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
+                <i class="icon-delete"></i>
+            </a>
         </div>
 
         <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
