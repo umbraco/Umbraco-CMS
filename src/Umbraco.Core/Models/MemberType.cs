@@ -76,11 +76,11 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanEditProperty(string propertyTypeAlias)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            MemberTypePropertyProfileAccess propertyProfile;
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
             {
-                return MemberTypePropertyTypes[propertyTypeAlias].IsEditable;
+                return propertyProfile.IsEditable;
             }
-
             return false;
         }
 
@@ -91,11 +91,11 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanViewProperty(string propertyTypeAlias)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            MemberTypePropertyProfileAccess propertyProfile;
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
             {
-                return MemberTypePropertyTypes[propertyTypeAlias].IsVisible;
+                return propertyProfile.IsVisible;
             }
-
             return false;
         }
 
@@ -106,11 +106,11 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool IsSensitiveProperty(string propertyTypeAlias)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            MemberTypePropertyProfileAccess propertyProfile;
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
             {
-                return MemberTypePropertyTypes[propertyTypeAlias].IsSensitive;
+                return propertyProfile.IsSensitive;
             }
-
             return false;
         }
 
@@ -121,9 +121,10 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanEditProperty(string propertyTypeAlias, bool value)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            MemberTypePropertyProfileAccess propertyProfile;
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
             {
-                MemberTypePropertyTypes[propertyTypeAlias].IsEditable = value;
+                propertyProfile.IsEditable = value;
             }
             else
             {
@@ -139,9 +140,10 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanViewProperty(string propertyTypeAlias, bool value)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            MemberTypePropertyProfileAccess propertyProfile;
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
             {
-                MemberTypePropertyTypes[propertyTypeAlias].IsVisible = value;
+                propertyProfile.IsVisible = value;
             }
             else
             {
@@ -157,9 +159,10 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetIsSensitiveProperty(string propertyTypeAlias, bool value)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            MemberTypePropertyProfileAccess propertyProfile;
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out propertyProfile))
             {
-                MemberTypePropertyTypes[propertyTypeAlias].IsSensitive = value;
+                propertyProfile.IsSensitive = value;
             }
             else
             {

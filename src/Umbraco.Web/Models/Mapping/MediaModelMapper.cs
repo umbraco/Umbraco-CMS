@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
-                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                .ForMember(display => display.TreeNodeUrl, opt => opt.ResolveUsing(new ContentTreeNodeUrlResolver<IMedia, MediaTreeController>()))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Published, expression => expression.Ignore())
@@ -74,23 +74,14 @@ namespace Umbraco.Web.Models.Mapping
         {
             // Adapted from ContentModelMapper
             //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            //TODO: STOP using these extension methods, they are not testable and require singletons to be setup
             var parent = media.Parent();
             display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
-
-            //map the tree node url
-            if (HttpContext.Current != null)
-            {
-                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                var url = urlHelper.GetUmbracoApiService<MediaTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
-                display.TreeNodeUrl = url;
-            }
-
+            
             if (media.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
             }
-
-            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText);
         }
 
         /// <summary>
@@ -101,9 +92,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override ContentTypeBasic ResolveCore(IMedia source)
             {
-                //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                //If this is a web request and there's a user signed in and the 
-                // user has access to the settings section, we will 
+                //TODO: We can resolve the UmbracoContext from the IValueResolver options!
                 if (HttpContext.Current != null && UmbracoContext.Current != null &&
                     UmbracoContext.Current.Security.CurrentUser != null
                     && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants

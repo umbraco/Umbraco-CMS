@@ -227,6 +227,7 @@
         <key alias="addTextBox">Add another text box</key>
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
+        <key alias="isSensitiveValue">Your user permissions do not allow access to this property</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>

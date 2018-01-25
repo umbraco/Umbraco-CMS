@@ -34,6 +34,9 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool HideLabel { get; set; }
 
         [DataMember(Name = "validation")]
-        public PropertyTypeValidation Validation { get; set; }        
+        public PropertyTypeValidation Validation { get; set; }
+
+        [DataMember(Name = "isSensitiveData")]
+        public bool IsSensitive { get; set; }
     }
 }

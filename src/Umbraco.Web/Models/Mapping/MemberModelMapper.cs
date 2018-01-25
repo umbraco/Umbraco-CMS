@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
-using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using AutoMapper;
@@ -14,7 +13,6 @@ using Umbraco.Web.Models.ContentEditing;
 using System.Linq;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
-using Umbraco.Web.Trees;
 using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
 
 namespace Umbraco.Web.Models.Mapping
@@ -58,7 +56,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(member => member.FailedPasswordAttempts, expression => expression.Ignore())
                 .ForMember(member => member.DeletedDate, expression => expression.Ignore())
                 //TODO: Support these eventually
-                .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())                
+                .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
                 .ForMember(member => member.RawPasswordAnswerValue, expression => expression.Ignore());
 
             //FROM IMember TO MediaItemDisplay
@@ -69,10 +67,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new MemberTabsAndPropertiesResolver(applicationContext.Services.TextService, applicationContext.Services.MemberService, applicationContext.Services.UserService)))
                 .ForMember(display => display.MemberProviderFieldMapping, expression => expression.ResolveUsing(new MemberProviderFieldMappingResolver()))
                 .ForMember(display => display.MembershipScenario,
-                    expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))
+                    expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(applicationContext.Services.MemberTypeService)))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Published, expression => expression.Ignore())
@@ -81,9 +79,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
-                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
-                .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
-                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, applicationContext.Services.UserService, member, display, applicationContext.Services.TextService));
+                .ForMember(display => display.TreeNodeUrl, opt => opt.ResolveUsing(new MemberTreeNodeUrlResolver()))
+                .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore());
+                //.AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, applicationContext.Services.UserService, member, display, applicationContext.Services.TextService));
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
@@ -100,14 +98,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
 
             //FROM MembershipUser TO MemberBasic
-            config.CreateMap<MembershipUser, MemberBasic>()                
+            config.CreateMap<MembershipUser, MemberBasic>()
                 //we're giving this entity an ID of 0 - we cannot really map it but it needs an id so the system knows it's not a new entity
                 .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                 .ForMember(display => display.Udi, expression => expression.Ignore())
                 .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                 .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                 .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                .ForMember(member => member.Owner, expression => expression.UseValue(new UserProfile {Name = "Admin", UserId = 0}))
+                .ForMember(member => member.Owner, expression => expression.UseValue(new UserProfile { Name = "Admin", UserId = 0 }))
                 .ForMember(member => member.Icon, expression => expression.UseValue("icon-user"))
                 .ForMember(member => member.Name, expression => expression.MapFrom(user => user.UserName))
                 .ForMember(member => member.Email, expression => expression.MapFrom(content => content.Email))
@@ -138,118 +136,10 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
-        /// Maps the generic tab with custom properties for content
-        /// </summary>
-        /// <param name="memberService"></param>
-        /// <param name="userService"></param>
-        /// <param name="member"></param>
-        /// <param name="display"></param>
-        /// <param name="localizedText"></param>
-        /// <remarks>
-        /// If this is a new entity and there is an approved field then we'll set it to true by default.
-        /// </remarks>
-        private static void MapGenericCustomProperties(IMemberService memberService, IUserService userService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
-        {
-            var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
-            //map the tree node url
-            if (HttpContext.Current != null)
-            {
-                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                var url = urlHelper.GetUmbracoApiService<MemberTreeController>(controller => controller.GetTreeNode(display.Key.ToString("N"), null));
-                display.TreeNodeUrl = url;
-            }
-
-            var genericProperties = new List<ContentPropertyDisplay>
-            {
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/membertype"),
-                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
-                },
-                GetLoginProperty(memberService, member, display, localizedText),
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("general/email"),
-                    Value = display.Email,
-                    View = "email",
-                    Validation = {Mandatory = true}
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("password"),
-                    //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
-                    // only when creating a new member and we want to have a generated password pre-filled.
-                    Value = new Dictionary<string, object>
-                    {
-                        {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
-                        {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
-                    },
-                    //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
-                    View = "changepassword",
-                    //initialize the dictionary with the configuration from the default membership provider
-                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration(userService))
-                    {
-                        //the password change toggle will only be displayed if there is already a password assigned.
-                        {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
-                    }
-                },
-                new ContentPropertyDisplay
-                {
-                    Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = localizedText.Localize("content/membergroup"),
-                    Value = GetMemberGroupValue(display.Username),
-                    View = "membergroups",
-                    Config = new Dictionary<string, object> {{"IsRequired", true}}
-                }
-            };
-
-            TabsAndPropertiesResolver.MapGenericProperties(member, display, localizedText, genericProperties, properties =>
-            {
-                if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
-                    && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
-                {
-                    var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", member.ContentTypeId);
-
-                    //Replace the doctype property
-                    var docTypeProperty = properties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    docTypeProperty.Value = new List<object>
-                    {
-                        new
-                        {
-                            linkText = member.ContentType.Name,
-                            url = memberTypeLink,
-                            target = "_self",
-                            icon = "icon-item-arrangement"
-                        }
-                    };
-                    docTypeProperty.View = "urllist";
-                }
-            });
-
-            //check if there's an approval field
-            var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
-            if (member.HasIdentity == false && provider != null)
-            {
-                var approvedField = provider.ApprovedPropertyTypeAlias;
-                var prop = display.Properties.FirstOrDefault(x => x.Alias == approvedField);
-                if (prop != null)
-                {
-                    prop.Value = 1;
-                }
-            }
-        }
-
-        /// <summary>
         /// Returns the login property display field
         /// </summary>
         /// <param name="memberService"></param>
         /// <param name="member"></param>
-        /// <param name="display"></param>
         /// <param name="localizedText"></param>
         /// <returns></returns>
         /// <remarks>
@@ -257,13 +147,13 @@ namespace Umbraco.Web.Models.Mapping
         /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively
         /// allow that.
         /// </remarks>
-        internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, MemberDisplay display, ILocalizedTextService localizedText)
+        internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, ILocalizedTextService localizedText)
         {
             var prop = new ContentPropertyDisplay
             {
                 Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                 Label = localizedText.Localize("login"),
-                Value = display.Username
+                Value = member.Username
             };
 
             var scenario = memberService.GetMembershipScenario();
@@ -329,24 +219,60 @@ namespace Umbraco.Web.Models.Mapping
         /// <remarks>
         /// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
         /// an admin cannot actually set isLockedOut = true, they can only unlock.
+        /// 
+        /// This also ensures that the IsSensitive property display value is set based on the configured IMemberType property type
         /// </remarks>
-        internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver
+        internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver, IValueResolver
         {
             private readonly ILocalizedTextService _localizedTextService;
+            private readonly IMemberService _memberService;
+            private readonly IUserService _userService;
 
-            public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+            public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService)
                 : base(localizedTextService)
             {
                 _localizedTextService = localizedTextService;
+                _memberService = memberService;
+                _userService = userService;
             }
 
             public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService,
-                IEnumerable<string> ignoreProperties) : base(localizedTextService, ignoreProperties)
+                IEnumerable<string> ignoreProperties, IMemberService memberService, IUserService userService) : base(localizedTextService, ignoreProperties)
             {
                 _localizedTextService = localizedTextService;
+                _memberService = memberService;
+                _userService = userService;
             }
 
-            protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
+            /// <summary>
+            /// Explicitly implement to override behavior
+            /// </summary>
+            /// <param name="source"></param>
+            /// <returns></returns>
+            /// <remarks>
+            /// This is required to get access to the <see cref="ResolutionResult"/> object which allows us access to the mapping options
+            /// </remarks>
+            ResolutionResult IValueResolver.Resolve(ResolutionResult source)
+            {
+                //call the base class logic
+                var result = base.Resolve(source);
+
+                var member = (IMember)source.Value;
+                //now we can customize the result and use the ResolutionResult options to get the UmbracoContext
+                var tabs = (List<Tab<ContentPropertyDisplay>>) result.Value;
+
+                //now we can customize the result with the current context, we can get the UmbracoContext from the options
+                CustomizeProperties(source.GetUmbracoContext(), member, tabs);
+
+                return result;
+            }
+
+            /// <summary>
+            /// Overridden to deal with custom member properties
+            /// </summary>
+            /// <param name="content"></param>
+            /// <returns></returns>
+            protected override List<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
             {
                 var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
@@ -355,7 +281,7 @@ namespace Umbraco.Web.Models.Mapping
                     .Select(x => x.Alias)
                     .ToArray();
 
-                var result = base.ResolveCore(content).ToArray();
+                var result = base.ResolveCore(content);
 
                 if (provider.IsUmbracoMembershipProvider() == false)
                 {
@@ -366,12 +292,10 @@ namespace Umbraco.Web.Models.Mapping
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
                     }
-
-                    return result;
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider) provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
@@ -382,17 +306,150 @@ namespace Umbraco.Web.Models.Mapping
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
                     }
-
-                    return result;
                 }
+
+                return result;
+            }
+
+            protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
+            {
+                var member = (IMember) content;
+                var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+                var genericProperties = new List<ContentPropertyDisplay>
+                {
+                    new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = _localizedTextService.Localize("content/membertype"),
+                        //Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                        Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
+                        View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                    },
+                    GetLoginProperty(_memberService, member, _localizedTextService),
+                    new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = _localizedTextService.Localize("general/email"),
+                        Value = member.Email,
+                        View = "email",
+                        Validation = {Mandatory = true}
+                    },
+                    new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = _localizedTextService.Localize("password"),
+                        //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
+                        // only when creating a new member and we want to have a generated password pre-filled.
+                        Value = new Dictionary<string, object>
+                        {
+                            {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
+                            {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
+                        },
+                        //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
+                        View = "changepassword",
+                        //initialize the dictionary with the configuration from the default membership provider
+                        Config = new Dictionary<string, object>(membersProvider.GetConfiguration(_userService))
+                        {
+                            //the password change toggle will only be displayed if there is already a password assigned.
+                            {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+                        }
+                    },
+                    new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = _localizedTextService.Localize("content/membergroup"),
+                        Value = GetMemberGroupValue(member.Username),
+                        View = "membergroups",
+                        Config = new Dictionary<string, object> {{"IsRequired", true}}
+                    }
+                };
+
+                return genericProperties;
+            }
+
+            /// <summary>
+            /// Performs some customizations for the properties based on the current context
+            /// </summary>         
+            /// <param name="umbracoContext"></param>
+            /// <param name="member"></param>
+            /// <param name="tabs">The current tab collection</param>
+            /// <remarks>
+            /// If this is a new entity and there is an approved field then we'll set it to true by default.
+            /// </remarks>
+            private void CustomizeProperties(UmbracoContext umbracoContext, IMember member, List<Tab<ContentPropertyDisplay>> tabs)
+            {
+                var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+                if (umbracoContext != null && umbracoContext.Security.CurrentUser != null
+                    && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+                {
+                    var memberTypeLink = string.Format("#/member/memberTypes/edit/{0}", member.ContentTypeId);
+
+                    //Replace the doctype property
+                    var docTypeProperty = tabs.SelectMany(x => x.Properties)
+                        .First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    docTypeProperty.Value = new List<object>
+                    {
+                        new
+                        {
+                            linkText = member.ContentType.Name,
+                            url = memberTypeLink,
+                            target = "_self",
+                            icon = "icon-item-arrangement"
+                        }
+                    };
+                    docTypeProperty.View = "urllist";
+                }
+
+                //check if there's an approval field
+                var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
+                if (member.HasIdentity == false && provider != null)
+                {
+                    var approvedField = provider.ApprovedPropertyTypeAlias;
+                    var prop = tabs.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == approvedField);
+                    if (prop != null)
+                    {
+                        prop.Value = 1;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Overridden to assign the IsSensitive property values
+            /// </summary>
+            /// <param name="content"></param>
+            /// <param name="properties"></param>
+            /// <returns></returns>
+            protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties)
+            {
+                var result = base.MapProperties(content, properties);
+                var member = (IMember)content;
+                var memberType = member.ContentType;
+                var labelPropEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
+                //now update the IsSensitive value
+                foreach (var prop in result)
+                {
+                    prop.IsSensitive = memberType.IsSensitiveProperty(prop.Alias);
+                    //check permissions for viewing sensitive data
+
+                    if (prop.IsSensitive)
+                    {
+                        //replace this editor with a label
+                        prop.View = labelPropEditor;
+                        //replace the value
+                        prop.Value = string.Format("<em class='text-warning'>{0}</em>", _localizedTextService.Localize("content/isSensitiveValue"));
+                    }
+                }
+                return result;
             }
         }
 
         internal class MembershipScenarioMappingResolver : ValueResolver<IMember, MembershipScenario>
         {
-            private readonly Lazy<IMemberTypeService> _memberTypeService;
+            private readonly IMemberTypeService _memberTypeService;
 
-            public MembershipScenarioMappingResolver(Lazy<IMemberTypeService> memberTypeService)
+            public MembershipScenarioMappingResolver(IMemberTypeService memberTypeService)
             {
                 _memberTypeService = memberTypeService;
             }
@@ -405,7 +462,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
-                var memberType = _memberTypeService.Value.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+                var memberType = _memberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 return memberType != null
                     ? MembershipScenario.CustomProviderWithUmbracoLink
                     : MembershipScenario.StandaloneCustomProvider;
@@ -432,7 +489,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider) provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
                     return new Dictionary<string, string>
                     {
@@ -445,3 +502,6 @@ namespace Umbraco.Web.Models.Mapping
         }
     }
 }
+
+
+

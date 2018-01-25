@@ -47,7 +47,7 @@ namespace Umbraco.Web.Models.Mapping
                             : content.GetContentUrls(UmbracoContext.Current)))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.AllowPreview, expression => expression.Ignore())
-                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                .ForMember(display => display.TreeNodeUrl, opt => opt.ResolveUsing(new ContentTreeNodeUrlResolver<IContent, ContentTreeController>()))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
@@ -101,16 +101,9 @@ namespace Umbraco.Web.Models.Mapping
             ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
             // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            //TODO: STOP using these extension methods, they are not testable and require singletons to be setup
             var parent = content.Parent();
-            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
-
-            //map the tree node url
-            if (HttpContext.Current != null)
-            {
-                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
-                display.TreeNodeUrl = url;
-            }
+            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));            
 
             //set default template if template isn't set
             if (string.IsNullOrEmpty(display.TemplateAlias))
@@ -122,8 +115,6 @@ namespace Umbraco.Web.Models.Mapping
             {
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
-
-            TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText);
         }
 
         /// <summary>
@@ -134,9 +125,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override ContentTypeBasic ResolveCore(IContent source)
             {
-                //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                //If this is a web request and there's a user signed in and the 
-                // user has access to the settings section, we will 
+                //TODO: We can resolve the UmbracoContext from the IValueResolver options!
                 if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                     && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                 {

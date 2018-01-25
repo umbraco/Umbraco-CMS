@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Factories
                     //Add the standard PropertyType to the current list
                     propertyTypes.Add(standardPropertyType.Value);
                     
-                    //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+                    //Internal dictionary for adding "MemberCanEdit", "VisibleOnProfile", "IsSensitive" properties to each PropertyType
                     memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
                         new MemberTypePropertyProfileAccess(false, false, false));
                 }
