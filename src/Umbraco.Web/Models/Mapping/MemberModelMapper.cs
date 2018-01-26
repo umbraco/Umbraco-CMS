@@ -386,7 +386,7 @@ namespace Umbraco.Web.Models.Mapping
                 var result = base.MapProperties(umbracoContext, content, properties);
                 var member = (IMember)content;
                 var memberType = member.ContentType;
-                var labelPropEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
+
                 //now update the IsSensitive value
                 foreach (var prop in result)
                 {
@@ -394,10 +394,10 @@ namespace Umbraco.Web.Models.Mapping
                     //check permissions for viewing sensitive data
                     if (prop.IsSensitive && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                     {
-                        //replace this editor with a label
-                        prop.View = labelPropEditor;
+                        //replace this editor with a sensitivevalue
+                        prop.View = "sensitivevalue";
                         //replace the value
-                        prop.Value = string.Format("<em class='text-warning'>{0}</em>", _localizedTextService.Localize("content/isSensitiveValue"));
+                        prop.Value = _localizedTextService.Localize("content/isSensitiveValue");
                     }
                 }
                 return result;
