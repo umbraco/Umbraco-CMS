@@ -14,6 +14,7 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 using umbraco;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Web.Trees
 {
@@ -21,6 +22,8 @@ namespace Umbraco.Web.Trees
     [PluginController("UmbracoTrees")]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
+        public static event TypedEventHandler<ApplicationTreeController, ApplicationTreeRenderingEventArgs> ApplicationTreeNodeRendering;
+
         /// <summary>
         /// Returns the tree nodes for an application
         /// </summary>
@@ -72,6 +75,9 @@ namespace Umbraco.Web.Trees
 
             var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
             multiTree.Name = ui.Text("sections", application);
+
+            ApplicationTreeNodeRendering?.Invoke(this, new ApplicationTreeRenderingEventArgs(application, tree, queryStrings, multiTree));
+
             return multiTree;
         }
 

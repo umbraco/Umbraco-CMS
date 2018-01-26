@@ -489,6 +489,7 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
+    <Compile Include="Trees\ApplicationTreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
