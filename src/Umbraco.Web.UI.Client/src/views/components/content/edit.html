@@ -7,8 +7,8 @@
         <umb-editor-view ng-if="!page.loading">
             
             <div class="umb-split-views">
-                <div class="umb-split-view" ng-repeat="editor in editors">
-
+                <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
+                    
                     <umb-load-indicator
                         ng-if="editor.loading">
                     </umb-load-indicator>

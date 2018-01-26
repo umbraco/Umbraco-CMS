@@ -438,23 +438,32 @@
     };
 
     $scope.closeSplitView = function(index, editor) {
-      $scope.editors.splice(index, 1);
+      // hacky animation stuff - it will be much better when angular is upgraded
+      editor.loading = true;
+      editor.collapsed = true;
+      $timeout(function(){
+        $scope.editors.splice(index, 1);
+      }, 400);
     };
 
     $scope.openInSplitView = function() {
 
       var editor = {};
+      // hacking animation states - these should hopefully be easier to do when we upgrade angular
+      editor.collapsed = true;
       editor.loading = true;
       $scope.editors.push(editor);
       var editorIndex = $scope.editors.length - 1;
-
+      $timeout(function(){ 
+        $scope.editors[editorIndex].collapsed = false;
+      }, 100);
+      
       // fake loading of content
       $timeout(function(){
         $scope.editors[editorIndex].content = angular.copy($scope.content);
         $scope.editors[editorIndex].content.name = "What a variant";
         $scope.editors[editorIndex].loading = false;
       }, 500);
-
     };
 
     function moveNode(node, target) {

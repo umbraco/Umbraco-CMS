@@ -29,11 +29,15 @@
 	flex-basis: auto;
 	position: relative;
 	background: transparent;
-	//transition: width 0.4s ease-in-out;
+	transition: flex-grow 0.4s ease-in-out;
 }
 
-.umb-split-view:first-of-type {
-	border-right: 2px solid @gray-9;
+.umb-split-view--collapsed {
+	flex-grow: 0.00001;
+}
+
+.umb-split-view + .umb-split-view {
+	border-left: 2px solid @gray-9;
 }
 
 .umb-split-view__content {
