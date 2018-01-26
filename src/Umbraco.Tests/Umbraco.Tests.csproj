@@ -350,7 +350,6 @@
     <Compile Include="Models\LanguageTests.cs" />
     <Compile Include="Models\MemberGroupTests.cs" />
     <Compile Include="Models\MemberTests.cs" />
-    <Compile Include="Models\PreValueCollectionTests.cs" />
     <Compile Include="Models\PropertyGroupTests.cs" />
     <Compile Include="Models\PropertyTypeTests.cs" />
     <Compile Include="Models\RelationTests.cs" />
@@ -420,7 +419,6 @@
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
     <Compile Include="PropertyEditors\MultiValuePropertyEditorTests.cs" />
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
-    <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverterTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
     <Compile Include="PublishedContent\RootNodeTests.cs" />
@@ -437,7 +435,6 @@
     <Compile Include="Packaging\PackageInstallationTest.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
-    <Compile Include="Services\PreValueConverterTests.cs" />
     <Compile Include="Services\RelationServiceTests.cs" />
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />

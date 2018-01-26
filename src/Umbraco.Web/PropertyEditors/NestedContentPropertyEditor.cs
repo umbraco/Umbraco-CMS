@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
         private IDictionary<string, object> _defaultPreValues;
-        public override IDictionary<string, object> DefaultPreValues
+        public override IDictionary<string, object> DefaultConfiguration
         {
             get => _defaultPreValues;
             set => _defaultPreValues = value;
@@ -37,7 +37,7 @@ namespace Umbraco.Web.PropertyEditors
             // Setup default values
             _defaultPreValues = new Dictionary<string, object>
             {
-                {NestedContentConfigurationEditor.ContentTypesPreValueKey, ""},
+                {"contentTypes", ""},
                 {"minItems", 0},
                 {"maxItems", 0},
                 {"confirmDeletes", "1"},
@@ -65,49 +65,6 @@ namespace Umbraco.Web.PropertyEditors
 
         #endregion
 
-        #region DataType Configuration
-
-        public class Configuration
-        {
-            public NestedContentType[] ContentTypes { get; set; }
-            public int? MinItems { get; set; }
-            public int? MaxItems { get; set; }
-            public bool ConfirmDeletes { get; set; }
-            public bool ShowIcons { get; set; }
-            public bool HideLabel { get; set; }
-
-            public class NestedContentType
-            {
-                [JsonProperty("ncAlias")]
-                public string Alias { get; set; }
-                [JsonProperty("ncTabAlias")]
-                public string Tab { get; set; }
-                [JsonProperty("nameTemplate")]
-                public string Template { get; set; }
-            }
-        }
-
-        public override object DeserializeConfiguration(string json)
-        {
-            return JsonConvert.DeserializeObject<Configuration>(json);
-
-            // fixme - can we have issues converting true/1 and false/0?
-            //var d = preValues.PreValuesAsDictionary;
-            //return new Configuration
-            //{
-            //    ContentTypes = d.TryGetValue("contentTypes", out var preValue)
-            //        ? JsonConvert.DeserializeObject<Configuration.NestedContentType[]>(preValue.Value)
-            //        : Array.Empty<Configuration.NestedContentType>(),
-            //    MinItems = d.TryGetValue("minItems", out preValue) && int.TryParse(preValue.Value, out var minItems) ? (int?) minItems : null,
-            //    MaxItems = d.TryGetValue("maxItems", out preValue) && int.TryParse(preValue.Value, out var maxItems) ? (int?) maxItems : null,
-            //    ConfirmDeletes = d.TryGetValue("confirmDeletes", out preValue) && preValue.Value == "1",
-            //    ShowIcons = d.TryGetValue("showIcons", out preValue) && preValue.Value == "1",
-            //    HideLabel = d.TryGetValue("hideLabel", out preValue) && preValue.Value == "1"
-            //};
-        }
-
-        #endregion
-
         #region Value Editor
 
         protected override ValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
@@ -125,18 +82,18 @@ namespace Umbraco.Web.PropertyEditors
 
             internal ServiceContext Services => Current.Services;
 
-            public override void ConfigureForDisplay(PreValueCollection preValues)
+            /// <inheritdoc />
+            public override object Configuration
             {
-                base.ConfigureForDisplay(preValues);
-
-                var asDictionary = preValues.PreValuesAsDictionary.ToDictionary(x => x.Key, x => x.Value.Value);
-                if (asDictionary.ContainsKey("hideLabel"))
+                get => base.Configuration;
+                set
                 {
-                    var boolAttempt = asDictionary["hideLabel"].TryConvertTo<bool>();
-                    if (boolAttempt.Success)
-                    {
-                        HideLabel = boolAttempt.Result;
-                    }
+                    if (value == null)
+                        throw new ArgumentNullException(nameof(value));
+                    if (!(value is NestedContentConfiguration configuration))
+                        throw new ArgumentException($"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
+                    HideLabel = configuration.HideLabel.TryConvertTo<bool>().Result;
+                    base.Configuration = value;
                 }
             }
 

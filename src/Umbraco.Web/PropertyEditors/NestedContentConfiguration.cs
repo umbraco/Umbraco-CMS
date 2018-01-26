@@ -1,20 +1,21 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Newtonsoft.Json;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the nested content value editor.
     /// </summary>
-    public class NestedContentConfiguration : ConfigurationEditor
+    public class NestedContentConfiguration
     {
         [ConfigurationField("contentTypes", "Doc Types", "views/propertyeditors/nestedcontent/nestedcontent.doctypepicker.html", Description = "Select the doc types to use as the data blueprint.")]
-        public string[] ContentTypes { get; set; }
+        public ContentType[] ContentTypes { get; set; }
 
         [ConfigurationField("minItems", "Min Items", "number", Description = "Set the minimum number of items allowed.")]
-        public int MinItems { get; set; }
+        public int? MinItems { get; set; }
 
         [ConfigurationField("maxItems", "Max Items", "number", Description = "Set the maximum number of items allowed.")]
-        public int MaxItems { get; set; }
+        public int? MaxItems { get; set; }
 
         [ConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
         public string ConfirmDeletes { get; set; } // fixme bool
@@ -24,5 +25,17 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
         public string HideLabel { get; set; } // fixme bool
+
+        public class ContentType
+        {
+            [JsonProperty("ncAlias")]
+            public string Alias { get; set; }
+
+            [JsonProperty("ncTabAlias")]
+            public string TabAlias { get; set; }
+
+            [JsonProperty("nameTemplate")]
+            public string Template { get; set; }
+        }
     }
 }

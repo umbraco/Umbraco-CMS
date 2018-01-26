@@ -409,15 +409,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var a in allPropertyDataDtos)
                 a.PropertyTypeDto = indexedPropertyTypeDtos[a.PropertyTypeId];
 
-            // lazy access to prevalue for data types if any property requires tag support
-            var pre = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
-            {
-                return Database.FetchByGroups<DataTypePreValueDto, int>(allPropertyTypeIds, 2000, batch =>
-                    SqlContext.Sql()
-                        .Select<DataTypePreValueDto>()
-                        .From<DataTypePreValueDto>()
-                        .WhereIn<DataTypePreValueDto>(x => x.DataTypeNodeId, batch));
-            });
+            //// lazy access to prevalue for data types if any property requires tag support
+            //var pre = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
+            //{
+            //    return Database.FetchByGroups<DataTypePreValueDto, int>(allPropertyTypeIds, 2000, batch =>
+            //        SqlContext.Sql()
+            //            .Select<DataTypePreValueDto>()
+            //            .From<DataTypePreValueDto>()
+            //            .WhereIn<DataTypePreValueDto>(x => x.DataTypeNodeId, batch));
+            //});
 
             // now we have
             // - the definitinos
@@ -425,10 +425,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // - a lazy access to prevalues
             // and we need to build the proper property collections
 
-            return GetPropertyCollections(temps, allPropertyDataDtos, pre);
+            return GetPropertyCollections(temps, allPropertyDataDtos /*, pre*/);
         }
 
-        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues)
+        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos /*, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues*/)
             where T : class, IContentBase
         {
             var result = new Dictionary<int, PropertyCollection>();
@@ -474,18 +474,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport = TagExtractor.GetAttribute(editor);
                     if (tagSupport == null) continue;
 
-                    //this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-                    // fixme - optimize with index
-                    var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeId)
-                        .Distinct()
-                        .ToArray();
+                    // fixme - this is totally borked of course for just anything and we need to re-do it entirely without prevalue
+                    //#error This cannot work!
 
-                    // build and set tags
-                    var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-                    var preVals = new PreValueCollection(asDictionary);
-                    // fixme this is totally borked of course for variants
-                    var contentPropData = new ContentPropertyData(property.GetValue(), preVals);
-                    TagExtractor.SetPropertyTags(property, contentPropData, property.GetValue(), tagSupport);
+                    //// this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
+                    //// fixme - optimize with index
+                    //var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeId)
+                    //    .Distinct()
+                    //    .ToArray();
+
+                    //// build and set tags
+                    //var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
+                    //var preVals = new PreValueCollection(asDictionary);
+                    //// fixme this is totally borked of course for variants
+                    //var contentPropData = new ContentPropertyData(property.GetValue(), preVals);
+                    //TagExtractor.SetPropertyTags(property, contentPropData, property.GetValue(), tagSupport);
                 }
 
                 if (result.ContainsKey(temp.VersionId))

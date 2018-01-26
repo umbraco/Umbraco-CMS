@@ -81,7 +81,7 @@ namespace Umbraco.Tests.PublishedContent
             var mType = MockedContentTypes.CreateImageMediaType("image2");
             //lets add an RTE to this
             mType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.NVarChar, "content")
+                new PropertyType("test", ValueStorageType.Nvarchar, "content")
                     {
                         Name = "Rich Text",
                         DataTypeId = -87 //tiny mce

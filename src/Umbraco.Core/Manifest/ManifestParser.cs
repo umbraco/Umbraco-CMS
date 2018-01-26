@@ -17,30 +17,37 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class ManifestParser
     {
+        private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+
         private readonly IRuntimeCacheProvider _cache;
-        private readonly string _path;
         private readonly ILogger _logger;
         private readonly ManifestValidatorCollection _validators;
 
-        private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+        private string _path;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, ILogger logger) // fixme is LightInject going to pick that one?
+        public ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, ILogger logger)
             : this(cache, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, string path, ILogger logger)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullOrEmptyException(nameof(path));
-            _path = path.StartsWith("~/") ? IOHelper.MapPath(path) : path;
+            Path = path;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public string Path
+        {
+            get => _path;
+            set => _path = value.StartsWith("~/") ? IOHelper.MapPath(value) : value;
         }
 
         /// <summary>

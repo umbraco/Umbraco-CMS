@@ -33,9 +33,9 @@ namespace Umbraco.Web.PropertyEditors
             });
         }
 
-        public override Dictionary<string, object> ToEditor(TagConfiguration defaultConfiguration, TagConfiguration configuration)
+        public override Dictionary<string, object> ToEditor(TagConfiguration configuration)
         {
-            var dictionary = base.ToEditor(defaultConfiguration, configuration);
+            var dictionary = base.ToEditor(configuration);
 
             // the front-end editor expects the string value of the storage type
             dictionary["storageType"] = dictionary["storageType"].ToString();

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            _parser = new ManifestParser(NullCacheProvider.Instance, Mock.Of<ILogger>());
+            _parser = new ManifestParser(NullCacheProvider.Instance, new ManifestValidatorCollection(Enumerable.Empty<ManifestValidator>()), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -193,7 +193,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("\\d*", v.Config);
 
             // this is not part of the manifest
-            var preValues = editor.DefaultPreValues;
+            var preValues = editor.DefaultConfiguration;
             Assert.IsNull(preValues);
 
             var preValueEditor = editor.ConfigurationEditor;

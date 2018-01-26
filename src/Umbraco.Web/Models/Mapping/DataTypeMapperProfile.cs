@@ -105,7 +105,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConvertUsing(src =>
                     {
                         //this is a new data type, so just return the field editors, there are no values yet
-                        var defaultVals = src.DefaultPreValues;
+                        var defaultVals = src.DefaultConfiguration;
                         var fields = src.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
                         if (defaultVals != null)
                         {

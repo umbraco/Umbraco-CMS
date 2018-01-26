@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
 
@@ -46,7 +47,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
-            dtdRepository = new DataTypeRepository(scopeAccessor, cacheHelper, Logger);
+            var editors = new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>());
+            dtdRepository = new DataTypeRepository(scopeAccessor, cacheHelper, new Lazy<PropertyEditorCollection>(() => editors), Logger);
             return ctRepository;
         }
 

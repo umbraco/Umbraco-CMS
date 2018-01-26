@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Models
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,
-                DatabaseType = ValueStorageType.NVarChar,
+                DatabaseType = ValueStorageType.Nvarchar,
                 Id = 4,
                 Key = Guid.NewGuid(),
                 Level = 7,
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Models
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,
-                DatabaseType = ValueStorageType.NVarChar,
+                DatabaseType = ValueStorageType.Nvarchar,
                 Id = 4,
                 Key = Guid.NewGuid(),
                 Level = 7,

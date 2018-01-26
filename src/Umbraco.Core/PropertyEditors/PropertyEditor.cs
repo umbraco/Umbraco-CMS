@@ -17,9 +17,7 @@ namespace Umbraco.Core.PropertyEditors
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "(),nq}")]
     public class PropertyEditor : IParameterEditor
     {
-        private ValueEditor _valueEditor;
         private ValueEditor _valueEditorAssigned;
-        private ConfigurationEditor _configurationEditor;
         private ConfigurationEditor _configurationEditorAssigned;
 
         /// <summary>
@@ -95,12 +93,11 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("editor", Required = Required.Always)]
         public ValueEditor ValueEditor
         {
-            get => _valueEditor ?? (_valueEditor = CreateValueEditor());
-            set
-            {
-                _valueEditorAssigned = value;
-                _valueEditor = null;
-            }
+            // create a new value editor each time - the property editor can be a
+            // singleton, but the value editor will get a configuration which depends
+            // on the datatype, so it cannot be a singleton really
+            get => CreateValueEditor();
+            set => _valueEditorAssigned = value;
         }
 
         [JsonIgnore]
@@ -109,19 +106,20 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("prevalues")] // change, breaks manifests
         public ConfigurationEditor ConfigurationEditor
         {
-            get => _configurationEditor ?? (_configurationEditor = CreateConfigurationEditor());
-            set
-            {
-                _configurationEditorAssigned = value;
-                _configurationEditor = null;
-            }
+            // create a new configuration editor each time - the property editor can be a
+            // singleton, and technically the configuration editor could be a singleton
+            // too, but we'd rather not keep all configuration editor around in memory
+            get => CreateConfigurationEditor();
+            set => _configurationEditorAssigned = value;
         }
 
+        // fixme explain what this is
+        // makes sense only for dictionary-based configurationeditor, true conf editors have classes?
         [JsonProperty("defaultConfig")]
-        public virtual IDictionary<string, object> DefaultPreValues { get; set; }
+        public virtual IDictionary<string, object> DefaultConfiguration { get; set; }
 
         [JsonIgnore]
-        IDictionary<string, object> IParameterEditor.Configuration => DefaultPreValues; // fixme - because we must, but - bah
+        IDictionary<string, object> IParameterEditor.Configuration => DefaultConfiguration; // fixme - because we must, but - bah
 
         /// <summary>
         /// Creates a value editor instance.
@@ -173,14 +171,6 @@ namespace Umbraco.Core.PropertyEditors
         protected virtual string DebuggerDisplay()
         {
             return $"Name: {Name}, Alias: {Alias}, IsParameterEditor: {IsParameterEditor}";
-        }
-
-        /// <summary>
-        /// Maps configuration to a strongly typed object.
-        /// </summary>
-        public virtual object DeserializeConfiguration(string json) // fixme
-        {
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
         }
     }
 }

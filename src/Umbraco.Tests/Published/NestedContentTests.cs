@@ -31,28 +31,45 @@ namespace Umbraco.Tests.Published
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);
 
-            var dataTypeService = new Mock<IDataTypeService>();
+            var dataType1 = new DataType("editorAlias1")
+            {
+                Configuration = new NestedContentConfiguration
+                {
+                    MinItems = 1,
+                    MaxItems = 2,
+                    ContentTypes = new[]
+                    {
+                        new NestedContentConfiguration.ContentType { Alias = "contentN1" }
+                    }
+                }
+            };
+
+            var dataType2 = new DataType("editorAlias2")
+            {
+                Configuration = new NestedContentConfiguration
+                {
+                    MinItems = 1,
+                    MaxItems = 99,
+                    ContentTypes = new[]
+                    {
+                        new NestedContentConfiguration.ContentType { Alias = "contentN1" }
+                    }
+                }
+            };
 
             // mocked dataservice returns nested content preValues
-            dataTypeService
-                .Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                .Returns((int id) =>
+            var dataTypeService = Mock.Of<IDataTypeService>();
+
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns<int>(x =>
                 {
-                    if (id == 1)
-                        return new PreValueCollection(new Dictionary<string, PreValue>
-                        {
-                            { "minItems", new PreValue("1") },
-                            { "maxItems", new PreValue("1") },
-                            { "contentTypes", new PreValue("[{\"ncAlias\":\"contentN1\",\"ncTabAlias\":\"\",\"nameTemplate\":\"\"}]") }
-                        });
-                    if (id == 2)
-                        return new PreValueCollection(new Dictionary<string, PreValue>
-                        {
-                            { "minItems", new PreValue("1") },
-                            { "maxItems", new PreValue("99") },
-                            { "contentTypes", new PreValue("[{\"ncAlias\":\"contentN1\",\"ncTabAlias\":\"\",\"nameTemplate\":\"\"}]") }
-                        });
-                    return null;
+                    switch (x)
+                    {
+                        case 1: return dataType1;
+                        case 2: return dataType2;
+                        default: return null;
+                    }
                 });
 
             var publishedModelFactory = new Mock<IPublishedModelFactory>();
@@ -113,7 +130,7 @@ namespace Umbraco.Tests.Published
                 new NestedContentPropertyEditor(Mock.Of<ILogger>(), new Lazy<PropertyEditorCollection>(() => editors))
             });
 
-            var source = new DataTypeConfigurationSource(dataTypeService.Object, editors);
+            var source = new DataTypeConfigurationSource(dataTypeService, editors);
             var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, source);
 
             var propertyType1 = factory.CreatePropertyType("property1", 1, Constants.PropertyEditors.Aliases.NestedContent);

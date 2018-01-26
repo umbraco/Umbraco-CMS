@@ -21,14 +21,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly bool _publishIds;
 
-        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, ILogger logger, ValueEditorAttribute attribute)
-            : base(dataTypeService, attribute, logger)
+        internal PublishValuesMultipleValueEditor(bool publishIds, ILogger logger, ValueEditorAttribute attribute)
+            : base(attribute, logger)
         {
             _publishIds = publishIds;
         }
 
         public PublishValuesMultipleValueEditor(bool publishIds, ValueEditorAttribute attribute)
-            : this(publishIds, Current.Services.DataTypeService, Current.Logger, attribute)
+            : this(publishIds, Current.Logger, attribute)
         { }
 
         /// <summary>
@@ -57,15 +57,10 @@ namespace Umbraco.Web.PropertyEditors
                 return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
             }
 
-            var preValues = GetPreValues(propertyType);
-            if (preValues != null)
-            {
-                //get all pre-values matching our Ids
-                return string.Join(",", preValues.Where(x => selectedIds.Contains(x.Value.Id.ToInvariantString())).Select(x => x.Value.Value));
-            }
-
-            // bah, fallback to base
-            return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
+            // fixme I have no idea what I'm doing here
+            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
+            var items = configuration.Items.Where(x => selectedIds.Contains(x.Id.ToInvariantString())).Select(x => x.Value);
+            return string.Join(",", items);
         }
 
         /// <summary>

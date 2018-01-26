@@ -308,14 +308,15 @@ namespace Umbraco.Tests.Services.Importing
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
-            DataTypePreValueDto preValueKey;
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var dtos = scope.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
-                int preValueId;
-                int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
-                preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
-            }
+            Assert.Fail("ARE WE REALLY IMPORTING PREVALUES IN PACKAGES?!");
+            //DataTypePreValueDto preValueKey;
+            //using (var scope = ScopeProvider.CreateScope())
+            //{
+            //    var dtos = scope.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
+            //    int preValueId;
+            //    int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
+            //    preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
+            //}
 
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
@@ -325,8 +326,8 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
-            Assert.That(preValueKey, Is.Not.Null);
-            Assert.That(preValueKey.Value, Is.EqualTo("test3"));
+            //Assert.That(preValueKey, Is.Not.Null);
+            //Assert.That(preValueKey.Value, Is.EqualTo("test3"));
         }
 
         [Test]

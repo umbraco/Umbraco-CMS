@@ -21,7 +21,9 @@ namespace Umbraco.Core.Persistence.Dtos
         public string DbType { get; set; }//NOTE Is set to [varchar] (50) in Sql Server script
 
         [Column("config")]
-        public string Configuration { get; set; } // fixme - length?
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [Constraint(Default = "")]
+        public string Configuration { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]

@@ -18,62 +18,37 @@ namespace Umbraco.Web.PropertyEditors
     /// </remarks>
     internal class PublishValueValueEditor : ValueEditor
     {
-        private readonly IDataTypeService _dataTypeService;
         private readonly ILogger _logger;
 
-        internal PublishValueValueEditor(IDataTypeService dataTypeService, ValueEditorAttribute attribute, ILogger logger)
+        internal PublishValueValueEditor(ValueEditorAttribute attribute, ILogger logger)
             : base(attribute)
         {
-            _dataTypeService = dataTypeService;
             _logger = logger;
         }
 
-        public PublishValueValueEditor(ValueEditorAttribute attribute, ILogger logger)
-            : this(Current.Services.DataTypeService, attribute, logger)
-        {
-        }
-
-        /// <summary>
-        /// Need to lookup the pre-values and put the string version in cache, not the ID (which is what is stored in the db)
-        /// </summary>
-        /// <param name="property"></param>
-        /// <param name="propertyType"></param>
-        /// <param name="dataTypeService"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
             if (value == null)
                 return null;
 
+            // fixme we should probably completely kill this editor
+
+            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
+            var items = configuration.Items;
+
             var idAttempt = value.TryConvertTo<int>();
             if (idAttempt.Success)
             {
-                var preValId = idAttempt.Result;
-                var preVals = GetPreValues(propertyType);
-                if (preVals != null)
-                {
-                    if (preVals.Any(x => x.Value.Id == preValId))
-                    {
-                        return preVals.Single(x => x.Value.Id == preValId).Value.Value;
-                    }
+                var itemId = idAttempt.Result;
+                var item = items.FirstOrDefault(x => x.Id == itemId);
+                if (item != null) return item.Value;
 
-                    _logger.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + propertyType.Alias);
-                }
+                _logger.Warn<PublishValueValueEditor>("Could not find a configuration item with ID " + itemId + " for property alias " + propertyType.Alias);
             }
 
             // fallback to default
             return base.ConvertDbToString(propertyType, value, dataTypeService);
-        }
-
-        protected IDictionary<string, PreValue> GetPreValues(PropertyType propertyType)
-        {
-            var config = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
-            if (preVals != null)
-            {
-                var dictionary = preVals.FormatAsDictionary();
-                return dictionary;
-            }
-            return null;
         }
     }
 }

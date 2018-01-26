@@ -1,105 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Umbraco.Core
 {
     /// <summary>
-    /// A very useful class for parsing, enumerating and querying Enum objects
+    /// Provides utility methods for handling enumerations.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <remarks>
     /// Taken from http://damieng.com/blog/2010/10/17/enums-better-syntax-improved-performance-and-tryparse-in-net-3-5
     /// </remarks>
-    public static class Enum<T> where T : struct
+    public static class Enum<T>
+        where T : struct
     {
-        private static readonly IEnumerable<T> All = Enum.GetValues(typeof(T)).Cast<T>();
-        private static readonly Dictionary<string, T> InsensitiveNames = All.ToDictionary(k => Enum.GetName(typeof(T), k).ToLowerInvariant());
-        private static readonly Dictionary<string, T> SensitiveNames = All.ToDictionary(k => Enum.GetName(typeof(T), k));
-        private static readonly Dictionary<int, T> Values = All.ToDictionary(k => Convert.ToInt32(k));
-        private static readonly Dictionary<T, string> Names = All.ToDictionary(k => k, v => v.ToString());
+        private static readonly List<T> Values;
+        private static readonly Dictionary<string, T> InsensitiveNameToValue;
+        private static readonly Dictionary<string, T> SensitiveNameToValue;
+        private static readonly Dictionary<int, T> IntToValue;
+        private static readonly Dictionary<T, string> ValueToName;
+
+        static Enum()
+        {
+            Values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+
+            IntToValue = new Dictionary<int, T>();
+            ValueToName = new Dictionary<T, string>();
+            SensitiveNameToValue = new Dictionary<string, T>();
+            InsensitiveNameToValue = new Dictionary<string, T>();
+
+            foreach (var value in Values)
+            {
+                var name = value.ToString();
+
+                IntToValue[Convert.ToInt32(value)] = value;
+                ValueToName[value] = name;
+                SensitiveNameToValue[name] = value;
+                InsensitiveNameToValue[name.ToLowerInvariant()] = value;
+            }
+        }
 
         public static bool IsDefined(T value)
         {
-            return Names.Keys.Contains(value);
+            return ValueToName.Keys.Contains(value);
         }
 
         public static bool IsDefined(string value)
         {
-            return SensitiveNames.Keys.Contains(value);
+            return SensitiveNameToValue.Keys.Contains(value);
         }
 
         public static bool IsDefined(int value)
         {
-            return Values.Keys.Contains(value);
+            return IntToValue.Keys.Contains(value);
         }
 
         public static IEnumerable<T> GetValues()
         {
-            return All;
+            return Values;
         }
 
         public static string[] GetNames()
         {
-            return Names.Values.ToArray();
+            return ValueToName.Values.ToArray();
         }
 
         public static string GetName(T value)
         {
-            string name;
-            Names.TryGetValue(value, out name);
-            return name;
+            return ValueToName.TryGetValue(value, out var name) ? name : null;
         }
 
-        public static T Parse(string value)
+        public static T Parse(string value, bool ignoreCase = false)
         {
-            T parsed = default(T);
-            if (!SensitiveNames.TryGetValue(value, out parsed))
-                throw new ArgumentException("Value is not one of the named constants defined for the enumeration", "value");
-            return parsed;
+            var names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
+            if (ignoreCase) value = value.ToLowerInvariant();
+
+            if (names.TryGetValue(value, out var parsed))
+                return parsed;
+
+            throw new ArgumentException($"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.", nameof(value));
         }
 
-        public static T Parse(string value, bool ignoreCase)
+        public static bool TryParse(string value, out T returnValue, bool ignoreCase = false)
         {
-            if (!ignoreCase)
-                return Parse(value);
-
-            T parsed = default(T);
-            if (!InsensitiveNames.TryGetValue(value.ToLowerInvariant(), out parsed))
-                throw new ArgumentException("Value is not one of the named constants defined for the enumeration", "value");
-            return parsed;
-        }
-
-        public static bool TryParse(string value, out T returnValue)
-        {
-            return SensitiveNames.TryGetValue(value, out returnValue);
-        }
-
-        public static bool TryParse(string value, bool ignoreCase, out T returnValue)
-        {
-            if (!ignoreCase)
-                return TryParse(value, out returnValue);
-
-            return InsensitiveNames.TryGetValue(value.ToLowerInvariant(), out returnValue);
+            var names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
+            if (ignoreCase) value = value.ToLowerInvariant();
+            return names.TryGetValue(value, out returnValue);
         }
 
         public static T? ParseOrNull(string value)
         {
-            if (String.IsNullOrEmpty(value))
+            if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            T foundValue;
-            if (InsensitiveNames.TryGetValue(value.ToLowerInvariant(), out foundValue))
-                return foundValue;
+            if (InsensitiveNameToValue.TryGetValue(value.ToLowerInvariant(), out var parsed))
+                return parsed;
 
             return null;
         }
 
         public static T? CastOrNull(int value)
         {
-            T foundValue;
-            if (Values.TryGetValue(value, out foundValue))
+            if (IntToValue.TryGetValue(value, out var foundValue))
                 return foundValue;
 
             return null;

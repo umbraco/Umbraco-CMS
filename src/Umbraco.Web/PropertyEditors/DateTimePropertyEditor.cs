@@ -31,7 +31,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Overridden because we ONLY support Date + Time format
         /// </summary>
-        public override IDictionary<string, object> DefaultPreValues
+        public override IDictionary<string, object> DefaultConfiguration
         {
             get { return _defaultPreVals; }
             set { _defaultPreVals = value; }

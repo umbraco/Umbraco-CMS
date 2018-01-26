@@ -56,32 +56,45 @@ namespace Umbraco.Core.PropertyEditors
             HideLabel = attribute.HideLabel;
         }
 
-        private PreValueCollection _preVals;
-        protected PreValueCollection PreValues
-        {
-            get
-            {
-                if (_preVals == null)
-                {
-                    throw new InvalidOperationException("Pre values cannot be accessed until the Configure method has been called");
-                }
-                return _preVals;
-            }
-        }
+        // fixme kabam!
+        // I don't understand the remarks in the code commented out below
+        // and then,
+        // IPropertyEditor come from a PropertyEditorCollection so they are singletons
+        // IValueEditor is the actual value editor used for editing the value,
+        //  and it has its own configuration, depending on the datatype, so it
+        //  should NOT be a singleton => do NOT cache it in PropertyEditor!
 
         /// <summary>
-        /// This is called to configure the editor for display with it's prevalues, useful when properties need to change dynamically
-        /// depending on what is in the pre-values.
+        /// Gets or sets the value editor configuration.
         /// </summary>
-        /// <param name="preValues"></param>
-        /// <remarks>
-        /// This cannot be used to change the value being sent to the editor, ConfigureEditor will be called *after* ConvertDbToEditor, pre-values
-        /// should not be used to modify values.
-        /// </remarks>
-        public virtual void ConfigureForDisplay(PreValueCollection preValues)
-        {
-            _preVals = preValues ?? throw new ArgumentNullException(nameof(preValues));
-        }
+        public virtual object Configuration { get; set; }
+
+        //private PreValueCollection _preVals;
+        //protected PreValueCollection PreValues
+        //{
+        //    get
+        //    {
+        //        if (_preVals == null)
+        //        {
+        //            throw new InvalidOperationException("Pre values cannot be accessed until the Configure method has been called");
+        //        }
+        //        return _preVals;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// This is called to configure the editor for display with it's prevalues, useful when properties need to change dynamically
+        ///// depending on what is in the pre-values.
+        ///// </summary>
+        ///// <param name="preValues"></param>
+        ///// <remarks>
+        ///// This cannot be used to change the value being sent to the editor, ConfigureEditor will be called *after* ConvertDbToEditor, pre-values
+        ///// should not be used to modify values.
+        ///// </remarks>
+        //public virtual void ConfigureForDisplay(PreValueCollection preValues)
+        //{
+        //    _preVals = preValues ?? throw new ArgumentNullException(nameof(preValues));
+        //}
 
         /// <summary>
         /// Gets or sets the editor view.
@@ -166,7 +179,7 @@ namespace Umbraco.Core.PropertyEditors
             switch (GetDatabaseType())
             {
                 case ValueStorageType.Ntext:
-                case ValueStorageType.NVarChar:
+                case ValueStorageType.Nvarchar:
                     valueType = typeof(string);
                     break;
                 case ValueStorageType.Integer:
@@ -257,7 +270,7 @@ namespace Umbraco.Core.PropertyEditors
             switch (GetDatabaseType())
             {
                 case ValueStorageType.Ntext:
-                case ValueStorageType.NVarChar:
+                case ValueStorageType.Nvarchar:
                     //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
                     //to a real json object so we can pass the true json object directly to angular!
                     var asString = property.GetValue().ToString();
@@ -352,7 +365,7 @@ namespace Umbraco.Core.PropertyEditors
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
                     return new XText(ConvertDbToString(propertyType, value, dataTypeService));
-                case ValueStorageType.NVarChar:
+                case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     //put text in cdata
                     return new XCData(ConvertDbToString(propertyType, value, dataTypeService));
@@ -371,7 +384,7 @@ namespace Umbraco.Core.PropertyEditors
 
             switch (GetDatabaseType())
             {
-                case ValueStorageType.NVarChar:
+                case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     return value.ToXmlString<string>();
                 case ValueStorageType.Integer:

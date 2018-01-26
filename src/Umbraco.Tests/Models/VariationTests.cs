@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void PropertyTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.NVarChar) { Alias = "prop" };
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var prop = new Property(propertyType);
 
             // can set value
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.NVarChar) { Alias = "prop" };
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var contentType = new ContentType(-1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
 
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void IsDirtyTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.NVarChar) { Alias = "prop" };
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var prop = new Property(propertyType);
             var contentType = new ContentType(-1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidationTests()
         {
-            var propertyType = new PropertyType("editor", ValueStorageType.NVarChar) { Alias = "prop", IsPublishing = true };
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop", IsPublishing = true };
             var prop = new Property(propertyType);
 
             prop.SetValue("a");

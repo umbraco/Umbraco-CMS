@@ -274,14 +274,14 @@ namespace Umbraco.Core
                             },
                             {
                                 PasswordAnswer,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.NVarChar, true, PasswordAnswer)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar, true, PasswordAnswer)
                                     {
                                         Name = PasswordAnswerLabel
                                     }
                             },
                             {
                                 PasswordQuestion,
-                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.NVarChar, true, PasswordQuestion)
+                                new PropertyType(PropertyEditors.Aliases.NoEdit, ValueStorageType.Nvarchar, true, PasswordQuestion)
                                     {
                                         Name = PasswordQuestionLabel
                                     }

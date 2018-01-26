@@ -274,22 +274,23 @@ namespace Umbraco.Core.Services.Implement
 
                         if (propertyType != null)
                         {
-                            if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList)
-                            {
+                            // fixme - wtf is this very specific thing here?!
+                            //if (propertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.CheckBoxList)
+                            //{
 
-                                //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
-                                var database = scope.Database;
-                                var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeId });
+                            //    //TODO: We need to refactor this so the packager isn't making direct db calls for an 'edge' case
+                            //    var database = scope.Database;
+                            //    var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeId });
 
-                                var propertyValueList = new List<string>();
-                                foreach (var preValue in propertyValue.Split(','))
-                                {
-                                    propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
-                                }
+                            //    var propertyValueList = new List<string>();
+                            //    foreach (var preValue in propertyValue.Split(','))
+                            //    {
+                            //        propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
+                            //    }
 
-                                propertyValue = string.Join(",", propertyValueList.ToArray());
+                            //    propertyValue = string.Join(",", propertyValueList.ToArray());
 
-                            }
+                            //}
                         }
                         //set property value
                         content.SetValue(propertyTypeAlias, propertyValue);
@@ -1016,7 +1017,7 @@ namespace Umbraco.Core.Services.Implement
 
                 try
                 {
-                    dataType.Configuration = editor.DeserializeConfiguration(configurationAttribute.Value);
+                    dataType.Configuration = editor.ConfigurationEditor.ParseConfiguration(configurationAttribute.Value);
                 }
                 catch (Exception ex)
                 {

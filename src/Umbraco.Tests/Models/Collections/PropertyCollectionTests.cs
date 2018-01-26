@@ -16,8 +16,8 @@ namespace Umbraco.Tests.Models.Collections
         {
             var collection = new PropertyCollection();
 
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.NVarChar, "test")));
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.NVarChar, "Test")));
+            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "test")));
+            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "Test")));
 
             Assert.AreEqual(1, collection.Count);
         }
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models.Collections
         {
             var collection = new PropertyCollection();
 
-            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.NVarChar, "test")));
+            collection.Add(new Property(new PropertyType("propEditor", ValueStorageType.Nvarchar, "test")));
 
             Assert.IsTrue(collection.Contains("Test"));
         }

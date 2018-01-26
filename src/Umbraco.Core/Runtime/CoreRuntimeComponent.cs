@@ -58,12 +58,6 @@ namespace Umbraco.Core.Runtime
             // register manifest parser, will be injected in collection builders where needed
             composition.Container.RegisterSingleton<ManifestParser>();
 
-            composition.Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetPropertyEditors());
-
-            composition.Container.RegisterCollectionBuilder<ParameterEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetParameterEditors());
-
             // register our predefined validators
             composition.Container.RegisterCollectionBuilder<ManifestValidatorCollectionBuilder>()
                 .Add<RequiredManifestValueValidator>()
@@ -72,6 +66,12 @@ namespace Umbraco.Core.Runtime
                 .Add<EmailValidator>()
                 .Add<IntegerValidator>()
                 .Add<DecimalValidator>();
+
+            composition.Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
+                .Add(factory => factory.GetInstance<TypeLoader>().GetPropertyEditors());
+
+            composition.Container.RegisterCollectionBuilder<ParameterEditorCollectionBuilder>()
+                .Add(factory => factory.GetInstance<TypeLoader>().GetParameterEditors());
 
             // register a server registrar, by default it's the db registrar unless the dev
             // has the legacy dist calls enabled - fixme - should obsolete the legacy thing

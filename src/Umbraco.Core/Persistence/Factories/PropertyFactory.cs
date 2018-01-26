@@ -80,7 +80,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 dto.TextValue = value.ToString();
             }
-            else if (property.ValueStorageType == ValueStorageType.NVarChar && value != null)
+            else if (property.ValueStorageType == ValueStorageType.Nvarchar && value != null)
             {
                 dto.VarcharValue = value.ToString();
             }

@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
             switch (GetDatabaseType())
             {
                 case ValueStorageType.Ntext:
-                case ValueStorageType.NVarChar:
+                case ValueStorageType.Nvarchar:
                     return property.GetValue().ToString();
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:

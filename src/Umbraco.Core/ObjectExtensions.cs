@@ -7,6 +7,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Xml;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core
@@ -501,26 +503,37 @@ namespace Umbraco.Core
             return new Dictionary<string, TVal>();
         }
 
-        private static readonly ConcurrentDictionary<Type, Dictionary<string, Func<object, object>>> ToObjectTypes
-            = new ConcurrentDictionary<Type, Dictionary<string, Func<object, object>>>();
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> ToObjectTypes
+            = new ConcurrentDictionary<Type, Dictionary<string, object>>();
 
         /// <summary>
         /// Converts an object's properties into a dictionary.
         /// </summary>
         /// <param name="obj">The object to convert.</param>
         /// <returns>A dictionary containing each properties.</returns>
-        public static Dictionary<string, object> ToObjectDictionary(object obj)
+        public static Dictionary<string, object> ToObjectDictionary<T>(T obj)
         {
+            // fixme refactor this!
+            var d = new Dictionary<string, object>();
+            if (obj == null) return d;
+            foreach (var p in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+            {
+                var jsonProperty = p.GetCustomAttribute<JsonPropertyAttribute>();
+                var name = jsonProperty != null ? jsonProperty.PropertyName : p.Name;
+                d[name] = p.GetValue(obj);
+            }
+            return d;
+
             var t = obj.GetType();
 
             if (!ToObjectTypes.TryGetValue(t, out var properties))
             {
                 ToObjectTypes[t] = properties = t
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-                    .ToDictionary(x => x.Name, ReflectionUtilities.EmitPropertyGetter<object, object>);
+                    .ToDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<T, object>(x));
             }
 
-            return properties.ToDictionary(x => x.Key, x => x.Value(obj));
+            return properties.ToDictionary(x => x.Key, x => ((Func<T, object>) x.Value)(obj));
         }
 
         internal static string ToDebugString(this object obj, int levels = 0)

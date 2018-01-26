@@ -11,9 +11,9 @@ namespace Umbraco.Core.Models
         {
             var type = contentType.GetType();
             var itemType = PublishedItemType.Unknown;
-            if (type == typeof(IContentType)) itemType = PublishedItemType.Content;
-            else if (type == typeof(IMediaType)) itemType = PublishedItemType.Media;
-            else if (type == typeof(IMemberType)) itemType = PublishedItemType.Member;
+            if (typeof(IContentType).IsAssignableFrom(type)) itemType = PublishedItemType.Content;
+            else if (typeof(IMediaType).IsAssignableFrom(type)) itemType = PublishedItemType.Media;
+            else if (typeof(IMemberType).IsAssignableFrom(type)) itemType = PublishedItemType.Member;
             return itemType;
         }
     }

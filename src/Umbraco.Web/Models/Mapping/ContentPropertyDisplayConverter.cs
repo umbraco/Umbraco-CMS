@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //configure the editor for display with the pre-values
             var valEditor = display.PropertyEditor.ValueEditor;
-            valEditor.ConfigureForDisplay(config);
+            valEditor.Configuration = config;
 
             //set the display properties after mapping
             display.Alias = originalProp.Alias;
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.ConfigurationEditor.ConvertDbToEditor(display.PropertyEditor.DefaultPreValues, preVals);
+                display.Config = display.PropertyEditor.ConfigurationEditor.ToEditor(display.PropertyEditor.DefaultConfiguration, config);
                 display.View = valEditor.View;
             }
 

@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
             return new ListViewConfigurationEditor();
         }
 
-        public override IDictionary<string, object> DefaultPreValues
+        public override IDictionary<string, object> DefaultConfiguration
         {
             get
             {

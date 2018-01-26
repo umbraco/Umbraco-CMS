@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -16,13 +14,11 @@ namespace Umbraco.Web.PropertyEditors
     public class FileUploadPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
-        private readonly ILocalizedTextService _textService;
 
-        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem,ILocalizedTextService textService)
+        public FileUploadPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
 
         /// <summary>
@@ -35,12 +31,6 @@ namespace Umbraco.Web.PropertyEditors
             editor.Validators.Add(new UploadFileTypeValidator());
             return editor;
         }
-
-        /// <summary>
-        /// Creates the corresponding preValue editor.
-        /// </summary>
-        /// <returns>The corresponding preValue editor.</returns>
-        protected override ConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor(_textService);
 
         /// <summary>
         /// Gets a value indicating whether a property is an upload field.
@@ -158,93 +148,6 @@ namespace Umbraco.Web.PropertyEditors
                         _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
                     else
                         _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.LanguageId, pvalue.Segment);
-                }
-            }
-        }
-
-        /// <summary>
-        /// A custom pre-val editor to ensure that the data is stored how the legacy data was stored in
-        /// </summary>
-        internal class FileUploadConfigurationEditor : ValueListConfigurationEditor
-        {
-            public FileUploadConfigurationEditor(ILocalizedTextService textService)
-                : base(textService)
-            {
-                var field = Fields.First();
-                field.Description = "Enter a max width/height for each thumbnail";
-                field.Name = "Add thumbnail size";
-                //need to have some custom validation happening here
-                field.Validators.Add(new ThumbnailListValidator());
-            }
-
-            /// <inheritdoc />
-            public override Dictionary<string, object> ToEditor(ValueListConfiguration defaultConfiguration, ValueListConfiguration configuration)
-            {
-                var result = new List<PreValue>();
-
-                //the pre-values just take up one field with a semi-colon delimiter so we'll just parse
-                var dictionary = configuration.FormatAsDictionary();
-                if (dictionary.Any())
-                {
-                    //there should only be one val
-                    var delimited = dictionary.First().Value.Value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    var i = 0;
-                    result.AddRange(delimited.Select(x => new PreValue(i++, x)));
-                }
-
-                //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-                return new Dictionary<string, object> { { "items", result.ToDictionary(x => x.Id, PreValueAsDictionary) } };
-            }
-
-            private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)
-            {
-                return new Dictionary<string, object> { { "value", preValue.Value }, { "sortOrder", preValue.SortOrder } };
-            }
-            /// <summary>
-            /// Take the posted values and convert them to a semi-colon separated list so that its backwards compatible
-            /// </summary>
-            /// <param name="editorValue"></param>
-            /// <param name="configuration"></param>
-            /// <returns></returns>
-            public override ValueListConfiguration FromEditor(Dictionary<string, object> editorValue, ValueListConfiguration configuration)
-            {
-                var result = base.ConvertEditorToDb(editorValue, configuration);
-
-                //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is
-                // semi-colon delimited
-                var values = result.Select(item => item.Value.Value).ToList();
-
-                result.Clear();
-                result.Add("thumbs", new PreValue(string.Join(";", values)));
-                return result;
-            }
-
-            internal class ThumbnailListValidator : IValueValidator
-            {
-                public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
-                {
-                    if (!(value is JArray json)) yield break;
-
-                    //validate each item which is a json object
-                    for (var index = 0; index < json.Count; index++)
-                    {
-                        var i = json[index];
-                        var jItem = i as JObject;
-                        if (jItem?["value"] == null) continue;
-
-                        //NOTE: we will be removing empty values when persisting so no need to validate
-                        var asString = jItem["value"].ToString();
-                        if (asString.IsNullOrWhiteSpace()) continue;
-
-                        if (int.TryParse(asString, out _) == false)
-                        {
-                            yield return new ValidationResult("The value " + asString + " is not a valid number", new[]
-                            {
-                                //we'll make the server field the index number of the value so it can be wired up to the view
-                                "item_" + index.ToInvariantString()
-                            });
-                        }
-                    }
                 }
             }
         }

@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.Mapping
             if (editor != null)
             {
                 fields = editor.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
-                configuration = editor.ConfigurationEditor.ToEditor(editor.DefaultPreValues, configuration);
+                configuration = editor.ConfigurationEditor.ToEditor(editor.DefaultConfiguration, configuration);
             }
 
             // either it's a dictionary already, or convert

@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.NVarChar));
+                        && definition.DatabaseType == ValueStorageType.Nvarchar));
 
             var display = CreateMemberTypeSave();
 
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.NVarChar));
+                        && definition.DatabaseType == ValueStorageType.Nvarchar));
 
             var display = CreateMediaTypeSave();
 
@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.NVarChar));
+                        && definition.DatabaseType == ValueStorageType.Nvarchar));
 
 
             _fileService.Setup(x => x.GetTemplate(It.IsAny<string>()))
@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.NVarChar));
+                        && definition.DatabaseType == ValueStorageType.Nvarchar));
 
 
             var display = CreateCompositionMediaTypeSave();
@@ -312,7 +312,7 @@ namespace Umbraco.Tests.Models.Mapping
                     definition =>
                         definition.Id == 555
                         && definition.EditorAlias == "myPropertyType"
-                        && definition.DatabaseType == ValueStorageType.NVarChar));
+                        && definition.DatabaseType == ValueStorageType.Nvarchar));
 
 
             var display = CreateCompositionContentTypeSave();
@@ -333,11 +333,6 @@ namespace Umbraco.Tests.Models.Mapping
             //Arrange
 
             // setup the mocks to return the data we want to test against...
-
-            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
-            // TODO: but we'll need to change this to return some pre-values to test the mappings
-            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
 
             var memberType = MockedContentTypes.CreateSimpleMemberType();
             memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true);
@@ -397,11 +392,6 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
-            // TODO: but we'll need to change this to return some pre-values to test the mappings
-            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
-
             var mediaType = MockedContentTypes.CreateImageMediaType();
             MockedContentTypes.EnsureAllIds(mediaType, 8888);
 
@@ -454,11 +444,6 @@ namespace Umbraco.Tests.Models.Mapping
             //Arrange
 
             // setup the mocks to return the data we want to test against...
-
-            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
-            // TODO: but we'll need to change this to return some pre-values to test the mappings
-            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
 
             var contentType = MockedContentTypes.CreateTextpageContentType();
             MockedContentTypes.EnsureAllIds(contentType, 8888);
@@ -723,11 +708,6 @@ namespace Umbraco.Tests.Models.Mapping
 
             // setup the mocks to return the data we want to test against...
 
-            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
-            // TODO: but we'll need to change this to return some pre-values to test the mappings
-            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
-
             _entityService.Setup(x => x.GetObjectType(It.IsAny<int>()))
                 .Returns(UmbracoObjectTypes.DocumentType);
 
@@ -818,11 +798,6 @@ namespace Umbraco.Tests.Models.Mapping
             //Arrange
 
             // setup the mocks to return the data we want to test against...
-
-            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
-            // TODO: but we'll need to change this to return some pre-values to test the mappings
-            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
 
             _entityService.Setup(x => x.GetObjectType(It.IsAny<int>()))
                 .Returns(UmbracoObjectTypes.DocumentType);

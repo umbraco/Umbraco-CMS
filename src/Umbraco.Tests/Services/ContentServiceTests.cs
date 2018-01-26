@@ -22,6 +22,7 @@ using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Services
 {
@@ -698,12 +699,15 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
             var dataTypeService = ServiceContext.DataTypeService;
-            //set the pre-values
-            dataTypeService.SavePreValues(1041, new Dictionary<string, PreValue>
+
+            //set configuration
+            var dataType = dataTypeService.GetDataType(1041);
+            dataType.Configuration = new TagConfiguration
             {
-                {"group", new PreValue("test")},
-                {"storageType", new PreValue("Csv")}
-            });
+                Group = "test",
+                StorageType = TagCacheStorageType.Csv
+            };
+
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType("test", ValueStorageType.Ntext, "tags")

@@ -1021,60 +1021,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Gets the prevalues from a umbraco DataType with the specified data type id.
-        /// </summary>
-        /// <param name="DataTypeId">The data type id.</param>
-        /// <returns>Returns the prevalues as a XPathNodeIterator in the format:
-        ///     <preValues>
-        ///         <prevalue id="[id]">[value]</prevalue>
-        ///     </preValues>
-        ///</returns>
-        public static XPathNodeIterator GetPreValues(int DataTypeId)
-        {
-            var xd = new XmlDocument();
-            xd.LoadXml("<preValues/>");
-
-            using (var scope = Current.ScopeProvider.CreateScope())
-            {
-                foreach (var dr in scope.Database.Query<dynamic>(
-                    "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                    new { dataTypeId = DataTypeId }))
-                {
-                    XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.value);
-                    n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.id.ToString()));
-                    xd.DocumentElement.AppendChild(n);
-                }
-                scope.Complete();
-            }
-
-            var xp = xd.CreateNavigator();
-            return xp.Select("/preValues");
-        }
-
-        /// <summary>
-        /// Gets the umbraco data type prevalue with the specified Id as string.
-        /// </summary>
-        /// <param name="id">The id.</param>
-        /// <returns>Returns the prevalue as a string</returns>
-        public static string GetPreValueAsString(int id)
-        {
-            using (var scope = Current.ScopeProvider.CreateScope())
-            {
-                string ret;
-                try
-                {
-                    ret = scope.Database.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id", new { id });
-                }
-                catch
-                {
-                    ret = string.Empty;
-                }
-                scope.Complete();
-                return ret;
-            }
-        }
-
-        /// <summary>
         /// Gets the dictionary item with the specified key.
         /// </summary>
         /// <param name="Key">The key.</param>

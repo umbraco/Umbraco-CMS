@@ -12,6 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web;
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.PropertyEditors
             var sourceObj = CropperJson3.SerializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<JObject>();
             Assert.IsTrue(destObj.Success);
-            Assert.AreEqual(sourceObj, destObj.Result.ToObject<ImageCropDataSet>());
+            Assert.AreEqual(sourceObj, destObj.Result.ToObject<ImageCropperValue>());
         }
 
         [Test]
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.PropertyEditors
             var destObj = sourceObj.TryConvertTo<string>();
             Assert.IsTrue(destObj.Success);
             Assert.IsTrue(destObj.Result.DetectIsJson());
-            var obj = JsonConvert.DeserializeObject<ImageCropDataSet>(CropperJson1, new JsonSerializerSettings {Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal});
+            var obj = JsonConvert.DeserializeObject<ImageCropperValue>(CropperJson1, new JsonSerializerSettings {Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal});
             Assert.AreEqual(sourceObj, obj);
         }
 
@@ -67,10 +68,7 @@ namespace Umbraco.Tests.PropertyEditors
                 container.ConfigureUmbracoCore();
                 container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
-                var dataTypeService = new Mock<IDataTypeService>();
-                dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>())).Returns(new PreValueCollection(Enumerable.Empty<PreValue>()));
-
-                var converter = new Umbraco.Web.PropertyEditors.ValueConverters.ImageCropperValueConverter(dataTypeService.Object);
+                var converter = new Core.PropertyEditors.ValueConverters.ImageCropperValueConverter();
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
                 var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 0, "test"), val1, false); // does not use type for conversion
 

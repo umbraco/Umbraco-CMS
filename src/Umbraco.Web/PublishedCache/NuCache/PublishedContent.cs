@@ -187,7 +187,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     case PublishedItemType.Media:
                         return GetMediaById(IsPreviewing, _contentNode.ParentContentId);
                     default:
-                        throw new Exception("oops");
+                        throw new Exception($"Panic: unsupported item type \"{_contentNode.ContentType.ItemType}\".");
                 }
             }
         }

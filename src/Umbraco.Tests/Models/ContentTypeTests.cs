@@ -243,7 +243,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyTypes"));
-            clone.AddPropertyType(new PropertyType("test", ValueStorageType.NVarChar, "blah"));
+            clone.AddPropertyType(new PropertyType("test", ValueStorageType.Nvarchar, "blah"));
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
             clone.AddPropertyGroup("hello");

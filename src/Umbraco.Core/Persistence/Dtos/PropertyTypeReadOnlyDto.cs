@@ -45,7 +45,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("viewOnProfile")]
         public bool ViewOnProfile { get; set; }
 
-        /* cmsDataType */
+        /* DataType */
         [Column("propertyEditorAlias")]
         public string PropertyEditorAlias { get; set; }
 

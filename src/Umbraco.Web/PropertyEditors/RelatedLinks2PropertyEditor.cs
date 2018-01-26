@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal IDictionary<string, object> InternalPreValues;
 
-        public override IDictionary<string, object> DefaultPreValues
+        public override IDictionary<string, object> DefaultConfiguration
         {
             get => InternalPreValues;
             set => InternalPreValues = value;

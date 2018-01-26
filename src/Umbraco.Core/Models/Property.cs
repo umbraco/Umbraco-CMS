@@ -353,7 +353,7 @@ namespace Umbraco.Core.Models
 
             switch (PropertyType.ValueStorageType)
             {
-                case ValueStorageType.NVarChar:
+                case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     return s;
 

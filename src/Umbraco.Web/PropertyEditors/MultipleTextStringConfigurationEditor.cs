@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToEditor(MultipleTestStringConfiguration defaultConfiguration, MultipleTestStringConfiguration configuration)
+        public override Dictionary<string, object> ToEditor(MultipleTestStringConfiguration configuration)
         {
             return new Dictionary<string, object>
             {

@@ -763,7 +763,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
 
                 // Act
-                var urlAlias = new PropertyType("test", ValueStorageType.NVarChar, "urlAlias")
+                var urlAlias = new PropertyType("test", ValueStorageType.Nvarchar, "urlAlias")
                     {
                         Name = "Url Alias",
                         Description = "",

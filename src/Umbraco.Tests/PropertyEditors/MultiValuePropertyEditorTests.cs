@@ -29,8 +29,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void DropDownMultipleValueEditor_With_Keys_Format_Data_For_Cache()
         {
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValuesMultipleValueEditor(true, dataTypeService, Mock.Of<ILogger>(), new ValueEditor());
+            var editor = new PublishValuesMultipleValueEditor(true, Mock.Of<ILogger>(), new ValueEditorAttribute("key", "nam", "view"));
 
             var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor")));
             prop.SetValue("1234,4567,8910");
@@ -43,24 +42,31 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_No_Keys_Format_Data_For_Cache()
         {
-            var dataTypeServiceMock = new Mock<IDataTypeService>();
+            var dataType = new DataType("editorAlias")
+            {
+                Configuration = new ValueListConfiguration
+                {
+                    Items = new List<ValueListConfiguration.ValueListItem>
+                    {
+                        new ValueListConfiguration.ValueListItem { Id = 4567, Value = "Value 1" },
+                        new ValueListConfiguration.ValueListItem { Id = 1234, Value = "Value 2" },
+                        new ValueListConfiguration.ValueListItem { Id = 8910, Value = "Value 3" }
+                    }
+                }
+            };
 
-            dataTypeServiceMock
-                .Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                           .Returns(new PreValueCollection(new Dictionary<string, PreValue>
-                               {
-                                   {"key0", new PreValue(4567, "Value 1")},
-                                   {"key1", new PreValue(1234, "Value 2")},
-                                   {"key2", new PreValue(8910, "Value 3")}
-                               }));
+            var dataTypeService = Mock.Of<IDataTypeService>();
 
-            var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValuesMultipleValueEditor(false, dataTypeService, Mock.Of<ILogger>(), new ValueEditor());
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns<int>(x => x == 1 ? dataType : null);
+
+            var editor = new PublishValuesMultipleValueEditor(false, Mock.Of<ILogger>(), new ValueEditorAttribute("alias", "name", "view"));
 
             var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor")));
             prop.SetValue("1234,4567,8910");
 
-            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
+            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -68,23 +74,31 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
-            var dataTypeServiceMock = new Mock<IDataTypeService>();
-            dataTypeServiceMock
-                .Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
-                           .Returns(new PreValueCollection(new Dictionary<string, PreValue>
-                               {
-                                   {"key0", new PreValue(10, "Value 1")},
-                                   {"key1", new PreValue(1234, "Value 2")},
-                                   {"key2", new PreValue(11, "Value 3")}
-                               }));
+            var dataType = new DataType("editorAlias")
+            {
+                Configuration = new ValueListConfiguration
+                {
+                    Items = new List<ValueListConfiguration.ValueListItem>
+                    {
+                        new ValueListConfiguration.ValueListItem { Id = 10, Value = "Value 1" },
+                        new ValueListConfiguration.ValueListItem { Id = 1234, Value = "Value 2" },
+                        new ValueListConfiguration.ValueListItem { Id = 11, Value = "Value 3" }
+                    }
+                }
+            };
 
-            var dataTypeService = dataTypeServiceMock.Object;
-            var editor = new PublishValueValueEditor(dataTypeService, new ValueEditor(), Mock.Of<ILogger>());
+            var dataTypeService = Mock.Of<IDataTypeService>();
+
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns<int>(x => x == 1 ? dataType : null);
+
+            var editor = new PublishValueValueEditor(new ValueEditorAttribute("alias", "name", "view"), Mock.Of<ILogger>());
 
             var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor")));
             prop.SetValue("1234");
 
-            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
+            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
 
             Assert.AreEqual("Value 2", result);
         }
@@ -110,16 +124,19 @@ namespace Umbraco.Tests.PropertyEditors
             //Current.ApplicationContext = appContext;
 
             var defaultVals = new Dictionary<string, object>();
-            var persisted = new PreValueCollection(new Dictionary<string, PreValue>
+            var configuration = new ValueListConfiguration
+            {
+                Items = new List<ValueListConfiguration.ValueListItem>
                 {
-                    {"item1", new PreValue(1, "Item 1")},
-                    {"item2", new PreValue(2, "Item 2")},
-                    {"item3", new PreValue(3, "Item 3")}
-                });
+                    new ValueListConfiguration.ValueListItem { Id = 1, Value = "Item 1" },
+                    new ValueListConfiguration.ValueListItem { Id = 2, Value = "Item 2" },
+                    new ValueListConfiguration.ValueListItem { Id = 3, Value = "Item 3" }
+                }
+            };
 
-            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), logger);
+            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>());
 
-            var result = editor.ConvertDbToEditor(defaultVals, persisted);
+            var result = editor.ToEditor(defaultVals, configuration);
 
             Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result.ContainsKey("items"));

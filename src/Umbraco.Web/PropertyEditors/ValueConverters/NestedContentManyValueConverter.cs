@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentPropertyEditor.Configuration>().ContentTypes;
+            var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>().ContentTypes;
             return contentTypes.Length > 1
                 ? typeof (IEnumerable<IPublishedElement>)
                 : typeof (IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0].Alias));
@@ -66,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var contentTypes = configuration.ContentTypes;
                 var elements = contentTypes.Length > 1
                     ? new List<IPublishedElement>()
-                    : PublishedModelFactory.CreateModelList(contentTypes[0]);
+                    : PublishedModelFactory.CreateModelList(contentTypes[0].Alias);
 
                 foreach (var sourceObject in objects)
                 {

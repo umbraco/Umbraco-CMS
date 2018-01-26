@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NPoco;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -19,22 +20,27 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            // drop all keys and indexes
-            Delete.KeysAndIndexes("cmsDataType").Do();
+            // delete *all* keys and indexes - because of FKs
+            Delete.KeysAndIndexes().Do();
 
             // drop and create columns
             Delete.Column("pk").FromTable("cmsDataType").Do();
-            AddColumn<DataTypeDto>("cmsDataType", "config");
 
             // rename the table
-            Rename.Table("cmsDataType").To(Constants.DatabaseSchema.Tables.Document).Do();
+            Rename.Table("cmsDataType").To(Constants.DatabaseSchema.Tables.DataType).Do();
 
-            // recreate all keys and indexes
-            Create.KeysAndIndexes<DataTypeDto>().Do();
+            // create column
+            // fixme it is annoying that these are NOT written out to the log?!
+            AddColumn<DataTypeDto>(Constants.DatabaseSchema.Tables.DataType, "config");
+            Database.Execute(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty)));
+
+            // re-create *all* keys and indexes
+            foreach (var x in DatabaseSchemaCreator.OrderedTables)
+                Create.KeysAndIndexes(x.Value).Do();
 
             var sql = Sql()
                 .Select<DataTypeDto>()
-                .AndSelect<PreValueDto>()
+                .AndSelect<PreValueDto>(x => x.Alias, x => x.SortOrder, x => x.Value)
                 .From<DataTypeDto>()
                 .InnerJoin<PreValueDto>().On<DataTypeDto, PreValueDto>((left, right) => left.NodeId == right.NodeId)
                 .OrderBy<DataTypeDto>(x => x.NodeId)
@@ -71,7 +77,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             }
 
             // drop preValues table
-            Delete.Table("cmsDataTypePreValues");
+            // FIXME keep it around for now
+            //Delete.Table("cmsDataTypePreValues");
         }
 
         [TableName("cmsDataTypePreValues")]

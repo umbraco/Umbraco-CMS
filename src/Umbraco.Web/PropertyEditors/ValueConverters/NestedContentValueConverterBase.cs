@@ -30,7 +30,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (!IsNested(publishedProperty))
                 return false;
 
-            var config = publishedProperty.DataType.ConfigurationAs<NestedContentPropertyEditor.Configuration>();
+            var config = publishedProperty.DataType.ConfigurationAs<NestedContentConfiguration>();
             return config.MinItems == 1 && config.MaxItems == 1;
         }
 

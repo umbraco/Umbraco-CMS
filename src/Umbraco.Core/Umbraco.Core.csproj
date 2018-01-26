@@ -334,7 +334,6 @@
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
     <Compile Include="PropertyEditors\IConfigureValueType.cs" />
-    <Compile Include="PropertyEditors\IDataTypeConfiguration.cs" />
     <Compile Include="PropertyEditors\ImageCropperEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\SliderPropertyEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditorConfiguration.cs" />
@@ -671,8 +670,6 @@
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\PartialViewType.cs" />
-    <Compile Include="Models\PreValue.cs" />
-    <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
@@ -723,7 +720,6 @@
     <Compile Include="Persistence\Dtos\ContentVersionDto.cs" />
     <Compile Include="Persistence\Dtos\ContentXmlDto.cs" />
     <Compile Include="Persistence\Dtos\DataTypeDto.cs" />
-    <Compile Include="Persistence\Dtos\DataTypePreValueDto.cs" />
     <Compile Include="Persistence\Dtos\DictionaryDto.cs" />
     <Compile Include="Persistence\Dtos\DocumentDto.cs" />
     <Compile Include="Persistence\Dtos\DocumentPublishedReadOnlyDto.cs" />

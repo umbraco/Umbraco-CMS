@@ -307,6 +307,10 @@ namespace Umbraco.Core.Composing
             if (factory == null)
                 throw new ArgumentNullException(nameof(factory));
 
+            // fixme temp - STOP doing this, it confuses LightInject and then we get ugly exception traces
+            // we HAVE to let LightInject throw - and catch at THE OUTERMOST if InvalidOperationException in LightInject.Anything!
+
+            return factory.GetInstance(tService, serviceName, args);
             try
             {
                 return factory.GetInstance(tService, serviceName, args);

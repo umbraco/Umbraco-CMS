@@ -367,14 +367,25 @@ namespace Umbraco.Core
                 ThrowInvalidLambda<TLambda>(method.Name, returned, args);
 
             // all other generic args must match parameters
-            // except the last one, if it's a function, 'cos then its the returned type
+            // except the last one, if it's a function, 'cos then it's the returned type
             while (gx < genericArgs.Length - (isFunction ? 1 : 0))
                 if (genericArgs[gx++] != args[ax++])
                     ThrowInvalidLambda<TLambda>(method.Name, returned, args);
 
             // if it's a function then the last one must match the returned type
-            if (isFunction && genericArgs[gx] != returned)
-                ThrowInvalidLambda<TLambda>(method.Name, returned, args);
+            if (isFunction)
+            {
+                if (genericArgs[gx] != returned)
+                {
+                    if (genericArgs[gx].IsAssignableFrom(returned))
+                    {
+                        returned = genericArgs[gx]; // FIXME cast etc?!
+                    }
+                    else ThrowInvalidLambda<TLambda>(method.Name, returned, args);
+                }
+            }
+            //if (isFunction && !genericArgs[gx].IsAssignableFrom(returned))
+            //    ThrowInvalidLambda<TLambda>(method.Name, returned, args);
 
             // emit
             return EmitMethod<TLambda>(returned, args, method);

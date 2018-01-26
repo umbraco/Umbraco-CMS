@@ -140,7 +140,8 @@ namespace Umbraco.Core.Cache
             // in order NOT to cache exceptions
 
             _items.TryRemove(cacheKey, out result);
-            throw eh.Exception; // throw once!
+            eh.Exception.Throw(); // throw once!
+            return null; // never reached
         }
     }
 }

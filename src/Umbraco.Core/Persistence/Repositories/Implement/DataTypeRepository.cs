@@ -24,9 +24,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class DataTypeRepository : NPocoRepositoryBase<int, IDataType>, IDataTypeRepository
     {
-        private readonly PropertyEditorCollection _editors;
+        private readonly Lazy<PropertyEditorCollection> _editors;
 
-        public DataTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, PropertyEditorCollection editors, ILogger logger)
+        // fixme temp fixing circular dependencies with LAZY but is this the right place?
+        public DataTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, Lazy<PropertyEditorCollection> editors, ILogger logger)
             : base(scopeAccessor, cache, logger)
         {
             _editors = editors;
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors[x.EditorAlias])).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value[x.EditorAlias])).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -64,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors[x.EditorAlias])).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value[x.EditorAlias])).ToArray();
         }
 
         #endregion
@@ -112,10 +113,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             //TODO: should the below be removed?
             //Cannot add a duplicate data type
-            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
-INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { name = entity.Name });
-            if (exists > 0)
+            var existsSql = Sql()
+                .SelectCount()
+                .From<DataTypeDto>()
+                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
+                .Where<NodeDto>(x => x.Text == entity.Name);
+            var exists = Database.ExecuteScalar<int>(existsSql) > 0;
+            if (exists)
             {
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
@@ -158,12 +162,13 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
             entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
 
             //Cannot change to a duplicate alias
-            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
-INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
-WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + @"= @name
-AND umbracoNode.id <> @id",
-                    new { id = entity.Id, name = entity.Name });
-            if (exists > 0)
+            var existsSql = Sql()
+                .SelectCount()
+                .From<DataTypeDto>()
+                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
+                .Where<NodeDto>(x => x.Text == entity.Name && x.NodeId != entity.Id);
+            var exists = Database.ExecuteScalar<int>(existsSql) > 0;
+            if (exists)
             {
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }

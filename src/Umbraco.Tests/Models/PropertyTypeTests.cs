@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
+            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                ValueStorageType = ValueStorageType.NVarChar
+                ValueStorageType = ValueStorageType.Nvarchar
             };
 
             var clone = (PropertyType)pt.DeepClone();
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
+            var pt = new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Models
                 SortOrder = 9,
                 UpdateDate = DateTime.Now,
                 ValidationRegExp = "xxxx",
-                ValueStorageType = ValueStorageType.NVarChar
+                ValueStorageType = ValueStorageType.Nvarchar
             };
 
             var result = ss.ToStream(pt);

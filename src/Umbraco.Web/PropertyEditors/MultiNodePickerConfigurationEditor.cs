@@ -76,10 +76,10 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToEditor(MultiNodePickerConfiguration defaultConfiguration, MultiNodePickerConfiguration configuration)
+        public override Dictionary<string, object> ToEditor(MultiNodePickerConfiguration configuration)
         {
             // sanitize configuraiton
-            var output = base.ToEditor(defaultConfiguration, configuration);
+            var output = base.ToEditor(configuration);
 
             output["multiPicker"] = configuration.MaxNumber > 1 ? "1" : "0";
 

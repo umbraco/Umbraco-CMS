@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -50,21 +49,9 @@ namespace Umbraco.Web.PropertyEditors
                     return null;
                 }
 
-                var preVals = editorValue.PreValues.FormatAsDictionary();
-                var max = -1;
-                if (preVals.Any())
-                {
-                    try
-                    {
-                        var json = JsonConvert.DeserializeObject<JObject>(preVals.First().Value.Value);
-                        max = int.Parse(json["Maximum"].ToString());
-                    }
-                    catch (Exception)
-                    {
-                        //swallow
-                        max = -1;
-                    }
-                }
+                if (!(editorValue.DataTypeConfiguration is MultipleTestStringConfiguration config))
+                    throw new Exception("panic");
+                var max = config.Maximum;
 
                 //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
                 var array = asArray.OfType<JObject>()

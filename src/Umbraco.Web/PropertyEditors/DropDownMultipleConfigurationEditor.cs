@@ -60,9 +60,9 @@ namespace Umbraco.Web.PropertyEditors
         // FromEditor can totally ignore 'multiple'
 
         /// <inheritdoc/>
-        public override Dictionary<string, object> ToEditor(ValueListConfiguration defaultConfiguration, ValueListConfiguration configuration)
+        public override Dictionary<string, object> ToEditor(ValueListConfiguration configuration)
         {
-            var dictionary = base.ToEditor(defaultConfiguration, configuration);
+            var dictionary = base.ToEditor(configuration);
 
             // always add the multiple field, as 'true'
             dictionary["multiple"] = 1;

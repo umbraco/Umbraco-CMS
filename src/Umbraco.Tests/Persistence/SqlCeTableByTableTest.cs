@@ -146,21 +146,6 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_cmsDataTypePreValues_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, Mock.Of<ILogger>());
-
-                helper.CreateTable<NodeDto>();
-                helper.CreateTable<DataTypeDto>();
-                helper.CreateTable<DataTypePreValueDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
         public void Can_Create_cmsDictionary_Table()
         {
             using (var scope = ScopeProvider.CreateScope())

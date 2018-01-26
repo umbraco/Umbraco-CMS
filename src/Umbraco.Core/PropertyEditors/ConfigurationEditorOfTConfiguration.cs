@@ -91,13 +91,17 @@ namespace Umbraco.Core.PropertyEditors
             return fields;
         }
 
-        /// <summary>
-        /// Parses the configuration.
-        /// </summary>
-        /// <remarks>Used to create the actual configuration object from the database value.</remarks>
-        public new virtual TConfiguration ParseConfiguration(string configuration)
+        /// <inheritdoc />
+        public override object ParseConfiguration(string configuration)
         {
-            return JsonConvert.DeserializeObject<TConfiguration>(configuration);
+            try
+            {
+                return JsonConvert.DeserializeObject<TConfiguration>(configuration);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Failed to parse configuration \"{configuration}\" as \"{typeof(TConfiguration).Name}\" (see inner exception).", e);
+            }
         }
 
         /// <inheritdoc />
@@ -119,7 +123,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <inheritdoc />
         public sealed override Dictionary<string, object> ToEditor(object defaultConfiguration, object configuration)
         {
-            return ToEditor((TConfiguration) defaultConfiguration, (TConfiguration) configuration);
+            return ToEditor((TConfiguration) configuration);
         }
 
         /// <summary>
@@ -127,7 +131,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="defaultConfiguration">The default configuration.</param>
         /// <param name="configuration">The configuration.</param>
-        public virtual Dictionary<string, object> ToEditor(TConfiguration defaultConfiguration, TConfiguration configuration)
+        public virtual Dictionary<string, object> ToEditor(TConfiguration configuration)
         {
             // fixme - how shall we merge? does defaultConfiguration makes any sense here?
             var dictionary = ObjectExtensions.ToObjectDictionary(configuration);
@@ -149,8 +153,11 @@ namespace Umbraco.Core.PropertyEditors
             where T : new()
         {
             // fixme cache! see also ToObject in ObjectExtensions
+            // this is probably very bad, must REAFACTOR! the property setter of course cannot work like this!
+            //var properties = TypeHelper.CachedDiscoverableProperties(typeof(T))
+            //    .ToDictionary(x => x.Name, x => (Type: x.PropertyType, Set: ReflectionUtilities.EmitPropertySetter<object, object>(x)));
             var properties = TypeHelper.CachedDiscoverableProperties(typeof(T))
-                .ToDictionary(x => x.Name, x => (Type: x.PropertyType, Set: ReflectionUtilities.EmitPropertySetter<object, object>(x)));
+                .ToDictionary(x => x.Name, x => (Type: x.PropertyType, Infos: x));
 
             var obj = new T();
 
@@ -161,7 +168,8 @@ namespace Umbraco.Core.PropertyEditors
                 // fixme if value is null? is this what we want?
                 if (!value.GetType().IsInstanceOfType(property.Type))
                     throw new Exception();
-                property.Set(obj, value);
+                //property.Set(obj, value);
+                property.Infos.SetValue(obj, value);
             }
 
             return obj;

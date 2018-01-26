@@ -587,7 +587,7 @@ AND umbracoNode.id <> @id",
         {
             public class AssociatedTemplate
             {
-                public AssociatedTemplate(int templateId, string @alias, string templateName)
+                public AssociatedTemplate(int templateId, string alias, string templateName)
                 {
                     TemplateId = templateId;
                     Alias = alias;
@@ -1095,7 +1095,7 @@ ORDER BY contentTypeId, id";
     pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp, pt.variations as variations,
     dt.nodeId as dataTypeId, dt.dbType as dbType, dt.propertyEditorAlias as editorAlias
 FROM cmsPropertyType pt
-INNER JOIN cmsDataType as dt ON pt.dataTypeId = dt.nodeId
+INNER JOIN uDataType as dt ON pt.dataTypeId = dt.nodeId
 WHERE pt.contentTypeId IN (@ids)
 ORDER BY contentTypeId, groupId, id";
 

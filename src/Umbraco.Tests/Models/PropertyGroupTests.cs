@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
-                    new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
+                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
@@ -30,9 +30,9 @@ namespace Umbraco.Tests.Models
                         SortOrder = 9,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "xxxx",
-                        ValueStorageType = ValueStorageType.NVarChar
+                        ValueStorageType = ValueStorageType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test2")
+                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Models
                         SortOrder = 10,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "yyyy",
-                        ValueStorageType = ValueStorageType.NVarChar
+                        ValueStorageType = ValueStorageType.Nvarchar
                     }
                 }))
             {
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(false, new[]
                 {
-                    new PropertyType("TestPropertyEditor", ValueStorageType.NVarChar, "test")
+                    new PropertyType("TestPropertyEditor", ValueStorageType.Nvarchar, "test")
                     {
                         Id = 3,
                         CreateDate = DateTime.Now,
@@ -107,9 +107,9 @@ namespace Umbraco.Tests.Models
                         SortOrder = 9,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "xxxx",
-                        ValueStorageType = ValueStorageType.NVarChar
+                        ValueStorageType = ValueStorageType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor2", ValueStorageType.NVarChar, "test2")
+                    new PropertyType("TestPropertyEditor2", ValueStorageType.Nvarchar, "test2")
                     {
                         Id = 4,
                         CreateDate = DateTime.Now,
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Models
                         SortOrder = 10,
                         UpdateDate = DateTime.Now,
                         ValidationRegExp = "yyyy",
-                        ValueStorageType = ValueStorageType.NVarChar
+                        ValueStorageType = ValueStorageType.Nvarchar
                     }
                 }))
             {

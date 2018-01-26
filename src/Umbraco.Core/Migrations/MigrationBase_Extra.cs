@@ -13,8 +13,13 @@ namespace Umbraco.Core.Migrations
 
         protected void AddColumn<T>(string tableName, string columnName)
         {
-            AddColumn<T>(tableName, columnName, out var sqls);
-            foreach (var sql in sqls) Database.Execute(sql);
+            //if (ColumnExists(tableName, columnName))
+            //    throw new InvalidOperationException($"Column {tableName}.{columnName} already exists.");
+
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            var column = table.Columns.First(x => x.Name == columnName);
+            var createSql = SqlSyntax.Format(column);
+            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
         }
 
         protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)

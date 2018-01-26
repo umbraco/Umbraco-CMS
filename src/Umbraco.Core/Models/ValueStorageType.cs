@@ -10,6 +10,10 @@ namespace Umbraco.Core.Models
     [DataContract]
     public enum ValueStorageType
     {
+        // note: these values are written out in the database in some places,
+        // and then parsed back in a case-sensitive way - think about it before
+        // changing the casing of values.
+
         /// <summary>
         /// Store property value as NText.
         /// </summary>
@@ -20,7 +24,7 @@ namespace Umbraco.Core.Models
         /// Store property value as NVarChar.
         /// </summary>
         [EnumMember]
-        NVarChar,
+        Nvarchar,
 
         /// <summary>
         /// Store property value as Integer.

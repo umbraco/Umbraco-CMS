@@ -40,7 +40,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("hello world", false)]
         public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
         {
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.NVarChar));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.Nvarchar));
             prop.SetValue(value);
 
             var valueEditor = new ValueEditor
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase(ValueTypes.DateTime, "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
-            var prop = new Property(1, new PropertyType("test", ValueStorageType.NVarChar));
+            var prop = new Property(1, new PropertyType("test", ValueStorageType.Nvarchar));
             prop.SetValue(val);
 
             var valueEditor = new ValueEditor

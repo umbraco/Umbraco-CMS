@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
 
         private IDictionary<string, object> _defaultPreVals;
 
-        public override IDictionary<string, object> DefaultPreValues
+        public override IDictionary<string, object> DefaultConfiguration
         {
             get { return _defaultPreVals; }
             set { _defaultPreVals = value; }

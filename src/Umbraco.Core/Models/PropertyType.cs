@@ -322,7 +322,7 @@ namespace Umbraco.Core.Models
                         return valueType == typeof(decimal);
                     case ValueStorageType.Date:
                         return valueType == typeof(DateTime);
-                    case ValueStorageType.NVarChar:
+                    case ValueStorageType.Nvarchar:
                         return valueType == typeof(string);
                     case ValueStorageType.Ntext:
                         return valueType == typeof(string);

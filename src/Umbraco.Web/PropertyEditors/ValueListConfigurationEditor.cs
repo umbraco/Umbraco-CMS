@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
         // the sort order that comes back makes no sense
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToEditor(ValueListConfiguration defaultConfiguration, ValueListConfiguration configuration)
+        public override Dictionary<string, object> ToEditor(ValueListConfiguration configuration)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 

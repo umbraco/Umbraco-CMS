@@ -54,34 +54,17 @@ namespace Umbraco.Web.Migrations
                 if (syntax.SupportsIdentityInsert())
                     scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", syntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
 
+                const string memberListViewConfiguration = "{\"pageSize\":10,\"orderBy\":Name,\"orderDirection\":asc,includeProperties:[{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]}";
+
                 scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultContentListView, EditorAlias = Constants.PropertyEditors.Aliases.ListView, DbType = "Nvarchar" });
                 scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultMediaListView, EditorAlias = Constants.PropertyEditors.Aliases.ListView, DbType = "Nvarchar" });
-                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultMembersListView, EditorAlias = Constants.PropertyEditors.Aliases.ListView, DbType = "Nvarchar" });
+                scope.Database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = Constants.DataTypes.DefaultMembersListView, EditorAlias = Constants.PropertyEditors.Aliases.ListView, DbType = "Nvarchar", Configuration = memberListViewConfiguration });
             }
             finally
             {
                 //Turn off identity insert if db provider is not mysql
                 if (syntax.SupportsIdentityInsert())
                     scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", syntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DataType))));
-            }
-
-            try
-            {
-                //Turn on identity insert if db provider is not mysql
-                if (syntax.SupportsIdentityInsert())
-                    scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", syntax.GetQuotedTableName("cmsDataTypePreValues"))));
-
-                //defaults for the member list
-                scope.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -1, Alias = "pageSize", SortOrder = 1, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "10" });
-                scope.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -2, Alias = "orderBy", SortOrder = 2, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "Name" });
-                scope.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -3, Alias = "orderDirection", SortOrder = 3, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "asc" });
-                scope.Database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto { Id = -4, Alias = "includeProperties", SortOrder = 4, DataTypeNodeId = Constants.DataTypes.DefaultMembersListView, Value = "[{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]" });
-            }
-            finally
-            {
-                //Turn off identity insert if db provider is not mysql
-                if (syntax.SupportsIdentityInsert())
-                    scope.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", syntax.GetQuotedTableName("cmsDataTypePreValues"))));
             }
         }
     }

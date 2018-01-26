@@ -45,7 +45,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Parses the configuration.
         /// </summary>
         /// <remarks>Used to create the actual configuration dictionary from the database value.</remarks>
-        public object ParseConfiguration(string configurationJson)
+        public virtual object ParseConfiguration(string configurationJson)
             => JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
 
         public static TConfiguration ConfigurationAs<TConfiguration>(object obj)
@@ -83,8 +83,15 @@ namespace Umbraco.Core.PropertyEditors
             // configuration with their current configuration
 
             // make sure we have dictionaries
+            if (defaultConfiguration == null)
+                defaultConfiguration = new Dictionary<string, object>();
+
             if (!(defaultConfiguration is IDictionary<string, object> d))
                 throw new ArgumentException($"Expecting a {typeof(Dictionary<string,object>).Name} instance but got {defaultConfiguration.GetType().Name}.", nameof(defaultConfiguration));
+
+            if (configuration == null)
+                configuration = new Dictionary<string, object>();
+
             if (!(configuration is IDictionary<string, object> c))
                 throw new ArgumentException($"Expecting a {typeof(Dictionary<string,object>).Name} instance but got {configuration.GetType().Name}.", nameof(configuration));
 

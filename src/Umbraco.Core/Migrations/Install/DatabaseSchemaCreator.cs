@@ -38,7 +38,7 @@ namespace Umbraco.Core.Migrations.Install
             {5, typeof (DocumentDto)},
             {6, typeof (ContentTypeTemplateDto)},
             {7, typeof (DataTypeDto)},
-            {8, typeof (DataTypePreValueDto)},
+            //removed: {8, typeof (DataTypePreValueDto)},
             {9, typeof (DictionaryDto)},
 
             {10, typeof (LanguageDto)},

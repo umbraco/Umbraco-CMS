@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, contentSettings1);
         }
 
-        public override IDictionary<string, object> DefaultPreValues
+        public override IDictionary<string, object> DefaultConfiguration
         {
             get => _internalPreValues;
             set => _internalPreValues = value;
@@ -51,20 +51,13 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override ValueEditor CreateValueEditor()
-        {
-            var baseEditor = base.CreateValueEditor();
-            return new ImageCropperPropertyValueEditor(baseEditor, Logger, _mediaFileSystem);
-        }
+        protected override ValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new ImageCropperConfigurationEditor();
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor();
 
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.

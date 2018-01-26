@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
@@ -36,22 +37,20 @@ namespace Umbraco.Web.PropertyEditors
                 : base(attribute)
             { }
 
-            /// <summary>
-            /// override so that we can hide the label based on the pre-value
-            /// </summary>
-            /// <param name="preValues"></param>
-            public override void ConfigureForDisplay(Core.Models.PreValueCollection preValues)
+            /// <inheritdoc />
+            public override object Configuration
             {
-                base.ConfigureForDisplay(preValues);
-                var asDictionary = preValues.FormatAsDictionary();
-                if (asDictionary.ContainsKey("hideLabel"))
+                get => base.Configuration;
+                set
                 {
-                    var boolAttempt = asDictionary["hideLabel"].Value.TryConvertTo<bool>();
-                    if (boolAttempt.Success)
-                    {
-                        HideLabel = boolAttempt.Result;
-                    }
+                    if (value == null)
+                        throw new ArgumentNullException(nameof(value));
+                    if (!(value is RichTextConfiguration configuration))
+                        throw new ArgumentException($"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
+                    HideLabel = configuration.HideLabel;
+                    base.Configuration = value;
                 }
+
             }
 
             /// <summary>

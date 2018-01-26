@@ -573,7 +573,7 @@ namespace Umbraco.Tests.PublishedContent
             var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
             var pt1 = factory.CreatePropertyType("legend", 0, Constants.PropertyEditors.Aliases.Textbox);
-            var pt2 = factory.CreatePropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
+            var pt2 = factory.CreatePropertyType("image", 0, Constants.PropertyEditors.Aliases.MediaPicker2);
             var pt3 = factory.CreatePropertyType("size", 0, Constants.PropertyEditors.Aliases.Integer);
             const string val1 = "boom bam";
             const int val2 = 0;

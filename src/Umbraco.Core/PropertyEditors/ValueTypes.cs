@@ -87,7 +87,7 @@ namespace Umbraco.Core.PropertyEditors
                     return ValueStorageType.Decimal;
 
                 case String:
-                    return ValueStorageType.NVarChar;
+                    return ValueStorageType.Nvarchar;
 
                 case Text:
                 case Json:
