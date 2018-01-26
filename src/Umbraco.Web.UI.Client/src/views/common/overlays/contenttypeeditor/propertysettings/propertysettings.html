@@ -93,18 +93,21 @@
        <h5><localize key="general_options"></localize></h5>
        
        <label class="checkbox no-indent">
-          <input type="checkbox" ng-model="model.property.showOnMemberProfile">
-          <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+           <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+           <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+           <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
        </label>
 
-      <label class="checkbox no-indent">
-         <input type="checkbox" ng-model="model.property.memberCanEdit">
-         <localize key="contentTypeEditor_memberCanEdit"></localize>
-      </label>
+       <label class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.memberCanEdit">
+           <localize key="contentTypeEditor_memberCanEdit"></localize>
+           <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
+       </label>
 
        <label class="checkbox no-indent">
            <input type="checkbox" ng-model="model.property.isSensitiveData">
            <localize key="contentTypeEditor_isSensitiveData"></localize>
+           <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
        </label>
 
    </div>
