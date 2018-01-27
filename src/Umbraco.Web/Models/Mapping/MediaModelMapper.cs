@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
-                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.IsChildOfListView, expression => expression.ResolveUsing(new ChildOfListViewResolver(applicationContext.Services.MediaService, applicationContext.Services.ContentTypeService)))
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
@@ -45,7 +45,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.ContentType, expression => expression.ResolveUsing<MediaTypeBasicResolver>())
                 .ForMember(display => display.MediaLink, expression => expression.ResolveUsing(
                     content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, applicationContext.ProfilingLogger.Logger))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
+                .AfterMap((media, display) =>
+                {
+                    if (media.ContentType.IsContainer)
+                    {
+                        TabsAndPropertiesResolver<IMedia>.AddListView(display, "media", applicationContext.Services.DataTypeService, applicationContext.Services.TextService);
+                    }
+                });
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -68,22 +74,27 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());            
-        }
+        }        
 
-        //TODO: All of this logic should be moved to the TabsAndPropertiesResolver and not in AfterMap
-        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
+        private class ChildOfListViewResolver : ValueResolver<IMedia, bool>
         {
-            // Adapted from ContentModelMapper
-            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            //TODO: STOP using these extension methods, they are not testable and require singletons to be setup
-            var parent = media.Parent();
-            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
-            
-            if (media.ContentType.IsContainer)
+            private readonly IMediaService _mediaService;
+            private readonly IContentTypeService _contentTypeService;
+
+            public ChildOfListViewResolver(IMediaService mediaService, IContentTypeService contentTypeService)
             {
-                TabsAndPropertiesResolver<IMedia>.AddListView(display, "media", dataTypeService, localizedText);
+                _mediaService = mediaService;
+                _contentTypeService = contentTypeService;
+            }
+
+            protected override bool ResolveCore(IMedia source)
+            {
+                // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+                var parent = _mediaService.GetParent(source);
+                return parent != null && (parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
             }
         }
+
 
         /// <summary>
         /// Resolves a <see cref="ContentTypeBasic"/> from the <see cref="IContent"/> item and checks if the current user

@@ -35,16 +35,12 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.IsContainer, expression => expression.MapFrom(content => content.ContentType.IsContainer))
-                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.IsChildOfListView, expression => expression.ResolveUsing(new ChildOfListViewResolver(applicationContext.Services.ContentService, applicationContext.Services.ContentTypeService)))
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(display => display.PublishDate, expression => expression.MapFrom(content => GetPublishedDate(content)))
-                .ForMember(display => display.TemplateAlias, expression => expression.MapFrom(content => content.Template.Alias))
+                .ForMember(display => display.TemplateAlias, expression => expression.ResolveUsing<DefaultTemplateResolver>())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.MapFrom(content => content.HasPublishedVersion))
-                .ForMember(display => display.Urls,
-                    expression => expression.MapFrom(content =>
-                        UmbracoContext.Current == null
-                            ? new[] { "Cannot generate urls without a current Umbraco Context" }
-                            : content.GetContentUrls(UmbracoContext.Current)))
+                .ForMember(display => display.Urls, expression => expression.ResolveUsing<ContentUrlResolver>())
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.AllowPreview, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, opt => opt.ResolveUsing(new ContentTreeNodeUrlResolver<IContent, ContentTreeController>()))
@@ -59,8 +55,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver<IContent>(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService), new Lazy<IContentService>(() => applicationContext.Services.ContentService))))
-                .AfterMap((content, display) => AfterMap(content, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
-                    applicationContext.Services.ContentTypeService));
+                .AfterMap((content, display) =>
+                {
+                    if (content.ContentType.IsContainer)
+                    {
+                        TabsAndPropertiesResolver<IContent>.AddListView(display, "content", applicationContext.Services.DataTypeService, applicationContext.Services.TextService);
+                    }
+                });
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -88,34 +89,55 @@ namespace Umbraco.Web.Models.Mapping
             var date = ((Content)content).PublishedDate;
             return date == default(DateTime) ? (DateTime?)null : date;
         }
-
-        /// <summary>
-        /// Maps the generic tab with custom properties for content
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="display"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="localizedText"></param>
-        /// <param name="contentTypeService"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService,
-            ILocalizedTextService localizedText, IContentTypeService contentTypeService)
+        
+        internal class ContentUrlResolver : IValueResolver
         {
-            //TODO: All of this logic should be moved to the TabsAndPropertiesResolver and not in AfterMap
-
-            // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            //TODO: STOP using these extension methods, they are not testable and require singletons to be setup
-            var parent = content.Parent();
-            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));            
-
-            //set default template if template isn't set
-            if (string.IsNullOrEmpty(display.TemplateAlias))
-                display.TemplateAlias = content.ContentType.DefaultTemplate == null
-                    ? string.Empty
-                    : content.ContentType.DefaultTemplate.Alias;
-
-            if (content.ContentType.IsContainer)
+            public ResolutionResult Resolve(ResolutionResult source)
             {
-                TabsAndPropertiesResolver<IContent>.AddListView(display, "content", dataTypeService, localizedText);
+                var content = (IContent)source.Value;
+
+                var umbCtx = source.Context.GetUmbracoContext();
+
+                var urls = umbCtx == null
+                    ? new[] {"Cannot generate urls without a current Umbraco Context"}
+                    : content.GetContentUrls(umbCtx);
+
+                return source.New(urls, typeof(string[]));
+            }
+        }
+
+        internal class DefaultTemplateResolver : ValueResolver<IContent, string>
+        {
+            protected override string ResolveCore(IContent source)
+            {
+                var alias = source.Template.Alias;
+
+                //set default template if template isn't set
+                if (string.IsNullOrEmpty(alias))
+                    alias = source.ContentType.DefaultTemplate == null
+                        ? string.Empty
+                        : source.ContentType.DefaultTemplate.Alias;
+
+                return alias;
+            }
+        }
+
+        private class ChildOfListViewResolver : ValueResolver<IContent, bool>
+        {
+            private readonly IContentService _contentService;
+            private readonly IContentTypeService _contentTypeService;
+
+            public ChildOfListViewResolver(IContentService contentService, IContentTypeService contentTypeService)
+            {
+                _contentService = contentService;
+                _contentTypeService = contentTypeService;
+            }
+
+            protected override bool ResolveCore(IContent source)
+            {
+                // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+                var parent = _contentService.GetParent(source);
+                return parent != null && (parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
             }
         }
 

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZe
 
             if (columns.Any(x => x.TableName.InvariantEquals("cmsMemberType") && x.ColumnName.InvariantEquals("isSensitive")) == false)
             {
-                Create.Column("isSensitive").OnTable("cmsMemberType").AsBoolean();
+                Create.Column("isSensitive").OnTable("cmsMemberType").AsBoolean().WithDefaultValue(0).NotNullable();
             }
         }
 
@@ -32,5 +32,4 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZe
         {
         }
     }
-    
 }
