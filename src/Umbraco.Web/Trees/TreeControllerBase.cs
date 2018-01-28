@@ -350,6 +350,16 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// If the request should bypass user permissions
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected bool BypassUserPermissions(FormDataCollection queryStrings)
+        {
+            return queryStrings.GetValue<bool>(TreeQueryStringParameters.BypassUserPermissions);
+        }
+
+        /// <summary>
         /// An event that allows developers to modify the tree node collection that is being rendered
         /// </summary>
         /// <remarks>
