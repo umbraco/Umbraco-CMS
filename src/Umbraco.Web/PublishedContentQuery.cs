@@ -241,8 +241,10 @@ namespace Umbraco.Web
                     var tmpNodes = cache.GetXPathNavigator().Select("//*[@nodeTypeAlias]");
                     foreach (XPathNavigator tmpNode in tmpNodes)
                     {
-                        if (int.TryParse(tmpNode.GetAttribute("id", string.Empty), out int tmpNodeId)
-                            && Guid.TryParse(tmpNode.GetAttribute("key", string.Empty), out Guid tmpNodeKey))
+                        int tmpNodeId;
+                        Guid tmpNodeKey;
+                        if (int.TryParse(tmpNode.GetAttribute("id", string.Empty), out tmpNodeId)
+                            && Guid.TryParse(tmpNode.GetAttribute("key", string.Empty), out tmpNodeKey))
                         {
                             _guidToIntLoopkup[tmpNodeKey] = tmpNodeId;
                         }
@@ -253,7 +255,8 @@ namespace Umbraco.Web
             IPublishedContent doc;
 
             // Check if the lookup contains the GUID/INT value
-            if (_guidToIntLoopkup.TryGetValue(id, out int nodeId) == false)
+            int nodeId;
+            if (_guidToIntLoopkup.TryGetValue(id, out nodeId) == false)
             {
                 // If not, then we perform an inefficient XPath for the GUID
 
