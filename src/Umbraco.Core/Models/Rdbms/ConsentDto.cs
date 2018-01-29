@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("source")]
         [Length(512)] // aligned with Deploy SignatureDto
-        [Index(IndexTypes.UniqueNonClustered, ForColumns = "source, action", Name = "IX_" + TableName + "_UniqueSourceAction")]
+        [Index(IndexTypes.UniqueNonClustered, ForColumns = "source, actionType, action", Name = "IX_" + TableName + "_UniqueSourceAction")]
         public string Source { get; set; }
 
         [Column("action")]

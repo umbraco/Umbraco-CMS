@@ -24,12 +24,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the consents of a source.
         /// </summary>
-        IEnumerable<IConsent> GetBySource(Udi source, string actionType = null);
+        IEnumerable<IConsent> GetBySource(string source, string actionType = null);
 
         /// <summary>
         /// Gets the consents for an action.
         /// </summary>
-        IEnumerable<IConsent> GetByAction(Udi action);
+        IEnumerable<IConsent> GetByAction(string action);
 
         /// <summary>
         /// Gets the consents for an action type.

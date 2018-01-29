@@ -14,16 +14,18 @@ namespace Umbraco.Core.Models
     {
         private static PropertySelectors _selector;
 
-        private Udi _source;
-        private Udi _action;
+        private string _source;
+        private string _action;
+        private string _actionType;
         private ConsentState _state;
         private string _comment;
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
-            public readonly PropertyInfo SourceUdi = ExpressionHelper.GetPropertyInfo<Consent, Udi>(x => x.Source);
-            public readonly PropertyInfo ActionUdi = ExpressionHelper.GetPropertyInfo<Consent, Udi>(x => x.Action);
+            public readonly PropertyInfo Source = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Source);
+            public readonly PropertyInfo Action = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Action);
+            public readonly PropertyInfo ActionType = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.ActionType);
             public readonly PropertyInfo State = ExpressionHelper.GetPropertyInfo<Consent, ConsentState>(x => x.State);
             public readonly PropertyInfo Comment = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Comment);
         }
@@ -31,29 +33,37 @@ namespace Umbraco.Core.Models
         private static PropertySelectors Selectors => _selector ?? (_selector = new PropertySelectors());
 
         /// <inheritdoc />
-        public Udi Source
+        public string Source
         {
             get => _source;
             set
             {
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _source, Selectors.SourceUdi);
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
+                SetPropertyValueAndDetectChanges(value, ref _source, Selectors.Source);
             }
         }
 
         /// <inheritdoc />
-        public Udi Action
+        public string Action
         {
             get => _action;
             set
             {
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _action, Selectors.ActionUdi);
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
+                SetPropertyValueAndDetectChanges(value, ref _action, Selectors.Action);
             }
         }
 
         /// <inheritdoc />
-        public string ActionType => _action.EntityType;
+        public string ActionType
+        {
+            get => _actionType;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
+                SetPropertyValueAndDetectChanges(value, ref _actionType, Selectors.ActionType);
+            }
+        }
 
         /// <inheritdoc />
         public ConsentState State

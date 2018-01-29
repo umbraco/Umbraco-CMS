@@ -11,8 +11,8 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 Id = dto.Id,
                 UpdateDate = dto.UpdateDate,
-                Source = Udi.Parse(dto.Source),
-                Action = Udi.Parse(dto.Action),
+                Source = dto.Source,
+                Action = dto.Action,
                 // ActionType derives from Action
                 State = (ConsentState) dto.State, // assume value is valid
                 Comment = dto.Comment
@@ -30,8 +30,8 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 Id = entity.Id,
                 UpdateDate = entity.UpdateDate,
-                Source = entity.Source.ToString(),
-                Action = entity.Action.ToString(),
+                Source = entity.Source,
+                Action = entity.Action,
                 ActionType = entity.ActionType,
                 State = (int) entity.State,
                 Comment = entity.Comment

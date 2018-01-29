@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent> GetBySource(Udi source, string actionType = null)
+        public IEnumerable<IConsent> GetBySource(string source, string actionType = null)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent> GetByAction(Udi action)
+        public IEnumerable<IConsent> GetByAction(string action)
         {
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {

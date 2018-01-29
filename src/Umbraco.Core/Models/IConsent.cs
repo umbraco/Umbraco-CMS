@@ -8,21 +8,25 @@ namespace Umbraco.Core.Models
     public interface IConsent : IAggregateRoot, IRememberBeingDirty
     {
         /// <summary>
-        /// Gets or sets the Udi of whoever is consenting.
+        /// Gets or sets the unique identifier of whoever is consenting.
         /// </summary>
-        Udi Source { get; set; }
+        /// <remarks>Could be a Udi, or anything really.</remarks>
+        string Source { get; set; }
 
         /// <summary>
         /// Gets or sets the Udi of the consented action.
         /// </summary>
-        Udi Action { get; set; }
+        /// <remarks>Could be a Udi, or anything really.</remarks>
+        string Action { get; set; }
 
         /// <summary>
         /// Gets the type of the consented action.
         /// </summary>
-        /// <remarks>This is the Udi type of <see cref="Action"/> and represents
-        /// the domain, application, scope... of the action.</remarks>
-        string ActionType { get; } // eg "forms-actions" -> "forms-actions/publish-my-details"
+        /// <remarks>
+        /// <para>Represents the domain, application, scope... of the action.</para>
+        /// <para>When the action is a Udi, this should be the Udi type.</para>
+        /// </remarks>
+        string ActionType { get; }
 
         /// <summary>
         /// Gets or sets the state of the consent.
@@ -30,7 +34,7 @@ namespace Umbraco.Core.Models
         ConsentState State { get; set; }
 
         /// <summary>
-        /// Gets or sets - fixme - comment, or additional json data?
+        /// Gets or sets some additional free text.
         /// </summary>
         string Comment { get; set; }
     }
