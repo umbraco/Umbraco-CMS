@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 using System.Linq;
+using System.Net.Http;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 
@@ -253,11 +254,37 @@ namespace Umbraco.Web.WebApi.Binders
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);
                 }
 
-                var sensitiveProperties = postedItem.PersistedContent.ContentType
-                    .PropertyTypes.Where(x => postedItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
-                    .ToList();
+                var httpCtx = actionContext.Request.TryGetHttpContext();
+                if (httpCtx.Success == false)
+                {
+                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, "No http context");
+                    return false;
+                }
+                var umbCtx = httpCtx.Result.GetUmbracoContext();
 
-                //TODO: Finish this validation
+                //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
+                //if a sensitive value is being submitted.
+                if (umbCtx.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                {
+                    var sensitiveProperties = postedItem.PersistedContent.ContentType
+                        .PropertyTypes.Where(x => postedItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                        .ToList();
+
+                    foreach (var sensitiveProperty in sensitiveProperties)
+                    {
+                        var prop = propertiesToValidate.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+
+                        if (prop != null)
+                        {
+                            //this should not happen, this means that there was data posted for a sensitive property that
+                            //the user doesn't have access to, which means that someone is trying to hack the values.
+
+                            var message = string.Format("property with alias: {0} cannot be posted", prop.Alias);
+                            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
+                            return false;
+                        }
+                    }
+                }
 
                 return ValidateProperties(propertiesToValidate, postedItem.PersistedContent.Properties.ToList(), actionContext);
             }
