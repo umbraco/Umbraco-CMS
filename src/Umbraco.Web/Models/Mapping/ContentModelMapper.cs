@@ -110,6 +110,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override string ResolveCore(IContent source)
             {
+                if (source == null || source.Template == null) return null;
+
                 var alias = source.Template.Alias;
 
                 //set default template if template isn't set
