@@ -16,6 +16,7 @@ namespace Umbraco.Web.PropertyEditors
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
                 {"showPathOnHover", "0"},
+                {"bypassUserPermissions", "0"},
                 {"idType", "udi"}
             };
         }
@@ -37,6 +38,13 @@ namespace Umbraco.Web.PropertyEditors
             public MultiNodePickerPreValueEditor()
             {
                 //create the fields
+                Fields.Add(new PreValueField()
+                {
+                    Key = "bypassUserPermissions",
+                    View = "boolean",
+                    Name = "Bypass User Permissions",
+                    Description = "If set, the chosen start node will bypass any user permissions."
+                });
                 Fields.Add(new PreValueField()
                 {
                     Key = "startNode",
