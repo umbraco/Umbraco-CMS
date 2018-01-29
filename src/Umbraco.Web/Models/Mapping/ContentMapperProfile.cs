@@ -56,6 +56,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(src => tabsAndPropertiesResolver.Resolve(src)))
                 .ForMember(dest => dest.AllowedActions, opt => opt.ResolveUsing(src => actionButtonsResolver.Resolve(src)))
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .AfterMap((src, dest) => AfterMap(src, dest, dataTypeService, textService, contentTypeService, contentService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
@@ -67,7 +68,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
-                .ForMember(dest => dest.Alias, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             //FROM IContent TO ContentItemDto<IContent>
             CreateMap<IContent, ContentItemDto<IContent>>()
@@ -76,7 +78,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
         }
 
         /// <summary>

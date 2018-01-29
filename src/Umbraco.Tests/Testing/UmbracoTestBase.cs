@@ -303,6 +303,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<ISectionService, SectionService>();
 
             // somehow property editor ends up wanting this
+            Container.RegisterCollectionBuilder<ManifestValidatorCollectionBuilder>();
             Container.RegisterSingleton<ManifestParser>();
 
             // note - don't register collections, use builders

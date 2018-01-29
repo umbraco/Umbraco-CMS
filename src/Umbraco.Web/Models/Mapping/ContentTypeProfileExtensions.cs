@@ -141,7 +141,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AllowedContentTypes, opt => opt.MapFrom(src => src.AllowedContentTypes.Select(x => x.Id.Value)))
                 .ForMember(dest => dest.CompositeContentTypes, opt => opt.MapFrom(src => src.ContentTypeComposition))
                 .ForMember(dest => dest.LockedCompositeContentTypes, opt => opt.ResolveUsing(src => lockedCompositionsResolver.Resolve(src)))
-                .ForMember(dest => dest.Groups, opt => opt.ResolveUsing(src => propertyTypeGroupResolver.Resolve(src)));
+                .ForMember(dest => dest.Groups, opt => opt.ResolveUsing(src => propertyTypeGroupResolver.Resolve(src)))
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
         }
 
         /// <summary>

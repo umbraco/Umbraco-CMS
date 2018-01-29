@@ -55,8 +55,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("STRING", "hello", "hello")]
         [TestCase("TEXT", "hello", "hello")]
         [TestCase("INT", "123", 123)]
-        [TestCase("INTEGER", "123", 123)]
-        [TestCase("INTEGER", "", null)] //test empty string for int
+        [TestCase("INT", "", null)] //test empty string for int
         [TestCase("DATETIME", "", null)] //test empty string for date
         public void Value_Editor_Can_Convert_To_Clr_Type(string valueType, string val, object expected)
         {

@@ -197,20 +197,18 @@ namespace Umbraco.Web.Editors
             //TODO: Check if the property editor has changed, if it has ensure we don't pass the
             // existing values to the new property editor!
 
-            //get the configuration, current and new
-            var newConfiguration = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
+            // get the current configuration,
+            // get the new configuration as a dictionary (this is how we get it from model)
+            // and map it to an actual configuration object
             var currentConfiguration = dataType.PersistedDataType.Configuration;
+            var configurationDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
+            var configuration = dataType.PropertyEditor.ConfigurationEditor.FromEditor(configurationDictionary, currentConfiguration);
 
-            // fixme FromEditor should accept a dictionary
-            // then ToEditor should return a dictionary!
-
-            //we need to allow for the property editor to deserialize the prevalues
-            var configuration = dataType.PropertyEditor.ConfigurationEditor.FromEditor(newConfiguration, currentConfiguration);
             dataType.PersistedDataType.Configuration = configuration;
 
+            // save the data type
             try
             {
-                //save the data type
                 Services.DataTypeService.Save(dataType.PersistedDataType, Security.CurrentUser.Id);
             }
             catch (DuplicateNameException ex)
@@ -219,10 +217,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
+            // map back to display model, and return
             var display = Mapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/dataTypeSaved"), "");
-
-            //now return the updated model
             return display;
         }
 

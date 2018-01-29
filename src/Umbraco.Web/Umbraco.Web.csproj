@@ -473,7 +473,6 @@
     <Compile Include="PropertyEditors\DateConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DecimalPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetTypeConverter.cs" />
     <Compile Include="Routing\RedirectTrackingComponent.cs" />
     <Compile Include="Editors\RedirectUrlManagementController.cs" />
     <Compile Include="Models\ContentEditing\RedirectUrlSearchResults.cs" />

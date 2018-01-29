@@ -18,11 +18,11 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("dbType")]
         [Length(50)]
-        public string DbType { get; set; }//NOTE Is set to [varchar] (50) in Sql Server script
+        public string DbType { get; set; }
 
         [Column("config")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
-        [Constraint(Default = "")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Configuration { get; set; }
 
         [ResultColumn]

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var editor = new PublishValuesMultipleValueEditor(false, Mock.Of<ILogger>(), new ValueEditorAttribute("alias", "name", "view"));
 
-            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor")));
+            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor") { Id = 1 }));
             prop.SetValue("1234,4567,8910");
 
             var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var editor = new PublishValueValueEditor(new ValueEditorAttribute("alias", "name", "view"), Mock.Of<ILogger>());
 
-            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor")));
+            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor") { Id = 1 }));
             prop.SetValue("1234");
 
             var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
@@ -138,14 +139,10 @@ namespace Umbraco.Tests.PropertyEditors
 
             var result = editor.ToEditor(defaultVals, configuration);
 
-            Assert.AreEqual(1, result.Count);
-            Assert.IsTrue(result.ContainsKey("items"));
-            var items = result["items"] as IDictionary<int, IDictionary<string, object>>;
-            Assert.IsNotNull(items);
-            Assert.AreEqual("Item 1", items[1]["value"]);
-            Assert.AreEqual("Item 2", items[2]["value"]);
-            Assert.AreEqual("Item 3", items[3]["value"]);
+            // 'result' is meant to be serialized, is built with anonymous objects
+            // so we cannot really test what's in it - but by serializing it
+            var json = JsonConvert.SerializeObject(result);
+            Assert.AreEqual("{\"items\":{\"1\":{\"value\":\"Item 1\",\"sortOrder\":1},\"2\":{\"value\":\"Item 2\",\"sortOrder\":2},\"3\":{\"value\":\"Item 3\",\"sortOrder\":3}}}", json);
         }
-
     }
 }

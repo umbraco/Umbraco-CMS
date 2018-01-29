@@ -96,6 +96,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(configuration)) return default;
                 return JsonConvert.DeserializeObject<TConfiguration>(configuration);
             }
             catch (Exception e)
@@ -133,7 +134,6 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="configuration">The configuration.</param>
         public virtual Dictionary<string, object> ToEditor(TConfiguration configuration)
         {
-            // fixme - how shall we merge? does defaultConfiguration makes any sense here?
             var dictionary = ObjectExtensions.ToObjectDictionary(configuration);
 
             if (configuration is ConfigurationWithAdditionalData withAdditionalData)

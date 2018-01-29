@@ -49,16 +49,18 @@ namespace Umbraco.Web.PropertyEditors
                 return propertyValue.ToString();
             }
 
-            //get the multiple ids
+            // get the multiple ids
+            // if none, fallback to base
             var selectedIds = propertyValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             if (selectedIds.Any() == false)
-            {
-                //nothing there, fallback to base
                 return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
-            }
 
-            // fixme I have no idea what I'm doing here
+            // get the configuration items
+            // if none, fallback to base
             var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
+            if (configuration == null)
+                return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
+
             var items = configuration.Items.Where(x => selectedIds.Contains(x.Id.ToInvariantString())).Select(x => x.Value);
             return string.Join(",", items);
         }

@@ -46,13 +46,18 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <remarks>Used to create the actual configuration dictionary from the database value.</remarks>
         public virtual object ParseConfiguration(string configurationJson)
-            => JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
+            => string.IsNullOrWhiteSpace(configurationJson)
+                ? null
+                : JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
 
+        /// <summary>
+        /// Gets the configuration as a typed object.
+        /// </summary>
         public static TConfiguration ConfigurationAs<TConfiguration>(object obj)
         {
-            // fixme what about nulls?
+            if (obj == null) return default;
             if (obj is TConfiguration configuration) return configuration;
-            throw new InvalidCastException(); // fixme message
+            throw new InvalidCastException($"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
         }
 
         // notes

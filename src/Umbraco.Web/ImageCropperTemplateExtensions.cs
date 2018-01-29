@@ -236,7 +236,7 @@ namespace Umbraco.Web
             ImageCropperValue cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                cropDataSet = imageCropperValue.SerializeToCropDataSet();
+                cropDataSet = imageCropperValue.DeserializeImageCropperValue();
             }
             return GetCropUrl(
                 imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
@@ -318,11 +318,12 @@ namespace Umbraco.Web
                 {
                     var crop = cropDataSet.GetCrop(cropAlias);
 
+                    // if a crop was specified, but not found, return null
                     if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
-                        return null; // fixme is this ok? compared to what we had?
+                        return null;
 
                     imageProcessorUrl.Append(cropDataSet.Src);
-                    cropDataSet.AppendCropBaseUrl(imageProcessorUrl, crop, preferFocalPoint);
+                    cropDataSet.AppendCropBaseUrl(imageProcessorUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
 
                     if (crop != null & useCropDimensions)
                     {
@@ -431,8 +432,7 @@ namespace Umbraco.Web
             return string.Empty;
         }
 
-        // fixme this is DEserialize !! arf!
-        internal static ImageCropperValue SerializeToCropDataSet(this string json)
+        internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {
             var imageCrops = new ImageCropperValue();
             if (json.DetectIsJson())

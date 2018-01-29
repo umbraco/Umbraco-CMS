@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using LightInject;
 using Moq;
 using Newtonsoft.Json;
@@ -8,12 +7,9 @@ using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web;
 
@@ -31,31 +27,31 @@ namespace Umbraco.Tests.PropertyEditors
         public void CanConvertImageCropperDataSetSrcToString()
         {
             //cropperJson3 - has not crops
-            var sourceObj = CropperJson3.SerializeToCropDataSet();
-            var destObj = sourceObj.TryConvertTo<string>();
-            Assert.IsTrue(destObj.Success);
-            Assert.AreEqual(destObj.Result, "/media/1005/img_0672.jpg");
+            var cropperValue = CropperJson3.DeserializeImageCropperValue();
+            var serialized = cropperValue.TryConvertTo<string>();
+            Assert.IsTrue(serialized.Success);
+            Assert.AreEqual("/media/1005/img_0672.jpg", serialized.Result);
         }
 
         [Test]
         public void CanConvertImageCropperDataSetJObject()
         {
             //cropperJson3 - has not crops
-            var sourceObj = CropperJson3.SerializeToCropDataSet();
-            var destObj = sourceObj.TryConvertTo<JObject>();
-            Assert.IsTrue(destObj.Success);
-            Assert.AreEqual(sourceObj, destObj.Result.ToObject<ImageCropperValue>());
+            var cropperValue = CropperJson3.DeserializeImageCropperValue();
+            var serialized = cropperValue.TryConvertTo<JObject>();
+            Assert.IsTrue(serialized.Success);
+            Assert.AreEqual(cropperValue, serialized.Result.ToObject<ImageCropperValue>());
         }
 
         [Test]
         public void CanConvertImageCropperDataSetJsonToString()
         {
-            var sourceObj = CropperJson1.SerializeToCropDataSet();
-            var destObj = sourceObj.TryConvertTo<string>();
-            Assert.IsTrue(destObj.Success);
-            Assert.IsTrue(destObj.Result.DetectIsJson());
+            var cropperValue = CropperJson1.DeserializeImageCropperValue();
+            var serialized = cropperValue.TryConvertTo<string>();
+            Assert.IsTrue(serialized.Success);
+            Assert.IsTrue(serialized.Result.DetectIsJson());
             var obj = JsonConvert.DeserializeObject<ImageCropperValue>(CropperJson1, new JsonSerializerSettings {Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal});
-            Assert.AreEqual(sourceObj, obj);
+            Assert.AreEqual(cropperValue, obj);
         }
 
         [TestCase(CropperJson1, CropperJson1, true)]
@@ -68,11 +64,11 @@ namespace Umbraco.Tests.PropertyEditors
                 container.ConfigureUmbracoCore();
                 container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
-                var converter = new Core.PropertyEditors.ValueConverters.ImageCropperValueConverter();
+                var converter = new ImageCropperValueConverter();
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
                 var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 0, "test"), val1, false); // does not use type for conversion
 
-                var resultShouldMatch = val2.SerializeToCropDataSet();
+                var resultShouldMatch = val2.DeserializeImageCropperValue();
                 if (expected)
                 {
                     Assert.AreEqual(resultShouldMatch, result);
@@ -84,7 +80,7 @@ namespace Umbraco.Tests.PropertyEditors
             }
             finally
             {
-                Core.Composing.Current.Reset();
+                Current.Reset();
             }
         }
 
@@ -142,7 +138,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetBaseCropUrlFromModelTest()
         {
-            var cropDataSet = CropperJson1.SerializeToCropDataSet();
+            var cropDataSet = CropperJson1.DeserializeImageCropperValue();
             var urlString = cropDataSet.GetCropUrl("thumb");
             Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }

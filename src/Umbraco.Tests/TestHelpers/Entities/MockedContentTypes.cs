@@ -152,7 +152,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext) { Alias = "title", Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });

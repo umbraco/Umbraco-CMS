@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "DatabaseType");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsDataType].[dbType]"));
+            Assert.That(column, Is.EqualTo("[uDataType].[dbType]"));
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "EditorAlias");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[cmsDataType].[propertyEditorAlias]"));
+            Assert.That(column, Is.EqualTo("[uDataType].[propertyEditorAlias]"));
         }
     }
 }

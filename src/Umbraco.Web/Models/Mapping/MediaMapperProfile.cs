@@ -43,6 +43,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(src => tabsAndPropertiesResolver.Resolve(src)))
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .AfterMap((src, dest) => AfterMap(src, dest, dataTypeService, textService, logger, mediaService));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
@@ -54,7 +55,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Published, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             //FROM IMedia TO ContentItemDto<IMedia>
             CreateMap<IMedia, ContentItemDto<IMedia>>()
@@ -63,7 +65,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Published, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore());
+                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
         }
 
         private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, ILogger logger, IMediaService mediaService)

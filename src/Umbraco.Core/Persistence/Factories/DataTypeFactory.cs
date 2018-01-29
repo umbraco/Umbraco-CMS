@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -11,6 +10,9 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public static IDataType BuildEntity(DataTypeDto dto, PropertyEditor editor)
         {
+            if (editor == null)
+                throw new ArgumentNullException(nameof(editor), $"Editor with alias \"{dto.EditorAlias}\" is required.");
+
             var dataType = new DataType(dto.EditorAlias);
 
             try
@@ -30,7 +32,6 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.Trashed = dto.NodeDto.Trashed;
                 dataType.CreatorId = dto.NodeDto.UserId ?? 0;
 
-                dataType.EditorAlias = editor.Alias;
                 dataType.SetConfiguration(dto.Configuration, editor);
 
                 // reset dirty initial properties (U4-1946)
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Persistence.Factories
                 EditorAlias = entity.EditorAlias,
                 NodeId = entity.Id,
                 DbType = entity.DatabaseType.ToString(),
-                Configuration = JsonConvert.SerializeObject(entity.Configuration),
+                Configuration = entity.Configuration == null ? null : JsonConvert.SerializeObject(entity.Configuration),
                 NodeDto = BuildNodeDto(entity)
             };
 

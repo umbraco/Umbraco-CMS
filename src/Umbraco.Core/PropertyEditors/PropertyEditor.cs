@@ -90,7 +90,24 @@ namespace Umbraco.Core.PropertyEditors
         [JsonIgnore]
         public bool IsDeprecated { get; internal set; } // fixme - kill it all in v8
 
-        [JsonProperty("editor", Required = Required.Always)]
+        /// <summary>
+        /// Gets or sets the value editor.
+        /// </summary>
+        /// <remarks>
+        /// <para>If an instance of a value editor is assigned to the property, 
+        /// then this instance is returned when getting the property value. Otherwise, a
+        /// new instance is created by CreateValueEditor.</para>
+        /// <para>The instance created by CreateValueEditor is not cached, i.e.
+        /// a new instance is created each time the property value is retrieved. The
+        /// property editor is a singleton, and the value editor cannot be a singleton
+        /// since it depends on the datatype configuration.</para>
+        /// <para>Technically, it could be cached by datatype but let's keep things
+        /// simple enough for now.</para>
+        /// <para>The property is marked as a Json property with ObjectCreationHandling
+        /// set to Replace in order to prevent the Json deserializer to retrieve the
+        /// value of the property before setting it.</para>
+        /// </remarks>
+        [JsonProperty("editor", Required = Required.Always, ObjectCreationHandling = ObjectCreationHandling.Replace)]
         public ValueEditor ValueEditor
         {
             // create a new value editor each time - the property editor can be a
@@ -103,12 +120,25 @@ namespace Umbraco.Core.PropertyEditors
         [JsonIgnore]
         IValueEditor IParameterEditor.ValueEditor => ValueEditor; // fixme - because we must, but - bah
 
-        [JsonProperty("prevalues")] // change, breaks manifests
+        /// <summary>
+        /// Gets or sets the configuration editor.
+        /// </summary>
+        /// <remarks>
+        /// <para>If an instance of a configuration editor is assigned to the property, 
+        /// then this instance is returned when getting the property value. Otherwise, a
+        /// new instance is created by CreateConfigurationEditor.</para>
+        /// <para>The instance created by CreateConfigurationEditor is not cached, i.e.
+        /// a new instance is created each time the property value is retrieved. The
+        /// property editor is a singleton, and although the configuration editor could
+        /// technically be a singleton too, we'd rather not keep configuration editor
+        /// cached.</para>
+        /// <para>The property is marked as a Json property with ObjectCreationHandling
+        /// set to Replace in order to prevent the Json deserializer to retrieve the
+        /// value of the property before setting it.</para>
+        /// </remarks>
+        [JsonProperty("prevalues", ObjectCreationHandling = ObjectCreationHandling.Replace)] // changing the name would break manifests
         public ConfigurationEditor ConfigurationEditor
         {
-            // create a new configuration editor each time - the property editor can be a
-            // singleton, and technically the configuration editor could be a singleton
-            // too, but we'd rather not keep all configuration editor around in memory
             get => CreateConfigurationEditor();
             set => _configurationEditorAssigned = value;
         }

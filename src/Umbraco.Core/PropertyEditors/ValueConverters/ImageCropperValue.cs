@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
+using Newtonsoft.Json;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS OR SOMETHING
 {
     /// <summary>
     /// Represents a value of the image cropper value editor.
     /// </summary>
+    [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropperValue>))]
+    [TypeConverter(typeof(ImageCropperValueTypeConverter))]
+    [DataContract(Name="imageCropDataSet")]
     public class ImageCropperValue : IHtmlString, IEquatable<ImageCropperValue>
     {
         /// <summary>
@@ -32,6 +38,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         public IEnumerable<ImageCropperCrop> Crops { get; set; }
 
         /// <inheritdoc />
+        public override string ToString()
+        {
+            return Crops.Any() ? JsonConvert.SerializeObject(this) : Src;
+        }
+
+        /// <inheritdoc />
         public string ToHtmlString() => Src;
 
         /// <summary>
@@ -39,20 +51,20 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         /// </summary>
         public ImageCropperCrop GetCrop(string alias)
         {
-            if (Crops == null || !Crops.Any())
+            if (Crops == null)
                 return null;
 
             return string.IsNullOrWhiteSpace(alias)
-                ? Crops.First()
+                ? Crops.FirstOrDefault()
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
         // fixme was defined in web project, extension methods? why internal?
-        internal void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool preferFocalPoint)
+        internal void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
         {
             if (preferFocalPoint && HasFocalPoint()
                 || crop != null && crop.Coordinates == null && HasFocalPoint()
-                || crop == null && HasFocalPoint())
+                || defaultCrop && HasFocalPoint())
             {
                 url.Append("?center=");
                 url.Append(FocalPoint.Top.ToString(CultureInfo.InvariantCulture));
@@ -89,7 +101,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
 
             var url = new StringBuilder();
 
-            AppendCropBaseUrl(url, crop, useFocalPoint);
+            AppendCropBaseUrl(url, crop, string.IsNullOrWhiteSpace(alias), useFocalPoint);
 
             if (crop != null && useCropDimensions)
             {
@@ -110,7 +122,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         {
             var url = new StringBuilder();
 
-            AppendCropBaseUrl(url, null, useFocalPoint);
+            AppendCropBaseUrl(url, null, true, useFocalPoint);
 
             url.Append("&width=").Append(width);
             url.Append("&height=").Append(height);
@@ -149,6 +161,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
             // merge the crop values - the alias + width + height comes from
             // configuration, but each crop can store its own coordinates
 
+            if (configuration == null) return;
+
             var configuredCrops = configuration.Crops;
             var crops = Crops.ToList();
 
@@ -183,16 +197,18 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
 
         /// <inheritdoc />
         public bool Equals(ImageCropperValue other)
-            => other != null && (ReferenceEquals(this, other) || Equals(this, other));
+            => ReferenceEquals(this, other) || Equals(this, other);
 
         /// <inheritdoc />
         public override bool Equals(object obj)
-            => obj != null && (ReferenceEquals(this, obj) || obj is ImageCropperValue other && Equals(this, other));
+            => ReferenceEquals(this, obj) || obj is ImageCropperValue other && Equals(this, other);
 
         private static bool Equals(ImageCropperValue left, ImageCropperValue right)
-            => string.Equals(left.Src, right.Src)
-               && Equals(left.FocalPoint, right.FocalPoint)
-               && left.ComparableCrops.SequenceEqual(right.ComparableCrops);
+            => ReferenceEquals(left, right) // deals with both being null, too
+                || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+                   && string.Equals(left.Src, right.Src)
+                   && Equals(left.FocalPoint, right.FocalPoint)
+                   && left.ComparableCrops.SequenceEqual(right.ComparableCrops);
 
         private IEnumerable<ImageCropperCrop> ComparableCrops
             => Crops?.OrderBy(x => x.Alias) ?? Enumerable.Empty<ImageCropperCrop>();
@@ -232,15 +248,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
 
             /// <inheritdoc />
             public bool Equals(ImageCropperFocalPoint other)
-                => other != null && (ReferenceEquals(this, other) || Equals(this, other));
+                => ReferenceEquals(this, other) || Equals(this, other);
 
             /// <inheritdoc />
             public override bool Equals(object obj)
-                => obj != null && (ReferenceEquals(this, obj) || obj is ImageCropperFocalPoint other && Equals(this, other));
+                => ReferenceEquals(this, obj) || obj is ImageCropperFocalPoint other && Equals(this, other);
 
             private static bool Equals(ImageCropperFocalPoint left, ImageCropperFocalPoint right)
-                => left.Left == right.Left
-                   && left.Top == right.Top;
+                => ReferenceEquals(left, right) // deals with both being null, too
+                   || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+                       && left.Left == right.Left
+                       && left.Top == right.Top;
 
             public static bool operator ==(ImageCropperFocalPoint left, ImageCropperFocalPoint right)
                 => Equals(left, right);
@@ -281,17 +299,19 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
 
             /// <inheritdoc />
             public bool Equals(ImageCropperCrop other)
-                => other != null && (ReferenceEquals(this, other) || Equals(this, other));
+                => ReferenceEquals(this, other) || Equals(this, other);
 
             /// <inheritdoc />
             public override bool Equals(object obj)
-                => obj != null && (ReferenceEquals(this, obj) || obj is ImageCropperCrop other && Equals(this, other));
+                => ReferenceEquals(this, obj) || obj is ImageCropperCrop other && Equals(this, other);
 
             private static bool Equals(ImageCropperCrop left, ImageCropperCrop right)
-                => string.Equals(left.Alias, right.Alias)
-                   && left.Width == right.Width
-                   && left.Height == right.Height
-                   && Equals(left.Coordinates, right.Coordinates);
+                => ReferenceEquals(left, right) // deals with both being null, too
+                    || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+                       && string.Equals(left.Alias, right.Alias)
+                       && left.Width == right.Width
+                       && left.Height == right.Height
+                       && Equals(left.Coordinates, right.Coordinates);
 
             public static bool operator ==(ImageCropperCrop left, ImageCropperCrop right)
                 => Equals(left, right);
@@ -336,17 +356,19 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
             
             /// <inheritdoc />
             public bool Equals(ImageCropperCropCoordinates other)
-                => other != null && (ReferenceEquals(this, other) || Equals(this, other));
+                => ReferenceEquals(this, other) || Equals(this, other);
 
             /// <inheritdoc />
             public override bool Equals(object obj)
-                => obj != null && (ReferenceEquals(this, obj) || obj is ImageCropperCropCoordinates other && Equals(this, other));
+                => ReferenceEquals(this, obj) || obj is ImageCropperCropCoordinates other && Equals(this, other);
 
             private static bool Equals(ImageCropperCropCoordinates left, ImageCropperCropCoordinates right)
-                => left.X1 == right.X1
-                   && left.X2 == right.X2
-                   && left.Y1 == right.Y1
-                   && left.Y2 == right.Y2;
+                => ReferenceEquals(left, right) // deals with both being null, too
+                   || !ReferenceEquals(left, null) && !ReferenceEquals(right, null)
+                      && left.X1 == right.X1
+                      && left.X2 == right.X2
+                      && left.Y1 == right.Y1
+                      && left.Y2 == right.Y2;
 
             public static bool operator ==(ImageCropperCropCoordinates left, ImageCropperCropCoordinates right)
                 => Equals(left, right);

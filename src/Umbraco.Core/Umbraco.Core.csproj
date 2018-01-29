@@ -338,6 +338,7 @@
     <Compile Include="PropertyEditors\SliderPropertyEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />

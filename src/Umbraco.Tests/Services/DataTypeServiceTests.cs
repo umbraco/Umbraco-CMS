@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            IDataType dataType = new DataType(-1, "Test.TestEditor") { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            IDataType dataType = new DataType(-1, Constants.PropertyEditors.Aliases.NoEdit) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
 
             // Assert

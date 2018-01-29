@@ -41,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
 
             var configuration = dataType.Configuration;
+            Dictionary<string, object> configurationDictionary = null;
             var fields = Array.Empty<DataTypeConfigurationFieldDisplay>();
 
             // if we have a property editor,
@@ -49,14 +50,13 @@ namespace Umbraco.Web.Models.Mapping
             if (editor != null)
             {
                 fields = editor.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
-                configuration = editor.ConfigurationEditor.ToEditor(editor.DefaultConfiguration, configuration);
+                configurationDictionary = editor.ConfigurationEditor.ToEditor(editor.DefaultConfiguration, configuration);
             }
 
-            // either it's a dictionary already, or convert
-            // fixme if it's no a dictionary we should just throw at that point
-            var dictionary = configuration as IDictionary<string, object> ?? ObjectExtensions.ToObjectDictionary(configuration);
+            if (configurationDictionary == null)
+                configurationDictionary = new Dictionary<string, object>();
  
-            MapPreValueValuesToPreValueFields(fields, dictionary);
+            MapPreValueValuesToPreValueFields(fields, configurationDictionary);
 
             return fields;
         }

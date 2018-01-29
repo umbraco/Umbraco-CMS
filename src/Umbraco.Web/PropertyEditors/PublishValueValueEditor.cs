@@ -32,9 +32,12 @@ namespace Umbraco.Web.PropertyEditors
             if (value == null)
                 return null;
 
-            // fixme we should probably completely kill this editor
-
+            // get the configuration items
+            // if none, fallback to base
             var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
+            if (configuration == null)
+                return base.ConvertDbToString(propertyType, value, dataTypeService);
+
             var items = configuration.Items;
 
             var idAttempt = value.TryConvertTo<int>();

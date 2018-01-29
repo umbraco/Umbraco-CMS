@@ -20,6 +20,9 @@ namespace Umbraco.Core.Models
         public static T ConfigurationAs<T>(this IDataType dataType)
             where T : class
         {
+            if (dataType == null)
+                throw new ArgumentNullException(nameof(dataType));
+
             var configuration = dataType.Configuration;
 
             switch (configuration)

@@ -100,7 +100,7 @@ namespace Umbraco.Core.PropertyEditors
                     return ValueStorageType.Date;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(valueType), "Not a valid ValueTypes");
+                    throw new ArgumentOutOfRangeException(nameof(valueType), $"Value \"{valueType}\" is not a valid ValueTypes.");
             }
 
         }

@@ -4,33 +4,30 @@ using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
-    /// Used to do some type conversions from ImageCropDataSet to string and JObject
-    /// fixme WHY?
+    /// Converts <see cref="ImageCropperValue"/> to string or JObject (why?).
     /// </summary>
-    public class ImageCropDataSetTypeConverter : TypeConverter
+    public class ImageCropperValueTypeConverter : TypeConverter
     {
         private static readonly Type[] ConvertableTypes = { typeof(JObject) };
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
             return ConvertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
-                   || base.CanConvertFrom(context, destinationType);
+                   || CanConvertFrom(context, destinationType);
         }
 
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var cropDataSet = value as ImageCropperValue;
-            if (cropDataSet == null)
+            var cropperValue = value as ImageCropperValue;
+            if (cropperValue == null)
                 return null;
 
             return TypeHelper.IsTypeAssignableFrom<JObject>(destinationType)
-                ? JObject.FromObject(cropDataSet)
+                ? JObject.FromObject(cropperValue)
                 : base.ConvertTo(context, culture, value, destinationType);
         }
     }

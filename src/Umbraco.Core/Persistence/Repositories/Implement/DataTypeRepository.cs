@@ -53,6 +53,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
+            // fixme what shall we do when there is no editor for the editor alias?
+            // we should pass _editors to the factory - and then what?
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
             return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value[x.EditorAlias])).ToArray();
         }

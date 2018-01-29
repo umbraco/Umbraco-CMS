@@ -69,36 +69,44 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public object Configuration // fixme is this OK if null? should!
+        public object Configuration
         {
             get
             {
+                // if we know we have a configuration (which may be null), return it
+                // if we don't have an editor, then we have no configuration, return null
+                // else, use the editor to get the configuration object
+
                 if (_hasConfiguration) return _configuration;
+                if (_editor == null) return null;
 
                 _configuration = _editor.ConfigurationEditor.ParseConfiguration(_configurationJson);
                 _hasConfiguration = true;
                 _configurationJson = null;
+                _editor = null;
                 return _configuration;
             }
             set
             {
-                if (value == null) throw new ArgumentNullException(); // or is this ok?
-
-                // fixme - do it HERE
-                // fixme - BUT then we have a problem, what if it's changed?
-                // can't we treat configurations as plain immutable objects?!
-                // also it means that we just cannot work with dictionaries?
-                if (value is IConfigureValueType valueTypeConfiguration)
-                    DatabaseType = ValueTypes.ToStorageType(valueTypeConfiguration.ValueType);
-                if (value is IDictionary<string, object> dictionaryConfiguration
-                    && dictionaryConfiguration.TryGetValue("", out var valueTypeObject)
-                    && valueTypeObject is string valueTypeString)
-                    DatabaseType = ValueTypes.ToStorageType(valueTypeString);
+                if (value != null)
+                {
+                    // fixme - do it HERE
+                    // fixme - BUT then we have a problem, what if it's changed?
+                    // can't we treat configurations as plain immutable objects?!
+                    // also it means that we just cannot work with dictionaries?
+                    if (value is IConfigureValueType valueTypeConfiguration)
+                        DatabaseType = ValueTypes.ToStorageType(valueTypeConfiguration.ValueType);
+                    if (value is IDictionary<string, object> dictionaryConfiguration
+                        && dictionaryConfiguration.TryGetValue("", out var valueTypeObject)
+                        && valueTypeObject is string valueTypeString)
+                        DatabaseType = ValueTypes.ToStorageType(valueTypeString);
+                }
 
                 // fixme detect changes? if it's the same object? need a special comparer!
                 SetPropertyValueAndDetectChanges(value, ref _configuration, Selectors.Configuration);
                 _hasConfiguration = true;
                 _configurationJson = null;
+                _editor = null;
             }
         }
 
@@ -106,10 +114,10 @@ namespace Umbraco.Core.Models
         public void SetConfiguration(string configurationJson, PropertyEditor editor)
         {
             // fixme this is lazy, BUT then WHEN are we figuring out the valueType?
+            _editor = editor ?? throw new ArgumentNullException(nameof(editor));
             _hasConfiguration = false;
             _configuration = null;
             _configurationJson = configurationJson;
-            _editor = editor;
             OnPropertyChanged(Selectors.Configuration);
         }
     }

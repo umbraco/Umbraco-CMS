@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Published
                 Configuration = new NestedContentConfiguration
                 {
                     MinItems = 1,
-                    MaxItems = 2,
+                    MaxItems = 1,
                     ContentTypes = new[]
                     {
                         new NestedContentConfiguration.ContentType { Alias = "contentN1" }

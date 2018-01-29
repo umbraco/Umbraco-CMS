@@ -161,19 +161,16 @@ namespace Umbraco.Web.PropertyEditors
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
 
-            // fixme - no idea of what we should do here, and ConvertDbToString should die anyways
-            throw new NotImplementedException();
+            // if we dont have a json structure, we will get it from the property type
+            var val = value.ToString();
+            if (val.DetectIsJson())
+                return val;
 
-            //// if we dont have a json structure, we will get it from the property type
-            //var val = value.ToString();
-            //if (val.DetectIsJson())
-            //    return val;
-
-            //// more magic here ;-(
-            //var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeId).FirstOrDefault();
-            //var crops = string.IsNullOrEmpty(config) ? "[]" : config;
-            //var newVal = "{src: '" + val + "', crops: " + crops + "}";
-            //return newVal;
+            // more magic here ;-(
+            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var crops = configuration?.Crops; // fixme but Crops should not be a string and then we'd serialize them
+            if (string.IsNullOrWhiteSpace(crops)) crops = "[]";
+            return "{src: '" + val + "', crops: " + crops + "}";
         }
     }
 }

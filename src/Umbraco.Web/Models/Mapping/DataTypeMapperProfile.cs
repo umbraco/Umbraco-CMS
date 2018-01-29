@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             // create, capture, cache
             var availablePropertyEditorsResolver = new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content);
-            var preValueDisplayResolver = new DataTypeConfigurationFieldDisplayResolver();
+            var configurationDisplayResolver = new DataTypeConfigurationFieldDisplayResolver();
             var databaseTypeResolver = new DatabaseTypeResolver();
 
             CreateMap<PropertyEditor, PropertyEditorBasic>();
@@ -54,6 +54,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.Group, opt => opt.Ignore())
                 .ForMember(dest => dest.IsSystemDataType, opt => opt.MapFrom(src => systemIds.Contains(src.Id)))
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
                     if (Current.PropertyEditors.TryGet(src.EditorAlias, out var editor))
@@ -67,7 +68,7 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<IDataType, DataTypeDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.DataType, src.Key)))
                 .ForMember(dest => dest.AvailableEditors, opt => opt.ResolveUsing(src => availablePropertyEditorsResolver.Resolve(src)))
-                .ForMember(dest => dest.PreValues, opt => opt.ResolveUsing(src => preValueDisplayResolver.Resolve(src)))
+                .ForMember(dest => dest.PreValues, opt => opt.ResolveUsing(src => configurationDisplayResolver.Resolve(src)))
                 .ForMember(dest => dest.SelectedEditor, opt => opt.MapFrom(src => src.EditorAlias.IsNullOrWhiteSpace() ? null : src.EditorAlias))
                 .ForMember(dest => dest.HasPrevalues, opt => opt.Ignore())
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
@@ -75,6 +76,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.Group, opt => opt.Ignore())
                 .ForMember(dest => dest.IsSystemDataType, opt => opt.MapFrom(src => systemIds.Contains(src.Id)))
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {
                     if (Current.PropertyEditors.TryGet(src.EditorAlias, out var editor))
@@ -86,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //gets a list of PreValueFieldDisplay objects from the data type definition
             CreateMap<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>()
-                  .ConvertUsing(src => preValueDisplayResolver.Resolve(src));
+                  .ConvertUsing(src => configurationDisplayResolver.Resolve(src));
 
             CreateMap<DataTypeSave, IDataType>()
                 .ConstructUsing(src => new DataType(src.EditorAlias) {CreateDate = DateTime.Now})
@@ -98,7 +100,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.DatabaseType, opt => opt.ResolveUsing(src => databaseTypeResolver.Resolve(src)))
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())
-                .ForMember(dest => dest.SortOrder, opt => opt.Ignore());
+                .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
+                .ForMember(dest => dest.Configuration, opt => opt.Ignore());
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
             CreateMap<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
