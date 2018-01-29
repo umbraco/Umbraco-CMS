@@ -5,6 +5,15 @@
         "group": "Getting Started",
         "groupOrder": 100,
         "allowDisable": true,
+        "requiredSections": [
+            "content",
+            "media",
+            "settings",
+            "developer",
+            "users",
+            "member",
+            "forms"
+        ],
         "steps": [
             {
                 "title": "Welcome to Umbraco - The Friendly CMS",
@@ -25,7 +34,6 @@
                 "content": "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the appropriate icon in the main menu and you'll be there in no time.",
                 "backdropOpacity": 0.6
             },
-
             {
                 "element": "#tree",
                 "elementPreventClick": true,
@@ -88,6 +96,15 @@
         "alias": "umbIntroCreateDocType",
         "group": "Getting Started",
         "groupOrder": 100,
+        "requiredSections": [
+            "content",
+            "media",
+            "settings",
+            "developer",
+            "users",
+            "member",
+            "forms"
+        ],
         "steps": [
             {
                 "title": "Create your first Document Type",
@@ -203,6 +220,15 @@
         "alias": "umbIntroCreateContent",
         "group": "Getting Started",
         "groupOrder": 100,
+        "requiredSections": [
+            "content",
+            "media",
+            "settings",
+            "developer",
+            "users",
+            "member",
+            "forms"
+        ],
         "steps": [
             {
                 "title": "Creating your first content node",
@@ -253,6 +279,15 @@
         "alias": "umbIntroRenderInTemplate",
         "group": "Getting Started",
         "groupOrder": 100,
+        "requiredSections": [
+            "content",
+            "media",
+            "settings",
+            "developer",
+            "users",
+            "member",
+            "forms"
+        ],
         "steps": [
             {
                 "title": "Render your content in a template",
@@ -299,6 +334,15 @@
         "alias": "umbIntroViewHomePage",
         "group": "Getting Started",
         "groupOrder": 100,
+        "requiredSections": [
+            "content",
+            "media",
+            "settings",
+            "developer",
+            "users",
+            "member",
+            "forms"
+        ],
         "steps": [
             {
                 "title": "View your Umbraco site",
@@ -339,6 +383,15 @@
         "alias": "umbIntroMediaSection",
         "group": "Getting Started",
         "groupOrder": 100,
+        "requiredSections": [
+            "content",
+            "media",
+            "settings",
+            "developer",
+            "users",
+            "member",
+            "forms"
+        ],
         "steps": [
             {
                 "title": "How to use the media library",

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,9 +18,6 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<BackOfficeTourFile> GetTours()
         {
-            //Check if it has admin group
-            var isAdmin = UmbracoContext.Current.Security.CurrentUser.Groups.Any(x => x.Alias == "admin");
-
             var result = new List<BackOfficeTourFile>();
 
             if (UmbracoConfig.For.UmbracoSettings().BackOffice.Tours.EnableTours == false)
@@ -39,10 +37,6 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
                 {
-                    var tourFileName = Path.GetFileName(tourFile.TrimEnd('\\'));
-                    //We brake if isAdmin is false as we don't want to show getting-started tour to non-admins
-                    if (tourFileName.Equals("getting-started.json") && isAdmin == false) break;
-
                     TryParseTourFile(tourFile, result, nonPluginFilters, aliasOnlyFilters);
                 }
             }
@@ -71,8 +65,28 @@ namespace Umbraco.Web.Editors
                     }
                 }
             }
+            //Get all allowed sections for the current user
+            var allowedSections = UmbracoContext.Current.Security.CurrentUser.AllowedSections.ToList();
 
-            return result.OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
+            var toursToBeRemoved = new List<BackOfficeTourFile>();
+
+            //Checking to see if the user has access to the required tour sections, else we remove the tour
+            foreach (var backOfficeTourFile in result)
+            {
+                foreach (var tour in backOfficeTourFile.Tours)
+                {
+                    foreach (var toursRequiredSection in tour.RequiredSections)
+                    {
+                        if (allowedSections.Contains(toursRequiredSection) == false)
+                        {
+                            toursToBeRemoved.Add(backOfficeTourFile);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private void TryParseTourFile(string tourFile,
