@@ -145,35 +145,36 @@ a.umb-editor-header__close-split-view:hover {
 	margin-right: -5px;
 }
 
-.umb-variant-switcher_item:hover .umb-variant-switcher__state {
-	opacity: 0;
-	visibility: hidden;
+.umb-variant-switcher__item {
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.umb-variant-switcher_item:hover .umb-variant-switcher__split-view {
-	opacity: 1;
-	visibility: visible;
+.umb-variant-switcher__item:hover,
+.umb-variant-switcher__item:focus,
+.umb-variant-switcher__name:hover,
+.umb-variant-switcher__name:focus {
+	background-color: @gray-10;
+	outline: none;
+}
+
+.umb-variant-switcher__item:hover .umb-variant-switcher__split-view {
+	display: block;
+	cursor: pointer;
 }
 
 .umb-variant-switcher__name {
 	font-size: 14px;
-}
-
-.umb-variant-switcher__state {
-	position: absolute;
-	right: 20px;
-	opacity: 1;
-	transition: opacity 0.2;
-	visibility: visible;
+	padding: 8px 20px;
+	flex: 1;
+	cursor: pointer;
 }
 
 .umb-variant-switcher__split-view {
 	font-size: 13px;
-	position: absolute;
-	right: 20px;
-	opacity: 0;
-	transition: opacity 0.2;
-	visibility: hidden;
+	display: none;
+	padding: 8px 20px;
 }
 
 // container

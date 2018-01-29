@@ -209,9 +209,20 @@ Use this directive to construct a header inside the main editor window.
         function link(scope, el, attr, ctrl) {
 
             scope.vm = {};
+            scope.vm.dropdownOpen = false;
+            scope.vm.currentVariant = "";
 
             function onInit() {
+                setCurrentVariant(scope.variants);
                 setVariantStatusColor(scope.variants);
+            }
+
+            function setCurrentVariant(variants) {
+                angular.forEach(variants, function (variant) {
+                    if(variant.current) {
+                        scope.vm.currentVariant = variant;
+                    }
+                });
             }
 
             function setVariantStatusColor(variants) {
@@ -235,11 +246,13 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
-            scope.selectVariant = function(variant) {
+            scope.selectVariant = function(event, variant) {
+                console.log("selec variant called");
                 if(scope.onSelectVariant) {
                     scope.onSelectVariant({"variant": variant});
+                    scope.vm.dropdownOpen = false;
                 }
-            }
+            };
 
             scope.openIconPicker = function() {
                 scope.dialogModel = {
@@ -274,17 +287,19 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
-            scope.openInSplitView = function(variant) {
+            scope.openInSplitView = function(event, variant) {
                 if(scope.onOpenInSplitView) {
-                    scope.onOpenInSplitView(variant);
+                    scope.vm.dropdownOpen = false;
+                    scope.onOpenInSplitView({"variant": variant});
                 }
             };
 
             scope.$watch('variants', function(newValue, oldValue){
                 if(!newValue) return;
                 if(newValue === oldValue) return;
+                setCurrentVariant(newValue);
                 setVariantStatusColor(newValue);
-            });
+            }, true);
 
             onInit();
 

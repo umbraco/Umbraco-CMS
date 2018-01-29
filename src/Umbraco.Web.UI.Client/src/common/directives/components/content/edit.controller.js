@@ -56,7 +56,8 @@
       // prototype variants
       $scope.content.variants = [
         {
-          "culture": "English (United States)",
+          "cultureDisplayName": "English (United States)",
+          "culture": "en-US",
           "current": true,
           "segments" : [
             {
@@ -73,7 +74,8 @@
           ]
         },
         {
-          "culture": "Danish",
+          "cultureDisplayName": "Danish",
+          "culture": "da-DK",
           "current": false,
           "segments" : [
             {
@@ -87,7 +89,8 @@
           ]
         },
         {
-            "culture": "Spanish (Spain)",
+            "cultureDisplayName": "Spanish (Spain)",
+            "culture": "es-ES",
             "current": false,
             "states": [
               {
@@ -99,7 +102,8 @@
             ]
         },
         {
-            "culture": "French (France)",
+            "cultureDisplayName": "French (France)",
+            "culture": "fr-FR",
             "current": false,
             "segments" : [
               {
@@ -116,7 +120,8 @@
             ]
         },
         {
-            "culture": "German (Germany)",
+            "cultureDisplayName": "German (Germany)",
+            "culture": "de-DE",
             "current": false
         }
       ];
@@ -385,10 +390,6 @@
       $location.path($scope.page.listViewPath);
     };
 
-    $scope.selectVariant = function(variant) {
-      console.log(variant);
-    }
-
     $scope.restore = function (content) {
 
       $scope.page.buttonRestore = "busy";
@@ -437,6 +438,14 @@
 
     };
 
+    $scope.selectVariant = function(variant, variants) {
+      $scope.content.name = "You changed to a variant";
+      angular.forEach(variants, function(variant) {
+        variant.current = false;
+      });
+      variant.current = true;
+    };
+
     $scope.closeSplitView = function(index, editor) {
       // hacky animation stuff - it will be much better when angular is upgraded
       editor.loading = true;
@@ -446,7 +455,9 @@
       }, 400);
     };
 
-    $scope.openInSplitView = function() {
+    $scope.openInSplitView = function(selectedVariant) {
+
+      console.log(selectedVariant);
 
       var editor = {};
       // hacking animation states - these should hopefully be easier to do when we upgrade angular
@@ -457,11 +468,20 @@
       $timeout(function(){ 
         $scope.editors[editorIndex].collapsed = false;
       }, 100);
-      
+    
       // fake loading of content
       $timeout(function(){
         $scope.editors[editorIndex].content = angular.copy($scope.content);
         $scope.editors[editorIndex].content.name = "What a variant";
+        // set selected variant on split view content
+        console.log($scope.editors[editorIndex].content.variants);
+        angular.forEach($scope.editors[editorIndex].content.variants, function(variant) {
+          if(variant.culture === selectedVariant.culture) {
+            variant.current = true;
+          } else {
+            variant.current = false;
+          }
+        });
         $scope.editors[editorIndex].loading = false;
       }, 500);
     };

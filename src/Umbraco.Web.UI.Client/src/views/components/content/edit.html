@@ -22,11 +22,11 @@
                             hide-alias="true"
                             navigation="editor.content.apps"
                             variants="editor.content.variants"
-                            on-select-variant="selectVariant(variant)"
+                            on-select-variant="selectVariant(variant, editor.content.variants)"
                             on-back="backToListView()"
                             show-back-button="{{page.listViewPath}}"
                             split-view-open="editors.length > 1"
-                            on-open-in-split-view="openInSplitView()"
+                            on-open-in-split-view="openInSplitView(variant)"
                             on-close-split-view="closeSplitView($index, editor)">
                         </umb-editor-header>
 
