@@ -167,7 +167,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         });
     }
     else {
-        dialogOptions.startNodeId = $scope.model.config.startNode.id;
+        dialogOptions.startNodeId = $scope.model.config.startNode.id ? $scope.model.config.startNode.id : -1;
     }
 
     //dialog
