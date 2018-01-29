@@ -20,12 +20,6 @@ namespace Umbraco.Core.Persistence.Mappers
 
         public Func<object, object> GetFromDbConverter(PropertyInfo pi, Type sourceType)
         {
-            // Udi is handled as string
-            if (typeof(Udi).IsAssignableFrom(pi.PropertyType) && sourceType == typeof(string))
-                return value => value is string stringValue
-                    ? (string.IsNullOrWhiteSpace(stringValue) ? null : Udi.Parse(stringValue))
-                    : null;
-
             return null;
         }
 
@@ -44,10 +38,6 @@ namespace Umbraco.Core.Persistence.Mappers
                     return null;
                 };
             }
-
-            // Udi is handled as string
-            if (typeof(Udi).IsAssignableFrom(sourceType))
-                return value => value?.ToString();
 
             return null;
         }
