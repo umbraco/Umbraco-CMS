@@ -74,7 +74,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <returns></returns>
         protected virtual bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
-            return ValidateProperties(postedItem.Properties.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
+            return ValidateProperties(postedItem.Properties.ToList(), postedItem.PersistedContent.Properties.ToList(), actionContext);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="persistedProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected bool ValidateProperties(ContentPropertyBasic[] postedProperties , Property[] persistedProperties, HttpActionContext actionContext)
+        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties , List<Property> persistedProperties, HttpActionContext actionContext)
         {
             foreach (var p in postedProperties)
             {

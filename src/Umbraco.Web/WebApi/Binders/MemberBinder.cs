@@ -235,6 +235,14 @@ namespace Umbraco.Web.WebApi.Binders
                 return base.ValidatePropertyData(postedItem, actionContext);
             }
 
+            /// <summary>
+            /// This ensures that the internal membership property types are removed from validation before processing the validation
+            /// since those properties are actually mapped to real properties of the IMember.
+            /// This also validates any posted data for fields that are sensitive.
+            /// </summary>
+            /// <param name="postedItem"></param>
+            /// <param name="actionContext"></param>
+            /// <returns></returns>
             protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
@@ -245,9 +253,15 @@ namespace Umbraco.Web.WebApi.Binders
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);
                 }
 
-                return ValidateProperties(propertiesToValidate.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
-            }
+                var sensitiveProperties = postedItem.PersistedContent.ContentType
+                    .PropertyTypes.Where(x => postedItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                    .ToList();
 
+                //TODO: Finish this validation
+
+                return ValidateProperties(propertiesToValidate, postedItem.PersistedContent.Properties.ToList(), actionContext);
+            }
+            
             internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
             {
                 if (contentItem == null) throw new ArgumentNullException("contentItem");
