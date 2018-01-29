@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using umbraco.presentation.webservices;
 
 namespace Umbraco.Web.Models
 {

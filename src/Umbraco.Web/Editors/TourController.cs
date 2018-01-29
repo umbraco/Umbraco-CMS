@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,8 +7,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
