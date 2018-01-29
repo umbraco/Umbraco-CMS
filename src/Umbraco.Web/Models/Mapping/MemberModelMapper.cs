@@ -390,14 +390,17 @@ namespace Umbraco.Web.Models.Mapping
                 //now update the IsSensitive value
                 foreach (var prop in result)
                 {
-                    prop.IsSensitive = memberType.IsSensitiveProperty(prop.Alias);
+                    //check if this property is flagged as sensitive
+                    var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
                     //check permissions for viewing sensitive data
-                    if (prop.IsSensitive && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                    if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                     {
+                        //mark this property as readonly so that it does not post any data
+                        prop.Readonly = true;
                         //replace this editor with a sensitivevalue
                         prop.View = "sensitivevalue";
-                        //replace the value
-                        prop.Value = _localizedTextService.Localize("content/isSensitiveValue");
+                        //clear the value
+                        prop.Value = null;
                     }
                 }
                 return result;

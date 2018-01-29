@@ -304,14 +304,14 @@
                     _.each(tab.properties, function (prop) {
 
                         //don't include the custom generic tab properties
-                        if (!prop.alias.startsWith("_umb_")) {
+                        //don't include a property that is marked readonly
+                        if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
                             saveModel.properties.push({
                                 id: prop.id,
                                 alias: prop.alias,
                                 value: prop.value
                             });
                         }
-
                     });
                 });
 

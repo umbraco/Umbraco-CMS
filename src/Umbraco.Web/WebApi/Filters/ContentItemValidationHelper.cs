@@ -125,8 +125,12 @@ namespace Umbraco.Web.WebApi.Filters
                     continue;
                 }
 
-                //get the posted value for this property
-                var postedValue = postedItem.Properties.Single(x => x.Alias == p.Alias).Value;
+                //get the posted value for this property, this may be null in cases where the property was marked as readonly which means
+                //the angular app will not post that value.
+                var postedProp = postedItem.Properties.FirstOrDefault(x => x.Alias == p.Alias);
+                if (postedProp == null) continue;
+
+                var postedValue = postedProp.Value;
 
                 //get the pre-values for this property
                 var preValues = p.PreValues;
