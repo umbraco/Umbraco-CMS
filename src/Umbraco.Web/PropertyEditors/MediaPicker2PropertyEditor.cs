@@ -58,6 +58,13 @@ namespace Umbraco.Web.PropertyEditors
                 });
                 Fields.Add(new PreValueField()
                 {
+                    Key = "bypassUserPermissions",
+                    View = "boolean",
+                    Name = "Bypass User Permissions",
+                    Description = "If set, the chosen start node will bypass any user permissions."
+                });
+                Fields.Add(new PreValueField()
+                {
                     Key = "startNodeId",
                     View = "mediapicker",
                     Name = "Start node",
