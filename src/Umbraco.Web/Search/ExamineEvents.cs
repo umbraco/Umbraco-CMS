@@ -25,7 +25,12 @@ namespace Umbraco.Web.Search
 	/// </summary>
 	public sealed class ExamineEvents : ApplicationEventHandler
 	{
-		/// <summary>
+	    // the default enlist priority is 100
+	    // enlist with a lower priority to ensure that anything "default" runs after us
+        // but greater that SafeXmlReaderWriter priority which is 60
+	    private const int EnlistPriority = 80;
+
+	    /// <summary>
 		/// Once the application has started we should bind to all events and initialize the providers.
 		/// </summary>
 		/// <param name="httpApplication"></param>
@@ -534,7 +539,7 @@ namespace Umbraco.Web.Search
 	                (completed, actions) => // action
 	                {
 	                    if (completed) actions.Execute();
-	                }, 99);
+	                }, EnlistPriority);
 	        }
 
 	        public void Add(DeferedAction action)
