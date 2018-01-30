@@ -20,7 +20,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        showSearch: false,
 	        results: [],
 	        selectedSearchResults: []
-	    };
+        };
+
+        $scope.bypassUserPermissions = dialogOptions.bypassUserPermissions;
+        
+        $scope.customTreeParams = $scope.bypassUserPermissions ? "bypassUserPermissions=" + $scope.bypassUserPermissions : "";
 
 	    if (dialogOptions.currentTarget) {
 	        $scope.model.target = dialogOptions.currentTarget;
