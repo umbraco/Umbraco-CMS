@@ -64,7 +64,7 @@ namespace Umbraco.Web.Trees
         {
             var node = base.CreateRootNode(queryStrings);
 
-            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false)
+            if (IsDialog(queryStrings) && UserStartNodes.Contains(Constants.System.Root) == false && BypassUserPermissions(queryStrings) == false)
             {
                 node.AdditionalData["noAccess"] = true;
             }
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Trees
         {
             bool hasPathAccess;
             var entityIsAncestorOfStartNodes = Security.CurrentUser.IsInBranchOfStartNode(e, Services.EntityService, RecycleBinId, out hasPathAccess);
-            if (entityIsAncestorOfStartNodes == false)
+            if (BypassUserPermissions(queryStrings) == false && entityIsAncestorOfStartNodes == false)
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
