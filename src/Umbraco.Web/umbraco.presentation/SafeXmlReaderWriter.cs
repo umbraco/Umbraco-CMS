@@ -21,7 +21,7 @@ namespace umbraco
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" has a clean xml
-        private const int EnlistPriority = 90;
+        private const int EnlistPriority = 60;
 
         private SafeXmlReaderWriter(IDisposable releaser, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool isWriter, bool scoped)
         {
