@@ -25,6 +25,7 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
+               $scope.contentPickerOverlay.customTreeParams = $scope.model.config.bypassUserPermissions ? "bypassUserPermissions=" + $scope.model.config.bypassUserPermissions : "";
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {
@@ -50,6 +51,7 @@
                $scope.contentPickerOverlay.view = "contentpicker";
                $scope.contentPickerOverlay.multiPicker = false;
                $scope.contentPickerOverlay.show = true;
+               $scope.contentPickerOverlay.customTreeParams = $scope.model.config.bypassUserPermissions ? "bypassUserPermissions=" + $scope.model.config.bypassUserPermissions : "";
                $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
 
                $scope.contentPickerOverlay.submit = function(model) {

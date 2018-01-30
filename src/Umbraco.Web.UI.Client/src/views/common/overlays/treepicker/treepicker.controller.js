@@ -123,9 +123,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         function initTree() {
             //create the custom query string param for this tree
-            $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
-            $scope.customTreeParams += dialogOptions.bypassUserPermissions ? "&bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
-            $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
+            var params = [];
+
+            if (dialogOptions.startNodeId)
+                params.push("startNodeId=" + dialogOptions.startNodeId);
+
+            if (dialogOptions.bypassUserPermissions)
+                params.push("bypassUserPermissions=" + dialogOptions.bypassUserPermissions);
+
+            if (dialogOptions.customTreeParams)
+                params.push(dialogOptions.customTreeParams);
+
+            $scope.customTreeParams = params.join('&');
+
             $scope.treeReady = true;
         }
 
