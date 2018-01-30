@@ -1,71 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
 using umbraco;
 using umbraco.cms.businesslogic.web;
-using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
-    // debug
-    public class ExamineCultureEvents : IApplicationEventHandler
-    {
-        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            //throw new NotImplementedException();
-        }
-
-        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            //throw new NotImplementedException();
-        }
-
-        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            var helper = new UmbracoHelper(UmbracoContext.Current);
-            ExamineManager.Instance.IndexProviderCollection["ExternalIndexer"].GatheringNodeData
-                += (sender, e) => ExamineCultureEvents.GatheringContentData(sender, e, helper);
-            PageCacheRefresher.CacheUpdated += (sender, args) =>
-            {
-                var x = UmbracoContext.Current.ContentCache.GetById(1);
-            };
-        }
-
-        public static void GatheringContentData(object sender, IndexingNodeDataEventArgs e, UmbracoHelper helper)
-        {
-            // this should happen in the ExamineEvents class
-            var scopeProvider = ApplicationContext.Current.ScopeProvider;
-            using (var scope = scopeProvider.CreateScope()) // no scope, no context
-            {
-                var enlisted = scopeProvider.Context.Enlist("key",
-                    () => new List<int>(), // creator
-                    (completed, list) => // action
-                    {
-                        // anything, really
-                    },
-                    1000); // default priority, used by SafeXmlReaderWriter, is 100 - run after it - fixme - internal should run < 100!
-                enlisted.Add(e.NodeId);
-                scope.Complete();
-            }
-
-            var c = ApplicationContext.Current.Services.ContentService.GetById(e.NodeId).GetCulture();
-            IPublishedContent content = helper.TypedContent(e.NodeId);
-            if (content != null)
-            {
-                var culture = content.GetCulture();
-                if (culture != null)
-                {
-                    e.Fields.Add("culture", culture.ToString());
-                }
-            }
-        }
-    }
-
     /// <summary>
     /// PageCacheRefresher is the standard CacheRefresher used by Load-Balancing in Umbraco.
     /// </summary>
