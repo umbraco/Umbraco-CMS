@@ -14,6 +14,7 @@
             vm.linkPickerOverlay = {
                 view: "linkpicker",
                 currentTarget: currentTarget,
+                bypassUserPermissions: $scope.model.config.rte.bypassUserPermissions,
                 show: true,
                 submit: function(model) {
                     tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);

@@ -40,4 +40,10 @@
             <input type="number" min="0" ng-model="model.value.maxImageSize" class="umb-editor-tiny" placeholder="Width/Height" /> Pixels
         </div> 
     </umb-control-group>
+
+    <umb-control-group label="Bypass User Permissions" description="If set, the chosen start node will bypass any user permissions.">
+        <div class="vertical-align-items">
+            <input type="checkbox" ng-model="model.value.bypassUserPermissions" class="umb-editor-tiny"  />
+        </div>
+    </umb-control-group>
 </div>
