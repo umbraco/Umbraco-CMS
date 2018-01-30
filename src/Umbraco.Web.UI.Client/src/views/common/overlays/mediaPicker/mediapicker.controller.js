@@ -350,7 +350,7 @@ angular.module("umbraco")
 
             function getChildren(id) {
                 $scope.loading = true;
-                return mediaResource.getChildren(id)
+                return mediaResource.getChildren(id, { bypassUserPermissions: $scope.model.bypassUserPermissions })
                     .then(function(data) {
                         $scope.searchOptions.filter = "";
                         $scope.images = data.items ? data.items : [];
