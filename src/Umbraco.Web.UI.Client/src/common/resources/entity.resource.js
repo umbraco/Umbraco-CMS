@@ -292,14 +292,29 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
-        getAncestors: function (id, type) {            
+        getAncestors: function (id, type, options) {    
+            var defaults = {
+                bypassUserPermissions: false
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetAncestors",
-                       [{id: id}, {type: type}])),
-               'Failed to retrieve ancestor data for id ' + id);
+                       [
+                           { id: id },
+                           { type: type },
+                           { bypassUserPermissions: options.bypassUserPermissions }
+                       ])),
+                       'Failed to retrieve ancestor data for id ' + id);
         },
         
         /**
