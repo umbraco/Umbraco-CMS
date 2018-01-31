@@ -534,7 +534,8 @@ namespace Umbraco.Web.Editors
             int pageSize,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
-            string filter = "")
+            string filter = "",
+            bool bypassUserPermissions = false)
         {
             if (pageNumber <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -562,7 +563,7 @@ namespace Umbraco.Web.Editors
                             break;
                     }
 
-                    entities = aids == null || aids.Contains(Constants.System.Root)
+                    entities = aids == null || aids.Contains(Constants.System.Root) || bypassUserPermissions == true
                         ? Services.EntityService.GetPagedDescendantsFromRoot(objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter, includeTrashed: false)
                         : Services.EntityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize, out totalRecords, orderBy, orderDirection, filter);
                 }

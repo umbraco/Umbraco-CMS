@@ -446,7 +446,8 @@ function entityResource($q, $http, umbRequestHelper) {
                 pageNumber: 100,
                 filter: '',
                 orderDirection: "Ascending",
-                orderBy: "SortOrder"
+                orderBy: "SortOrder",
+                bypassUserPermissions: false
             };
             if (options === undefined) {
                 options = {};
@@ -475,7 +476,8 @@ function entityResource($q, $http, umbRequestHelper) {
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
                             orderDirection: options.orderDirection,
-                            filter: encodeURIComponent(options.filter)
+                            filter: encodeURIComponent(options.filter),
+                            bypassUserPermissions: options.bypassUserPermissions
                         }
                     )),
                 'Failed to retrieve child data for id ' + parentId);

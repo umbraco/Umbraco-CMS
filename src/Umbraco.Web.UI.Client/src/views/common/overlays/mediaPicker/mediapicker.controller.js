@@ -53,6 +53,7 @@ angular.module("umbraco")
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
+                bypassUserPermissions: $scope.model.bypassUserPermissions
             };
 
             //preload selected item
@@ -304,7 +305,8 @@ angular.module("umbraco")
                                 pageSize: 100,
                                 totalItems: 0,
                                 totalPages: 0,
-                                filter: ''
+                                filter: '',
+                                bypassUserPermissions: $scope.model.bypassUserPermissions
                             };
                             getChildren($scope.currentFolder.id);
                         }
