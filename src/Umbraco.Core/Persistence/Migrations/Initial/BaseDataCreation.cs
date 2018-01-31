@@ -178,11 +178,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, StartMediaId = -1, StartContentId = -1, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
             _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, StartMediaId = -1, StartContentId = -1, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5Fï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
             _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.TranslatorGroupAlias, Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-globe" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 5, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.SensitiveDataGroupAlias, Name = "Sensitive data", DefaultPermissions = "", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-lock" });
         }
 
         private void CreateUmbracoUser2UserGroupData()
         {
-            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = 0 });
+            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = 0 }); //add admin to admins
+            _database.Insert(new User2UserGroupDto { UserGroupId = 5, UserId = 0 }); //add admin to sensitive data
         }
 
         private void CreateUmbracoUserGroup2AppData()

@@ -154,6 +154,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(7, 7, 0);
             }
 
+            //if the error is for isSensitive column it must be the previous version to 7.9 since that is when it is added
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMemberType,isSensitive"))))
+            {
+                return new Version(7, 8, 0);
+            }
+
             return UmbracoVersion.Current;
         }
 

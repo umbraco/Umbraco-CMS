@@ -47,6 +47,10 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var mockedContentService = Mock.Of<IContentService>();
                 var mockedMediaService = Mock.Of<IMediaService>();
                 var mockedEntityService = Mock.Of<IEntityService>();
+                var mockedMemberService = Mock.Of<IMemberService>();
+                var mockedMemberTypeService = Mock.Of<IMemberTypeService>();
+                var mockedDataTypeService = Mock.Of<IDataTypeService>();
+                var mockedContentTypeService = Mock.Of<IContentTypeService>();
 
                 var mockedMigrationService = new Mock<IMigrationEntryService>();
                 //set it up to return anything so that the app ctx is 'Configured'
@@ -57,6 +61,10 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                     contentService: mockedContentService,
                     mediaService: mockedMediaService,
                     entityService: mockedEntityService,
+                    memberService: mockedMemberService,
+                    memberTypeService: mockedMemberTypeService,
+                    dataTypeService: mockedDataTypeService,
+                    contentTypeService: mockedContentTypeService,
                     migrationEntryService: mockedMigrationService.Object,
                     localizedTextService:Mock.Of<ILocalizedTextService>(),
                     sectionService:Mock.Of<ISectionService>());
