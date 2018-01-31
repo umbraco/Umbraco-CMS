@@ -14,7 +14,6 @@ function SearchController($scope, searchService, $log, $location, navigationServ
     $scope.isSearching = false;
     $scope.selectedResult = -1;
 
-
     $scope.navigateResults = function (ev) {
         //38: up 40: down, 13: enter
 
@@ -34,13 +33,15 @@ function SearchController($scope, searchService, $log, $location, navigationServ
         }
     };
 
-
     var group = undefined;
     var groupNames = [];
     var groupIndex = -1;
     var itemIndex = -1;
     $scope.selectedItem = undefined;
 
+    $scope.clearSearch = function () {
+        $scope.searchTerm = null;
+    };
     function iterateResults(up) {
         //default group
         if (!group) {
