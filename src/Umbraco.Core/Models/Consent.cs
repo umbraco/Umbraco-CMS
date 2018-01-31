@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class Consent : Entity, IConsent
+    public class Consent : Entity, IConsent
     {
         private static PropertySelectors _selector;
 
