@@ -84,7 +84,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null, bool bypassUserPermissions = false)
         {
             //TODO: Should we restrict search results based on what app the user has access to?
             // - Theoretically you shouldn't be able to see member data if you don't have access to members right?
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityBasic>();
 
-            return ExamineSearch(query, type, searchFrom);
+            return ExamineSearch(query, type, searchFrom, bypassUserPermissions);
         }
 
         /// <summary>
@@ -615,10 +615,10 @@ namespace Umbraco.Web.Editors
         /// <param name="entityType"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null)
+        private IEnumerable<SearchResultItem> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool bypassUserPermissions = false)
         {
             long total;
-            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom);
+            return _treeSearcher.ExamineSearch(Umbraco, query, entityType, 200, 0, out total, searchFrom, bypassUserPermissions);
         }
         
 

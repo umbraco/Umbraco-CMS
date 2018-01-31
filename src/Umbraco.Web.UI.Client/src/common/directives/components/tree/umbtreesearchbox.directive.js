@@ -12,6 +12,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             searchFromName: "@",
             showSearch: "@",
             section: "@",
+            bypassUserPermissions: "@",
             hideSearchCallback: "=",
             searchCallback: "="
         },
@@ -32,6 +33,10 @@ function treeSearchBox(localizationService, searchService, $q) {
 
             if (!scope.showSearch) {
                 scope.showSearch = "false";
+            }
+
+            if (!scope.bypassUserPermissions) {
+                scope.bypassUserPermissions = "false";
             }
 
             //used to cancel any request in progress if another one needs to take it's place
@@ -59,6 +64,10 @@ function treeSearchBox(localizationService, searchService, $q) {
                     if (scope.searchFromId) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
+
+                    if (scope.bypassUserPermissions) {                        
+                        searchArgs["bypassUserPermissions"] = scope.bypassUserPermissions;
+                    }                   
 
                     searcher(searchArgs).then(function (data) {
                         scope.searchCallback(data);

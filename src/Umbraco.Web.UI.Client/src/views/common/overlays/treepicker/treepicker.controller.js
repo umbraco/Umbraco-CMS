@@ -16,6 +16,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             searchFromId: dialogOptions.startNodeId,
             searchFromName: null,
             showSearch: false,
+            bypassUserPermissions: dialogOptions.bypassUserPermissions,
             results: [],
             selectedSearchResults: []
         }

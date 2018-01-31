@@ -503,11 +503,15 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type, searchFrom, canceler) {
+        search: function (query, type, searchFrom, canceler, bypassUserPermissions) {
 
             var args = [{ query: query }, { type: type }];
             if (searchFrom) {
                 args.push({ searchFrom: searchFrom });
+            }
+
+            if (bypassUserPermissions) {
+                args.push({ bypassUserPermissions: bypassUserPermissions });
             }
 
             var httpConfig = {};
