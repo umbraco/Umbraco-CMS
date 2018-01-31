@@ -33,6 +33,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Consent has been revoked.
         /// </summary>
-        Revoked = 0x30000
+        Revoked = 0x40000
     }
 }

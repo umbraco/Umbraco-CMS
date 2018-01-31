@@ -22,75 +22,59 @@ namespace Umbraco.Core.Services
         { }
 
         /// <inheritdoc />
-        public IConsent Get(int id)
+        public IConsent Register(string source, string context, string action, ConsentState state, string comment = null)
         {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateConsentRepository(uow);
-                return repository.Get(id);
-            }
-        }
+            // prevent stupid states
+            var v = 0;
+            if ((state & ConsentState.Pending) > 0) v++;
+            if ((state & ConsentState.Granted) > 0) v++;
+            if ((state & ConsentState.Revoked) > 0) v++;
+            if (v != 1)
+                throw new ArgumentException("Invalid state.", nameof(state));
 
-        /// <inheritdoc />
-        public IEnumerable<IConsent> GetBySource(string source, string actionType = null)
-        {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            var consent = new Consent
             {
-                var repository = RepositoryFactory.CreateConsentRepository(uow);
-                var query = new Query<IConsent>().Where(x => x.Source == source);
-                if (string.IsNullOrWhiteSpace(actionType) == false)
-                    query = query.Where(x => x.ActionType == actionType);
-                return repository.GetByQuery(query);
-            }
-        }
+                Current = true,
+                Source = source,
+                Context = context,
+                Action = action,
+                CreateDate = DateTime.Now,
+                State = state,
+                Comment = comment
+            };
 
-        /// <inheritdoc />
-        public IEnumerable<IConsent> GetByAction(string action)
-        {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateConsentRepository(uow);
-                var query = new Query<IConsent>().Where(x => x.Action == action);
-                return repository.GetByQuery(query);
-            }
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IConsent> GetByActionType(string actionType)
-        {
-            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
-            {
-                var repository = RepositoryFactory.CreateConsentRepository(uow);
-                var query = new Query<IConsent>().Where(x => x.ActionType == actionType);
-                return repository.GetByQuery(query);
-            }
-        }
-
-        /// <inheritdoc />
-        public void Save(IConsent consent)
-        {
-            try
-            {
-                using (var uow = UowProvider.GetUnitOfWork())
-                {
-                    var repository = RepositoryFactory.CreateConsentRepository(uow);
-                    repository.AddOrUpdate(consent);
-                    uow.Commit();
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Failed to save consent (see inner exception).", e);
-            }
-        }
-
-        public void Delete(IConsent consent)
-        {
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateConsentRepository(uow);
-                repository.Delete(consent);
+                repository.ClearCurrent(source, context, action);
+                repository.AddOrUpdate(consent);
                 uow.Commit();
+            }
+
+            return consent;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IConsent> Get(string source = null, string context = null, string action = null,
+            bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
+            bool includeHistory = false)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateConsentRepository(uow);
+
+                IQuery<IConsent> query = new Query<IConsent>();
+
+                if (string.IsNullOrWhiteSpace(source) == false)
+                    query = sourceStartsWith ? query.Where(x => x.Source.StartsWith(source)) : query.Where(x => x.Source == source);
+                if (string.IsNullOrWhiteSpace(context) == false)
+                    query = contextStartsWith ? query.Where(x => x.Context.StartsWith(context)) : query.Where(x => x.Context == context);
+                if (string.IsNullOrWhiteSpace(action) == false)
+                    query = actionStartsWith ? query.Where(x => x.Action.StartsWith(action)) : query.Where(x => x.Action == action);
+                if (includeHistory == false)
+                    query = query.Where(x => x.Current);
+
+                return repository.GetByQuery(query);
             }
         }
     }

@@ -1,41 +1,55 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a consent.
+    /// Represents a consent state.
     /// </summary>
+    /// <remarks>
+    /// <para>A consent is fully identified by a source (whoever is consenting), a context (for
+    /// example, an application), and an action (whatever is consented).</para>
+    /// <para>A consent state registers the state of the consent (granted, revoked...).</para>
+    /// </remarks>
     public interface IConsent : IAggregateRoot, IRememberBeingDirty
     {
         /// <summary>
-        /// Gets or sets the unique identifier of whoever is consenting.
+        /// Determines whether the consent entity represents the current state.
         /// </summary>
-        /// <remarks>Could be a Udi, or anything really.</remarks>
-        string Source { get; set; }
+        bool Current { get; }
 
         /// <summary>
-        /// Gets or sets the Udi of the consented action.
+        /// Gets the unique identifier of whoever is consenting.
         /// </summary>
-        /// <remarks>Could be a Udi, or anything really.</remarks>
-        string Action { get; set; }
+        string Source { get; }
 
         /// <summary>
-        /// Gets the type of the consented action.
+        /// Gets the unique identifier of the context of the consent.
         /// </summary>
         /// <remarks>
         /// <para>Represents the domain, application, scope... of the action.</para>
         /// <para>When the action is a Udi, this should be the Udi type.</para>
         /// </remarks>
-        string ActionType { get; }
+        string Context { get; }
 
         /// <summary>
-        /// Gets or sets the state of the consent.
+        /// Gets the unique identifier of the consented action.
         /// </summary>
-        ConsentState State { get; set; }
+        string Action { get; }
 
         /// <summary>
-        /// Gets or sets some additional free text.
+        /// Gets the state of the consent.
         /// </summary>
-        string Comment { get; set; }
+        ConsentState State { get; }
+
+        /// <summary>
+        /// Gets some additional free text.
+        /// </summary>
+        string Comment { get; }
+
+        /// <summary>
+        /// Gets the previous states of this consent.
+        /// </summary>
+        IEnumerable<IConsent> History { get; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -10,27 +11,36 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Consent : Entity, IConsent
+    internal class Consent : Entity, IConsent
     {
         private static PropertySelectors _selector;
 
+        private bool _current;
         private string _source;
+        private string _context;
         private string _action;
-        private string _actionType;
         private ConsentState _state;
         private string _comment;
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
+            public readonly PropertyInfo Current = ExpressionHelper.GetPropertyInfo<Consent, bool>(x => x.Current);
             public readonly PropertyInfo Source = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Source);
+            public readonly PropertyInfo Context = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Context);
             public readonly PropertyInfo Action = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Action);
-            public readonly PropertyInfo ActionType = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.ActionType);
             public readonly PropertyInfo State = ExpressionHelper.GetPropertyInfo<Consent, ConsentState>(x => x.State);
             public readonly PropertyInfo Comment = ExpressionHelper.GetPropertyInfo<Consent, string>(x => x.Comment);
         }
 
         private static PropertySelectors Selectors => _selector ?? (_selector = new PropertySelectors());
+
+        /// <inheritdoc />
+        public bool Current
+        {
+            get => _current;
+            set => SetPropertyValueAndDetectChanges(value, ref _current, Selectors.Current);
+        }
 
         /// <inheritdoc />
         public string Source
@@ -40,6 +50,17 @@ namespace Umbraco.Core.Models
             {
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
                 SetPropertyValueAndDetectChanges(value, ref _source, Selectors.Source);
+            }
+        }
+
+        /// <inheritdoc />
+        public string Context
+        {
+            get => _context;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
+                SetPropertyValueAndDetectChanges(value, ref _context, Selectors.Context);
             }
         }
 
@@ -55,17 +76,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public string ActionType
-        {
-            get => _actionType;
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(nameof(value));
-                SetPropertyValueAndDetectChanges(value, ref _actionType, Selectors.ActionType);
-            }
-        }
-
-        /// <inheritdoc />
         public ConsentState State
         {
             get => _state;
@@ -74,10 +84,19 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _state, Selectors.State);
         }
 
+        /// <inheritdoc />
         public string Comment
         {
             get => _comment;
             set => SetPropertyValueAndDetectChanges(value, ref _comment, Selectors.Comment);
         }
+
+        /// <inheritdoc />
+        public IEnumerable<IConsent> History => HistoryInternal;
+
+        /// <summary>
+        /// Gets the previous states of this consent.
+        /// </summary>
+        public List<IConsent> HistoryInternal { get; set; }
     }
 }

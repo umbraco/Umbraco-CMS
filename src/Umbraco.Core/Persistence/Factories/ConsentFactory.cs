@@ -1,27 +1,50 @@
-﻿using Umbraco.Core.Models;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class ConsentFactory
     {
-        public static IConsent BuildEntity(ConsentDto dto)
+        public static IEnumerable<IConsent> BuildEntities(IEnumerable<ConsentDto> dtos)
         {
-            var consent = new Consent
-            {
-                Id = dto.Id,
-                UpdateDate = dto.UpdateDate,
-                Source = dto.Source,
-                Action = dto.Action,
-                // ActionType derives from Action
-                State = (ConsentState) dto.State, // assume value is valid
-                Comment = dto.Comment
-            };
+            var ix = new Dictionary<string, Consent>();
+            var output = new List<Consent>();
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            consent.ResetDirtyProperties(false);
-            return consent;
+            foreach (var dto in dtos)
+            {
+                var k = dto.Source + "::" + dto.Context + "::" + dto.Action;
+
+                var consent = new Consent
+                {
+                    Id = dto.Id,
+                    Current = dto.Current,
+                    CreateDate = dto.CreateDate,
+                    Source = dto.Source,
+                    Context = dto.Context,
+                    Action = dto.Action,
+                    State = (ConsentState) dto.State, // assume value is valid
+                    Comment = dto.Comment
+                };
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                consent.ResetDirtyProperties(false);
+
+                if (ix.TryGetValue(k, out var current))
+                {
+                    if (current.HistoryInternal == null)
+                        current.HistoryInternal = new List<IConsent>();
+                    current.HistoryInternal.Add(consent);
+                }
+                else
+                {
+                    ix[k] = consent;
+                    output.Add(consent);
+                }
+            }
+
+            return output;
         }
 
         public static ConsentDto BuildDto(IConsent entity)
@@ -29,10 +52,11 @@ namespace Umbraco.Core.Persistence.Factories
             return new ConsentDto
             {
                 Id = entity.Id,
-                UpdateDate = entity.UpdateDate,
+                Current = entity.Current,
+                CreateDate = entity.CreateDate,
                 Source = entity.Source,
+                Context = entity.Context,
                 Action = entity.Action,
-                ActionType = entity.ActionType,
                 State = (int) entity.State,
                 Comment = entity.Comment
             };

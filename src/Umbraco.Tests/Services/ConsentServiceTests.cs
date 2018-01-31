@@ -10,7 +10,6 @@ namespace Umbraco.Tests.Services
 {
     [TestFixture]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
-    [NUnit.Framework.Explicit("breaks everything!")]
     public class ConsentServiceTests : BaseServiceTest
     {
         [SetUp]
@@ -31,123 +30,96 @@ namespace Umbraco.Tests.Services
             // fixme - why isn't this set by the test base class?
             Database.Mapper = new PetaPocoMapper();
 
-            var consent = new Consent
-            {
-                Source = "user/1234",
-                Action = "app-actions/do-something",
-                ActionType = "app-actions",
-                State = ConsentState.Granted,
-                Comment = "no comment"
-            };
-
             var consentService = ServiceContext.ConsentService;
 
-            // can save
+            // can register
 
-            consentService.Save(consent);
-
+            var consent = consentService.Register("user/1234", "app1", "do-something", ConsentState.Granted, "no comment");
             Assert.AreNotEqual(0, consent.Id);
 
-            // can get
+            Assert.IsTrue(consent.Current);
+            Assert.AreEqual("user/1234", consent.Source);
+            Assert.AreEqual("app1", consent.Context);
+            Assert.AreEqual("do-something", consent.Action);
+            Assert.AreEqual(ConsentState.Granted, consent.State);
+            Assert.AreEqual("no comment", consent.Comment);
 
-            var consent2 = consentService.Get(consent.Id);
+            Assert.IsTrue(consent.IsGranted());
 
-            Assert.AreEqual(consent.Source, consent2.Source);
-            Assert.AreEqual(consent.Action, consent2.Action);
-            Assert.AreEqual(consent.State, consent2.State);
-            Assert.AreEqual(consent.Comment, consent2.Comment);
+            // can register more
 
-            // can save more
-
-            consentService.Save(new Consent
-            {
-                Source = "user/1234",
-                Action = "app-actions/do-something-else",
-                ActionType = "app-actions",
-                State = ConsentState.Granted,
-                Comment = "no comment"
-            });
-
-            consentService.Save(new Consent
-            {
-                Source = "user/1236",
-                Action = "app-actions/do-something",
-                ActionType = "app-actions",
-                State = ConsentState.Granted,
-                Comment = "no comment"
-            });
-
-            consentService.Save(new Consent
-            {
-                Source = "user/1237",
-                Action = "app2-actions/do-something",
-                ActionType = "app2-actions",
-                State = ConsentState.Granted,
-                Comment = "no comment"
-            });
+            consentService.Register("user/1234", "app1", "do-something-else", ConsentState.Granted, "no comment");
+            consentService.Register("user/1236", "app1", "do-something", ConsentState.Granted, "no comment");
+            consentService.Register("user/1237", "app2", "do-something", ConsentState.Granted, "no comment");
 
             // can get by source
 
-            var consents = consentService.GetBySource("user/1235").ToArray();
+            var consents = consentService.Get(source: "user/1235").ToArray();
             Assert.IsEmpty(consents);
 
-            consents = consentService.GetBySource("user/1234").ToArray();
+            consents = consentService.Get(source: "user/1234").ToArray();
             Assert.AreEqual(2, consents.Length);
             Assert.IsTrue(consents.All(x => x.Source == "user/1234"));
-            Assert.IsTrue(consents.Any(x => x.Action == "app-actions/do-something"));
-            Assert.IsTrue(consents.Any(x => x.Action == "app-actions/do-something-else"));
+            Assert.IsTrue(consents.Any(x => x.Action == "do-something"));
+            Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
+
+            // can get by context
+
+            consents = consentService.Get(context: "app3").ToArray();
+            Assert.IsEmpty(consents);
+
+            consents = consentService.Get(context: "app2").ToArray();
+            Assert.AreEqual(1, consents.Length);
+
+            consents = consentService.Get(context: "app1").ToArray();
+            Assert.AreEqual(3, consents.Length);
+            Assert.IsTrue(consents.Any(x => x.Action == "do-something"));
+            Assert.IsTrue(consents.Any(x => x.Action == "do-something-else"));
 
             // can get by action
 
-            consents = consentService.GetByAction("app-actions/do-whatever").ToArray();
+            consents = consentService.Get(action: "do-whatever").ToArray();
             Assert.IsEmpty(consents);
 
-            consents = consentService.GetByAction("app-actions/do-something").ToArray();
+            consents = consentService.Get(context: "app1", action: "do-something").ToArray();
             Assert.AreEqual(2, consents.Length);
-            Assert.IsTrue(consents.All(x => x.Action == "app-actions/do-something"));
+            Assert.IsTrue(consents.All(x => x.Action == "do-something"));
             Assert.IsTrue(consents.Any(x => x.Source == "user/1234"));
             Assert.IsTrue(consents.Any(x => x.Source == "user/1236"));
 
-            // can get by action type
+            // can revoke
 
-            consents = consentService.GetByActionType("app3-actions").ToArray();
-            Assert.IsEmpty(consents);
+            consent = consentService.Register("user/1234", "app1", "do-something", ConsentState.Revoked, "no comment");
 
-            consents = consentService.GetByActionType("app2-actions").ToArray();
+            consents = consentService.Get(source: "user/1234", context: "app1", action: "do-something").ToArray();
             Assert.AreEqual(1, consents.Length);
+            Assert.IsTrue(consents[0].Current);
+            Assert.AreEqual(ConsentState.Revoked, consents[0].State);
 
-            consents = consentService.GetByActionType("app-actions").ToArray();
+            // can filter
+
+            consents = consentService.Get(context: "app1", action: "do-", actionStartsWith: true).ToArray();
             Assert.AreEqual(3, consents.Length);
-            Assert.IsTrue(consents.Any(x => x.Action == "app-actions/do-something"));
-            Assert.IsTrue(consents.Any(x => x.Action == "app-actions/do-something-else"));
+            Assert.IsTrue(consents.All(x => x.Context == "app1"));
+            Assert.IsTrue(consents.All(x => x.Action.StartsWith("do-")));
 
-            // can delete
+            // can get history
 
-            consents = consentService.GetByActionType("app2-actions").ToArray();
+            consents = consentService.Get(source: "user/1234", context: "app1", action: "do-something", includeHistory: true).ToArray();
             Assert.AreEqual(1, consents.Length);
-            consentService.Delete(consents[0]);
-            consents = consentService.GetByActionType("app2-actions").ToArray();
-            Assert.IsEmpty(consents);
+            Assert.IsTrue(consents[0].Current);
+            Assert.AreEqual(ConsentState.Revoked, consents[0].State);
+            Assert.IsTrue(consents[0].IsRevoked());
+            Assert.IsNotNull(consents[0].History);
+            var history = consents[0].History.ToArray();
+            Assert.AreEqual(1, history.Length);
+            Assert.IsFalse(history[0].Current);
+            Assert.AreEqual(ConsentState.Granted, history[0].State);
 
-            // can update
+            // cannot be stupid
 
-            var date = consent.UpdateDate;
-            consent.State = ConsentState.Revoked;
-            consentService.Save(consent);
-            Assert.AreNotEqual(date, consent.UpdateDate);
-
-            // cannot create duplicates
-
-            var consent3 = new Consent
-            {
-                Source = "user/1234",
-                Action = "app-actions/do-something",
-                ActionType = "app-actions",
-                State = ConsentState.Granted,
-                Comment = "no comment"
-            };
-
-            Assert.Throws<Exception>(() => consentService.Save(consent3));
+            Assert.Throws<ArgumentException>(() =>
+                consentService.Register("user/1234", "app1", "do-something", ConsentState.Granted | ConsentState.Revoked, "no comment"));
         }
     }
 }

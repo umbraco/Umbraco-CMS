@@ -16,22 +16,24 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
+        [Column("current")]
+        public bool Current { get; set; }
+
         [Column("source")]
-        [Length(512)] // aligned with Deploy SignatureDto
-        [Index(IndexTypes.UniqueNonClustered, ForColumns = "source, actionType, action", Name = "IX_" + TableName + "_UniqueSourceAction")]
+        [Length(512)]
         public string Source { get; set; }
 
+        [Column("context")]
+        [Length(128)]
+        public string Context { get; set; }
+
         [Column("action")]
-        [Length(512)] // aligned with Deploy SignatureDto
+        [Length(512)]
         public string Action { get; set; }
 
-        [Column("actionType")]
-        [Length(128)]
-        public string ActionType { get; set; }
-
-        [Column("updateDate")]
+        [Column("createDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
-        public DateTime UpdateDate { get; set; }
+        public DateTime CreateDate { get; set; }
 
         [Column("state")]
         public int State { get; set; }
