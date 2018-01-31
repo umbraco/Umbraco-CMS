@@ -148,13 +148,18 @@ a.umb-editor-header__close-split-view:hover {
 .umb-variant-switcher__item {
 	display: flex;
     justify-content: space-between;
-    align-items: center;
+	align-items: center;
+	border-bottom: 1px solid @gray-9;
+}
+
+.umb-variant-switcher__item:last-child {
+	border-bottom: none;
 }
 
 .umb-variant-switcher__item:hover,
 .umb-variant-switcher__item:focus,
-.umb-variant-switcher__name:hover,
-.umb-variant-switcher__name:focus {
+.umb-variant-switcher__name-wrapper:hover,
+.umb-variant-switcher__name-wrapper:focus {
 	background-color: @gray-10;
 	outline: none;
 }
@@ -164,11 +169,23 @@ a.umb-editor-header__close-split-view:hover {
 	cursor: pointer;
 }
 
-.umb-variant-switcher__name {
+.umb-variant-switcher__name-wrapper {
 	font-size: 14px;
-	padding: 8px 20px;
+	padding: 5px 20px;
 	flex: 1;
 	cursor: pointer;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.umb-variant-switcher__name {
+	display: block;
+	font-weight: bold;
+}
+
+.umb-variant-switcher__state {
+	font-size: 13px;
+	color: @gray-4;
 }
 
 .umb-variant-switcher__split-view {

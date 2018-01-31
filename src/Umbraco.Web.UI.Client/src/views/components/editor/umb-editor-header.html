@@ -45,8 +45,9 @@
 
                 <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                     <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.current}" ng-repeat="variant in variants">
-                        <a href="" class="umb-variant-switcher__name" ng-click="selectVariant($event, variant)" prevent-default>
-                            {{variant.cultureDisplayName}}
+                        <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
+                            <span class="umb-variant-switcher__name">{{variant.cultureDisplayName}}</span>
+                            <span class="umb-variant-switcher__state">{{variant.state}}</span>
                         </a>
                         <div ng-if="splitViewOpen !== true" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
                     </umb-dropdown-item>

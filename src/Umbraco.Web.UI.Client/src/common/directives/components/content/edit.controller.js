@@ -67,11 +67,7 @@
               "name": "Job campign"
             }
           ],
-          "states": [
-            {
-              "name": "Published"
-            }
-          ]
+          "state": "Published"
         },
         {
           "cultureDisplayName": "Danish",
@@ -82,24 +78,13 @@
               "name": "Mobile"
             }
           ],
-          "states": [
-            {
-              "name": "Published"
-            }
-          ]
+          "state": "Published"
         },
         {
             "cultureDisplayName": "Spanish (Spain)",
             "culture": "es-ES",
             "current": false,
-            "states": [
-              {
-                "name": "Published"
-              },
-              {
-                "name": "Draft"
-              }
-            ]
+            "state": "Published (pending changes)"
         },
         {
             "cultureDisplayName": "French (France)",
@@ -113,16 +98,13 @@
                 "name": "Job campign"
               }
             ],
-            "states": [
-              {
-                "name": "Draft"
-              }
-            ]
+            "state": "Draft"
         },
         {
             "cultureDisplayName": "German (Germany)",
             "culture": "de-DE",
-            "current": false
+            "current": false,
+            "state": "Draft"
         }
       ];
 
