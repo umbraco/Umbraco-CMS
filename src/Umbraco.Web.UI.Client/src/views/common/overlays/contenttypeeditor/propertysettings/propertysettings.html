@@ -104,7 +104,7 @@
            <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
        </label>
 
-       <label class="checkbox no-indent">
+       <label ng-if="vm.showSensitiveData" class="checkbox no-indent">
            <input type="checkbox" ng-model="model.property.isSensitiveData">
            <localize key="contentTypeEditor_isSensitiveData"></localize>
            <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
