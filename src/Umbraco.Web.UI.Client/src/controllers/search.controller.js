@@ -14,7 +14,6 @@ function SearchController($scope, searchService, $log, $location, navigationServ
     $scope.isSearching = false;
     $scope.selectedResult = -1;
 
-
     $scope.navigateResults = function (ev) {
         //38: up 40: down, 13: enter
 
@@ -34,24 +33,37 @@ function SearchController($scope, searchService, $log, $location, navigationServ
         }
     };
 
-
     var group = undefined;
+    var groupNames = [];
     var groupIndex = -1;
     var itemIndex = -1;
     $scope.selectedItem = undefined;
 
-
+    $scope.clearSearch = function () {
+        $scope.searchTerm = null;
+    };
     function iterateResults(up) {
         //default group
         if (!group) {
-            group = $scope.groups[0];
+
+            for (var g in $scope.groups) {
+                if ($scope.groups.hasOwnProperty(g)) {
+                    groupNames.push(g);
+
+                }
+            }
+
+            //Sorting to match the groups order
+            groupNames.sort();
+
+            group = $scope.groups[groupNames[0]];
             groupIndex = 0;
         }
 
         if (up) {
             if (itemIndex === 0) {
                 if (groupIndex === 0) {
-                    gotoGroup($scope.groups.length - 1, true);
+                    gotoGroup(Object.keys($scope.groups).length - 1, true);
                 } else {
                     gotoGroup(groupIndex - 1, true);
                 }
@@ -62,7 +74,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
             if (itemIndex < group.results.length - 1) {
                 gotoItem(itemIndex + 1);
             } else {
-                if (groupIndex === $scope.groups.length - 1) {
+                if (groupIndex === Object.keys($scope.groups).length - 1) {
                     gotoGroup(0);
                 } else {
                     gotoGroup(groupIndex + 1);
@@ -73,7 +85,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
 
     function gotoGroup(index, up) {
         groupIndex = index;
-        group = $scope.groups[groupIndex];
+        group = $scope.groups[groupNames[groupIndex]];
 
         if (up) {
             gotoItem(group.results.length - 1);
@@ -95,6 +107,13 @@ function SearchController($scope, searchService, $log, $location, navigationServ
             $scope.hasResults = false;
             if ($scope.searchTerm) {
                 if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
+
+                    //Resetting for brand new search
+                    group = undefined;
+                    groupNames = [];
+                    groupIndex = -1;
+                    itemIndex = -1;
+
                     $scope.isSearching = true;
                     navigationService.showSearch();
                     $scope.selectedItem = undefined;
@@ -114,7 +133,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
                         var filtered = {};
                         _.each(result, function (value, key) {
                             if (value.results.length > 0) {
-                              filtered[key] = value;
+                                filtered[key] = value;
                             }
                         });
                         $scope.groups = filtered;

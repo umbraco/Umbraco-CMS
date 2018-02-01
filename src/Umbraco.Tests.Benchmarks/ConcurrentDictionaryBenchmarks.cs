@@ -37,7 +37,8 @@ namespace Umbraco.Tests.Benchmarks
         {
             // This method is 10% faster
             var key = new CompositeTypeTypeKey(source, target);
-            if (AssignableTypeCache.TryGetValue(key, out bool canConvert))
+            bool canConvert;
+            if (AssignableTypeCache.TryGetValue(key, out canConvert))
             {
                 return canConvert;
             }

@@ -212,6 +212,9 @@
                 throw "Tour " + tour.alias + " is missing tour steps";
             }
 
+            if (tour.requiredSections.length === 0) {
+                throw "Tour " + tour.alias + " is missing the required sections";
+            }
         }
         
         /**

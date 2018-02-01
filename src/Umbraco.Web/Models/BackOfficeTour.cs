@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models
 {
@@ -18,6 +19,8 @@ namespace Umbraco.Web.Models
         public int GroupOrder { get; set; }
         [DataMember(Name = "allowDisable")]
         public bool AllowDisable { get; set; }
+        [DataMember(Name = "requiredSections")]
+        public List<string> RequiredSections { get; set; }
         [DataMember(Name = "steps")]
         public BackOfficeTourStep[] Steps { get; set; }
     }

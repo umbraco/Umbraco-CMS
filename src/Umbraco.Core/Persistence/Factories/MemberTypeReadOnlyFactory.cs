@@ -56,10 +56,10 @@ namespace Umbraco.Core.Persistence.Factories
 
                     //Add the standard PropertyType to the current list
                     propertyTypes.Add(standardPropertyType.Value);
-
-                    //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
+                    
+                    //Internal dictionary for adding "MemberCanEdit", "VisibleOnProfile", "IsSensitive" properties to each PropertyType
                     memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
-                        new MemberTypePropertyProfileAccess(false, false));
+                        new MemberTypePropertyProfileAccess(false, false, false));
                 }
                 memberType.NoGroupPropertyTypes = propertyTypes;
 
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                     memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
-                        new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit));
+                        new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit, typeDto.IsSensitive));
 
                     var tempGroupDto = groupDto;
 
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                 memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
-                    new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit));
+                    new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit, typeDto.IsSensitive));
 
                 //ensures that any built-in membership properties have their correct dbtype assigned no matter
                 //what the underlying data type is

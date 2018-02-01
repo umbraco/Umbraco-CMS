@@ -19,9 +19,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
-
-            config.CreateMap<PropertyEditor, PropertyEditorBasic>();                
+            config.CreateMap<PropertyEditor, PropertyEditorBasic>();
 
             //just maps the standard properties, does not map the value!
             config.CreateMap<PreValueField, PreValueFieldDisplay>()
@@ -67,7 +65,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.DataType, content.Key)))
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing(new AvailablePropertyEditorsResolver(UmbracoConfig.For.UmbracoSettings().Content)))
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
-                    new PreValueDisplayResolver(lazyDataTypeService)))
+                    new PreValueDisplayResolver(applicationContext.Services.DataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
                     definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
                 .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
@@ -90,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>()
                   .ConvertUsing(definition =>
                       {
-                          var resolver = new PreValueDisplayResolver(lazyDataTypeService);
+                          var resolver = new PreValueDisplayResolver(applicationContext.Services.DataTypeService);
                           return resolver.Convert(definition);
                       });
 
