@@ -830,6 +830,12 @@ Vennlig hilsen Umbraco roboten
     <key alias="template">Mal</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Sett inn element</key>
     <key alias="chooseLayout">Velg layout</key>
     <key alias="addRows">Legg til rad</key>
