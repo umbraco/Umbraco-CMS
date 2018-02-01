@@ -25,6 +25,14 @@ namespace Umbraco.Web.PropertyEditors
 
             Fields.Add(new PreValueField()
             {
+                Key = "bypassUserPermissions",
+                View = "boolean",
+                Name = "Bypass User Permissions",
+                Description = "If set, user and group permissions will be bypassed."
+            });
+
+            Fields.Add(new PreValueField()
+            {
                 Name = "Hide Label",
                 View = "boolean",
                 Key = "hideLabel"

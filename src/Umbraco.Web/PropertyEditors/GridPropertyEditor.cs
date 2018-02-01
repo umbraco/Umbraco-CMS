@@ -136,6 +136,9 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
             public string Rte { get; set; }
+
+            [PreValueField("bypassUserPermissions", "Bypass User Permissions", "boolean", Description = "If set, the chosen start node will bypass any user permissions.")]
+            public bool BypassUserPermissions { get; set; }
         }
 
         #region Application event handler, used to bind to events on startup
