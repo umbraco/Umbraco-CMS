@@ -261,6 +261,9 @@ angular.module("umbraco")
             }
 
             function hasFolderAccess(node) {
+                if (userStartNodes.length === 0)
+                    return true;
+
                 var nodePath = node.path ? node.path.split(',') : [node.id];
 
                 for (var i = 0; i < nodePath.length; i++) {
