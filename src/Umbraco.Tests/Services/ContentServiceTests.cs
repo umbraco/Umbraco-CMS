@@ -19,6 +19,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
@@ -393,12 +394,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, true);
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
             content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishValues();
             contentService.SaveAndPublish(content2);
 
@@ -464,12 +465,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "bam" }, true);
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
             content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishValues();
             contentService.SaveAndPublish(content2);
 
@@ -536,12 +537,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "plus" }, true);
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
             content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
-            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishValues();
             contentService.SaveAndPublish(content2);
 
@@ -614,12 +615,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "bam" }, true);
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
             content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishValues();
             contentService.SaveAndPublish(content2);
 
@@ -661,12 +662,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.SetTags("tags", new[] { "hello", "world", "some", "tags", "bam" }, true);
+            content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
             content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1);
-            content2.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content2.PublishValues();
             contentService.SaveAndPublish(content2);
 
@@ -705,7 +706,7 @@ namespace Umbraco.Tests.Services
             dataType.Configuration = new TagConfiguration
             {
                 Group = "test",
-                StorageType = TagCacheStorageType.Csv
+                StorageType = TagsStorageType.Csv
             };
 
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
@@ -718,15 +719,15 @@ namespace Umbraco.Tests.Services
             contentType.AllowedContentTypes = new[] { new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias) };
 
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
-            content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             contentService.Save(content);
 
             var child1 = MockedContent.CreateSimpleContent(contentType, "child 1 content", content.Id);
-            child1.SetTags("tags", new[] { "hello1", "world1", "some1" }, true);
+            child1.AssignTags("tags", new[] { "hello1", "world1", "some1" });
             contentService.Save(child1);
 
             var child2 = MockedContent.CreateSimpleContent(contentType, "child 2 content", content.Id);
-            child2.SetTags("tags", new[] { "hello2", "world2" }, true);
+            child2.AssignTags("tags", new[] { "hello2", "world2" });
             contentService.Save(child2);
 
             // Act
@@ -766,12 +767,12 @@ namespace Umbraco.Tests.Services
 
             // create a content with tags and publish
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
-            content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
             // edit tags and save
-            content.SetTags("tags", new[] { "another", "world" }, false);
+            content.AssignTags("tags", new[] { "another", "world" }, merge: true);
             contentService.Save(content);
 
             // the (edit) property does contain all tags
@@ -806,7 +807,7 @@ namespace Umbraco.Tests.Services
 
 
             // Act
-            content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
@@ -837,12 +838,12 @@ namespace Umbraco.Tests.Services
                 });
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
-            content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
-            content.SetTags("tags", new[] { "another", "world" }, false);
+            content.AssignTags("tags", new[] { "another", "world" }, merge: true);
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
@@ -873,7 +874,7 @@ namespace Umbraco.Tests.Services
                 });
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
-            content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
+            content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
@@ -1971,21 +1972,54 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Copy_Content_With_Tags()
         {
-            var contentService = ServiceContext.ContentService;
-            var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
+            const string propAlias = "tags";
 
-            var content = MockedContent.CreateSimpleContent(contentType, "Simple Text Page", -1);
-            var prop = content.Properties.First();
-            content.SetTags(prop.Alias, new[] {"hello", "world"}, true);
+            var contentService = ServiceContext.ContentService;
+
+            // create a content type that has a 'tags' property
+            // the property needs to support tags, else nothing works of course!
+            var contentType = MockedContentTypes.CreateSimpleContentType3("umbTagsPage", "TagsPage");
+            contentType.Key = new Guid("78D96D30-1354-4A1E-8450-377764200C58");
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var content = MockedContent.CreateSimpleContent(contentType, "Simple Tags Page", -1);
+            content.AssignTags(propAlias, new[] {"hello", "world"});
+            contentService.Save(content);
+
+            // value has been set but no tags have been created (not published)
+            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            var contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
+            Assert.AreEqual(0, contentTags.Length);
+
+            // reloading the content yields the same result
+            content = (Content) contentService.GetById(content.Id);
+            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
+            Assert.AreEqual(0, contentTags.Length);
+
+            // publish
             content.PublishValues();
             contentService.SaveAndPublish(content);
 
-            var copy = contentService.Copy(content, content.ParentId, false, 0);
+            // now tags have been set (published)
+            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
+            Assert.AreEqual(2, contentTags.Length);
+
+            // copy
+            var copy = contentService.Copy(content, content.ParentId, false);
+
+            // copy is not published, so property has value, but no tags have been created
+            Assert.AreEqual("hello,world", copy.GetValue(propAlias));
             var copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
             Assert.AreEqual(0, copiedTags.Length);
 
+            // publish
             copy.PublishValues();
             contentService.SaveAndPublish(copy);
+
+            // now tags have been set (published)
             copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
 
             Assert.AreEqual(2, copiedTags.Length);

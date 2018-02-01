@@ -163,6 +163,24 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
+        public static ContentType CreateSimpleContentType3(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
+        {
+            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName);
+
+            var propertyType = new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Nvarchar)
+            {
+                Alias = RandomAlias("tags", randomizeAliases),
+                Name = "Tags",
+                Description = "Tags",
+                Mandatory = false,
+                SortOrder = 99,
+                DataTypeId = Constants.DataTypes.Tags
+            };
+            contentType.AddPropertyType(propertyType);
+
+            return contentType;
+        }
+
         public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
             var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName);

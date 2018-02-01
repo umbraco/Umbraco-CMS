@@ -1,6 +1,6 @@
 ﻿using Umbraco.Core.Models;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the tag value editor.
@@ -11,6 +11,8 @@ namespace Umbraco.Web.PropertyEditors
 
         public string Group { get; set; }
 
-        public TagCacheStorageType StorageType { get; set; } = TagCacheStorageType.Csv;
+        public TagsStorageType StorageType { get; set; } = TagsStorageType.Csv;
+
+        public char Delimiter { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Mappers
             if (PropertyInfoCache.IsEmpty == false) return;
 
             CacheMap<Tag, TagDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Tag, TagDto>(src => src.Text, dto => dto.Tag);
+            CacheMap<Tag, TagDto>(src => src.Text, dto => dto.Text);
             CacheMap<Tag, TagDto>(src => src.Group, dto => dto.Group);
         }
     }

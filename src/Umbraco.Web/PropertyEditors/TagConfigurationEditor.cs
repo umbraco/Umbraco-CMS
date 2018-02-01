@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
             // [JsonConverter(typeof(StringEnumConverter))]
             // but here we're only deserializing to object and it's too late
 
-            editorValue["storageType"] = Enum.Parse(typeof(TagCacheStorageType), (string) editorValue["storageType"]);
+            editorValue["storageType"] = Enum.Parse(typeof(TagsStorageType), (string) editorValue["storageType"]);
             return base.FromEditor(editorValue, configuration);
         }
     }

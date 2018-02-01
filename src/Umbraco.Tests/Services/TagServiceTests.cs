@@ -18,6 +18,47 @@ namespace Umbraco.Tests.Services
     public class TagServiceTests : TestWithSomeContentBase
     {
         [Test]
+        [Explicit("Fails, tags API is not consistent.")]
+        public void TagApiConsistencyTest()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var tagService = ServiceContext.TagService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentType.PropertyGroups.First().PropertyTypes.Add(
+                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                {
+                    DataTypeId = 1041
+                });
+            contentTypeService.Save(contentType);
+
+            IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
+            content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
+            contentService.SaveAndPublish(content1);
+
+            content1.AssignTags("tags", new[] { "elephant" }, true);
+            content1.RemoveTags("tags", new[] { "cow" });
+            contentService.SaveAndPublish(content1);
+
+            content1 = contentService.GetById(content1.Id);
+            var tagsValue = content1.GetValue("tags").ToString();
+            var tagsValues = tagsValue.Split(',');
+            Assert.AreEqual(3, tagsValues.Length);
+            Assert.Contains("pig", tagsValues);
+            Assert.Contains("goat", tagsValues);
+            Assert.Contains("elephant", tagsValues);
+
+            var tags = tagService.GetTagsForProperty(content1.Id, "tags").ToArray();
+            Assert.IsTrue(tags.All(x => x.Group == "default"));
+            tagsValues = tags.Select(x => x.Text).ToArray();
+
+            Assert.AreEqual(3, tagsValues.Length);
+            Assert.Contains("pig", tagsValues);
+            Assert.Contains("goat", tagsValues);
+            Assert.Contains("elephant", tagsValues);
+        }
+
+        [Test]
         public void TagList_Contains_NodeCount()
         {
             var contentService = ServiceContext.ContentService;
@@ -32,17 +73,17 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
-            content1.SetTags("tags", new[] { "cow", "pig", "goat" }, true);
+            content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
             content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
-            content2.SetTags("tags", new[] { "cow", "pig" }, true);
+            content2.AssignTags("tags", new[] { "cow", "pig" });
             content2.PublishValues();
             contentService.SaveAndPublish(content2);
 
             var content3 = MockedContent.CreateSimpleContent(contentType, "Tagged content 3", -1);
-            content3.SetTags("tags", new[] { "cow" }, true);
+            content3.AssignTags("tags", new[] { "cow" });
             content3.PublishValues();
             contentService.SaveAndPublish(content3);
 

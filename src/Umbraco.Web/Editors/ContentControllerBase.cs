@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,8 +7,8 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
@@ -71,50 +70,50 @@ namespace Umbraco.Web.Editors
         protected virtual void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
             where TPersisted : IContentBase
         {
-            //Map the property values
-            foreach (var property in contentItem.ContentDto.Properties)
+            // map the property values
+            foreach (var propertyDto in contentItem.ContentDto.Properties)
             {
-                //get the dbo property
-                var dboProperty = contentItem.PersistedContent.Properties[property.Alias];
+                // get the property editor
+                if (propertyDto.PropertyEditor == null)
+                {
+                    Logger.Warn<ContentController>("No property editor found for property " + propertyDto.Alias);
+                    continue;
+                }
 
-                //create the property data to send to the property editor
+                // get the value editor
+                // nothing to save/map if it is readonly
+                var valueEditor = propertyDto.PropertyEditor.ValueEditor;
+                if (valueEditor.IsReadOnly) continue;
 
-                //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
+                // get the property
+                var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
+
+                // prepare files, if any
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == propertyDto.Alias).ToArray();
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
-                var data = new ContentPropertyData(property.Value, property.DataType.Configuration)
+                // create the property data for the property editor
+                var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType.Configuration)
                 {
                     ContentKey = contentItem.PersistedContent.Key,
-                    PropertyTypeKey = dboProperty.PropertyType.Key,
+                    PropertyTypeKey = property.PropertyType.Key,
                     Files =  files
                 };
 
-                //get the deserialized value from the property editor
-                if (property.PropertyEditor == null)
+                // let the editor convert the value that was received, deal with files, etc
+                var value = valueEditor.ConvertEditorToDb(data, property.GetValue());
+
+                // set the value - tags are special
+                var tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
+                if (tagAttribute != null)
                 {
-                    Logger.Warn<ContentController>("No property editor found for property " + property.Alias);
+                    var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
+                    if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = tagAttribute.Delimiter;
+                    property.SetTagsValue(value, tagConfiguration);
                 }
                 else
-                {
-                    var valueEditor = property.PropertyEditor.ValueEditor;
-
-                    // don't persist if the editor is readonly
-                    if (valueEditor.IsReadOnly) continue;
-
-                    // else
-                    var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.GetValue());
-                    var supportTagsAttribute = TagExtractor.GetAttribute(property.PropertyEditor);
-                    if (supportTagsAttribute != null)
-                    {
-                        TagExtractor.SetPropertyTags(dboProperty, data, propVal, supportTagsAttribute);
-                    }
-                    else
-                    {
-                        dboProperty.SetValue(propVal);
-                    }
-                }
+                    property.SetValue(value);
             }
         }
 

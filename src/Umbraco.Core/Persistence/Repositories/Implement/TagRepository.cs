@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -19,74 +20,40 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             : base(scopeAccessor, cache, logger)
         { }
 
+        #region Manage Tag Entities
+
+        /// <inheritdoc />
+        protected override Guid NodeObjectTypeId => throw new NotSupportedException();
+
+        /// <inheritdoc />
         protected override ITag PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var tagDto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
-            if (tagDto == null)
-                return null;
-
-            var factory = new TagFactory();
-            var entity = factory.BuildEntity(tagDto);
-
-            // reset dirty initial properties (U4-1946)
-            ((BeingDirtyBase)entity).ResetDirtyProperties(false);
-
-            return entity;
+            var sql = Sql().Select<TagDto>().From<TagDto>().Where<TagDto>(x => x.Id == id);
+            var dto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            return dto == null ? null : TagFactory.BuildEntity(dto);
         }
 
+        /// <inheritdoc />
         protected override IEnumerable<ITag> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false);
+            var dtos = ids.Length == 0
+                ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
+                : Database.FetchByGroups<TagDto, int>(ids, 2000, batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
 
-            if (ids.Any())
-            {
-                sql.Where("id in (@ids)", new {ids = ids});
-
-                //return PerformGetAllOnIds(ids);
-            }
-
-            return ConvertFromDtos(Database.Fetch<TagDto>(sql))
-                .ToArray();// we don't want to re-iterate again!
+            return dtos.Select(TagFactory.BuildEntity).ToList();
         }
 
-        //private IEnumerable<ITag> PerformGetAllOnIds(params int[] ids)
-        //{
-        //    //TODO: Fix the n+1 query! This one is particularly bad!!!!!!!!
-
-        //    if (ids.Any() == false) yield break;
-        //    foreach (var id in ids)
-        //    {
-        //        yield return Get(id);
-        //    }
-        //}
-
-        private IEnumerable<ITag> ConvertFromDtos(IEnumerable<TagDto> dtos)
-        {
-            var factory = new TagFactory();
-            foreach (var entity in dtos.Select(factory.BuildEntity))
-            {
-                // reset dirty initial properties (U4-1946)
-                ((BeingDirtyBase)entity).ResetDirtyProperties(false);
-                yield return entity;
-            }
-        }
-
+        /// <inheritdoc />
         protected override IEnumerable<ITag> PerformGetByQuery(IQuery<ITag> query)
         {
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<ITag>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = Sql().Select<TagDto>().From<TagDto>();
+            var translator = new SqlTranslator<ITag>(sql, query);
+            sql = translator.Translate();
 
-            var dtos = Database.Fetch<TagDto>(sql);
-
-            return ConvertFromDtos(dtos)
-                .ToArray();// we don't want to re-iterate again!
-
+            return Database.Fetch<TagDto>(sql).Select(TagFactory.BuildEntity).ToList();
         }
 
+        /// <inheritdoc />
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
             return isCount ? Sql().SelectCount().From<TagDto>() : GetBaseQuery();
@@ -94,14 +61,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private Sql<ISqlContext> GetBaseQuery()
         {
-            return Sql().SelectAll().From<TagDto>();
+            return Sql().Select<TagDto>().From<TagDto>();
         }
 
+        /// <inheritdoc />
         protected override string GetBaseWhereClause()
         {
             return "id = @id";
         }
 
+        /// <inheritdoc />
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
@@ -112,40 +81,188 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        /// <inheritdoc />
         protected override void PersistNewItem(ITag entity)
         {
             ((EntityBase)entity).AddingEntity();
 
-            var factory = new TagFactory();
-            var dto = factory.BuildDto(entity);
-
+            var dto = TagFactory.BuildDto(entity);
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
             entity.ResetDirtyProperties();
         }
 
+        /// <inheritdoc />
         protected override void PersistUpdatedItem(ITag entity)
         {
             ((EntityBase)entity).UpdatingEntity();
 
-            var factory = new TagFactory();
-            var dto = factory.BuildDto(entity);
-
+            var dto = TagFactory.BuildDto(entity);
             Database.Update(dto);
 
             entity.ResetDirtyProperties();
         }
 
-        //TODO: Consider caching implications.
+        #endregion
 
-        //TODO: We need to add lookups for parentId or path! (i.e. get content in tag group that are descendants of x)
+        #region Assign and Remove Tags
 
+        /// <inheritdoc />
+        public void Assign(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags)
+        {
+            // to no-duplicates array
+            var tagsA = tags.Distinct(new TagComparer()).ToArray();
+
+            // no tags?
+            if (tagsA.Length == 0)
+            {
+                // replacing = clear all
+                if (replaceTags)
+                {
+                    var sql0 = Sql().Delete<TagRelationshipDto>().Where<TagRelationshipDto>(x => x.NodeId == contentId && x.PropertyTypeId == propertyTypeId);
+                    Database.Execute(sql0);
+                }
+
+                // nothing else to do
+                return;
+            }
+
+            // tags
+            // using some clever logic (?) to insert tags that don't exist in 1 query
+
+            var tagSetSql = GetTagSet(tagsA);
+            var group = SqlSyntax.GetQuotedColumnName("group");
+
+            // insert tags
+            var sql1 = $@"INSERT INTO cmsTags (tag, {group})
+SELECT tagSet.tag, tagSet.{group}
+FROM {tagSetSql}
+LEFT OUTER JOIN cmsTags ON (tagSet.tag = cmsTags.tag AND tagSet.{group} = cmsTags.{group})
+WHERE cmsTags.id IS NULL";
+
+            Database.Execute(sql1);
+
+            // if replacing, remove everything first
+            if (replaceTags)
+            {
+                var sql2 = Sql().Delete<TagRelationshipDto>().Where<TagRelationshipDto>(x => x.NodeId == contentId && x.PropertyTypeId == propertyTypeId);
+                Database.Execute(sql2);
+            }
+
+            // insert relations
+            var sql3 = $@"INSERT INTO cmsTagRelationship (nodeId, propertyTypeId, tagId)
+SELECT {contentId}, {propertyTypeId}, tagSet2.Id
+FROM (
+    SELECT t.Id
+    FROM {tagSetSql}
+    INNER JOIN cmsTags as t ON (tagSet.tag = t.tag AND tagSet.{group} = t.{group})
+) AS tagSet2
+LEFT OUTER JOIN cmsTagRelationship r ON (tagSet2.id = r.tagId AND r.nodeId = {contentId} AND r.propertyTypeID = {propertyTypeId})
+WHERE r.tagId IS NULL";
+
+            Database.Execute(sql3);
+        }
+
+        /// <inheritdoc />
+        public void Remove(int contentId, int propertyTypeId, IEnumerable<ITag> tags)
+        {
+            var tagSetSql = GetTagSet(tags);
+
+            var deleteSql = string.Concat("DELETE FROM cmsTagRelationship WHERE nodeId = ",
+                                          contentId,
+                                          " AND propertyTypeId = ",
+                                          propertyTypeId,
+                                          " AND tagId IN ",
+                                          "(SELECT id FROM cmsTags INNER JOIN ",
+                                          tagSetSql,
+                                          " ON (TagSet.Tag = cmsTags.Tag and TagSet." + SqlSyntax.GetQuotedColumnName("group") + @" = cmsTags." + SqlSyntax.GetQuotedColumnName("group") + @"))");
+
+            Database.Execute(deleteSql);
+        }
+
+        /// <inheritdoc />
+        public void RemoveAll(int contentId, int propertyTypeId)
+        {
+            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
+                new { nodeId = contentId, propertyTypeId = propertyTypeId });
+        }
+
+        /// <inheritdoc />
+        public void RemoveAll(int contentId)
+        {
+            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
+                new { nodeId = contentId });
+        }
+
+        // this is a clever way to produce an SQL statement like this:
+        //
+        // (
+        //   SELECT 'Spacesdd' AS Tag, 'default' AS [group]
+        //   UNION
+        //   SELECT 'Cool' AS tag, 'default' AS [group]
+        // ) AS tagSet
+        //
+        // which we can then use to reduce queries
+        //
+        private string GetTagSet(IEnumerable<ITag> tags)
+        {
+            string EscapeSqlString(string s)
+            {
+                // why were we escaping @ symbols?
+                //return NPocoDatabaseExtensions.EscapeAtSymbols(s.Replace("'", "''"));
+                return s.Replace("'", "''");
+            }
+
+            var sql = new StringBuilder();
+            var group = SqlSyntax.GetQuotedColumnName("group");
+            var first = true;
+
+            sql.Append("(");
+
+            foreach (var tag in tags)
+            {
+                if (first) first = false;
+                else sql.Append(" UNION ");
+
+                sql.Append("SELECT N'");
+                sql.Append(EscapeSqlString(tag.Text));
+                sql.Append("' AS tag, '");
+                sql.Append(EscapeSqlString(tag.Group));
+                sql.Append("' AS ");
+                sql.Append(group);
+            }
+
+            sql.Append(") AS tagSet");
+
+            return sql.ToString();
+        }
+
+        // used to run Distinct() on tags
+        private class TagComparer : IEqualityComparer<ITag>
+        {
+            public bool Equals(ITag x, ITag y)
+            {
+                return ReferenceEquals(x, y) // takes care of both being null
+                       || x != null && y != null && x.Text == y.Text && x.Group == y.Group;
+            }
+
+            public int GetHashCode(ITag obj)
+            {
+                unchecked
+                {
+                    return (obj.Text.GetHashCode() * 397) ^ obj.Group.GetHashCode();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Queries
+
+        // TODO
+        // consider caching implications
+        // add lookups for parentId or path (ie get content in tag group, that are descendants of x)
 
         public TaggedEntity GetTaggedEntityByKey(Guid key)
         {
@@ -222,7 +339,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .On<PropertyTypeDto, TagRelationshipDto>(left => left.Id, right => right.PropertyTypeId)
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .Where<TagDto>(dto => dto.Tag == tag);
+                .Where<TagDto>(dto => dto.Text == tag);
 
             if (objectType != TaggableObjectTypes.All)
             {
@@ -247,7 +364,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var properties = new List<TaggedProperty>();
                 foreach (var propertyType in node.GroupBy(x => new { id = (int)x.propertyTypeId, alias = (string)x.Alias }))
                 {
-                    var tags = propertyType.Select(x => new Tag((int)x.tagId, (string)x.tag, (string)x.group));
+                    var tags = propertyType.Select(x => new Tag((int)x.tagId, (string)x.group, (string)x.tag));
                     properties.Add(new TaggedProperty(propertyType.Key.id, propertyType.Key.alias, tags));
                 }
                 yield return new TaggedEntity(node.Key, properties);
@@ -381,130 +498,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<ITag> ExecuteTagsQuery(Sql sql)
         {
-            var factory = new TagFactory();
-
-            return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
-        }
-
-        /// <summary>
-        /// Assigns the given tags to a content item's property
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeId"></param>
-        /// <param name="tags">The tags to assign</param>
-        /// <param name="replaceTags">
-        /// If set to true, this will replace all tags with the given tags,
-        /// if false this will append the tags that already exist for the content item
-        /// </param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
-        /// </remarks>
-        //public void AssignTagsToProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags, bool replaceTags)
-        public void AssignTagsToProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags)
-        {
-            //First we need to ensure there are no duplicates
-            var asArray = tags.Distinct(new TagComparer()).ToArray();
-
-            //we don't have to do anything if there are no tags assigning and we're not replacing them
-            if (asArray.Length == 0 && replaceTags == false)
-            {
-                return;
-            }
-
-            //next check if we're removing all of the tags
-            if (asArray.Length == 0 && replaceTags)
-            {
-                Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId=" + contentId + " AND propertyTypeId=" + propertyTypeId);
-                return;
-            }
-
-            //ok so now we're actually assigning tags...
-            //NOTE: There's some very clever logic in the umbraco.cms.businesslogic.Tags.Tag to insert tags where they don't exist,
-            // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up
-            // with quite a few additional queries.
-
-            var tagSetSql = GetTagSet(asArray);
-
-            //adds any tags found in the collection that aren't in cmsTag
-            var insertTagsSql = string.Concat("insert into cmsTags (Tag,",
-                                                SqlSyntax.GetQuotedColumnName("group"),
-                                                ") ",
-                                                " select TagSet.Tag, TagSet.",
-                                                SqlSyntax.GetQuotedColumnName("group"),
-                                                " from ",
-                                                tagSetSql,
-                                                " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet.",
-                                                SqlSyntax.GetQuotedColumnName("group"),
-                                                " = cmsTags.",
-                                                SqlSyntax.GetQuotedColumnName("group"),
-                                                ")",
-                                                " where cmsTags.Id is null ");
-            //insert the tags that don't exist
-            Database.Execute(insertTagsSql);
-
-            if (replaceTags)
-            {
-                //if we are replacing the tags then remove them first
-                Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId=" + contentId + " AND propertyTypeId=" + propertyTypeId);
-            }
-
-            //adds any tags found in csv that aren't in tagrelationships
-            var insertTagRelationsSql = string.Concat("insert into cmsTagRelationship (tagId,nodeId,propertyTypeId) ",
-                                                        "select NewTagsSet.Id, " + contentId + ", " + propertyTypeId + " from  ",
-                                                        "( ",
-                                                        "select NewTags.Id from  ",
-                                                        tagSetSql,
-                                                        " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.",
-                                                        SqlSyntax.GetQuotedColumnName("group"),
-                                                        " = NewTags.",
-                                                        SqlSyntax.GetQuotedColumnName("group"),
-                                                        ") ",
-                                                        ") as NewTagsSet ",
-                                                        "left outer join cmsTagRelationship ",
-                                                        "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.nodeId = ",
-                                                        contentId,
-                                                        " and cmsTagRelationship.propertyTypeId = ",
-                                                        propertyTypeId,
-                                                        ") ",
-                                                        "where cmsTagRelationship.tagId is null ");
-
-            //insert the tags relations that don't exist
-            Database.Execute(insertTagRelationsSql);
-        }
-
-        /// <summary>
-        /// Removes any of the given tags from the property association
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeId"></param>
-        /// <param name="tags">The tags to remove from the property</param>
-        public void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags)
-        {
-            var tagSetSql = GetTagSet(tags);
-
-            var deleteSql = string.Concat("DELETE FROM cmsTagRelationship WHERE nodeId = ",
-                                          contentId,
-                                          " AND propertyTypeId = ",
-                                          propertyTypeId,
-                                          " AND tagId IN ",
-                                          "(SELECT id FROM cmsTags INNER JOIN ",
-                                          tagSetSql,
-                                          " ON (TagSet.Tag = cmsTags.Tag and TagSet." + SqlSyntax.GetQuotedColumnName("group") + @" = cmsTags." + SqlSyntax.GetQuotedColumnName("group") + @"))");
-
-            Database.Execute(deleteSql);
-        }
-
-        public void ClearTagsFromProperty(int contentId, int propertyTypeId)
-        {
-            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
-                new { nodeId = contentId, propertyTypeId = propertyTypeId });
-        }
-
-        public void ClearTagsFromEntity(int contentId)
-        {
-            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
-                new { nodeId = contentId });
+            return Database.Fetch<TagDto>(sql).Select(TagFactory.BuildEntity);
         }
 
         private Guid GetNodeObjectType(TaggableObjectTypes type)
@@ -522,48 +516,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
         }
 
-        /// <summary>
-        /// This is a clever way to produce an SQL statement like this:
-        ///
-        ///     (select 'Spacesdd' as Tag, 'default' as [Group]
-        ///     union
-        ///     select 'Cool' as Tag, 'default' as [Group]
-        ///     ) as TagSet
-        ///
-        /// This allows us to use the tags to be inserted as a temporary in memory table.
-        /// </summary>
-        /// <param name="tagsToInsert"></param>
-        /// <returns></returns>
-        private string GetTagSet(IEnumerable<ITag> tagsToInsert)
-        {
-            // fixme.npoco
-            //TODO: Fix this query, since this is going to be basically a unique query each time, this will cause some mem usage in peta poco,
-            // and surely there's a nicer way!
-            //TODO: When we fix, be sure to remove the @ symbol escape
-
-            var array = tagsToInsert
-                .Select(tag =>
-                    string.Format("select N'{0}' as Tag, '{1}' as " + SqlSyntax.GetQuotedColumnName("group") + @"",
-                        NPocoDatabaseExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
-                .ToArray();
-            return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
-        }
-
-        private class TagComparer : IEqualityComparer<ITag>
-        {
-            public bool Equals(ITag x, ITag y)
-            {
-                return x.Text == y.Text && x.Group == y.Group;
-            }
-
-            public int GetHashCode(ITag obj)
-            {
-                unchecked
-                {
-                    return (obj.Text.GetHashCode() * 397) ^ obj.Group.GetHashCode();
-                }
-            }
-        }
-
+        #endregion
     }
 }

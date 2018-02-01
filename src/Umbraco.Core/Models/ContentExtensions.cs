@@ -11,6 +11,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -390,113 +391,6 @@ namespace Umbraco.Core.Models
         public static IProfile GetWriterProfile(this IMedia content, IUserService userService)
         {
             return userService.GetProfileById(content.WriterId);
-        }
-
-        #endregion
-
-        #region Tags
-
-        /// <summary>
-        /// Sets tags.
-        /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="propertyTypeAlias">The property alias.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="replaceTags">True to replace the tags with the specified tags or false to merge them with the currently assigned ones.</param>
-        /// <param name="tagGroup">The tags group.</param>
-        /// <param name="storage">The tags storage type.</param>
-        public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags = true, string tagGroup = "default", TagCacheStorageType storage = TagCacheStorageType.Csv)
-        {
-            var property = content.Properties[propertyTypeAlias];
-            if (property == null)
-                throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
-            property.SetTags(propertyTypeAlias, tags, replaceTags, tagGroup, storage);
-        }
-
-        // fixme - totally not ok with variants
-        internal static void SetTags(this Property property, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags = true, string tagGroup = "default", TagCacheStorageType storage = TagCacheStorageType.Csv)
-        {
-            if (property == null) throw new ArgumentNullException(nameof(property));
-
-            var trimmedTags = tags.Select(x => x.Trim()).ToArray();
-            var changes = property.TagChanges;
-
-            changes.Add(new PropertyTagChange
-            {
-                Type = replaceTags ? PropertyTagChange.ChangeType.Replace : PropertyTagChange.ChangeType.Merge,
-                Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup))
-            });
-
-            // ensure the property value is set to the same thing
-            if (replaceTags)
-            {
-                switch (storage)
-                {
-                    case TagCacheStorageType.Csv:
-                        property.SetValue(string.Join(",", trimmedTags)); // csv string
-                        break;
-                    case TagCacheStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(trimmedTags)); // json array
-                        break;
-                }
-            }
-            else // merge
-            {
-                IEnumerable<string> currentTags;
-                switch (storage)
-                {
-                    case TagCacheStorageType.Csv:
-                        currentTags = property.GetValue().ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
-                        property.SetValue(string.Join(",", currentTags.Union(trimmedTags))); // csv string
-                        break;
-                    case TagCacheStorageType.Json:
-                        currentTags = JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString());
-                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray())); // json array
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Remove tags.
-        /// </summary>
-        /// <param name="content">The content item.</param>
-        /// <param name="propertyTypeAlias">The property alias.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="tagGroup">The tags group.</param>
-        // fixme - totally not ok with variants
-        public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string tagGroup = "default")
-        {
-            var property = content.Properties[propertyTypeAlias];
-            if (property == null)
-                throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
-
-            var trimmedTags = tags.Select(x => x.Trim()).ToArray();
-            var changes = property.TagChanges;
-
-            changes.Add(new PropertyTagChange
-            {
-                Type = PropertyTagChange.ChangeType.Remove,
-                Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup))
-            });
-
-            // set the property value
-            var value = property.GetValue()?.ToString();
-            if (string.IsNullOrWhiteSpace(value)) return;
-
-            var storage = value.StartsWith("[") ? TagCacheStorageType.Json : TagCacheStorageType.Csv;
-            IEnumerable<string> currentTags;
-            switch (storage)
-            {
-                case TagCacheStorageType.Csv:
-                    currentTags = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
-                    property.SetValue(string.Join(",", currentTags.Except(trimmedTags)));
-                    break;
-                case TagCacheStorageType.Json:
-                    currentTags = JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString());
-                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray())); // json array
-                    break;
-            }
         }
 
         #endregion

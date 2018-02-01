@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     {
         public ChangeType Type { get; set; }
 
-        public IEnumerable<Tuple<string, string>> Tags { get; set; }
+        public IEnumerable<(string Type, string Tags)> Tags { get; set; }
 
         public enum ChangeType
         {

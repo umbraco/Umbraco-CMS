@@ -6,6 +6,45 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface ITagRepository : IReadWriteQueryRepository<int, ITag>
     {
+        #region Assign and Remove Tags
+
+        /// <summary>
+        /// Assign tags to a content property.
+        /// </summary>
+        /// <param name="contentId">The identifier of the content item.</param>
+        /// <param name="propertyTypeId">The identifier of the property type.</param>
+        /// <param name="tags">The tags to assign.</param>
+        /// <param name="replaceTags">A value indicating whether to replace already assigned tags.</param>
+        /// <remarks>
+        /// <para>When <paramref name="replaceTags"/> is false, the tags specified in <paramref name="tags"/> are added to those already assigned.</para>
+        /// <para>When <paramref name="tags"/> is empty and <paramref name="replaceTags"/> is true, all assigned tags are removed.</para>
+        /// </remarks>
+        void Assign(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags);
+
+        /// <summary>
+        /// Removes assigned tags from a content property.
+        /// </summary>
+        /// <param name="contentId">The identifier of the content item.</param>
+        /// <param name="propertyTypeId">The identifier of the property type.</param>
+        /// <param name="tags">The tags to remove.</param>
+        void Remove(int contentId, int propertyTypeId, IEnumerable<ITag> tags);
+
+        /// <summary>
+        /// Removes all assigned tags from a content item.
+        /// </summary>
+        /// <param name="contentId">The identifier of the content item.</param>
+        void RemoveAll(int contentId);
+        
+        /// <summary>
+        /// Removes all assigned tags from a content property.
+        /// </summary>
+        /// <param name="contentId">The identifier of the content item.</param>
+        /// <param name="propertyTypeId">The identifier of the property type.</param>
+        void RemoveAll(int contentId, int propertyTypeId);
+
+        #endregion
+
+        #region Queries
 
         TaggedEntity GetTaggedEntityByKey(Guid key);
         TaggedEntity GetTaggedEntityById(int id);
@@ -56,41 +95,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string group = null);
 
-        /// <summary>
-        /// Assigns the given tags to a content item's property
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeId"></param>
-        /// <param name="tags">The tags to assign</param>
-        /// <param name="replaceTags">
-        /// If set to true, this will replace all tags with the given tags,
-        /// if false this will append the tags that already exist for the content item
-        /// </param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
-        /// </remarks>
-        void AssignTagsToProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags);
-
-        /// <summary>
-        /// Removes any of the given tags from the property association
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeId"></param>
-        /// <param name="tags">The tags to remove from the property</param>
-        void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags);
-
-        /// <summary>
-        /// Removes all tag associations from the property
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyTypeId"></param>
-        void ClearTagsFromProperty(int contentId, int propertyTypeId);
-
-        /// <summary>
-        /// Removes all tag associations from the entity
-        /// </summary>
-        /// <param name="contentId"></param>
-        void ClearTagsFromEntity(int contentId);
+        #endregion
     }
 }

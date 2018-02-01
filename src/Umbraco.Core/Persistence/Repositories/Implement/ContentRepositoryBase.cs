@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -38,6 +40,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         { }
 
         protected abstract TRepository This { get; }
+
+        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
 
         #region Versions
 
@@ -200,29 +204,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Tags
 
         /// <summary>
+        /// Updates tags for an item.
+        /// </summary>
+        protected void SetEntityTags(IContentBase entity, ITagRepository tagRepo)
+        {
+            foreach (var property in entity.Properties)
+            {
+                var tagConfiguration = property.GetTagConfiguration();
+                if (tagConfiguration == null) continue;
+                tagRepo.Assign(entity.Id, property.PropertyTypeId, property.GetTagsValue().Select(x => new Tag { Group = tagConfiguration.Group, Text = x }), true);
+            }
+        }
+
+        // FIXME should we do it when un-publishing? or?
+        /// <summary>
         /// Clears tags for an item.
         /// </summary>
         protected void ClearEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
-            tagRepo.ClearTagsFromEntity(entity.Id);
-        }
-
-        /// <summary>
-        /// Updates tags for an item.
-        /// </summary>
-        protected void UpdateEntityTags(IContentBase entity, ITagRepository tagRepo)
-        {
-            foreach (var property in entity.Properties.Where(x => x.HasTagChanges))
-            {
-                foreach (var change in property.TagChanges)
-                {
-                    var tags = change.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 });
-                    if (change.Type == PropertyTagChange.ChangeType.Remove)
-                        tagRepo.RemoveTagsFromProperty(entity.Id, property.PropertyTypeId, tags);
-                    else
-                        tagRepo.AssignTagsToProperty(entity.Id, property.PropertyTypeId, tags, change.Type == PropertyTagChange.ChangeType.Replace);
-                }
-            }
+            tagRepo.RemoveAll(entity.Id);
         }
 
         #endregion
@@ -400,8 +400,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var allPropertyTypeIds = allPropertyDataDtos.Select(x => x.PropertyTypeId).Distinct().ToList();
             var allPropertyTypeDtos = Database.FetchByGroups<PropertyTypeDto, int>(allPropertyTypeIds, 2000, batch =>
                 SqlContext.Sql()
-                    .Select<PropertyTypeDto>()
+                    .Select<PropertyTypeDto>(r => r.Select(x => x.DataTypeDto))
                     .From<PropertyTypeDto>()
+                    .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                     .WhereIn<PropertyTypeDto>(x => x.Id, batch));
 
             // index the types for perfs, and assign to PropertyDataDto
@@ -409,30 +410,31 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var a in allPropertyDataDtos)
                 a.PropertyTypeDto = indexedPropertyTypeDtos[a.PropertyTypeId];
 
-            //// lazy access to prevalue for data types if any property requires tag support
-            //var pre = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
-            //{
-            //    return Database.FetchByGroups<DataTypePreValueDto, int>(allPropertyTypeIds, 2000, batch =>
-            //        SqlContext.Sql()
-            //            .Select<DataTypePreValueDto>()
-            //            .From<DataTypePreValueDto>()
-            //            .WhereIn<DataTypePreValueDto>(x => x.DataTypeNodeId, batch));
-            //});
+            // prefetch configuration for tag properties
+            var tagEditors = new Dictionary<string, TagConfiguration>();
+            foreach (var propertyTypeDto in indexedPropertyTypeDtos.Values)
+            {
+                var editorAlias = propertyTypeDto.DataTypeDto.EditorAlias;
+                var editorAttribute = PropertyEditors[editorAlias].GetTagAttribute();
+                if (editorAttribute == null) continue;
+                var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyTypeDto.DataTypeDto.Configuration);
+                if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = editorAttribute.Delimiter;
+                tagEditors[editorAlias] = tagConfiguration;
+            }
 
             // now we have
             // - the definitinos
             // - all property data dtos
-            // - a lazy access to prevalues
+            // - tag editors
             // and we need to build the proper property collections
 
-            return GetPropertyCollections(temps, allPropertyDataDtos /*, pre*/);
+            return GetPropertyCollections(temps, allPropertyDataDtos, tagEditors);
         }
 
-        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos /*, Lazy<IEnumerable<DataTypePreValueDto>> allPreValues*/)
+        private IDictionary<int, PropertyCollection> GetPropertyCollections<T>(List<TempContent<T>> temps, IEnumerable<PropertyDataDto> allPropertyDataDtos, Dictionary<string, TagConfiguration> tagConfigurations)
             where T : class, IContentBase
         {
             var result = new Dictionary<int, PropertyCollection>();
-            var propertiesWithTagSupport = new Dictionary<string, SupportTagsAttribute>();
             var compositionPropertiesIndex = new Dictionary<int, PropertyType[]>();
 
             // index PropertyDataDto per versionId for perfs
@@ -468,27 +470,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // deal with tags
                 foreach (var property in properties)
                 {
-                    // test for support and cache
-                    var editor = Current.PropertyEditors[property.PropertyType.PropertyEditorAlias];
-                    if (propertiesWithTagSupport.TryGetValue(property.PropertyType.PropertyEditorAlias, out var tagSupport) == false)
-                        propertiesWithTagSupport[property.PropertyType.PropertyEditorAlias] = tagSupport = TagExtractor.GetAttribute(editor);
-                    if (tagSupport == null) continue;
+                    if (!tagConfigurations.TryGetValue(property.PropertyType.PropertyEditorAlias, out var tagConfiguration))
+                        continue;
 
-                    // fixme - this is totally borked of course for just anything and we need to re-do it entirely without prevalue
-                    //#error This cannot work!
-
-                    //// this property has tags, so we need to extract them and for that we need the prevals which we've already looked up
-                    //// fixme - optimize with index
-                    //var preValData = allPreValues.Value.Where(x => x.DataTypeNodeId == property.PropertyType.DataTypeId)
-                    //    .Distinct()
-                    //    .ToArray();
-
-                    //// build and set tags
-                    //var asDictionary = preValData.ToDictionary(x => x.Alias, x => new PreValue(x.Id, x.Value, x.SortOrder));
-                    //var preVals = new PreValueCollection(asDictionary);
-                    //// fixme this is totally borked of course for variants
-                    //var contentPropData = new ContentPropertyData(property.GetValue(), preVals);
-                    //TagExtractor.SetPropertyTags(property, contentPropData, property.GetValue(), tagSupport);
+                    property.SetTagsValue(property.GetValue(), tagConfiguration);
                 }
 
                 if (result.ContainsKey(temp.VersionId))

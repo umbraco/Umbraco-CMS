@@ -33,6 +33,15 @@ namespace Umbraco.Core.Migrations
             Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
         }
 
+        protected void AlterColumn<T>(string tableName, string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            var column = table.Columns.First(x => x.Name == columnName);
+            SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out var sqls);
+            foreach (var sql in sqls)
+                Database.Execute(sql);
+        }
+
         protected void ReplaceColumn<T>(string tableName, string currentName, string newName)
         {
             AddColumn<T>(tableName, newName, out var sqls);

@@ -10,11 +10,11 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [SupportTags(typeof(TagPropertyEditorTagDefinition), ValueType = TagValueType.CustomTagList)]
+    [TagsPropertyEditor]
     [ValueEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
     public class TagsPropertyEditor : PropertyEditor
     {
-        private ManifestValidatorCollection _validators;
+        private readonly ManifestValidatorCollection _validators;
 
         public TagsPropertyEditor(ManifestValidatorCollection validators, ILogger logger)
             : base(logger)
@@ -23,19 +23,18 @@ namespace Umbraco.Web.PropertyEditors
             _defaultPreVals = new Dictionary<string, object>
                 {
                     {"group", "default"},
-                    {"storageType", TagCacheStorageType.Csv.ToString()}
+                    {"storageType", TagsStorageType.Csv.ToString()}
                 };
         }
 
         private IDictionary<string, object> _defaultPreVals;
 
-        /// <summary>
-        /// Override to supply the default group
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>Can be overriden to supply a different default group.</remarks>
         public override IDictionary<string, object> DefaultConfiguration
         {
-            get { return _defaultPreVals; }
-            set { _defaultPreVals = value; }
+            get => _defaultPreVals;
+            set => _defaultPreVals = value;
         }
 
         protected override ValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
@@ -56,19 +55,8 @@ namespace Umbraco.Web.PropertyEditors
                     : null;
             }
 
-            /// <summary>
-            /// Returns the validator used for the required field validation which is specified on the PropertyType
-            /// </summary>
-            /// <remarks>
-            /// This will become legacy as soon as we implement overridable pre-values.
-            ///
-            /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
-            /// if they need to do some custom validation, or if the value being validated is a json object.
-            /// </remarks>
-            public override ManifestValidator RequiredValidator
-            {
-                get { return new RequiredTagsValueValidator(); }
-            }
+            /// <inheritdoc />
+            public override ManifestValidator RequiredValidator => new RequiredTagsValueValidator();
 
             /// <summary>
             /// Custom validator to validate a required value against an empty json value

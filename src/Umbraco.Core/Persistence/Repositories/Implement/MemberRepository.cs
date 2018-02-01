@@ -310,7 +310,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
-            UpdateEntityTags(entity, _tagRepository);
+            SetEntityTags(entity, _tagRepository);
 
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
@@ -375,7 +375,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
-            UpdateEntityTags(entity, _tagRepository);
+            SetEntityTags(entity, _tagRepository);
 
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 

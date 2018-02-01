@@ -11,6 +11,8 @@
             public const int DefaultContentListView = -95;
             public const int DefaultMediaListView = -96;
             public const int DefaultMembersListView = -97;
+
+            public const int Tags = 1041;
         }
     }
 }

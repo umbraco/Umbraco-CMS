@@ -16,8 +16,6 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Property : EntityBase
     {
-        private List<PropertyTagChange> _tagChanges;
-
         private List<PropertyValue> _values = new List<PropertyValue>();
         private PropertyValue _pvalue;
         private Dictionary<CompositeIntStringKey, PropertyValue> _vvalues;
@@ -105,16 +103,6 @@ namespace Umbraco.Core.Models
                     : null;
             }
         }
-
-        /// <summary>
-        /// Gets the tag changes.
-        /// </summary>
-        internal List<PropertyTagChange> TagChanges => _tagChanges ?? (_tagChanges = new List<PropertyTagChange>());
-
-        /// <summary>
-        /// Gets a value indicating whether the property has tag changes.
-        /// </summary>
-        internal bool HasTagChanges => _tagChanges != null;
 
         /// <summary>
         /// Returns the Alias of the PropertyType, which this Property is based on

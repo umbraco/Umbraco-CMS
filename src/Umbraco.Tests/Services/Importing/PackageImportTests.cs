@@ -5,10 +5,12 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Composing.Current;
+using LightInject;
 
 namespace Umbraco.Tests.Services.Importing
 {
@@ -16,6 +18,40 @@ namespace Umbraco.Tests.Services.Importing
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PackageImportTests : TestWithSomeContentBase
     {
+        [HideFromTypeFinder]
+        public class Editor1 : PropertyEditor
+        {
+            public Editor1(ILogger logger)
+                : base(logger)
+            {
+                Alias = "7e062c13-7c41-4ad9-b389-41d88aeef87c";
+            }
+        }
+
+        [HideFromTypeFinder]
+        public class Editor2 : PropertyEditor
+        {
+            public Editor2(ILogger logger)
+                : base(logger)
+            {
+                Alias = "d15e1281-e456-4b24-aa86-1dda3e4299d5";
+            }
+        }
+
+        protected override void Compose()
+        {
+            base.Compose();
+
+            // the packages that are used by these tests reference totally bogus property
+            // editors that must exist - so they are defined here - and in order not to
+            // pollute everything, they are ignored by the type finder and explicitely
+            // added to the editors collection
+
+            Container.GetInstance<PropertyEditorCollectionBuilder>()
+                .Add<Editor1>()
+                .Add<Editor2>();
+        }
+
         [Test]
         public void PackagingService_Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
         {
@@ -308,15 +344,12 @@ namespace Umbraco.Tests.Services.Importing
                                 where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
-            Assert.Fail("ARE WE REALLY IMPORTING PREVALUES IN PACKAGES?!");
-            //DataTypePreValueDto preValueKey;
-            //using (var scope = ScopeProvider.CreateScope())
-            //{
-            //    var dtos = scope.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { dataTypeDefinitions.First().Id });
-            //    int preValueId;
-            //    int.TryParse(contents.First().GetValue<string>("testList"), out preValueId);
-            //    preValueKey = dtos.SingleOrDefault(x => x.Id == preValueId);
-            //}
+            string configuration;
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
+                configuration = dtos.Single().Configuration;
+            }
 
             // Assert
             Assert.That(dataTypeDefinitions, Is.Not.Null);
@@ -326,8 +359,7 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
-            //Assert.That(preValueKey, Is.Not.Null);
-            //Assert.That(preValueKey.Value, Is.EqualTo("test3"));
+            Assert.AreEqual("{\"items\":[{\"id\":59,\"value\":\"test\"},{\"id\":60,\"value\":\"test3\"},{\"id\":61,\"value\":\"test2\"}]}", configuration);
         }
 
         [Test]

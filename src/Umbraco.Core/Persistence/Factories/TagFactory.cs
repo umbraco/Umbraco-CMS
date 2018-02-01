@@ -3,25 +3,25 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class TagFactory
+    internal static class TagFactory
     {
-        public ITag BuildEntity(TagDto dto)
+        public static ITag BuildEntity(TagDto dto)
         {
-            var model = new Tag(dto.Id, dto.Tag, dto.Group, dto.NodeCount);
+            var entity = new Tag(dto.Id, dto.Group, dto.Text) { NodeCount = dto.NodeCount };
             // reset dirty initial properties (U4-1946)
-            model.ResetDirtyProperties(false);
-            return model;
+            entity.ResetDirtyProperties(false);
+            return entity;
         }
 
-        public TagDto BuildDto(ITag entity)
+        public static TagDto BuildDto(ITag entity)
         {
             return new TagDto
-                {
-                    Id = entity.Id,
-                    Group = entity.Group,
-                    Tag = entity.Text,
-                    NodeCount = entity.NodeCount,
-                };
+            {
+                Id = entity.Id,
+                Group = entity.Group,
+                Text = entity.Text,
+                //Key = entity.Group + "/" + entity.Text // de-normalize
+            };
         }
     }
 }

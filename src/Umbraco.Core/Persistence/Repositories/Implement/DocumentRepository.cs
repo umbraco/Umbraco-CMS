@@ -338,6 +338,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishTemplate = content.Template;
                 content.PublisherId = content.WriterId;
                 content.PublishDate = content.UpdateDate;
+
+                SetEntityTags(entity, _tagRepository);
             }
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
@@ -346,11 +348,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishTemplate = null;
                 content.PublisherId = null;
                 content.PublishDate = null;
-            }
 
-            // if published, set tags accordingly
-            if (entity.Published)
-                UpdateEntityTags(entity, _tagRepository);
+                ClearEntityTags(entity, _tagRepository);
+            }
 
             entity.ResetDirtyProperties();
 
@@ -466,7 +466,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // if entity is publishing, update tags, else leave tags there
             // means that implicitely unpublished, or trashed, entities *still* have tags in db
             if (content.PublishedState == PublishedState.Publishing)
-                UpdateEntityTags(entity, _tagRepository);
+                SetEntityTags(entity, _tagRepository);
 
             // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
@@ -480,6 +480,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishTemplate = content.Template;
                 content.PublisherId = content.WriterId;
                 content.PublishDate = content.UpdateDate;
+
+                SetEntityTags(entity, _tagRepository);
             }
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
@@ -488,7 +490,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishTemplate = null;
                 content.PublisherId = null;
                 content.PublishDate = null;
+
+                ClearEntityTags(entity, _tagRepository);
             }
+
+            // note re. tags: explicitely unpublished entities have cleared tags,
+            // but masked or trashed entitites *still* have tags in the db fixme so what?
 
             entity.ResetDirtyProperties();
 

@@ -84,7 +84,8 @@ namespace Umbraco.Core.Migrations.Upgrade
                 .Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}")
                 .Chain<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}")
                 .Chain<DropMigrationsTable>("{F0C42457-6A3B-4912-A7EA-F27ED85A2092}")
-                .Chain<RefactorDataType>("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
+                .Chain<RefactorDataType>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}")
+                .Chain<TagsMigration>("{139F26D7-7E08-48E3-81D9-E50A21A72F67}");
 
             // 7.8.1 = same as 7.8.0
             From("{init-7.8.1}")
@@ -153,6 +154,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<VariantsMigration>("{6550C7E8-77B7-4DE3-9B58-E31C81CB9504}");
             Chain<DropMigrationsTable>("{E3388F73-89FA-45FE-A539-C7FACC8D63DD}");
             Chain<RefactorDataType>("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
+            Chain<TagsMigration>("{139F26D7-7E08-48E3-81D9-E50A21A72F67}");
         }
     }
 }

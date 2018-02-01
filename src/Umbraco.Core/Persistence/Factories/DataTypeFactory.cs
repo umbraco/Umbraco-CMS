@@ -8,10 +8,10 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal static class DataTypeFactory
     {
-        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditor editor)
+        public static IDataType BuildEntity(DataTypeDto dto, PropertyEditorCollection editors)
         {
-            if (editor == null)
-                throw new ArgumentNullException(nameof(editor), $"Editor with alias \"{dto.EditorAlias}\" is required.");
+            if (!editors.TryGet(dto.EditorAlias, out var editor))
+                throw new InvalidOperationException($"Could not find an editor with alias \"{dto.EditorAlias}\".");
 
             var dataType = new DataType(dto.EditorAlias);
 
