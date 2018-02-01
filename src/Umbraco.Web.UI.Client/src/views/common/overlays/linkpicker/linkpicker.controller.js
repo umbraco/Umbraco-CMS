@@ -17,14 +17,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	    $scope.searchInfo = {
 	        searchFromId: null,
 	        searchFromName: null,
-	        showSearch: false,
+            showSearch: false,
+            bypassUserPermissions: dialogOptions.bypassUserPermissions,
 	        results: [],
 	        selectedSearchResults: []
         };
-
-        $scope.bypassUserPermissions = dialogOptions.bypassUserPermissions;
         
-        $scope.customTreeParams = $scope.bypassUserPermissions ? "bypassUserPermissions=" + $scope.bypassUserPermissions : "";
+        $scope.customTreeParams = dialogOptions.bypassUserPermissions ? "bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
 
 	    if (dialogOptions.currentTarget) {
 	        $scope.model.target = dialogOptions.currentTarget;
