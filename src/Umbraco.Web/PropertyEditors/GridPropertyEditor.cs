@@ -137,7 +137,7 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
             public string Rte { get; set; }
 
-            [PreValueField("bypassUserPermissions", "Bypass User Permissions", "boolean", Description = "If set, the chosen start node will bypass any user permissions.")]
+            [PreValueField("bypassUserPermissions", "Bypass User Permissions", "boolean", Description = "If set, user and group start node permissions will be bypassed.")]
             public bool BypassUserPermissions { get; set; }
         }
 

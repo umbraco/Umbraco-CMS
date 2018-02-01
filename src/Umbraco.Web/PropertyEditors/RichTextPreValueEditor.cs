@@ -28,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
                 Key = "bypassUserPermissions",
                 View = "boolean",
                 Name = "Bypass User Permissions",
-                Description = "If set, user and group permissions will be bypassed."
+                Description = "If set, user and group start node permissions will be bypassed."
             });
 
             Fields.Add(new PreValueField()
