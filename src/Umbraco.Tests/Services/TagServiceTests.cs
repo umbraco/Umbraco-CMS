@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -18,7 +19,6 @@ namespace Umbraco.Tests.Services
     public class TagServiceTests : TestWithSomeContentBase
     {
         [Test]
-        [Explicit("Fails, tags API is not consistent.")]
         public void TagApiConsistencyTest()
         {
             var contentService = ServiceContext.ContentService;
@@ -34,12 +34,24 @@ namespace Umbraco.Tests.Services
 
             IContent content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "cow", "pig", "goat" });
+            content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
+            // change
             content1.AssignTags("tags", new[] { "elephant" }, true);
             content1.RemoveTags("tags", new[] { "cow" });
+            content1.PublishValues();
             contentService.SaveAndPublish(content1);
 
+            // more changes
+            content1.AssignTags("tags", new[] { "mouse" }, true);
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
+            content1.RemoveTags("tags", new[] { "mouse" });
+            content1.PublishValues();
+            contentService.SaveAndPublish(content1);
+
+            // get it back
             content1 = contentService.GetById(content1.Id);
             var tagsValue = content1.GetValue("tags").ToString();
             var tagsValues = tagsValue.Split(',');
@@ -66,9 +78,9 @@ namespace Umbraco.Tests.Services
             var tagService = ServiceContext.TagService;
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", ValueStorageType.Ntext, "tags")
+                new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext, "tags")
                 {
-                    DataTypeId = 1041
+                    DataTypeId = Constants.DataTypes.Tags
                 });
             contentTypeService.Save(contentType);
 

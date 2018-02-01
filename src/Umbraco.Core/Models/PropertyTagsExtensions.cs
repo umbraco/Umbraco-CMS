@@ -24,11 +24,11 @@ namespace Umbraco.Core.Models
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
-            var editor = PropertyEditors[property.Alias];
+            var editor = PropertyEditors[property.PropertyType.PropertyEditorAlias];
             var tagAttribute = editor.GetTagAttribute();
             if (tagAttribute == null) return null;
 
-            var configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            var configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId).Configuration;
             var configuration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(configurationObject);
 
             if (configuration.Delimiter == default)

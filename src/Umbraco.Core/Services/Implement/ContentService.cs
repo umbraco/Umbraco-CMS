@@ -991,6 +991,7 @@ namespace Umbraco.Core.Services.Implement
                 if (result.Success == false)
                 {
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
+                    scope.Complete(); // compete the save
                     return result;
                 }
 

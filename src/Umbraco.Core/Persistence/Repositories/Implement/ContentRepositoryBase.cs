@@ -417,7 +417,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var editorAlias = propertyTypeDto.DataTypeDto.EditorAlias;
                 var editorAttribute = PropertyEditors[editorAlias].GetTagAttribute();
                 if (editorAttribute == null) continue;
-                var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyTypeDto.DataTypeDto.Configuration);
+                var tagConfigurationSource = propertyTypeDto.DataTypeDto.Configuration;
+                var tagConfiguration = string.IsNullOrWhiteSpace(tagConfigurationSource)
+                    ? new TagConfiguration()
+                    : JsonConvert.DeserializeObject<TagConfiguration>(tagConfigurationSource);
                 if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = editorAttribute.Delimiter;
                 tagEditors[editorAlias] = tagConfiguration;
             }
