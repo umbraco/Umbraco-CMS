@@ -1201,6 +1201,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   
   <area alias="grid">
+      <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
     <key alias="insertControl">Choisissez le type de contenu</key>
     <key alias="chooseLayout">Choisissez une mise en page</key>
     <key alias="addRows">Ajouter une ligne</key>
