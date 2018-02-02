@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {

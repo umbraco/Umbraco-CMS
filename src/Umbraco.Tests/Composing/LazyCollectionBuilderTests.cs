@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Tests.DI
+namespace Umbraco.Tests.Composing
 {
     [TestFixture]
     public class LazyCollectionBuilderTests
@@ -28,7 +28,7 @@ namespace Umbraco.Tests.DI
         // so we don't have a test for duplicates as we had with resolvers in v7
 
         [Test]
-        public void LazyCollectionBuilderTypes()
+        public void LazyCollectionBuilderHandlesTypes()
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        public void LazyCollectionBuilderProducers()
+        public void LazyCollectionBuilderHandlesProducers()
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        public void LazyCollectionBuilderBoth()
+        public void LazyCollectionBuilderHandlesTypesAndProducers()
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        public void LazyCollectionBuilderThrows()
+        public void LazyCollectionBuilderThrowsOnIllegalTypes()
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.DI
         }
 
         [Test]
-        public void LazyCollectionBuilderExclude()
+        public void LazyCollectionBuilderCanExcludeTypes()
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.DI
             Assert.IsFalse(values.Contains(o1)); // transient
         }
 
-        #region Test classes
+        #region Test Objects
 
         private interface ITestInterface
         { }
@@ -162,6 +162,7 @@ namespace Umbraco.Tests.DI
         private class TransientObject4
         { }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilder : LazyCollectionBuilderBase<TestCollectionBuilder, TestCollection, ITestInterface>
         {
             public TestCollectionBuilder(IServiceContainer container)
@@ -173,6 +174,7 @@ namespace Umbraco.Tests.DI
             protected override ILifetime CollectionLifetime => null; // transient
         }
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollection : BuilderCollectionBase<ITestInterface>
         {
             public TestCollection(IEnumerable<ITestInterface> items)

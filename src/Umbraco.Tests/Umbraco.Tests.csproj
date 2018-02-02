@@ -319,7 +319,7 @@
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
-    <Compile Include="DependencyInjection\ResolverBaseTest.cs" />
+    <Compile Include="Composing\ComposingTestBase.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\BackOfficeCookieManagerTests.cs" />
@@ -428,7 +428,7 @@
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
-    <Compile Include="DependencyInjection\XsltExtensionsResolverTests.cs" />
+    <Compile Include="Composing\XsltExtensionCollectionTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
     <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
@@ -508,7 +508,7 @@
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
-    <Compile Include="DependencyInjection\ActionCollectionTests.cs" />
+    <Compile Include="Composing\ActionCollectionTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Stubs\TestProfiler.cs" />
@@ -521,8 +521,8 @@
     <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
     <Compile Include="CoreThings\ObjectExtensionsTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
-    <Compile Include="DependencyInjection\LazyCollectionBuilderTests.cs" />
-    <Compile Include="DependencyInjection\CollectionBuildersTests.cs" />
+    <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
+    <Compile Include="Composing\CollectionBuildersTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
@@ -581,7 +581,7 @@
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="CoreThings\UriExtensionsTests.cs" />
     <Compile Include="Misc\UriUtilityTests.cs" />
-    <Compile Include="DependencyInjection\PackageActionCollectionTests.cs" />
+    <Compile Include="Composing\PackageActionCollectionTests.cs" />
     <Compile Include="Plugins\PluginManagerExtensions.cs" />
     <Compile Include="Plugins\PluginManagerTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />

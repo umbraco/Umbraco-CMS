@@ -9,39 +9,30 @@ namespace Umbraco.Web.PropertyEditors
     public class ListViewConfiguration
     {
         [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
-        [JsonProperty("pageSize")]
         public int PageSize { get; set; }
 
         [ConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
-        [JsonProperty("displayAtNumber")]
         public int DisplayAtTabNumber { get; set; }
 
         [ConfigurationField("orderBy", "Order By", "views/propertyeditors/listview/sortby.prevalues.html",
             Description = "The default sort order for the list")]
-        [JsonProperty("orderBy")]
         public string OrderBy { get; set; }
 
         [ConfigurationField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
-        [JsonProperty("orderDirection")]
         public string OrderDirection { get; set; }
-
 
         [ConfigurationField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
             Description = "The properties that will be displayed for each column")]
-        [JsonProperty("includeProperties")]
         public Property[] IncludeProperties { get; set; }
 
         [ConfigurationField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
-        [JsonProperty("layouts")]
         public Layout[] Layouts { get; set; }
 
         [ConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
             Description = "The bulk actions that are allowed from the list view")]
-        [JsonProperty("bulkActionPermissions")]
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // fixme managing defaults?
 
         [ConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
-        [JsonProperty("tabName")]
         public int TabName { get; set; }
 
         public class Property

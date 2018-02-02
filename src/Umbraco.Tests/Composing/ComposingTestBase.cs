@@ -6,11 +6,12 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
-namespace Umbraco.Tests.DI
+namespace Umbraco.Tests.Composing
 {
-    public abstract class ResolverBaseTest // fixme rename, do something!
+    public abstract class ComposingTestBase
     {
         protected TypeLoader TypeLoader { get; private set; }
+
         protected ProfilingLogger ProfilingLogger { get; private set; }
 
         [SetUp]
@@ -18,9 +19,7 @@ namespace Umbraco.Tests.DI
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(NullCacheProvider.Instance,
-                ProfilingLogger,
-                false)
+            TypeLoader = new TypeLoader(NullCacheProvider.Instance, ProfilingLogger, detectChanges: false)
             {
                 AssembliesToScan = AssembliesToScan
             };

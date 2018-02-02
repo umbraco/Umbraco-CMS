@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using Lucene.Net.Index;
 using NUnit.Framework;
 using Umbraco.Core;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Umbraco.Tests.Clr
 {
@@ -267,7 +268,260 @@ namespace Umbraco.Tests.Clr
             Assert.IsNull(ReflectionUtilities.EmitPropertyGetter<Class1, int>("Value2", false));
         }
 
+        [Test]
+        public void SetterCanCastValue()
+        {
+            // test that we can emit property setters that cast from eg 'object'
+
+            // well - no - we don't do this
+
+            /*
+
+            var type4 = typeof(Class4);
+            var propString4 = type4.GetProperty("StringValue");
+            var propClassA4 = type4.GetProperty("ClassAValue");
+
+            var object4 = new Class4();
+            var object2A = new Class2A();
+
+            // works with a string property
+            Assert.IsNotNull(propString4);
+            var setterString4 = ReflectionUtilities.EmitPropertySetter<Class4, object>(propString4);
+            Assert.IsNotNull(setterString4);
+            setterString4(object4, "foo");
+            Assert.IsNotNull(object4.StringValue);
+            Assert.AreEqual("foo", object4.StringValue);
+
+            setterString4(object4, new Class2());
+
+            // works with a reference property
+            Assert.IsNotNull(propClassA4);
+            var setterClassA4 = ReflectionUtilities.EmitPropertySetter<Class4, object>(propClassA4);
+            Assert.IsNotNull(setterClassA4);
+            setterClassA4(object4, object2A);
+            Assert.IsNotNull(object4.ClassAValue);
+            Assert.AreEqual(object2A, object4.ClassAValue);
+
+            */
+        }
+
+        [Test]
+        public void SetterCanCastObject()
+        {
+            var type5 = typeof(Class5);
+            var propClass4 = type5.GetProperty("ClassValue");
+
+            var object2 = new Class2();
+            var object4 = new Class5();
+
+            // can cast the object type from Class5 to Class4
+            var setterClass4 = ReflectionUtilities.EmitPropertySetter<Class5, Class2>(propClass4);
+
+            setterClass4(object4, object2);
+            Assert.IsNotNull(object4.ClassValue);
+            Assert.AreSame(object2, object4.ClassValue);
+        }
+
+        [Test]
+        public void GetterCanCastValue()
+        {
+            var type4 = typeof(Class4);
+            var propClassA4 = type4.GetProperty("ClassAValue");
+            var propInt4 = type4.GetProperty("IntValue");
+
+            var object2A = new Class2A();
+            var object4 = new Class4 { ClassAValue = object2A, IntValue = 159 };
+
+            // can cast the return type from Class2A to Class2
+            var getterClassA4 = ReflectionUtilities.EmitPropertyGetter<Class4, Class2>(propClassA4);
+
+            var valueClass4A = getterClassA4(object4);
+            Assert.IsNotNull(valueClass4A);
+            Assert.AreSame(object2A, valueClass4A);
+
+            // cannot cast the return type from Class2A to Class3!
+            Assert.Throws<ArgumentException>(()
+                => ReflectionUtilities.EmitPropertyGetter<Class4, Class3>(propClassA4));
+
+            // can cast and box the return type from int to object
+            var getterInt4 = ReflectionUtilities.EmitPropertyGetter<Class4, object>(propInt4);
+
+            var valueInt4 = getterInt4(object4);
+            Assert.IsTrue(valueInt4 is int);
+            Assert.AreEqual(159, valueInt4);
+
+            // cannot cast the return type from int to Class3!
+            Assert.Throws<ArgumentException>(()
+                => ReflectionUtilities.EmitPropertyGetter<Class4, Class3>(propInt4));
+        }
+
+        [Test]
+        public void GetterCanCastObject()
+        {
+            var type5 = typeof(Class5);
+            var propClass4 = type5.GetProperty("ClassValue");
+
+            var object2 = new Class2();
+            var object4 = new Class5 { ClassValue = object2 };
+
+            // can cast the object type from Class5 to Class4
+            var getterClass4 = ReflectionUtilities.EmitPropertyGetter<Class5, Class2>(propClass4);
+
+            var valueClass4 = getterClass4(object4);
+            Assert.IsNotNull(valueClass4);
+            Assert.AreSame(object2, valueClass4);
+
+            // cannot cast the object type from Class3 to Class4!
+            Assert.Throws<ArgumentException>(()
+                => ReflectionUtilities.EmitPropertyGetter<Class3, Class2>(propClass4));
+        }
+
+        [Test]
+        public void CanEmitCastGetters()
+        {
+            // test that we can emit property getters that cast the returned value to 'object'
+
+            // test simple class
+
+            var type4 = typeof(Class4);
+
+            var object4 = new Class4
+            {
+                IntValue = 1,
+                StringValue = "foo",
+                ClassValue = new Class2(),
+            };
+
+            // works with a string property
+            var propString4 = type4.GetProperty("StringValue");
+            Assert.IsNotNull(propString4);
+            var getterString4 = ReflectionUtilities.EmitPropertyGetter<Class4, object>(propString4);
+            Assert.IsNotNull(getterString4);
+            var valueString4 = getterString4(object4);
+            Assert.IsNotNull(valueString4);
+            Assert.AreEqual("foo", valueString4);
+
+            // works with a reference property
+            var propClass4 = type4.GetProperty("ClassValue");
+            Assert.IsNotNull(propClass4);
+            var getterClass4 = ReflectionUtilities.EmitPropertyGetter<Class4, object>(propClass4);
+            Assert.IsNotNull(getterClass4);
+            var valueClass4 = getterClass4(object4);
+            Assert.IsNotNull(valueClass4);
+            Assert.IsInstanceOf<Class2>(valueClass4);
+
+            // works with a value type property
+            var propInt4 = type4.GetProperty("IntValue");
+            Assert.IsNotNull(propInt4);
+
+            // ... if explicitely getting a value type
+            var getterInt4T = ReflectionUtilities.EmitPropertyGetter<Class4, int>(propInt4);
+            Assert.IsNotNull(getterInt4T);
+            var valueInt4T = getterInt4T(object4);
+            Assert.AreEqual(1, valueInt4T);
+
+            // ... if using a compiled getter
+            var valueInt4D = GetIntValue(object4);
+            Assert.IsNotNull(valueInt4D);
+            Assert.IsTrue(valueInt4D is int);
+            Assert.AreEqual(1, valueInt4D);
+
+            // ... if getting a non-value type (emit adds a box)
+            var getterInt4 = ReflectionUtilities.EmitPropertyGetter<Class4, object>(propInt4);
+            Assert.IsNotNull(getterInt4);
+            var valueInt4 = getterInt4(object4);
+            Assert.IsNotNull(valueInt4);
+            Assert.IsTrue(valueInt4 is int);
+            Assert.AreEqual(1, valueInt4);
+
+            var getters4 = type4
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
+                .ToDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<Class4, object>(x));
+
+            Console.WriteLine("Getting object4 values...");
+            var values4 = getters4.ToDictionary(kvp => kvp.Key, kvp => ((Func<Class4, object>) kvp.Value)(object4));
+
+            Console.WriteLine("Writing object4 values...");
+            foreach ((var name, var value) in values4)
+                Console.WriteLine($"{name}: {value}");
+            Assert.AreEqual(4, values4.Count);
+            Assert.AreEqual("foo", values4["StringValue"]);
+            Assert.IsInstanceOf<Class2>(values4["ClassValue"]);
+            Assert.AreEqual(1, values4["IntValue"]);
+
+            // test hierarchy
+
+            var type5 = typeof(Class5);
+
+            var getters5 = type5
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
+                .ToDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<Class5, object>(x));
+
+            var object5 = new Class5
+            {
+                IntValue = 1,
+                IntValue2 = 1,
+                StringValue = "foo",
+                StringValue2 = "foo",
+                ClassValue = new Class2(),
+                ClassValue2 = new Class2()
+            };
+
+            Console.WriteLine("Getting object5 values...");
+            var values5 = getters5.ToDictionary(kvp => kvp.Key, kvp => ((Func<Class5, object>) kvp.Value)(object5));
+
+            Console.WriteLine("Writing object5 values...");
+            foreach ((var name, var value) in values5)
+                Console.WriteLine($"{name}: {value}");
+            Assert.AreEqual(7, values5.Count);
+            Assert.AreEqual("foo", values5["StringValue"]);
+            Assert.IsInstanceOf<Class2>(values5["ClassValue"]);
+            Assert.AreEqual(1, values5["IntValue"]);
+            Assert.AreEqual("foo", values5["StringValue2"]);
+            Assert.IsInstanceOf<Class2>(values5["ClassValue2"]);
+            Assert.AreEqual(1, values5["IntValue2"]);
+
+            // test object extensions
+
+            Console.WriteLine("Getting object5D values...");
+            var values5D = ObjectExtensions.ToObjectDictionary(object5);
+
+            Console.WriteLine("Writing object5D values...");
+            foreach ((var name, var value) in values5)
+                Console.WriteLine($"{name}: {value}");
+            Assert.AreEqual(7, values5.Count);
+            Assert.AreEqual("foo", values5D["StringValue"]);
+            Assert.IsInstanceOf<Class2>(values5D["ClassValue"]);
+            Assert.AreEqual(1, values5D["IntValue"]);
+            Assert.AreEqual("foo", values5D["StringValue2"]);
+            Assert.IsInstanceOf<Class2>(values5D["ClassValue2"]);
+            Assert.AreEqual(1, values5D["intValue2"]); // JsonProperty changes property name
+        }
+
         // fixme - missing tests specifying 'returned' on method, property
+
+        #region IL Code
+
+        // these functions can be examined in eg DotPeek to understand IL works
+
+        // box          [mscorlib]System.Int32
+        public object GetIntValue(Class4 object4) => object4.IntValue;
+
+        // unbox.any    [mscorlib]System.Int32
+        public void SetIntValue(Class4 object4, object i) => object4.IntValue = (int) i;
+
+        // castclass    [mscorlib]System.String
+        public void SetStringValue(Class4 object4, object s) => object4.StringValue = (string) s;
+
+        // conv.i4
+        public void SetIntValue(Class4 object4, double d) => object4.IntValue = (int) d;
+
+        // conv.i4
+        public void SetIntValue2(Class4 object4, object d) => object4.IntValue = (int) (double) d;
+
+        #endregion
+
+        #region Test Objects
 
         public static class StaticClass1
         {
@@ -302,11 +556,31 @@ namespace Umbraco.Tests.Clr
 
         public class Class2 { }
 
+        public class Class2A : Class2 { }
+
         public class Class3
         {
             public Class3(int i) { }
 
             private Class3(string s) { }
         }
+
+        public class Class4
+        {
+            public int IntValue { get; set; }
+            public string StringValue { get; set; }
+            public Class2 ClassValue { get;set; }
+            public Class2A ClassAValue { get; set; }
+        }
+
+        public class Class5 : Class4
+        {
+            [JsonProperty("intValue2")]
+            public int IntValue2 { get; set; }
+            public string StringValue2 { get; set; }
+            public Class2 ClassValue2 { get;set; }
+        }
+
+        #endregion
     }
 }

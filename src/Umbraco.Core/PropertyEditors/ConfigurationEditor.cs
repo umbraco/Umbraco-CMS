@@ -47,7 +47,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>Used to create the actual configuration dictionary from the database value.</remarks>
         public virtual object ParseConfiguration(string configurationJson)
             => string.IsNullOrWhiteSpace(configurationJson)
-                ? null
+                ? new Dictionary<string, object>()
                 : JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
 
         /// <summary>

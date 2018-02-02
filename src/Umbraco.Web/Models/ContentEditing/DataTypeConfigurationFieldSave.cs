@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -9,15 +10,15 @@ namespace Umbraco.Web.Models.ContentEditing
     public class DataTypeConfigurationFieldSave
     {
         /// <summary>
-        /// Gets the configuration field key.
+        /// Gets or sets the configuration field key.
         /// </summary>
         [DataMember(Name = "key", IsRequired = true)]
         public string Key { get; set; }
 
         /// <summary>
-        /// Gets the configuration field value.
+        /// Gets or sets the configuration field value.
         /// </summary>
         [DataMember(Name = "value", IsRequired = true)]
-        public object Value { get; set; } // fixme - what's a value?
+        public object Value { get; set; }
     }
 }

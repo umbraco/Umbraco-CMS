@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Newtonsoft.Json;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -7,8 +8,19 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class ImageCropperConfiguration
     {
-        // fixme should not be a string!
         [ConfigurationField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
-        public string Crops { get; set; }
+        public ImageCropperCrop[] Crops { get; set; }
+
+        public class ImageCropperCrop
+        {
+            [JsonProperty("alias")]
+            public string Alias { get; set; }
+
+            [JsonProperty("width")]
+            public int Width { get; set; }
+
+            [JsonProperty("height")]
+            public int Height { get; set; }
+        }
     }
 }

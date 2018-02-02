@@ -49,7 +49,11 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         public override Dictionary<string, object> ToEditor(ValueListConfiguration configuration)
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (configuration == null)
+                return new Dictionary<string, object>
+                {
+                    { "items", new object() }
+                };
 
             // map to what the (still v7) editor expects
             // {"item":{"169":{"value":"a","sortOrder":1},"170":{"value":"b","sortOrder":2},"171":{"value":"c","sortOrder":3}}}

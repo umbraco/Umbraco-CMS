@@ -168,8 +168,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // more magic here ;-(
             var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
-            var crops = configuration?.Crops; // fixme but Crops should not be a string and then we'd serialize them
-            if (string.IsNullOrWhiteSpace(crops)) crops = "[]";
+            var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.ImageCropperCrop>();
             return "{src: '" + val + "', crops: " + crops + "}";
         }
     }

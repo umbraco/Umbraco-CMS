@@ -6,17 +6,13 @@ using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core._Legacy.PackageActions;
 
-namespace Umbraco.Tests.DI
+namespace Umbraco.Tests.Composing
 {
     [TestFixture]
-    public class PackageActionCollectionTests : ResolverBaseTest
+    public class PackageActionCollectionTests : ComposingTestBase
     {
-        // NOTE
-        // ManyResolverTests ensure that we'll get our actions back and PackageActionResolver works,
-        // so all we're testing here is that plugin manager _does_ find our package actions
-        // which should be ensured by PlugingManagerTests anyway, so this is useless?
         [Test]
-        public void FindAllPackageActions()
+        public void PackageActionCollectionBuilderWorks()
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
@@ -34,7 +30,7 @@ namespace Umbraco.Tests.DI
             Assert.IsTrue(hasAction2);
         }
 
-        #region Classes for tests
+        #region Test Objects
 
         public class PackageAction1 : IPackageAction
         {

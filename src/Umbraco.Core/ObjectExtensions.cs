@@ -18,6 +18,9 @@ namespace Umbraco.Core
     /// </summary>
     public static class ObjectExtensions
     {
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> ToObjectTypes
+            = new ConcurrentDictionary<Type, Dictionary<string, object>>();
+
         //private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
 
         /// <summary>
@@ -503,34 +506,34 @@ namespace Umbraco.Core
             return new Dictionary<string, TVal>();
         }
 
-        private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> ToObjectTypes
-            = new ConcurrentDictionary<Type, Dictionary<string, object>>();
-
         /// <summary>
         /// Converts an object's properties into a dictionary.
         /// </summary>
         /// <param name="obj">The object to convert.</param>
+        /// <param name="namer">A property namer function.</param>
         /// <returns>A dictionary containing each properties.</returns>
-        public static Dictionary<string, object> ToObjectDictionary<T>(T obj)
+        public static Dictionary<string, object> ToObjectDictionary<T>(T obj, Func<PropertyInfo, string> namer = null)
         {
-            // fixme refactor this!
-            var d = new Dictionary<string, object>();
-            if (obj == null) return d;
-            foreach (var p in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+            if (obj == null) return new Dictionary<string, object>();
+
+            string DefaultNamer(PropertyInfo property)
             {
-                var jsonProperty = p.GetCustomAttribute<JsonPropertyAttribute>();
-                var name = jsonProperty != null ? jsonProperty.PropertyName : p.Name;
-                d[name] = p.GetValue(obj);
+                var jsonProperty = property.GetCustomAttribute<JsonPropertyAttribute>();
+                return jsonProperty?.PropertyName ?? property.Name;
             }
-            return d;
 
             var t = obj.GetType();
 
+            if (namer == null) namer = DefaultNamer;
+
             if (!ToObjectTypes.TryGetValue(t, out var properties))
             {
-                ToObjectTypes[t] = properties = t
-                    .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-                    .ToDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<T, object>(x));
+                properties = new Dictionary<string, object>();
+
+                foreach (var p in t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+                    properties[namer(p)] = ReflectionUtilities.EmitPropertyGetter<T, object>(p);
+
+                ToObjectTypes[t] = properties;
             }
 
             return properties.ToDictionary(x => x.Key, x => ((Func<T, object>) x.Value)(obj));

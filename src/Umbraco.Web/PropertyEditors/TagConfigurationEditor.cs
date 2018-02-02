@@ -38,7 +38,9 @@ namespace Umbraco.Web.PropertyEditors
             var dictionary = base.ToEditor(configuration);
 
             // the front-end editor expects the string value of the storage type
-            dictionary["storageType"] = dictionary["storageType"].ToString();
+            if (!dictionary.TryGetValue("storageType", out var storageType))
+                storageType = TagsStorageType.Csv;
+            dictionary["storageType"] = storageType.ToString();
 
             return dictionary;
         }

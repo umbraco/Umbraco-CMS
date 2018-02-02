@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
@@ -13,6 +15,10 @@ namespace Umbraco.Core.PropertyEditors
     public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         where TConfiguration : new()
     {
+        // ReSharper disable once StaticMemberInGenericType
+        private static Dictionary<string, (Type PropertyType, object Setter)> _fromObjectTypes
+            = new Dictionary<string, (Type, object)>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationEditor{TConfiguration}"/> class.
         /// </summary>
@@ -96,7 +102,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(configuration)) return default;
+                if (string.IsNullOrWhiteSpace(configuration)) return new TConfiguration();
                 return JsonConvert.DeserializeObject<TConfiguration>(configuration);
             }
             catch (Exception e)
@@ -118,7 +124,21 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="configuration">The current configuration object.</param>
         public virtual TConfiguration FromEditor(Dictionary<string, object> editorValue, TConfiguration configuration)
         {
-            return ToObject<TConfiguration>(editorValue);
+            // note - editorValue contains a mix of Clr types (string, int...) and JToken
+            // turning everything back into a JToken... might not be fastest but is simplest
+            // for now
+
+            var o = new JObject();
+
+            foreach (var field in Fields)
+            {
+                // only fields - ignore json property
+                // fixme should we deal with jsonProperty anyways?
+                if (editorValue.TryGetValue(field.Key, out var value) && value != null)
+                    o[field.PropertyName] = value is JToken jtoken ? jtoken : JToken.FromObject(value);
+            }
+
+            return o.ToObject<TConfiguration>();
         }
 
         /// <inheritdoc />
@@ -134,7 +154,18 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="configuration">The configuration.</param>
         public virtual Dictionary<string, object> ToEditor(TConfiguration configuration)
         {
-            var dictionary = ObjectExtensions.ToObjectDictionary(configuration);
+            string FieldNamer(PropertyInfo property)
+            {
+                // field first
+                var field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
+                if (field != null) return field.Key;
+
+                // then, json property
+                var jsonProperty = property.GetCustomAttribute<JsonPropertyAttribute>();
+                return jsonProperty?.PropertyName ?? property.Name;
+            }
+
+            var dictionary = ObjectExtensions.ToObjectDictionary(configuration, FieldNamer);
 
             if (configuration is ConfigurationWithAdditionalData withAdditionalData)
                 foreach (var kv in withAdditionalData.GetAdditionalValues())
@@ -149,27 +180,49 @@ namespace Umbraco.Core.PropertyEditors
         /// <typeparam name="T">The type of the object.</typeparam>
         /// <param name="source">The source dictionary.</param>
         /// <returns>The object corresponding to the dictionary.</returns>
-        protected T ToObject<T>(Dictionary<string, object> source)
+        protected T FromObjectDictionary<T>(Dictionary<string, object> source) // fixme KILL - NOT USED ANYMORE
             where T : new()
         {
-            // fixme cache! see also ToObject in ObjectExtensions
-            // this is probably very bad, must REAFACTOR! the property setter of course cannot work like this!
-            //var properties = TypeHelper.CachedDiscoverableProperties(typeof(T))
-            //    .ToDictionary(x => x.Name, x => (Type: x.PropertyType, Set: ReflectionUtilities.EmitPropertySetter<object, object>(x)));
-            var properties = TypeHelper.CachedDiscoverableProperties(typeof(T))
-                .ToDictionary(x => x.Name, x => (Type: x.PropertyType, Infos: x));
+            // this needs to be here (and not in ObjectExtensions) because it is based on fields
+
+            var t = typeof(T);
+
+            if (_fromObjectTypes == null)
+            {
+                var p = t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                var fromObjectTypes = new Dictionary<string, (Type, object)>();
+
+                foreach (var field in Fields)
+                {
+                    var fp = p.FirstOrDefault(x => x.Name == field.PropertyName);
+                    if (fp == null) continue;
+
+                    fromObjectTypes[field.Key] = (fp.PropertyType, ReflectionUtilities.EmitPropertySetter<T, object>(fp));
+                }
+
+                _fromObjectTypes = fromObjectTypes;
+            }
 
             var obj = new T();
 
             foreach (var field in Fields)
             {
-                if (!properties.TryGetValue(field.PropertyName, out var property)) continue;
+                if (!_fromObjectTypes.TryGetValue(field.Key, out var ps)) continue;
                 if (!source.TryGetValue(field.Key, out var value)) continue;
-                // fixme if value is null? is this what we want?
-                if (!value.GetType().IsInstanceOfType(property.Type))
-                    throw new Exception();
-                //property.Set(obj, value);
-                property.Infos.SetValue(obj, value);
+
+                if (ps.PropertyType.IsValueType)
+                {
+                    if (value == null)
+                        throw new InvalidCastException($"Cannot cast null value to {ps.PropertyType.Name}.");
+                }
+                else
+                {
+                    // ReSharper disable once UseMethodIsInstanceOfType
+                    if (!ps.PropertyType.IsAssignableFrom(value.GetType()))
+                        throw new InvalidCastException($"Cannot cast value of type {value.GetType()} to {ps.PropertyType.Name}.");
+                }
+
+                ((Action<T, object>) ps.Setter)(obj, value);
             }
 
             return obj;

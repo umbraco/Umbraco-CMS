@@ -4,18 +4,13 @@ using NUnit.Framework;
 using Umbraco.Core.Macros;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.DI
+namespace Umbraco.Tests.Composing
 {
     [TestFixture]
-    public class XsltExtensionsResolverTests : ResolverBaseTest
+    public class XsltExtensionCollectionTests : ComposingTestBase
     {
-        // NOTE
-        // ManyResolverTests ensure that we'll get our actions back and ActionsResolver works,
-        // so all we're testing here is that plugin manager _does_ find our actions
-        // which should be ensured by PlugingManagerTests anyway, so this is useless?
-        // maybe not as it seems to handle the "instance" thing... so we test that we respect the singleton?
         [Test]
-        public void Find_All_Extensions()
+        public void XsltExtensionsCollectionBuilderWorks()
         {
             var container = new ServiceContainer();
             var builder = new XsltExtensionCollectionBuilder(container);
@@ -30,19 +25,16 @@ namespace Umbraco.Tests.DI
             Assert.AreEqual("test2", extensions.Single(x => x.ExtensionObject.GetType() == typeof(XsltEx2)).Namespace);
         }
 
-        #region Classes for tests
+        #region Test Objects
 
-        [Umbraco.Core.Macros.XsltExtension("test1")]
+        [XsltExtension("test1")]
         public class XsltEx1
-        {
-
-        }
+        { }
 
         //test with legacy one
         [umbraco.XsltExtension("test2")]
         public class XsltEx2
-        {
-        }
+        { }
 
         #endregion
     }

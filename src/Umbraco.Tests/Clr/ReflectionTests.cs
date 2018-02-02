@@ -38,6 +38,8 @@ namespace Umbraco.Tests.Clr
             Assert.Contains(typeof(IInterface2), interfaces);
         }
 
+        #region Test Objects
+
         interface IInterface1
         { }
 
@@ -53,5 +55,7 @@ namespace Umbraco.Tests.Clr
 
         class Class2 : Class1
         { }
+
+        #endregion
     }
 }

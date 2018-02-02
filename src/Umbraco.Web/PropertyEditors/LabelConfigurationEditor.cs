@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
@@ -19,12 +18,10 @@ namespace Umbraco.Web.PropertyEditors
             // not simply deserializing Json because we want to validate the valueType
 
             if (editorValue.TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
-                && valueTypeObj is JToken jtoken
-                && jtoken.Type == JTokenType.String)
+                && valueTypeObj is string stringValue)
             {
-                var valueType = jtoken.Value<string>();
-                if (!string.IsNullOrWhiteSpace(valueType) && ValueTypes.IsValue(valueType)) // validate
-                    newConfiguration.ValueType = valueType;
+                if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue)) // validate
+                    newConfiguration.ValueType = stringValue;
             }
 
             return newConfiguration;
