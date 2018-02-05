@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -15,10 +13,6 @@ namespace Umbraco.Core.PropertyEditors
     public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
         where TConfiguration : new()
     {
-        // ReSharper disable once StaticMemberInGenericType
-        private static Dictionary<string, (Type PropertyType, object Setter)> _fromObjectTypes
-            = new Dictionary<string, (Type, object)>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationEditor{TConfiguration}"/> class.
         /// </summary>
@@ -98,7 +92,10 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override object ParseConfiguration(string configuration)
+        public override IDictionary<string, object> DefaultConfiguration => ToConfigurationEditor(new TConfiguration());
+
+        /// <inheritdoc />
+        public override object FromDatabase(string configuration)
         {
             try
             {
@@ -112,17 +109,17 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override object FromEditor(Dictionary<string, object> editorValue, object configuration)
+        public sealed override object FromConfigurationEditor(Dictionary<string, object> editorValues, object configuration)
         {
-            return FromEditor(editorValue, (TConfiguration) configuration);
+            return FromConfigurationEditor(editorValues, (TConfiguration) configuration);
         }
 
         /// <summary>
         /// Converts the configuration posted by the editor.
         /// </summary>
-        /// <param name="editorValue">The configuration object posted by the editor.</param>
+        /// <param name="editorValues">The configuration object posted by the editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        public virtual TConfiguration FromEditor(Dictionary<string, object> editorValue, TConfiguration configuration)
+        public virtual TConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, TConfiguration configuration)
         {
             // note - editorValue contains a mix of Clr types (string, int...) and JToken
             // turning everything back into a JToken... might not be fastest but is simplest
@@ -132,9 +129,10 @@ namespace Umbraco.Core.PropertyEditors
 
             foreach (var field in Fields)
             {
-                // only fields - ignore json property
-                // fixme should we deal with jsonProperty anyways?
-                if (editorValue.TryGetValue(field.Key, out var value) && value != null)
+                // field only, JsonPropertyAttribute is ignored here
+                // only keep fields that have a non-null/empty value
+                // rest will fall back to default during ToObject()
+                if (editorValues.TryGetValue(field.Key, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
                     o[field.PropertyName] = value is JToken jtoken ? jtoken : JToken.FromObject(value);
             }
 
@@ -142,9 +140,9 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override Dictionary<string, object> ToEditor(object defaultConfiguration, object configuration)
+        public sealed override Dictionary<string, object> ToConfigurationEditor(object configuration)
         {
-            return ToEditor((TConfiguration) configuration);
+            return ToConfigurationEditor((TConfiguration) configuration);
         }
 
         /// <summary>
@@ -152,17 +150,17 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="defaultConfiguration">The default configuration.</param>
         /// <param name="configuration">The configuration.</param>
-        public virtual Dictionary<string, object> ToEditor(TConfiguration configuration)
+        public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration configuration)
         {
             string FieldNamer(PropertyInfo property)
             {
-                // field first
+                // try the field
                 var field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
                 if (field != null) return field.Key;
 
-                // then, json property
-                var jsonProperty = property.GetCustomAttribute<JsonPropertyAttribute>();
-                return jsonProperty?.PropertyName ?? property.Name;
+                // but the property may not be a field just an extra thing
+                var json = property.GetCustomAttribute<JsonPropertyAttribute>();
+                return json?.PropertyName ?? property.Name;
             }
 
             var dictionary = ObjectExtensions.ToObjectDictionary(configuration, FieldNamer);
@@ -172,60 +170,6 @@ namespace Umbraco.Core.PropertyEditors
                     dictionary[kv.Key] = kv.Value;
 
             return dictionary;
-        }
-
-        /// <summary>
-        /// Converts a dictionary into an object.
-        /// </summary>
-        /// <typeparam name="T">The type of the object.</typeparam>
-        /// <param name="source">The source dictionary.</param>
-        /// <returns>The object corresponding to the dictionary.</returns>
-        protected T FromObjectDictionary<T>(Dictionary<string, object> source) // fixme KILL - NOT USED ANYMORE
-            where T : new()
-        {
-            // this needs to be here (and not in ObjectExtensions) because it is based on fields
-
-            var t = typeof(T);
-
-            if (_fromObjectTypes == null)
-            {
-                var p = t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-                var fromObjectTypes = new Dictionary<string, (Type, object)>();
-
-                foreach (var field in Fields)
-                {
-                    var fp = p.FirstOrDefault(x => x.Name == field.PropertyName);
-                    if (fp == null) continue;
-
-                    fromObjectTypes[field.Key] = (fp.PropertyType, ReflectionUtilities.EmitPropertySetter<T, object>(fp));
-                }
-
-                _fromObjectTypes = fromObjectTypes;
-            }
-
-            var obj = new T();
-
-            foreach (var field in Fields)
-            {
-                if (!_fromObjectTypes.TryGetValue(field.Key, out var ps)) continue;
-                if (!source.TryGetValue(field.Key, out var value)) continue;
-
-                if (ps.PropertyType.IsValueType)
-                {
-                    if (value == null)
-                        throw new InvalidCastException($"Cannot cast null value to {ps.PropertyType.Name}.");
-                }
-                else
-                {
-                    // ReSharper disable once UseMethodIsInstanceOfType
-                    if (!ps.PropertyType.IsAssignableFrom(value.GetType()))
-                        throw new InvalidCastException($"Cannot cast value of type {value.GetType()} to {ps.PropertyType.Name}.");
-                }
-
-                ((Action<T, object>) ps.Setter)(obj, value);
-            }
-
-            return obj;
         }
     }
 }

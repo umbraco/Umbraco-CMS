@@ -14,7 +14,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Only_Tests_On_JArray()
         {
-            var validator = new ColorListConfigurationEditor.ColorListValidator();
+            var validator = new ColorPickerConfigurationEditor.ColorListValidator();
             var result = validator.Validate("hello", null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
@@ -22,7 +22,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Only_Tests_On_JArray_Of_Item_JObject()
         {
-            var validator = new ColorListConfigurationEditor.ColorListValidator();
+            var validator = new ColorPickerConfigurationEditor.ColorListValidator();
             var result = validator.Validate(new JArray("hello", "world"), null, new ColorPickerPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             Assert.AreEqual(0, result.Count());
         }
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Validates_Color_Vals()
         {
-            var validator = new ColorListConfigurationEditor.ColorListValidator();
+            var validator = new ColorPickerConfigurationEditor.ColorListValidator();
             var result = validator.Validate(new JArray(
                                                 JObject.FromObject(new { value = "CC0000" }),
                                                 JObject.FromObject(new { value = "zxcvzxcvxzcv" }),

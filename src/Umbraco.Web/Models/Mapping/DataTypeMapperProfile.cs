@@ -107,13 +107,15 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
                 .ConvertUsing(src =>
                     {
-                        //this is a new data type, so just return the field editors, there are no values yet
-                        var defaultVals = src.DefaultConfiguration;
+                        // this is a new data type, so just return the field editors, with default values - there are no values yet
                         var fields = src.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
-                        if (defaultVals != null)
-                        {
-                            DataTypeConfigurationFieldDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultVals);
-                        }
+
+                        // fixme for ConfigurationEditor it's a dictionary, for ConfigurationEditor<TConfiguration> it's a new TConfiguration
+                        // and then what? need to get it back as a dictionary so it can be applied here?
+                        var defaultConfiguration = src.DefaultConfiguration;
+                        if (defaultConfiguration != null)
+                            DataTypeConfigurationFieldDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultConfiguration);
+
                         return fields;
                     });
         }

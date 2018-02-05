@@ -50,7 +50,7 @@ namespace Umbraco.Web.Models.Mapping
             if (editor != null)
             {
                 fields = editor.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
-                configurationDictionary = editor.ConfigurationEditor.ToEditor(editor.DefaultConfiguration, configuration);
+                configurationDictionary = editor.ConfigurationEditor.ToConfigurationEditor(configuration);
             }
 
             if (configurationDictionary == null)

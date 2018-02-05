@@ -18,33 +18,18 @@ namespace Umbraco.Web.PropertyEditors
     public class ImageCropperPropertyEditor : PropertyEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
-        private readonly IDataTypeService _dataTypeService;
         private readonly UploadAutoFillProperties _autoFillProperties;
-        private IDictionary<string, object> _internalPreValues; // preValues
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService)
+        public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             var contentSettings1 = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
-            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
-
-            _internalPreValues = new Dictionary<string, object>
-                {
-                    {"focalPoint", "{left: 0.5, top: 0.5}"},
-                    {"src", ""}
-                };
 
             _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, contentSettings1);
-        }
-
-        public override IDictionary<string, object> DefaultConfiguration
-        {
-            get => _internalPreValues;
-            set => _internalPreValues = value;
         }
 
         /// <summary>

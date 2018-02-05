@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -13,42 +9,15 @@ namespace Umbraco.Web.PropertyEditors
     public class DateTimePropertyEditor : PropertyEditor
     {
         public DateTimePropertyEditor(ILogger logger): base(logger)
-        {
-            _defaultPreVals = new Dictionary<string, object>
-                {
-                    //NOTE: This is very important that we do not use .Net format's there, this format
-                    // is the correct format for the JS picker we are using so you cannot capitalize the HH, they need to be 'hh'
-                    {"format", "YYYY-MM-DD HH:mm:ss"},
-                    //a pre-value indicating if the client/server time should be offset, when set to true the date/time seen
-                    // by the client will be offset with the server time.
-                    // For example, this is forced to true for scheduled publishing date/time pickers
-                    {"offsetTime", "0"}
-                };
-        }
-
-        private IDictionary<string, object> _defaultPreVals;
-
-        /// <summary>
-        /// Overridden because we ONLY support Date + Time format
-        /// </summary>
-        public override IDictionary<string, object> DefaultConfiguration
-        {
-            get { return _defaultPreVals; }
-            set { _defaultPreVals = value; }
-        }
+        { }
 
         protected override ValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
-
             editor.Validators.Add(new DateTimeValidator());
-
             return editor;
         }
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new DateTimeConfigurationEditor();
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor();
     }
 }

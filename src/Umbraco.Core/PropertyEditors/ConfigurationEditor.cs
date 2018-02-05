@@ -32,23 +32,13 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("fields")]
         public List<ConfigurationField> Fields { get; }
 
-        protected void AddField(ConfigurationField field)
-        {
-            var existing = Fields.FirstOrDefault(x => x.Key == field.Key);
-            if (existing != null)
-                Fields[Fields.IndexOf(existing)] = field;
-            else
-                Fields.Add(field);
-        }
-
         /// <summary>
-        /// Parses the configuration.
+        /// Gets a field by property name.
         /// </summary>
-        /// <remarks>Used to create the actual configuration dictionary from the database value.</remarks>
-        public virtual object ParseConfiguration(string configurationJson)
-            => string.IsNullOrWhiteSpace(configurationJson)
-                ? new Dictionary<string, object>()
-                : JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
+        /// <remarks>Can be used in constructors to add infos to a field that has been defined
+        /// by a property marked with the <see cref="ConfigurationFieldAttribute"/>.</remarks>
+        protected ConfigurationField Field(string name)
+            => Fields.First(x => x.PropertyName == name);
 
         /// <summary>
         /// Gets the configuration as a typed object.
@@ -60,39 +50,53 @@ namespace Umbraco.Core.PropertyEditors
             throw new InvalidCastException($"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
         }
 
+        /// <summary>
+        /// Gets the default configuration.
+        /// </summary>
+        /// <remarks>The default configuration is used to initialize new datatypes.</remarks>
+        public virtual IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
+
         // notes
-        // ToEditor returns a dictionary, and FromEditor accepts a dictionary.
+        // ToConfigurationEditor returns a dictionary, and FromConfigurationEditor accepts a dictionary.
         // this is due to the way our front-end editors work, see DataTypeController.PostSave
         // and DataTypeConfigurationFieldDisplayResolver - we are not going to change it now.
 
         /// <summary>
-        /// Converts the configuration posted by the editor.
+        /// Converts the serialized database value into the actual configuration object.
         /// </summary>
-        /// <param name="editorValue">The configuration object posted by the editor.</param>
+        /// <remarks>Converting the configuration object to the serialized database value is
+        /// achieved by simply serializing the configuration.</remarks>
+        public virtual object FromDatabase(string configurationJson)
+            => string.IsNullOrWhiteSpace(configurationJson)
+                ? new Dictionary<string, object>()
+                : JsonConvert.DeserializeObject<Dictionary<string, object>>(configurationJson);
+
+        /// <summary>
+        /// Converts the values posted by the configuration editor into the actual configuration object.
+        /// </summary>
+        /// <param name="editorValues">The values posted by the configuration editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        public virtual object FromEditor(Dictionary<string, object> editorValue, object configuration)
+        public virtual object FromConfigurationEditor(Dictionary<string, object> editorValues, object configuration)
         {
             // by default, return the posted dictionary
-            return editorValue;
+            // but only keep entries that have a non-null/empty value
+            // rest will fall back to default during ToConfigurationEditor()
+
+            var keys = editorValues.Where(x => x.Value == null || x.Value is string stringValue && string.IsNullOrWhiteSpace(stringValue)).Select(x => x.Key);
+            foreach (var key in keys) editorValues.Remove(key);
+
+            return editorValues;
         }
 
         /// <summary>
-        /// Converts configuration values to values for the editor.
+        /// Converts the configuration object to values for the configuration editor.
         /// </summary>
-        /// <param name="defaultConfiguration">The default configuration.</param>
         /// <param name="configuration">The configuration.</param>
-        public virtual Dictionary<string, object> ToEditor(object defaultConfiguration, object configuration)
+        public virtual Dictionary<string, object> ToConfigurationEditor(object configuration)
         {
             // editors that do not override ToEditor/FromEditor have their configuration
             // as a dictionary of <string, object> and, by default, we merge their default
             // configuration with their current configuration
-
-            // make sure we have dictionaries
-            if (defaultConfiguration == null)
-                defaultConfiguration = new Dictionary<string, object>();
-
-            if (!(defaultConfiguration is IDictionary<string, object> d))
-                throw new ArgumentException($"Expecting a {typeof(Dictionary<string,object>).Name} instance but got {defaultConfiguration.GetType().Name}.", nameof(defaultConfiguration));
 
             if (configuration == null)
                 configuration = new Dictionary<string, object>();
@@ -101,10 +105,17 @@ namespace Umbraco.Core.PropertyEditors
                 throw new ArgumentException($"Expecting a {typeof(Dictionary<string,object>).Name} instance but got {configuration.GetType().Name}.", nameof(configuration));
 
             // clone the default configuration, and apply the current configuration values
-            var dc = new Dictionary<string, object>(d);
+            var d = new Dictionary<string, object>(DefaultConfiguration);
             foreach ((var key, var value) in c)
-                dc[key] = value;
-            return dc;
+                d[key] = value;
+            return d;
         }
+
+        /// <summary>
+        /// Converts the configuration object to values for the value editror.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        public virtual Dictionary<string, object> ToValueEditor(object configuration)
+            => ToConfigurationEditor(configuration);
     }
 }

@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
         // the sort order that comes back makes no sense
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToEditor(ValueListConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration configuration)
         {
             if (configuration == null)
                 return new Dictionary<string, object>
@@ -66,27 +66,25 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override ValueListConfiguration FromEditor(Dictionary<string, object> editorValue, ValueListConfiguration configuration)
+        public override ValueListConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, ValueListConfiguration configuration)
         {
             var output = new ValueListConfiguration();
 
-            if (!editorValue.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // auto-assigning our ids, get next id from existing values
-            var nextId = configuration.Items.Max(x => x.Id) + 1;
+            var nextId = 1;
+            if (configuration?.Items != null && configuration.Items.Count > 0)
+                nextId = configuration.Items.Max(x => x.Id) + 1;
 
             // create ValueListItem instances - sortOrder is ignored here
             foreach (var item in jItems.OfType<JObject>())
             {
-                var valueProp = item.Property("value");
-                if (valueProp == null || valueProp.Type != JTokenType.String) continue;
-                var value = valueProp.Value<string>();
+                var value = item.Property("value")?.Value?.Value<string>();
                 if (string.IsNullOrWhiteSpace(value)) continue;
 
-                var idProp = item.Property("id");
-                var id = idProp != null && idProp.Type == JTokenType.Integer ? idProp.Value<int>() : 0;
-
+                var id = item.Property("id")?.Value?.Value<int>() ?? 0;
                 if (id >= nextId) nextId = id + 1;
 
                 output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });

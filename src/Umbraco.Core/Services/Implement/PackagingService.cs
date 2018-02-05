@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml.Linq;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
@@ -1017,7 +1018,7 @@ namespace Umbraco.Core.Services.Implement
 
                 try
                 {
-                    dataType.Configuration = editor.ConfigurationEditor.ParseConfiguration(configurationAttribute.Value);
+                    dataType.Configuration = editor.ConfigurationEditor.FromDatabase(configurationAttribute.Value);
                 }
                 catch (Exception ex)
                 {

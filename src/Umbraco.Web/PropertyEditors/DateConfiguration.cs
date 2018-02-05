@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -10,6 +8,6 @@ namespace Umbraco.Web.PropertyEditors
     public class DateConfiguration
     {
         [ConfigurationField("format", "Date format", "textstring", Description = "If left empty then the format is YYYY-MM-DD. (see momentjs.com for supported formats)")]
-        public string DefaultValue { get; set; } // fixme datetime?
+        public string Format { get; set; } = "YYYY-MM-DD";
     }
 }

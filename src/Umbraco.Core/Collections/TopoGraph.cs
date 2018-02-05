@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Collections
 {
     public class TopoGraph
     {

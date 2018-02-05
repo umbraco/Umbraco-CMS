@@ -33,9 +33,16 @@ namespace Umbraco.Web.PropertyEditors
             });
         }
 
-        public override Dictionary<string, object> ToEditor(TagConfiguration configuration)
+        // fixme
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
         {
-            var dictionary = base.ToEditor(configuration);
+            {"group", "default"},
+            {"storageType", TagsStorageType.Csv.ToString()}
+        };
+
+        public override Dictionary<string, object> ToConfigurationEditor(TagConfiguration configuration)
+        {
+            var dictionary = base.ToConfigurationEditor(configuration);
 
             // the front-end editor expects the string value of the storage type
             if (!dictionary.TryGetValue("storageType", out var storageType))
@@ -45,15 +52,15 @@ namespace Umbraco.Web.PropertyEditors
             return dictionary;
         }
 
-        public override TagConfiguration FromEditor(Dictionary<string, object> editorValue, TagConfiguration configuration)
+        public override TagConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, TagConfiguration configuration)
         {
             // the front-end editor retuns the string value of the storage type
             // pure Json could do with
             // [JsonConverter(typeof(StringEnumConverter))]
             // but here we're only deserializing to object and it's too late
 
-            editorValue["storageType"] = Enum.Parse(typeof(TagsStorageType), (string) editorValue["storageType"]);
-            return base.FromEditor(editorValue, configuration);
+            editorValues["storageType"] = Enum.Parse(typeof(TagsStorageType), (string) editorValues["storageType"]);
+            return base.FromConfigurationEditor(editorValues, configuration);
         }
     }
 }

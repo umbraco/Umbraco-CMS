@@ -202,7 +202,7 @@ namespace Umbraco.Web.Editors
             // and map it to an actual configuration object
             var currentConfiguration = dataType.PersistedDataType.Configuration;
             var configurationDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value); // fixme tokens!
-            var configuration = dataType.PropertyEditor.ConfigurationEditor.FromEditor(configurationDictionary, currentConfiguration);
+            var configuration = dataType.PropertyEditor.ConfigurationEditor.FromConfigurationEditor(configurationDictionary, currentConfiguration);
 
             dataType.PersistedDataType.Configuration = configuration;
 

@@ -10,14 +10,14 @@ namespace Umbraco.Web.PropertyEditors
     public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     {
         /// <inheritdoc />
-        public override LabelConfiguration FromEditor(Dictionary<string, object> editorValue, LabelConfiguration configuration)
+        public override LabelConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, LabelConfiguration configuration)
         {
             var newConfiguration = new LabelConfiguration();
 
             // get the value type
             // not simply deserializing Json because we want to validate the valueType
 
-            if (editorValue.TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
+            if (editorValues.TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
                 && valueTypeObj is string stringValue)
             {
                 if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue)) // validate

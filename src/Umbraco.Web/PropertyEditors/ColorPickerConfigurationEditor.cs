@@ -9,9 +9,9 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class ColorListConfigurationEditor : ValueListConfigurationEditor
+    internal class ColorPickerConfigurationEditor : ValueListConfigurationEditor
     {
-        public ColorListConfigurationEditor(ILocalizedTextService textService)
+        public ColorPickerConfigurationEditor(ILocalizedTextService textService)
             : base(textService)
         {
             var field = Fields.First();
@@ -24,6 +24,23 @@ namespace Umbraco.Web.PropertyEditors
             field.Name = "Add color";
             //need to have some custom validation happening here
             field.Validators.Add(new ColorListValidator());
+        }
+
+        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration configuration)
+        {
+            if (configuration == null)
+                return new Dictionary<string, object>
+                {
+                    { "items", new object() }
+                };
+
+            // for now, we have to do this, because the color picker is weird, but it's fixed in 7.7 at some point
+            // and then we probably don't need this whole override method anymore - base shouls be enough?
+
+            return new Dictionary<string, object>
+            {
+                { "items", configuration.Items.ToDictionary(x => x.Id.ToString(), x => x.Value) }
+            };
         }
 
         internal class ColorListValidator : IValueValidator

@@ -1435,7 +1435,7 @@
     <Compile Include="Sync\WebServiceServerMessenger.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="ThreadExtensions.cs" />
-    <Compile Include="TopoGraph.cs" />
+    <Compile Include="Collections\TopoGraph.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />

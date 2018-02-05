@@ -143,12 +143,10 @@ namespace Umbraco.Core.PropertyEditors
             set => _configurationEditorAssigned = value;
         }
 
-        // fixme explain what this is
-        // makes sense only for dictionary-based configurationeditor, true conf editors have classes?
         [JsonProperty("defaultConfig")]
-        public virtual IDictionary<string, object> DefaultConfiguration { get; set; }
+        public IDictionary<string, object> DefaultConfiguration => ConfigurationEditor.DefaultConfiguration;
 
-        [JsonIgnore]
+        [JsonIgnore] // fixme - but is parameterEditor.Configuration the same thing as preValues?
         IDictionary<string, object> IParameterEditor.Configuration => DefaultConfiguration; // fixme - because we must, but - bah
 
         /// <summary>

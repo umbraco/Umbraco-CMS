@@ -10,21 +10,18 @@ namespace Umbraco.Web.PropertyEditors
     [ValueEditor(Constants.PropertyEditors.Aliases.UserPicker, "User picker", "entitypicker", ValueTypes.Integer, Group="People", Icon="icon-user")]
     public class UserPickerPropertyEditor : PropertyEditor
     {
-        private IDictionary<string, object> _defaultPreValues;
-
         public UserPickerPropertyEditor(ILogger logger)
             : base(logger)
-        {
-            _defaultPreValues = new Dictionary<string, object>
-                {
-                    {"entityType", "User"}
-                };
-        }
+        { }
 
-        public override IDictionary<string, object> DefaultConfiguration
+        protected override ConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();
+    }
+
+    public class UserPickerConfiguration : ConfigurationEditor
+    {
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
         {
-            get { return _defaultPreValues; }
-            set { _defaultPreValues = value; }
-        }
+            {"entityType", "User"}
+        };
     }
 }

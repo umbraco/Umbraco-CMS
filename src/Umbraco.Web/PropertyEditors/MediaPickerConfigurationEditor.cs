@@ -26,5 +26,11 @@ namespace Umbraco.Web.PropertyEditors
                 }
             });
         }
+
+        // fixme - is this configuration? or field' configuration? WTF?!
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        {
+            {"idType", "udi"}
+        }; 
     }
 }

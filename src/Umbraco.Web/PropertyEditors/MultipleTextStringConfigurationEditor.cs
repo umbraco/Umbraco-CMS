@@ -32,13 +32,13 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override MultipleTestStringConfiguration FromEditor(Dictionary<string, object> editorValue, MultipleTestStringConfiguration configuration)
+        public override MultipleTestStringConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, MultipleTestStringConfiguration configuration)
         {
             // fixme this isn't pretty
             //the values from the editor will be min/max fieds and we need to format to json in one field
             // is the editor sending strings or ints or?!
-            var min = (editorValue.ContainsKey("min") ? editorValue["min"].ToString() : "0").TryConvertTo<int>();
-            var max = (editorValue.ContainsKey("max") ? editorValue["max"].ToString() : "0").TryConvertTo<int>();
+            var min = (editorValues.ContainsKey("min") ? editorValues["min"].ToString() : "0").TryConvertTo<int>();
+            var max = (editorValues.ContainsKey("max") ? editorValues["max"].ToString() : "0").TryConvertTo<int>();
 
             return new MultipleTestStringConfiguration
             {
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToEditor(MultipleTestStringConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(MultipleTestStringConfiguration configuration)
         {
             return new Dictionary<string, object>
             {

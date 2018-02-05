@@ -20,6 +20,6 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor() => new ColorListConfigurationEditor(_textService);
+        protected override ConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_textService);
     }
 }

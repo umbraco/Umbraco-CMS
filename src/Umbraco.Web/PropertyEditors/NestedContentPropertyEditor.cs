@@ -22,27 +22,10 @@ namespace Umbraco.Web.PropertyEditors
 
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
-        private IDictionary<string, object> _defaultPreValues;
-        public override IDictionary<string, object> DefaultConfiguration
-        {
-            get => _defaultPreValues;
-            set => _defaultPreValues = value;
-        }
-
         public NestedContentPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors)
             : base (logger)
         {
             _propertyEditors = propertyEditors;
-
-            // Setup default values
-            _defaultPreValues = new Dictionary<string, object>
-            {
-                {"contentTypes", ""},
-                {"minItems", 0},
-                {"maxItems", 0},
-                {"confirmDeletes", "1"},
-                {"showIcons", "1"}
-            };
         }
 
         // has to be lazy else circular dep in ctor
@@ -58,10 +41,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Pre Value Editor
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new NestedContentConfigurationEditor();
-        }
+        protected override ConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
 
         #endregion
 

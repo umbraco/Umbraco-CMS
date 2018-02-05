@@ -213,7 +213,7 @@ namespace Umbraco.Web.Models.Mapping
                     Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
                     Label = p.Name,
                     View = propertyEditor.ValueEditor.View,
-                    Config = propertyEditor.ConfigurationEditor.ToEditor(propertyEditor.DefaultConfiguration, configuration),
+                    Config = propertyEditor.ConfigurationEditor.ToConfigurationEditor(configuration),
                     //Value = "",
                     GroupId = groupId,
                     Inherited = inherited,

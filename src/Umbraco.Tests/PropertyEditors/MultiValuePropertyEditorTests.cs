@@ -124,7 +124,6 @@ namespace Umbraco.Tests.PropertyEditors
             //};
             //Current.ApplicationContext = appContext;
 
-            var defaultVals = new Dictionary<string, object>();
             var configuration = new ValueListConfiguration
             {
                 Items = new List<ValueListConfiguration.ValueListItem>
@@ -137,7 +136,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>());
 
-            var result = editor.ToEditor(defaultVals, configuration);
+            var result = editor.ToConfigurationEditor(configuration);
 
             // 'result' is meant to be serialized, is built with anonymous objects
             // so we cannot really test what's in it - but by serializing it

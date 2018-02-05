@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.ConfigurationEditor.ToEditor(display.PropertyEditor.DefaultConfiguration, config);
+                display.Config = display.PropertyEditor.ConfigurationEditor.ToValueEditor(config);
                 display.View = valEditor.View;
             }
 

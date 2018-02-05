@@ -80,7 +80,7 @@ namespace Umbraco.Core.Models
                 if (_hasConfiguration) return _configuration;
                 if (_editor == null) return null;
 
-                _configuration = _editor.ConfigurationEditor.ParseConfiguration(_configurationJson);
+                _configuration = _editor.ConfigurationEditor.FromDatabase(_configurationJson);
                 _hasConfiguration = true;
                 _configurationJson = null;
                 _editor = null;

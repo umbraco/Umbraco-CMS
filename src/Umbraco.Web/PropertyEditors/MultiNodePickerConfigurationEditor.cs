@@ -75,11 +75,21 @@ namespace Umbraco.Web.PropertyEditors
             });
         }
 
+        // fixme
+        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        {
+            { "multiPicker", 1 },
+            { "showOpenButton", 0 },
+            { "showEditButton", 0 },
+            { "showPathOnHover", 0 },
+            { "idType", "udi" }
+        };
+
         /// <inheritdoc />
-        public override Dictionary<string, object> ToEditor(MultiNodePickerConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(MultiNodePickerConfiguration configuration)
         {
             // sanitize configuraiton
-            var output = base.ToEditor(configuration);
+            var output = base.ToConfigurationEditor(configuration);
 
             output["multiPicker"] = configuration.MaxNumber > 1 ? "1" : "0";
 

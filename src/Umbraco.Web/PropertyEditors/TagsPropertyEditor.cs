@@ -20,21 +20,6 @@ namespace Umbraco.Web.PropertyEditors
             : base(logger)
         {
             _validators = validators;
-            _defaultPreVals = new Dictionary<string, object>
-                {
-                    {"group", "default"},
-                    {"storageType", TagsStorageType.Csv.ToString()}
-                };
-        }
-
-        private IDictionary<string, object> _defaultPreVals;
-
-        /// <inheritdoc />
-        /// <remarks>Can be overriden to supply a different default group.</remarks>
-        public override IDictionary<string, object> DefaultConfiguration
-        {
-            get => _defaultPreVals;
-            set => _defaultPreVals = value;
         }
 
         protected override ValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
