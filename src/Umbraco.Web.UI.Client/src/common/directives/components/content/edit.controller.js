@@ -193,6 +193,7 @@
     }
 
     function createButtons(content) {
+      $scope.page.buttonGroupState = "init";
       var buttons = contentEditingHelper.configureContentEditorButtons({
         create: $scope.page.isNew,
         content: content,
@@ -323,6 +324,8 @@
 
             $scope.page.buttonGroupState = "success";
 
+          }, function(err) {
+            $scope.page.buttonGroupState = 'error';
           });
       }
 

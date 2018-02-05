@@ -51,11 +51,34 @@ namespace Umbraco.Web
         IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null);
 
         /// <summary>
+        /// Searches content
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="term"></param>
+        /// <param name="useWildCards"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null);
+
+        /// <summary>
         /// Searhes content
         /// </summary>
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
         IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
+
+        /// <summary>
+        /// Searhes content
+        /// </summary>
+        /// <param name="totalrecords"></param>
+        /// <param name="criteria"></param>
+        /// <param name="searchProvider"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalrecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
     }
 }

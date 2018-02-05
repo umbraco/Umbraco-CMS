@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models
 {
+    /// <summary>
+    /// A model representing a tour.
+    /// </summary>
     [DataContract(Name = "tour", Namespace = "")]
     public class BackOfficeTour
     {
@@ -15,8 +15,12 @@ namespace Umbraco.Web.Models
         public string Alias { get; set; }
         [DataMember(Name = "group")]
         public string Group { get; set; }
+        [DataMember(Name = "groupOrder")]
+        public int GroupOrder { get; set; }
         [DataMember(Name = "allowDisable")]
         public bool AllowDisable { get; set; }
+        [DataMember(Name = "requiredSections")]
+        public List<string> RequiredSections { get; set; }
         [DataMember(Name = "steps")]
         public BackOfficeTourStep[] Steps { get; set; }
     }

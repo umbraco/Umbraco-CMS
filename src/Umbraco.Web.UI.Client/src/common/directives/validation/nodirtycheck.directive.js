@@ -9,9 +9,14 @@ function noDirtyCheck() {
         restrict: 'A',
         require: 'ngModel',
         link: function (scope, elm, attrs, ctrl) {
+
             elm.focus(function () {
-                ctrl.$pristine = false;
+                scope.$watch(function() {
+                    ctrl.$pristine = false;
+                });
             });
+
+
         }
     };
 }

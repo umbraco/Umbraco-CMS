@@ -333,6 +333,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
+                // remove all templates - since they are not saved, they would break the (wtf) mapping code
+                contentType.AllowedTemplates = new ITemplate[0];
+
                 // there is NO mapping from display to contentType, but only from save
                 // to contentType, so if we want to test, let's to it properly!
                 var display = Mapper.Map<DocumentTypeDisplay>(contentType);

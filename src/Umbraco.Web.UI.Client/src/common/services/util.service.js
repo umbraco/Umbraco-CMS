@@ -90,6 +90,21 @@ function dateHelper() {
       //create a moment with the iso format which will include the offset with the correct time
       // then convert it to local time
       return moment.parseZone(isoFormat).local();
+    },
+
+    getLocalDate: function (date, culture, format) {
+      if (date) {
+        var dateVal;
+        var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
+        var localOffset = new Date().getTimezoneOffset();
+        var serverTimeNeedsOffsetting = -serverOffset !== localOffset;
+        if (serverTimeNeedsOffsetting) {
+          dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
+        } else {
+          dateVal = moment(date, 'YYYY-MM-DD HH:mm:ss');
+        }
+        return dateVal.locale(culture).format(format);
+      }
     }
 
   };

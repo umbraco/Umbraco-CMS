@@ -13,7 +13,8 @@
                        class="umb-search-field search-query input-block-level"
                        localize="placeholder"
                        placeholder="@placeholders_filter"
-                       umb-auto-focus />
+                       umb-auto-focus
+                       no-dirty-check />
             </div>
 
             <ul class="umb-card-grid">
@@ -27,9 +28,8 @@
                 </li>
             </ul>
 
-            <umb-empty-state
-                ng-if="nomacros"
-                position="center">
+            <umb-empty-state ng-if="nomacros"
+                             position="center">
                 <localize key="defaultdialogs_noMacros">
                     There are no macros available to insert
                 </localize>
@@ -52,9 +52,8 @@
                 </li>
             </ul>
 
-            <umb-empty-state
-                ng-if="noMacroParams"
-                position="center">
+            <umb-empty-state ng-if="noMacroParams"
+                             position="center">
                 <localize key="defaultdialogs_noMacroParams">There are no parameters for this macro</localize>
             </umb-empty-state>
 

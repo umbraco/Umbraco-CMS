@@ -20,6 +20,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var name = Name;
 
+				// cater for instances where node has no name.
+				if(string.IsNullOrWhiteSpace(name))
+				{
+					return _numPos;
+ 				}
+
                 if (name[name.Length - 1] != ')')
                     return _numPos = -1;
 
@@ -106,7 +112,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            return uniqueing ? string.Concat(nodeName, " (", uniqueNumber.ToString(), ")") : nodeName;
+            return uniqueing || string.IsNullOrWhiteSpace(nodeName) ? string.Concat(nodeName, " (", uniqueNumber.ToString(), ")") : nodeName;
         }
     }
 }

@@ -12,23 +12,23 @@
 
             <h5 style="margin-bottom: 10px; margin-top: 0;">Tours</h5>
             
-            <div ng-repeat="(key,value) in vm.tours" style="margin-bottom: 5px;">
+            <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'" style="margin-bottom: 5px;">
 
                 <div class="umb-help-list">
 
-                    <a href="" class="umb-help-list-item umb-help-list-item__content flex items-center justify-between" style="text-decoration: none;" ng-click="value.open = !value.open">
-                        <h5 class="umb-help-list-item__group-title"><i style="margin-right: 2px;text-decoration: none;" ng-class="{'icon-navigation-right': !value.open, 'icon-navigation-down': value.open}"></i>
-                            <span ng-if="key !== 'undefined'">{{key}}</span>
-                            <span ng-if="key === 'undefined'">Other</span>
+                    <a href="" class="umb-help-list-item umb-help-list-item__content flex items-center justify-between" style="text-decoration: none;" ng-click="tourGroup.open = !tourGroup.open">
+                        <h5 class="umb-help-list-item__group-title"><i style="margin-right: 2px;text-decoration: none;" ng-class="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}"></i>
+                            <span ng-if="tourGroup.group !== 'undefined'">{{tourGroup.group}}</span>
+                            <span ng-if="tourGroup.group === 'undefined'">Other</span>
                         </h5>
                         <umb-progress-circle
-                            percentage="{{value.completedPercentage}}"
+                            percentage="{{tourGroup.completedPercentage}}"
                             size="40">
                         </umb-progress-circle>
                     </a>
 
-                    <div ng-if="value.open">
-                        <div data-element="tour-{{tour.alias}}" class="umb-help-list-item" ng-repeat="tour in value">
+                    <div ng-if="tourGroup.open">
+                        <div data-element="tour-{{tour.alias}}" class="umb-help-list-item" ng-repeat="tour in tourGroup.tours">
                             <div class="umb-help-list-item__content justify-between">
                                 <div class="flex items-center">
                                     <div ng-if="!tour.completed" class="umb-number-badge umb-number-badge--xs umb-help-list-item__icon">{{ $index + 1 }}</div>
@@ -36,7 +36,7 @@
                                     <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
                                 </div>
                                 <div>
-                                    <umb-button ng-if="!tour.completed && vm.showTourButton($index, value)" button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>                                
+                                    <umb-button ng-if="!tour.completed && vm.showTourButton($index, tourGroup)" button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>       
                                     <umb-button ng-if="tour.completed" size="xxs" type="button" label="Rerun" action="vm.startTour(tour)"></umb-button>
                                 </div>
                             </div>

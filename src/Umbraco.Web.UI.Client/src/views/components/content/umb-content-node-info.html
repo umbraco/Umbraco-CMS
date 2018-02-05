@@ -109,9 +109,9 @@
                                 </div>
 
                                 <div class="date-container__date" ng-if="node.releaseDate">
-                                    <div class="date-wrapper__date">{{node.releaseDateMonth}} {{node.releaseDate | amDateFormat:'YYYY'}}</div>
-                                    <div class="date-wrapper__number">{{node.releaseDate | amDateFormat:'DD'}}</div>
-                                    <div class="date-wrapper__date">{{node.releaseDateDay}} {{node.releaseDate | amDateFormat:'HH:mm'}}</div>
+                                    <div class="date-wrapper__date">{{node.releaseDateMonth}} {{node.releaseDateYear}}</div>
+                                    <div class="date-wrapper__number">{{node.releaseDateDayNumber}}</div>
+                                    <div class="date-wrapper__date">{{node.releaseDateDay}} {{node.releaseDateTime}}</div>
                                 </div>
 
                                 <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>                                                    
@@ -141,9 +141,9 @@
                                 </div>
                                 
                                 <div class="date-container__date" ng-if="node.removeDate">
-                                    <div class="date-wrapper__date">{{node.removeDateMonth}} {{node.removeDate | amDateFormat:'YYYY'}}</div>
-                                    <div class="date-wrapper__number">{{node.removeDate | amDateFormat:'DD'}}</div>
-                                    <div class="date-wrapper__date">{{node.removeDateDay}} {{node.removeDate | amDateFormat:'HH:mm'}}</div>
+                                    <div class="date-wrapper__date">{{node.removeDateMonth}} {{node.removeDateYear}}</div>
+                                    <div class="date-wrapper__number">{{node.removeDateDayNumber}}</div>
+                                    <div class="date-wrapper__date">{{node.removeDateDay}} {{node.removeDateTime}}</div>
                                 </div>
 
                                 <a href="" ng-if="!node.removeDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>

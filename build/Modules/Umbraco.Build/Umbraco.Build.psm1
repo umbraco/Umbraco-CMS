@@ -239,18 +239,18 @@ function Prepare-Tests
   
   # data
   Write-Host "Copy data files"
-  if( -Not (Test-Path -Path "$tmp\tests\Packaging" ) )
+  if (-Not (Test-Path -Path "$tmp\tests\Packaging" ) )
   {
     Write-Host "Create packaging directory"
-    New-Item -ItemType directory -Path "$tmp\tests\Packaging"
+    mkdir "$tmp\tests\Packaging" > $null
   }
   Copy-Files "$src\Umbraco.Tests\Packaging\Packages" "*" "$tmp\tests\Packaging\Packages"
   
   # required for package install tests  
-  if( -Not (Test-Path -Path "$tmp\tests\bin" ) )
+  if (-Not (Test-Path -Path "$tmp\tests\bin" ) )
   {
     Write-Host "Create bin directory"
-    New-Item -ItemType directory -Path "$tmp\tests\bin"
+    mkdir "$tmp\tests\bin" > $null
   }
 }
 
