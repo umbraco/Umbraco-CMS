@@ -98,10 +98,26 @@ if ($project) {
 		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
 		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
 	} else {
+		# This part only runs for upgrades
+	
 		$upgradeViewSource = Join-Path $umbracoFolderSource "Views\install\*"
 		$upgradeView = Join-Path $umbracoFolder "Views\install\"
 		Write-Host "Copying2 ${upgradeViewSource} to ${upgradeView}"
 		Copy-Item $upgradeViewSource $upgradeView -Force
+		
+		Try 
+		{
+			# Disable tours for upgrades, presumably Umbraco experience is already available
+			$umbracoSettingsConfigPath = Join-Path $configFolder "umbracoSettings.config"
+			$content = (Get-Content $umbracoSettingsConfigPath).Replace('<tours enable="true">','<tours enable="false">')
+			# Saves with UTF-8 encoding without BOM which makes sure Umbraco can still read it
+			# Reference: https://stackoverflow.com/a/32951824/5018
+			[IO.File]::WriteAllLines($umbracoSettingsConfigPath, $content)
+		} 
+		Catch 
+		{
+			# Not a big problem if this fails, let it go
+		}
 	}
 	
 	$installFolder = Join-Path $projectPath "Install"
