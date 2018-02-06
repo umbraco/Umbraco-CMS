@@ -28,18 +28,9 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     vm.startTour = startTour;
 
     function onInit() {
-        
         // load tours
         tourService.getGroupedTours().then(function(groupedTours) {
             vm.tours = groupedTours;
-        });
-        
-        // get intro tour
-        tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
-            // start intro tour if it hasn't been completed or disabled
-            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                tourService.startTour(introTour);
-            }
         });
     }
 
