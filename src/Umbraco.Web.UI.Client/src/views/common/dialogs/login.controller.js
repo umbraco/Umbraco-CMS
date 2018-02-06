@@ -303,12 +303,14 @@
             // while the form is invalid, then revalidate them so that the form can
             // be submitted again.
             $scope.loginForm.username.$viewChangeListeners.push(function () {
-                if ($scope.loginForm.username.$invalid) {
+                if ($scope.loginForm.$invalid) {
                     $scope.loginForm.username.$setValidity('auth', true);
+                    $scope.loginForm.password.$setValidity('auth', true);
                 }
             });
             $scope.loginForm.password.$viewChangeListeners.push(function () {
-                if ($scope.loginForm.password.$invalid) {
+                if ($scope.loginForm.$invalid) {
+                    $scope.loginForm.username.$setValidity('auth', true);
                     $scope.loginForm.password.$setValidity('auth', true);
                 }
             });
