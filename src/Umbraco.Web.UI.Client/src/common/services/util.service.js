@@ -99,7 +99,7 @@ function dateHelper() {
         var localOffset = new Date().getTimezoneOffset();
         var serverTimeNeedsOffsetting = -serverOffset !== localOffset;
         if (serverTimeNeedsOffsetting) {
-          dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
+          dateVal = this.convertToLocalMomentTime(date, serverOffset);
         } else {
           dateVal = moment(date, 'YYYY-MM-DD HH:mm:ss');
         }
