@@ -9,6 +9,9 @@
             passwordPolicies: null,
             passwordPolicyText: ""
         }
+        $scope.loginStates = {
+            submitButton: "init"
+        }
         $scope.avatarFile = {
             filesHolder: null,
             uploadStatus: null,
@@ -272,10 +275,11 @@
                 return;
             }
 
-
+            $scope.loginStates.submitButton = "busy";
 
             userService.authenticate(login, password)
                 .then(function (data) {
+                    $scope.loginStates.submitButton = "success";
                     $scope.submit(true);
                 },
                 function (reason) {
@@ -286,6 +290,7 @@
                         show2FALoginDialog(reason.data.twoFactorView, $scope.submit);
                     }
                     else {
+                        $scope.loginStates.submitButton = "error";
                         $scope.errorMsg = reason.errorMsg;
 
                         //set the form inputs to invalid

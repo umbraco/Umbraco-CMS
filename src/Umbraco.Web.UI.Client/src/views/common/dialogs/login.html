@@ -155,7 +155,12 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <button type="submit" class="btn btn-success" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
+                            <umb-button button-style="success"
+                                        disabled="loginForm.$invalid"
+                                        label-key="general_login"
+                                        state="loginStates.submitButton"
+                                        type="submit">
+                            </umb-button>
                             <div ng-show="allowPasswordReset">
                                 <a class="muted" style="text-decoration: underline;" href="#" prevent-default ng-click="showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
                             </div>
