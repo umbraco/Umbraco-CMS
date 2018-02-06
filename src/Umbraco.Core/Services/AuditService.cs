@@ -107,5 +107,50 @@ namespace Umbraco.Core.Services
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
             }
         }
+
+        /// <inheritdoc />
+        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDate, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
+        {
+            var entry = new AuditEntry
+            {
+                PerformingUserId = performingUserId,
+                PerformingDetails = perfomingDetails,
+                PerformingIp = performingIp,
+                EventDate = eventDate,
+                AffectedUserId = affectedUserId,
+                AffectedDetails = affectedDetails,
+                EventType = eventType,
+                EventDetails = eventDetails
+            };
+
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
+                repository.AddOrUpdate(entry);
+                uow.Commit();
+            }
+
+            return entry;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IAuditEntry> Get()
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
+                return repository.GetAll();
+            }
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
+                return repository.GetPage(pageIndex, pageCount, out records);
+            }
+        }
     }
 }
