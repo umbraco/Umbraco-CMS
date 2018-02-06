@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PrevalueEditors.CropSizesController" class="umb-editor umb-cropsizes">
+<div ng-controller="Umbraco.PrevalueEditors.CropSizesController" class="umb-property-editor umb-cropsizes">
 
 
     <div class="control-group" ng-if="model.value.length > 0">
@@ -30,10 +30,10 @@
         <div class="control-group">
             <label><localize key="general_size">Size</localize></label>
             <input name="newItem.width" type="number" localize="placeholder" placeholder="@general_width"
-                   ng-model="newItem.width" class="umb-editor-small" val-highlight="{{hasError}}" />
+                   ng-model="newItem.width" class="umb-property-editor-small" val-highlight="{{hasError}}" />
             &times;
             <input name="newItem.height" type="number" localize="placeholder" placeholder="@general_height"
-                   ng-model="newItem.height" class="umb-editor-small" val-highlight="{{hasError}}" />
+                   ng-model="newItem.height" class="umb-property-editor-small" val-highlight="{{hasError}}" />
         </div>
 
         <div class="control-group">

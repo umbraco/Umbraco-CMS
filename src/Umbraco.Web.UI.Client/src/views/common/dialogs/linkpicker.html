@@ -5,7 +5,7 @@
 			  <input type="text"
 					localize="placeholder" 
 					placeholder="@general_url" 
-					class="umb-editor umb-textstring" 
+					class="umb-property-editor umb-textstring" 
 					ng-model="target.url"
 					ng-disabled="target.id"
 					 />
@@ -15,12 +15,12 @@
 				<input type="text"
 					localize="placeholder" 
 					placeholder="@placeholders_entername" 
-					class="umb-editor umb-textstring" 
+					class="umb-property-editor umb-textstring" 
 					ng-model="target.name" />
 			</umb-control-group>
 
 			<umb-control-group label="@content_target">
-				<select class="umb-editor umb-dropdown" ng-model="target.target">
+				<select class="umb-property-editor umb-dropdown" ng-model="target.target">
 					<option value=""></option>
 					<option value="_blank"><localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize></option>
 				</select>
