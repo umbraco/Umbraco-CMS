@@ -60,6 +60,38 @@ namespace Umbraco.Core.Auditing
 
             MemberService.Saved += OnSavedMember;
             MemberService.Deleted += OnDeletedMember;
+            MemberService.AssignedRoles += OnAssignedRoles;
+            MemberService.RemovedRoles += OnRemovedRoles;
+        }
+
+        private void OnRemovedRoles(IMemberService sender, MemberService.RolesEventArgs args)
+        {
+            var performingUser = PerformingUser;
+            var roles = string.Join(", ", args.Roles);
+            var members = ApplicationContext.Current.Services.MemberService.GetAllMembers(args.MemberIds).ToDictionary(x => x.Id, x => x);
+            foreach (var id in args.MemberIds)
+            {
+                members.TryGetValue(id, out var member);
+                AuditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                    DateTime.Now,
+                    0, null,
+                    "umbraco/member", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, removed {roles}");
+            }
+        }
+
+        private void OnAssignedRoles(IMemberService sender, MemberService.RolesEventArgs args)
+        {
+            var performingUser = PerformingUser;
+            var roles = string.Join(", ", args.Roles);
+            var members = ApplicationContext.Current.Services.MemberService.GetAllMembers(args.MemberIds).ToDictionary(x => x.Id, x => x);
+            foreach (var id in args.MemberIds)
+            {
+                members.TryGetValue(id, out var member);
+                AuditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                    DateTime.Now,
+                    0, null,
+                    "umbraco/member", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, assigned {roles}");
+            }
         }
 
         private void OnSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> saveEventArgs)

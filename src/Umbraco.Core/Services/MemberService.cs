@@ -1173,12 +1173,16 @@ namespace Umbraco.Core.Services
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.AssignRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(string username, string roleName)
@@ -1188,12 +1192,16 @@ namespace Umbraco.Core.Services
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.DissociateRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void AssignRole(int memberId, string roleName)
@@ -1209,6 +1217,8 @@ namespace Umbraco.Core.Services
                 repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(int memberId, string roleName)
@@ -1224,6 +1234,8 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
 
@@ -1288,6 +1300,21 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
+
+        public class RolesEventArgs : EventArgs
+        {
+            public RolesEventArgs(int[] memberIds, string[] roles)
+            {
+                MemberIds = memberIds;
+                Roles = roles;
+            }
+
+            public int[] MemberIds { get; set; }
+            public string[] Roles { get; set; }
+        }
 
         #endregion
 
