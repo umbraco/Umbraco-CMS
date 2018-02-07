@@ -95,6 +95,10 @@ namespace Umbraco.Core.PropertyEditors
         public override IDictionary<string, object> DefaultConfiguration => ToConfigurationEditor(new TConfiguration());
 
         /// <inheritdoc />
+        public override bool IsConfiguration(object obj)
+            => obj is TConfiguration;
+
+        /// <inheritdoc />
         public override object FromDatabase(string configuration)
         {
             try

@@ -32,7 +32,8 @@ namespace Umbraco.Tests.PropertyEditors
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var editor = new PublishValuesMultipleValueEditor(true, Mock.Of<ILogger>(), new ValueEditorAttribute("key", "nam", "view"));
 
-            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor")));
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
+            var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("1234,4567,8910");
 
             var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), new Mock<IDataTypeService>().Object);
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_No_Keys_Format_Data_For_Cache()
         {
-            var dataType = new DataType("editorAlias")
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -53,7 +54,8 @@ namespace Umbraco.Tests.PropertyEditors
                         new ValueListConfiguration.ValueListItem { Id = 1234, Value = "Value 2" },
                         new ValueListConfiguration.ValueListItem { Id = 8910, Value = "Value 3" }
                     }
-                }
+                },
+                Id = 1
             };
 
             var dataTypeService = Mock.Of<IDataTypeService>();
@@ -62,12 +64,10 @@ namespace Umbraco.Tests.PropertyEditors
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => x == 1 ? dataType : null);
 
-            var editor = new PublishValuesMultipleValueEditor(false, Mock.Of<ILogger>(), new ValueEditorAttribute("alias", "name", "view"));
-
-            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor") { Id = 1 }));
+            var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("1234,4567,8910");
 
-            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = dataType.Editor.ValueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
-            var dataType = new DataType("editorAlias")
+            var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()))
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -85,7 +85,8 @@ namespace Umbraco.Tests.PropertyEditors
                         new ValueListConfiguration.ValueListItem { Id = 1234, Value = "Value 2" },
                         new ValueListConfiguration.ValueListItem { Id = 11, Value = "Value 3" }
                     }
-                }
+                },
+                Id = 1
             };
 
             var dataTypeService = Mock.Of<IDataTypeService>();
@@ -94,12 +95,10 @@ namespace Umbraco.Tests.PropertyEditors
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => x == 1 ? dataType : null);
 
-            var editor = new PublishValueValueEditor(new ValueEditorAttribute("alias", "name", "view"), Mock.Of<ILogger>());
-
-            var prop = new Property(1, new PropertyType(new DataType(1, "Test.TestEditor") { Id = 1 }));
+            var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("1234");
 
-            var result = editor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
+            var result = dataType.Editor.ValueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeService);
 
             Assert.AreEqual("Value 2", result);
         }

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
             if (!editors.TryGet(dto.EditorAlias, out var editor))
                 throw new InvalidOperationException($"Could not find an editor with alias \"{dto.EditorAlias}\".");
 
-            var dataType = new DataType(dto.EditorAlias);
+            var dataType = new DataType(editor);
 
             try
             {
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.Trashed = dto.NodeDto.Trashed;
                 dataType.CreatorId = dto.NodeDto.UserId ?? 0;
 
-                dataType.SetConfiguration(dto.Configuration, editor);
+                dataType.SetConfiguration(dto.Configuration);
 
                 // reset dirty initial properties (U4-1946)
                 dataType.ResetDirtyProperties(false);

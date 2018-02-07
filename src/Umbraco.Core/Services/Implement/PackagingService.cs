@@ -872,7 +872,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DataTypes' for multiple imports or 'DataType' for a single import.");
             }
 
-            var dataTypes = new Dictionary<string, IDataType>();
+            var dataTypes = new List<IDataType>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
                                        : new List<XElement> { element };
@@ -898,16 +898,31 @@ namespace Umbraco.Core.Services.Implement
                                            ? databaseTypeAttribute.Value.EnumParse<ValueStorageType>(true)
                                            : ValueStorageType.Ntext;
 
-                    //the Id field is actually the string property editor Alias
-                    var dataTypeDefinition = new DataType(dataTypeElement.Attribute("Id").Value.Trim())
+                    // the Id field is actually the string property editor Alias
+                    // however, the actual editor with this alias could be installed with the package, and
+                    // therefore not yet part of the _propertyEditors collection, so we cannot try and get
+                    // the actual editor - going with a void editor
+
+                    var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
+                    if (!_propertyEditors.TryGet(editorAlias, out var editor))
+                        editor = new VoidEditor(_logger) { Alias = editorAlias };
+
+                    var dataTypeDefinition = new DataType(editor)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
                             DatabaseType = databaseType,
                             ParentId = parentId
                     };
-                    dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
 
+                    // fixme - so what?
+                    var configurationAttribute = dataTypeElement.Attribute("Configuration");
+                    if (!string.IsNullOrWhiteSpace(configurationAttribute?.Value))
+                    {
+                        dataTypeDefinition.Configuration = editor.ConfigurationEditor.FromDatabase(configurationAttribute.Value);
+                    }
+
+                    dataTypes.Add(dataTypeDefinition);
                 }
                 else
                 {
@@ -916,24 +931,15 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
 
-            var list = dataTypes.Select(x => x.Value).ToList();
-            if (list.Any())
+            if (dataTypes.Count > 0)
             {
-                //NOTE: As long as we have to deal with the two types of PreValue lists (with/without Keys)
-                //this is a bit of a pain to handle while ensuring that the imported DataTypes has PreValues
-                //place when triggering the save event.
-
-                _dataTypeService.Save(list, userId, false);//Save without raising events
-
-                SavePrevaluesFromXml(list, dataTypeElements);//Save the PreValues for the current list of DataTypes
-
-                _dataTypeService.Save(list, userId, true);//Re-save and raise events
+                _dataTypeService.Save(dataTypes, userId, true);
             }
 
             if (raiseEvents)
-                ImportedDataType.RaiseEvent(new ImportEventArgs<IDataType>(list, element, false), this);
+                ImportedDataType.RaiseEvent(new ImportEventArgs<IDataType>(dataTypes, element, false), this);
 
-            return list;
+            return dataTypes;
         }
 
         private Dictionary<string, int> CreateDataTypeFolderStructure(IEnumerable<XElement> datatypeElements)
@@ -992,39 +998,6 @@ namespace Umbraco.Core.Services.Implement
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
-        }
-
-        private void SavePrevaluesFromXml(List<IDataType> dataTypes, IEnumerable<XElement> dataTypeElements)
-        {
-            foreach (var dataTypeElement in dataTypeElements)
-            {
-                var configurationAttribute = dataTypeElement.Attribute("Configuration");
-                if (string.IsNullOrWhiteSpace(configurationAttribute?.Value)) continue;
-                
-                var dataTypeName = dataTypeElement.Attribute("Name")?.Value;
-                var dataType = dataTypes.FirstOrDefault(x => x.Name == dataTypeName);
-
-                if (dataType == null)
-                {
-                    _logger.Warn<PackagingService>($"No data type found with name \"{dataTypeName}\",  configuration will not be saved.");
-                    continue;
-                }
-
-                if (!_propertyEditors.TryGet(dataType.EditorAlias, out var editor))
-                {
-                    _logger.Warn<PackagingService>($"Failed to find an editor with alias \"{dataType.EditorAlias}\",  configuration will not be saved.");
-                    continue;
-                }
-
-                try
-                {
-                    dataType.Configuration = editor.ConfigurationEditor.FromDatabase(configurationAttribute.Value);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warn<PackagingService>($"Failed to deserialize string \"{configurationAttribute.Value}\" as configuration for editor of type \"{editor.GetType().Name}\".", ex);
-                }
-            }
         }
 
         #endregion

@@ -502,7 +502,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType("test"));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
             {
@@ -571,7 +571,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void PropertyGroupBasic_To_PropertyGroup()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType("test"));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             var basic = new PropertyGroupBasic<PropertyTypeBasic>
             {
@@ -637,7 +637,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void MemberPropertyTypeBasic_To_PropertyType()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType("test"));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             var basic = new MemberPropertyTypeBasic()
             {
@@ -671,7 +671,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void PropertyTypeBasic_To_PropertyType()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType("test"));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             var basic = new PropertyTypeBasic()
             {
@@ -883,7 +883,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void MemberPropertyTypeBasic_To_MemberPropertyTypeDisplay()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType("test"));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             var basic = new MemberPropertyTypeBasic()
             {
@@ -921,7 +921,7 @@ namespace Umbraco.Tests.Models.Mapping
         public void PropertyTypeBasic_To_PropertyTypeDisplay()
         {
             _dataTypeService.Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns(new DataType("test"));
+                .Returns(new DataType(new VoidEditor(Mock.Of<ILogger>())));
 
             var basic = new PropertyTypeBasic()
             {

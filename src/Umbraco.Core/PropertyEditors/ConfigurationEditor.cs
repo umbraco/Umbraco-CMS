@@ -56,6 +56,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>The default configuration is used to initialize new datatypes.</remarks>
         public virtual IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
 
+        /// <summary>
+        /// Determines whether a configuration object is of the type expected by the configuration editor.
+        /// </summary>
+        public virtual bool IsConfiguration(object obj)
+            => obj is IDictionary<string, object>;
+
         // notes
         // ToConfigurationEditor returns a dictionary, and FromConfigurationEditor accepts a dictionary.
         // this is due to the way our front-end editors work, see DataTypeController.PostSave

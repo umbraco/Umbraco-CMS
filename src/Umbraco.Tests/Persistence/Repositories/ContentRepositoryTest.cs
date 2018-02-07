@@ -18,6 +18,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -347,7 +348,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository((IScopeAccessor) provider, out var contentTypeRepository, out DataTypeRepository dataTypeDefinitionRepository);
 
-                var dtd = new DataType(-1, Constants.PropertyEditors.Aliases.Decimal) { Name = "test", DatabaseType = ValueStorageType.Decimal };
+                var editor = new DecimalPropertyEditor(Logger);
+                var dtd = new DataType(editor) { Name = "test", DatabaseType = ValueStorageType.Decimal };
                 dataTypeDefinitionRepository.Save(dtd);
 
                 const string decimalPropertyAlias = "decimalProperty";

@@ -16,6 +16,8 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class DataTypeMapperProfile : Profile
     {
+        private PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
+
         public DataTypeMapperProfile()
         {
             // create, capture, cache
@@ -91,7 +93,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ConvertUsing(src => configurationDisplayResolver.Resolve(src));
 
             CreateMap<DataTypeSave, IDataType>()
-                .ConstructUsing(src => new DataType(src.EditorAlias) {CreateDate = DateTime.Now})
+                .ConstructUsing(src => new DataType(PropertyEditors[src.EditorAlias]) {CreateDate = DateTime.Now})
                 .IgnoreEntityCommonProperties()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
                 .ForMember(dest => dest.Key, opt => opt.Ignore()) // ignore key, else resets UniqueId - U4-3911
@@ -101,7 +103,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())
-                .ForMember(dest => dest.Configuration, opt => opt.Ignore());
+                .ForMember(dest => dest.Configuration, opt => opt.Ignore())
+                .ForMember(dest => dest.Editor, opt => opt.MapFrom(src => PropertyEditors[src.EditorAlias]));
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
             CreateMap<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()

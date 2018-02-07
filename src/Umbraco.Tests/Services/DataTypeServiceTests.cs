@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Services
 {
@@ -24,7 +25,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            IDataType dataType = new DataType(-1, Constants.PropertyEditors.Aliases.NoEdit) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
+            IDataType dataType = new DataType(new LabelPropertyEditor(Logger)) { Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext };
             dataTypeService.Save(dataType);
 
             // Assert
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Services
             var dataTypeService = ServiceContext.DataTypeService;
 
             // Act
-            var dataTypeDefinition = new DataType(-1, "Test.TestEditor") { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
+            var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger)) { Name = string.Empty, DatabaseType = ValueStorageType.Ntext };
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => dataTypeService.Save(dataTypeDefinition));

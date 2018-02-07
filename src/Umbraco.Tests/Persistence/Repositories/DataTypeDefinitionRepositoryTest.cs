@@ -8,7 +8,9 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using LightInject;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -42,14 +44,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
-                var dataType = (IDataType)new DataType(container2.Id, Constants.PropertyEditors.Aliases.RadioButtonList)
+                var dataType = (IDataType) new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container2.Id)
                 {
                     Name = "dt1"
                 };
                 repository.Save(dataType);
 
                 //create a
-                var dataType2 = (IDataType)new DataType(dataType.Id, Constants.PropertyEditors.Aliases.RadioButtonList)
+                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), dataType.Id)
                 {
                     Name = "dt2"
                 };
@@ -121,7 +123,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                var dataTypeDefinition = new DataType(container.Id, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
+                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container.Id) { Name = "test" };
                 repository.Save(dataTypeDefinition);
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -141,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                IDataType dataType = new DataType(container.Id, Constants.PropertyEditors.Aliases.RadioButtonList) { Name = "test" };
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService), container.Id) { Name = "test" };
                 repository.Save(dataType);
 
                 // Act
@@ -164,7 +166,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                IDataType dataType = new DataType(-1, Constants.PropertyEditors.Aliases.RadioButtonList) {Name = "test"};
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(Logger, ServiceContext.TextService)) {Name = "test"};
 
                 repository.Save(dataType);
 
@@ -285,11 +287,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(Constants.PropertyEditors.Aliases.NoEdit)
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
-                    CreatorId = 0
+                    CreatorId = 0,
+                    Configuration = new LabelConfiguration { ValueType = ValueTypes.Xml }
                 };
 
                 // Act
@@ -302,7 +305,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dataTypeDefinition.HasIdentity, Is.True);
                 Assert.That(exists, Is.True);
 
-                TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, "yyyy-MM-dd HH:mm:ss");
+                // cannot compare 'configuration' as it's two different objects
+                TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "Configuration" });
+
+                // still, can compare explicitely
+                Assert.IsNotNull(dataTypeDefinition.Configuration);
+                Assert.IsInstanceOf<LabelConfiguration>(dataTypeDefinition.Configuration);
+                Assert.IsNotNull(fetched.Configuration);
+                Assert.IsInstanceOf<LabelConfiguration>(fetched.Configuration);
+                Assert.AreEqual(ConfigurationEditor.ConfigurationAs<LabelConfiguration>(dataTypeDefinition.Configuration).ValueType, ConfigurationEditor.ConfigurationAs<LabelConfiguration>(fetched.Configuration).ValueType);
             }
         }
 
@@ -314,7 +325,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(Constants.PropertyEditors.Aliases.Integer)
+                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(Logger))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -325,7 +336,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var definition = repository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-                definition.EditorAlias = Constants.PropertyEditors.Aliases.NoEdit; //change
+                definition.Editor = new LabelPropertyEditor(Logger); //change
                 repository.Save(definition);
 
                 var definitionUpdated = repository.Get(dataTypeDefinition.Id);
@@ -345,7 +356,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (provider.CreateScope())
             {
                 var repository = CreateRepository();
-                var dataTypeDefinition = new DataType(Constants.PropertyEditors.Aliases.NoEdit)
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(Logger))
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",

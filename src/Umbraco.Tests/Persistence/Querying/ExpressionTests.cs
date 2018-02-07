@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using System.Linq;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.Persistence.Querying
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Equals_Claus_With_Two_Entity_Values()
         {
-            var dataType = new DataType(-1, "Test")
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>()))
             {
                 Id = 12345
             };

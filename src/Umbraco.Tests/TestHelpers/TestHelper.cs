@@ -152,7 +152,8 @@ namespace Umbraco.Tests.TestHelpers
             else
             {
                 // directly compare values
-                Assert.AreEqual(expected, actual, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name, expected, actual);
+                Assert.AreEqual(expected, actual, "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name, property.Name,
+                    expected?.ToString() ?? "<null>", actual?.ToString() ?? "<null>");
             }
         }
 

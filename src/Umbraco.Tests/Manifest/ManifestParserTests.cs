@@ -194,7 +194,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 
             // this is not part of the manifest
             var preValues = editor.DefaultConfiguration;
-            Assert.IsNull(preValues);
+            Assert.IsEmpty(preValues);
 
             var preValueEditor = editor.ConfigurationEditor;
             Assert.IsNotNull(preValueEditor);

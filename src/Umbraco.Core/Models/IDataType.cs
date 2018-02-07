@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Models.Entities;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {
@@ -8,9 +9,14 @@ namespace Umbraco.Core.Models
     public interface IDataType : IUmbracoEntity
     {
         /// <summary>
-        /// Gets or sets the property editor alias.
+        /// Gets or sets the property editor.
         /// </summary>
-        string EditorAlias { get; set; }
+        PropertyEditor Editor { get; set; }
+
+        /// <summary>
+        /// Gets the property editor alias.
+        /// </summary>
+        string EditorAlias { get; }
 
         /// <summary>
         /// Gets or sets the database type for the data type values.

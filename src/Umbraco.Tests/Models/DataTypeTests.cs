@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
@@ -13,7 +15,7 @@ namespace Umbraco.Tests.Models
         [Test]
         public void Can_Deep_Clone()
         {
-            var dtd = new DataType(9, Guid.NewGuid().ToString())
+            var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>()), 9)
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,
@@ -58,7 +60,7 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var dtd = new DataType(9, Guid.NewGuid().ToString())
+            var dtd = new DataType(new VoidEditor(Mock.Of<ILogger>()), 9)
             {
                 CreateDate = DateTime.Now,
                 CreatorId = 5,

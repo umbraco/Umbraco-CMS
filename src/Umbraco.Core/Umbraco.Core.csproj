@@ -343,6 +343,7 @@
     <Compile Include="PropertyEditors\TagConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
+    <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />

@@ -31,8 +31,13 @@ namespace Umbraco.Tests.Published
             var profiler = Mock.Of<IProfiler>();
             var proflog = new ProfilingLogger(logger, profiler);
 
-            var dataType1 = new DataType("editorAlias1")
+            PropertyEditorCollection editors = null;
+            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors));
+            editors = new PropertyEditorCollection(new PropertyEditor[] { editor });
+
+            var dataType1 = new DataType(editor)
             {
+                Id = 1,
                 Configuration = new NestedContentConfiguration
                 {
                     MinItems = 1,
@@ -44,8 +49,9 @@ namespace Umbraco.Tests.Published
                 }
             };
 
-            var dataType2 = new DataType("editorAlias2")
+            var dataType2 = new DataType(editor)
             {
+                Id = 2,
                 Configuration = new NestedContentConfiguration
                 {
                     MinItems = 1,
@@ -122,12 +128,6 @@ namespace Umbraco.Tests.Published
             {
                 new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
                 new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
-            });
-
-            PropertyEditorCollection editors = null;
-            editors = new PropertyEditorCollection(new PropertyEditor[]
-            {
-                new NestedContentPropertyEditor(Mock.Of<ILogger>(), new Lazy<PropertyEditorCollection>(() => editors))
             });
 
             var source = new DataTypeConfigurationSource(dataTypeService, editors);
