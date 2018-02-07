@@ -398,6 +398,11 @@ namespace Umbraco.Core.Persistence
                 _sqlSyntax);
         }
 
+        public IConsentRepository CreateConsentRepository(IScopeUnitOfWork uow)
+        {
+            return new ConsentRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+        }
+
         public IAuditEntryRepository CreateAuditEntryRepository(IScopeUnitOfWork uow)
         {
             return new AuditEntryRepository(uow, _cacheHelper, _logger, _sqlSyntax);

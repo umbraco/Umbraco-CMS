@@ -7,8 +7,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -23,7 +21,7 @@ namespace Umbraco.Web.Editors
                 return result;
 
             var filters = TourFilterResolver.Current.Filters.ToList();
-            
+
             //get all filters that will be applied to all tour aliases
             var aliasOnlyFilters = filters.Where(x => x.PluginName == null && x.TourFileName == null).ToList();
 
@@ -64,8 +62,28 @@ namespace Umbraco.Web.Editors
                     }
                 }
             }
+            //Get all allowed sections for the current user
+            var allowedSections = UmbracoContext.Current.Security.CurrentUser.AllowedSections.ToList();
 
-            return result.OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
+            var toursToBeRemoved = new List<BackOfficeTourFile>();
+
+            //Checking to see if the user has access to the required tour sections, else we remove the tour
+            foreach (var backOfficeTourFile in result)
+            {
+                foreach (var tour in backOfficeTourFile.Tours)
+                {
+                    foreach (var toursRequiredSection in tour.RequiredSections)
+                    {
+                        if (allowedSections.Contains(toursRequiredSection) == false)
+                        {
+                            toursToBeRemoved.Add(backOfficeTourFile);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private void TryParseTourFile(string tourFile,
@@ -79,7 +97,7 @@ namespace Umbraco.Web.Editors
 
             //get the filters specific to this file
             var fileFilters = filters.Where(x => x.TourFileName != null && x.TourFileName.IsMatch(fileName)).ToList();
-            
+
             //If there is any filter applied to match the file only (no tour alias) then ignore the file entirely
             var isFileFiltered = fileFilters.Any(x => x.TourAlias == null);
             if (isFileFiltered) return;

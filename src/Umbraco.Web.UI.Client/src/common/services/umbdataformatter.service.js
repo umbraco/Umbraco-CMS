@@ -56,7 +56,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData');
                         return saveProperty;
                     });
 
@@ -304,14 +304,14 @@
                     _.each(tab.properties, function (prop) {
 
                         //don't include the custom generic tab properties
-                        if (!prop.alias.startsWith("_umb_")) {
+                        //don't include a property that is marked readonly
+                        if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
                             saveModel.properties.push({
                                 id: prop.id,
                                 alias: prop.alias,
                                 value: prop.value
                             });
                         }
-
                     });
                 });
 

@@ -13,17 +13,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
     {
-        public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService)
+        private readonly ILocalizedTextService _textService;
+
+        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService)
             : base(dataTypeService)
         {
-
+            _textService = textService;
         }
 
         protected override ContentPropertyDisplay ConvertCore(Property originalProp)
         {
             var display = base.ConvertCore(originalProp);
 
-            var dataTypeService = DataTypeService.Value;
+            var dataTypeService = DataTypeService;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
 
             //configure the editor for display with the pre-values
@@ -53,6 +55,10 @@ namespace Umbraco.Web.Models.Mapping
                 display.Config = display.PropertyEditor.PreValueEditor.ConvertDbToEditor(display.PropertyEditor.DefaultPreValues, preVals);
                 display.View = valEditor.View;
             }
+
+            //Translate
+            display.Label = _textService.UmbracoDictionaryTranslate(display.Label);
+            display.Description = _textService.UmbracoDictionaryTranslate(display.Description);
 
             return display;
         }
