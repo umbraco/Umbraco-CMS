@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
     {
         private readonly IMemberGroupService _memberGroupService;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;        
+        private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         //only for unit tests!
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _memberGroupService = memberGroupService;
             _dataTypeService = dataTypeService;
-        }        
+        }
 
         #region IMemberService Implementation
 
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
         {
             if (member == null) throw new ArgumentNullException("member");
 
-            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();            
+            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider())
             {
                 provider.ChangePassword(member.Username, "", password);

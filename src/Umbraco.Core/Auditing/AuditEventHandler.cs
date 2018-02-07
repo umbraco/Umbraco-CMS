@@ -52,12 +52,32 @@ namespace Umbraco.Core.Auditing
             BackOfficeUserManager.PasswordReset += OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount += ;
 
+            UserService.SavedUserGroup += OnSavedUserGroup;
+
             UserService.SavedUser += OnSavedUser;
             UserService.DeletedUser += OnDeletedUser;
-            UserService.UserGroupPermissionsAssigned+= UserGroupPermissionAssigned;
+            UserService.UserGroupPermissionsAssigned += UserGroupPermissionAssigned;
 
             MemberService.Saved += OnSavedMember;
             MemberService.Deleted += OnDeletedMember;
+        }
+
+        private void OnSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> saveEventArgs)
+        {
+            var performingUser = PerformingUser;
+            var groups = saveEventArgs.SavedEntities;
+            foreach (var group in groups)
+            {
+                //var dp = string.Join(", ", member.Properties.Where(x => x.WasDirty()).Select(x => x.Alias));
+                var dp = string.Join(", ", ((UserGroup) group).GetWereDirtyProperties());
+                var sections = string.Join(", ", group.AllowedSections);
+                var perms = string.Join(", ", group.Permissions);
+
+                AuditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                    DateTime.Now,
+                    0, null,
+                    "umbraco/user", $"save group id:{group.Id}:{group.Alias} \"{group.Name}\", updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}, sections: {sections}, perms: {perms}");
+            }
         }
 
         private void UserGroupPermissionAssigned(IUserService sender, SaveEventArgs<EntityPermission> saveEventArgs)
