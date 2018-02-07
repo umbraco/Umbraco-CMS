@@ -1,0 +1,5 @@
+<div class="umb-editor" ng-style="editor.style" ng-class="{'umb-editor--small': editor.size === 'small'}">
+    <div ng-if="!editor.view" ng-transclude></div>
+    <div ng-if="editor.view" ng-include="editor.view"></div>
+    <div ng-if="editor.showOverlay" class="umb-editor__overlay"></div>
+</div>
