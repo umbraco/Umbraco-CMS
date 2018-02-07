@@ -838,13 +838,9 @@ namespace Umbraco.Core.Services
                 repository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 uow.Commit();
 
-                uow.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(
-                    entityIds.Select(
-                            x => new EntityPermission(
-                                groupId,
-                                x,
-                                permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray()))
-                        .ToArray(), false));
+                var assigned = permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
+                uow.Events.Dispatch(UserGroupPermissionsAssigned, this,
+                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
             }
         }
 
@@ -865,13 +861,9 @@ namespace Umbraco.Core.Services
                 repository.AssignGroupPermission(groupId, permission, entityIds);
                 uow.Commit();
 
-                uow.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(
-                    entityIds.Select(
-                            x => new EntityPermission(
-                                groupId,
-                                x,
-                                new[] { permission.ToString(CultureInfo.InvariantCulture) }))
-                        .ToArray(), false));
+                var assigned = new[] { permission.ToString(CultureInfo.InvariantCulture) };
+                uow.Events.Dispatch(UserGroupPermissionsAssigned, this,
+                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
             }
         }
 
