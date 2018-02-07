@@ -688,7 +688,7 @@
     <key alias="defaultUserChangePass"><![CDATA[<strong>La contraseña del usuario por defecto debe ser cambiada</strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>El usuario por defecto ha sido desabilitado o ha perdido el acceso a Umbraco!</strong></p><p>Pinche en <b>Próximo</b> para continuar.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>¡La contraseña del usuario por defecto ha sido cambiada desde que se instaló!</strong></p><p>No hay que realizar ninguna tarea más. Pulsa <strong>Siguiente</strong> para proseguir.]]></key>
-    <key alias="defaultUserPasswordChanged">¡La constraseña se ha cambiado!</key>
+    <key alias="defaultUserPasswordChanged">¡La contraseña se ha cambiado!</key>
     <key alias="greatStart">Ten un buen comienzo, visita nuestros videos de introducción</key>
     <key alias="licenseText">Pulsando el botón de Siguiente (o modificando el UmbracoConfigurationStatus en el web.config), aceptar la licencia de este software tal y como se especifica en el cuadro de debajo. Ten en cuenta que esta distribución de Umbraco consta de dos licencias diferentes, la licencia open source MIT para el framework y la licencia Umbraco freeware que cubre la IU.</key>
     <key alias="None">No ha sido instalado.</key>
@@ -1076,7 +1076,7 @@
     <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
     <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haga clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
     <key alias="masterDocumentType">Tipo de documento Maestro</key>
-    <key alias="createMatchingTemplate">Crear template correspondiente</key>
+    <key alias="createMatchingTemplate">Crear plantilla correspondiente</key>
     <key alias="addIcon">Añadir icono</key>
   </area>
   <area alias="sort">
@@ -1277,7 +1277,7 @@
   </area>
   <area alias="grid">
     <key alias="insertControl">Insertar control</key>
-    <key alias="chooseLayout">Choose layout</key>
+    <key alias="chooseLayout">Elije configuración</key>
     <key alias="addRows">Añade más filas</key>
     <key alias="addElement">Añadir contenido</key>
     <key alias="dropElement">Soltar contenido</key>
@@ -1752,64 +1752,64 @@
 		   1: Recommended value
 		   2: Server version
 	  -->
-        <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
-        <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
-        <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
+        <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Intentar saltar Errores Personalizados de IIS está '%0%' y estás usando IIS versión '%1%'.</key>
+        <key alias="trySkipIisCustomErrorsCheckErrorMessage">Intentar saltar Errores Personalizados de IIS está '%0%'. Se recomienda configurarlo como '%1%' para tu versión (%2%) de IIS.</key>
+        <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Intentar saltar Errores Personalizados de IIS se configuró como con '%0%' éxito.</key>
 
         <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-        <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
-        <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
-        <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
+        <key alias="configurationServiceFileNotFound">Archivo no existe: '%0%'.</key>
+        <key alias="configurationServiceNodeNotFound"><![CDATA[No se puedo encontrar <strong>'%0%'</strong> en archivo de configuración <strong>'%1%'</strong>.]]></key>
+        <key alias="configurationServiceError">Hubo un error, revisa los logs para ver el error completo: %0%.</key>
 
-        <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-        <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
-        <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
+        <key alias="xmlDataIntegrityCheckMembers">Miembros - Total XML: %0%, Total: %1%, Total invalidos: %2%</key>
+        <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalidos: %2%</key>
+        <key alias="xmlDataIntegrityCheckContent">Contenido - Total XML: %0%, Total publicados: %1%, Total invalidos: %2%</key>
 
-        <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
-        <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
-        <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
-        <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
-        <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
-        <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-        <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
-        <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
-        <key alias="httpsCheckEnableHttpsError">Could not update the 'umbracoUseSSL' setting in your web.config file. Error: %0%</key>
+        <key alias="httpsCheckValidCertificate">El certificado de tu sitio es válido.</key>
+        <key alias="httpsCheckInvalidCertificate">Error validando certificado: '%0%'</key>
+        <key alias="httpsCheckExpiredCertificate">El ceriticado SSL de tu sitio ha caducado.</key>
+        <key alias="httpsCheckExpiringCertificate">El ceriticado SSL de tu sitio caducará en %0% días.</key>
+        <key alias="httpsCheckInvalidUrl">Error pinging la URL %0% - '%1%'</key>
+        <key alias="httpsCheckIsCurrentSchemeHttps">Actualmente estás %0% viendo el sitio usando el esquema HTTPS.</key>
+        <key alias="httpsCheckConfigurationRectifyNotPossible">El appSetting 'umbracoUseSSL' está configurado como 'false' en tu archivo web.config. Una vez que accedes al sitio usando HTTPS, debería ser configuraio como 'true'.</key>
+        <key alias="httpsCheckConfigurationCheckResult">Ele appSetting 'umbracoUseSSL' está configurado como '%0%' en tu archivo your web.config, tus cookies son %1% marcadas como seguras.</key>
+        <key alias="httpsCheckEnableHttpsError">No se pudo actualizar 'umbracoUseSSL' en tu archivo web.config. Error: %0%</key>
 
         <!-- The following keys don't get tokens passed in -->
-        <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
-        <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
-        <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'umbracoUseSSL' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
+        <key alias="httpsCheckEnableHttpsButton">Activar HTTPS</key>
+        <key alias="httpsCheckEnableHttpsDescription">Configura umbracoSSL como true en los appSettings del archivo web.config.</key>
+        <key alias="httpsCheckEnableHttpsSuccess">El appSetting 'umbracoUseSSL' está ahora configurado como 'true' en tu archivo web.config, tus cookies se marcarán como seguras.</key>
 
-        <key alias="rectifyButton">Fix</key>
-        <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
-        <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
-        <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+        <key alias="rectifyButton">Arreglar</key>
+        <key alias="cannotRectifyShouldNotEqual">No se pudo arreglar chequeo con un valor de comparación 'ShouldNotEqual'.</key>
+        <key alias="cannotRectifyShouldEqualWithValue">No se pudo arreglar chequeo con un valor de comparación 'ShouldEqual' con el valor introducido.</key>
+        <key alias="valueToRectifyNotProvided">Valor para arreglar chequeo no introducido.</key>
 
-        <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
-        <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
-        <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
+        <key alias="compilationDebugCheckSuccessMessage">Modo Debug en compilacion está desactivado.</key>
+        <key alias="compilationDebugCheckErrorMessage">Modo Debug en compilacion está activado. Se recomienda desactivarlo antes de publicar el sitio.</key>
+        <key alias="compilationDebugCheckRectifySuccessMessage">Modo Debug en compilación se ha desactivado correctamente.</key>
 
-        <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
-        <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
-        <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
+        <key alias="traceModeCheckSuccessMessage">Modo Trace está desactivado.</key>
+        <key alias="traceModeCheckErrorMessage">Modo Trace está activado. Se recomienda desactivarlo antes de publicar el sitio.</key>
+        <key alias="traceModeCheckRectifySuccessMessage">Modo Trace se ha desactivado correctamente..</key>
 
-        <key alias="folderPermissionsCheckMessage">All folders have the correct permissions set.</key>
+        <key alias="folderPermissionsCheckMessage">Todas las carpetas tienen los permisos correspondientes.</key>
         <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-        <key alias="requiredFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
-        <key alias="optionalFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+        <key alias="requiredFolderPermissionFailed"><![CDATA[Las siguientes carpetas se deben configurar con permisos de modificación pero no se pudieron acceder: <strong>%0%</strong>.]]></key>
+        <key alias="optionalFolderPermissionFailed"><![CDATA[Las siguientes carpetas se deben configurar con permisos de modificación para ciertas operaciones en Umbraco pero no se pudieron acceder: <strong>%0%</strong>. Opcional.]]></key>
 
-        <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
+        <key alias="filePermissionsCheckMessage">Todos los archivos tienen los permisos correspondientes.</key>
         <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-        <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
-        <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
+        <key alias="requiredFilePermissionFailed"><![CDATA[Los siguientes archivos se deben configurar con permisos de escritura pero no se pudieron acceder: <strong>%0%</strong>.: <strong>%0%</strong>.]]></key>
+        <key alias="optionalFilePermissionFailed"><![CDATA[Los siguientes archivos se deben configurar con permisos de escritura para ciertas operaciones en Umbraco pero no se pudieron acceder: <strong>%0%</strong>. Opcional.]]></key>
 
-        <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
-        <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
-        <key alias="clickJackingSetHeaderInConfig">Set Header in Config</key>
+        <key alias="clickJackingCheckHeaderFound"><![CDATA[El header or meta-tag <strong>X-Frame-Options</strong> usado para controlar si un sitio puede ser IFRAMEd por otra fue encontrado.]]></key>
+        <key alias="clickJackingCheckHeaderNotFound"><![CDATA[El header or meta-tag <strong>X-Frame-Options</strong> usado para controlar si un sitio puede ser IFRAMEd por otra no se ha encontrado.]]></key>
+        <key alias="clickJackingSetHeaderInConfig">Establecer Header en Config</key>
         <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
         <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
         <key alias="clickJackingSetHeaderInConfigError">Could not update web.config file. Error: %0%</key>
@@ -1818,17 +1818,17 @@
 	    0: Comma delimitted list of headers found
   	-->
         <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
-        <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
+        <key alias="excessiveHeadersNotFound">No se ha encontrado ninguna cabecerá que revele información sobre la tecnología del sitio.</key>
 
-        <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
-        <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
-        <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
-        <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
+        <key alias="smtpMailSettingsNotFound">No se encontró system.net/mailsettings en Web.config.</key>
+        <key alias="smtpMailSettingsHostNotConfigured">En la sección system.net/mailsettings section de web.config, el host no está configurado.</key>
+        <key alias="smtpMailSettingsConnectionSuccess">Los valores SMTP están configurados correctamente y el servicio opera con normalidad.</key>
+        <key alias="smtpMailSettingsConnectionFail">El servidor SMTP configurado con host '%0%' y puerto '%1%' no se pudo alcanzar. Por favor revisa que la configuración en la sección system.net/mailsettings del archivo Web.config es correcta.</key>
 
-        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
-        <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
-        <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
-        <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status</key>
+        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Email de notificación has sido configurado como <strong>%0%</strong>.]]></key>
+        <key alias="notificationEmailsCheckErrorMessage"><![CDATA[El email de notificación está todavía configurado en su valor por defecto: <strong>%0%</strong>.]]></key>
+        <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Los resultados de los Chequeos de Salud de Umbraco programados para ejecutarse el %0% a las %1% son:</p>%2%</body></html>]]></key>
+        <key alias="scheduledHealthCheckEmailSubject">Status de los Chequeos de Salud de Umbraco</key>
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Desactivar URL tracker</key>
@@ -1836,16 +1836,16 @@
         <key alias="originalUrl">URL Original</key>
         <key alias="redirectedTo">Redirigido a To</key>
         <key alias="noRedirects">No se ha creado ninguna redirección</key>
-        <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
-        <key alias="removeButton">Remove</key>
-        <key alias="confirmRemove">Are you sure you want to remove the redirect from '%0%' to '%1%'?</key>
-        <key alias="redirectRemoved">Redirect URL removed.</key>
+        <key alias="noRedirectsDescription">Cuando una página es renombrada o movida, una redirección a la nueva página es automáticamente creada.</key>
+        <key alias="removeButton">Eliminar</key>
+        <key alias="confirmRemove">¿Estás seguro que quieres eliminar la redirección de '%0%' a '%1%'?</key>
+        <key alias="redirectRemoved">Redirección URL eliminada.</key>
         <key alias="redirectRemoveError">Error removing redirect URL.</key>
-        <key alias="confirmDisable">Are you sure you want to disable the URL tracker?</key>
-        <key alias="disabledConfirm">URL tracker has now been disabled.</key>
-        <key alias="disableError">Error disabling the URL tracker, more information can be found in your log file.</key>
-        <key alias="enabledConfirm">URL tracker has now been enabled.</key>
-        <key alias="enableError">Error enabling the URL tracker, more information can be found in your log file.</key>
+        <key alias="confirmDisable">¿Seguro que quieres desactivar URL tracker?</key>
+        <key alias="disabledConfirm">URL tracker ha sido desactivado.</key>
+        <key alias="disableError">Error desactivando URL tracker, más información se puede encontrar en los logs.</key>
+        <key alias="enabledConfirm">URL tracker ha sido activado.</key>
+        <key alias="enableError">Error activando URL tracker, más información se puede encontrar en los logs.</key>
     </area>
     <area alias="emptyStates">
         <key alias="emptyDictionaryTree">No hay elementos de Diccionario para elegir</key>
