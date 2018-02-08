@@ -1,5 +1,5 @@
-<div class="umb-editor" ng-style="editor.style" ng-class="{'umb-editor--small': editor.size === 'small'}">
-    <div ng-if="!editor.view" ng-transclude></div>
-    <div ng-if="editor.view" ng-include="editor.view"></div>
-    <div ng-if="editor.showOverlay" class="umb-editor__overlay"></div>
+<div class="umb-editor" ng-style="model.style" ng-class="{'umb-editor--small': model.size === 'small'}">
+    <div ng-if="!model.view" ng-transclude></div>
+    <div ng-if="model.view" ng-include="model.view"></div>
+    <div ng-if="model.showOverlay" class="umb-editor__overlay"></div>
 </div>

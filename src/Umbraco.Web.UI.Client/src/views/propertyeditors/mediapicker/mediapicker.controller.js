@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService, editorService) {
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -94,45 +94,64 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.sync();
         };
 
-        $scope.goToItem = function(item) {
-            $location.path('media/media/edit/' + item.id);
+        $scope.editItem = function(item) {
+
+            var mediaEditor = {
+                "view": "views/media/edit.html",
+                "node": item,
+                submit: function(model) {
+                    console.log("submitted", model);
+                    editorService.close(model.id);
+                },
+                close: function(model) {
+                    console.log("closed", model);
+                    editorService.close(model.id);
+                }
+            };
+
+            editorService.open(mediaEditor);
+            
         };
 
-       $scope.add = function() {
+        $scope.add = function() {
+            var mediaPicker = {
+                "view": "views/editors/mediapicker/mediapicker.html",
+                "size": "small",
+                startNodeId: $scope.model.config.startNodeId,
+                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
+                multiPicker: multiPicker,
+                onlyImages: onlyImages,
+                disableFolderSelect: disableFolderSelect,
+                submit: function(model) {
 
-           $scope.mediaPickerOverlay = {
-               view: "mediapicker",
-               title: "Select media",
-               startNodeId: $scope.model.config.startNodeId,
-               startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
-               multiPicker: multiPicker,
-               onlyImages: onlyImages,
-               disableFolderSelect: disableFolderSelect,
-               show: true,
-               submit: function(model) {
+                    _.each(model.selectedImages, function(media, i) {
+                        // if there is no thumbnail, try getting one if the media is not a placeholder item
+                        if (!media.thumbnail && media.id && media.metaData) {
+                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                        }
+ 
+                        $scope.images.push(media);
+ 
+                        if ($scope.model.config.idType === "udi") {
+                            $scope.ids.push(media.udi);
+                        }
+                        else {
+                            $scope.ids.push(media.id);
+                        }
+                    });
+ 
+                    $scope.sync();
+ 
+                    editorService.close(model.id);
 
-                   _.each(model.selectedImages, function(media, i) {
-                       // if there is no thumbnail, try getting one if the media is not a placeholder item
-                       if (!media.thumbnail && media.id && media.metaData) {
-                           media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                       }
+                },
+                close: function(model) {
+                    editorService.close(model.id);
+                }
+            }
 
-                       $scope.images.push(media);
+            editorService.open(mediaPicker);
 
-                       if ($scope.model.config.idType === "udi") {
-                           $scope.ids.push(media.udi);
-                       }
-                       else {
-                           $scope.ids.push(media.id);
-                       }
-                   });
-
-                   $scope.sync();
-
-                   $scope.mediaPickerOverlay.show = false;
-                   $scope.mediaPickerOverlay = null;
-               }
-           };
        };
 
        $scope.sortableOptions = {

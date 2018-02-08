@@ -12,7 +12,7 @@
             replace: true,
             templateUrl: 'views/components/editor/umb-editor.html',
             scope: {
-                editor: "="
+                model: "="
             },
             link: link
         };

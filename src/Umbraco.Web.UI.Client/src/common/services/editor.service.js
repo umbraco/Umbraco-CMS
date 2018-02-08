@@ -14,6 +14,9 @@
             // set unique id
             editor.id = editors.length + 1;
 
+            // set flag so we know when the editor is open in "infinie mode"
+            editor.infiniteMode = true;
+
             editors.push(editor);
 
             setIndent();
@@ -40,15 +43,10 @@
 
         function setIndent() {
 
-            //console.log("editors", editors);
-
             var indentSize = 80;
             var numberOfCollapsed = editors.length;
 
-            console.log(numberOfCollapsed);
-
             angular.forEach(editors, function(editor, index){
-                //console.log("editor", editor);
 
                 var lastOpened = false;
                 var style = {};
@@ -76,7 +74,6 @@
                 style.left = (index + 1) * indentSize + "px";
                 editor.style = style;
                 
-                console.log(editor.style);
             });
 
         }
