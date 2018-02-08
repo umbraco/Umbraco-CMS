@@ -176,6 +176,12 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
+            var jv = value as JValue;
+            if (jv != null)
+            {
+                value = value.ToString();
+            }
+
             //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
             var s = value as string;
             if (s != null)
@@ -248,7 +254,7 @@ namespace Umbraco.Core.PropertyEditors
                 return null;
             }
 
-            var result = TryConvertValueToCrlType((editorValue.Value != null && editorValue.Value.GetType() == typeof(JValue)) ? editorValue.Value.ToString() : editorValue.Value);
+            var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
                 LogHelper.Warn<PropertyValueEditor>("The value " + editorValue.Value + " cannot be converted to the type " + GetDatabaseType());
