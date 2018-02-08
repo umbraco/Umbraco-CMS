@@ -94,7 +94,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                if(!$scope.model.infiniteMode) {
+                if($scope.model && !$scope.model.infiniteMode) {
                     syncTreeNode($scope.content, data.path, true); 
                 }
                
@@ -190,7 +190,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     editorState.set($scope.content);
                     $scope.busy = false;
 
-                    if(!$scope.model.infiniteMode) {
+                    if($scope.model && !$scope.model.infiniteMode) {
                         syncTreeNode($scope.content, data.path);
                     }
 
