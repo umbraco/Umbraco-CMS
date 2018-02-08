@@ -156,14 +156,14 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         /// Applies a configuration.
         /// </summary>
         /// <remarks>Ensures that all crops defined in the configuration exists in the value.</remarks>
-        internal void ApplyConfiguration(ImageCropperEditorConfiguration configuration)
+        internal void ApplyConfiguration(ImageCropperConfiguration configuration)
         {
             // merge the crop values - the alias + width + height comes from
             // configuration, but each crop can store its own coordinates
 
-            if (configuration == null) return;
+            var configuredCrops = configuration?.Crops;
+            if (configuredCrops == null) return;
 
-            var configuredCrops = configuration.Crops;
             var crops = Crops.ToList();
 
             foreach (var configuredCrop in configuredCrops)

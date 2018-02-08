@@ -6,8 +6,11 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
@@ -25,11 +28,15 @@ namespace Umbraco.Tests.Published
             {
                 new SimpleConverter1(),
             });
-            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
             var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", new[]
             {
-                contentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
+                contentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
@@ -40,7 +47,7 @@ namespace Umbraco.Tests.Published
         private class SimpleConverter1 : IPropertyValueConverter
         {
             public bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.EditorAlias.InvariantEquals("editor1");
+                => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
             public Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof (int);
@@ -78,11 +85,15 @@ namespace Umbraco.Tests.Published
             {
                 new SimpleConverter2(publishedSnapshotAccessor),
             });
-            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var contentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
             var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", new[]
             {
-                contentTypeFactory.CreatePropertyType("prop1", 0, "editor2"),
+                contentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
@@ -106,7 +117,7 @@ namespace Umbraco.Tests.Published
             }
 
             public bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.EditorAlias.InvariantEquals("editor2");
+                => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
             public Type GetPropertyValueType(PublishedPropertyType propertyType)
                 // the first version would be the "generic" version, but say we want to be more precise
@@ -160,26 +171,31 @@ namespace Umbraco.Tests.Published
             Current.Container.Register(f => publishedSnapshotAccessorMock.Object);
 
             var converters = Current.Container.GetInstance<PropertyValueConverterCollection>();
-            var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, Mock.Of<IDataTypeConfigurationSource>());
+
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 },
+                new DataType(new VoidEditor("2", Mock.Of<ILogger>())) { Id = 2 });
+
+            var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeService);
 
             var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", new[]
             {
-                contentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
+                contentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             var elementType2 = contentTypeFactory.CreateContentType(1001, "element2", new[]
             {
-                contentTypeFactory.CreatePropertyType("prop2", 0, "editor2"),
+                contentTypeFactory.CreatePropertyType("prop2", 2),
             });
 
             var contentType1 = contentTypeFactory.CreateContentType(1002, "content1", new[]
             {
-                contentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
+                contentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             var contentType2 = contentTypeFactory.CreateContentType(1003, "content2", new[]
             {
-                contentTypeFactory.CreatePropertyType("prop2", 0, "editor2"),
+                contentTypeFactory.CreatePropertyType("prop2", 2),
             });
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
@@ -222,7 +238,7 @@ namespace Umbraco.Tests.Published
         public class SimpleConverter3A : PropertyValueConverterBase
         {
             public override bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.EditorAlias == "editor1";
+                => propertyType.EditorAlias == "Umbraco.Void";
 
             public override Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof (string);
@@ -241,7 +257,7 @@ namespace Umbraco.Tests.Published
             }
 
             public override bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.EditorAlias == "editor2";
+                => propertyType.EditorAlias == "Umbraco.Void.2";
 
             public override Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1"));

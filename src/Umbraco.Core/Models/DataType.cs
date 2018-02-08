@@ -125,11 +125,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public abstract class EditorConfiguration
-        {
-            public abstract bool Equals(EditorConfiguration other);
-        }
-
         /// <summary>
         /// Lazily set the configuration as a serialized json string.
         /// </summary>
@@ -141,11 +136,39 @@ namespace Umbraco.Core.Models
         /// type, and they should be the same.</para>
         /// <para>Think before using!</para>
         /// </remarks>
-        internal void SetConfiguration(string configurationJson)
+        internal void SetLazyConfiguration(string configurationJson)
         {
             _hasConfiguration = false;
             _configuration = null;
             _configurationJson = configurationJson;
+        }
+
+        /// <summary>
+        /// Gets a lazy configuration.
+        /// </summary>
+        /// <remarks>
+        /// <para>The configuration object will be lazily de-serialized.</para>
+        /// <para>This method is meant to be used when creating published datatypes, exclusively.</para>
+        /// <para>Think before using!</para>
+        /// </remarks>
+        internal Lazy<object> GetLazyConfiguration()
+        {
+            // note: in both cases, make sure we capture what we need - we don't want
+            // to capture a reference to this full, potentially heavy, DataType instance.
+
+            if (_hasConfiguration)
+            {
+                // if configuration has already been de-serialized, return
+                var capturedConfiguration = _configuration;
+                return new Lazy<object>(() => capturedConfiguration);
+            }
+            else
+            {
+                // else, create a Lazy de-serializer
+                var capturedConfiguration = _configurationJson;
+                var capturedEditor = _editor;
+                return new Lazy<object>(() => capturedEditor.ConfigurationEditor.FromDatabase(capturedConfiguration));
+            }
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 value = new ImageCropperValue { Src = sourceString };
             }
 
-            value.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperEditorConfiguration>());
+            value.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>());
 
             return value;
         }

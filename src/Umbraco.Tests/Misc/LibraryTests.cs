@@ -12,6 +12,8 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using LightInject;
 using Moq;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Misc
 {
@@ -26,7 +28,10 @@ namespace Umbraco.Tests.Misc
         {
             base.SetUp();
 
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
@@ -36,7 +41,7 @@ namespace Umbraco.Tests.Misc
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    factory.CreatePropertyType("content", 0, "?"),
+                    factory.CreatePropertyType("content", 1),
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = (alias) => type;

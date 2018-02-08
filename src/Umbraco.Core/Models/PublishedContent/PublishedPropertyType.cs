@@ -31,34 +31,32 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
         public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
-            : this(propertyType.Alias, propertyType.DataTypeId, propertyType.PropertyEditorAlias, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
+            : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with specific values.
+        /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
         /// <remarks>
-        /// <para>This constructor is for tests and is not intended to be used directly from application code.</para>
         /// <para>Values are assumed to be consisted and are not checked.</para>
         /// <para>The new published property type belongs to the published content type.</para>
         /// </remarks>
-        public PublishedPropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, string editorAlias, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
-            : this(propertyTypeAlias, dataTypeId, editorAlias, isUserProperty, variations, propertyValueConverters, publishedModelFactory, factory)
+        public PublishedPropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+            : this(propertyTypeAlias, dataTypeId, isUserProperty, variations, propertyValueConverters, publishedModelFactory, factory)
         {
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with specific values.
+        /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
         /// <remarks>
-        /// <para>This constructor is for tests and is not intended to be used directly from application code.</para>
-        /// <para>Values are assumed to be consisted and are not checked.</para>
+        /// <para>Values are assumed to be consistent and are not checked.</para>
         /// <para>The new published property type does not belong to a published content type.</para>
         /// </remarks>
-        public PublishedPropertyType(string propertyTypeAlias, int dataTypeId, string editorAlias, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+        public PublishedPropertyType(string propertyTypeAlias, int dataTypeId, bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
         {
             _publishedModelFactory = publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));
             _propertyValueConverters = propertyValueConverters ?? throw new ArgumentNullException(nameof(propertyValueConverters));
@@ -68,7 +66,7 @@ namespace Umbraco.Core.Models.PublishedContent
             IsUserProperty = isUserProperty;
             Variations = variations;
 
-            DataType = factory.CreateDataType(dataTypeId, editorAlias);
+            DataType = factory.GetDataType(dataTypeId);
         }
 
         #endregion

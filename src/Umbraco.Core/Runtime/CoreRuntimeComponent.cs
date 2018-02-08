@@ -104,11 +104,9 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(f => f.GetInstance<TypeLoader>().GetPackageActions());
 
-            // need to filter out the ones we dont want!! fixme - what does that mean?
             composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
 
-            composition.Container.Register<IDataTypeConfigurationSource, DataTypeConfigurationSource>(new PerContainerLifetime());
             composition.Container.Register<IPublishedContentTypeFactory, PublishedContentTypeFactory>(new PerContainerLifetime());
 
             composition.Container.RegisterSingleton<IShortStringHelper>(factory

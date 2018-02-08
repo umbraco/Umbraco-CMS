@@ -12,6 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.PropertyEditors;
@@ -63,20 +64,13 @@ namespace Umbraco.Tests.Published
                 }
             };
 
-            // mocked dataservice returns nested content preValues
-            var dataTypeService = Mock.Of<IDataTypeService>();
+            var dataType3 = new DataType(new TextboxPropertyEditor(logger))
+            {
+                Id = 3
+            };
 
-            Mock.Get(dataTypeService)
-                .Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns<int>(x =>
-                {
-                    switch (x)
-                    {
-                        case 1: return dataType1;
-                        case 2: return dataType2;
-                        default: return null;
-                    }
-                });
+            // mocked dataservice returns nested content preValues
+            var dataTypeService = new TestObjects.TestDataTypeService(dataType1, dataType2, dataType3);
 
             var publishedModelFactory = new Mock<IPublishedModelFactory>();
 
@@ -130,12 +124,11 @@ namespace Umbraco.Tests.Published
                 new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
             });
 
-            var source = new DataTypeConfigurationSource(dataTypeService, editors);
-            var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, source);
+            var factory = new PublishedContentTypeFactory(publishedModelFactory.Object, converters, dataTypeService);
 
-            var propertyType1 = factory.CreatePropertyType("property1", 1, Constants.PropertyEditors.Aliases.NestedContent);
-            var propertyType2 = factory.CreatePropertyType("property2", 2, Constants.PropertyEditors.Aliases.NestedContent);
-            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 0, Constants.PropertyEditors.Aliases.Textbox);
+            var propertyType1 = factory.CreatePropertyType("property1", 1);
+            var propertyType2 = factory.CreatePropertyType("property2", 2);
+            var propertyTypeN1 = factory.CreatePropertyType("propertyN1", 3);
 
             var contentType1 = factory.CreateContentType(1, "content1", new[] { propertyType1 });
             var contentType2 = factory.CreateContentType(2, "content2", new[] { propertyType2 });

@@ -6,9 +6,11 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
@@ -121,7 +123,10 @@ namespace Umbraco.Tests.PublishedContent
 
         private IPublishedContent GetContent(bool createChildren, int indexVals)
         {
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var contentTypeAlias = createChildren ? "Parent" : "Child";
             var d = new TestPublishedContent
                 {
@@ -146,8 +151,8 @@ namespace Umbraco.Tests.PublishedContent
                 };
             d.Properties = new Collection<IPublishedProperty>(new List<IPublishedProperty>
             {
-                new RawValueProperty(factory.CreatePropertyType("property1", 0, ""), d, "value" + indexVals),
-                new RawValueProperty(factory.CreatePropertyType("property2", 0, ""), d, "value" + (indexVals + 1))
+                new RawValueProperty(factory.CreatePropertyType("property1", 1), d, "value" + indexVals),
+                new RawValueProperty(factory.CreatePropertyType("property2", 1), d, "value" + (indexVals + 1))
             });
             if (createChildren)
             {
@@ -163,12 +168,12 @@ namespace Umbraco.Tests.PublishedContent
             {
                 //create additional columns, used to test the different columns for child nodes
                 ((Collection<IPublishedProperty>) d.Properties).Add(
-                    new RawValueProperty(factory.CreatePropertyType("property4", 0, ""), d, "value" + (indexVals + 2)));
+                    new RawValueProperty(factory.CreatePropertyType("property4",1), d, "value" + (indexVals + 2)));
             }
             else
             {
                 ((Collection<IPublishedProperty>) d.Properties).Add(
-                    new RawValueProperty(factory.CreatePropertyType("property3", 0, ""), d, "value" + (indexVals + 2)));
+                    new RawValueProperty(factory.CreatePropertyType("property3", 1), d, "value" + (indexVals + 2)));
             }
             return d;
         }

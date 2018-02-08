@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
                 dataType.Trashed = dto.NodeDto.Trashed;
                 dataType.CreatorId = dto.NodeDto.UserId ?? 0;
 
-                dataType.SetConfiguration(dto.Configuration);
+                dataType.SetLazyConfiguration(dto.Configuration);
 
                 // reset dirty initial properties (U4-1946)
                 dataType.ResetDirtyProperties(false);

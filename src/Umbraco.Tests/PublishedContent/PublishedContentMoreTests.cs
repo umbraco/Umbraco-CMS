@@ -12,7 +12,11 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Core.Composing.Current;
 using LightInject;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
@@ -191,13 +195,16 @@ namespace Umbraco.Tests.PublishedContent
 
         private static SolidPublishedShapshot CreatePublishedSnapshot()
         {
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var caches = new SolidPublishedShapshot();
             var cache = caches.InnerContentCache;
 
             var props = new[]
             {
-                factory.CreatePropertyType("prop1", 1, "?"),
+                factory.CreatePropertyType("prop1", 1),
             };
 
             var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);

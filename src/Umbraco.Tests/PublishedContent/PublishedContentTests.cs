@@ -10,7 +10,13 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
 using LightInject;
+using Moq;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -27,6 +33,16 @@ namespace Umbraco.Tests.PublishedContent
 
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+
+            var logger = Mock.Of<ILogger>();
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(logger)) { Id = 1},
+                new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
+                new DataType(new RichTextPropertyEditor(logger)) { Id = 1002 },
+                new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
+                new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
+                new DataType(new MediaPicker2PropertyEditor(logger)) { Id = 1005 });
+            Container.RegisterSingleton<IDataTypeService>(f => dataTypeService);
         }
 
         protected override void Initialize()
@@ -43,11 +59,11 @@ namespace Umbraco.Tests.PublishedContent
             var propertyTypes = new[]
             {
                 // AutoPublishedContentType will auto-generate other properties
-                factory.CreatePropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.Aliases.Boolean),
-                factory.CreatePropertyType("selectedNodes", 0, "?"),
-                factory.CreatePropertyType("umbracoUrlAlias", 0, "?"),
-                factory.CreatePropertyType("content", 0, Constants.PropertyEditors.Aliases.TinyMce),
-                factory.CreatePropertyType("testRecursive", 0, "?"),
+                factory.CreatePropertyType("umbracoNaviHide", 1001),
+                factory.CreatePropertyType("selectedNodes", 1),
+                factory.CreatePropertyType("umbracoUrlAlias", 1),
+                factory.CreatePropertyType("content", 1002),
+                factory.CreatePropertyType("testRecursive", 1),
             };
             var compositionAliases = new[] { "MyCompositionAlias" };
             var type = new AutoPublishedContentType(0, "anything", compositionAliases, propertyTypes);
@@ -553,7 +569,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt = factory.CreatePropertyType("detached", 0, Constants.PropertyEditors.Aliases.Integer);
+            var pt = factory.CreatePropertyType("detached", 1003);
             var ct = factory.CreateContentType(0, "alias", new[] { pt });
             var prop = new PublishedElementPropertyBase(pt, null, false, PropertyCacheLevel.None, 5548);
             Assert.IsInstanceOf<int>(prop.GetValue());
@@ -572,9 +588,9 @@ namespace Umbraco.Tests.PublishedContent
         {
             var factory = Container.GetInstance<IPublishedContentTypeFactory>() as PublishedContentTypeFactory;
 
-            var pt1 = factory.CreatePropertyType("legend", 0, Constants.PropertyEditors.Aliases.Textbox);
-            var pt2 = factory.CreatePropertyType("image", 0, Constants.PropertyEditors.Aliases.MediaPicker2);
-            var pt3 = factory.CreatePropertyType("size", 0, Constants.PropertyEditors.Aliases.Integer);
+            var pt1 = factory.CreatePropertyType("legend", 1004);
+            var pt2 = factory.CreatePropertyType("image", 1005);
+            var pt3 = factory.CreatePropertyType("size", 1003);
             const string val1 = "boom bam";
             const int val2 = 0;
             const int val3 = 666;

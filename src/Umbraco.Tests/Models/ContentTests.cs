@@ -138,10 +138,6 @@ namespace Umbraco.Tests.Models
             postedFileMock.Setup(x => x.FileName).Returns("sample.txt");
             postedFileMock.Setup(x => x.InputStream).Returns(stream);
 
-            // note: must pass a data type service, the "dynamic" SetValue that accepts an object
-            // arg and does not get a dataTypeService is trying to get the service from app context
-            var dataTypeService = Mock.Of<IDataTypeService>();
-
             // Assert
             content.SetValue("title", postedFileMock.Object);
 

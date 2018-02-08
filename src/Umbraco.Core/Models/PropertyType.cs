@@ -4,20 +4,19 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Defines the type of a <see cref="Property"/> object
+    /// Represents a property type.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyType : EntityBase, IEquatable<PropertyType>
     {
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        private static PropertySelectors _selectors;
 
         private readonly bool _isExplicitDbType;
         private string _name;
@@ -28,14 +27,13 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
         private bool _mandatory;
-        private string _helpText;
         private int _sortOrder;
         private string _validationRegExp;
         private ContentVariation _variations;
 
         public PropertyType(IDataType dataType)
         {
-            if (dataType == null) throw new ArgumentNullException("dataType");
+            if (dataType == null) throw new ArgumentNullException(nameof(dataType));
 
             if(dataType.HasIdentity)
                 _dataTypeId = dataType.Id;
@@ -45,10 +43,13 @@ namespace Umbraco.Core.Models
             _variations = ContentVariation.InvariantNeutral;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// </summary>
         public PropertyType(IDataType dataType, string propertyTypeAlias)
             : this(dataType)
         {
-            _alias = GetAlias(propertyTypeAlias);
+            _alias = SanitizeAlias(propertyTypeAlias);
         }
 
         public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType)
@@ -58,6 +59,8 @@ namespace Umbraco.Core.Models
         public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
             : this(propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
         { }
+
+        // fixme - need to explain and understand this explicitDbType thing here
 
         /// <summary>
         /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
@@ -85,79 +88,84 @@ namespace Umbraco.Core.Models
             _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
             _valueStorageType = valueStorageType;
-            _alias = GetAlias(propertyTypeAlias);
+            _alias = SanitizeAlias(propertyTypeAlias);
             _variations = ContentVariation.InvariantNeutral;
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
+        private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
+
         private class PropertySelectors
         {
-            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
-            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
-            public readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-            public readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
-            public readonly PropertyInfo PropertyEditorAliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
-            public readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, ValueStorageType>(x => x.ValueStorageType);
-            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
-            public readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
-            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
-            public readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
-            public readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
+            public readonly PropertyInfo Name = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
+            public readonly PropertyInfo Alias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
+            public readonly PropertyInfo Description = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
+            public readonly PropertyInfo DataTypeId = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
+            public readonly PropertyInfo PropertyEditorAlias = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.PropertyEditorAlias);
+            public readonly PropertyInfo ValueStorageType = ExpressionHelper.GetPropertyInfo<PropertyType, ValueStorageType>(x => x.ValueStorageType);
+            public readonly PropertyInfo Mandatory = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
+            public readonly PropertyInfo SortOrder = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
+            public readonly PropertyInfo ValidationRegExp = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+            public readonly PropertyInfo PropertyGroupId = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
             public readonly PropertyInfo VaryBy = ExpressionHelper.GetPropertyInfo<PropertyType, ContentVariation>(x => x.Variations);
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the content type, owning this property type, is publishing.
+        /// </summary>
         public bool IsPublishing { get; internal set; }
 
         /// <summary>
-        /// Gets of Sets the Name of the PropertyType
+        /// Gets of sets the name of the property type.
         /// </summary>
         [DataMember]
         public string Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _name, Selectors.Name);
         }
 
         /// <summary>
-        /// Gets of Sets the Alias of the PropertyType
+        /// Gets of sets the alias of the property type.
         /// </summary>
         [DataMember]
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(GetAlias(value), ref _alias, Ps.Value.AliasSelector);
+            set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, Selectors.Alias);
         }
 
         /// <summary>
-        /// Gets of Sets the Description for the PropertyType
+        /// Gets of sets the description of the property type.
         /// </summary>
         [DataMember]
         public string Description
         {
             get => _description;
-            set => SetPropertyValueAndDetectChanges(value, ref _description, Ps.Value.DescriptionSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _description, Selectors.Description);
         }
 
         /// <summary>
-        /// Gets of Sets the Id of the DataType (Definition), which the PropertyType is "wrapping"
+        /// Gets or sets the identifier of the datatype for this property type.
         /// </summary>
-        /// <remarks>This is actually the Id of the <see cref="IDataType"/></remarks>
         [DataMember]
         public int DataTypeId
         {
             get => _dataTypeId;
-            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, Ps.Value.DataTypeDefinitionIdSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, Selectors.DataTypeId);
         }
 
+        /// <summary>
+        /// Gets or sets the alias of the property editor for this property type.
+        /// </summary>
         [DataMember]
         public string PropertyEditorAlias
         {
             get => _propertyEditorAlias;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Ps.Value.PropertyEditorAliasSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyEditorAlias, Selectors.PropertyEditorAlias);
         }
 
         /// <summary>
-        /// Gets or Sets the DatabaseType for which the DataType's value is saved as
+        /// Gets or sets the database type for storing value for this property type.
         /// </summary>
         [DataMember]
         internal ValueStorageType ValueStorageType
@@ -167,60 +175,49 @@ namespace Umbraco.Core.Models
             {
                 //don't allow setting this if an explicit declaration has been made in the ctor
                 if (_isExplicitDbType) return;
-                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Ps.Value.DataTypeDatabaseTypeSelector);
+                SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Selectors.ValueStorageType);
             }
         }
 
         /// <summary>
-        /// Gets or sets the identifier of the PropertyGroup this PropertyType belongs to.
+        /// Gets or sets the identifier of the property group this property type belongs to.
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
         internal Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
-            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Ps.Value.PropertyGroupIdSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, Selectors.PropertyGroupId);
         }
 
         /// <summary>
-        /// Gets of Sets the Boolean indicating whether a value for this PropertyType is required
+        /// Gets of sets a value indicating whether a value for this property type is required.
         /// </summary>
         [DataMember]
         public bool Mandatory
         {
             get => _mandatory;
-            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Selectors.Mandatory);
         }
 
         /// <summary>
-        /// Gets of Sets the Help text for the current PropertyType
-        /// </summary>
-        [DataMember]
-        [Obsolete("Not used anywhere, will be removed in future versions")]
-        public string HelpText
-        {
-            get => _helpText;
-            set => SetPropertyValueAndDetectChanges(value, ref _helpText, Ps.Value.HelpTextSelector);
-        }
-
-        /// <summary>
-        /// Gets of Sets the Sort order of the PropertyType, which is used for sorting within a group
+        /// Gets of sets the sort order of the property type.
         /// </summary>
         [DataMember]
         public int SortOrder
         {
             get => _sortOrder;
-            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _sortOrder, Selectors.SortOrder);
         }
 
         /// <summary>
-        /// Gets or Sets the RegEx for validation of legacy DataTypes
+        /// Gets or sets the regular expression for validation of legacy DataTypes fixme??
         /// </summary>
         [DataMember]
         public string ValidationRegExp
         {
             get => _validationRegExp;
-            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Ps.Value.ValidationRegExpSelector);
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, Selectors.ValidationRegExp);
         }
 
         /// <summary>
@@ -229,9 +226,12 @@ namespace Umbraco.Core.Models
         public ContentVariation Variations
         {
             get => _variations;
-            set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
+            set => SetPropertyValueAndDetectChanges(value, ref _variations, Selectors.VaryBy);
         }
 
+        /// <summary>
+        /// Validates that a variation is valid for the property type.
+        /// </summary>
         public bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid)
         {
             ContentVariation variation;
@@ -258,17 +258,6 @@ namespace Umbraco.Core.Models
             return true;
         }
 
-        private static string GetAlias(string value)
-        {
-            //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
-            // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
-            // which is used internally
-
-            return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
-                        ? value
-                        : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
-        }
-
         /// <summary>
         /// Creates a new property of this property type.
         /// </summary>
@@ -278,13 +267,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether the value is of the expected type
-        /// for the property, and can be assigned to the property "as is".
+        /// Determines whether a value is of the expected type for this property type.
         /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>True if the value is of the expected type for the property,
-        /// and can be assigned to the property "as is". Otherwise, false, to indicate
-        /// that some conversion is required.</returns>
+        /// <remarks>
+        /// <para>If the value is of the expected type, it can be directly assigned to the property.
+        /// Otherwise, some conversion is required.</para>
+        /// </remarks>
         public bool IsPropertyTypeValid(object value)
         {
             // null values are assumed to be ok
@@ -338,10 +326,8 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Validates the Value from a Property according to the validation settings
+        /// Determines whether a value is valid for this property type.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns>True if valid, otherwise false</returns>
         public bool IsValidPropertyValue(object value)
         {
             //If the Property is mandatory and value is null or empty, return false as the validation failed
@@ -378,14 +364,27 @@ namespace Umbraco.Core.Models
             return true;
         }
 
-        public bool Equals(PropertyType other)
+        /// <summary>
+        /// Sanitizes a property type alias.
+        /// </summary>
+        private static string SanitizeAlias(string value)
         {
-            if (base.Equals(other)) return true;
+            //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
+            // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
+            // which is used internally
 
-            //Check whether the PropertyType's properties are equal.
-            return Alias.InvariantEquals(other.Alias);
+            return value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
+                ? value
+                : value.ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase);
         }
 
+        /// <inheritdoc />
+        public bool Equals(PropertyType other)
+        {
+            return other != null && (base.Equals(other) || Alias.InvariantEquals(other.Alias));
+        }
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             //Get hash code for the Name field if it is not null.
@@ -398,6 +397,7 @@ namespace Umbraco.Core.Models
             return baseHash ^ hashAlias;
         }
 
+        /// <inheritdoc />
         public override object DeepClone()
         {
             var clone = (PropertyType)base.DeepClone();

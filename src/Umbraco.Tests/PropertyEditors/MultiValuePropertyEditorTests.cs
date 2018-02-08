@@ -58,11 +58,7 @@ namespace Umbraco.Tests.PropertyEditors
                 Id = 1
             };
 
-            var dataTypeService = Mock.Of<IDataTypeService>();
-
-            Mock.Get(dataTypeService)
-                .Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns<int>(x => x == 1 ? dataType : null);
+            var dataTypeService = new TestObjects.TestDataTypeService(dataType);
 
             var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("1234,4567,8910");
@@ -89,11 +85,7 @@ namespace Umbraco.Tests.PropertyEditors
                 Id = 1
             };
 
-            var dataTypeService = Mock.Of<IDataTypeService>();
-
-            Mock.Get(dataTypeService)
-                .Setup(x => x.GetDataType(It.IsAny<int>()))
-                .Returns<int>(x => x == 1 ? dataType : null);
+            var dataTypeService = new TestObjects.TestDataTypeService(dataType);
 
             var prop = new Property(1, new PropertyType(dataType));
             prop.SetValue("1234");

@@ -7,11 +7,17 @@ using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
 using Umbraco.Web;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -64,9 +70,17 @@ namespace Umbraco.Tests.PropertyEditors
                 container.ConfigureUmbracoCore();
                 container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
+                container.Register<ILogger, PerContainerLifetime>(f => Mock.Of<ILogger>());
+                container.Register<IContentSection, PerContainerLifetime>(f => Mock.Of<IContentSection>());
+                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
+
+                var dataTypeService = new TestObjects.TestDataTypeService(
+                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>())) { Id = 1 });
+
+                var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+
                 var converter = new ImageCropperValueConverter();
-                var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
-                var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 0, "test"), val1, false); // does not use type for conversion
+                var result = converter.ConvertSourceToIntermediate(null, factory.CreatePropertyType("test", 1), val1, false); // does not use type for conversion
 
                 var resultShouldMatch = val2.DeserializeImageCropperValue();
                 if (expected)

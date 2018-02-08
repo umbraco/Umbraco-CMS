@@ -4,9 +4,11 @@ using System.Linq;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
@@ -315,10 +317,16 @@ namespace Umbraco.Tests.PublishedContent
 
     class AutoPublishedContentType : PublishedContentType
     {
-        private static readonly PublishedContentTypeFactory Factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+        private static readonly PublishedPropertyType Default;
 
-        private static readonly PublishedPropertyType Default
-            = Factory.CreatePropertyType("*", 0, "?");
+        static AutoPublishedContentType()
+        {
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 666 });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+            Default = factory.CreatePropertyType("*", 666);
+        }
 
         public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
             : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.InvariantNeutral)

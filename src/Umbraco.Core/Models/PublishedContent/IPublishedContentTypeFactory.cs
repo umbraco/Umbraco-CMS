@@ -26,18 +26,19 @@
         /// <param name="contentType">The published content type owning the property.</param>
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <param name="dataTypeId">The datatype identifier.</param>
-        /// <param name="propertyEditorAlias">The property editor alias.</param> FIXME derive from dataTypeId?
         /// <param name="variations">The variations.</param>
         /// <remarks>Is used by <see cref="PublishedContentType"/> constructor to create special property types.</remarks>
-        PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, string propertyEditorAlias, ContentVariation variations);
+        PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations);
 
         /// <summary>
-        /// Creates a published data type.
+        /// Gets a published datatype.
         /// </summary>
-        /// <param name="id">The data type identifier.</param>
-        /// <param name="editorAlias">The data type editor alias.</param>
-        /// <returns>A published data type with the specified properties.</returns>
-        /// <remarks>Properties are assumed to be consistent and not checked.</remarks>
-        PublishedDataType CreateDataType(int id, string editorAlias);
+        PublishedDataType GetDataType(int id);
+
+        /// <summary>
+        /// Notifies the factory of datatype changes.
+        /// </summary>
+        /// <remarks>This is so the factory can flush its caches.</remarks>
+        void NotifyDataTypeChanges(); // fixme never invoked!
     }
 }

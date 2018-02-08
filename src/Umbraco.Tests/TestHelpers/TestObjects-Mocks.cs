@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Web;
 using LightInject;
 using Moq;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -128,8 +131,6 @@ namespace Umbraco.Tests.TestHelpers
 
         #region Inner classes
 
-
-
         private class MockDbConnection : DbConnection
         {
             protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
@@ -163,6 +164,123 @@ namespace Umbraco.Tests.TestHelpers
             public override string DataSource { get; }
             public override string ServerVersion { get; }
             public override ConnectionState State => ConnectionState.Open; // else NPoco reopens
+        }
+
+        public class TestDataTypeService : IDataTypeService
+        {
+            public TestDataTypeService()
+            {
+                DataTypes = new Dictionary<int, IDataType>();
+            }
+
+            public TestDataTypeService(params IDataType[] dataTypes)
+            {
+                DataTypes = dataTypes.ToDictionary(x => x.Id, x => x);
+            }
+
+            public TestDataTypeService(IEnumerable<IDataType> dataTypes)
+            {
+                DataTypes = dataTypes.ToDictionary(x => x.Id, x => x);
+            }
+
+            public Dictionary<int, IDataType> DataTypes { get; }
+
+            public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public EntityContainer GetContainer(int containerId)
+            {
+                throw new NotImplementedException();
+            }
+
+            public EntityContainer GetContainer(Guid containerId)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<EntityContainer> GetContainers(string folderName, int level)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IDataType GetDataType(string name)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IDataType GetDataType(int id)
+            {
+                DataTypes.TryGetValue(id, out var dataType);
+                return dataType;
+            }
+
+            public IDataType GetDataType(Guid id)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<IDataType> GetAll(params int[] ids)
+            {
+                if (ids.Length == 0) return DataTypes.Values;
+                return ids.Select(x => DataTypes.TryGetValue(x, out var dataType) ? dataType : null).WhereNotNull();
+            }
+
+            public void Save(IDataType dataType, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(IDataType dataType, int userId = 0)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         #endregion

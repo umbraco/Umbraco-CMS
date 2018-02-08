@@ -197,7 +197,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PropertyGroupId, opt => opt.Condition(source => source.GroupId > 0))
                 .ForMember(dest => dest.PropertyGroupId, opt => opt.MapFrom(display => new Lazy<int>(() => display.GroupId, false)))
                 .ForMember(dest => dest.Key, opt => opt.Ignore())
-                .ForMember(dest => dest.HelpText, opt => opt.Ignore())
                 .ForMember(dest => dest.HasIdentity, opt => opt.Ignore())
                 //ignore because this is set in the ctor NOT ON UPDATE, STUPID!
                 //.ForMember(type => type.Alias, opt => opt.Ignore())

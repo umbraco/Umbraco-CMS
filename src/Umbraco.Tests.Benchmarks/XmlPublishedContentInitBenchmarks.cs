@@ -9,8 +9,11 @@ using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Benchmarks
@@ -307,9 +310,19 @@ namespace Umbraco.Tests.Benchmarks
 
         private static PublishedContentType GetPublishedContentType(PublishedItemType type, string alias)
         {
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), Mock.Of<IDataTypeConfigurationSource>());
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 };
+
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns<int>(id => id == 1 ? dataType : null);
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetAll())
+                .Returns(new[] { dataType });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             return factory.CreateContentType(0, alias, new string[] {},
-                new List<PublishedPropertyType>(Enumerable.Range(0, 10).Select(x => factory.CreatePropertyType("prop" + x, 0, "test"))));
+                new List<PublishedPropertyType>(Enumerable.Range(0, 10).Select(x => factory.CreatePropertyType("prop" + x, 1))));
         }
     }
 }

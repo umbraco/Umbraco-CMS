@@ -6,6 +6,10 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using LightInject;
 using Moq;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -35,13 +39,17 @@ namespace Umbraco.Tests.PublishedContent
             base.Initialize();
 
             var converters = Container.GetInstance<PropertyValueConverterCollection>();
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new RichTextPropertyEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
 
             // need to specify a custom callback for unit tests
             var propertyTypes = new[]
             {
                 // AutoPublishedContentType will auto-generate other properties
-                publishedContentTypeFactory.CreatePropertyType("content", 0, Constants.PropertyEditors.Aliases.TinyMce),
+                publishedContentTypeFactory.CreatePropertyType("content", 1),
             };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;

@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
 
             var dataType = dataTypeService.GetDataType(propertyType.DataTypeId);
             if (dataType?.Configuration != null)
-                value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperEditorConfiguration>());
+                value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
 
             return value;
         }
@@ -168,7 +168,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // more magic here ;-(
             var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
-            var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.ImageCropperCrop>();
+            var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
             return "{src: '" + val + "', crops: " + crops + "}";
         }
     }

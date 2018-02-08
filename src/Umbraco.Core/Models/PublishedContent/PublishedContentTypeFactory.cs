@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -11,13 +14,15 @@ namespace Umbraco.Core.Models.PublishedContent
     {
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PropertyValueConverterCollection _propertyValueConverters;
-        private readonly IDataTypeConfigurationSource _dataTypeConfigurationSource;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly object _publishedDataTypesLocker = new object();
+        private Dictionary<int, PublishedDataType> _publishedDataTypes;
 
-        public PublishedContentTypeFactory(IPublishedModelFactory publishedModelFactory, PropertyValueConverterCollection propertyValueConverters, IDataTypeConfigurationSource dataTypeConfigurationSource)
+        public PublishedContentTypeFactory(IPublishedModelFactory publishedModelFactory, PropertyValueConverterCollection propertyValueConverters, IDataTypeService dataTypeService)
         {
             _publishedModelFactory = publishedModelFactory;
             _propertyValueConverters = propertyValueConverters;
-            _dataTypeConfigurationSource = dataTypeConfigurationSource;
+            _dataTypeService = dataTypeService;
         }
 
         /// <inheritdoc />
@@ -45,21 +50,47 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, string propertyEditorAlias, ContentVariation variations = ContentVariation.InvariantNeutral)
+        public PublishedPropertyType CreatePropertyType(PublishedContentType contentType, string propertyTypeAlias, int dataTypeId, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
-            return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, propertyEditorAlias, true, variations, _propertyValueConverters, _publishedModelFactory, this);
+            return new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
 
         // for tests
-        internal PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, string propertyEditorAlias, bool umbraco = false, ContentVariation variations = ContentVariation.InvariantNeutral)
+        internal PublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, bool umbraco = false, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
-            return new PublishedPropertyType(propertyTypeAlias, dataTypeId, propertyEditorAlias, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
+            return new PublishedPropertyType(propertyTypeAlias, dataTypeId, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
         }
 
         /// <inheritdoc />
-        public PublishedDataType CreateDataType(int id, string editorAlias)
+        public PublishedDataType GetDataType(int id)
         {
-            return new PublishedDataType(id, editorAlias, _dataTypeConfigurationSource);
+            Dictionary<int, PublishedDataType> publishedDataTypes;
+            lock (_publishedDataTypesLocker)
+            {
+                if (_publishedDataTypes == null)
+                {
+                    var dataTypes = _dataTypeService.GetAll();
+                    _publishedDataTypes = dataTypes.ToDictionary(
+                        x => x.Id,
+                        x => new PublishedDataType(x.Id, x.EditorAlias, x is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => x.Configuration)));
+                }
+
+                publishedDataTypes = _publishedDataTypes;
+            }
+
+            if (!publishedDataTypes.TryGetValue(id, out var dataType))
+                throw new ArgumentException("Not a valid datatype identifier.", nameof(id));
+
+            return dataType;
+        }
+
+        /// <inheritdoc />
+        public void NotifyDataTypeChanges()
+        {
+            lock (_publishedDataTypesLocker)
+            {
+                _publishedDataTypes = null;
+            }
         }
     }
 }

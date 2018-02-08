@@ -4,8 +4,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
@@ -27,10 +31,13 @@ namespace Umbraco.Tests.Published
                 converter,
             });
 
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
             {
-                publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
+                publishedContentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             // PublishedElementPropertyBase.GetCacheLevels:
@@ -102,10 +109,13 @@ namespace Umbraco.Tests.Published
                 converter,
             });
 
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
             {
-                publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
+                publishedContentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             var elementsCache = new DictionaryCacheProvider();
@@ -173,10 +183,13 @@ namespace Umbraco.Tests.Published
                 converter,
             });
 
-            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, Mock.Of<IDataTypeConfigurationSource>());
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeService);
             var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", new[]
             {
-                publishedContentTypeFactory.CreatePropertyType("prop1", 0, "editor1"),
+                publishedContentTypeFactory.CreatePropertyType("prop1", 1),
             });
 
             Assert.Throws<Exception>(() =>
@@ -198,7 +211,7 @@ namespace Umbraco.Tests.Published
             public int InterConverts { get; private set; }
 
             public bool IsConverter(PublishedPropertyType propertyType)
-                => propertyType.EditorAlias.InvariantEquals("editor1");
+                => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
             public Type GetPropertyValueType(PublishedPropertyType propertyType)
                 => typeof(int);

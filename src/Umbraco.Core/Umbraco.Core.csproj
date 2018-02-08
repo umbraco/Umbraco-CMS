@@ -337,7 +337,7 @@
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
     <Compile Include="PropertyEditors\IConfigureValueType.cs" />
-    <Compile Include="PropertyEditors\ImageCropperEditorConfiguration.cs" />
+    <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTagsExtensions.cs" />
     <Compile Include="PropertyEditors\SliderPropertyEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\TagConfiguration.cs" />
@@ -686,8 +686,6 @@
     <Compile Include="Models\PropertyTypeCollection.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
-    <Compile Include="Models\PublishedContent\DataTypeConfigurationSource.cs" />
-    <Compile Include="Models\PublishedContent\IDataTypeConfigurationSource.cs" />
     <Compile Include="Models\PublishedContent\IndexedArrayItem.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContent.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentTypeFactory.cs" />

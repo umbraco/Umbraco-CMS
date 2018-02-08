@@ -12,41 +12,38 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </remarks>
     public class PublishedDataType
     {
-        private readonly IDataTypeConfigurationSource _dataTypeConfigurationSource;
-        private object _configuration;
+        private readonly Lazy<object> _lazyConfiguration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedDataType"/> class.
         /// </summary>
-        internal PublishedDataType(int id, string editorAlias, IDataTypeConfigurationSource dataTypeConfigurationSource)
+        internal PublishedDataType(int id, string editorAlias, Lazy<object> lazyConfiguration)
         {
-            _dataTypeConfigurationSource = dataTypeConfigurationSource ?? throw new ArgumentNullException(nameof(dataTypeConfigurationSource));
+            _lazyConfiguration = lazyConfiguration;
 
             Id = id;
             EditorAlias = editorAlias;
         }
 
         /// <summary>
-        /// Gets the data type identifier.
+        /// Gets the datatype identifier.
         /// </summary>
-        public int Id { get; } // definition id
+        public int Id { get; }
 
         /// <summary>
-        /// Gets the data type editor alias.
+        /// Gets the dat type editor alias.
         /// </summary>
         public string EditorAlias { get; }
 
         /// <summary>
         /// Gets the data type configuration.
         /// </summary>
-        public object Configuration
-            => _configuration ?? (_configuration = _dataTypeConfigurationSource.GetDataTypeConfiguration(EditorAlias, Id));
+        public object Configuration => _lazyConfiguration.Value;
 
         /// <summary>
         /// Gets the configuration object.
         /// </summary>
         /// <typeparam name="T">The expected type of the configuration object.</typeparam>
-        /// <param name="dataType">This datatype.</param>
         /// <exception cref="InvalidCastException">When the datatype configuration is not of the expected type.</exception>
         public T ConfigurationAs<T>()
             where T : class

@@ -183,7 +183,6 @@ namespace Umbraco.Tests.Testing
 
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Container.RegisterSingleton<IDataTypeConfigurationSource, DataTypeConfigurationSource>();
         }
 
         protected virtual void ComposeCacheHelper()
