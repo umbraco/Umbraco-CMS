@@ -212,7 +212,7 @@ namespace Umbraco.Core
                 var convertible2 = input as IConvertible;
                 if (convertible2 != null)
                 {
-                    return Attempt.Succeed(Convert.ChangeType(convertible2, target));
+                    return Attempt.Succeed(Convert.ChangeType(convertible2, Nullable.GetUnderlyingType(target) ?? target));
                 }
             }
             catch (Exception e)
