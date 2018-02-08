@@ -95,6 +95,42 @@ namespace Umbraco.Tests
         }
 
         [Test]
+        public void ConvertToNullableDecimalTest()
+        {
+            var conv = "100".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.000".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100,000".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.001".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.000m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.001m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+        }
+
+        [Test]
         public void ConvertToDateTimeTest()
         {
             var conv = "2016-06-07".TryConvertTo<DateTime>();

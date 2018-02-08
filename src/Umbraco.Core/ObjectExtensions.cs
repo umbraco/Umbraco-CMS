@@ -156,6 +156,11 @@ namespace Umbraco.Core
                         if (inner.Success)
                         {
                             input = inner.Result; // Now fall on through...
+
+                            if (input is decimal)
+                            {
+                                target = underlying;
+                            }
                         }
                         else
                         {
@@ -212,7 +217,7 @@ namespace Umbraco.Core
                 var convertible2 = input as IConvertible;
                 if (convertible2 != null)
                 {
-                    return Attempt.Succeed(Convert.ChangeType(convertible2, Nullable.GetUnderlyingType(target) ?? target));
+                    return Attempt.Succeed(Convert.ChangeType(convertible2, target));
                 }
             }
             catch (Exception e)
