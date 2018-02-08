@@ -1,5 +1,5 @@
 .umb-editor-sub-header {
-   padding: 15px 0;
+   padding: 10px 0;
    margin-bottom: 10px;
    background: @gray-10;
    display: flex;
@@ -10,11 +10,11 @@
 }
 
 .umb-editor-sub-header.-umb-sticky-bar {
-   box-shadow: 0 5px 0 rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.16);
-   transition: box-shadow 1s;
-   top: 100px; /* height of header */
-   margin-top: 0;
-   margin-bottom: 0;
+    box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
+    transition: box-shadow 1s;
+    top: calc(@appHeaderHeight + @editorHeaderHeight);
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .umb-group-builder__property-preview .umb-editor-sub-header {
