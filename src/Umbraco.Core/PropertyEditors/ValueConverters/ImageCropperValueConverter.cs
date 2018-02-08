@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// <summary>
     /// Represents a value converter for the image cropper value editor.
     /// </summary>
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class ImageCropperValueConverter : PropertyValueConverterBase
     {
         /// <inheritdoc />

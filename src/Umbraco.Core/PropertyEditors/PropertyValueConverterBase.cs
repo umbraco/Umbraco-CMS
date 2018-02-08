@@ -6,7 +6,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Provides a default overridable implementation for <see cref="IPropertyValueConverter"/> that does nothing.
     /// </summary>
-    public class PropertyValueConverterBase : IPropertyValueConverter
+    public abstract class PropertyValueConverterBase : IPropertyValueConverter
     {
         public virtual bool IsConverter(PublishedPropertyType propertyType)
         {

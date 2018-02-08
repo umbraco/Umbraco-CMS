@@ -161,6 +161,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
             // merge the crop values - the alias + width + height comes from
             // configuration, but each crop can store its own coordinates
 
+            if (Crops == null) return;
+
             var configuredCrops = configuration?.Crops;
             if (configuredCrops == null) return;
 

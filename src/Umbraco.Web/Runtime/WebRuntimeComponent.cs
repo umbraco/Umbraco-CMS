@@ -137,8 +137,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.GetInstance<PropertyValueConverterCollectionBuilder>()
                 .Remove<TinyMceValueConverter>()
                 .Remove<TextStringValueConverter>()
-                .Remove<MarkdownEditorValueConverter>()
-                .Remove<ImageCropperValueConverter>();
+                .Remove<MarkdownEditorValueConverter>();
 
             // add all known factories, devs can then modify this list on application
             // startup either by binding to events or in their own global.asax
