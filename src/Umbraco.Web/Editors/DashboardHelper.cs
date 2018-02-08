@@ -69,6 +69,7 @@ namespace Umbraco.Web.Editors
 
                         var dashboardControl = new DashboardControl();
                         var controlPath = control.ControlPath.Trim();
+                        dashboardControl.Caption = control.PanelCaption;
                         dashboardControl.Path = IOHelper.FindFile(controlPath);
                         if (controlPath.ToLowerInvariant().EndsWith(".ascx".ToLowerInvariant()))
                             dashboardControl.ServerSide = true;
