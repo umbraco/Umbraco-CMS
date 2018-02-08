@@ -13,9 +13,13 @@ namespace Umbraco.Core.Services
 {
     public sealed class AuditService : ScopeRepositoryService, IAuditService
     {
+        private readonly Lazy<bool> _isAvailable;
+
         public AuditService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
-        { }
+        {
+            _isAvailable = new Lazy<bool>(DetermineIsAvailable);
+        }
 
         public void Add(AuditType type, string comment, int userId, int objectId)
         {
@@ -123,6 +127,8 @@ namespace Umbraco.Core.Services
                 EventDetails = eventDetails
             };
 
+            if (_isAvailable.Value == false) return entry;
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
@@ -136,6 +142,8 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public IEnumerable<IAuditEntry> Get()
         {
+            if (_isAvailable.Value == false) return Enumerable.Empty<IAuditEntry>();
+
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
@@ -146,10 +154,28 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
         {
+            if (_isAvailable.Value == false)
+            {
+                records = 0;
+                return Enumerable.Empty<IAuditEntry>();
+            }
+
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
                 return repository.GetPage(pageIndex, pageCount, out records);
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the repository is available.
+        /// </summary>
+        private bool DetermineIsAvailable()
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateAuditEntryRepository(uow);
+                return repository.IsAvailable();
             }
         }
     }

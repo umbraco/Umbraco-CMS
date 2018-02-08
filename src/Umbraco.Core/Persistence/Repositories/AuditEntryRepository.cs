@@ -120,5 +120,12 @@ namespace Umbraco.Core.Persistence.Repositories
             records = page.TotalItems;
             return page.Items.Select(AuditEntryFactory.BuildEntity);
         }
+
+        /// <inheritdoc />
+        public bool IsAvailable()
+        {
+            var tables = SqlSyntax.GetTablesInSchema(Database).ToArray();
+            return tables.InvariantContains(AuditEntryDto.TableName);
+        }
     }
 }
