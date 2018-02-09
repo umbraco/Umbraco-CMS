@@ -33,7 +33,12 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class DataTypeController : BackOfficeNotificationsController
     {
-        private PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
+        private readonly PropertyEditorCollection _propertyEditors;
+
+        public DataTypeController(PropertyEditorCollection propertyEditors)
+        {
+            _propertyEditors = propertyEditors;
+        }
 
         /// <summary>
         /// Gets data type by name
@@ -84,7 +89,7 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay GetEmpty(int parentId)
         {
             // cannot create an "empty" data type, so use something by default.
-            var editor = PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
+            var editor = _propertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
             var dt = new DataType(editor, parentId);
             return Mapper.Map<IDataType, DataTypeDisplay>(dt);
         }
@@ -117,7 +122,7 @@ namespace Umbraco.Web.Editors
             //if it doesnt exist yet, we will create it.
             if (dt == null)
             {
-                var editor = PropertyEditors[Constants.PropertyEditors.Aliases.ListView];
+                var editor = _propertyEditors[Constants.PropertyEditors.Aliases.ListView];
                 dt = new DataType(editor);
                 dt.Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
                 Services.DataTypeService.Save(dt);

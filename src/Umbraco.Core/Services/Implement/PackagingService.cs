@@ -143,7 +143,7 @@ namespace Umbraco.Core.Services.Implement
                             where (string)doc.Attribute("isDoc") == ""
                             select doc;
 
-                var contents = ParseDocumentRootXml(roots, parentId);
+                var contents = ParseDocumentRootXml(roots, parentId).ToList();
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 //This is a single doc import
                 var elements = new List<XElement> { element };
-                var contents = ParseDocumentRootXml(elements, parentId);
+                var contents = ParseDocumentRootXml(elements, parentId).ToList();
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
@@ -187,9 +187,10 @@ namespace Umbraco.Core.Services.Implement
                 var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId);
                 contents.Add(content);
 
-                var children = from child in root.Elements()
+                var children = (from child in root.Elements()
                                where (string)child.Attribute("isDoc") == ""
-                               select child;
+                               select child)
+                    .ToList();
                 if (children.Any())
                     contents.AddRange(CreateContentFromXml(children, content));
             }
@@ -215,9 +216,9 @@ namespace Umbraco.Core.Services.Implement
 
                 //Recursive call
                 XElement child1 = child;
-                var grandChildren = from grand in child1.Elements()
-                                    where (string)grand.Attribute("isDoc") == ""
-                                    select grand;
+                var grandChildren = (from grand in child1.Elements()
+                    where (string) grand.Attribute("isDoc") == ""
+                    select grand).ToList();
 
                 if (grandChildren.Any())
                     list.AddRange(CreateContentFromXml(grandChildren, content));
@@ -907,7 +908,7 @@ namespace Umbraco.Core.Services.Implement
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
                         editor = new VoidEditor(_logger) { Alias = editorAlias };
 
-                    var dataTypeDefinition = new DataType(editor)
+                    var dataType = new DataType(editor)
                     {
                         Key = dataTypeDefinitionId,
                         Name = dataTypeDefinitionName,
@@ -915,14 +916,11 @@ namespace Umbraco.Core.Services.Implement
                             ParentId = parentId
                     };
 
-                    // fixme - so what?
-                    var configurationAttribute = dataTypeElement.Attribute("Configuration");
-                    if (!string.IsNullOrWhiteSpace(configurationAttribute?.Value))
-                    {
-                        dataTypeDefinition.Configuration = editor.ConfigurationEditor.FromDatabase(configurationAttribute.Value);
-                    }
+                    var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
+                    if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
+                        dataType.Configuration = editor.ConfigurationEditor.FromDatabase(configurationAttributeValue);
 
-                    dataTypes.Add(dataTypeDefinition);
+                    dataTypes.Add(dataType);
                 }
                 else
                 {
