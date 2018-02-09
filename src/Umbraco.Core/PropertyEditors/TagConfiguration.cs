@@ -9,7 +9,7 @@ namespace Umbraco.Core.PropertyEditors
     {
         // no field attribute, all defined in the editor, due to validators
 
-        public string Group { get; set; }
+        public string Group { get; set; } = "default";
 
         public TagsStorageType StorageType { get; set; } = TagsStorageType.Csv;
 

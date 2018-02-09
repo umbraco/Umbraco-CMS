@@ -33,13 +33,6 @@ namespace Umbraco.Web.PropertyEditors
             });
         }
 
-        // fixme
-        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
-        {
-            {"group", "default"},
-            {"storageType", TagsStorageType.Csv.ToString()}
-        };
-
         public override Dictionary<string, object> ToConfigurationEditor(TagConfiguration configuration)
         {
             var dictionary = base.ToConfigurationEditor(configuration);

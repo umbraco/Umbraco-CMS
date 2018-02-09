@@ -16,8 +16,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("disableFolderSelect", "Disable folder select", "boolean", Description = "Do not allow folders to be picked.")]
         public bool DisableFolderSelect { get; set; }
 
-        // cannot set field.Config through attribute = done in editor ctor
-        //[ConfigurationField("startNodeId", "Start node", "mediapicker")]
+        [ConfigurationField("startNodeId", "Start node", "mediapicker")]
         public int StartNodeId { get; set; }
     }
 }

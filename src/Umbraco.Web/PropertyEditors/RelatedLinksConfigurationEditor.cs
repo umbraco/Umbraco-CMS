@@ -8,10 +8,11 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class RelatedLinksConfigurationEditor : ConfigurationEditor
     {
-        // fixme - this is weird?!
-        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        public override Dictionary<string, object> ToValueEditor(object configuration)
         {
-            {"idType", "udi"}
-        };
+            var d = base.ToValueEditor(configuration);
+            d["idType"] = "udi";
+            return d;
+        }
     }
 }

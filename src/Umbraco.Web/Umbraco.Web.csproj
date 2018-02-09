@@ -239,6 +239,7 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
     <Compile Include="PropertyEditors\ContentPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ContentPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DateConfiguration.cs" />
     <Compile Include="PropertyEditors\DateValueEditor.cs" />

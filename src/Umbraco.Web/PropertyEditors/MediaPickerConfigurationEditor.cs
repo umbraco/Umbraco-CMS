@@ -13,24 +13,18 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         public MediaPickerConfigurationEditor()
         {
-            // must add that one explicitely due to field.Config
-            Fields.Add(new ConfigurationField
-            {
-                Key = "startNodeId",
-                View = "mediapicker",
-                Name = "Start node",
-                PropertyName = nameof(MediaPickerConfiguration.StartNodeId),
-                Config = new Dictionary<string, object>
+            Field(nameof(MediaPickerConfiguration.StartNodeId))
+                .Config = new Dictionary<string, object>
                 {
-                    {"idType", "udi"}
-                }
-            });
+                    { "idType", "udi" }
+                };
         }
 
-        // fixme - is this configuration? or field' configuration? WTF?!
-        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        public override Dictionary<string, object> ToValueEditor(object configuration)
         {
-            {"idType", "udi"}
-        }; 
+            var d = base.ToValueEditor(configuration);
+            d["idType"] = "udi";
+            return d;
+        }
     }
 }
