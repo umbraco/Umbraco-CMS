@@ -774,6 +774,7 @@
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\OperationStatus.cs" />
     <Compile Include="Services\OperationStatusType.cs" />
+    <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Services\ScopeRepositoryService.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />

@@ -16,6 +16,10 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn]
         public int Id { get; set; }
 
+        // there is NO foreign key to the users table here, neither for performing user nor for
+        // affected user, so we can delete users and NOT delete the associated audit trails, and
+        // users can still be identified via the details free-form text fields.
+
         [Column("performingUserId")]
         public int PerformingUserId { get; set; }
 

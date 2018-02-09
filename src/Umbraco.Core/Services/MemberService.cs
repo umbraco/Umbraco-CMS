@@ -1304,18 +1304,6 @@ namespace Umbraco.Core.Services
         public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
         public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
 
-        public class RolesEventArgs : EventArgs
-        {
-            public RolesEventArgs(int[] memberIds, string[] roles)
-            {
-                MemberIds = memberIds;
-                Roles = roles;
-            }
-
-            public int[] MemberIds { get; set; }
-            public string[] Roles { get; set; }
-        }
-
         #endregion
 
         /// <summary>
