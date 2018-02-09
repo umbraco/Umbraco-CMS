@@ -87,14 +87,16 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets or sets a value indicating whether the property editor is deprecated.
         /// </summary>
+        /// <remarks>A deprecated editor does not show up in the list of available editors for a datatype,
+        /// unless it is the current editor for the datatype.</remarks>
         [JsonIgnore]
-        public bool IsDeprecated { get; internal set; } // fixme - kill it all in v8
+        public bool IsDeprecated { get; internal set; }
 
         /// <summary>
         /// Gets or sets the value editor.
         /// </summary>
         /// <remarks>
-        /// <para>If an instance of a value editor is assigned to the property, 
+        /// <para>If an instance of a value editor is assigned to the property,
         /// then this instance is returned when getting the property value. Otherwise, a
         /// new instance is created by CreateValueEditor.</para>
         /// <para>The instance created by CreateValueEditor is not cached, i.e.
@@ -124,7 +126,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets or sets the configuration editor.
         /// </summary>
         /// <remarks>
-        /// <para>If an instance of a configuration editor is assigned to the property, 
+        /// <para>If an instance of a configuration editor is assigned to the property,
         /// then this instance is returned when getting the property value. Otherwise, a
         /// new instance is created by CreateConfigurationEditor.</para>
         /// <para>The instance created by CreateConfigurationEditor is not cached, i.e.

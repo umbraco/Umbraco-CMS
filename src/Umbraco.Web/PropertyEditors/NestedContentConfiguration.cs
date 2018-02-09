@@ -18,13 +18,13 @@ namespace Umbraco.Web.PropertyEditors
         public int? MaxItems { get; set; }
 
         [ConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
-        public string ConfirmDeletes { get; set; } // fixme bool
+        public bool ConfirmDeletes { get; set; } = true;
 
         [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
-        public string ShowIcons { get; set; } // fixme bool
+        public bool ShowIcons { get; set; } = true;
 
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
-        public string HideLabel { get; set; } // fixme bool
+        public bool HideLabel { get; set; }
 
         public class ContentType
         {

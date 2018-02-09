@@ -68,10 +68,11 @@ namespace Umbraco.Core.PropertyEditors
         public bool IsMacroParameterEditor { get; set; } // => (EditorType & EditorType.MacroParameter) != 0;
 
         /// <summary>
-        /// If set to true, this property editor will not show up in the DataType's drop down list
-        /// if there is not already one of them chosen for a DataType
+        /// Gets or sets a value indicating whether the value editor is deprecated.
         /// </summary>
-        public bool IsDeprecated { get; set; } // fixme should just kill in v8
+        /// <remarks>A deprecated editor does not show up in the list of available editors for a datatype,
+        /// unless it is the current editor for the datatype.</remarks>
+        public bool IsDeprecated { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the editor should be displayed without its label.

@@ -254,7 +254,7 @@ namespace Umbraco.Core
             if (lambdaParameters.Length != ctorParameters.Length)
                 ThrowInvalidLambda<TLambda>("ctor", ctorDeclaring, ctorParameters);
             for (var i = 0; i < lambdaParameters.Length; i++)
-                if (lambdaParameters[i] != ctorParameters[i]) // fixme cast? relax?
+                if (lambdaParameters[i] != ctorParameters[i]) // note: relax the constraint with IsAssignableFrom?
                     ThrowInvalidLambda<TLambda>("ctor", ctorDeclaring, ctorParameters);
             if (!returned.IsAssignableFrom(ctorDeclaring))
                 ThrowInvalidLambda<TLambda>("ctor", ctorDeclaring, ctorParameters);
@@ -596,42 +596,6 @@ namespace Umbraco.Core
                     ilgen.Emit(ldargOpCodes[i]);
                 else
                     ilgen.Emit(OpCodes.Ldarg, i);
-
-                //EmitInputAdapter(ilgen, lambdaArgTypes[i], methodArgTypes[i]);
-            }
-        }
-
-        // emits adapter opcodes after each OpCode.Ldarg
-        private static void EmitInputAdapter(ILGenerator ilgen, Type inputType, Type methodParamType)
-        {
-            if (inputType == methodParamType) return;
-
-            if (methodParamType.IsValueType)
-            {
-                if (inputType.IsValueType)
-                {
-                    // both input and parameter are value types
-                    // not supported, use proper input
-                    // (otherwise, would require converting)
-                    throw new NotSupportedException("ValueTypes conversion.");
-                }
-
-                // parameter is value type, but input is reference type
-                // unbox the input to the parameter value type
-                // fixme - conversions?
-                ilgen.Emit(OpCodes.Unbox_Any, inputType);
-            }
-            else
-            {
-                // parameter is reference type, but input is value type
-                // not supported, input should always be less constrained
-                // (otherwise, would require boxing and converting)
-                if (inputType.IsValueType)
-                    throw new NotSupportedException("ValueType boxing.");
-
-                // both input and parameter are reference types
-                // cast the input to the parameter type
-                ilgen.Emit(OpCodes.Castclass, methodParamType);
             }
         }
 
@@ -652,7 +616,6 @@ namespace Umbraco.Core
 
                 // returned is value type, but output is reference type
                 // box the returned value
-                // fixme - conversions?
                 ilgen.Emit(OpCodes.Box, methodReturnedType);
             }
             else

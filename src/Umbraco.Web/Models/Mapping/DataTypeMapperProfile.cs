@@ -111,8 +111,6 @@ namespace Umbraco.Web.Models.Mapping
                         // this is a new data type, so just return the field editors, with default values - there are no values yet
                         var fields = src.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
 
-                        // fixme for ConfigurationEditor it's a dictionary, for ConfigurationEditor<TConfiguration> it's a new TConfiguration
-                        // and then what? need to get it back as a dictionary so it can be applied here?
                         var defaultConfiguration = src.DefaultConfiguration;
                         if (defaultConfiguration != null)
                             DataTypeConfigurationFieldDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultConfiguration);

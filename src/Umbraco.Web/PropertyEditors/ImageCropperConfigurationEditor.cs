@@ -8,12 +8,13 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCropperConfiguration>
     {
-        //fixme
-        // BUT... focal point and src are NOT part of configuration?!
-        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
+        /// <inheritdoc />
+        public override Dictionary<string, object> ToValueEditor(object configuration)
         {
-            {"focalPoint", "{left: 0.5, top: 0.5}"},
-            {"src", ""}
-        };
+            var d = base.ToValueEditor(configuration);
+            if (!d.ContainsKey("focalPoint")) d["focalPoint"] = new { left = 0.5, top = 0.5 };
+            if (!d.ContainsKey("src")) d["src"] = "";
+            return d;
+        }
     }
 }

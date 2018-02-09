@@ -20,13 +20,7 @@ namespace Umbraco.Web.Models.Mapping
         public IEnumerable<PropertyEditorBasic> Resolve(IDataType source)
         {
             return Current.PropertyEditors
-                .Where(x =>
-                {
-                    // fixme should we support deprecating?
-                    //if (_contentSection.ShowDeprecatedPropertyEditors)
-                    //    return true;
-                    return source.EditorAlias == x.Alias || x.IsDeprecated == false;
-                })
+                .Where(x => !x.IsDeprecated || _contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name)
                 .Select(Mapper.Map<PropertyEditorBasic>);
         }
