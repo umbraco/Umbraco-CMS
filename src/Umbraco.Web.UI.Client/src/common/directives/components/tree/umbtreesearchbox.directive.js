@@ -35,9 +35,6 @@ function treeSearchBox(localizationService, searchService, $q) {
                 scope.showSearch = "false";
             }
 
-            if (!scope.bypassUserPermissions) {
-                scope.bypassUserPermissions = "false";
-            }
 
             //used to cancel any request in progress if another one needs to take it's place
             var canceler = null;
@@ -65,6 +62,7 @@ function treeSearchBox(localizationService, searchService, $q) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
 
+                    //append bypassUserPermissions value if there is one
                     if (scope.bypassUserPermissions) {                        
                         searchArgs["bypassUserPermissions"] = scope.bypassUserPermissions;
                     }                   

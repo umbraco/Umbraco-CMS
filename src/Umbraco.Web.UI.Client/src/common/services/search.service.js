@@ -42,7 +42,11 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Member", args.searchFrom).then(function (data) {
+                var options = {
+                    searchFrom: args.searchFrom                    
+                }
+
+                return entityResource.search(args.term, "Member", options).then(function (data) {
                     _.each(data, function (item) {
                         searchResultFormatter.configureMemberResult(item);
                     });
@@ -67,7 +71,12 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.bypassUserPermissions).then(function (data) {
+                var options = {
+                    searchFrom: args.searchFrom,
+                    bypassUserPermissions: args.bypassUserPermissions
+                }
+
+                return entityResource.search(args.term, "Document", options, args.canceler).then(function (data) {
                     _.each(data, function (item) {
                         searchResultFormatter.configureContentResult(item);
                     });
@@ -92,7 +101,12 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Media", args.searchFrom, args.canceler, args.bypassUserPermissions).then(function (data) {
+                var options = {
+                    searchFrom: args.searchFrom,
+                    bypassUserPermissions: args.bypassUserPermissions
+                }
+
+                return entityResource.search(args.term, "Media", options).then(function (data) {
                     _.each(data, function (item) {
                         searchResultFormatter.configureMediaResult(item);
                     });

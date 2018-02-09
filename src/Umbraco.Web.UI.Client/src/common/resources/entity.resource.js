@@ -505,16 +505,19 @@ function entityResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */
-        search: function (query, type, searchFrom, canceler, bypassUserPermissions) {
+        search: function (query, type, options, canceler) {
 
-            var args = [{ query: query }, { type: type }];
-            if (searchFrom) {
-                args.push({ searchFrom: searchFrom });
+            var defaults = {
+                searchFrom: null,
+                bypassUserPermissions: false
+            };
+            if (options === undefined) {
+                options = {};
             }
-
-            if (bypassUserPermissions) {
-                args.push({ bypassUserPermissions: bypassUserPermissions });
-            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
 
             var httpConfig = {};
             if (canceler) {
@@ -526,7 +529,12 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "Search",
-                        args),
+                        {
+                            query: query,
+                            type: type,
+                            searchFrom: options.searchFrom,
+                            bypassUserPermissions: options.bypassUserPermissions
+                        }),
                     httpConfig),
                 'Failed to retrieve entity data for query ' + query);
         },
