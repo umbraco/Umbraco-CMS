@@ -19,9 +19,6 @@ angular.module("umbraco")
             $scope.lockedFolder = true;
 
             var userStartNodes = []; 
-            userService.getCurrentUser().then(function (userData) {
-                userStartNodes = userData.startMediaIds;
-            });
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
@@ -63,15 +60,19 @@ angular.module("umbraco")
             }
 
             function onInit() {
-                if ($scope.startNodeId !== -1) {
-                    entityResource.getById($scope.startNodeId, "media")
-                        .then(function (ent) {
-                            $scope.startNodeId = ent.id;
-                            run();
-                        });
-                } else {
-                    run();
-                }
+                userService.getCurrentUser().then(function (userData) {
+                    userStartNodes = userData.startMediaIds;
+
+                    if ($scope.startNodeId !== -1) {
+                        entityResource.getById($scope.startNodeId, "media")
+                            .then(function (ent) {
+                                $scope.startNodeId = ent.id;
+                                run();
+                            });
+                    } else {
+                        run();
+                    }
+                });
             }
 
             function run() {
