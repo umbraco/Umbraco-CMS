@@ -53,7 +53,7 @@
             <div ng-repeat="tab in vm.customDashboard">
                 <div ng-repeat="property in tab.properties">
                     <div>
-                        <h3 ng-if="property.caption">{{property.caption}}</h3>
+                        <h5 ng-if="property.caption">{{property.caption}}</h5>
                         <div ng-include="property.path"></div>
                     </div>
                 </div>
