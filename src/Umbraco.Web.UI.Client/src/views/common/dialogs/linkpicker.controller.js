@@ -17,6 +17,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        results: [],
 	        selectedSearchResults: []
 	    }
+    
+        $scope.showTarget = dialogOptions.hideTarget !== true;
 
 	    if (dialogOptions.currentTarget) {
 	        $scope.target = dialogOptions.currentTarget;
