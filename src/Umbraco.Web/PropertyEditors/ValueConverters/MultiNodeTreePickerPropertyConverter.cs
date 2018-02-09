@@ -146,11 +146,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             switch (GetPublishedContentType(propertyType.DataTypeId))
             {
                 case PublishedItemType.Media:
-                    contentFetcher = umbHelper.TypedMember;
+                    contentFetcher = umbHelper.TypedMedia;
                     break;
 
                 case PublishedItemType.Member:
-                    contentFetcher = umbHelper.TypedMedia;
+                    contentFetcher = umbHelper.TypedMember;
                     break;
 
                 case PublishedItemType.Content:
