@@ -246,7 +246,7 @@ namespace Umbraco.Core.Models
             if (!PropertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
-            pvalue.PublishedValue = ConvertSetValue(pvalue.EditedValue);
+            pvalue.PublishedValue = PropertyType.ConvertAssignedValue(pvalue.EditedValue);
             DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
         }
 
@@ -257,7 +257,7 @@ namespace Umbraco.Core.Models
             if (!PropertyType.IsPublishing)
                 throw new NotSupportedException("Property type does not support publishing.");
             var origValue = pvalue.PublishedValue;
-            pvalue.PublishedValue = ConvertSetValue(null);
+            pvalue.PublishedValue = PropertyType.ConvertAssignedValue(null);
             DetectChanges(pvalue.EditedValue, origValue, Ps.Value.ValuesSelector, Ps.Value.PropertyValueComparer, false);
         }
 
@@ -270,7 +270,7 @@ namespace Umbraco.Core.Models
             (var pvalue, var change) = GetPValue(languageId, segment, true);
 
             var origValue = pvalue.EditedValue;
-            var setValue = ConvertSetValue(value);
+            var setValue = PropertyType.ConvertAssignedValue(value);
 
             pvalue.EditedValue = setValue;
 
@@ -324,57 +324,6 @@ namespace Umbraco.Core.Models
                 change = true;
             }
             return (pvalue, change);
-        }
-
-        private object ConvertSetValue(object value)
-        {
-            var isOfExpectedType = PropertyType.IsPropertyTypeValid(value);
-
-            if (isOfExpectedType)
-                return value;
-
-            // isOfExpectedType is true if value is null - so if false, value is *not* null
-            // "garbage-in", accept what we can & convert
-            // throw only if conversion is not possible
-
-            var s = value.ToString();
-
-            switch (PropertyType.ValueStorageType)
-            {
-                case ValueStorageType.Nvarchar:
-                case ValueStorageType.Ntext:
-                    return s;
-
-                case ValueStorageType.Integer:
-                    if (s.IsNullOrWhiteSpace())
-                        return null; // assume empty means null
-                    var convInt = value.TryConvertTo<int>();
-                    if (convInt == false) ThrowTypeException(value, typeof(int), PropertyType.Alias);
-                    return convInt.Result;
-
-                case ValueStorageType.Decimal:
-                    if (s.IsNullOrWhiteSpace())
-                        return null; // assume empty means null
-                    var convDecimal = value.TryConvertTo<decimal>();
-                    if (convDecimal == false) ThrowTypeException(value, typeof(decimal), PropertyType.Alias);
-                    // need to normalize the value (change the scaling factor and remove trailing zeroes)
-                    // because the underlying database is going to mess with the scaling factor anyways.
-                    return convDecimal.Result.Normalize();
-
-                case ValueStorageType.Date:
-                    if (s.IsNullOrWhiteSpace())
-                        return null; // assume empty means null
-                    var convDateTime = value.TryConvertTo<DateTime>();
-                    if (convDateTime == false) ThrowTypeException(value, typeof(DateTime), PropertyType.Alias);
-                    return convDateTime.Result;
-            }
-
-            return value;
-        }
-
-        private static void ThrowTypeException(object value, Type expected, string alias)
-        {
-            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
         }
 
         /// <summary>
@@ -444,7 +393,7 @@ namespace Umbraco.Core.Models
         /// <returns>True is property value is valid, otherwise false</returns>
         private bool IsValidValue(object value)
         {
-            return PropertyType.IsValidPropertyValue(value);
+            return PropertyType.IsPropertyValueValid(value);
         }
 
         public override object DeepClone()

@@ -16,6 +16,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class JsonValueConverter : PropertyValueConverterBase
     {
+        private readonly PropertyEditorCollection _propertyEditors;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonValueConverter"/> class.
+        /// </summary>
+        public JsonValueConverter(PropertyEditorCollection propertyEditors)
+        {
+            _propertyEditors = propertyEditors;
+        }
+
         /// <summary>
         /// It is a converter for any value type that is "JSON"
         /// </summary>
@@ -23,9 +33,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// <returns></returns>
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            var propertyEditor = Current.PropertyEditors[propertyType.EditorAlias]; // fixme inject!
-            if (propertyEditor == null) return false;
-            return propertyEditor.ValueEditor.ValueType.InvariantEquals(ValueTypes.Json);
+            return _propertyEditors.TryGet(propertyType.EditorAlias, out var editor)
+                   && editor.ValueEditor.ValueType.InvariantEquals(ValueTypes.Json);
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models
     {
         private static PropertySelectors _selectors;
 
-        private readonly bool _isExplicitDbType;
+        private readonly bool _forceValueStorageType;
         private string _name;
         private string _alias;
         private string _description;
@@ -31,6 +31,9 @@ namespace Umbraco.Core.Models
         private string _validationRegExp;
         private ContentVariation _variations;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// </summary>
         public PropertyType(IDataType dataType)
         {
             if (dataType == null) throw new ArgumentNullException(nameof(dataType));
@@ -52,43 +55,31 @@ namespace Umbraco.Core.Models
             _alias = SanitizeAlias(propertyTypeAlias);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// </summary>
         public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType)
             : this(propertyEditorAlias, valueStorageType, false)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
+        /// </summary>
         public PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
             : this(propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
         { }
 
-        // fixme - need to explain and understand this explicitDbType thing here
-
         /// <summary>
-        /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
+        /// Initializes a new instance of the <see cref="PropertyType"/> class.
         /// </summary>
-        /// <param name="propertyEditorAlias"></param>
-        /// <param name="valueStorageType"></param>
-        /// <param name="isExplicitDbType"></param>
-        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool isExplicitDbType)
+        /// <remarks>Set <paramref name="forceValueStorageType"/> to true to force the value storage type. Values assigned to
+        /// the property, eg from the underlying datatype, will be ignored.</remarks>
+        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string propertyTypeAlias = null)
         {
-            _isExplicitDbType = isExplicitDbType;
             _propertyEditorAlias = propertyEditorAlias;
             _valueStorageType = valueStorageType;
-            _variations = ContentVariation.InvariantNeutral;
-        }
-
-        /// <summary>
-        /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
-        /// </summary>
-        /// <param name="propertyEditorAlias"></param>
-        /// <param name="valueStorageType"></param>
-        /// <param name="isExplicitDbType"></param>
-        /// <param name="propertyTypeAlias"></param>
-        internal PropertyType(string propertyEditorAlias, ValueStorageType valueStorageType, bool isExplicitDbType, string propertyTypeAlias)
-        {
-            _isExplicitDbType = isExplicitDbType;
-            _propertyEditorAlias = propertyEditorAlias;
-            _valueStorageType = valueStorageType;
-            _alias = SanitizeAlias(propertyTypeAlias);
+            _forceValueStorageType = forceValueStorageType;
+            _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
             _variations = ContentVariation.InvariantNeutral;
         }
 
@@ -173,8 +164,7 @@ namespace Umbraco.Core.Models
             get => _valueStorageType;
             set
             {
-                //don't allow setting this if an explicit declaration has been made in the ctor
-                if (_isExplicitDbType) return;
+                if (_forceValueStorageType) return; // ignore changes
                 SetPropertyValueAndDetectChanges(value, ref _valueStorageType, Selectors.ValueStorageType);
             }
         }
@@ -211,7 +201,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the regular expression for validation of legacy DataTypes fixme??
+        /// Gets or sets the regular expression validating the property values.
         /// </summary>
         [DataMember]
         public string ValidationRegExp
@@ -273,93 +263,160 @@ namespace Umbraco.Core.Models
         /// <para>If the value is of the expected type, it can be directly assigned to the property.
         /// Otherwise, some conversion is required.</para>
         /// </remarks>
-        public bool IsPropertyTypeValid(object value)
+        public bool IsOfExpectedPropertyType(object value)
         {
             // null values are assumed to be ok
             if (value == null)
                 return true;
 
             // check if the type of the value matches the type from the DataType/PropertyEditor
+            // then it can be directly assigned, anything else requires conversion
             var valueType = value.GetType();
-
-            //TODO Add PropertyEditor Type validation when its relevant to introduce
-            /*bool isEditorModel = value is IEditorModel;
-            if (isEditorModel && DataTypeControlId != Guid.Empty)
+            switch (ValueStorageType)
             {
-                //Find PropertyEditor by Id
-                var propertyEditor = PropertyEditorResolver.Current.GetById(DataTypeControlId);
+                case ValueStorageType.Integer:
+                    return valueType == typeof(int);
+                case ValueStorageType.Decimal:
+                    return valueType == typeof(decimal);
+                case ValueStorageType.Date:
+                    return valueType == typeof(DateTime);
+                case ValueStorageType.Nvarchar:
+                    return valueType == typeof(string);
+                case ValueStorageType.Ntext:
+                    return valueType == typeof(string);
+                default:
+                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
+            }
+        }
 
-                if (propertyEditor == null)
-                    return false;//Throw exception instead?
+        /// <summary>
+        /// Determines whether a value can be assigned to a property.
+        /// </summary>
+        public bool IsValueAssignable(object value) => TryConvertAssignedValue(value, false, out _);
 
-                //Get the generic parameter of the PropertyEditor and check it against the type of the passed in (object) value
-                Type argument = propertyEditor.GetType().BaseType.GetGenericArguments()[0];
-                return argument == type;
-            }*/
+        /// <summary>
+        /// Converts a value assigned to a property.
+        /// </summary>
+        /// <remarks>
+        /// <para>The input value can be pretty much anything, and is converted to the actual Clr type
+        /// expected by the property (eg an integer if the property values are integers).</para>
+        /// <para>Throws if the value cannot be converted.</para>
+        /// </remarks>
+        public object ConvertAssignedValue(object value) => TryConvertAssignedValue(value, true, out var converted) ? converted : null;
 
-            if (PropertyEditorAlias.IsNullOrWhiteSpace() == false) // fixme - always true?
+        /// <summary>
+        /// Tries to convert a value assigned to a property.
+        /// </summary>
+        /// <remarks>
+        /// <para></para>
+        /// </remarks>
+        public bool TryConvertAssignedValue(object value, out object converted) => TryConvertAssignedValue(value, false, out converted);
+
+        private bool TryConvertAssignedValue(object value, bool throwOnError, out object converted)
+        {
+            var isOfExpectedType = IsOfExpectedPropertyType(value);
+            if (isOfExpectedType)
             {
-                // simple validation using the DatabaseType from the DataTypeDefinition
-                // and the Type of the passed in value
-                switch (ValueStorageType)
-                {
-                    // fixme breaking!
-                    case ValueStorageType.Integer:
-                        return valueType == typeof(int);
-                    case ValueStorageType.Decimal:
-                        return valueType == typeof(decimal);
-                    case ValueStorageType.Date:
-                        return valueType == typeof(DateTime);
-                    case ValueStorageType.Nvarchar:
-                        return valueType == typeof(string);
-                    case ValueStorageType.Ntext:
-                        return valueType == typeof(string);
-                }
+                converted = value;
+                return true;
             }
 
-            // fixme - never reached + makes no sense?
-            // fallback for simple value types when no Control Id or Database Type is set
-            if (valueType.IsPrimitive || value is string)
-                return true;
+            // isOfExpectedType is true if value is null - so if false, value is *not* null
+            // "garbage-in", accept what we can & convert
+            // throw only if conversion is not possible
 
-            return false;
+            var s = value.ToString();
+            converted = null;
+
+            switch (ValueStorageType)
+            {
+                case ValueStorageType.Nvarchar:
+                case ValueStorageType.Ntext:
+                {
+                    converted = s;
+                    return true;
+                }
+
+                case ValueStorageType.Integer:
+                    if (s.IsNullOrWhiteSpace())
+                        return true; // assume empty means null
+                    var convInt = value.TryConvertTo<int>();
+                    if (convInt)
+                    {
+                        converted = convInt.Result;
+                        return true;
+                    }
+                    if (throwOnError)
+                        ThrowTypeException(value, typeof(int), Alias);
+                    return false;
+
+                case ValueStorageType.Decimal:
+                    if (s.IsNullOrWhiteSpace())
+                        return true; // assume empty means null
+                    var convDecimal = value.TryConvertTo<decimal>();
+                    if (convDecimal)
+                    {
+                        // need to normalize the value (change the scaling factor and remove trailing zeroes)
+                        // because the underlying database is going to mess with the scaling factor anyways.
+                        converted = convDecimal.Result.Normalize();
+                        return true;
+                    }
+                    if (throwOnError)
+                        ThrowTypeException(value, typeof(decimal), Alias);
+                    return false;
+
+                case ValueStorageType.Date:
+                    if (s.IsNullOrWhiteSpace())
+                        return true; // assume empty means null
+                    var convDateTime = value.TryConvertTo<DateTime>();
+                    if (convDateTime)
+                    {
+                        converted = convDateTime.Result;
+                        return true;
+                    }
+                    if (throwOnError)
+                        ThrowTypeException(value, typeof(DateTime), Alias);
+                    return false;
+
+                default:
+                    throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
+            }
+        }
+
+        private static void ThrowTypeException(object value, Type expected, string alias)
+        {
+            throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
         }
 
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
-        public bool IsValidPropertyValue(object value)
+        public bool IsPropertyValueValid(object value)
         {
-            //If the Property is mandatory and value is null or empty, return false as the validation failed
-            if (Mandatory && (value == null || string.IsNullOrEmpty(value.ToString())))
+            var stringValue = Mandatory || !string.IsNullOrWhiteSpace(ValidationRegExp)
+                ? value?.ToString()
+                : null;
+
+            // validate mandatory property value
+            if (Mandatory && string.IsNullOrWhiteSpace(stringValue))
                 return false;
 
-            //Check against Regular Expression for Legacy DataTypes - Validation exists and value is not null:
-            if(string.IsNullOrEmpty(ValidationRegExp) == false && (value != null && string.IsNullOrEmpty(value.ToString()) == false))
+            // validate regular expression if appropriate (have a regex and a string value)
+            if (!string.IsNullOrWhiteSpace(ValidationRegExp) && !string.IsNullOrWhiteSpace(stringValue))
             {
                 try
                 {
-                    var regexPattern = new Regex(ValidationRegExp);
-                    return regexPattern.IsMatch(value.ToString());
+                    return new Regex(ValidationRegExp).IsMatch(stringValue);
                 }
                 catch
                 {
-                         throw new Exception($"Invalid validation expression on property {Alias}");
+                    throw new Exception($"Invalid validation expression on property {Alias}.");
                 }
-
             }
 
-            //TODO: We must ensure that the property value can actually be saved based on the specified database type
-
-            //TODO Add PropertyEditor validation when its relevant to introduce
-            /*if (value is IEditorModel && DataTypeControlId != Guid.Empty)
-            {
-                //Find PropertyEditor by Id
-                var propertyEditor = PropertyEditorResolver.Current.GetById(DataTypeControlId);
-
-                //TODO Get the validation from the PropertyEditor if a validation attribute exists
-                //Will probably need to reflect the PropertyEditor in order to apply the validation
-            }*/
+            // fixme - todo
+            // ensure that the property value complies with the value storage type, ie can be saved
+            // plug PropertyEditor validation - when it's a thing
 
             return true;
         }

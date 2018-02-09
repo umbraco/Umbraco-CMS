@@ -757,6 +757,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             using (_contentStore.GetWriter(_scopeProvider))
             using (_mediaStore.GetWriter(_scopeProvider))
             {
+                // fixme - datatype lock
+                // this is triggering datatypes reload in the factory, and right after we create some
+                // content types by loading them ... there's a race condition here, which would require
+                // some locking on datatypes
+                _publishedContentTypeFactory.NotifyDataTypeChanges(idsA);
+
                 if (!(_serviceContext.ContentService is ContentService))
                     throw new Exception("oops");
 

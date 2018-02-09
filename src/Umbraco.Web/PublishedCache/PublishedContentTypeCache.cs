@@ -41,6 +41,8 @@ namespace Umbraco.Web.PublishedCache
             _publishedContentTypeFactory = publishedContentTypeFactory;
         }
 
+        // note: cache clearing is performed by XmlStore
+
         /// <summary>
         /// Clears all cached content types.
         /// </summary>

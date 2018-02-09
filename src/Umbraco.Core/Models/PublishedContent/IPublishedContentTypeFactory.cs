@@ -38,7 +38,10 @@
         /// <summary>
         /// Notifies the factory of datatype changes.
         /// </summary>
-        /// <remarks>This is so the factory can flush its caches.</remarks>
-        void NotifyDataTypeChanges(); // fixme never invoked!
+        /// <remarks>
+        /// <para>This is so the factory can flush its caches.</para>
+        /// <para>Invoked by the IPublishedSnapshotService.</para>
+        /// </remarks>
+        void NotifyDataTypeChanges(int[] ids);
     }
 }

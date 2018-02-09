@@ -22,6 +22,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     {
         private readonly XmlStore _xmlStore;
         private readonly RoutesCache _routesCache;
+        private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly IDomainService _domainService;
         private readonly IMemberService _memberService;
@@ -77,6 +78,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             : base(publishedSnapshotAccessor)
         {
             _routesCache = new RoutesCache();
+            _publishedContentTypeFactory = publishedContentTypeFactory;
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
 
@@ -234,6 +236,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
+            _publishedContentTypeFactory.NotifyDataTypeChanges(payloads.Select(x => x.Id).ToArray());
             _xmlStore.Notify(payloads);
         }
 
