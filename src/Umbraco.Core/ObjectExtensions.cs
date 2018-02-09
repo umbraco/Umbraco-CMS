@@ -143,6 +143,7 @@ namespace Umbraco.Core
                         var inputString = input as string;
                         if (inputString != null)
                         {
+                            //TODO: Why the check against only bool/date when a string is null/empty? In what scenario can we convert to another type when the string is null or empty other than just being null?
                             if (string.IsNullOrEmpty(inputString) && (underlying == typeof(DateTime) || underlying == typeof(bool)))
                             {
                                 return Attempt<object>.Succeed(null);
@@ -206,6 +207,14 @@ namespace Umbraco.Core
                 if (outputConverter != null)
                 {
                     return Attempt.Succeed(outputConverter.ConvertFrom(input));
+                }
+
+                if (target.IsGenericType && GetCachedGenericNullableType(target) != null)
+                {
+                    // cannot Convert.ChangeType as that does not work with nullable
+                    // input has already been converted to the underlying type - just
+                    // return input, there's an implicit conversion from T to T? anyways
+                    return Attempt.Succeed(input);
                 }
 
                 // Re-check convertables since we altered the input through recursion
