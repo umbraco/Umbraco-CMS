@@ -20,11 +20,5 @@ namespace Umbraco.Web.Features
         /// Gets the disabled controllers.
         /// </summary>
         public TypeList<UmbracoApiControllerBase> Controllers { get; private set; }
-
-        /// <summary>
-        /// Specifies if rendering pipeline should ignore HasTemplate check when handling a request.
-        /// <remarks>This is to allow JSON preview of content with no template set.</remarks>
-        /// </summary>
-        public bool AllowRenderWithoutTemplate { get; set; }
     }
 }
