@@ -152,9 +152,11 @@
       $scope.content.apps[0].active = true;
 
       // create new editor for split view
-      var editor = {};
-      editor.content = $scope.content;
-      $scope.editors.push(editor);
+      if($scope.editors.length === 0) {
+        var editor = {};
+        editor.content = $scope.content;
+        $scope.editors.push(editor);
+      }
 
     }
 
