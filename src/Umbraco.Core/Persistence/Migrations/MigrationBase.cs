@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
+using Umbraco.Core.Persistence.Migrations.Syntax.Check;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete;
 using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
@@ -43,6 +44,11 @@ namespace Umbraco.Core.Persistence.Migrations
         public IAlterSyntaxBuilder Alter
         {
             get { return new AlterSyntaxBuilder(Context, SqlSyntax); }
+        }
+
+        public ICheckBuilder Check
+        {
+            get { return new CheckBuilder(Context, SqlSyntax); }
         }
 
         public ICreateBuilder Create
