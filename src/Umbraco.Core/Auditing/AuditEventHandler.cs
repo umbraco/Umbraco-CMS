@@ -79,7 +79,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     0, null,
-                    "umbraco/member", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, removed {roles}");
+                    "umbraco/member/roles/removed", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, removed {roles}");
             }
         }
 
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     0, null,
-                    "umbraco/member", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, assigned {roles}");
+                    "umbraco/member/roles/assigned", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, assigned {roles}");
             }
         }
 
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user", $"save group id:{group.Id}:{group.Alias} \"{group.Name}\", updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}, sections: {sections}, perms: {perms}");
+                    "umbraco/user-group/save", $"save group id:{group.Id}:{group.Alias} \"{group.Name}\", updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}, sections: {sections}, perms: {perms}");
             }
         }
 
@@ -129,7 +129,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user", $"assign group {(perm.IsDefaultPermissions ? "default " : "")}perms id:{group.Id}:{group.Alias} \"{group.Name}\", assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
+                    "umbraco/user-group/permissions-change", $"assign group {(perm.IsDefaultPermissions ? "default " : "")}perms id:{group.Id}:{group.Alias} \"{group.Name}\", assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
             }
         }
 
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     0, null,
-                    "umbraco/member", $"save member id:{member.Id} \"{member.Name}\" <{member.Email}>, updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
+                    "umbraco/member/save", $"save member id:{member.Id} \"{member.Name}\" <{member.Email}>, updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
             }
         }
 
@@ -158,7 +158,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     0, null,
-                    "umbraco/member", $"delete member id:{member.Id} \"{member.Name}\" <{member.Email}>");
+                    "umbraco/member/delete", $"delete member id:{member.Id} \"{member.Name}\" <{member.Email}>");
             }
         }
 
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user", $"save user{(sections == null ? "" : (", sections: " + sections))}{(groups == null ? "" : (", groups: " + groups))}");
+                    "umbraco/user/save", $"save user{(sections == null ? "" : (", sections: " + sections))}{(groups == null ? "" : (", groups: " + groups))}");
             }
         }
 
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
                     DateTime.Now,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user", "delete user");
+                    "umbraco/user/delete", "delete user");
         }
 
         private void OnLoginSuccess(object sender, EventArgs args)
@@ -198,10 +198,11 @@ namespace Umbraco.Core.Auditing
             if (args is IdentityAuditEventArgs identityArgs)
             {
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user", "login success");
+                    "umbraco/user/login/success", "login success");
             }
         }
 
@@ -210,10 +211,11 @@ namespace Umbraco.Core.Auditing
             if (args is IdentityAuditEventArgs identityArgs)
             {
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user", "logout success");
+                    "umbraco/user/logout/success", "logout success");
             }
         }
 
@@ -221,12 +223,15 @@ namespace Umbraco.Core.Auditing
         {
             if (args is IdentityAuditEventArgs identityArgs)
             {
+                if (identityArgs.PerformingUser < 0) return;
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
+                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user", "password reset");
+                    "umbraco/user/password/reset", "password reset");
             }
         }
 
@@ -234,12 +239,15 @@ namespace Umbraco.Core.Auditing
         {
             if (args is IdentityAuditEventArgs identityArgs)
             {
+                if (identityArgs.PerformingUser < 0) return;
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
+                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user", "password change");
+                    "umbraco/user/password/change", "password change");
             }
         }
 
@@ -247,11 +255,13 @@ namespace Umbraco.Core.Auditing
         {
             if (args is IdentityAuditEventArgs identityArgs)
             {
+                if (identityArgs.PerformingUser < 0) return;
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user", "login failed");
+                    "umbraco/user/login/failed", "login failed");
             }
         }
 
@@ -260,11 +270,13 @@ namespace Umbraco.Core.Auditing
             if (args is IdentityAuditEventArgs identityArgs)
             {
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
+                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user", "password forgot/change");
+                    "umbraco/user/password/forgot/change", "password forgot/change");
             }
         }
 
@@ -272,12 +284,15 @@ namespace Umbraco.Core.Auditing
         {
             if (args is IdentityAuditEventArgs identityArgs)
             {
+                if (identityArgs.PerformingUser < 0) return;
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
+                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
+                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user", "password forgot/request");
+                    "umbraco/user/password/forgot/request", "password forgot/request");
             }
         }
     }

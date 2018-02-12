@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Security;
@@ -63,6 +64,13 @@ namespace Umbraco.Core.Auditing
                 : performingUser;
         }
 
+        /// <summary>
+        /// Creates an instance without a performing user (the id will be set to -1)
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="ipAddress"></param>
+        /// <param name="username"></param>
+        /// <param name="comment"></param>
         public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment)
         {
             DateTimeUtc = DateTime.UtcNow;
@@ -71,6 +79,22 @@ namespace Umbraco.Core.Auditing
             IpAddress = ipAddress;
             Username = username;
             Comment = comment;
+
+            PerformingUser = -1;
+        }
+
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment, int performingUser)
+        {
+            DateTimeUtc = DateTime.UtcNow;
+            Action = action;
+
+            IpAddress = ipAddress;
+            Username = username;
+            Comment = comment;
+
+            PerformingUser = performingUser == -1
+                ? GetCurrentRequestBackofficeUserId()
+                : performingUser;
         }
 
         /// <summary>
