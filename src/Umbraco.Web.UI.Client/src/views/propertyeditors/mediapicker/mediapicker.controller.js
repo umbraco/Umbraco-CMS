@@ -136,6 +136,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
        };
 
        $scope.sortableOptions = {
+           items: "li:not(.unsortable)",
+           cancel: ".unsortable",
            update: function(e, ui) {
                var r = [];
                //TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
