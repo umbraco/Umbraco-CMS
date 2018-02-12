@@ -70,7 +70,11 @@ namespace Umbraco.Core.Services
         /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
         /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
         /// <param name="eventType">
-        /// The type of the audited event - must contain only alphanumeric chars, hyphens and at least one '/' defining categories
+        /// The type of the audited event - must contain only alphanumeric chars and hyphens with forward slashes separating categories.
+        /// <example>
+        /// The eventType will generally be formatted like: {application}/{entity-type}/{category}/{sub-category}
+        /// Example: umbraco/user/sign-in/failed
+        /// </example>
         /// </param>
         /// <param name="eventDetails">Free-form details about the audited event.</param>
         IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDate, int affectedUserId, string affectedDetails, string eventType, string eventDetails);
