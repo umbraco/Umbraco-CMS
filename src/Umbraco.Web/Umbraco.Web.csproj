@@ -329,6 +329,7 @@
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
+    <Compile Include="Features\EnabledFeatures.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="TourFilterResolver.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
