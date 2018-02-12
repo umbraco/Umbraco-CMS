@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Table;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
 {
@@ -13,6 +14,11 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             _context = context;
             _sqlSyntax = sqlSyntax;
             _databaseProviders = databaseProviders;
+        }
+
+        public ICheckTableOptionSyntax Table(string name)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
