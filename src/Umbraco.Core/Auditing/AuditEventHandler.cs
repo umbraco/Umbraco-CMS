@@ -202,7 +202,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user/login/success", "login success");
+                    "umbraco/user/sign-in/login", "login success");
             }
         }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user/logout/success", "logout success");
+                    "umbraco/user/sign-in/logout", "logout success");
             }
         }
 
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Auditing
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
-                    "umbraco/user/login/failed", "login failed");
+                    "umbraco/user/sign-in/failed", "login failed");
             }
         }
 
