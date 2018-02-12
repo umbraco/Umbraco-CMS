@@ -6,14 +6,6 @@ namespace Umbraco.Web.Features
     internal class EnabledFeatures
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EnabledFeatures"/> class.
-        /// </summary>
-        public EnabledFeatures()
-        {
-
-        }
-
-        /// <summary>
         /// Specifies if rendering pipeline should ignore HasTemplate check when handling a request.
         /// <remarks>This is to allow JSON preview of content with no template set.</remarks>
         /// </summary>
