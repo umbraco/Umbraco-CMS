@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models.EntityBase
                 : _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
         }
 
-        internal virtual IEnumerable<string> GetWereDirtyProperties()
+        internal virtual IEnumerable<string> GetPreviouslyDirtyProperties()
         {
             return _lastPropertyChangedInfo == null
                 ? Enumerable.Empty<string>()

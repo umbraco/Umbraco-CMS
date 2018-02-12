@@ -28,10 +28,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
-                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))                
-                .ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
+                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
+                //.ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
+                .ForMember(dest => dest.Permissions, map => map.Ignore())
                 .AfterMap((save, userGroup) =>
                 {
+                    userGroup.Permissions = save.DefaultPermissions;
+
                     userGroup.ClearAllowedSections();
                     foreach (var section in save.Sections)
                     {

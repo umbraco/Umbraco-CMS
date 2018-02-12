@@ -120,6 +120,10 @@ namespace Umbraco.Core.Services
             if (string.IsNullOrWhiteSpace(eventType)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
             if (string.IsNullOrWhiteSpace(eventDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
 
+            //we need to truncate the data else we'll get SQL errors
+            affectedDetails = affectedDetails?.Substring(0, Math.Min(affectedDetails.Length, 1024));
+            eventDetails = eventDetails.Substring(0, Math.Min(eventDetails.Length, 1024));
+
             //validate the eventType - must contain a forward slash, no spaces, no special chars
             var eventTypeParts = eventType.ToCharArray();
             if (eventTypeParts.Contains('/') == false || eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)

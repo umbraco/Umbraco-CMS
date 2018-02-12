@@ -22,7 +22,7 @@ namespace Umbraco.Core.Auditing
             {
                 var identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
                 return identity == null
-                    ? new User { Id = 0, Name = "(no user)", Email = "" }
+                    ? new User { Id = 0, Name = "SYSTEM", Email = "" }
                     : _userServiceInstance.GetUserById(Convert.ToInt32(identity.Id));
             }
         }
@@ -68,6 +68,16 @@ namespace Umbraco.Core.Auditing
             MemberService.RemovedRoles += OnRemovedRoles;
         }
 
+        private string FormatEmail(IMember member)
+        {
+            return member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? "" : $"<{member.Email}>";
+        }
+
+        private string FormatEmail(IUser user)
+        {
+            return user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
+        }
+
         private void OnRemovedRoles(IMemberService sender, RolesEventArgs args)
         {
             var performingUser = PerformingUser;
@@ -76,10 +86,10 @@ namespace Umbraco.Core.Auditing
             foreach (var id in args.MemberIds)
             {
                 members.TryGetValue(id, out var member);
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    0, null,
-                    "umbraco/member/roles/removed", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, removed {roles}");
+                    -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                    "umbraco/member/roles/removed", $"roles modified, removed {roles}");
             }
         }
 
@@ -91,10 +101,10 @@ namespace Umbraco.Core.Auditing
             foreach (var id in args.MemberIds)
             {
                 members.TryGetValue(id, out var member);
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    0, null,
-                    "umbraco/member/roles/assigned", $"modified roles for member id:{id} \"{member?.Name ?? "(unknown)"}\" <{member?.Email ?? ""}>, assigned {roles}");
+                    -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                    "umbraco/member/roles/assigned", $"roles modified, assigned {roles}");
             }
         }
 
@@ -104,15 +114,18 @@ namespace Umbraco.Core.Auditing
             var groups = saveEventArgs.SavedEntities;
             foreach (var group in groups)
             {
-                //var dp = string.Join(", ", member.Properties.Where(x => x.WasDirty()).Select(x => x.Alias));
-                var dp = string.Join(", ", ((UserGroup) group).GetWereDirtyProperties());
-                var sections = string.Join(", ", group.AllowedSections);
-                var perms = string.Join(", ", group.Permissions);
+                var dp = string.Join(", ", ((UserGroup) group).GetPreviouslyDirtyProperties());
+                var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
+                    ? string.Join(", ", group.AllowedSections)
+                    : null;
+                var perms = ((UserGroup)group).WasPropertyDirty("Permissions")
+                    ? string.Join(", ", group.Permissions)
+                    : null;
 
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    0, null,
-                    "umbraco/user-group/save", $"save group id:{group.Id}:{group.Alias} \"{group.Name}\", updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}, sections: {sections}, perms: {perms}");
+                    -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                    "umbraco/user-group/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)};{(sections == null ? "" : $", assigned sections: {sections}")}{(perms == null ? "" : $", assigned perms: {perms}")}");
             }
         }
 
@@ -126,10 +139,10 @@ namespace Umbraco.Core.Auditing
                 var assigned = string.Join(", ", perm.AssignedPermissions);
                 var entity = _entityServiceInstance.Get(perm.EntityId);
 
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    0, null,
-                    "umbraco/user-group/permissions-change", $"assign group {(perm.IsDefaultPermissions ? "default " : "")}perms id:{group.Id}:{group.Alias} \"{group.Name}\", assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
+                    -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                    "umbraco/user-group/permissions-change", $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
             }
         }
 
@@ -139,13 +152,12 @@ namespace Umbraco.Core.Auditing
             var members = saveEventArgs.SavedEntities;
             foreach (var member in members)
             {
-                //var dp = string.Join(", ", member.Properties.Where(x => x.WasDirty()).Select(x => x.Alias));
-                var dp = string.Join(", ", ((Member) member).GetWereDirtyProperties());
+                var dp = string.Join(", ", ((Member) member).GetPreviouslyDirtyProperties());
 
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    0, null,
-                    "umbraco/member/save", $"save member id:{member.Id} \"{member.Name}\" <{member.Email}>, updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
+                    -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                    "umbraco/member/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
             }
         }
 
@@ -155,10 +167,10 @@ namespace Umbraco.Core.Auditing
             var members = deleteEventArgs.DeletedEntities;
             foreach (var member in members)
             {
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    0, null,
-                    "umbraco/member/delete", $"delete member id:{member.Id} \"{member.Name}\" <{member.Email}>");
+                    -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                    "umbraco/member/delete", $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
             }
         }
 
@@ -168,17 +180,16 @@ namespace Umbraco.Core.Auditing
             var affectedUsers = saveEventArgs.SavedEntities;
             foreach (var affectedUser in affectedUsers)
             {
-                var sections = affectedUser.WasPropertyDirty("AllowedSections")
-                    ? string.Join(", ", affectedUser.AllowedSections)
-                    : null;
                 var groups = affectedUser.WasPropertyDirty("Groups")
                     ? string.Join(", ", affectedUser.Groups.Select(x => x.Alias))
                     : null;
 
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                var dp = string.Join(", ", ((User)affectedUser).GetPreviouslyDirtyProperties());
+
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
-                    "umbraco/user/save", $"save user{(sections == null ? "" : (", sections: " + sections))}{(groups == null ? "" : (", groups: " + groups))}");
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+                    "umbraco/user/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? "" : "; groups assigned: " + groups)}");
             }
         }
 
@@ -187,9 +198,9 @@ namespace Umbraco.Core.Auditing
             var performingUser = PerformingUser;
             var affectedUsers = deleteEventArgs.DeletedEntities;
             foreach (var affectedUser in affectedUsers)
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", PerformingIp,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/delete", "delete user");
         }
 
@@ -199,7 +210,7 @@ namespace Umbraco.Core.Auditing
             {
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
                     "umbraco/user/sign-in/login", "login success");
@@ -212,7 +223,7 @@ namespace Umbraco.Core.Auditing
             {
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
                     "umbraco/user/sign-in/logout", "logout success");
@@ -228,9 +239,9 @@ namespace Umbraco.Core.Auditing
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
                 if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/password/reset", "password reset");
             }
         }
@@ -244,9 +255,9 @@ namespace Umbraco.Core.Auditing
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
                 if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/password/change", "password change");
             }
         }
@@ -258,7 +269,7 @@ namespace Umbraco.Core.Auditing
                 if (identityArgs.PerformingUser < 0) return;
                 var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
                     0, null,
                     "umbraco/user/sign-in/failed", "login failed");
@@ -273,9 +284,9 @@ namespace Umbraco.Core.Auditing
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
                 if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/password/forgot/change", "password forgot/change");
             }
         }
@@ -289,9 +300,9 @@ namespace Umbraco.Core.Auditing
                 if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
                 var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
                 if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" <{performingUser.Email}>", identityArgs.IpAddress,
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" <{affectedUser.Email}>",
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/password/forgot/request", "password forgot/request");
             }
         }

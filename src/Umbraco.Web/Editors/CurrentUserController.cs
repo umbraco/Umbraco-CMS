@@ -144,14 +144,11 @@ namespace Umbraco.Web.Editors
             {
                 var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
 
-                //raise the appropriate event
+                //raise the reset event
+                //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
                 if (data.Reset.HasValue && data.Reset.Value)
                 {
                     userMgr.RaisePasswordResetEvent(Security.CurrentUser.Id);
-                }
-                else
-                {
-                    userMgr.RaisePasswordChangedEvent(Security.CurrentUser.Id);
                 }
 
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
