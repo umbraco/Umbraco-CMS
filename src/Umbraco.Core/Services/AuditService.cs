@@ -115,6 +115,16 @@ namespace Umbraco.Core.Services
         /// <inheritdoc />
         public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDate, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
         {
+            if (performingUserId < 0) throw new ArgumentOutOfRangeException(nameof(performingUserId));
+            if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
+            if (string.IsNullOrWhiteSpace(eventType)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
+            if (string.IsNullOrWhiteSpace(eventDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
+
+            //validate the eventType - must contain a forward slash, no spaces, no special chars
+            var eventTypeParts = eventType.ToCharArray();
+            if (eventTypeParts.Contains('/') == false || eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)
+                throw new ArgumentException(nameof(eventType) + " must contain only alphanumeric characters, hyphens and at least one '/' defining a category");
+
             var entry = new AuditEntry
             {
                 PerformingUserId = performingUserId,

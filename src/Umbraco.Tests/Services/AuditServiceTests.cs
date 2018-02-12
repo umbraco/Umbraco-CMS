@@ -18,13 +18,13 @@ namespace Umbraco.Tests.Services
             Database.Mapper = new PetaPocoMapper();
 
             var yesterday = DateTime.Now.AddDays(-1);
-            var entry = ServiceContext.AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "user-admin", "change property whatever value");
+            var entry = ServiceContext.AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             Assert.AreEqual(123, entry.PerformingUserId);
             Assert.AreEqual("user 123, bob@example.com", entry.PerformingDetails);
             Assert.AreEqual(yesterday, entry.EventDate);
             Assert.AreEqual(456, entry.AffectedUserId);
             Assert.AreEqual("user 456, alice@example.com", entry.AffectedDetails);
-            Assert.AreEqual("user-admin", entry.EventType);
+            Assert.AreEqual("umbraco/user", entry.EventType);
             Assert.AreEqual("change property whatever value", entry.EventDetails);
 
             var entries = ServiceContext.AuditService.Get().ToArray();
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 10; i++)
             {
                 yesterday = yesterday.AddMinutes(1);
-                entry = ServiceContext.AuditService.Write(123 + i, "user 123, bob@example.com", null, yesterday, 456 + i, "user 456, alice@example.com", "user-admin", "change property whatever value");
+                entry = ServiceContext.AuditService.Write(123 + i, "user 123, bob@example.com", null, yesterday, 456 + i, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             }
 
             //
