@@ -149,8 +149,8 @@ namespace Umbraco.Core.Services
             return entry;
         }
 
-        /// <inheritdoc />
-        public IEnumerable<IAuditEntry> Get()
+        //TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
+        internal IEnumerable<IAuditEntry> GetAll()
         {
             if (_isAvailable.Value == false) return Enumerable.Empty<IAuditEntry>();
 
@@ -161,8 +161,8 @@ namespace Umbraco.Core.Services
             }
         }
 
-        /// <inheritdoc />
-        public IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
+        //TODO: Currently used in testing only, not part of the interface, need to add queryable methods to the interface instead
+        internal IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
         {
             if (_isAvailable.Value == false)
             {

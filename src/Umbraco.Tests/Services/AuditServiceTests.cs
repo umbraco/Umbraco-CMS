@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("umbraco/user", entry.EventType);
             Assert.AreEqual("change property whatever value", entry.EventDetails);
 
-            var entries = ServiceContext.AuditService.Get().ToArray();
+            var entries = ((AuditService)ServiceContext.AuditService).GetAll().ToArray();
             Assert.IsNotNull(entries);
             Assert.AreEqual(1, entries.Length);
             Assert.AreEqual(123, entries[0].PerformingUserId);
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Services
             // page 2 contains 123+5, 123+4
             // ...
 
-            entries = ServiceContext.AuditService.GetPage(2, 2, out var count).ToArray();
+            entries = ((AuditService)ServiceContext.AuditService).GetPage(2, 2, out var count).ToArray();
 
             Assert.AreEqual(2, entries.Length);
 

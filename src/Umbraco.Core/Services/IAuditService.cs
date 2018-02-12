@@ -78,16 +78,6 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="eventDetails">Free-form details about the audited event.</param>
         IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDate, int affectedUserId, string affectedDetails, string eventType, string eventDetails);
-
-        /// <summary>
-        /// Retrieves audit entries.
-        /// </summary>
-        IEnumerable<IAuditEntry> Get(); // fixme missing querying options
-
-        /// <summary>
-        /// Retrieves audit entries.
-        /// </summary>
-        /// <remarks>Entries are ordered by event date, most recent first.</remarks>
-        IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records); // fixme missing querying options
+        
     }
 }
