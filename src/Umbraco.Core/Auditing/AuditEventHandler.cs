@@ -16,7 +16,7 @@ namespace Umbraco.Core.Auditing
         private IUserService _userServiceInstance;
         private IEntityService _entityServiceInstance;
 
-        private IUser PerformingUser
+        private IUser CurrentPerformingUser
         {
             get
             {
@@ -25,6 +25,12 @@ namespace Umbraco.Core.Auditing
                     ? new User { Id = 0, Name = "SYSTEM", Email = "" }
                     : _userServiceInstance.GetUserById(Convert.ToInt32(identity.Id));
             }
+        }
+
+        private IUser GetPerformingUser(int userId)
+        {
+            var found = userId >= 0 ? _userServiceInstance.GetUserById(userId) : null;
+            return found ?? new User {Id = 0, Name = "SYSTEM", Email = ""};
         }
 
         private string PerformingIp
@@ -80,7 +86,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnRemovedRoles(IMemberService sender, RolesEventArgs args)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var roles = string.Join(", ", args.Roles);
             var members = sender.GetAllMembers(args.MemberIds).ToDictionary(x => x.Id, x => x);
             foreach (var id in args.MemberIds)
@@ -95,7 +101,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnAssignedRoles(IMemberService sender, RolesEventArgs args)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var roles = string.Join(", ", args.Roles);
             var members = sender.GetAllMembers(args.MemberIds).ToDictionary(x => x.Id, x => x);
             foreach (var id in args.MemberIds)
@@ -110,7 +116,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> saveEventArgs)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var groups = saveEventArgs.SavedEntities;
             foreach (var group in groups)
             {
@@ -131,7 +137,7 @@ namespace Umbraco.Core.Auditing
 
         private void UserGroupPermissionAssigned(IUserService sender, SaveEventArgs<EntityPermission> saveEventArgs)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var perms = saveEventArgs.SavedEntities;
             foreach (var perm in perms)
             {
@@ -148,7 +154,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnSavedMember(IMemberService sender, SaveEventArgs<IMember> saveEventArgs)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var members = saveEventArgs.SavedEntities;
             foreach (var member in members)
             {
@@ -163,7 +169,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnDeletedMember(IMemberService sender, DeleteEventArgs<IMember> deleteEventArgs)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var members = deleteEventArgs.DeletedEntities;
             foreach (var member in members)
             {
@@ -176,7 +182,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnSavedUser(IUserService sender, SaveEventArgs<IUser> saveEventArgs)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var affectedUsers = saveEventArgs.SavedEntities;
             foreach (var affectedUser in affectedUsers)
             {
@@ -195,7 +201,7 @@ namespace Umbraco.Core.Auditing
 
         private void OnDeletedUser(IUserService sender, DeleteEventArgs<IUser> deleteEventArgs)
         {
-            var performingUser = PerformingUser;
+            var performingUser = CurrentPerformingUser;
             var affectedUsers = deleteEventArgs.DeletedEntities;
             foreach (var affectedUser in affectedUsers)
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
@@ -208,11 +214,14 @@ namespace Umbraco.Core.Auditing
         {
             if (args is IdentityAuditEventArgs identityArgs)
             {
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
+                var performingUser = GetPerformingUser(identityArgs.PerformingUser);
+
+                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
+                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
+
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
-                    0, null,
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/sign-in/login", "login success");
             }
         }
@@ -221,11 +230,14 @@ namespace Umbraco.Core.Auditing
         {
             if (args is IdentityAuditEventArgs identityArgs)
             {
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
+                var performingUser = GetPerformingUser(identityArgs.PerformingUser);
+
+                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
+                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
+
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
                     DateTime.Now,
-                    0, null,
+                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/sign-in/logout", "logout success");
             }
         }
