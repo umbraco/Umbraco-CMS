@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Core.Events
 {
     public class RolesEventArgs : EventArgs
     {
