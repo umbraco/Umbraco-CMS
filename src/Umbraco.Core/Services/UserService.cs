@@ -942,6 +942,25 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                // we need to figure out which users have been added / removed, for audit purposes
+                var empty = new IUser[0];
+                var addedUsers = empty;
+                var removedUsers = empty;
+
+                if (userIds != null)
+                {
+                    var urepository = RepositoryFactory.CreateUserRepository(uow);
+
+                    var groupUsers = userGroup.HasIdentity ? urepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
+                    var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
+                    var groupIds = groupUsers.Select(x => x.Id).ToArray();
+
+                    var temp = userIds.Except(groupIds).Where(x => x > 0).ToArray();
+
+                    addedUsers = urepository.GetAll(userIds.Except(groupIds).ToArray()).Where(x => x.Id != 0).ToArray();
+                    removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
+                }
+
                 var saveEventArgs = new SaveEventArgs<IUserGroup>(userGroup);
                 if (raiseEvents && uow.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
                 {
@@ -958,6 +977,7 @@ namespace Umbraco.Core.Services
                 {
                     saveEventArgs.CanCancel = false;
                     uow.Events.Dispatch(SavedUserGroup, this, saveEventArgs);
+                    uow.Events.Dispatch(SavedUserGroupWithUsers, this, new SaveUserGroupWithUsersEventArgs(userGroup, addedUsers, removedUsers));
                 }
             }
         }
@@ -1294,6 +1314,11 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavedUserGroup;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IUserService, SaveUserGroupWithUsersEventArgs> SavedUserGroupWithUsers;
 
         /// <summary>
         /// Occurs before Delete

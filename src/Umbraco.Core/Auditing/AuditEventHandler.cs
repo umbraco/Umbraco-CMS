@@ -64,6 +64,7 @@ namespace Umbraco.Core.Auditing
             //BackOfficeUserManager.ResetAccessFailedCount += ;
 
             UserService.SavedUserGroup += OnSavedUserGroup;
+            UserService.SavedUserGroupWithUsers += OnSavedUserGroupWithUsers;
 
             UserService.SavedUser += OnSavedUser;
             UserService.DeletedUser += OnDeletedUser;
@@ -145,6 +146,56 @@ namespace Umbraco.Core.Auditing
                     -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
                     "umbraco/user-group/save", $"{sb}");
             }
+        }
+
+        private void OnSavedUserGroupWithUsers(IUserService sender, SaveUserGroupWithUsersEventArgs saveUserGroupWithUsersEventArgs)
+        {
+            var performingUser = CurrentPerformingUser;
+            var group = saveUserGroupWithUsersEventArgs.UserGroup;
+
+            if (saveUserGroupWithUsersEventArgs.RemovedUsers.Length == 0 && saveUserGroupWithUsersEventArgs.AddedUsers.Length == 0)
+                return;
+
+            var sb = new StringBuilder();
+            if (saveUserGroupWithUsersEventArgs.RemovedUsers.Length > 0)
+            {
+                sb.Append("Removed: ");
+                var first = true;
+                foreach (var user in saveUserGroupWithUsersEventArgs.RemovedUsers)
+                {
+                    if (first) first = false;
+                    else sb.Append(", ");
+                    sb.Append(user.Name);
+                    sb.Append(" [");
+                    sb.Append(user.Id);
+                    sb.Append("] <");
+                    sb.Append(user.Email);
+                    sb.Append(">");
+                }
+                sb.Append(". ");
+            }
+            if (saveUserGroupWithUsersEventArgs.AddedUsers.Length > 0)
+            {
+                sb.Append("Added: ");
+                var first = true;
+                foreach (var user in saveUserGroupWithUsersEventArgs.AddedUsers)
+                {
+                    if (first) first = false;
+                    else sb.Append(", ");
+                    sb.Append(user.Name);
+                    sb.Append(" [");
+                    sb.Append(user.Id);
+                    sb.Append("] <");
+                    sb.Append(user.Email);
+                    sb.Append(">");
+                }
+                sb.Append(". ");
+            }
+
+            _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
+                DateTime.Now,
+                -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                "umbraco/user-group/save", $"{sb}");
         }
 
         private void UserGroupPermissionAssigned(IUserService sender, SaveEventArgs<EntityPermission> saveEventArgs)
