@@ -271,7 +271,7 @@ AnotherContentFinder
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.ResolveAssignedMapperTypes();
-            Assert.AreEqual(30, foundTypes1.Count());
+            Assert.AreEqual(31, foundTypes1.Count());
         }
 
         [Test]
