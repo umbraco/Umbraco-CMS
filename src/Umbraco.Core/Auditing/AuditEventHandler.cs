@@ -227,14 +227,7 @@ namespace Umbraco.Core.Auditing
             if (args is IdentityAuditEventArgs identityArgs)
             {
                 var performingUser = GetPerformingUser(identityArgs.PerformingUser);
-
-                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
-                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                    "umbraco/user/sign-in/login", "login success");
+                WriteAudit(performingUser, identityArgs.AffectedUser, identityArgs.IpAddress, "umbraco/user/sign-in/login", "login success");
             }
         }
 
@@ -243,92 +236,85 @@ namespace Umbraco.Core.Auditing
             if (args is IdentityAuditEventArgs identityArgs)
             {
                 var performingUser = GetPerformingUser(identityArgs.PerformingUser);
-
-                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
-                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                    "umbraco/user/sign-in/logout", "logout success");
+                WriteAudit(performingUser, identityArgs.AffectedUser, identityArgs.IpAddress, "umbraco/user/sign-in/logout", "logout success");
             }
         }
 
         private void OnPasswordReset(object sender, EventArgs args)
         {
-            if (args is IdentityAuditEventArgs identityArgs)
+            if (args is IdentityAuditEventArgs identityArgs && identityArgs.PerformingUser >= 0)
             {
-                if (identityArgs.PerformingUser < 0) return;
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
-                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                    "umbraco/user/password/reset", "password reset");
+                WriteAudit(identityArgs.PerformingUser, identityArgs.AffectedUser, identityArgs.IpAddress, "umbraco/user/password/reset", "password reset");
             }
         }
 
         private void OnPasswordChanged(object sender, EventArgs args)
         {
-            if (args is IdentityAuditEventArgs identityArgs)
+            if (args is IdentityAuditEventArgs identityArgs && identityArgs.PerformingUser >= 0)
             {
-                if (identityArgs.PerformingUser < 0) return;
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
-                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                    "umbraco/user/password/change", "password change");
+                WriteAudit(identityArgs.PerformingUser, identityArgs.AffectedUser, identityArgs.IpAddress, "umbraco/user/password/change", "password change");
             }
         }
 
         private void OnLoginFailed(object sender, EventArgs args)
         {
-            if (args is IdentityAuditEventArgs identityArgs)
+            if (args is IdentityAuditEventArgs identityArgs && identityArgs.PerformingUser >= 0)
             {
-                if (identityArgs.PerformingUser < 0) return;
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    0, null,
-                    "umbraco/user/sign-in/failed", "login failed");
+                WriteAudit(identityArgs.PerformingUser, 0, identityArgs.IpAddress, "umbraco/user/sign-in/failed", "login failed", affectedDetails: "");
             }
         }
 
         private void OnForgotPasswordChange(object sender, EventArgs args)
         {
-            if (args is IdentityAuditEventArgs identityArgs)
+            if (args is IdentityAuditEventArgs identityArgs && identityArgs.PerformingUser >= 0)
             {
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
-                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                    "umbraco/user/password/forgot/change", "password forgot/change");
+                WriteAudit(identityArgs.PerformingUser, identityArgs.AffectedUser, identityArgs.IpAddress, "umbraco/user/password/forgot/change", "password forgot/change");
             }
         }
 
         private void OnForgotPasswordRequest(object sender, EventArgs args)
         {
-            if (args is IdentityAuditEventArgs identityArgs)
+            if (args is IdentityAuditEventArgs identityArgs && identityArgs.PerformingUser >= 0)
             {
-                if (identityArgs.PerformingUser < 0) return;
-                var performingUser = _userServiceInstance.GetUserById(identityArgs.PerformingUser);
-                if (performingUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.PerformingUser}");
-                var affectedUser = _userServiceInstance.GetUserById(identityArgs.AffectedUser);
-                if (affectedUser == null) throw new InvalidOperationException($"No user found with id {identityArgs.AffectedUser}");
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", identityArgs.IpAddress,
-                    DateTime.Now,
-                    affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                    "umbraco/user/password/forgot/request", "password forgot/request");
+                WriteAudit(identityArgs.PerformingUser, identityArgs.AffectedUser, identityArgs.IpAddress, "umbraco/user/password/forgot/request", "password forgot/request");
             }
+        }
+
+        private void WriteAudit(int performingId, int affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
+        {
+            var performingUser = _userServiceInstance.GetUserById(performingId);
+
+            var performingDetails = performingUser == null
+                ? $"User UNKNOWN:{performingId}"
+                : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
+
+            WriteAudit(performingId, performingDetails, affectedId, ipAddress, eventType, eventDetails, affectedDetails);
+        }
+
+        private void WriteAudit(IUser performingUser, int affectedId, string ipAddress, string eventType, string eventDetails)
+        {
+            var performingDetails = performingUser == null
+                ? $"User UNKNOWN"
+                : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
+
+            WriteAudit(performingUser?.Id ?? 0, performingDetails, affectedId, ipAddress, eventType, eventDetails);
+        }
+
+        private void WriteAudit(int performingId, string performingDetails, int affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
+        {
+            if (affectedDetails == null)
+            {
+                var affectedUser = _userServiceInstance.GetUserById(affectedId);
+                affectedDetails = affectedUser == null
+                    ? $"User UNKNOWN:{affectedId}"
+                    : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";
+            }
+
+            _auditServiceInstance.Write(performingId, performingDetails,
+                ipAddress,
+                DateTime.Now,
+                affectedId, affectedDetails,
+                eventType, eventDetails);
         }
     }
 }
