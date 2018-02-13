@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Events;
@@ -128,10 +129,21 @@ namespace Umbraco.Core.Auditing
                     ? string.Join(", ", group.Permissions)
                     : null;
 
+                var sb = new StringBuilder();
+                sb.Append($"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)};");
+                if (sections != null)
+                    sb.Append($", assigned sections: {sections}");
+                if (perms != null)
+                {
+                    if (sections != null)
+                        sb.Append(", ");
+                    sb.Append($"default perms: {perms}");
+                }
+
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.Now,
                     -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
-                    "umbraco/user-group/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)};{(sections == null ? "" : $", assigned sections: {sections}")}{(perms == null ? "" : $", assigned perms: {perms}")}");
+                    "umbraco/user-group/save", $"{sb}");
             }
         }
 

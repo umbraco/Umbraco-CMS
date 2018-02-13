@@ -29,10 +29,12 @@ namespace Umbraco.Web.Models.Mapping
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
                 .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
+                //TODO: This is insane - but with our current version of AutoMapper when mapping from an existing object to another existing object, it will map the private fields which means the public setter is not used! wtf. So zpqrtbnk will laugh and say how crappy AutoMapper is... well he'll win this battle this time, so we need to do this in AfterMap to make sure the public setter is used so the property is dirty
                 //.ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
                 .ForMember(dest => dest.Permissions, map => map.Ignore())
                 .AfterMap((save, userGroup) =>
                 {
+                    //TODO: See above comment
                     userGroup.Permissions = save.DefaultPermissions;
 
                     userGroup.ClearAllowedSections();

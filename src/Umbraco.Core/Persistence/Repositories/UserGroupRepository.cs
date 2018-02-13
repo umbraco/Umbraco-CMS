@@ -285,7 +285,7 @@ umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.u
 
         protected override void PersistNewItem(IUserGroup entity)
         {
-            ((UserGroup)entity).AddingEntity();            
+            ((UserGroup)entity).AddingEntity();
 
             var userGroupDto = UserGroupFactory.BuildDto(entity);
 
@@ -293,6 +293,8 @@ umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.u
             entity.Id = id;
 
             PersistAllowedSections(entity);
+
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IUserGroup entity)
@@ -304,6 +306,8 @@ umbracoUserGroup.userGroupName, umbracoUserGroup2App.app, umbracoUserGroup2App.u
             Database.Update(userGroupDto);
 
             PersistAllowedSections(entity);
+
+            entity.ResetDirtyProperties();
         }
 
         private void PersistAllowedSections(IUserGroup entity)
