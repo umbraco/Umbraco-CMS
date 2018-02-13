@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Auditing
 {
-    internal class AuditEventHandler : ApplicationEventHandler
+    public sealed class AuditEventHandler : ApplicationEventHandler
     {
         private IAuditService _auditServiceInstance;
         private IUserService _userServiceInstance;
