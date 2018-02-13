@@ -11,6 +11,9 @@ namespace Umbraco.Core.Models.Rdbms
     internal class AuditEntryDto
     {
         public const string TableName = "umbracoAudit";
+        public const int IpLength = 64;
+        public const int EventTypeLength = 256;
+        public const int DetailsLength = 1024;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -25,12 +28,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("performingDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(1024)]
+        [Length(DetailsLength)]
         public string PerformingDetails { get; set; }
 
         [Column("performingIp")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(64)]
+        [Length(IpLength)]
         public string PerformingIp { get; set; }
 
         [Column("eventDate")]
@@ -42,16 +45,16 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("affectedDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(1024)]
+        [Length(DetailsLength)]
         public string AffectedDetails { get; set; }
 
         [Column("eventType")]
-        [Length(256)]
+        [Length(EventTypeLength)]
         public string EventType { get; set; }
 
         [Column("eventDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(1024)]
+        [Length(DetailsLength)]
         public string EventDetails { get; set; }
     }
 }
