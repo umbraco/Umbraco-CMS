@@ -1230,6 +1230,12 @@
   </area>
 
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">选择内容类别</key>
     <key alias="chooseLayout">选择一项布局</key>
     <key alias="addRows">添加一行</key>

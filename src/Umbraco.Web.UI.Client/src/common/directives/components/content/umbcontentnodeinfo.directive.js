@@ -149,8 +149,17 @@
 
             function setPublishDate(date) {
 
+                if (!date) {
+                    return;
+                }
+
+                //The date being passed in here is the user's local date/time that they have selected
+                //we need to convert this date back to the server date on the model.
+
+                var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+
                 // update publish value
-                scope.node.releaseDate = date;
+                scope.node.releaseDate = serverTime;
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
@@ -174,8 +183,17 @@
 
             function setUnpublishDate(date) {
 
+                if (!date) {
+                    return;
+                }
+
+                //The date being passed in here is the user's local date/time that they have selected
+                //we need to convert this date back to the server date on the model.
+
+                var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+
                 // update publish value
-                scope.node.removeDate = date;
+                scope.node.removeDate = serverTime;
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();

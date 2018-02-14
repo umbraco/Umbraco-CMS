@@ -14,6 +14,7 @@ namespace Umbraco.Web.Features
         public UmbracoFeatures()
         {
             Disabled = new DisabledFeatures();
+            Enabled = new EnabledFeatures();
         }
 
         // note
@@ -27,6 +28,11 @@ namespace Umbraco.Web.Features
         /// Gets the disabled features.
         /// </summary>
         public DisabledFeatures Disabled { get; set; }
+
+        /// <summary>
+        /// Gets the enabled features.
+        /// </summary>
+        public EnabledFeatures Enabled { get; set; }
 
         /// <summary>
         /// Determines whether a feature is enabled.
