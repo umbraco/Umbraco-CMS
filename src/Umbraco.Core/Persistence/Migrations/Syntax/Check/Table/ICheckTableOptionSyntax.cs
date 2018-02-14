@@ -2,9 +2,8 @@
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
 {
-    public interface ICheckTableOptionSyntax : IFluentSyntax
+    public interface ICheckTableOptionSyntax : ICheckOptionSyntax
     {
-        ICheckColumnOptionSyntax Column(string name);
-        bool Exists();
+        ICheckColumnOptionSyntax Column(string columnName);
     }
 }
