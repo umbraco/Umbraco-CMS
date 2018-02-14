@@ -29,13 +29,17 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
 
             if (string.IsNullOrWhiteSpace(Expression.TableName))
             {
-                return constraints.Any(x => x.Item2.InvariantEquals(Expression.ColumnName)
-                                         && x.Item3.InvariantEquals(Expression.ConstraintName));
+                return Expression.ColumnNames.All(x =>
+                                                    constraints.Any(c => c.Item2.InvariantEquals(x)
+                                                                 && c.Item3.InvariantEquals(Expression.ConstraintName)
+                                                  ));
             }
 
-            return constraints.Any(x => x.Item1.InvariantEquals(Expression.TableName)
-                                     && x.Item2.InvariantEquals(Expression.ColumnName)
-                                     && x.Item3.InvariantEquals(Expression.ConstraintName));
+            return Expression.ColumnNames.All(x =>
+                                                constraints.Any(c => c.Item1.InvariantEquals(Expression.TableName)
+                                                                  && c.Item2.InvariantEquals(x)
+                                                                  && c.Item3.InvariantEquals(Expression.ConstraintName)
+                                             ));
         }
     }
 }

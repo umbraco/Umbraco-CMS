@@ -2,7 +2,8 @@
 {
     public interface ICheckConstraintOptionSyntax : IFluentSyntax
     {
-        ICheckTableConstraintOptionSyntax OnTable(string tableName);
         ICheckColumnConstraintOptionSyntax OnColumn(string columnName);
+        ICheckColumnConstraintOptionSyntax OnColumns(string[] columnNames);
+        ICheckTableConstraintOptionSyntax OnTable(string tableName);
     }
 }

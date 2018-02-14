@@ -3,5 +3,6 @@
     public interface ICheckTableConstraintOptionSyntax : ICheckOptionSyntax
     {
         ICheckOptionSyntax AndColumn(string columnName);
+        ICheckOptionSyntax AndColumns(string[] columnNames);
     }
 }

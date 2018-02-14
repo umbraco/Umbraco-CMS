@@ -16,15 +16,22 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
             _sqlSyntax = sqlSyntax;
         }
 
-        public ICheckColumnConstraintOptionSyntax OnColumn(string columnName)
+        public ICheckColumnConstraintOptionSyntax OnColumns(string[] columnNames)
         {
             var expression = new CheckConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {
-                ColumnName = columnName,
+                ColumnNames = columnNames,
                 ConstraintName = Expression.ConstraintName
             };
 
             return new CheckColumnConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
+        }
+
+        public ICheckColumnConstraintOptionSyntax OnColumn(string columnName)
+        {
+            var columnNames = new string[] { columnName };
+
+            return OnColumns(columnNames);
         }
 
         public ICheckTableConstraintOptionSyntax OnTable(string tableName)
