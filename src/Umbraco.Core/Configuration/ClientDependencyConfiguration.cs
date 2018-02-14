@@ -28,18 +28,7 @@ namespace Umbraco.Core.Configuration
             _logger = logger;
             _fileName = IOHelper.MapPath(string.Format("{0}/ClientDependency.config", SystemDirectories.Config));
         }
-
-        /// <summary>
-        /// Changes the version number in ClientDependency.config to a hashed value for the version and the DateTime.Now
-        /// </summary>
-        /// <returns>Boolean to indicate succesful update of the ClientDependency.config file</returns>
-        /// <seealso cref="UpdateVersionNumber(SemVersion, DateTime, string)" />
-        [Obsolete("Use the overload specifying the date and dateFormat")]
-        public bool UpdateVersionNumber()
-        {
-            return UpdateVersionNumber(UmbracoVersion.GetSemanticVersion(), DateTime.UtcNow, "yyyyMMdd");
-        }
-
+        
         /// <summary>
         /// Changes the version number in ClientDependency.config to a hashed value for the version and the DateTime.Day
         /// </summary>
@@ -105,6 +94,8 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Changes the version number in ClientDependency.config to a random value to avoid stale caches
         /// </summary>
+        /// <seealso cref="UpdateVersionNumber(SemVersion, DateTime, string)" />
+        [Obsolete("Use the UpdateVersionNumber method specifying the version, date and dateFormat instead")]
         public bool IncreaseVersionNumber()
         {
             try
