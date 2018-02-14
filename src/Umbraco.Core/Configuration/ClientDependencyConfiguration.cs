@@ -30,16 +30,25 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
+        /// Changes the version number in ClientDependency.config to a hashed value for the version and the DateTime.Now
+        /// </summary>
+        /// <returns>Boolean to indicate succesful update of the ClientDependency.config file</returns>
+        /// <seealso cref="UpdateVersionNumber(SemVersion, DateTime, string)" />
+        [Obsolete("Use the overload specifying the date and dateFormat")]
+        public bool UpdateVersionNumber()
+        {
+            return UpdateVersionNumber(UmbracoVersion.GetSemanticVersion(), DateTime.UtcNow, "yyyyMMdd");
+        }
+
+        /// <summary>
         /// Changes the version number in ClientDependency.config to a hashed value for the version and the DateTime.Day
         /// </summary>
-        /// <param name="version"></param>
-        /// <param name="date"></param>
-        /// <param name="dateFormat">
-        /// Allows the developer to specify the date precision for the hash (i.e. "yyyyMMdd" would be a precision for the day)
-        /// </param>
-        /// <returns></returns>
+        /// <param name="version">The <see cref="SemVersion">version</see> of Umbraco we're upgrading to</param>
+        /// <param name="date">A <see cref="DateTime">date</see> value to use in the hash to prevent this method from updating the version on each startup</param>
+        /// <param name="dateFormat">Allows the developer to specify the <see cref="string">date precision</see> for the hash (i.e. "yyyyMMdd" would be a precision for the day)</param>
+        /// <returns>Boolean to indicate succesful update of the ClientDependency.config file</returns>
         public bool UpdateVersionNumber(SemVersion version, DateTime date, string dateFormat)
-        {         
+        {
             var byteContents = Encoding.Unicode.GetBytes(version + date.ToString(dateFormat));
             
             //This is a way to convert a string to a long
