@@ -4,13 +4,13 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
 {
-    public class CheckColumnConstraintBuilder : ExpressionBuilderBase<CheckConstraintExpression>, ICheckColumnConstraintOptionSyntax
+    public class CheckColumnsConstraintBuilder : ExpressionBuilderBase<CheckConstraintExpression>, ICheckColumnsConstraintOptionSyntax
     {
         private IMigrationContext _context;
         private DatabaseProviders[] _databaseProviders;
         private ISqlSyntaxProvider _sqlSyntax;
 
-        public CheckColumnConstraintBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, CheckConstraintExpression expression) : base(expression)
+        public CheckColumnsConstraintBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, CheckConstraintExpression expression) : base(expression)
         {
             _context = context;
             _databaseProviders = databaseProviders;

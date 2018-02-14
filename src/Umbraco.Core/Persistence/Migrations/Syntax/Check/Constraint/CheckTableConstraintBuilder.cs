@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
                 ColumnNames = columnNames
             };
 
-            return new CheckColumnConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
+            return new CheckColumnsConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
 

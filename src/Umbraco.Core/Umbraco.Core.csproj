@@ -541,9 +541,9 @@
     <Compile Include="Persistence\Migrations\Syntax\Check\Column\CheckColumnBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Column\ICheckColumnOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\CheckTableConstraintBuilder.cs" />
-    <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\CheckColumnConstraintBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\CheckColumnsConstraintBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\CheckConstraintBuilder.cs" />
-    <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\ICheckColumnConstraintOptionSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\ICheckColumnsConstraintOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\ICheckConstraintOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\ICheckTableConstraintOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckColumnExpression.cs" />
