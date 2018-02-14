@@ -53,6 +53,19 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("config")]
         public IDictionary<string, object> Configuration { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value editor.
+        /// </summary>
+        /// <remarks>
+        /// <para>If an instance of a value editor is assigned to the property,
+        /// then this instance is returned when getting the property value. Otherwise, a
+        /// new instance is created by CreateValueEditor.</para>
+        /// <para>The instance created by CreateValueEditor is not cached, i.e.
+        /// a new instance is created each time the property value is retrieved.</para>
+        /// <para>The property is marked as a Json property with ObjectCreationHandling
+        /// set to Replace in order to prevent the Json deserializer to retrieve the
+        /// value of the property before setting it.</para>
+        /// </remarks>
         [JsonProperty("editor")]
         public ParameterValueEditor ValueEditor
         {

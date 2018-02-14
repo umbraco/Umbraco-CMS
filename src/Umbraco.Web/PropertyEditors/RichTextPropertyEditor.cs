@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
 
         protected override ConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 

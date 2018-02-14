@@ -109,7 +109,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override ValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute);
 
         protected override ConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 

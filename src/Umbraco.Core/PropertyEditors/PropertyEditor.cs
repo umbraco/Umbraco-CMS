@@ -17,7 +17,7 @@ namespace Umbraco.Core.PropertyEditors
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "(),nq}")]
     public class PropertyEditor : IParameterEditor
     {
-        private ValueEditor _valueEditorAssigned;
+        private IPropertyValueEditor _valueEditorAssigned;
         private ConfigurationEditor _configurationEditorAssigned;
 
         /// <summary>
@@ -105,12 +105,12 @@ namespace Umbraco.Core.PropertyEditors
         /// since it depends on the datatype configuration.</para>
         /// <para>Technically, it could be cached by datatype but let's keep things
         /// simple enough for now.</para>
-        /// <para>The property is marked as a Json property with ObjectCreationHandling
-        /// set to Replace in order to prevent the Json deserializer to retrieve the
-        /// value of the property before setting it.</para>
+        /// <para>The property is *not* marked with json ObjectCreationHandling = ObjectCreationHandling.Replace,
+        /// so by default the deserializer will first try to read it before assigning it, which is why
+        /// all deserialization *should* set the property before anything (see manifest deserializer).</para>
         /// </remarks>
-        [JsonProperty("editor", Required = Required.Always, ObjectCreationHandling = ObjectCreationHandling.Replace)]
-        public ValueEditor ValueEditor
+        [JsonProperty("editor", Required = Required.Always)]
+        public IPropertyValueEditor ValueEditor
         {
             // create a new value editor each time - the property editor can be a
             // singleton, but the value editor will get a configuration which depends
@@ -119,8 +119,9 @@ namespace Umbraco.Core.PropertyEditors
             set => _valueEditorAssigned = value;
         }
 
+        /// <inheritdoc />
         [JsonIgnore]
-        IValueEditor IParameterEditor.ValueEditor => ValueEditor; // fixme - because we must, but - bah
+        IValueEditor IParameterEditor.ValueEditor => ValueEditor;
 
         /// <summary>
         /// Gets or sets the configuration editor.
@@ -134,27 +135,28 @@ namespace Umbraco.Core.PropertyEditors
         /// property editor is a singleton, and although the configuration editor could
         /// technically be a singleton too, we'd rather not keep configuration editor
         /// cached.</para>
-        /// <para>The property is marked as a Json property with ObjectCreationHandling
-        /// set to Replace in order to prevent the Json deserializer to retrieve the
-        /// value of the property before setting it.</para>
+        /// <para>The property is *not* marked with json ObjectCreationHandling = ObjectCreationHandling.Replace,
+        /// so by default the deserializer will first try to read it before assigning it, which is why
+        /// all deserialization *should* set the property before anything (see manifest deserializer).</para>
         /// </remarks>
-        [JsonProperty("prevalues", ObjectCreationHandling = ObjectCreationHandling.Replace)] // changing the name would break manifests
+        [JsonProperty("prevalues")] // changing the name would break manifests
         public ConfigurationEditor ConfigurationEditor
         {
             get => CreateConfigurationEditor();
             set => _configurationEditorAssigned = value;
         }
 
-        [JsonProperty("defaultConfig")]
-        public IDictionary<string, object> DefaultConfiguration => ConfigurationEditor.DefaultConfiguration;
-
-        [JsonIgnore] // fixme - but is parameterEditor.Configuration the same thing as preValues?
-        IDictionary<string, object> IParameterEditor.Configuration => DefaultConfiguration; // fixme - because we must, but - bah
+        // a property editor has a configuration editor which is in charge of all configuration
+        // a parameter editor does not have a configuration editor and directly handles its configuration
+        // when a property editor can also be a parameter editor it needs to expose the configuration
+        // fixme but that's only for some property editors
+        [JsonIgnore]
+        IDictionary<string, object> IParameterEditor.Configuration => ConfigurationEditor.DefaultConfiguration;
 
         /// <summary>
         /// Creates a value editor instance.
         /// </summary>
-        protected virtual ValueEditor CreateValueEditor()
+        protected virtual IPropertyValueEditor CreateValueEditor()
         {
             // handle assigned editor
             // or create a new editor

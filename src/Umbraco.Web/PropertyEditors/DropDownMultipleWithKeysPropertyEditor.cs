@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override ValueEditor CreateValueEditor() => new PublishValuesMultipleValueEditor(true, Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new PublishValuesMultipleValueEditor(true, Attribute);
 
         /// <inheritdoc />
         protected override ConfigurationEditor CreateConfigurationEditor() => new DropDownMultipleConfigurationEditor(_textService);

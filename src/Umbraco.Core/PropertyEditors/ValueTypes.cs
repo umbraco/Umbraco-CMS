@@ -102,7 +102,6 @@ namespace Umbraco.Core.PropertyEditors
                 default:
                     throw new ArgumentOutOfRangeException(nameof(valueType), $"Value \"{valueType}\" is not a valid ValueTypes.");
             }
-
         }
     }
 }

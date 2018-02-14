@@ -34,5 +34,8 @@ namespace Umbraco.Core.PropertyEditors
             get => _view;
             set => _view = IOHelper.ResolveVirtualUrl(value);
         }
+
+        /// <inheritdoc />
+        public string ValueType { get; set; }
     }
 }

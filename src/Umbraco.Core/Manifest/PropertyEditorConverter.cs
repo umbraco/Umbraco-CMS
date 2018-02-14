@@ -33,9 +33,9 @@ namespace Umbraco.Core.Manifest
         {
             if (jobject["editor"] != null)
             {
-                // the deserializer will first try to get the property, and that would throw since
-                // the editor would try to create a new value editor, so we have to set a
-                // value editor by ourselves, which will then be populated by the deserializer.
+                // explicitely assign a value editor of type ValueEditor
+                // (else the deserializer will try to read it before setting it)
+                // (and besides it's an interface)
                 target.ValueEditor = new ValueEditor();
 
                 // in the manifest, validators are a simple dictionary eg
@@ -49,14 +49,29 @@ namespace Umbraco.Core.Manifest
                     jobject["editor"]["validation"] = RewriteValidators(validation);
             }
 
-            // see note about validators, above - same applies to field validators
-            if (jobject["prevalues"]?["fields"] is JArray jarray)
+            if (jobject["prevalues"] is JObject prevalues)
             {
-                foreach (var field in jarray)
+                // explicitely assign a configuration editor of type ConfigurationEditor
+                // (else the deserializer will try to read it before setting it)
+                // (and besides it's an interface)
+                target.ConfigurationEditor = new ConfigurationEditor();
+
+                // see note about validators, above - same applies to field validators
+                if (jobject["prevalues"]?["fields"] is JArray jarray)
                 {
-                    // see note above, for editor
-                    if (field["validation"] is JObject validation)
-                        field["validation"] = RewriteValidators(validation);
+                    foreach (var field in jarray)
+                    {
+                        if (field["validation"] is JObject validation)
+                            field["validation"] = RewriteValidators(validation);
+                    }
+                }
+
+                // in the manifest, default configuration is at editor level
+                // move it down to configuration editor level so it can be deserialized properly
+                if (jobject["defaultConfig"] is JObject defaultConfig)
+                {
+                    prevalues["defaultConfig"] = defaultConfig;
+                    jobject.Remove("defaultConfig");
                 }
             }
 

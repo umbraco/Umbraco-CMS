@@ -123,8 +123,7 @@ namespace Umbraco.Web.Editors
             if (dt == null)
             {
                 var editor = _propertyEditors[Constants.PropertyEditors.Aliases.ListView];
-                dt = new DataType(editor);
-                dt.Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
+                dt = new DataType(editor) { Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias };
                 Services.DataTypeService.Save(dt);
             }
 
@@ -209,9 +208,9 @@ namespace Umbraco.Web.Editors
 
             // get the current configuration,
             // get the new configuration as a dictionary (this is how we get it from model)
-            // and map it to an actual configuration object
+            // and map to an actual configuration object
             var currentConfiguration = dataType.PersistedDataType.Configuration;
-            var configurationDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value); // fixme tokens!
+            var configurationDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
             var configuration = dataType.PropertyEditor.ConfigurationEditor.FromConfigurationEditor(configurationDictionary, currentConfiguration);
 
             dataType.PersistedDataType.Configuration = configuration;

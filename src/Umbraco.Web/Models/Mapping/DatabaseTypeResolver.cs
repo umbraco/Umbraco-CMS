@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -17,7 +18,9 @@ namespace Umbraco.Web.Models.Mapping
             {
                 throw new InvalidOperationException("Could not find property editor with id " + source.EditorAlias);
             }
-            return propertyEditor.ValueEditor.GetDatabaseType();
+
+            var valueType = propertyEditor.ValueEditor.ValueType;
+            return ValueTypes.ToStorageType(valueType);
         }
     }
 }

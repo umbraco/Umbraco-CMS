@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
         {
         }
 
-        protected override ValueEditor CreateValueEditor()
+        protected override IPropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             //add an email address validator

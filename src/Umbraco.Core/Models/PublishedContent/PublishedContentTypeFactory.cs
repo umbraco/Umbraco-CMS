@@ -102,7 +102,7 @@ namespace Umbraco.Core.Models.PublishedContent
                     _publishedDataTypes.Remove(id);
                 var dataTypes = _dataTypeService.GetAll(ids);
                 foreach (var dataType in dataTypes)
-                    _publishedDataTypes[dataType.Id] = new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => dataType.Configuration)));
+                    _publishedDataTypes[dataType.Id] = new PublishedDataType(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object>(() => dataType.Configuration));
             }
         }
     }

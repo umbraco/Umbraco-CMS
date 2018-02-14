@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
         public DateTimePropertyEditor(ILogger logger): base(logger)
         { }
 
-        protected override ValueEditor CreateValueEditor()
+        protected override IPropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             editor.Validators.Add(new DateTimeValidator());

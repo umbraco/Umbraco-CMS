@@ -130,7 +130,7 @@ namespace Umbraco.Web.Editors
             return new ContentPropertyDisplay()
             {
                 Editor = dataTypeDiff.EditorAlias,
-                Validation = new PropertyTypeValidation() { },
+                Validation = new PropertyTypeValidation(),
                 View = editor.ValueEditor.View,
                 Config = editor.ConfigurationEditor.ToConfigurationEditor(configuration)
             };

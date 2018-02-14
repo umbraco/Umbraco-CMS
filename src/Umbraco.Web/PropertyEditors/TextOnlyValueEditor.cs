@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (property.GetValue() == null) return string.Empty;
 
-            switch (GetDatabaseType())
+            switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:

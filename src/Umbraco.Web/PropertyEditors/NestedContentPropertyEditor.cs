@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override ValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
+        protected override IPropertyValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
 
         internal class NestedContentPropertyValueEditor : ValueEditor
         {

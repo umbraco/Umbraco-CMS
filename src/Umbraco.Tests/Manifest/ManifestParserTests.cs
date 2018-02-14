@@ -193,7 +193,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("\\d*", v.Config);
 
             // this is not part of the manifest
-            var preValues = editor.DefaultConfiguration;
+            var preValues = editor.ConfigurationEditor.DefaultConfiguration;
             Assert.IsEmpty(preValues);
 
             var preValueEditor = editor.ConfigurationEditor;

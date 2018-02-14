@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         public MultipleTextStringPropertyEditor(ILogger logger) : base(logger)
         { }
 
-        protected override ValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
 
         protected override ConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
 

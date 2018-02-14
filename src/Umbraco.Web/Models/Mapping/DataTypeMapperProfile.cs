@@ -108,12 +108,18 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
                 .ConvertUsing(src =>
                     {
-                        // this is a new data type, so just return the field editors, with default values - there are no values yet
-                        var fields = src.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+                        // this is a new data type, initialize default configuration
+                        // get the configuration editor,
+                        // get the configuration fields and map to UI,
+                        // get the configuration default values and map to UI
 
-                        var defaultConfiguration = src.DefaultConfiguration;
+                        var configurationEditor = src.ConfigurationEditor;
+
+                        var fields = configurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+
+                        var defaultConfiguration = configurationEditor.DefaultConfiguration;
                         if (defaultConfiguration != null)
-                            DataTypeConfigurationFieldDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultConfiguration);
+                            DataTypeConfigurationFieldDisplayResolver.MapConfigurationFields(fields, defaultConfiguration);
 
                         return fields;
                     });

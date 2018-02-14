@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Maps pre-values in the dictionary to the values for the fields
         /// </summary>
-        internal static void MapPreValueValuesToPreValueFields(DataTypeConfigurationFieldDisplay[] fields, IDictionary<string, object> configuration)
+        internal static void MapConfigurationFields(DataTypeConfigurationFieldDisplay[] fields, IDictionary<string, object> configuration)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -49,14 +49,15 @@ namespace Umbraco.Web.Models.Mapping
             // and convert configuration to editor
             if (editor != null)
             {
-                fields = editor.ConfigurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
-                configurationDictionary = editor.ConfigurationEditor.ToConfigurationEditor(configuration);
+                var configurationEditor = editor.ConfigurationEditor;
+                fields = configurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+                configurationDictionary = configurationEditor.ToConfigurationEditor(configuration);
             }
 
             if (configurationDictionary == null)
                 configurationDictionary = new Dictionary<string, object>();
  
-            MapPreValueValuesToPreValueFields(fields, configurationDictionary);
+            MapConfigurationFields(fields, configurationDictionary);
 
             return fields;
         }

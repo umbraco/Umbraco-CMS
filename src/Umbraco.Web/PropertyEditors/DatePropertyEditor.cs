@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ValueEditor CreateValueEditor() => new DateValueEditor(Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new DateValueEditor(Attribute);
 
         /// <inheritdoc />
         protected override ConfigurationEditor CreateConfigurationEditor() => new DateConfigurationEditor();

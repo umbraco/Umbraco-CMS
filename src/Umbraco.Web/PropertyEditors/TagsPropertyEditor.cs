@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
             _validators = validators;
         }
 
-        protected override ValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
 
         protected override ConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
 

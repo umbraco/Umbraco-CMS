@@ -19,6 +19,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     public class GridValueConverter : JsonValueConverter
     {
+        public GridValueConverter(PropertyEditorCollection propertyEditors)
+            : base(propertyEditors)
+        { }
+
         public override bool IsConverter(PublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Grid);
 

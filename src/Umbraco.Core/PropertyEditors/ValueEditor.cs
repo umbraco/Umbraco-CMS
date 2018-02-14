@@ -16,14 +16,14 @@ namespace Umbraco.Core.PropertyEditors
     /// <summary>
     /// Represents a value editor for content properties.
     /// </summary>
-    public class ValueEditor : IValueEditor
+    public class ValueEditor : IPropertyValueEditor
     {
         private string _view;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueEditor"/> class.
         /// </summary>
-        public ValueEditor()
+        public ValueEditor() // for tests, and manifest
         {
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
@@ -32,7 +32,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueEditor"/> class.
         /// </summary>
-        public ValueEditor(string view, params IValueValidator[] validators)
+        public ValueEditor(string view, params IValueValidator[] validators) // not used
             : this()
         {
             View = view;
@@ -147,12 +147,6 @@ namespace Umbraco.Core.PropertyEditors
         public virtual ManifestValidator RegexValidator => new RegexValidator();
 
         /// <summary>
-        /// Gets the <see cref="ValueStorageType"/> corresponding to the value type.
-        /// </summary>
-        /// <returns></returns>
-        public ValueStorageType GetDatabaseType() => ValueTypes.ToStorageType(ValueType);
-
-        /// <summary>
         /// If this is is true than the editor will be displayed full width without a label
         /// </summary>
         [JsonProperty("hideLabel")]
@@ -176,7 +170,7 @@ namespace Umbraco.Core.PropertyEditors
 
             Type valueType;
             //convert the string to a known type
-            switch (GetDatabaseType())
+            switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:
@@ -246,7 +240,7 @@ namespace Umbraco.Core.PropertyEditors
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
-                Current.Logger.Warn<ValueEditor>("The value " + editorValue.Value + " cannot be converted to the type " + GetDatabaseType());
+                Current.Logger.Warn<ValueEditor>("The value " + editorValue.Value + " cannot be converted to the type " + ValueTypes.ToStorageType(ValueType));
                 return null;
             }
             return result.Result;
@@ -267,7 +261,7 @@ namespace Umbraco.Core.PropertyEditors
         {
             if (property.GetValue() == null) return string.Empty;
 
-            switch (GetDatabaseType())
+            switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:
@@ -359,7 +353,7 @@ namespace Umbraco.Core.PropertyEditors
                 return new XText(ConvertDbToString(propertyType, value, dataTypeService));
             }
 
-            switch (GetDatabaseType())
+            switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Date:
                 case ValueStorageType.Integer:
@@ -382,7 +376,7 @@ namespace Umbraco.Core.PropertyEditors
             if (value == null)
                 return string.Empty;
 
-            switch (GetDatabaseType())
+            switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:

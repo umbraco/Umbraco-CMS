@@ -20,15 +20,24 @@ namespace Umbraco.Core.Manifest
         /// <inheritdoc />
         protected override void Deserialize(JObject jobject, ParameterEditor target, JsonSerializer serializer)
         {
+            // in a manifest, a parameter editor looks like:
+            //
+            // {
+            //   "alias": "...",
+            //   "name": "...",
+            //   "view": "...",
+            //   "config": { "key1": "value1", "key2": "value2" ... }
+            // }
+            //
+            // the view is at top level, but should be down one level to be propertly
+            // deserialized as a ParameterValueEditor property -> need to move it
+
             if (jobject.Property("view") != null)
             {
-                // the deserializer will first try to get the property, and that would throw since
-                // the editor would try to create a new value editor, so we have to set a
-                // value editor by ourselves, which will then be populated by the deserializer.
+                // explicitely assign a value editor of type ParameterValueEditor
                 target.ValueEditor = new ParameterValueEditor();
 
-                // the 'view' property in the manifest is at top-level, and needs to be moved
-                // down one level to the actual value editor.
+                // move the 'view' property
                 jobject["editor"] = new JObject { ["view"] = jobject["view"] };
                 jobject.Property("view").Remove();
             }

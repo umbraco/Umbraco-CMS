@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Attribute);
+        protected override IPropertyValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Attribute);
 
         /// <inheritdoc />
         protected override ConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor();

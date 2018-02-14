@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ValueEditor CreateValueEditor()
+        protected override IPropertyValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             editor.Validators.Add(new IntegerValidator()); // ensure the value is validated

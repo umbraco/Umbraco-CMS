@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override ValueEditor CreateValueEditor()
+        protected override IPropertyValueEditor CreateValueEditor()
         {
             var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem);
             editor.Validators.Add(new UploadFileTypeValidator());

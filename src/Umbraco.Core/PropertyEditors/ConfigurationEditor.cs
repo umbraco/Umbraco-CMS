@@ -53,7 +53,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the default configuration.
         /// </summary>
-        /// <remarks>The default configuration is used to initialize new datatypes.</remarks>
+        /// <remarks>
+        /// <para>The default configuration is used to initialize new datatypes.</para>
+        /// </remarks>
+        [JsonProperty("defaultConfig")]
         public virtual IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
 
         /// <summary>

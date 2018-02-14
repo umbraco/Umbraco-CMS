@@ -4,6 +4,7 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -27,7 +28,13 @@ namespace Umbraco.Web.Models.Mapping
 
             //configure the editor for display with the pre-values
             var valEditor = display.PropertyEditor.ValueEditor;
-            valEditor.Configuration = config;
+            // fixme - the value editor REQUIRES the configuration to operate
+            //  at the moment, only for richtext and nested, where it's used to set HideLabel
+            //  but, this is the ONLY place where it's assigned? it is also the only place where
+            //  .HideLabel is used - and basically all the rest kinda never depends on config,
+            //  but... it should?
+            var ve = (ValueEditor) valEditor;
+            ve.Configuration = config;
 
             //set the display properties after mapping
             display.Alias = originalProp.Alias;

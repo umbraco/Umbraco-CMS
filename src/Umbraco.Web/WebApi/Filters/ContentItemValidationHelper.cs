@@ -132,6 +132,7 @@ namespace Umbraco.Web.WebApi.Filters
                 //get the pre-values for this property
                 var preValues = p.DataType.Configuration;
 
+                // fixme what does this mean?
                 //TODO: when we figure out how to 'override' certain pre-value properties we'll either need to:
                 // * Combine the preValues with the overridden values stored with the document type property (but how to combine?)
                 // * Or, pass in the overridden values stored with the doc type property separately
@@ -167,7 +168,7 @@ namespace Umbraco.Web.WebApi.Filters
                         //It's required
                         || (p.IsRequired))
                     {
-                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
+                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, null, preValues, p.ValidationRegExp))
                         {
                             actionContext.ModelState.AddPropertyError(result, p.Alias);
                         }

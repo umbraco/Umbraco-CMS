@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
