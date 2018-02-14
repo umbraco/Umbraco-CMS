@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Table;
+﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
+using Umbraco.Core.Persistence.Migrations.Syntax.Check.Table;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
@@ -16,9 +17,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             _databaseProviders = databaseProviders;
         }
 
-        public ICheckTableOptionSyntax Table(string name)
+        public ICheckTableOptionSyntax Table(string tableName)
         {
-            throw new System.NotImplementedException();
+            var expression = new CheckTableExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                TableName = tableName
+            };
+
+            return new CheckTableBuilder(_context, _sqlSyntax, expression);
         }
     }
 }
