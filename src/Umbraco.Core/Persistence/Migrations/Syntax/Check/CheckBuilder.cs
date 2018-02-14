@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
                 TableName = tableName
             };
 
-            return new CheckTableBuilder(_context, _sqlSyntax, expression);
+            return new CheckTableBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
     }
 }

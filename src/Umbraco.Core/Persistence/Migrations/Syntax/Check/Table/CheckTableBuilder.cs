@@ -9,11 +9,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
     {
         private readonly IMigrationContext _context;
         private readonly ISqlSyntaxProvider _sqlSyntax;
+        private readonly DatabaseProviders[] _databaseProviders;
 
-        public CheckTableBuilder(IMigrationContext context, ISqlSyntaxProvider sqlSyntax, CheckTableExpression expression)
+        public CheckTableBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, CheckTableExpression expression)
             : base(expression)
         {
             _context = context;
+            _databaseProviders = databaseProviders;
             _sqlSyntax = sqlSyntax;
         }
 
