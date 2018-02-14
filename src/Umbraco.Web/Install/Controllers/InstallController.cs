@@ -46,7 +46,8 @@ namespace Umbraco.Web.Install.Controllers
             {
                 // Update ClientDependency version
                 var clientDependencyConfig = new ClientDependencyConfiguration(ApplicationContext.Current.ProfilingLogger.Logger);
-                var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+                var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumberForVersion(
+                    UmbracoVersion.GetSemanticVersion(), DateTime.UtcNow, "yyyyMMdd");
                 // Delete ClientDependency temp directories to make sure we get fresh caches
                 var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(HttpContext);
 
