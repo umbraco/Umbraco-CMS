@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
+﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint;
+using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Table;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -15,6 +16,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             _context = context;
             _sqlSyntax = sqlSyntax;
             _databaseProviders = databaseProviders;
+        }
+
+        public ICheckConstraintOptionSyntax Constraint(string constraintName)
+        {
+            var expression = new CheckConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                ConstraintName = constraintName
+            };
+
+            return new CheckConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
         public ICheckTableOptionSyntax Table(string tableName)
