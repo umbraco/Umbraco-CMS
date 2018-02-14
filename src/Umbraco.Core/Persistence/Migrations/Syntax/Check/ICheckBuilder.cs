@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
 {
     public interface ICheckBuilder : IFluentSyntax
     {
-        ICheckTableOptionSyntax Table(string tableName);
-        ICheckConstraintOptionSyntax Constraint(string constraintName);
+        ICheckTableSyntax Table(string tableName);
+        ICheckConstraintSyntax Constraint(string constraintName);
     }
 }

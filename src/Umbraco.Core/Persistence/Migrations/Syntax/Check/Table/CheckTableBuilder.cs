@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
 {
-    public class CheckTableBuilder : ExpressionBuilderBase<CheckTableExpression>, ICheckTableOptionSyntax
+    public class CheckTableBuilder : ExpressionBuilderBase<CheckTableExpression>, ICheckTableSyntax
     {
         private readonly IMigrationContext _context;
         private readonly ISqlSyntaxProvider _sqlSyntax;
@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
             _sqlSyntax = sqlSyntax;
         }
 
-        public ICheckColumnOptionSyntax Column(string columnName)
+        public ICheckColumnOnTableSyntax Column(string columnName)
         {
             var expression = new CheckColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {
