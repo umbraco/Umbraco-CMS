@@ -538,7 +538,9 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\CheckBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\Column\CheckColumnBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Column\ICheckColumnOptionSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckColumnExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckTableExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\ICheckBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Table\CheckTableBuilder.cs" />
