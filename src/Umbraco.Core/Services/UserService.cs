@@ -961,8 +961,11 @@ namespace Umbraco.Core.Services
                     removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
                 }
 
+                //raise 2x events - the old and new one for backwards compat reasons
                 var saveEventArgs = new SaveEventArgs<IUserGroup>(userGroup);
-                if (raiseEvents && uow.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
+                var saveEventArgs2 = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers));
+                if (raiseEvents &&
+                    (uow.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs) || uow.Events.DispatchCancelable(SavingUserGroup2, this, saveEventArgs2)))
                 {
                     uow.Commit();
                     return;
@@ -976,8 +979,10 @@ namespace Umbraco.Core.Services
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
+
+                    //raise 2x events - the old and new one for backwards compat reasons
                     uow.Events.Dispatch(SavedUserGroup, this, saveEventArgs);
-                    uow.Events.Dispatch(SavedUserGroupWithUsers, this, new SaveUserGroupWithUsersEventArgs(userGroup, addedUsers, removedUsers));
+                    uow.Events.Dispatch(SavedUserGroup2, this, saveEventArgs2);
                 }
             }
         }
@@ -1308,17 +1313,24 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
+        //TODO: In v8, change this event to be SaveEventArgs<UserGroupWithUsers> and remove SavingUserGroup2
         public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
+        //TODO: In v8, change this event to be SaveEventArgs<UserGroupWithUsers> and remove SavedUserGroup2
         public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavedUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        internal static event TypedEventHandler<IUserService, SaveUserGroupWithUsersEventArgs> SavedUserGroupWithUsers;
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup2;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup2;
 
         /// <summary>
         /// Occurs before Delete

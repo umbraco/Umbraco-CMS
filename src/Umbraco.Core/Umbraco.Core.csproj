@@ -356,7 +356,7 @@
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
-    <Compile Include="Events\SaveUserGroupWithUsersEventArgs.cs" />
+    <Compile Include="Events\UserGroupWithUsers.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
     <Compile Include="Events\SendEmailEventArgs.cs" />

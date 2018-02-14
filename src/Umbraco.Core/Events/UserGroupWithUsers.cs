@@ -3,9 +3,9 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Events
 {
-    internal class SaveUserGroupWithUsersEventArgs : EventArgs
+    internal class UserGroupWithUsers
     {
-        public SaveUserGroupWithUsersEventArgs(IUserGroup userGroup, IUser[] addedUsers, IUser[] removedUsers)
+        public UserGroupWithUsers(IUserGroup userGroup, IUser[] addedUsers, IUser[] removedUsers)
         {
             UserGroup = userGroup;
             AddedUsers = addedUsers;

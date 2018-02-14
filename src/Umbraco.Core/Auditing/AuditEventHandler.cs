@@ -62,9 +62,8 @@ namespace Umbraco.Core.Auditing
             BackOfficeUserManager.PasswordChanged += OnPasswordChanged;
             BackOfficeUserManager.PasswordReset += OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount += ;
-
-            UserService.SavedUserGroup += OnSavedUserGroup;
-            UserService.SavedUserGroupWithUsers += OnSavedUserGroupWithUsers;
+            
+            UserService.SavedUserGroup2 += OnSavedUserGroupWithUsers;
 
             UserService.SavedUser += OnSavedUser;
             UserService.DeletedUser += OnDeletedUser;
@@ -116,13 +115,14 @@ namespace Umbraco.Core.Auditing
             }
         }
 
-        private void OnSavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> saveEventArgs)
+        private void OnSavedUserGroupWithUsers(IUserService sender, SaveEventArgs<UserGroupWithUsers> saveEventArgs)
         {
             var performingUser = CurrentPerformingUser;
-            var groups = saveEventArgs.SavedEntities;
-            foreach (var group in groups)
+            foreach (var groupWithUser in saveEventArgs.SavedEntities)
             {
-                var dp = string.Join(", ", ((UserGroup) group).GetPreviouslyDirtyProperties());
+                var group = groupWithUser.UserGroup;
+
+                var dp = string.Join(", ", ((UserGroup)group).GetPreviouslyDirtyProperties());
                 var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
                     ? string.Join(", ", group.AllowedSections)
                     : null;
@@ -145,57 +145,52 @@ namespace Umbraco.Core.Auditing
                     DateTime.Now,
                     -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
                     "umbraco/user-group/save", $"{sb}");
-            }
-        }
 
-        private void OnSavedUserGroupWithUsers(IUserService sender, SaveUserGroupWithUsersEventArgs saveUserGroupWithUsersEventArgs)
-        {
-            var performingUser = CurrentPerformingUser;
-            var group = saveUserGroupWithUsersEventArgs.UserGroup;
+                //Now audit the users that have changed
+                if (groupWithUser.RemovedUsers.Length == 0 && groupWithUser.AddedUsers.Length == 0)
+                    return;
 
-            if (saveUserGroupWithUsersEventArgs.RemovedUsers.Length == 0 && saveUserGroupWithUsersEventArgs.AddedUsers.Length == 0)
-                return;
-
-            var sb = new StringBuilder();
-            if (saveUserGroupWithUsersEventArgs.RemovedUsers.Length > 0)
-            {
-                sb.Append("Removed: ");
-                var first = true;
-                foreach (var user in saveUserGroupWithUsersEventArgs.RemovedUsers)
+                var sb2 = new StringBuilder();
+                if (groupWithUser.RemovedUsers.Length > 0)
                 {
-                    if (first) first = false;
-                    else sb.Append(", ");
-                    sb.Append(user.Name);
-                    sb.Append(" [");
-                    sb.Append(user.Id);
-                    sb.Append("] <");
-                    sb.Append(user.Email);
-                    sb.Append(">");
+                    sb2.Append("Removed: ");
+                    var first = true;
+                    foreach (var user in groupWithUser.RemovedUsers)
+                    {
+                        if (first) first = false;
+                        else sb2.Append(", ");
+                        sb2.Append(user.Name);
+                        sb2.Append(" [");
+                        sb2.Append(user.Id);
+                        sb2.Append("] <");
+                        sb2.Append(user.Email);
+                        sb2.Append(">");
+                    }
+                    sb2.Append(". ");
                 }
-                sb.Append(". ");
-            }
-            if (saveUserGroupWithUsersEventArgs.AddedUsers.Length > 0)
-            {
-                sb.Append("Added: ");
-                var first = true;
-                foreach (var user in saveUserGroupWithUsersEventArgs.AddedUsers)
+                if (groupWithUser.AddedUsers.Length > 0)
                 {
-                    if (first) first = false;
-                    else sb.Append(", ");
-                    sb.Append(user.Name);
-                    sb.Append(" [");
-                    sb.Append(user.Id);
-                    sb.Append("] <");
-                    sb.Append(user.Email);
-                    sb.Append(">");
+                    sb2.Append("Added: ");
+                    var first = true;
+                    foreach (var user in groupWithUser.AddedUsers)
+                    {
+                        if (first) first = false;
+                        else sb2.Append(", ");
+                        sb2.Append(user.Name);
+                        sb2.Append(" [");
+                        sb2.Append(user.Id);
+                        sb2.Append("] <");
+                        sb2.Append(user.Email);
+                        sb2.Append(">");
+                    }
+                    sb2.Append(". ");
                 }
-                sb.Append(". ");
-            }
 
-            _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                DateTime.Now,
-                -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
-                "umbraco/user-group/save", $"{sb}");
+                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
+                    DateTime.Now,
+                    -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                    "umbraco/user-group/save", $"{sb2}");
+            }
         }
 
         private void UserGroupPermissionAssigned(IUserService sender, SaveEventArgs<EntityPermission> saveEventArgs)
