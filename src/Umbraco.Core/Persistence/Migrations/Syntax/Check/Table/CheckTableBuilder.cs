@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Persistence.Migrations.Syntax.Check.Column;
+﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Column;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -21,7 +20,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
 
         public ICheckColumnOptionSyntax Column(string columnName)
         {
-            throw new NotImplementedException();
+            var expression = new CheckColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                ColumnName = columnName,
+                TableName = Expression.TableName
+            };
+
+            return new CheckColumnBuilder(_context, _sqlSyntax, expression);
         }
 
         public bool Exists()
