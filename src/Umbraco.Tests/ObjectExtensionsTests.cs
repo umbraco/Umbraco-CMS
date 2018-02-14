@@ -277,7 +277,7 @@ namespace Umbraco.Tests
         [Test]
         public void ConvertToDateTimeTest()
         {
-            var conv = "2016-06-07".TryConvertTo<DateTime?>();
+            var conv = "2016-06-07".TryConvertTo<DateTime>();
             Assert.IsTrue(conv);
             Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
         }
@@ -285,7 +285,7 @@ namespace Umbraco.Tests
         [Test]
         public void ConvertToNullableDateTimeTest()
         {
-            var conv = "2016-06-07".TryConvertTo<DateTime>();
+            var conv = "2016-06-07".TryConvertTo<DateTime?>();
             Assert.IsTrue(conv);
             Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
         }
