@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
     {
         private readonly IMemberGroupService _memberGroupService;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;        
+        private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         //only for unit tests!
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _memberGroupService = memberGroupService;
             _dataTypeService = dataTypeService;
-        }        
+        }
 
         #region IMemberService Implementation
 
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
         {
             if (member == null) throw new ArgumentNullException("member");
 
-            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();            
+            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider())
             {
                 provider.ChangePassword(member.Username, "", password);
@@ -1173,12 +1173,16 @@ namespace Umbraco.Core.Services
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.AssignRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(string username, string roleName)
@@ -1188,12 +1192,16 @@ namespace Umbraco.Core.Services
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.DissociateRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void AssignRole(int memberId, string roleName)
@@ -1209,6 +1217,8 @@ namespace Umbraco.Core.Services
                 repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(int memberId, string roleName)
@@ -1224,6 +1234,8 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
 
@@ -1288,6 +1300,9 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
 
         #endregion
 

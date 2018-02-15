@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
                     ? userMgr.GeneratePassword()
                     : passwordModel.NewPassword;
 
-                var resetResult = await userMgr.ResetPasswordAsync(savingUser.Id, resetToken, newPass);
+                var resetResult = await userMgr.ChangePasswordWithResetAsync(savingUser.Id, resetToken, newPass);
 
                 if (resetResult.Succeeded == false)
                 {
@@ -166,6 +166,7 @@ namespace Umbraco.Web.Editors
             }
 
             //Are we resetting the password??
+            //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
             if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
             {
                 var canReset = membershipProvider.CanResetPassword(_userService);
