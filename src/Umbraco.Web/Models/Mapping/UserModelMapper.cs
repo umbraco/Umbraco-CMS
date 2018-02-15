@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             
             config.CreateMap<UserGroupSave, IUserGroup>()
-                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
+                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.UtcNow })
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
                 .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))

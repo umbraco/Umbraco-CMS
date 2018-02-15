@@ -94,7 +94,7 @@ namespace Umbraco.Core.Auditing
             {
                 members.TryGetValue(id, out var member);
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
                     "umbraco/member/roles/removed", $"roles modified, removed {roles}");
             }
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Auditing
             {
                 members.TryGetValue(id, out var member);
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
                     "umbraco/member/roles/assigned", $"roles modified, assigned {roles}");
             }
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Auditing
                 }
 
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
                     "umbraco/user-group/save", $"{sb}");
 
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Auditing
                 foreach (var user in groupWithUser.RemovedUsers)
                 {
                     _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                        DateTime.Now,
+                        DateTime.UtcNow,
                         user.Id, $"User \"{user.Name}\" {FormatEmail(user)}",
                         "umbraco/user-group/save", $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
                 }
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Auditing
                 foreach (var user in groupWithUser.AddedUsers)
                 {
                     _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                        DateTime.Now,
+                        DateTime.UtcNow,
                         user.Id, $"User \"{user.Name}\" {FormatEmail(user)}",
                         "umbraco/user-group/save", $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
                 }
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Auditing
                 var entity = _entityServiceInstance.Get(perm.EntityId);
 
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
                     "umbraco/user-group/permissions-change", $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
             }
@@ -192,7 +192,7 @@ namespace Umbraco.Core.Auditing
                 var dp = string.Join(", ", ((Member) member).GetPreviouslyDirtyProperties());
 
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
                     "umbraco/member/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
             }
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Auditing
             foreach (var member in members)
             {
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
                     "umbraco/member/delete", $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
             }
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Auditing
                 var dp = string.Join(", ", ((User)affectedUser).GetPreviouslyDirtyProperties());
 
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? "" : "; groups assigned: " + groups)}");
             }
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Auditing
             var affectedUsers = deleteEventArgs.DeletedEntities;
             foreach (var affectedUser in affectedUsers)
                 _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
+                    DateTime.UtcNow,
                     affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                     "umbraco/user/delete", "delete user");
         }
@@ -331,7 +331,7 @@ namespace Umbraco.Core.Auditing
 
             _auditServiceInstance.Write(performingId, performingDetails,
                 ipAddress,
-                DateTime.Now,
+                DateTime.UtcNow,
                 affectedId, affectedDetails,
                 eventType, eventDetails);
         }

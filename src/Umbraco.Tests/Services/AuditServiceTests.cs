@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Services
             // fixme - why isn't this set by the test base class?
             Database.Mapper = new PetaPocoMapper();
 
-            var yesterday = DateTime.Now.AddDays(-1);
+            var yesterday = DateTime.UtcNow.AddDays(-1);
             var entry = ServiceContext.AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             Assert.AreEqual(123, entry.PerformingUserId);
             Assert.AreEqual("user 123, bob@example.com", entry.PerformingDetails);
