@@ -62,7 +62,7 @@ namespace Umbraco.Core.Auditing
             BackOfficeUserManager.PasswordChanged += OnPasswordChanged;
             BackOfficeUserManager.PasswordReset += OnPasswordReset;
             //BackOfficeUserManager.ResetAccessFailedCount += ;
-            
+
             UserService.SavedUserGroup2 += OnSavedUserGroupWithUsers;
 
             UserService.SavedUser += OnSavedUser;
@@ -146,50 +146,23 @@ namespace Umbraco.Core.Auditing
                     -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
                     "umbraco/user-group/save", $"{sb}");
 
-                //Now audit the users that have changed
-                if (groupWithUser.RemovedUsers.Length == 0 && groupWithUser.AddedUsers.Length == 0)
-                    return;
+                // now audit the users that have changed
 
-                var sb2 = new StringBuilder();
-                if (groupWithUser.RemovedUsers.Length > 0)
+                foreach (var user in groupWithUser.RemovedUsers)
                 {
-                    sb2.Append("Removed: ");
-                    var first = true;
-                    foreach (var user in groupWithUser.RemovedUsers)
-                    {
-                        if (first) first = false;
-                        else sb2.Append(", ");
-                        sb2.Append(user.Name);
-                        sb2.Append(" [");
-                        sb2.Append(user.Id);
-                        sb2.Append("] <");
-                        sb2.Append(user.Email);
-                        sb2.Append(">");
-                    }
-                    sb2.Append(". ");
-                }
-                if (groupWithUser.AddedUsers.Length > 0)
-                {
-                    sb2.Append("Added: ");
-                    var first = true;
-                    foreach (var user in groupWithUser.AddedUsers)
-                    {
-                        if (first) first = false;
-                        else sb2.Append(", ");
-                        sb2.Append(user.Name);
-                        sb2.Append(" [");
-                        sb2.Append(user.Id);
-                        sb2.Append("] <");
-                        sb2.Append(user.Email);
-                        sb2.Append(">");
-                    }
-                    sb2.Append(". ");
+                    _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
+                        DateTime.Now,
+                        user.Id, $"User \"{user.Name}\" {FormatEmail(user)}",
+                        "umbraco/user-group/save", $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
                 }
 
-                _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
-                    DateTime.Now,
-                    -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
-                    "umbraco/user-group/save", $"{sb2}");
+                foreach (var user in groupWithUser.AddedUsers)
+                {
+                    _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
+                        DateTime.Now,
+                        user.Id, $"User \"{user.Name}\" {FormatEmail(user)}",
+                        "umbraco/user-group/save", $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
+                }
             }
         }
 
