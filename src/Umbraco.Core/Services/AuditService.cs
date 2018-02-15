@@ -131,7 +131,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException(nameof(eventType) + " must contain only alphanumeric characters, hyphens and at least one '/' defining a category");
             if (eventType.Length > AuditEntryDto.EventTypeLength)
                 throw new ArgumentException($"Must be max {AuditEntryDto.EventTypeLength} chars.", nameof(eventType));
-            if (performingIp.Length > AuditEntryDto.IpLength)
+            if (performingIp != null && performingIp.Length > AuditEntryDto.IpLength)
                 throw new ArgumentException($"Must be max {AuditEntryDto.EventTypeLength} chars.", nameof(performingIp));
 
             var entry = new AuditEntry
