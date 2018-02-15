@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Services.Importing
     public class PackageImportTests : TestWithSomeContentBase
     {
         [HideFromTypeFinder]
-        public class Editor1 : PropertyEditor
+        public class Editor1 : ConfiguredDataEditor
         {
             public Editor1(ILogger logger)
                 : base(logger)
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [HideFromTypeFinder]
-        public class Editor2 : PropertyEditor
+        public class Editor2 : ConfiguredDataEditor
         {
             public Editor2(ILogger logger)
                 : base(logger)

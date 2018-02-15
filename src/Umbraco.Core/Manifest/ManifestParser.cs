@@ -59,7 +59,7 @@ namespace Umbraco.Core.Manifest
             {
                 var manifests = GetManifests();
                 return MergeManifests(manifests);
-            });
+            }, new TimeSpan(0, 4, 0));
 
         /// <summary>
         /// Gets all manifests.
@@ -95,8 +95,8 @@ namespace Umbraco.Core.Manifest
         {
             var scripts = new HashSet<string>();
             var stylesheets = new HashSet<string>();
-            var propertyEditors = new List<PropertyEditor>();
-            var parameterEditors = new List<ParameterEditor>();
+            var propertyEditors = new List<IConfiguredDataEditor>();
+            var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
 
             foreach (var manifest in manifests)
@@ -140,8 +140,7 @@ namespace Umbraco.Core.Manifest
                 throw new ArgumentNullOrEmptyException(nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new PropertyEditorConverter(_logger),
-                new ParameterEditorConverter(),
+                new DataEditorConverter(_logger),
                 new ManifestValidatorConverter(_validators));
 
             // scripts and stylesheets are raw string, must process here
@@ -149,6 +148,12 @@ namespace Umbraco.Core.Manifest
                 manifest.Scripts[i] = IOHelper.ResolveVirtualUrl(manifest.Scripts[i]);
             for (var i = 0; i < manifest.Stylesheets.Length; i++)
                 manifest.Stylesheets[i] = IOHelper.ResolveVirtualUrl(manifest.Stylesheets[i]);
+
+            // add property editors that are also parameter editors, to the parameter editors list
+            // (the manifest format is kinda legacy)
+            var ppEditors = manifest.PropertyEditors.Where(x => (x.Type & EditorType.MacroParameter) > 0).ToList();
+            if (ppEditors.Count > 0)
+                manifest.ParameterEditors = manifest.ParameterEditors.Union(ppEditors).ToArray();
 
             return manifest;
         }

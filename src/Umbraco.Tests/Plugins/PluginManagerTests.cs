@@ -297,11 +297,11 @@ AnotherContentFinder
         {
             var types = new HashSet<TypeLoader.TypeList>();
 
-            var propEditors = new TypeLoader.TypeList(typeof (PropertyEditor), null);
+            var propEditors = new TypeLoader.TypeList(typeof (ConfiguredDataEditor), null);
             propEditors.Add(typeof(LabelPropertyEditor));
             types.Add(propEditors);
 
-            var found = types.SingleOrDefault(x => x.BaseType == typeof (PropertyEditor) && x.AttributeType == null);
+            var found = types.SingleOrDefault(x => x.BaseType == typeof (ConfiguredDataEditor) && x.AttributeType == null);
 
             Assert.IsNotNull(found);
 

@@ -16,10 +16,10 @@ namespace Umbraco.Core.Manifest
         public string[] Stylesheets { get; set; }= Array.Empty<string>();
 
         [JsonProperty("propertyEditors")]
-        public PropertyEditor[] PropertyEditors { get; set; } = Array.Empty<PropertyEditor>();
+        public IConfiguredDataEditor[] PropertyEditors { get; set; } = Array.Empty<IConfiguredDataEditor>();
 
         [JsonProperty("parameterEditors")]
-        public ParameterEditor[] ParameterEditors { get; set; } = Array.Empty<ParameterEditor>();
+        public IDataEditor[] ParameterEditors { get; set; } = Array.Empty<IDataEditor>();
 
         [JsonProperty("gridEditors")]
         public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();

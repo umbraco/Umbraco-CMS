@@ -2,15 +2,16 @@
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor("tabPicker", "Tab Picker", "entitypicker")]
-    public class PropertyGroupParameterEditor : ParameterEditor
+    [DataEditor("tabPicker", EditorType.MacroParameter, "Tab Picker", "entitypicker")]
+    public class PropertyGroupParameterEditor : DataEditor
     {
         public PropertyGroupParameterEditor()
         {
-            Configuration.Add("multiple", "0");
-            Configuration.Add("entityType", "PropertyGroup");
+            // configure
+            DefaultConfiguration.Add("multiple", "0");
+            DefaultConfiguration.Add("entityType", "PropertyGroup");
             //don't publish the id for a property group, publish it's alias (which is actually just it's lower cased name)
-            Configuration.Add("publishBy", "alias");
+            DefaultConfiguration.Add("publishBy", "alias");
         }
     }
 }

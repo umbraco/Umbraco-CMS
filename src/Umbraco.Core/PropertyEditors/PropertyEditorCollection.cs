@@ -4,17 +4,17 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    public class PropertyEditorCollection : BuilderCollectionBase<PropertyEditor>
+    public class PropertyEditorCollection : BuilderCollectionBase<IConfiguredDataEditor>
     {
-        public PropertyEditorCollection(IEnumerable<PropertyEditor> items)
+        public PropertyEditorCollection(IEnumerable<IConfiguredDataEditor> items)
             : base(items)
         { }
 
         // note: virtual so it can be mocked
-        public virtual PropertyEditor this[string alias]
+        public virtual IConfiguredDataEditor this[string alias]
             => this.SingleOrDefault(x => x.Alias == alias);
 
-        public virtual bool TryGet(string alias, out PropertyEditor editor)
+        public virtual bool TryGet(string alias, out IConfiguredDataEditor editor)
         {
             editor = this.FirstOrDefault(x => x.Alias == alias);
             return editor != null;

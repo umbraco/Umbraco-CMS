@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the property editor.
         /// </summary>
-        PropertyEditor Editor { get; set; }
+        IConfiguredDataEditor Editor { get; set; }
 
         /// <summary>
         /// Gets the property editor alias.

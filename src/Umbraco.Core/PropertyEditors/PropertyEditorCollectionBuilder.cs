@@ -6,7 +6,7 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    public class PropertyEditorCollectionBuilder : LazyCollectionBuilderBase<PropertyEditorCollectionBuilder, PropertyEditorCollection, PropertyEditor>
+    public class PropertyEditorCollectionBuilder : LazyCollectionBuilderBase<PropertyEditorCollectionBuilder, PropertyEditorCollection, IConfiguredDataEditor>
     {
         private readonly ManifestParser _manifestParser;
 
@@ -18,9 +18,11 @@ namespace Umbraco.Core.PropertyEditors
 
         protected override PropertyEditorCollectionBuilder This => this;
 
-        protected override IEnumerable<PropertyEditor> CreateItems(params object[] args)
+        protected override IEnumerable<IConfiguredDataEditor> CreateItems(params object[] args)
         {
-            return base.CreateItems(args).Union(_manifestParser.Manifest.PropertyEditors);
+            return base.CreateItems(args)
+                .Where(x => (x.Type & EditorType.PropertyValue) > 0)
+                .Union(_manifestParser.Manifest.PropertyEditors);
         }
     }
 }

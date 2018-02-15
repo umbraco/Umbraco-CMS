@@ -15,8 +15,11 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.NestedContent, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
-    public class NestedContentPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a nested content property editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.NestedContent, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
+    public class NestedContentPropertyEditor : ConfiguredDataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
 
@@ -41,19 +44,19 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Pre Value Editor
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor();
 
         #endregion
 
         #region Value Editor
 
-        protected override IPropertyValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors);
 
-        internal class NestedContentPropertyValueEditor : ValueEditor
+        internal class NestedContentPropertyValueEditor : DataValueEditor
         {
             private readonly PropertyEditorCollection _propertyEditors;
 
-            public NestedContentPropertyValueEditor(ValueEditorAttribute attribute, PropertyEditorCollection propertyEditors)
+            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;

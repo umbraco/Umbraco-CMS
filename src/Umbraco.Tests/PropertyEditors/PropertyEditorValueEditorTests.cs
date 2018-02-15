@@ -43,7 +43,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType("test", ValueStorageType.Nvarchar));
             prop.SetValue(value);
 
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = ValueTypes.String
             };
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("DATETIME", "", null)] //test empty string for date
         public void Value_Editor_Can_Convert_To_Clr_Type(string valueType, string val, object expected)
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = valueType
                 };
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Decimal_Clr_Type()
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
             {
                 ValueType = ValueTypes.Decimal
             };
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Decimal_Clr_Type_With_Other_Separator()
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
             {
                 ValueType = ValueTypes.Decimal
             };
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Decimal_Clr_Type_With_Empty_String()
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
             {
                 ValueType = ValueTypes.Decimal
             };
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Convert_To_Date_Clr_Type()
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = ValueTypes.Date
             };
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType("test", ValueStorageType.Nvarchar));
             prop.SetValue(val);
 
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = valueType
                 };
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Value_Editor_Can_Serialize_Decimal_Value()
         {
             var value = 12.34M;
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = ValueTypes.Decimal
             };
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void Value_Editor_Can_Serialize_Decimal_Value_With_Empty_String()
         {
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = ValueTypes.Decimal
             };
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void Value_Editor_Can_Serialize_Date_Value()
         {
             var now = DateTime.Now;
-            var valueEditor = new ValueEditor
+            var valueEditor = new DataValueEditor
                 {
                     ValueType = ValueTypes.Date
             };

@@ -10,25 +10,31 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = ValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
-    public class MultipleTextStringPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a multiple text string property editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.MultipleTextstring, "Repeatable textstrings", "multipletextbox", ValueType = ValueTypes.Text, Icon="icon-ordered-list", Group="lists")]
+    public class MultipleTextStringPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
-        public MultipleTextStringPropertyEditor(ILogger logger) : base(logger)
+        public MultipleTextStringPropertyEditor(ILogger logger)
+            : base(logger)
         { }
 
-        protected override IPropertyValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
+        /// <inheritdoc />
+        protected override IDataValueEditor CreateValueEditor() => new MultipleTextStringPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor();
 
         /// <summary>
         /// Custom value editor so we can format the value for the editor and the database
         /// </summary>
-        internal class MultipleTextStringPropertyValueEditor : ValueEditor
+        internal class MultipleTextStringPropertyValueEditor : DataValueEditor
         {
-            public MultipleTextStringPropertyValueEditor(ValueEditorAttribute attribute)
+            public MultipleTextStringPropertyValueEditor(DataEditorAttribute attribute)
                 : base(attribute)
             { }
 

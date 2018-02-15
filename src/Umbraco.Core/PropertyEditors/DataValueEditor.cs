@@ -14,25 +14,25 @@ using Umbraco.Core.Services;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Represents a value editor for content properties.
+    /// Represents a value editor.
     /// </summary>
-    public class ValueEditor : IPropertyValueEditor
+    public class DataValueEditor : IDataValueEditor
     {
         private string _view;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValueEditor"/> class.
+        /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public ValueEditor() // for tests, and manifest
+        public DataValueEditor() // for tests, and manifest
         {
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValueEditor"/> class.
+        /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public ValueEditor(string view, params IValueValidator[] validators) // not used
+        public DataValueEditor(string view, params IValueValidator[] validators) // not used
             : this()
         {
             View = view;
@@ -40,9 +40,9 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValueEditor"/> class.
+        /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
-        public ValueEditor(ValueEditorAttribute attribute)
+        public DataValueEditor(DataEditorAttribute attribute)
             : this()
         {
             if (attribute == null) return;
@@ -240,7 +240,7 @@ namespace Umbraco.Core.PropertyEditors
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
-                Current.Logger.Warn<ValueEditor>("The value " + editorValue.Value + " cannot be converted to the type " + ValueTypes.ToStorageType(ValueType));
+                Current.Logger.Warn<DataValueEditor>("The value " + editorValue.Value + " cannot be converted to the type " + ValueTypes.ToStorageType(ValueType));
                 return null;
             }
             return result.Result;

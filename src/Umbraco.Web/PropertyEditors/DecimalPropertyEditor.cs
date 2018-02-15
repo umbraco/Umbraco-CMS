@@ -5,30 +5,28 @@ using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.Decimal, "Decimal", "decimal", ValueTypes.Decimal, IsMacroParameterEditor = true)]
-    public class DecimalPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a decimal property and parameter editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.Decimal, EditorType.PropertyValue | EditorType.MacroParameter, "Decimal", "decimal", ValueType = ValueTypes.Decimal)]
+    public class DecimalPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
-        /// The constructor will setup the property editor based on the attribute if one is found
+        /// Initializes a new instance of the <see cref="DecimalPropertyEditor"/> class.
         /// </summary>
-        public DecimalPropertyEditor(ILogger logger) : base(logger)
-        {
-        }
+        public DecimalPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        /// <summary>
-        /// Overridden to ensure that the value is validated
-        /// </summary>
-        /// <returns></returns>
-        protected override IPropertyValueEditor CreateValueEditor()
+        /// <inheritdoc />
+        protected override IDataValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             editor.Validators.Add(new DecimalValidator());
             return editor;
         }
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new DecimalConfigurationEditor();
-        }
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new DecimalConfigurationEditor();
     }
 }

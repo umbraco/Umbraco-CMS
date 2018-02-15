@@ -5,16 +5,13 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     // fixme - if deprecated, what's the alternative?
-    [ValueEditor(Constants.PropertyEditors.Aliases.MacroContainer, "(Obsolete) Macro Picker", "macrocontainer", ValueType = ValueTypes.Text, Group="rich content", Icon="icon-settings-alt", IsDeprecated = true)]
-    public class MacroContainerPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.MacroContainer, "(Obsolete) Macro Picker", "macrocontainer", ValueType = ValueTypes.Text, Group="rich content", Icon="icon-settings-alt", IsDeprecated = true)]
+    public class MacroContainerPropertyEditor : ConfiguredDataEditor
     {
         public MacroContainerPropertyEditor(ILogger logger)
             : base(logger)
         { }
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new MacroContainerConfigurationEditor();
-        }
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MacroContainerConfigurationEditor();
     }
 }

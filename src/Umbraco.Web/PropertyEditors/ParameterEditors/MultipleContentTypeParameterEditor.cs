@@ -2,13 +2,14 @@
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor("contentTypeMultiple", "Multiple Content Type Picker", "entitypicker")]
-    public class MultipleContentTypeParameterEditor : ParameterEditor
+    [DataEditor("contentTypeMultiple", EditorType.MacroParameter, "Multiple Content Type Picker", "entitypicker")]
+    public class MultipleContentTypeParameterEditor : DataEditor
     {
         public MultipleContentTypeParameterEditor()
         {
-            Configuration.Add("multiple", "1");
-            Configuration.Add("entityType", "DocumentType");
+            // configure
+            DefaultConfiguration.Add("multiple", true);
+            DefaultConfiguration.Add("entityType", "DocumentType");
         }
     }
 }

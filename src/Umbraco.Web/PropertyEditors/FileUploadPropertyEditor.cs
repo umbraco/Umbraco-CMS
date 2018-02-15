@@ -10,8 +10,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
-    public class FileUploadPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
+    public class FileUploadPropertyEditor : ConfiguredDataEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
 
@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IPropertyValueEditor CreateValueEditor()
+        protected override IDataValueEditor CreateValueEditor()
         {
             var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem);
             editor.Validators.Add(new UploadFileTypeValidator());

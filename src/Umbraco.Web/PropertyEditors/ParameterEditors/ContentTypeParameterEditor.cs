@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor("contentType", "Content Type Picker", "entitypicker")]
-    public class ContentTypeParameterEditor : ParameterEditor
+    /// <summary>
+    /// Represents a content type parameter editor.
+    /// </summary>
+    [DataEditor("contentType", EditorType.MacroParameter, "Content Type Picker", "entitypicker")]
+    public class ContentTypeParameterEditor : DataEditor
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentTypeParameterEditor"/> class.
+        /// </summary>
         public ContentTypeParameterEditor()
         {
-            Configuration.Add("multiple", "0");
-            Configuration.Add("entityType", "DocumentType");
+            // configure
+            DefaultConfiguration.Add("multiple", false);
+            DefaultConfiguration.Add("entityType", "DocumentType");
         }
     }
 }

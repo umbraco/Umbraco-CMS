@@ -5,16 +5,16 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.Date, "Date", "datepicker", ValueTypes.Date, Icon="icon-calendar")]
-    public class DatePropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.Date, "Date", "datepicker", ValueType = ValueTypes.Date, Icon="icon-calendar")]
+    public class DatePropertyEditor : ConfiguredDataEditor
     {
         public DatePropertyEditor(ILogger logger): base(logger)
         { }
 
         /// <inheritdoc />
-        protected override IPropertyValueEditor CreateValueEditor() => new DateValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new DateValueEditor(Attribute);
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor() => new DateConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new DateConfigurationEditor();
     }
 }

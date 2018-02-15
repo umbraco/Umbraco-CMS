@@ -10,9 +10,12 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
+    /// <summary>
+    /// Represents a tags property editor.
+    /// </summary>
     [TagsPropertyEditor]
-    [ValueEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
-    public class TagsPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
+    public class TagsPropertyEditor : ConfiguredDataEditor
     {
         private readonly ManifestValidatorCollection _validators;
 
@@ -22,13 +25,13 @@ namespace Umbraco.Web.PropertyEditors
             _validators = validators;
         }
 
-        protected override IPropertyValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators);
 
-        internal class TagPropertyValueEditor : ValueEditor
+        internal class TagPropertyValueEditor : DataValueEditor
         {
-            public TagPropertyValueEditor(ValueEditorAttribute attribute)
+            public TagPropertyValueEditor(DataEditorAttribute attribute)
                 : base(attribute)
             { }
 

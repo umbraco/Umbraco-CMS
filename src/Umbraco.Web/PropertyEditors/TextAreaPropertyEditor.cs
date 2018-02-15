@@ -5,10 +5,10 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Represents a textarea editor.
+    /// Represents a textarea property and parameter editor.
     /// </summary>
-    [ValueEditor(Constants.PropertyEditors.Aliases.TextboxMultiple, "Textarea", "textarea", IsMacroParameterEditor = true, ValueType = ValueTypes.Text, Icon="icon-application-window-alt")]
-    public class TextAreaPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.TextboxMultiple, EditorType.PropertyValue | EditorType.MacroParameter, "Textarea", "textarea", ValueType = ValueTypes.Text, Icon="icon-application-window-alt")]
+    public class TextAreaPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
@@ -18,9 +18,9 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override IPropertyValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(Attribute);
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor();
     }
 }

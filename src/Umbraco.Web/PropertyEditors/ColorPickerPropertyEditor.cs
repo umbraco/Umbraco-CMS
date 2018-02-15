@@ -5,8 +5,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
-    public class ColorPickerPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
+    public class ColorPickerPropertyEditor : ConfiguredDataEditor
     {
         private readonly ILocalizedTextService _textService;
 
@@ -20,6 +20,6 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_textService);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_textService);
     }
 }

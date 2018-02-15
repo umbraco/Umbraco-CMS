@@ -5,8 +5,8 @@ using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.EmailAddress, "Email address", "email", Icon="icon-message")]
-    public class EmailAddressPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.EmailAddress, "Email address", "email", Icon="icon-message")]
+    public class EmailAddressPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
         {
         }
 
-        protected override IPropertyValueEditor CreateValueEditor()
+        protected override IDataValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             //add an email address validator
@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
-        protected override ConfigurationEditor CreateConfigurationEditor()
+        protected override IConfigurationEditor CreateConfigurationEditor()
         {
             return new EmailAddressConfigurationEditor();
         }

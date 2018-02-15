@@ -12,11 +12,11 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// The value editor for the file upload property editor.
     /// </summary>
-    internal class FileUploadPropertyValueEditor : ValueEditor
+    internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
 
-        public FileUploadPropertyValueEditor(ValueEditorAttribute attribute, MediaFileSystem mediaFileSystem)
+        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, MediaFileSystem mediaFileSystem)
             : base(attribute)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));

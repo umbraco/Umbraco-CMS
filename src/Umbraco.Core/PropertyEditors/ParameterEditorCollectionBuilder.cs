@@ -6,7 +6,7 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    public class ParameterEditorCollectionBuilder : LazyCollectionBuilderBase<ParameterEditorCollectionBuilder, ParameterEditorCollection, IParameterEditor>
+    public class ParameterEditorCollectionBuilder : LazyCollectionBuilderBase<ParameterEditorCollectionBuilder, ParameterEditorCollection, IDataEditor>
     {
         private readonly ManifestParser _manifestParser;
 
@@ -18,24 +18,11 @@ namespace Umbraco.Core.PropertyEditors
 
         protected override ParameterEditorCollectionBuilder This => this;
 
-        protected override IEnumerable<IParameterEditor> CreateItems(params object[] args)
+        protected override IEnumerable<IDataEditor> CreateItems(params object[] args)
         {
-            //return base.CreateItems(args).Union(_manifestBuilder.PropertyEditors);
-
-            // the buider's producer returns all IParameterEditor implementations
-            // this includes classes inheriting from both PropertyEditor and ParameterEditor
-            // but only some PropertyEditor inheritors are also parameter editors
-            //
-            // return items,
-            // that are NOT PropertyEditor OR that also have IsParameterEditor set to true
-            // union all manifest's parameter editors
-            // union all manifest's property editors that are ALSO parameter editors
-
             return base.CreateItems(args)
-                .Where(x => (x is PropertyEditor) == false || ((PropertyEditor) x).IsParameterEditor)
-                .Union(_manifestParser.Manifest.ParameterEditors)
-                .Union(_manifestParser.Manifest.PropertyEditors.Where(x => x.IsParameterEditor))
-                .ToList();
+                .Where(x => (x.Type & EditorType.MacroParameter) > 0)
+                .Union(_manifestParser.Manifest.ParameterEditors);
         }
     }
 }

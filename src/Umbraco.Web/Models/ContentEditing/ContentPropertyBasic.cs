@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Used internally during model mapping
         /// </summary>
         [IgnoreDataMember]
-        internal PropertyEditor PropertyEditor { get; set; }
+        internal IConfiguredDataEditor PropertyEditor { get; set; }
 
     }
 }

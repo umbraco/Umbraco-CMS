@@ -7,8 +7,8 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a markdown editor.
     /// </summary>
-    [ValueEditor(Constants.PropertyEditors.Aliases.MarkdownEditor, "Markdown editor", "markdowneditor", ValueType = ValueTypes.Text, Icon="icon-code", Group="rich content")]
-    public class MarkdownPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.MarkdownEditor, "Markdown editor", "markdowneditor", ValueType = ValueTypes.Text, Icon="icon-code", Group="rich content")]
+    public class MarkdownPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
@@ -18,9 +18,6 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new MarkdownConfigurationEditor();
-        }
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MarkdownConfigurationEditor();
     }
 }

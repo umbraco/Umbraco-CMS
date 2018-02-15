@@ -5,19 +5,29 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.DateTime, "Date/Time", "datepicker", ValueType = ValueTypes.DateTime, Icon="icon-time")]
-    public class DateTimePropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a date and time property editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.DateTime, "Date/Time", "datepicker", ValueType = ValueTypes.DateTime, Icon="icon-time")]
+    public class DateTimePropertyEditor : ConfiguredDataEditor
     {
-        public DateTimePropertyEditor(ILogger logger): base(logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.
+        /// </summary>
+        /// <param name="logger"></param>
+        public DateTimePropertyEditor(ILogger logger)
+            : base(logger)
         { }
 
-        protected override IPropertyValueEditor CreateValueEditor()
+        /// <inheritdoc />
+        protected override IDataValueEditor CreateValueEditor()
         {
             var editor = base.CreateValueEditor();
             editor.Validators.Add(new DateTimeValidator());
             return editor;
         }
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor();
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor();
     }
 }

@@ -177,7 +177,7 @@ namespace umbraco.cms.presentation.developer
             return Convert.IsDBNull(test) ? 0 : test;
         }
 
-        protected IEnumerable<IParameterEditor> GetMacroParameterEditors()
+        protected IEnumerable<IDataEditor> GetMacroParameterEditors()
         {
             // we need to show the depracated ones for backwards compatibility
             // FIXME not managing deprecated here?!

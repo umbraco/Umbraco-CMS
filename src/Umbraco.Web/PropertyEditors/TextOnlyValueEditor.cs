@@ -9,9 +9,9 @@ namespace Umbraco.Web.PropertyEditors
     /// Custom value editor which ensures that the value stored is just plain text and that
     /// no magic json formatting occurs when translating it to and from the database values
     /// </summary>
-    public class TextOnlyValueEditor : ValueEditor
+    public class TextOnlyValueEditor : DataValueEditor
     {
-        public TextOnlyValueEditor(ValueEditorAttribute attribute)
+        public TextOnlyValueEditor(DataEditorAttribute attribute)
             : base(attribute)
         { }
 

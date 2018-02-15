@@ -7,8 +7,8 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a property editor for label properties.
     /// </summary>
-    [ValueEditor(Constants.PropertyEditors.Aliases.NoEdit, "Label", "readonlyvalue", Icon = "icon-readonly")]
-    public class LabelPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.NoEdit, "Label", "readonlyvalue", Icon = "icon-readonly")]
+    public class LabelPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LabelPropertyEditor"/> class.
@@ -18,15 +18,15 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override IPropertyValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new LabelPropertyValueEditor(Attribute);
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new LabelConfigurationEditor();
 
         // provides the property value editor
-        internal class LabelPropertyValueEditor : ValueEditor
+        internal class LabelPropertyValueEditor : DataValueEditor
         {
-            public LabelPropertyValueEditor(ValueEditorAttribute attribute)
+            public LabelPropertyValueEditor(DataEditorAttribute attribute)
                 : base(attribute)
             { }
 

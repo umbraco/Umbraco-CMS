@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.Compose();
 
-            Container.RegisterSingleton(f => new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>()));
+            Container.RegisterSingleton(f => new PropertyEditorCollection(Enumerable.Empty<ConfiguredDataEditor>()));
         }
 
         [Test]

@@ -10,9 +10,9 @@ namespace Umbraco.Web.PropertyEditors
     /// CUstom value editor so we can serialize with the correct date format (excluding time)
     /// and includes the date validator
     /// </summary>
-    internal class DateValueEditor : ValueEditor
+    internal class DateValueEditor : DataValueEditor
     {
-        public DateValueEditor(ValueEditorAttribute attribute)
+        public DateValueEditor(DataEditorAttribute attribute)
             : base(attribute)
         {
             Validators.Add(new DateTimeValidator());
@@ -28,6 +28,5 @@ namespace Umbraco.Web.PropertyEditors
             //Dates will be formatted as yyyy-MM-dd
             return date.Result.Value.ToString("yyyy-MM-dd");
         }
-
     }
 }

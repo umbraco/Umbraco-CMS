@@ -9,8 +9,11 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
-    public class RichTextPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a rich text property editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
+    public class RichTextPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -23,17 +26,17 @@ namespace Umbraco.Web.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IPropertyValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor();
 
 
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
-        internal class RichTextPropertyValueEditor : ValueEditor
+        internal class RichTextPropertyValueEditor : DataValueEditor
         {
-            public RichTextPropertyValueEditor(ValueEditorAttribute attribute)
+            public RichTextPropertyValueEditor(DataEditorAttribute attribute)
                 : base(attribute)
             { }
 

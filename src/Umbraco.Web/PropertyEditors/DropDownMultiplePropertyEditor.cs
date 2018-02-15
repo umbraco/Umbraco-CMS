@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -13,10 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Due to maintaining backwards compatibility this data type stores the value as a string which is a comma separated value of the
     /// ids of the individual items so we have logic in here to deal with that.
     /// </remarks>
-    [ParameterEditor("propertyTypePickerMultiple", "Name", "textbox")] // fixme multiple parameter editor attribute?!
-    [ParameterEditor("contentTypeMultiple", "Name", "textbox")]
-    [ParameterEditor("tabPickerMultiple", "Name", "textbox")]
-    [ValueEditor(Constants.PropertyEditors.Aliases.DropDownListMultiple, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list")]
+    [DataEditor(Constants.PropertyEditors.Aliases.DropDownListMultiple, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list")]
     public class DropDownMultiplePropertyEditor : DropDownMultipleWithKeysPropertyEditor
     {
         /// <summary>
@@ -27,6 +25,6 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override IPropertyValueEditor CreateValueEditor() => new PublishValuesMultipleValueEditor(false, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new PublishValuesMultipleValueEditor(false, Attribute);
     }
 }

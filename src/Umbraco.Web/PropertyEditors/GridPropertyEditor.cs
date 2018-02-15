@@ -15,8 +15,11 @@ namespace Umbraco.Web.PropertyEditors
 {
     using Examine = global::Examine;
 
-    [ValueEditor(Constants.PropertyEditors.Aliases.Grid, "Grid layout", "grid", HideLabel = true, IsMacroParameterEditor = false, ValueType = ValueTypes.Json, Group="rich content", Icon="icon-layout")]
-    public class GridPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a grid property and parameter editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.Grid, "Grid layout", "grid", HideLabel = true, ValueType = ValueTypes.Json, Group="rich content", Icon="icon-layout")]
+    public class GridPropertyEditor : ConfiguredDataEditor
     {
         public GridPropertyEditor(ILogger logger)
             : base(logger)
@@ -109,13 +112,13 @@ namespace Umbraco.Web.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IPropertyValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute);
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor();
 
-        internal class GridPropertyValueEditor : ValueEditor
+        internal class GridPropertyValueEditor : DataValueEditor
         {
-            public GridPropertyValueEditor(ValueEditorAttribute attribute)
+            public GridPropertyValueEditor(DataEditorAttribute attribute)
                 : base(attribute)
             { }
         }

@@ -67,11 +67,11 @@ namespace Umbraco.Core.Runtime
                 .Add<IntegerValidator>()
                 .Add<DecimalValidator>();
 
+            // both are initialized with data editors, and filter them out
             composition.Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetPropertyEditors());
-
+                .Add(factory => factory.GetInstance<TypeLoader>().GetDataEditors());
             composition.Container.RegisterCollectionBuilder<ParameterEditorCollectionBuilder>()
-                .Add(factory => factory.GetInstance<TypeLoader>().GetParameterEditors());
+                .Add(factory => factory.GetInstance<TypeLoader>().GetDataEditors());
 
             // register a server registrar, by default it's the db registrar unless the dev
             // has the legacy dist calls enabled - fixme - should obsolete the legacy thing

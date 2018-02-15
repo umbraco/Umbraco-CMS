@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -7,21 +6,13 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.UserPicker, "User picker", "entitypicker", ValueTypes.Integer, Group="People", Icon="icon-user")]
-    public class UserPickerPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.UserPicker, "User picker", "entitypicker", ValueType = ValueTypes.Integer, Group = "People", Icon = "icon-user")]
+    public class UserPickerPropertyEditor : ConfiguredDataEditor
     {
         public UserPickerPropertyEditor(ILogger logger)
             : base(logger)
         { }
 
-        protected override ConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();
-    }
-
-    public class UserPickerConfiguration : ConfigurationEditor
-    {
-        public override IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>
-        {
-            {"entityType", "User"}
-        };
+        protected override IConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();
     }
 }

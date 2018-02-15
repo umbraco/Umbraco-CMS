@@ -14,8 +14,11 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [ValueEditor(Constants.PropertyEditors.Aliases.ImageCropper, "Image Cropper", "imagecropper", ValueType = ValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
-    public class ImageCropperPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents an image cropper property editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.ImageCropper, "Image Cropper", "imagecropper", ValueType = ValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
+    public class ImageCropperPropertyEditor : ConfiguredDataEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly UploadAutoFillProperties _autoFillProperties;
@@ -36,13 +39,13 @@ namespace Umbraco.Web.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IPropertyValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem);
+        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, Logger, _mediaFileSystem);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override ConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor();
 
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.

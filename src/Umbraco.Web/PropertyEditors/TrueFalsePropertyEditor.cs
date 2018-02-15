@@ -5,10 +5,10 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Represents a boolean editor.
+    /// Represents a boolean property and parameter editor.
     /// </summary>
-    [ValueEditor(Constants.PropertyEditors.Aliases.Boolean, "True/False", "boolean", ValueTypes.Integer, IsMacroParameterEditor = true, Group = "Common", Icon="icon-checkbox")]
-    public class TrueFalsePropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.Boolean, EditorType.PropertyValue | EditorType.MacroParameter, "True/False", "boolean", ValueType = ValueTypes.Integer, Group = "Common", Icon="icon-checkbox")]
+    public class TrueFalsePropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
@@ -18,9 +18,6 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor()
-        {
-            return new TrueFalseConfigurationEditor();
-        }
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TrueFalseConfigurationEditor();
     }
 }

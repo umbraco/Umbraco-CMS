@@ -12,35 +12,11 @@ namespace Umbraco.Core.Composing
     internal static class TypeLoaderExtensions
     {
         /// <summary>
-        /// Gets all classes inheriting from PropertyEditor.
+        /// Gets all classes implementing <see cref="IDataEditor"/>.
         /// </summary>
-        /// <remarks>
-        /// <para>Excludes the actual PropertyEditor base type.</para>
-        /// </remarks>
-        public static IEnumerable<Type> GetPropertyEditors(this TypeLoader mgr)
+        public static IEnumerable<Type> GetDataEditors(this TypeLoader mgr)
         {
-            // look for IParameterEditor (fast, IDiscoverable) then filter
-
-            var propertyEditor = typeof (PropertyEditor);
-
-            return mgr.GetTypes<IParameterEditor>()
-                .Where(x => propertyEditor.IsAssignableFrom(x) && x != propertyEditor);
-        }
-
-        /// <summary>
-        /// Gets all classes implementing IParameterEditor.
-        /// </summary>
-        /// <remarks>
-        /// <para>Includes property editors.</para>
-        /// <para>Excludes the actual ParameterEditor and PropertyEditor base types.</para>
-        /// </remarks>
-        public static IEnumerable<Type> GetParameterEditors(this TypeLoader mgr)
-        {
-            var propertyEditor = typeof (PropertyEditor);
-            var parameterEditor = typeof (ParameterEditor);
-
-            return mgr.GetTypes<IParameterEditor>()
-                .Where(x => x != propertyEditor && x != parameterEditor);
+            return mgr.GetTypes<IDataEditor>();
         }
 
         /// <summary>

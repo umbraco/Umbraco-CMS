@@ -33,7 +33,7 @@ namespace Umbraco.Web.Models.Mapping
             //  but, this is the ONLY place where it's assigned? it is also the only place where
             //  .HideLabel is used - and basically all the rest kinda never depends on config,
             //  but... it should?
-            var ve = (ValueEditor) valEditor;
+            var ve = (DataValueEditor) valEditor;
             ve.Configuration = config;
 
             //set the display properties after mapping

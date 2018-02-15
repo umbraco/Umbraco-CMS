@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
     {
         private static PropertySelectors _selectors;
 
-        private PropertyEditor _editor;
+        private IConfiguredDataEditor _editor;
         private ValueStorageType _databaseType;
         private object _configuration;
         private bool _hasConfiguration;
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
         /// </summary>
-        public DataType(PropertyEditor editor, int parentId = -1)
+        public DataType(IConfiguredDataEditor editor, int parentId = -1)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
             ParentId = parentId;
@@ -36,14 +36,14 @@ namespace Umbraco.Core.Models
 
         private class PropertySelectors
         {
-            public readonly PropertyInfo Editor = ExpressionHelper.GetPropertyInfo<DataType, PropertyEditor>(x => x.Editor);
+            public readonly PropertyInfo Editor = ExpressionHelper.GetPropertyInfo<DataType, IDataEditor>(x => x.Editor);
             public readonly PropertyInfo DatabaseType = ExpressionHelper.GetPropertyInfo<DataType, ValueStorageType>(x => x.DatabaseType);
             public readonly PropertyInfo Configuration = ExpressionHelper.GetPropertyInfo<DataType, object>(x => x.Configuration);
         }
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public PropertyEditor Editor
+        public IConfiguredDataEditor Editor
         {
             get => _editor;
             set

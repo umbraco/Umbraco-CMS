@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             TemplateRepository tr;
             var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out tr);
-            var editors = new PropertyEditorCollection(Enumerable.Empty<PropertyEditor>());
+            var editors = new PropertyEditorCollection(Enumerable.Empty<ConfiguredDataEditor>());
             dtdRepository = new DataTypeRepository(scopeAccessor, cacheHelper, new Lazy<PropertyEditorCollection>(() => editors), Logger);
             return ctRepository;
         }

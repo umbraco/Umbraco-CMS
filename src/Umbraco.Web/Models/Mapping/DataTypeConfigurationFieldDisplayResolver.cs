@@ -36,10 +36,16 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         public IEnumerable<DataTypeConfigurationFieldDisplay> Resolve(IDataType dataType)
         {
-            PropertyEditor editor = null;
-            if (!string.IsNullOrWhiteSpace(dataType.EditorAlias) && !Current.PropertyEditors.TryGet(dataType.EditorAlias, out editor))
-                throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
-
+            ConfiguredDataEditor editor = null;
+            if (!string.IsNullOrWhiteSpace(dataType.EditorAlias))
+            {
+                if (!Current.PropertyEditors.TryGet(dataType.EditorAlias, out var e1))
+                    throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
+                if (!(e1 is ConfiguredDataEditor e2))
+                    throw new InvalidOperationException($"Property editor with alias \"{dataType.EditorAlias}\" is not configurable.");
+                editor = e2;
+            }
+ 
             var configuration = dataType.Configuration;
             Dictionary<string, object> configurationDictionary = null;
             var fields = Array.Empty<DataTypeConfigurationFieldDisplay>();

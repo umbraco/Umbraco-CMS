@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
             var configurationDisplayResolver = new DataTypeConfigurationFieldDisplayResolver();
             var databaseTypeResolver = new DatabaseTypeResolver();
 
-            CreateMap<PropertyEditor, PropertyEditorBasic>();
+            CreateMap<ConfiguredDataEditor, PropertyEditorBasic>();
 
             // map the standard properties, not the values
             CreateMap<ConfigurationField, DataTypeConfigurationFieldDisplay>()
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 Constants.DataTypes.DefaultMembersListView
             };
 
-            CreateMap<PropertyEditor, DataTypeBasic>()
+            CreateMap<ConfiguredDataEditor, DataTypeBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
                 .ForMember(dest => dest.HasPrevalues, opt => opt.Ignore())
                 .ForMember(dest => dest.IsSystemDataType, opt => opt.Ignore())
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Editor, opt => opt.MapFrom(src => propertyEditors[src.EditorAlias]));
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
-            CreateMap<PropertyEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
+            CreateMap<ConfiguredDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
                 .ConvertUsing(src =>
                     {
                         // this is a new data type, initialize default configuration

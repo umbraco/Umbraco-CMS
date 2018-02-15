@@ -7,8 +7,8 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a slider editor.
     /// </summary>
-    [ValueEditor(Constants.PropertyEditors.Aliases.Slider, "Slider", "slider", Icon="icon-navigation-horizontal")]
-    public class SliderPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.Slider, "Slider", "slider", Icon = "icon-navigation-horizontal")]
+    public class SliderPropertyEditor : ConfiguredDataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SliderPropertyEditor"/> class.
@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         { }
 
         /// <inheritdoc />
-        protected override ConfigurationEditor CreateConfigurationEditor()
+        protected override IConfigurationEditor CreateConfigurationEditor()
         {
             return new SliderConfigurationEditor();
         }
