@@ -688,8 +688,6 @@
         <key alias="switchToTab">Switch to tab</key>
         <key alias="closePopupsAndOverlays">Close popups and overlays</key>
         <key alias="goToNodeNameTextbox">Go to node name textbox</key>
-        
-        
     </area>
     <area alias="graphicheadline">
         <key alias="backgroundcolor">Background color</key>

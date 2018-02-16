@@ -21,6 +21,7 @@
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
         vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getNavigationShortcuts());
         vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
         
 
