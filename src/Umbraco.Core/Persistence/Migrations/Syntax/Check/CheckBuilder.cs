@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
+using Umbraco.Core.Persistence.Migrations.Syntax.Check.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Table;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -26,6 +27,15 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             };
 
             return new CheckConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
+        }
+
+        public ICheckIndexSyntax Index(string indexName)
+        {
+            var expression = new CheckIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                IndexName = indexName
+            };
+            return new CheckIndexBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
         public ICheckTableSyntax Table(string tableName)
