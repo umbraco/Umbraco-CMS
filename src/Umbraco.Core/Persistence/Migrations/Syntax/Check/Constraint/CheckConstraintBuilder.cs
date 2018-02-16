@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
 {
-    public class CheckConstraintBuilder : ExpressionBuilderBase<CheckConstraintExpression>, ICheckConstraintOptionSyntax
+    public class CheckConstraintBuilder : ExpressionBuilderBase<CheckConstraintExpression>, ICheckConstraintSyntax
     {
         private IMigrationContext _context;
         private DatabaseProviders[] _databaseProviders;

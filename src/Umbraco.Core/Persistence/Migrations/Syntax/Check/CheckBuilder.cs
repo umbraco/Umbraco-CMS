@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             _databaseProviders = databaseProviders;
         }
 
-        public ICheckConstraintOptionSyntax Constraint(string constraintName)
+        public ICheckConstraintSyntax Constraint(string constraintName)
         {
             var expression = new CheckConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             return new CheckConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
-        public ICheckTableOptionSyntax Table(string tableName)
+        public ICheckTableSyntax Table(string tableName)
         {
             var expression = new CheckTableExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {
