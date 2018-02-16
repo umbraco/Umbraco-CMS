@@ -13,12 +13,13 @@
             <div ng-controller="Umbraco.SearchController" ng-if="authenticated">
 
                 <!-- Search form -->
-                <div id="search-form">
+        <div data-element="global-search" id="search-form">
                     <div class="umb-modalcolumn-header">
 
                         <form class="form-search" novalidate>
                             <i class="icon-search"></i>
-                            <input type="text"
+              <input data-element="global-search-field"
+                     type="text"
                                    hotkey="ctrl+space"
                                    id="search-field"
                                    ng-model="searchTerm"
@@ -36,14 +37,9 @@
 
                     <umb-load-indicator ng-if="isSearching"></umb-load-indicator>
 
-                    <umb-empty-state ng-if="!hasResults && !isSearching" position="center">
+                    <umb-empty-state ng-if="!hasResults && !isSearching"
+                                     position="center">
                         <localize key="general_searchNoResult"></localize>
-                        <br />
-                        <button type="button" class="btn umb-button__button btn-info umb-button--" ng-click="clearSearch()" hotkey="" hotkey-when-hidden="">
-                            <span class="umb-button__content">
-                                <localize key="general_clearSearch" class="ng-isolate-scope ng-scope ng-binding">Clear Search</localize>
-                            </span>
-                        </button>
                     </umb-empty-state>
 
                     <ul class="umb-tree" ng-if="!isSearching && hasResults">

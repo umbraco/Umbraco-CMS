@@ -198,6 +198,7 @@
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
         <key alias="removeDate">Clear Date</key>
+        <key alias="setDate">Set date</key>
         <key alias="sortDone">Sortorder is updated</key>
         <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
         <key alias="statistics">Statistics</key>
@@ -220,6 +221,7 @@
         <key alias="addTextBox">Add another text box</key>
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
+        <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -509,6 +511,7 @@
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
+        <key alias="options">Options</key>
         <key alias="about">About</key>
         <key alias="action">Action</key>
         <key alias="actions">Actions</key>
@@ -604,7 +607,6 @@
         <key alias="rights">Permissions</key>
         <key alias="search">Search</key>
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
-        <key alias="clearSearch">Clear search</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
         <key alias="show">Show</key>
@@ -1615,7 +1617,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
         <key alias="memberCanEdit">Member can edit</key>
+        <key alias="memberCanEditDescription">Allow this property value to be edited by the member on their profile page</key>
+        <key alias="isSensitiveData">Is sensitive data</key>
+        <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
+        <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
+        
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
     </area>
 

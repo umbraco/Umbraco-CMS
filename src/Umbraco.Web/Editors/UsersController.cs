@@ -73,7 +73,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
         {
-            var urls = UmbracoContext.Security.CurrentUser.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache);
+            var urls = UmbracoContext.Security.CurrentUser.GetUserAvatarUrls(ApplicationContext.ApplicationCache.StaticCache);
             if (urls == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Could not access Gravatar endpoint"));
 
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Editors
                 });
             }
 
-            return request.CreateResponse(HttpStatusCode.OK, user.GetCurrentUserAvatarUrls(userService, staticCache));
+            return request.CreateResponse(HttpStatusCode.OK, user.GetUserAvatarUrls(staticCache));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
                     FileSystemProviderManager.Current.MediaFileSystem.DeleteFile(filePath);
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, found.GetCurrentUserAvatarUrls(Services.UserService, ApplicationContext.ApplicationCache.StaticCache));
+            return Request.CreateResponse(HttpStatusCode.OK, found.GetUserAvatarUrls(ApplicationContext.ApplicationCache.StaticCache));
         }
 
         /// <summary>
@@ -182,6 +182,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public UserDisplay GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
@@ -494,6 +495,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="userSave"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public async Task<UserDisplay> PostSaveUser(UserSave userSave)
         {
             if (userSave == null) throw new ArgumentNullException("userSave");
@@ -559,18 +561,10 @@ namespace Umbraco.Web.Editors
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
 
+                //this will change the password and raise appropriate events
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
-                    var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
-
-                    //raise the event - NOTE that the ChangePassword.Reset value here doesn't mean it's been 'reset', it means
-                    //it's been changed by a back office user
-                    if (userSave.ChangePassword.Reset.HasValue && userSave.ChangePassword.Reset.Value)
-                    {
-                        userMgr.RaisePasswordChangedEvent(intId.Result);
-                    }
-                    
                     //need to re-get the user 
                     found = Services.UserService.GetUserById(intId.Result);
                 }

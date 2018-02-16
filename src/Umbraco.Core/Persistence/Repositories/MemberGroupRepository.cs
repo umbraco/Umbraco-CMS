@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IMemberGroup GetByName(string name)
         {
             return IsolatedCache.GetCacheItem<IMemberGroup>(
-                string.Format("{0}.{1}", typeof(IMemberGroup).FullName, name),
+                string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
                 () =>
                 {
                     var qry = new Query<IMemberGroup>().Where(group => group.Name.Equals(name));
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     return result.FirstOrDefault();
                 },
                 //cache for 5 mins since that is the default in the RuntimeCacheProvider
-                TimeSpan.FromMinutes(5),
+                TimeSpan.FromMinutes(5), 
                 //sliding is true
                 true);
         }
@@ -199,9 +199,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select(x => _modelFactory.BuildEntity(x));
         }
 
-        public void AssignRoles(string[] usernames, string[] roleNames)
+        public int[] GetMemberIds(string[] names)
         {
-            //first get the member ids based on the usernames
             var memberSql = new Sql();
             var memberObjectType = new Guid(Constants.ObjectTypes.Member);
             memberSql.Select("umbracoNode.id")
@@ -209,25 +208,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<MemberDto>()
                 .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
-            var memberIds = Database.Fetch<int>(memberSql).ToArray();
+                .Where("cmsMember.LoginName in (@names)", new { names });
+            return Database.Fetch<int>(memberSql).ToArray();
+        }
 
+        public void AssignRoles(string[] usernames, string[] roleNames)
+        {
+            var memberIds = GetMemberIds(usernames);
             AssignRolesInternal(memberIds, roleNames);            
         }
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            //first get the member ids based on the usernames
-            var memberSql = new Sql();
-            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-            memberSql.Select("umbracoNode.id")
-                .From<NodeDto>()
-                .InnerJoin<MemberDto>()
-                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
-            var memberIds = Database.Fetch<int>(memberSql).ToArray();
-
+            var memberIds = GetMemberIds(usernames);
             DissociateRolesInternal(memberIds, roleNames);
         }
 

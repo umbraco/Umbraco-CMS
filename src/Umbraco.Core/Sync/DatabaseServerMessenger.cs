@@ -87,7 +87,8 @@ namespace Umbraco.Core.Sync
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);
@@ -165,10 +166,10 @@ namespace Umbraco.Core.Sync
                 }
                 else
                 {
-                    //check for how many instructions there are to process
-                    //TODO: In 7.6 we need to store the count of instructions per row since this is not affective because there can be far more than one (if not thousands)
-                    // of instructions in a single row.
-                    var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    //row so we will sum these numbers to get the actual count.
+                    var count = _appContext.DatabaseContext.Database
+                        .ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
@@ -205,7 +206,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Synchronize the server (throttled).
         /// </summary>
-        protected void Sync()
+        protected internal void Sync()
         {
             lock (_locko)
             {

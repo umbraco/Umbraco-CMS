@@ -230,10 +230,12 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     //success callback
 
                     //reset the tabs and set the active one
-                    _.each(data.tabs, function (item) {
-                        item.active = false;
-                    });
-                    data.tabs[activeTabIndex].active = true;
+                    if(data.tabs && data.tabs.length > 0) {
+                        _.each(data.tabs, function (item) {
+                            item.active = false;
+                        });
+                        data.tabs[activeTabIndex].active = true;
+                    }
 
                     //the data returned is the up-to-date data so the UI will refresh
                     deferred.resolve(data);

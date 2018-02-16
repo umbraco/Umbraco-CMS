@@ -6,7 +6,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Manifest
 {
-    internal class ManifestWatcher : DisposableObject
+    internal class ManifestWatcher : DisposableObjectSlim
     {
         private readonly ILogger _logger;
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();

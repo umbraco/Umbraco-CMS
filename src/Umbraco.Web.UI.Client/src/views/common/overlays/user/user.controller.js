@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper, localizationService) {
+    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, dashboardResource, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper, localizationService) {
 
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
@@ -169,10 +169,13 @@ angular.module("umbraco")
            $scope.showPasswordFields = !$scope.showPasswordFields;
         }
 
-        function clearPasswordFields() { 
+        function clearPasswordFields() {
            $scope.changePasswordModel.value.oldPassword = "";
            $scope.changePasswordModel.value.newPassword = "";
            $scope.changePasswordModel.value.confirm = "";
         }
-         
+
+        dashboardResource.getDashboard("user-dialog").then(function (dashboard) {
+            $scope.dashboard = dashboard;
+        });
     });
