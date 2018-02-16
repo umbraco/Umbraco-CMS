@@ -53,15 +53,9 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         public DataEditorAttribute(string alias, EditorType type, string name, string view)
         {
-            switch (type) // Enum.IsDefined is slow
-            {
-                case EditorType.PropertyValue:
-                case EditorType.MacroParameter:
-                    Type = type;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), $"Not a valid {typeof(EditorType)} value.");
-            }
+            if ((type & ~(EditorType.PropertyValue | EditorType.MacroParameter)) > 0)
+                throw new ArgumentOutOfRangeException(nameof(type), $"Not a valid {typeof(EditorType)} value.");
+            Type = type;
 
             if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
             Alias = alias;

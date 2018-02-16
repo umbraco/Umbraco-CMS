@@ -2,22 +2,21 @@
 using Umbraco.Core.ObjectResolution;
 using CoreCurrent = Umbraco.Core.Composing.Current;
 using LightInject;
-using LightInject;
 
 // ReSharper disable once CheckNamespace
 namespace Umbraco.Core.PropertyEditors
 {
-    public class PropertyEditorResolver : LazyManyObjectsResolverBase<PropertyEditorCollectionBuilder, PropertyEditorCollection, ConfiguredDataEditor>
+    public class PropertyEditorResolver : LazyManyObjectsResolverBase<DataEditorCollectionBuilder, DataEditorCollection, IDataEditor>
     {
-        private PropertyEditorResolver(PropertyEditorCollectionBuilder builder)
+        private PropertyEditorResolver(DataEditorCollectionBuilder builder)
             : base(builder)
         { }
 
         public static PropertyEditorResolver Current { get; }
-            = new PropertyEditorResolver(CoreCurrent.Container.GetInstance<PropertyEditorCollectionBuilder>());
+            = new PropertyEditorResolver(CoreCurrent.Container.GetInstance<DataEditorCollectionBuilder>());
 
-        public IEnumerable<ConfiguredDataEditor> PropertyEditors => CoreCurrent.PropertyEditors;
+        public IEnumerable<IConfiguredDataEditor> PropertyEditors => CoreCurrent.PropertyEditors;
 
-        public ConfiguredDataEditor GetByAlias(string alias) => CoreCurrent.PropertyEditors[alias];
+        public IConfiguredDataEditor GetByAlias(string alias) => CoreCurrent.PropertyEditors[alias];
     }
 }

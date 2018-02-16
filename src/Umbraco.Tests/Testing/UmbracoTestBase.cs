@@ -306,7 +306,9 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton<ManifestParser>();
 
             // note - don't register collections, use builders
-            Container.RegisterCollectionBuilder<PropertyEditorCollectionBuilder>();
+            Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>();
+            Container.RegisterSingleton<PropertyEditorCollection>();
+            Container.RegisterSingleton<ParameterEditorCollection>();
         }
 
         #endregion

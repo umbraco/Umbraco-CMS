@@ -7,12 +7,9 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Scheduling;
 
-namespace Umbraco.Tests.Plugins
+namespace Umbraco.Tests.Composing
 {
     /// <summary>
     /// Tests for TypeHelper

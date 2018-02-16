@@ -46,7 +46,7 @@ namespace Umbraco.Web.Models.Mapping
 
                     parameter.View = paramEditor.ValueEditor.View;
                     //set the config
-                    parameter.Configuration = paramEditor.Configuration;
+                    parameter.Configuration = paramEditor.DefaultConfiguration;
                 });
         }
     }

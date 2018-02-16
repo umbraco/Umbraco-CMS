@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
@@ -47,7 +45,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Gets or sets the property editor.
         /// </summary>
         [IgnoreDataMember]
-        internal ConfiguredDataEditor PropertyEditor { get; set; }
+        internal IConfiguredDataEditor PropertyEditor { get; set; }
 
     }
 }

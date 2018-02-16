@@ -77,9 +77,9 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Container.Register(factory => PublishedSnapshotService);
 
-            Container.GetInstance<PropertyEditorCollectionBuilder>()
+            Container.GetInstance<DataEditorCollectionBuilder>()
                 .Clear()
-                .Add(f => f.GetInstance<TypeLoader>().GetPropertyEditors());
+                .Add(f => f.GetInstance<TypeLoader>().GetDataEditors());
 
             Container.RegisterSingleton(f =>
             {

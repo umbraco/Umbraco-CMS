@@ -38,6 +38,12 @@ namespace Umbraco.Core.PropertyEditors
         string Group { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the editor is deprecated.
+        /// </summary>
+        /// <remarks>Deprecated editors are supported but not proposed in the UI.</remarks>
+        bool IsDeprecated { get; }
+
+        /// <summary>
         /// Gets the value editor.
         /// </summary>
         IDataValueEditor ValueEditor { get; } // fixme should be a method - but, deserialization?

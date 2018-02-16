@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services.Importing
             // pollute everything, they are ignored by the type finder and explicitely
             // added to the editors collection
 
-            Container.GetInstance<PropertyEditorCollectionBuilder>()
+            Container.GetInstance<DataEditorCollectionBuilder>()
                 .Add<Editor1>()
                 .Add<Editor2>();
         }

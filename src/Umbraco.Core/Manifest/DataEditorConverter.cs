@@ -35,7 +35,7 @@ namespace Umbraco.Core.Manifest
                 // property editor
                 var type = EditorType.PropertyValue;
                 if (jobject["isParameterEditor"] is JToken jToken && jToken.Value<bool>())
-                    type &= EditorType.MacroParameter;
+                    type |= EditorType.MacroParameter;
                 return new ConfiguredDataEditor(_logger, type);
             }
             else

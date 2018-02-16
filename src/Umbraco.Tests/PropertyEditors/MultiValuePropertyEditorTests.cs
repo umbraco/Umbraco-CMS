@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PropertyEditors
         public void DropDownMultipleValueEditor_With_Keys_Format_Data_For_Cache()
         {
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var editor = new PublishValuesMultipleValueEditor(true, Mock.Of<ILogger>(), new ValueEditorAttribute("key", "nam", "view"));
+            var editor = new PublishValuesMultipleValueEditor(true, Mock.Of<ILogger>(), new DataEditorAttribute("key", "nam", "view"));
 
             var dataType = new DataType(new CheckBoxListPropertyEditor(Mock.Of<ILogger>(), Mock.Of<ILocalizedTextService>()));
             var prop = new Property(1, new PropertyType(dataType));

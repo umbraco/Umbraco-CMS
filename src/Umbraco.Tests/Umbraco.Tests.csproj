@@ -564,7 +564,7 @@
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
-    <Compile Include="Plugins\TypeHelperTests.cs" />
+    <Compile Include="Composing\TypeHelperTests.cs" />
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
@@ -582,8 +582,8 @@
     <Compile Include="CoreThings\UriExtensionsTests.cs" />
     <Compile Include="Misc\UriUtilityTests.cs" />
     <Compile Include="Composing\PackageActionCollectionTests.cs" />
-    <Compile Include="Plugins\PluginManagerExtensions.cs" />
-    <Compile Include="Plugins\PluginManagerTests.cs" />
+    <Compile Include="Composing\TypeLoaderExtensions.cs" />
+    <Compile Include="Composing\TypeLoaderTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="CoreThings\EnumerableExtensionsTests.cs" />
@@ -593,7 +593,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Strings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
-    <Compile Include="Plugins\TypeFinderTests.cs" />
+    <Compile Include="Composing\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="CoreThings\VersionExtensionTests.cs" />
     <Compile Include="Web\TemplateUtilitiesTests.cs" />

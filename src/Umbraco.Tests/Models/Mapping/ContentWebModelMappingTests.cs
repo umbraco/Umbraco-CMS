@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Models.Mapping
             Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
         }
 
-        [ValueEditor("Test.Test", "Test", "~/Test.html")]
+        [DataEditor("Test.Test", "Test", "~/Test.html")]
         public class TestPropertyEditor : ConfiguredDataEditor
         {
             /// <summary>

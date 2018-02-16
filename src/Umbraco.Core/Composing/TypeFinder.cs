@@ -482,7 +482,7 @@ namespace Umbraco.Core.Composing
                         && (x.IsAbstract == false || x.IsSealed == false) // ie non-static, static is abstract and sealed
                         && x.IsNestedPrivate == false // exclude nested private
                         && (onlyConcreteClasses == false || x.IsAbstract == false) // exclude abstract
-                        && x.GetCustomAttribute<HideFromTypeFinderAttribute>() == null // exclude hidden
+                        && x.GetCustomAttribute<HideFromTypeFinderAttribute>(false) == null // exclude hidden
                         && (additionalFilter == null || additionalFilter(x)))); // filter
                 }
 

@@ -72,7 +72,8 @@ namespace Umbraco.Tests.Models.Mapping
 
             // create and register a fake property editor collection to return fake property editors
             var editors = new ConfiguredDataEditor[] { new TextboxPropertyEditor(Mock.Of<ILogger>()), };
-            _editorsMock = new Mock<PropertyEditorCollection>(new object[] { editors });
+            var dataEditors = new DataEditorCollection(editors);
+            _editorsMock = new Mock<PropertyEditorCollection>(dataEditors);
             _editorsMock.Setup(x => x[It.IsAny<string>()]).Returns(editors[0]);
             Container.RegisterSingleton(f => _editorsMock.Object);
 

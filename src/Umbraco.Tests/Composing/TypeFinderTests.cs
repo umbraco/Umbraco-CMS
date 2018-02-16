@@ -13,14 +13,14 @@ using System.Web.Compilation;
 using NUnit.Framework;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Trees;
 
-namespace Umbraco.Tests.Plugins
+namespace Umbraco.Tests.Composing
 {
 
     /// <summary>

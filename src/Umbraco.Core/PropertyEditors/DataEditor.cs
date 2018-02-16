@@ -35,6 +35,7 @@ namespace Umbraco.Core.PropertyEditors
             Alias = Attribute.Alias;
             Type = Attribute.Type;
             Name = Attribute.Name;
+            IsDeprecated = Attribute.IsDeprecated;
         }
 
         /// <summary>
@@ -61,6 +62,10 @@ namespace Umbraco.Core.PropertyEditors
         /// <inheritdoc />
         [JsonProperty("group")]
         public string Group { get; }
+
+        /// <inheritdoc />
+        [JsonIgnore]
+        public bool IsDeprecated { get; }
 
         /// <inheritdoc />
         [JsonProperty("editor")]

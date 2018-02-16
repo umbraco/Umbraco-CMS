@@ -43,18 +43,11 @@ namespace Umbraco.Core.Components
             => composition.Container.GetInstance<PackageActionCollectionBuilder>();
 
         /// <summary>
-        /// Gets the parameter editors collection builder.
+        /// Gets the data editor collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        internal static ParameterEditorCollectionBuilder ParameterEditors(this Composition composition)
-            => composition.Container.GetInstance<ParameterEditorCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the migrations collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        public static PropertyEditorCollectionBuilder PropertyEditors(this Composition composition)
-            => composition.Container.GetInstance<PropertyEditorCollectionBuilder>();
+        public static DataEditorCollectionBuilder DataEditors(this Composition composition)
+            => composition.Container.GetInstance<DataEditorCollectionBuilder>();
 
         /// <summary>
         /// Gets the property value converters collection builder.

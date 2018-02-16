@@ -108,6 +108,9 @@ namespace Umbraco.Core.Composing
         public static CacheRefresherCollection CacheRefreshers
             => Container.GetInstance<CacheRefresherCollection>();
 
+        public static DataEditorCollection DataEditors
+            => Container.GetInstance<DataEditorCollection>();
+
         public static PropertyEditorCollection PropertyEditors
             => Container.GetInstance<PropertyEditorCollection>();
 

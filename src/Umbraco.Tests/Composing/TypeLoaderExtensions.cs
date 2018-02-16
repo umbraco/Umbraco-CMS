@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Tests.Plugins
+namespace Umbraco.Tests.Composing
 {
     /// <summary>
     /// Used for PluginTypeResolverTests
     /// </summary>
-    internal static class PluginManagerExtensions
+    internal static class TypeLoaderExtensions
     {
         public static IEnumerable<Type> ResolveFindMeTypes(this TypeLoader resolver)
         {
-            return resolver.GetTypes<PluginManagerTests.IFindMe>();
+            return resolver.GetTypes<TypeLoaderTests.IFindMe>();
         }
     }
 }

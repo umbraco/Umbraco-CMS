@@ -163,12 +163,12 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual(2, manifest.PropertyEditors.Length);
 
             var editor = manifest.PropertyEditors[1];
-            Assert.IsTrue(editor.IsParameterEditor);
+            Assert.IsTrue((editor.Type & EditorType.MacroParameter) > 0);
 
             editor = manifest.PropertyEditors[0];
             Assert.AreEqual("Test.Test1", editor.Alias);
             Assert.AreEqual("Test 1", editor.Name);
-            Assert.IsFalse(editor.IsParameterEditor);
+            Assert.IsFalse((editor.Type & EditorType.MacroParameter) > 0);
 
             var valueEditor = editor.ValueEditor;
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", valueEditor.View);
@@ -246,11 +246,13 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var manifest = _parser.ParseManifest(json);
             Assert.AreEqual(3, manifest.ParameterEditors.Length);
 
+            Assert.IsTrue(manifest.ParameterEditors.All(x => (x.Type & EditorType.MacroParameter) > 0));
+
             var editor = manifest.ParameterEditors[1];
             Assert.AreEqual("parameter2", editor.Alias);
             Assert.AreEqual("Another parameter", editor.Name);
 
-            var config = editor.Configuration;
+            var config = editor.DefaultConfiguration;
             Assert.AreEqual(1, config.Count);
             Assert.IsTrue(config.ContainsKey("key1"));
             Assert.AreEqual("some config val", config["key1"]);

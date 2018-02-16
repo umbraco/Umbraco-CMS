@@ -220,6 +220,8 @@ namespace Umbraco.Web.Composing
 
         public static CacheRefresherCollection CacheRefreshers => CoreCurrent.CacheRefreshers;
 
+        public static DataEditorCollection DataEditors => CoreCurrent.DataEditors;
+
         public static PropertyEditorCollection PropertyEditors => CoreCurrent.PropertyEditors;
 
         public static ParameterEditorCollection ParameterEditors => CoreCurrent.ParameterEditors;
