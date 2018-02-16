@@ -146,12 +146,12 @@
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "v" }]
                     },
                     {
-                        "description": localizationService.format(["template_insert", "template_insertDictionaryItem"], "%0% %1%"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-                    },
-                    {
                         "description": localizationService.format(["template_insert", "template_insertMacro"], "%0% %1%"),
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "m" }]
+                    },
+                    {
+                        "description": localizationService.format(["template_insert", "template_insertDictionaryItem"], "%0% %1%"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
                     },
                     {
                         "description": localizationService.localize("template_queryBuilder"),
@@ -196,30 +196,6 @@
                 };
         }
 
-        function getTypeEditorShortcuts() {
-            return {
-                "name": localizationService.localize("shortcuts_shortcut"),
-                "shortcuts": [
-                    {
-                        "description": localizationService.localize("shortcuts_addTab"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_addProperty"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_addEditor"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_editDataType"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-                    }
-                ]
-            };
-        }
-
         function getDocumentTypeEditorShortcuts() {
             return {
                 "name": localizationService.localize("main_sections"),
@@ -262,6 +238,30 @@
                         }
                     ]
                 };
+        }
+
+        function getTypeEditorShortcuts() {
+            return {
+                "name": localizationService.localize("shortcuts_shortcut"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_addTab"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_addProperty"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_addEditor"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_editDataType"),
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                    }
+                ]
+            };
         }
 
         ////////////

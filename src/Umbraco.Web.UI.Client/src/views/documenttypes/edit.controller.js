@@ -52,7 +52,7 @@
         ];
 
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getTypeEditorShortcuts);
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getTypeEditorShortcuts());
         vm.page.keyboardShortcutsOverview.push(templateHelper.getDocumentTypeEditorShortcuts());
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
