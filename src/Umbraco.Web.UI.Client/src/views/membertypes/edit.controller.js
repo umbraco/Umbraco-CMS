@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper) {
+    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper, templateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -30,29 +30,8 @@
 			}
         ];
 
-        vm.page.keyboardShortcutsOverview = [
-			{
-                "name": localizationService.localize("shortcuts_shortcut"),
-			    "shortcuts": [
-					{
-					    "description": localizationService.localize("shortcuts_addTab"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-					},
-					{
-					    "description": localizationService.localize("shortcuts_addProperty"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-					},
-					{
-					    "description": localizationService.localize("shortcuts_addEditor"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-					},
-					{
-					    "description": localizationService.localize("shortcuts_editDataType"),
-					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-					}
-			    ]
-			}
-        ];
+        vm.page.keyboardShortcutsOverview = [];
+        vm.page.keyboardShortcutsOverview.push(templateHelper.getMemberTypeEditorShortcuts());
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;
