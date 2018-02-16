@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.ForeignKey
 {
-    public class CheckForeignKeyBuilder : ExpressionBuilderBase<CheckForeignKeyExpression>, ICheckForeignKeySyntax
+    public class CheckForeignKeyBuilder : ExpressionBuilderBase<CheckForeignKeyExpression>, ICheckForeignKeySyntax, ICheckForeignKeyFromTableSyntax, ICheckForeignKeyToTableSyntax
     {
         private IMigrationContext _context;
         private DatabaseProviders[] _databaseProviders;
@@ -19,13 +19,39 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.ForeignKey
 
         public bool Exists()
         {
-            var foreignKeys = _sqlSyntax.GetForeignKeys(_context.Database).Where(x => x.Item5.InvariantEquals(Expression.ForeignKeyName));
+            var foundForeignKeys = _sqlSyntax.GetForeignKeys(_context.Database);
+            
 
+            if (string.IsNullOrWhiteSpace(Expression.ForeignKeyName) == false)
+            {
+                foundForeignKeys = foundForeignKeys.Where(x => x.Item5.InvariantEquals(Expression.ForeignKeyName));
+            }
 
+            if (string.IsNullOrWhiteSpace(Expression.ForeignTableName) == false)
+            {
+                foundForeignKeys = foundForeignKeys.Where(x => x.Item1.InvariantEquals(Expression.ForeignTableName));
+            }
 
+            if (string.IsNullOrWhiteSpace(Expression.PrimaryTableName) == false)
+            {
+                foundForeignKeys = foundForeignKeys.Where(x => x.Item3.InvariantEquals(Expression.PrimaryTableName));
+            }
 
+            return foundForeignKeys.Any();
+        }
 
-            return foreignKeys.Any();
+        public ICheckForeignKeyFromTableSyntax FromTable(string tableName)
+        {
+            Expression.ForeignTableName = tableName;
+
+            return this;
+        }
+
+        public ICheckForeignKeyToTableSyntax ToTable(string tableName)
+        {
+            Expression.PrimaryTableName = tableName;
+
+            return this;
         }
     }
 }

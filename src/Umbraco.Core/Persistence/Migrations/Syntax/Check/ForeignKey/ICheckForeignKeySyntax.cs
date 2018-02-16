@@ -2,5 +2,6 @@
 {
     public interface ICheckForeignKeySyntax : ICheckOptionSyntax
     {
+        ICheckForeignKeyFromTableSyntax FromTable(string tableName);
     }
 }
