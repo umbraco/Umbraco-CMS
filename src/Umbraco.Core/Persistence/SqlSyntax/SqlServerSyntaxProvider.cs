@@ -181,6 +181,21 @@ order by T.name, I.name");
 
         public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}', 'COLUMN'"; } }
 
+        public override IEnumerable<Tuple<string, string, string, string, string>> GetForeignKeys(Database db)
+        {
+            var items = db.Fetch<dynamic>(
+            @"SELECT 
+                  OBJECT_NAME(f.parent_object_id) AS TABLE_NAME,
+                  COL_NAME(fc.parent_object_id,fc.parent_column_id) AS COLUMN_NAME,
+                  OBJECT_NAME (f.referenced_object_id) AS REFERENCE_TABLE_NAME,
+                  COL_NAME(fc.referenced_object_id,fc.referenced_column_id) AS REFERENCE_COLUMN_NAME,
+                  f.name AS FOREIGN_KEY_NAME
+              FROM
+                  sys.foreign_keys AS f
+                  INNER JOIN sys.foreign_key_columns AS fc ON f.OBJECT_ID = fc.constraint_object_id
+                  INNER JOIN sys.objects AS o ON o.OBJECT_ID = fc.referenced_object_id");
 
+            return items.Select(item => new Tuple<string, string, string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.REFERENCE_TABLE_NAME, item.REFERENCE_COLUMN_NAME, item.FOREIGN_KEY_NAME)).ToList();
+        }
     }
 }

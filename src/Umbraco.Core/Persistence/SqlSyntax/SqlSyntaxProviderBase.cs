@@ -505,6 +505,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract Sql SelectTop(Sql sql, int top);
 
+        public abstract IEnumerable<Tuple<string, string, string, string, string>> GetForeignKeys(Database db);
+
         public virtual string DeleteDefaultConstraint
         {
             get

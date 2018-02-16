@@ -400,5 +400,20 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         {
             return PetaPocoExtensions.EscapeAtSymbols(MySql.Data.MySqlClient.MySqlHelper.EscapeString(val));
         }
+
+        public override IEnumerable<Tuple<string, string, string, string, string>> GetForeignKeys(Database db)
+        {
+            var items = db.Fetch<dynamic>(
+            @"SELECT 
+                  TABLE_NAME,
+                  COLUMN_NAME,
+                  REFERENCED_TABLE_NAME AS REFERENCE_TABLE_NAME,
+                  REFERENCED_COLUMN_NAME AS REFERENCE_COLUMN_NAME,
+                  CONSTRAINT_NAME AS FOREIGN_KEY_NAME
+              FROM
+                  information_schema.KEY_COLUMN_USAGE");
+
+            return items.Select(item => new Tuple<string, string, string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.REFERENCE_TABLE_NAME, item.REFERENCE_COLUMN_NAME, item.FOREIGN_KEY_NAME)).ToList();
+        }
     }
 }

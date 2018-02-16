@@ -82,5 +82,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db);
 
         IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
+
+        IEnumerable<Tuple<string, string, string, string, string>> GetForeignKeys(Database db);
     }
 }

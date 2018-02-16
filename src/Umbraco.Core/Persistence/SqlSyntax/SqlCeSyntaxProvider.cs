@@ -210,9 +210,28 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             }
         }
 
-        
-
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
         
+        public override IEnumerable<Tuple<string, string, string, string, string>> GetForeignKeys(Database db)
+        {
+            var items = db.Fetch<dynamic>(
+            @"SELECT  
+                 KCU1.TABLE_NAME AS TABLE_NAME 
+                ,KCU1.COLUMN_NAME AS COLUMN_NAME 
+                ,KCU2.TABLE_NAME AS REFERENCE_TABLE_NAME 
+                ,KCU2.COLUMN_NAME AS REFERENCE_COLUMN_NAME 
+                ,KCU1.CONSTRAINT_NAME AS FOREIGN_KEY_NAME
+            FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS RC 
+
+            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU1 
+                ON KCU1.CONSTRAINT_NAME = RC.CONSTRAINT_NAME 
+
+            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU2 
+                ON KCU2.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME 
+                AND KCU2.ORDINAL_POSITION = KCU1.ORDINAL_POSITION");
+
+            return items.Select(item => new Tuple<string, string, string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.REFERENCE_TABLE_NAME, item.REFERENCE_COLUMN_NAME, item.FOREIGN_KEY_NAME)).ToList();
+        }
+
     }
 }
