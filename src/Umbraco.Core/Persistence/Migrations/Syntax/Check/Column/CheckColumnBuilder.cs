@@ -15,10 +15,43 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Column
             _sqlSyntax = sqlSyntax;
         }
 
+        private ColumnInfo GetColumnInfo()
+        {
+            return _sqlSyntax.GetColumnsInSchema(_context.Database).FirstOrDefault(x => x.TableName.InvariantEquals(Expression.TableName)
+                                                                                && x.ColumnName.InvariantEquals(Expression.ColumnName));
+        }
+
         public bool Exists()
         {
-            return _sqlSyntax.GetColumnsInSchema(_context.Database).Any(x => x.TableName.InvariantEquals(Expression.TableName)
-                                                                          && x.ColumnName.InvariantEquals(Expression.ColumnName));
+            var column = GetColumnInfo();
+
+            return Exists(column);
+        }
+
+        private bool Exists(ColumnInfo columnInfo)
+        {
+            return GetColumnInfo() != default(ColumnInfo);
+        }
+
+        public bool IsNotNullable()
+        {
+            var column = GetColumnInfo();
+
+            return Exists(column) && column.IsNullable == false;
+        }
+
+        public bool IsNullable()
+        {
+            var column = GetColumnInfo();
+
+            return Exists(column) && column.IsNullable;
+        }
+
+        public bool IsDataType(string dataType)
+        {
+            var column = GetColumnInfo();
+
+            return Exists() && column.DataType.InvariantEquals(dataType);
         }
     }
 }

@@ -2,5 +2,9 @@
 {
     public interface ICheckColumnOnTableSyntax : ICheckOptionSyntax
     {
+        bool IsNullable();
+        bool IsNotNullable();
+
+        bool IsDataType(string dataType);
     }
 }
