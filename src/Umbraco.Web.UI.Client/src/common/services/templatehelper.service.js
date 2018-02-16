@@ -264,6 +264,30 @@
             };
         }
 
+        function getNavigationShortcuts() {
+            return {
+                "name": localizationService.localize("shortcuts_navigationHeader"),
+                "shortcuts": [
+                    {
+                        "description": localizationService.localize("shortcuts_switchToSection"),
+                        "keys": [{ "key": "ctrl" }, { "key": "alt" }, { "key": "1" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_switchToTab"),
+                        "keys": [{ "key": "ctrl" }, { "key": "1" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_closePopupsAndOverlays"),
+                        "keys": [{ "key": "esc" }]
+                    },
+                    {
+                        "description": localizationService.localize("shortcuts_goToNodeNameTextbox"),
+                        "keys": [{ "key": "ctrl" }, { "key": ", (comma)" }]
+                    }
+                ]
+            };
+        }
+
         ////////////
 
         var service = {
@@ -279,7 +303,8 @@
             getPartialViewEditorShortcuts: getPartialViewEditorShortcuts,
             getMediaTypeEditorShortcuts: getMediaTypeEditorShortcuts,
             getDocumentTypeEditorShortcuts: getDocumentTypeEditorShortcuts,
-            getTypeEditorShortcuts: getTypeEditorShortcuts
+            getTypeEditorShortcuts: getTypeEditorShortcuts,
+            getNavigationShortcuts: getNavigationShortcuts
         };
 
         return service;

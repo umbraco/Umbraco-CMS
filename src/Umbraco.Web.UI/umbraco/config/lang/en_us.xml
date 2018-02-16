@@ -683,6 +683,13 @@
         <key alias="moveLineDown">Move Lines Down</key>
         <key alias="generalHeader">General</key>
         <key alias="editorHeader">Editor</key>
+        <key alias="navigationHeader">Navigation</key>
+        <key alias="switchToSection">Switch to section</key>
+        <key alias="switchToTab">Switch to tab</key>
+        <key alias="closePopupsAndOverlays">Close popups and overlays</key>
+        <key alias="goToNodeNameTextbox">Go to node name textbox</key>
+        
+        
     </area>
     <area alias="graphicheadline">
         <key alias="backgroundcolor">Background color</key>
