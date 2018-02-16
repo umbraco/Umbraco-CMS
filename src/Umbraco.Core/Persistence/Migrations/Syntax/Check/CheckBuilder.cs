@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
+using Umbraco.Core.Persistence.Migrations.Syntax.Check.ForeignKey;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Table;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -27,6 +28,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check
             };
 
             return new CheckConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
+        }
+
+        public ICheckForeignKeySyntax ForeignKey(string foreignKeyName)
+        {
+            var expression = new CheckForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                ForeignKeyName = foreignKeyName
+            };
+
+            return new CheckForeignKeyBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
         public ICheckIndexSyntax Index(string indexName)

@@ -548,8 +548,11 @@
     <Compile Include="Persistence\Migrations\Syntax\Check\Constraint\ICheckTableConstraintOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckColumnExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckConstraintExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckForeignKeyExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckIndexExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Expressions\CheckTableExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\ForeignKey\CheckForeignKeyBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Check\ForeignKey\ICheckForeignKeySyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\ICheckBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\ICheckOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Check\Index\CheckIndexBuilder.cs" />
