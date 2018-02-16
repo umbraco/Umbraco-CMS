@@ -31,7 +31,7 @@
         ];
 
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getMemberTypeEditorShortcuts());
+        vm.page.keyboardShortcutsOverview.push(templateHelper.TypeEditorShortcuts());
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;

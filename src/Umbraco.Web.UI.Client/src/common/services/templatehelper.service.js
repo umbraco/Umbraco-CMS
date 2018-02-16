@@ -173,27 +173,6 @@
                 ]
             },
                 {
-                    "name": localizationService.localize("general_design"),
-                    "shortcuts": [
-                        {
-                            "description": localizationService.localize("shortcuts_addTab"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-                        },
-                        {
-                            "description": localizationService.localize("shortcuts_addProperty"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-                        },
-                        {
-                            "description": localizationService.localize("shortcuts_addEditor"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-                        },
-                        {
-                            "description": localizationService.localize("shortcuts_editDataType"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-                        }
-                    ]
-                },
-                {
                     "name": localizationService.localize("general_listView"),
                     "shortcuts": [
                         {
@@ -217,7 +196,7 @@
                 };
         }
 
-        function getMemberTypeEditorShortcuts() {
+        function getTypeEditorShortcuts() {
             return {
                 "name": localizationService.localize("shortcuts_shortcut"),
                 "shortcuts": [
@@ -238,7 +217,7 @@
                         "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
                     }
                 ]
-            }
+            };
         }
 
         function getDocumentTypeEditorShortcuts() {
@@ -252,27 +231,6 @@
                     }
                 ]
             },
-                {
-                    "name": localizationService.localize("general_design"),
-                    "shortcuts": [
-                        {
-                            "description": localizationService.localize("shortcuts_addTab"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-                        },
-                        {
-                            "description": localizationService.localize("shortcuts_addProperty"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-                        },
-                        {
-                            "description": localizationService.localize("shortcuts_addEditor"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-                        },
-                        {
-                            "description": localizationService.localize("shortcuts_editDataType"),
-                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-                        }
-                    ]
-                },
                 {
                     "name": localizationService.localize("general_listView"),
                     "shortcuts": [
@@ -320,8 +278,8 @@
             getTemplateEditorShortcuts: getTemplateEditorShortcuts,
             getPartialViewEditorShortcuts: getPartialViewEditorShortcuts,
             getMediaTypeEditorShortcuts: getMediaTypeEditorShortcuts,
-            getMemberTypeEditorShortcuts: getMemberTypeEditorShortcuts,
-            getDocumentTypeEditorShortcuts: getDocumentTypeEditorShortcuts
+            getDocumentTypeEditorShortcuts: getDocumentTypeEditorShortcuts,
+            getTypeEditorShortcuts: getTypeEditorShortcuts
         };
 
         return service;
