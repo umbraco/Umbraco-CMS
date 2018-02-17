@@ -11,5 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions
         public string ForeignKeyName { get; set; }
         public string ForeignTableName { get; set; }
         public string PrimaryTableName { get; set; }
+        public string[] ForeignColumnNames { get; set; }
+        public string[] PrimaryColumnNames { get; set; }
     }
 }
