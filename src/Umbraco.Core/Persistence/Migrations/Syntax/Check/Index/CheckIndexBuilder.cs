@@ -19,22 +19,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
 
         public ICheckIndexOptionSyntax WithColumn(string columnName)
         {
-            return ColumnOption(columnName);
-        }
-
-        public ICheckIndexOptionSyntax WithColumns(string[] columnNames)
-        {
-            return ColumnsOption(columnNames);
-        }
-
-        private ICheckIndexOptionSyntax ColumnOption(string columnName)
-        {
             Expression.ColumnNames.Add(columnName);
 
             return this;
         }
 
-        private ICheckIndexOptionSyntax ColumnsOption(string[] columnNames)
+        public ICheckIndexOptionSyntax WithColumns(string[] columnNames)
         {
             foreach (var columnName in columnNames)
                 Expression.ColumnNames.Add(columnName);
@@ -70,17 +60,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
         public ICheckExistsSyntax NotUnique()
         {
             Expression.Unique = false;
+
             return this;
-        }
-
-        public ICheckIndexOptionSyntax OnColumn(string columnName)
-        {
-            return ColumnOption(columnName);
-        }
-
-        public ICheckIndexOptionSyntax OnColumns(string[] columnNames)
-        {
-            return ColumnsOption(columnNames);
         }
 
         public ICheckIndexForTableSyntax OnTable(string tableName)

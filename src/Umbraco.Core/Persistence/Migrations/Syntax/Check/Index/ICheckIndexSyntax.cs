@@ -3,7 +3,5 @@
     public interface ICheckIndexSyntax : ICheckIndexOptionSyntax
     {
         ICheckIndexForTableSyntax OnTable(string tableName);
-        ICheckIndexOptionSyntax OnColumn(string columnName);
-        ICheckIndexOptionSyntax OnColumns(string[] columnNames);
     }
 }
