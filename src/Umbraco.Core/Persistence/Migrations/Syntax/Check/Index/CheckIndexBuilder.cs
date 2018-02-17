@@ -17,12 +17,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
             _sqlSyntax = sqlSyntax;
         }
 
-        public ICheckIndexOptionSyntax AndColumn(string columnName)
+        public ICheckIndexOptionSyntax WithColumn(string columnName)
         {
             return ColumnOption(columnName);
         }
 
-        public ICheckIndexOptionSyntax AndColumns(string[] columnNames)
+        public ICheckIndexOptionSyntax WithColumns(string[] columnNames)
         {
             return ColumnsOption(columnNames);
         }

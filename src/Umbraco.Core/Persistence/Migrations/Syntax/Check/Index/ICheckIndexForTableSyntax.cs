@@ -2,7 +2,7 @@
 {
     public interface ICheckIndexForTableSyntax : ICheckIndexOptionSyntax
     {
-        ICheckIndexOptionSyntax AndColumn(string columnName);
-        ICheckIndexOptionSyntax AndColumns(string[] columnNames);
+        ICheckIndexOptionSyntax WithColumn(string columnName);
+        ICheckIndexOptionSyntax WithColumns(string[] columnNames);
     }
 }
