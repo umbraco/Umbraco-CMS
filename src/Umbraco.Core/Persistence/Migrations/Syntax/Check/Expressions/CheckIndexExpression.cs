@@ -7,11 +7,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions
     {
         public CheckIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) : base(current, databaseProviders, sqlSyntax)
         {
+            ColumnNames = new List<string>();
         }
 
-        public string IndexName { get; set; }
-        public string TableName { get; set; }
+        public virtual string IndexName { get; set; }
+        public virtual string TableName { get; set; }
         public ICollection<string> ColumnNames { get; set; }
-        public bool? Unique { get; set; }
+        public virtual bool? Unique { get; set; }
     }
 }

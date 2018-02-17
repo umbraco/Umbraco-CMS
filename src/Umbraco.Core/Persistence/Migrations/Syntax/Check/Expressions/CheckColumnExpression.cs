@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions
         {
         }
 
-        public string TableName { get; set; }
-        public string ColumnName { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual string ColumnName { get; set; }
     }
 }
