@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
 
         private ICheckIndexOptionSyntax ColumnsOption(string[] columnNames)
         {
-            foreach(var columnName in columnNames)
+            foreach (var columnName in columnNames)
                 Expression.ColumnNames.Add(columnName);
 
             return this;
@@ -44,24 +44,23 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
 
         public bool Exists()
         {
-            var indexes = _sqlSyntax.GetDefinedIndexes(_context.Database);
-            var foundIndexes = indexes.Where(x => x.Item2.InvariantEquals(Expression.IndexName));
+            var indexes = _sqlSyntax.GetDefinedIndexesDefinitions(_context.Database);
+            var foundIndexes = indexes.Where(x => x.IndexName.InvariantEquals(Expression.IndexName));
 
             if (string.IsNullOrWhiteSpace(Expression.TableName) == false)
             {
-                foundIndexes = foundIndexes.Where(x => x.Item1.InvariantEquals(Expression.TableName));
+                foundIndexes = foundIndexes.Where(x => x.TableName.InvariantEquals(Expression.TableName));
             }
-
-
+            
             if (Expression.Unique.HasValue)
             {
-                foundIndexes = foundIndexes.Where(x => x.Item4.Equals(Expression.Unique.Value));
+                foundIndexes = foundIndexes.Where(x => x.IsUnique.Equals(Expression.Unique.Value));
             }
 
             if (Expression.ColumnNames.Any())
             {
                 return Expression.ColumnNames.All(x =>
-                                                foundIndexes.Any(c => c.Item2.InvariantEquals(x)
+                                                foundIndexes.Any(c => c.ColumnName.InvariantEquals(x)
                                              ));
             }
 
