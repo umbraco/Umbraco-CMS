@@ -2,7 +2,7 @@
 {
     public interface ICheckTableConstraintOptionSyntax : ICheckOptionSyntax
     {
-        ICheckOptionSyntax AndColumn(string columnName);
-        ICheckOptionSyntax AndColumns(string[] columnNames);
+        ICheckOptionSyntax WithColumn(string columnName);
+        ICheckOptionSyntax WithColumns(string[] columnNames);
     }
 }
