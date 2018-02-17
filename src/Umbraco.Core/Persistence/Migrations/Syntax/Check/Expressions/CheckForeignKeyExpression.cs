@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions
 {
@@ -11,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions
         public string ForeignKeyName { get; set; }
         public string ForeignTableName { get; set; }
         public string PrimaryTableName { get; set; }
-        public string[] ForeignColumnNames { get; set; }
-        public string[] PrimaryColumnNames { get; set; }
+        public ICollection<string> ForeignColumnNames { get; set; }
+        public ICollection<string> PrimaryColumnNames { get; set; }
     }
 }

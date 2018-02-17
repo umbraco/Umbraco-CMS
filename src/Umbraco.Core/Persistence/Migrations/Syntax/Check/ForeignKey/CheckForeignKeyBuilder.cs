@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.ForeignKey
         {
             return AllColumnsMatch(Expression.PrimaryColumnNames, foundForeignKeys.Select(x => x.Item4));
         }
-        private bool AllColumnsMatch(string[] columnNames, IEnumerable<string> foundColumnNames)
+        private bool AllColumnsMatch(ICollection<string> columnNames, IEnumerable<string> foundColumnNames)
         {
             return columnNames.All(x => foundColumnNames.InvariantContains(x));
         }
