@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
             _sqlSyntax = sqlSyntax;
         }
 
-        public ICheckOptionSyntax AndTable(string tableName)
+        public ICheckExistsSyntax AndTable(string tableName)
         {
             Expression.TableName = tableName;
             return this;

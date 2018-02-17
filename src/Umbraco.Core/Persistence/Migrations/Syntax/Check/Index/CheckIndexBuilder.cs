@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
             return foundIndexes.Any();
         }
 
-        public ICheckOptionSyntax NotUnique()
+        public ICheckExistsSyntax NotUnique()
         {
             Expression.Unique = false;
             return this;
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
             return this;
         }
 
-        public ICheckOptionSyntax Unique()
+        public ICheckExistsSyntax Unique()
         {
             Expression.Unique = true;
 

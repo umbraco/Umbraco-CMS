@@ -1,8 +1,8 @@
 ﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
 {
-    public interface ICheckTableConstraintOptionSyntax : ICheckOptionSyntax
+    public interface ICheckTableConstraintOptionSyntax : ICheckExistsSyntax
     {
-        ICheckOptionSyntax WithColumn(string columnName);
-        ICheckOptionSyntax WithColumns(string[] columnNames);
+        ICheckExistsSyntax WithColumn(string columnName);
+        ICheckExistsSyntax WithColumns(string[] columnNames);
     }
 }

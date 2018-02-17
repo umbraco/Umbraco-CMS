@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
             return new CheckColumnBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
-        public ICheckOptionSyntax WithColumns(string[] columnNames)
+        public ICheckExistsSyntax WithColumns(string[] columnNames)
         {
             var expression = new CheckColumnsExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {

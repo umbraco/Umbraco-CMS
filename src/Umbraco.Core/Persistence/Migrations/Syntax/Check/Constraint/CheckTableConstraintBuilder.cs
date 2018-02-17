@@ -17,14 +17,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
             _sqlSyntax = sqlSyntax;
         }
 
-        public ICheckOptionSyntax WithColumn(string columnName)
+        public ICheckExistsSyntax WithColumn(string columnName)
         {
             var columnNames = new string[] { columnName };
 
             return WithColumns(columnNames);
         }
 
-        public ICheckOptionSyntax WithColumns(string[] columnNames)
+        public ICheckExistsSyntax WithColumns(string[] columnNames)
         {
             var expression = new CheckConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {

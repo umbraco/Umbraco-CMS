@@ -3,7 +3,7 @@
     /// <summary>
     /// The underlying interface that ensures an entity can evaluate it exists.
     /// </summary>
-    public interface ICheckOptionSyntax : IFluentSyntax
+    public interface ICheckExistsSyntax : IFluentSyntax
     {
         /// <summary>
         /// Evalutes the current chain to see if it exists.

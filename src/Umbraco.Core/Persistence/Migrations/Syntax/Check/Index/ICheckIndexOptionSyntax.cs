@@ -1,8 +1,8 @@
 ﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
 {
-    public interface ICheckIndexOptionSyntax : ICheckOptionSyntax
+    public interface ICheckIndexOptionSyntax : ICheckExistsSyntax
     {
-        ICheckOptionSyntax Unique();
-        ICheckOptionSyntax NotUnique();
+        ICheckExistsSyntax Unique();
+        ICheckExistsSyntax NotUnique();
     }
 }
