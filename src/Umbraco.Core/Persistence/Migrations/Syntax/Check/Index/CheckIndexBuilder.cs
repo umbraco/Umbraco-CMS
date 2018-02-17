@@ -37,9 +37,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
         private ICheckIndexOptionSyntax ColumnsOption(string[] columnNames)
         {
             foreach(var columnName in columnNames)
-            {
                 Expression.ColumnNames.Add(columnName);
-            }
 
             return this;
         }

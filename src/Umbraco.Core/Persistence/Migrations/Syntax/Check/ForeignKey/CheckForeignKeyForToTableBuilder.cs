@@ -18,9 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.ForeignKey
         public ICheckExistsSyntax WithColumns(string[] columnNames)
         {
             foreach (var columnName in columnNames)
-            {
                 Expression.PrimaryColumnNames.Add(columnName);
-            }
 
             return this;
         }

@@ -42,9 +42,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
             };
 
             foreach (var columnName in columnNames)
-            {
                 expression.ColumnNames.Add(columnName);
-            }
 
             return new CheckColumnsBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
