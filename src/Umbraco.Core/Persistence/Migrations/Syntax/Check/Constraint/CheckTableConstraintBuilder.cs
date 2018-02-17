@@ -17,11 +17,23 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
             _sqlSyntax = sqlSyntax;
         }
 
+        public bool Exists()
+        {
+            return _sqlSyntax.GetConstraintsPerTable(_context.Database).Any(x => x.Item1.InvariantEquals(Expression.TableName)
+                                                                              && x.Item2.InvariantEquals(Expression.ConstraintName));
+        }
+
         public ICheckExistsSyntax WithColumn(string columnName)
         {
-            var columnNames = new string[] { columnName };
+            var expression = new CheckConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                ConstraintName = Expression.ConstraintName,
+                TableName = Expression.TableName
+            };
+            
+            expression.ColumnNames.Add(columnName);
 
-            return WithColumns(columnNames);
+            return new CheckColumnsConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
         public ICheckExistsSyntax WithColumns(string[] columnNames)
@@ -29,18 +41,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
             var expression = new CheckConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {
                 ConstraintName = Expression.ConstraintName,
-                TableName = Expression.TableName,
-                ColumnNames = columnNames
+                TableName = Expression.TableName
             };
 
+            foreach (var columnName in columnNames)
+                expression.ColumnNames.Add(columnName);
+
             return new CheckColumnsConstraintBuilder(_context, _databaseProviders, _sqlSyntax, expression);
-        }
-
-
-        public bool Exists()
-        {
-            return _sqlSyntax.GetConstraintsPerTable(_context.Database).Any(x => x.Item1.InvariantEquals(Expression.TableName)
-                                                                              && x.Item2.InvariantEquals(Expression.ConstraintName));
         }
     }
 }
