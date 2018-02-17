@@ -11,13 +11,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.ForeignKey
 
         public ICheckForeignKeyForFromTableOptionSyntax WithColumn(string columnName)
         {
-            var columnNames = new string[] { columnName };
+            Expression.ForeignColumnNames.Add(columnName);
 
-            return WithColumns(columnNames);
+            return this;
         }
         public ICheckForeignKeyForFromTableOptionSyntax WithColumns(string[] columnNames)
         {
-            Expression.ForeignColumnNames = columnNames;
+            foreach (var columnName in columnNames)
+            {
+                Expression.ForeignColumnNames.Add(columnName);
+            }
 
             return this;
         }
