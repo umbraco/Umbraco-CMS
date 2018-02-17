@@ -7,11 +7,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Column
     public class CheckColumnsBuilder : ExpressionBuilderBase<CheckColumnsExpression>, ICheckOptionSyntax
     {
         private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
         private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        public CheckColumnsBuilder(IMigrationContext context, ISqlSyntaxProvider sqlSyntax, CheckColumnsExpression expression) : base(expression)
+        public CheckColumnsBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, CheckColumnsExpression expression) : base(expression)
         {
             _context = context;
+            _databaseProviders = databaseProviders;
             _sqlSyntax = sqlSyntax;
         }
 

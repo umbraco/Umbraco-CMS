@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Umbraco.Core.Persistence.Migrations.Syntax.Check.Column;
+﻿using Umbraco.Core.Persistence.Migrations.Syntax.Check.Column;
 using Umbraco.Core.Persistence.Migrations.Syntax.Check.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -32,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
                 TableName = Expression.TableName
             };
 
-            return new CheckColumnBuilder(_context, _sqlSyntax, expression);
+            return new CheckColumnBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
 
         public ICheckOptionSyntax WithColumns(string[] columnNames)
@@ -47,7 +46,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
                 expression.ColumnNames.Add(columnName);
             }
 
-            return new CheckColumnsBuilder(_context, _sqlSyntax, expression);
+            return new CheckColumnsBuilder(_context, _databaseProviders, _sqlSyntax, expression);
         }
     }
 }

@@ -6,9 +6,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Index
 {
     public class CheckIndexBuilder : ExpressionBuilderBase<CheckIndexExpression>, ICheckIndexSyntax, ICheckIndexForTableSyntax, ICheckIndexOptionSyntax
     {
-        private IMigrationContext _context;
-        private DatabaseProviders[] _databaseProviders;
-        private ISqlSyntaxProvider _sqlSyntax;
+        private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
         public CheckIndexBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, CheckIndexExpression expression) : base(expression)
         {

@@ -6,9 +6,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Constraint
 {
     public class CheckColumnsConstraintBuilder : ExpressionBuilderBase<CheckConstraintExpression>, ICheckColumnsConstraintOptionSyntax
     {
-        private IMigrationContext _context;
-        private DatabaseProviders[] _databaseProviders;
-        private ISqlSyntaxProvider _sqlSyntax;
+        private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
         public CheckColumnsConstraintBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, CheckConstraintExpression expression) : base(expression)
         {
