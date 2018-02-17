@@ -18,7 +18,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
             _sqlSyntax = sqlSyntax;
         }
 
-        public ICheckColumnOnTableSyntax Column(string columnName)
+        public bool Exists()
+        {
+            return _sqlSyntax.DoesTableExist(_context.Database, Expression.TableName);
+        }
+
+        public ICheckColumnOnTableSyntax WithColumn(string columnName)
         {
             var expression = new CheckColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
             {
@@ -29,9 +34,15 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Check.Table
             return new CheckColumnBuilder(_context, _sqlSyntax, expression);
         }
 
-        public bool Exists()
+        public ICheckOptionSyntax WithColumns(string[] columnNames)
         {
-            return _sqlSyntax.DoesTableExist(_context.Database, Expression.TableName);
+            var expression = new CheckColumnsExpression(_context.CurrentDatabaseProvider, _databaseProviders, _sqlSyntax)
+            {
+                ColumnNames = columnNames,
+                TableName = Expression.TableName
+            };
+
+            return new CheckColumnsBuilder(_context, _sqlSyntax, expression);
         }
     }
 }
