@@ -1559,6 +1559,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="enableUrlTracker">Slå URL tracker til</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Viderestillet til</key>
+    <key alias="redirectUrlManagement">Redirect Url Management</key>
     <key alias="noRedirects">Der er ikke lavet nogen viderestillinger</key>
     <key alias="noRedirectsDescription">Når en udgivet side bliver omdøbt eller flyttet, vil en viderestilling automatisk blive lavet til den nye side.</key>
     <key alias="removeButton">Fjern</key>

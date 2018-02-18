@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource, notificationsService) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -75,6 +75,9 @@
             scope.clearUnpublishDate = function () {
                 clearUnpublishDate();
             };
+            scope.removeRedirect = function (redirectToDelete) {
+                removeRedirect(redirectToDelete);
+            };
 
             function loadAuditTrail() {
 
@@ -102,7 +105,35 @@
                     });
 
             }
+            function loadRedirectUrls() {
 
+                scope.loadingRedirectUrls = true;
+                redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
+                    .then(function (data) {
+                        scope.redirectUrls = data.searchResults;
+                        scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
+                        scope.loadingRedirectUrls = false;                        
+                    });
+            }
+  
+            function removeRedirect(redirectToDelete) {
+                localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, scope.node.name]).then(function (value) {
+                    var toggleConfirm = confirm(value);
+
+                    if (toggleConfirm) {
+                        redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
+
+                            var index = scope.redirectUrls.indexOf(redirectToDelete);
+                            scope.redirectUrls.splice(index, 1);
+                            notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
+                            loadRedirectUrls();
+                        }, function (error) {
+                            notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
+                            loadRedirectUrls();
+                            });
+                    }
+                });
+            }
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
                     switch (item.logType) {
@@ -142,7 +173,7 @@
                 // published node with pending changes
                 if(node.hasPublishedVersion === true && node.publishDate && node.published === false) {
                     scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
-                    scope.publishStatus.color = "success"
+                    scope.publishStatus.color = "success";
                 }
 
             }
@@ -238,12 +269,13 @@
                 });
             }
 
-            // load audit trail when on the info tab
+            // load audit trail and redirects when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
                 $timeout(function(){
                     if (args.id === -1) {
                         isInfoTab = true;
                         loadAuditTrail();
+                        loadRedirectUrls();
                     } else {
                         isInfoTab = false;
                     }
@@ -258,6 +290,7 @@
                 
                 if(isInfoTab) {
                     loadAuditTrail();
+                    loadRedirectUrls();
                     formatDatesToLocal();
                     setNodePublishStatus(scope.node);
                 }
