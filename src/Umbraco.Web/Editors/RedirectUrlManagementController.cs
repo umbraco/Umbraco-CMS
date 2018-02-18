@@ -12,6 +12,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using File = System.IO.File;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Editors
 {
@@ -57,7 +58,29 @@ namespace Umbraco.Web.Editors
             return searchResult;
 
         }
-
+        /// <summary>
+        /// This lists the RedirectUrls for a particular content item
+        /// Do we need to consider paging here?
+        /// </summary>
+        /// <param name="contentUdi">Udi of content item to retrieve RedirectUrls for</param>
+        /// <returns></returns>
+        [HttpGet]
+        public RedirectUrlSearchResult RedirectUrlsForContentItem(string contentUdi)
+        {
+            var redirectsResult = new RedirectUrlSearchResult();
+            GuidUdi guidIdi;
+            var contentKey = GuidUdi.TryParse(contentUdi, out guidIdi) ? guidIdi.Guid : default(Guid);
+            //hmm what to do if this doesn't parse as a Guid?
+            var redirectUrlService = Services.RedirectUrlService;
+            var redirects = redirectUrlService.GetContentRedirectUrls(contentKey);
+            redirectsResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
+            //now map the Content/published - don't need to do this? - not displaying the target Url on the info tab, no need to retrieve in the same was as on the dashboard
+            //not doing paging 'yet'
+            redirectsResult.TotalCount = redirects.Count();
+            redirectsResult.CurrentPage = 1;
+            redirectsResult.PageCount = 1;
+            return redirectsResult;
+        }
         [HttpPost]
         public IHttpActionResult DeleteRedirectUrl(Guid id)
         {
