@@ -537,8 +537,16 @@ namespace Umbraco.Web
 
         public IPublishedContent TypedMember(object id)
         {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
+            int intId;
+            if (ConvertIdObjectToInt(id, out intId))
+                return MembershipHelper.GetById(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return TypedMember(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return TypedMember(udiId);
+            return null;
         }
 
         public IPublishedContent TypedMember(int id)
