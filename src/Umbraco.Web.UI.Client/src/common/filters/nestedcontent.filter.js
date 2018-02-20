@@ -35,13 +35,19 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         // make a load of requests while we wait for a response
         ncNodeNameCache.keys[input] = "Loading...";
 
-        entityResource.getById(input, "Document")
-            .then(function (ent) {
-                ncNodeNameCache.keys[input] = ent.name;
-            });
+        entityResource.getById(input, input.indexOf("umb://media/") === 0 ? "Media" : "Document")
+            .then(
+                function (ent) {
+                    ncNodeNameCache.keys[input] = ent.name;
+                }
+            );
 
         // Return the current value for now
         return ncNodeNameCache.keys[input];
     };
 
+}).filter("ncRichtext", function (editorState, entityResource) {
+    return function(input) {
+        return $("<div/>").html(input).text();
+    };
 });
