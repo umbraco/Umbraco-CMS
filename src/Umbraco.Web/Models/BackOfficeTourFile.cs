@@ -9,6 +9,11 @@ namespace Umbraco.Web.Models
     [DataContract(Name = "tourFile", Namespace = "")]
     public class BackOfficeTourFile
     {
+        public BackOfficeTourFile()
+        {
+            Tours = new List<BackOfficeTour>();
+        }
+
         /// <summary>
         /// The file name for the tour
         /// </summary>
