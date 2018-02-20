@@ -123,6 +123,7 @@
     <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
+    <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
     <key alias="showPage">Forhåndsvisning</key>
