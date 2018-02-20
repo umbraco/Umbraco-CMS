@@ -39,7 +39,12 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         // make a load of requests while we wait for a response
         ncNodeNameCache.keys[lookupId] = "Loading...";
 
-        entityResource.getById(lookupId, lookupId.indexOf("umb://media/") === 0 ? "Media" : "Document")
+        var type = lookupId.indexOf("umb://media/") === 0
+            ? "Media"
+            : lookupId.indexOf("umb://member/") === 0
+                ? "Member"
+                : "Document";
+        entityResource.getById(lookupId, type)
             .then(
                 function (ent) {
                     // If there is more than one item selected, append ", ..." to the header to hint that
