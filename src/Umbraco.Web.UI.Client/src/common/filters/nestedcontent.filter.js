@@ -7,7 +7,7 @@ var ncNodeNameCache = {
     keys: {}
 };
 
-angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource) {
+angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource, $q) {
 
     return function (input) {
 
@@ -25,28 +25,33 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
             ncNodeNameCache.keys = {};
         }
 
+        // MNTP values are comma separated IDs. We'll only fetch the first one for the NC header.
+        var ids = input.split(',');
+        var lookupId = ids[0];
+
         // See if there is a value in the cache and use that
-        if (ncNodeNameCache.keys[input]) {
-            return ncNodeNameCache.keys[input];
+        if (ncNodeNameCache.keys[lookupId]) {
+            return ncNodeNameCache.keys[lookupId];
         }
 
         // No value, so go fetch one 
         // We'll put a temp value in the cache though so we don't 
         // make a load of requests while we wait for a response
-        ncNodeNameCache.keys[input] = "Loading...";
+        ncNodeNameCache.keys[lookupId] = "Loading...";
 
-        entityResource.getById(input, input.indexOf("umb://media/") === 0 ? "Media" : "Document")
+        entityResource.getById(lookupId, lookupId.indexOf("umb://media/") === 0 ? "Media" : "Document")
             .then(
                 function (ent) {
-                    ncNodeNameCache.keys[input] = ent.name;
+                    // If there is more than one item selected, append ", ..." to the header to hint that
+                    ncNodeNameCache.keys[lookupId] = ent.name + (ids.length > 1 ? ", ..." : "");
                 }
             );
 
         // Return the current value for now
-        return ncNodeNameCache.keys[input];
+        return ncNodeNameCache.keys[lookupId];
     };
 
-}).filter("ncRichtext", function (editorState, entityResource) {
+}).filter("ncRichtext", function () {
     return function(input) {
         return $("<div/>").html(input).text();
     };
