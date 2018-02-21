@@ -7,7 +7,7 @@ var ncNodeNameCache = {
     keys: {}
 };
 
-angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource, $q) {
+angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource) {
 
     return function (input) {
 
