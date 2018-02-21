@@ -493,7 +493,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @methodOf umbraco.resources.mediaResource
           *
           * @description
-          * Empties the media recycle bin
+          * Paginated search for media items starting on the supplied nodeId
           *
           * ##usage
           * <pre>
@@ -506,7 +506,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @param {string} query The search query
           * @param {int} pageNumber The page number
           * @param {int} pageSize The number of media items on a page
-          * @param {int} searchFrom Id to search from
+          * @param {int} searchFrom NodeId to search from (-1 for root)
           * @returns {Promise} resourcePromise object.
           *
           */
