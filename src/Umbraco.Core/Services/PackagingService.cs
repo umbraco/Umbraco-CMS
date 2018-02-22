@@ -832,32 +832,21 @@ namespace Umbraco.Core.Services
             foreach (var element in structureElement.Elements("DocumentType"))
             {
                 var alias = element.Value;
-                if (_importedContentTypes.ContainsKey(alias))
+
+                var allowedChild = _importedContentTypes.ContainsKey(alias) ? _importedContentTypes[alias] : _contentTypeService.GetContentType(alias);
+                if (allowedChild == null)
                 {
-                    var allowedChild = _importedContentTypes[alias];
-                    if (allowedChild == null || allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
+                    _logger.Warn<PackagingService>(
+                    string.Format(
+                        "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
+                        alias, contentType.Alias));
 
-                    allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
-                    sortOrder++;
+                    continue;
                 }
-                else
-                {
-                    // DocumentType was not in imported or dependant types, try to get from ContentTypeService
-                    var allowedChild = _contentTypeService.GetContentType(alias);
-                    if (allowedChild == null)
-                    {
-                        _logger.Warn<PackagingService>(
-                        string.Format(
-                            "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
-                            alias, contentType.Alias));
+                if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
 
-                        continue;
-                    }
-                    if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
-
-                    allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
-                    sortOrder++;
-                }
+                allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
+                sortOrder++;
             }
 
             contentType.AllowedContentTypes = allowedChildren;
