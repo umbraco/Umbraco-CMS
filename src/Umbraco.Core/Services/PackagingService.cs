@@ -850,6 +850,8 @@ namespace Umbraco.Core.Services
                         string.Format(
                             "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
                             alias, contentType.Alias));
+
+                        continue;
                     }
                     if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
 
