@@ -10,8 +10,8 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         return umbRequestHelper.postSaveContent({
             restApiUrl: umbRequestHelper.getApiUrl(
-                   "memberApiBaseUrl",
-                   "PostSave"),
+                "memberApiBaseUrl",
+                "PostSave"),
             content: content,
             action: action,
             files: files,
@@ -67,35 +67,35 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             var params = [
-                   { pageNumber: options.pageNumber },
-                   { pageSize: options.pageSize },
-                   { orderBy: options.orderBy },
-                   { orderDirection: options.orderDirection },
-                   { orderBySystemField: toBool(options.orderBySystemField) },
-                   { filter: options.filter }
+                { pageNumber: options.pageNumber },
+                { pageSize: options.pageSize },
+                { orderBy: options.orderBy },
+                { orderDirection: options.orderDirection },
+                { orderBySystemField: toBool(options.orderBySystemField) },
+                { filter: options.filter }
             ];
             if (memberTypeAlias != null) {
                 params.push({ memberTypeAlias: memberTypeAlias });
             }
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "memberApiBaseUrl",
-                              "GetPagedResults",
-                              params)),
-                  'Failed to retrieve member paged result');
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetPagedResults",
+                        params)),
+                'Failed to retrieve member paged result');
         },
 
         getListNode: function (listName) {
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "memberApiBaseUrl",
-                              "GetListNodeDisplay",
-                              [{ listName: listName }])),
-                  'Failed to retrieve data for member list ' + listName);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetListNodeDisplay",
+                        [{ listName: listName }])),
+                'Failed to retrieve data for member list ' + listName);
         },
 
         /**
@@ -122,12 +122,12 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByKey: function (key) {
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "memberApiBaseUrl",
-                              "GetByKey",
-                              [{ key: key }])),
-                  'Failed to retrieve data for member id ' + key);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetByKey",
+                        [{ key: key }])),
+                'Failed to retrieve data for member id ' + key);
         },
 
         /**
@@ -152,12 +152,12 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         deleteByKey: function (key) {
             return umbRequestHelper.resourcePromise(
-                   $http.post(
-                         umbRequestHelper.getApiUrl(
-                               "memberApiBaseUrl",
-                               "DeleteByKey",
-                               [{ key: key }])),
-                   'Failed to delete item ' + key);
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "DeleteByKey",
+                        [{ key: key }])),
+                'Failed to delete item ' + key);
         },
 
         /**
@@ -194,20 +194,20 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             if (alias) {
                 return umbRequestHelper.resourcePromise(
-                        $http.get(
-                              umbRequestHelper.getApiUrl(
-                                    "memberApiBaseUrl",
-                                    "GetEmpty",
-                                    [{ contentTypeAlias: alias }])),
-                        'Failed to retrieve data for empty member item type ' + alias);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "memberApiBaseUrl",
+                            "GetEmpty",
+                            [{ contentTypeAlias: alias }])),
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
             else {
                 return umbRequestHelper.resourcePromise(
-                        $http.get(
-                              umbRequestHelper.getApiUrl(
-                                    "memberApiBaseUrl",
-                                    "GetEmpty")),
-                        'Failed to retrieve data for empty member item type ' + alias);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "memberApiBaseUrl",
+                            "GetEmpty")),
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
 
         },
@@ -242,6 +242,38 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         save: function (member, isNew, files) {
             return saveMember(member, "save" + (isNew ? "New" : ""), files);
+        },
+
+        exportMemberData: function (key) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "ExportMemberData",
+                        [{ key: key }]))
+                    .success(function (data, status, headers) {
+
+                        headers = headers();
+
+                        var filename = headers['x-filename'];
+                        var contentType = headers['content-type'];
+
+                        var linkElement = document.createElement('a');
+
+                        var blob = new Blob([data], { type: contentType });
+                        var url = window.URL.createObjectURL(blob);
+
+                        linkElement.setAttribute('href', url);
+                        linkElement.setAttribute("download", filename);
+
+                        var clickEvent = new MouseEvent("click", {
+                            "view": window,
+                            "bubbles": true,
+                            "cancelable": false
+                        });
+
+                        linkElement.dispatchEvent(clickEvent);
+                    }));
         }
     };
 }

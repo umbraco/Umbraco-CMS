@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.Http;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -198,6 +199,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         void DeleteMembersOfType(int memberTypeId);
+
+        HttpResponseMessage ExportMemberData(Guid key);
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]

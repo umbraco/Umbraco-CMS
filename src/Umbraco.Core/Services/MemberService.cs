@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
@@ -14,6 +15,9 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
@@ -253,6 +257,89 @@ namespace Umbraco.Core.Services
                 }
             }
         }
+        /// <summary>
+        /// Exports Member data by unique key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public HttpResponseMessage ExportMemberData(Guid key)
+        {
+
+            //Filters
+            List<string> memberPropFilter = new List<string>
+            {
+                "RawPasswordValue","ParentId","SortOrder", "Level", "Path", "CreatorId", "Version", "ContentTypeId", "HasIdentity",
+                "PropertyGroups", "PropertyTypes", "ProviderUserKey", "ContentType"
+            };
+
+            List<string> propertiesFilter = new List<string>
+            {
+                "PropertyType", "Version", "Id", "HasIdentity", "Key"
+            };
+
+
+            //Get the member
+            var member = GetByKey(key);
+            var memberProperties = member.GetType().GetProperties();
+
+            string fileName = member.Name + "_" + member.Email + ".txt";
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (TextWriter tw = new StreamWriter(ms))
+                {
+                    foreach (var memberProp in memberProperties)
+                    {
+                        if (memberPropFilter.Contains(memberProp.Name)) continue;
+
+                        var propValue = memberProp.GetValue(member, null);
+                        var type = propValue?.GetType();
+
+                        if (type == typeof(PropertyCollection))
+                        {
+                            tw.WriteLine("");
+                            tw.WriteLine("PROPERTIES");
+                            tw.WriteLine("**********");
+
+                            if (propValue is PropertyCollection pc)
+                                foreach (var prop in pc)
+                                {
+                                    var propProperties = prop.GetType().GetProperties();
+
+                                    //Writing the proerty name
+                                    tw.WriteLine("Name : " + prop.PropertyType.Name);
+
+                                    foreach (var p in propProperties)
+                                    {
+                                        if (propertiesFilter.Contains(p.Name)) continue;
+                                            var pValue = p.GetValue(prop, null);
+                                        tw.WriteLine(p.Name + " : " + pValue);
+                                    }
+
+                                    tw.WriteLine("------------------------");
+                                }
+                        }
+                        else
+                        {
+                            tw.WriteLine(memberProp.Name + " : " + propValue);
+                        }
+                    }
+
+                    tw.Flush();
+                }
+
+                HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+                httpResponseMessage.Content = new ByteArrayContent(ms.ToArray());
+                httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+                httpResponseMessage.StatusCode = HttpStatusCode.OK;
+
+                return httpResponseMessage;
+            }
+        }
+
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -588,7 +675,7 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 return repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);

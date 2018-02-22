@@ -774,5 +774,15 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+        /// <summary>
+        /// Exports member data
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public HttpResponseMessage ExportMemberData(Guid key)
+        {
+            return Services.MemberService.ExportMemberData(key);
+        }
     }
 }
