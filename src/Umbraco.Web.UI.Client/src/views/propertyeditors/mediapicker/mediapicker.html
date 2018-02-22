@@ -2,10 +2,11 @@
 
     <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
-    
+
     <div data-element="sortable-thumbnails" class="flex error">
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
+
 
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
@@ -28,21 +29,35 @@
                         <i class="icon icon-delete"></i>
                     </a>
                 </div>
+
             </li>
             <li style="border: none;">
-                <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" ng-if="showAdd()" prevent-default>
+                <a data-element="sortable-thumbnails-add" href="#" class="add-link add-link-square" ng-click="add()" ng-if="showAdd()" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>
             </li>
         </ul>
     </div>
+    <ng-form name="mediaPickerForm">
+        <!--These are here because we need ng-form fields to validate against-->
+        <input type="hidden" name="minCount" ng-model="images" />
+        <input type="hidden" name="maxCount" ng-model="images" />
 
-    <umb-overlay
-        data-element="overlay-media-picker"
-        ng-if="mediaPickerOverlay.show"
-        model="mediaPickerOverlay"
-        position="right"
-        view="mediaPickerOverlay.view">
+        <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
+            <localize key="validation_minCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_items">items</localize>
+        </div>
+
+        <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
+            <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
+        </div>
+    </ng-form>
+
+
+    <umb-overlay data-element="overlay-media-picker"
+                 ng-if="mediaPickerOverlay.show"
+                 model="mediaPickerOverlay"
+                 position="right"
+                 view="mediaPickerOverlay.view">
     </umb-overlay>
 
 </div>
