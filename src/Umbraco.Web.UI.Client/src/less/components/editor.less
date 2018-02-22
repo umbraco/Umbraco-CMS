@@ -159,6 +159,11 @@ a.umb-editor-header__close-split-view:hover {
 	border-bottom: none;
 }
 
+.umb-variant-switcher_item--current .umb-variant-switcher__name-wrapper {
+	background-color: @gray-10;
+	border-left: 2px solid @turquoise;
+}
+
 .umb-variant-switcher__item:hover,
 .umb-variant-switcher__item:focus,
 .umb-variant-switcher__name-wrapper:hover,
@@ -174,11 +179,11 @@ a.umb-editor-header__close-split-view:hover {
 
 .umb-variant-switcher__name-wrapper {
 	font-size: 14px;
-	padding: 5px 20px;
 	flex: 1;
 	cursor: pointer;
 	padding-top: 6px;
 	padding-bottom: 6px;
+	border-left: 2px solid transparent;
 }
 
 .umb-variant-switcher__name {
