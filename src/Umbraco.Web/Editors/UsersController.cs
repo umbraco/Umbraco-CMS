@@ -410,7 +410,7 @@ namespace Umbraco.Web.Editors
 
             //send the email
 
-            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, user, userSave.Message);
+            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
 
             return display;
         }
@@ -447,7 +447,7 @@ namespace Umbraco.Web.Editors
             return attempt.Result;
         }
 
-        private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, IUser to, string message)
+        private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, string fromEmail, IUser to, string message)
         {
             var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
 
@@ -476,7 +476,7 @@ namespace Umbraco.Web.Editors
             var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService),
-                new[] { userDisplay.Name, from, message, inviteUri.ToString() });
+                new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
             await UserManager.EmailService.SendAsync(
                 //send the special UmbracoEmailMessage which configures it's own sender
