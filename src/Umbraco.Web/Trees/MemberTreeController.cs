@@ -17,6 +17,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -180,6 +181,8 @@ namespace Umbraco.Web.Trees
 
             //add delete option for all members
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionExportMember>(ui.Text("actions", ActionExportMember.Instance.Alias));
+
 
             return menu;
         }

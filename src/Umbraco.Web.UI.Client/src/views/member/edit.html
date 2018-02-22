@@ -21,7 +21,7 @@
 
             <umb-tabs-content view="true" class="form-horizontal">
                 <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
-                    <button type="button" ng-click="export()">Export</button>
+
                     <umb-property property="property" ng-repeat="property in tab.properties">
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
