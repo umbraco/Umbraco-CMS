@@ -21,6 +21,10 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 			if(this.myForm.$valid){
 				installerService.forward();
 			}
-	};
+    };
+    $scope.togglePassword = function () {
+        var elem = $("form[name='myForm'] input[name='installer.current.model.password']");
+        elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+    }
 	
 });
