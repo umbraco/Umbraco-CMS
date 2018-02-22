@@ -84,6 +84,12 @@ namespace Umbraco.Core.Models.Identity
         public virtual DateTime? LockoutEndDateUtc { get; set; }
 
         /// <summary>
+        /// DateTime in UTC when the password was last changed.
+        /// 
+        /// </summary>
+        public virtual DateTime? LastPasswordChangeDateUtc { get; set; }
+
+        /// <summary>
         /// Is lockout enabled for this user
         /// 
         /// </summary>

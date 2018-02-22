@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models.Identity
                 })
                 .ConstructUsing(user => new BackOfficeIdentityUser(user.Id, user.Groups))
                 .ForMember(user => user.LastLoginDateUtc, expression => expression.MapFrom(user => user.LastLoginDate.ToUniversalTime()))
+                .ForMember(user => user.LastPasswordChangeDateUtc, expression => expression.MapFrom(user => user.LastPasswordChangeDate.ToUniversalTime()))
                 .ForMember(user => user.Email, expression => expression.MapFrom(user => user.Email))
                 .ForMember(user => user.EmailConfirmed, expression => expression.MapFrom(user => user.EmailConfirmedDate.HasValue))
                 .ForMember(user => user.Id, expression => expression.MapFrom(user => user.Id))
