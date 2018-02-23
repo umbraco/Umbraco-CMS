@@ -185,24 +185,31 @@ namespace Umbraco.Core.Manifest
                 }
 
                 //validate the property editors section
-                var propEditors = deserialized.Properties().Where(x => x.Name == "propertyEditors").ToArray();
+                var propEditors = deserialized.Properties().Where(x => x.Name == ManifestBuilder.PropertyEditorsKey).ToArray();
                 if (propEditors.Length > 1)
                 {
                     throw new FormatException("The manifest is not formatted correctly contains more than one 'propertyEditors' element");
                 }
 
                 //validate the parameterEditors section
-                var paramEditors = deserialized.Properties().Where(x => x.Name == "parameterEditors").ToArray();
+                var paramEditors = deserialized.Properties().Where(x => x.Name == ManifestBuilder.ParameterEditorsKey).ToArray();
                 if (paramEditors.Length > 1)
                 {
                     throw new FormatException("The manifest is not formatted correctly contains more than one 'parameterEditors' element");
                 }
 
                 //validate the gridEditors section
-                var gridEditors = deserialized.Properties().Where(x => x.Name == "gridEditors").ToArray();
+                var gridEditors = deserialized.Properties().Where(x => x.Name == ManifestBuilder.GridEditorsKey).ToArray();
                 if (gridEditors.Length > 1)
                 {
                     throw new FormatException("The manifest is not formatted correctly contains more than one 'gridEditors' element");
+                }
+
+                //validate the dashboards section
+                var dashboards = deserialized.Properties().Where(x => x.Name == "dashboards").ToArray();
+                if (dashboards.Length > 1)
+                {
+                    throw new FormatException("The manifest is not formatted correctly contains more than one 'dashboards' element");
                 }
 
                 var jConfig = init.Any() ? (JArray)deserialized["javascript"] : new JArray();
@@ -212,9 +219,9 @@ namespace Umbraco.Core.Manifest
                 ReplaceVirtualPaths(cssConfig);
 
                 //replace virtual paths for each property editor
-                if (deserialized["propertyEditors"] != null)
+                if (deserialized[ManifestBuilder.PropertyEditorsKey] != null)
                 {
-                    foreach (JObject p in deserialized["propertyEditors"])
+                    foreach (JObject p in deserialized[ManifestBuilder.PropertyEditorsKey])
                     {
                         if (p["editor"] != null)
                         {
@@ -228,9 +235,9 @@ namespace Umbraco.Core.Manifest
                 }
 
                 //replace virtual paths for each property editor
-                if (deserialized["gridEditors"] != null)
+                if (deserialized[ManifestBuilder.GridEditorsKey] != null)
                 {
-                    foreach (JObject p in deserialized["gridEditors"])
+                    foreach (JObject p in deserialized[ManifestBuilder.GridEditorsKey])
                     {
                         if (p["view"] != null)
                         {
@@ -247,9 +254,10 @@ namespace Umbraco.Core.Manifest
                     {
                         JavaScriptInitialize = jConfig,
                         StylesheetInitialize = cssConfig,
-                        PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
-                        ParameterEditors = paramEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray(),
-                        GridEditors = gridEditors.Any() ? (JArray)deserialized["gridEditors"] : new JArray()
+                        PropertyEditors = propEditors.Any() ? (JArray)deserialized[ManifestBuilder.PropertyEditorsKey] : new JArray(),
+                        ParameterEditors = paramEditors.Any() ? (JArray)deserialized[ManifestBuilder.ParameterEditorsKey] : new JArray(),
+                        GridEditors = gridEditors.Any() ? (JArray)deserialized[ManifestBuilder.GridEditorsKey] : new JArray(),
+                        Dashboards = dashboards.Any() ? deserialized[ManifestBuilder.DashboardsKey].ToObject<IDictionary<string, JObject>>() : new Dictionary<string, JObject>()
                     };
                 result.Add(manifest);
             }

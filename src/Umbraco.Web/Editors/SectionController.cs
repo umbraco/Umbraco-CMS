@@ -24,7 +24,7 @@ namespace Umbraco.Web.Editors
 
             //Check if there are empty dashboards or dashboards that will end up empty based on the current user's access
             //and add the meta data about them
-            var dashboardHelper = new DashboardHelper(Services.SectionService);
+            var dashboardHelper = new DashboardHelper(ApplicationContext);
             //this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
             //since tree's by nature are controllers and require request contextual data.
             var appTreeController = new ApplicationTreeController

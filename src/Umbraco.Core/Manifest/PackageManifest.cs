@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Core.Manifest
 {
@@ -26,10 +27,15 @@ namespace Umbraco.Core.Manifest
         /// The json array of parameter editors
         /// </summary>
         public JArray ParameterEditors { get; set; }
-
+        
         /// <summary>
         /// The json array of grid editors
         /// </summary>
         public JArray GridEditors { get; set; }
+
+        /// <summary>
+        /// The dictionary of dashboards
+        /// </summary>
+        public IDictionary<string, JObject> Dashboards { get; set; }
     }
 }

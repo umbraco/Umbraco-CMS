@@ -123,8 +123,8 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
-            var dashboardHelper = new DashboardHelper(Services.SectionService);
-            return dashboardHelper.GetDashboard(section, Security.CurrentUser);            
+            var dashboardHelper = new DashboardHelper(ApplicationContext);
+            return dashboardHelper.GetDashboard(section, Security.CurrentUser);
         }
     }
 }
