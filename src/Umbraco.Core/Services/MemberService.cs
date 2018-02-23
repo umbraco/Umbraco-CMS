@@ -257,13 +257,22 @@ namespace Umbraco.Core.Services
                 }
             }
         }
+
         /// <summary>
-        /// Exports Member data by unique key
+        /// Exports member data based on their unique Id
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public HttpResponseMessage ExportMemberData(Guid key, bool hasAccessToSensitive)
+        /// <param name="key">The unique <see cref="Guid">member identifier</see></param>
+        /// <param name="currentUser">The <see cref="IUser">user</see> requesting the export</param>
+        /// <returns><see cref="HttpResponseMessage"/></returns>
+        public HttpResponseMessage ExportMemberData(Guid key, IUser currentUser)
         {
+            var httpResponseMessage = new HttpResponseMessage();
+            if (currentUser.HasAccessToSensitiveData() == false)
+            {
+                httpResponseMessage.StatusCode = HttpStatusCode.Forbidden;
+                return httpResponseMessage;
+            }
+
             var memberPropertyFilter = new List<string>
             {
                 "RawPasswordValue",
@@ -288,75 +297,66 @@ namespace Umbraco.Core.Services
                 "HasIdentity",
                 "Key"
             };
+            
+            var member = GetByKey(key);
+            var memberProperties = member.GetType().GetProperties();
+            var fileName = $"{member.Name}_{member.Email}.txt";
 
-            var httpResponseMessage = new HttpResponseMessage();
-
-            if (hasAccessToSensitive)
+            using (var memoryStream = new MemoryStream())
             {
-                var member = GetByKey(key);
-
-                var memberProperties = member.GetType().GetProperties();
-                var fileName = $"{member.Name}_{member.Email}.txt";
-
-
-                using (var memoryStream = new MemoryStream())
+                using (var textWriter = new StreamWriter(memoryStream))
                 {
-                    using (var textWriter = new StreamWriter(memoryStream))
+                    foreach (var memberProperty in memberProperties)
                     {
-                        foreach (var memberProp in memberProperties)
+                        if (memberPropertyFilter.Contains(memberProperty.Name))
+                            continue;
+
+                        var propertyValue = memberProperty.GetValue(member, null);
+                        var type = propertyValue?.GetType();
+
+                        if (type == typeof(PropertyCollection))
                         {
-                            if (memberPropertyFilter.Contains(memberProp.Name)) continue;
-                            var propValue = memberProp.GetValue(member, null);
-                            var type = propValue?.GetType();
+                            textWriter.WriteLine("");
+                            textWriter.WriteLine("PROPERTIES");
+                            textWriter.WriteLine("**********");
 
-                            if (type == typeof(PropertyCollection))
+                            if (propertyValue is PropertyCollection propertyCollection)
                             {
-                                textWriter.WriteLine("");
-                                textWriter.WriteLine("PROPERTIES");
-                                textWriter.WriteLine("**********");
-
-                                if (propValue is PropertyCollection propertyCollection)
+                                foreach (var property in propertyCollection)
                                 {
-                                    foreach (var property in propertyCollection)
+                                    var propProperties = property.GetType().GetProperties();
+
+                                    textWriter.WriteLine("Name : " + property.PropertyType.Name);
+
+                                    foreach (var p in propProperties)
                                     {
-                                        var propProperties = property.GetType().GetProperties();
-
-                                        textWriter.WriteLine("Name : " + property.PropertyType.Name);
-
-                                        foreach (var p in propProperties)
-                                        {
-                                            if (propertiesFilter.Contains(p.Name)) continue;
-                                            var pValue = p.GetValue(property, null);
-                                            textWriter.WriteLine(p.Name + " : " + pValue);
-                                        }
-
-                                        textWriter.WriteLine("------------------------");
+                                        if (propertiesFilter.Contains(p.Name)) continue;
+                                        var pValue = p.GetValue(property, null);
+                                        textWriter.WriteLine(p.Name + " : " + pValue);
                                     }
+
+                                    textWriter.WriteLine("------------------------");
                                 }
                             }
-                            else
-                            {
-                                textWriter.WriteLine(memberProp.Name + " : " + propValue);
-                            }
                         }
-
-                        textWriter.Flush();
+                        else
+                        {
+                            textWriter.WriteLine(memberProperty.Name + " : " + propertyValue);
+                        }
                     }
 
-                    httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
-                    httpResponseMessage.Content.Headers.Add("x-filename", fileName);
-                    httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                    httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                    httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
-                    httpResponseMessage.StatusCode = HttpStatusCode.OK;
-
-                    return httpResponseMessage;
+                    textWriter.Flush();
                 }
+
+                httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
+                httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+                httpResponseMessage.StatusCode = HttpStatusCode.OK;
+
+                return httpResponseMessage;
             }
-
-            httpResponseMessage.StatusCode = HttpStatusCode.Forbidden;
-
-            return httpResponseMessage;
         }
 
 
