@@ -318,7 +318,6 @@
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorInsert">Name</key>
-        <key alias="anchorInsert">Name</key>
         <key alias="confirmExport">Export</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
