@@ -264,72 +264,84 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public HttpResponseMessage ExportMemberData(Guid key)
         {
-
-            //Filters
-            List<string> memberPropFilter = new List<string>
+            var memberPropertyFilter = new List<string>
             {
-                "RawPasswordValue","ParentId","SortOrder", "Level", "Path", "CreatorId", "Version", "ContentTypeId", "HasIdentity",
-                "PropertyGroups", "PropertyTypes", "ProviderUserKey", "ContentType"
+                "RawPasswordValue",
+                "ParentId",
+                "SortOrder",
+                "Level",
+                "Path",
+                "CreatorId",
+                "Version",
+                "ContentTypeId",
+                "HasIdentity",
+                "PropertyGroups",
+                "PropertyTypes",
+                "ProviderUserKey",
+                "ContentType"
             };
 
-            List<string> propertiesFilter = new List<string>
+            var propertiesFilter = new List<string>
             {
-                "PropertyType", "Version", "Id", "HasIdentity", "Key"
+                "PropertyType",
+                "Version",
+                "Id",
+                "HasIdentity",
+                "Key"
             };
-
-
-            //Get the member
+            
             var member = GetByKey(key);
             var memberProperties = member.GetType().GetProperties();
+            var fileName = $"{member.Name}_{member.Email}.txt";
 
-            string fileName = member.Name + "_" + member.Email + ".txt";
-
-            using (MemoryStream ms = new MemoryStream())
+            using (var memoryStream = new MemoryStream())
             {
-                using (TextWriter tw = new StreamWriter(ms))
+                using (var textWriter = new StreamWriter(memoryStream))
                 {
                     foreach (var memberProp in memberProperties)
                     {
-                        if (memberPropFilter.Contains(memberProp.Name)) continue;
+                        if (memberPropertyFilter.Contains(memberProp.Name)) continue;
 
                         var propValue = memberProp.GetValue(member, null);
                         var type = propValue?.GetType();
 
                         if (type == typeof(PropertyCollection))
                         {
-                            tw.WriteLine("");
-                            tw.WriteLine("PROPERTIES");
-                            tw.WriteLine("**********");
+                            textWriter.WriteLine("");
+                            textWriter.WriteLine("PROPERTIES");
+                            textWriter.WriteLine("**********");
 
-                            if (propValue is PropertyCollection pc)
-                                foreach (var prop in pc)
+                            if (propValue is PropertyCollection propertyCollection)
+                            {
+                                foreach (var property in propertyCollection)
                                 {
-                                    var propProperties = prop.GetType().GetProperties();
+                                    var propProperties = property.GetType().GetProperties();
 
                                     //Writing the proerty name
-                                    tw.WriteLine("Name : " + prop.PropertyType.Name);
+                                    textWriter.WriteLine("Name : " + property.PropertyType.Name);
 
                                     foreach (var p in propProperties)
                                     {
                                         if (propertiesFilter.Contains(p.Name)) continue;
-                                            var pValue = p.GetValue(prop, null);
-                                        tw.WriteLine(p.Name + " : " + pValue);
+                                        var pValue = p.GetValue(property, null);
+                                        textWriter.WriteLine(p.Name + " : " + pValue);
                                     }
 
-                                    tw.WriteLine("------------------------");
+                                    textWriter.WriteLine("------------------------");
                                 }
+                            }
                         }
                         else
                         {
-                            tw.WriteLine(memberProp.Name + " : " + propValue);
+                            textWriter.WriteLine(memberProp.Name + " : " + propValue);
                         }
                     }
 
-                    tw.Flush();
+                    textWriter.Flush();
                 }
 
-                HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
-                httpResponseMessage.Content = new ByteArrayContent(ms.ToArray());
+                var httpResponseMessage = new HttpResponseMessage();
+                httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
                 httpResponseMessage.Content.Headers.Add("x-filename", fileName);
                 httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
