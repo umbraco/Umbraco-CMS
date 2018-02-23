@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
@@ -14,6 +15,9 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
@@ -253,6 +257,108 @@ namespace Umbraco.Core.Services
                 }
             }
         }
+
+        /// <summary>
+        /// Exports member data based on their unique Id
+        /// </summary>
+        /// <param name="key">The unique <see cref="Guid">member identifier</see></param>
+        /// <param name="currentUser">The <see cref="IUser">user</see> requesting the export</param>
+        /// <returns><see cref="HttpResponseMessage"/></returns>
+        public HttpResponseMessage ExportMemberData(Guid key, IUser currentUser)
+        {
+            var httpResponseMessage = new HttpResponseMessage();
+            if (currentUser.HasAccessToSensitiveData() == false)
+            {
+                httpResponseMessage.StatusCode = HttpStatusCode.Forbidden;
+                return httpResponseMessage;
+            }
+
+            var memberPropertyFilter = new List<string>
+            {
+                "RawPasswordValue",
+                "ParentId",
+                "SortOrder",
+                "Level",
+                "Path",
+                "CreatorId",
+                "Version",
+                "ContentTypeId",
+                "HasIdentity",
+                "PropertyGroups",
+                "PropertyTypes",
+                "ProviderUserKey",
+                "ContentType"
+            };
+            var propertiesFilter = new List<string>
+            {
+                "PropertyType",
+                "Version",
+                "Id",
+                "HasIdentity",
+                "Key"
+            };
+            
+            var member = GetByKey(key);
+            var memberProperties = member.GetType().GetProperties();
+            var fileName = $"{member.Name}_{member.Email}.txt";
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var textWriter = new StreamWriter(memoryStream))
+                {
+                    foreach (var memberProperty in memberProperties)
+                    {
+                        if (memberPropertyFilter.Contains(memberProperty.Name))
+                            continue;
+
+                        var propertyValue = memberProperty.GetValue(member, null);
+                        var type = propertyValue?.GetType();
+
+                        if (type == typeof(PropertyCollection))
+                        {
+                            textWriter.WriteLine("");
+                            textWriter.WriteLine("PROPERTIES");
+                            textWriter.WriteLine("**********");
+
+                            if (propertyValue is PropertyCollection propertyCollection)
+                            {
+                                foreach (var property in propertyCollection)
+                                {
+                                    var propProperties = property.GetType().GetProperties();
+
+                                    textWriter.WriteLine("Name : " + property.PropertyType.Name);
+
+                                    foreach (var p in propProperties)
+                                    {
+                                        if (propertiesFilter.Contains(p.Name)) continue;
+                                        var pValue = p.GetValue(property, null);
+                                        textWriter.WriteLine(p.Name + " : " + pValue);
+                                    }
+
+                                    textWriter.WriteLine("------------------------");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            textWriter.WriteLine(memberProperty.Name + " : " + propertyValue);
+                        }
+                    }
+
+                    textWriter.Flush();
+                }
+
+                httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
+                httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+                httpResponseMessage.StatusCode = HttpStatusCode.OK;
+
+                return httpResponseMessage;
+            }
+        }
+
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -588,7 +694,7 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 return repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);

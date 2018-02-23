@@ -774,5 +774,17 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+        /// <summary>
+        /// Exports member data based on their unique Id
+        /// </summary>
+        /// <param name="key">The unique <see cref="Guid">member identifier</see></param>
+        /// <returns><see cref="HttpResponseMessage"/></returns>
+        [HttpGet]
+        public HttpResponseMessage ExportMemberData(Guid key)
+        {
+            var currentUser = UmbracoContext.Current.Security.CurrentUser;
+            return Services.MemberService.ExportMemberData(key, currentUser);
+        }
     }
 }

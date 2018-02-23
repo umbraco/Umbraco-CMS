@@ -11,6 +11,7 @@
         <key alias="changeDocType">Change Document Type</key>
         <key alias="copy">Copy</key>
         <key alias="create">Create</key>
+        <key alias="export">Export</key>
         <key alias="createPackage">Create Package</key>
         <key alias="createGroup">Create group</key>
         <key alias="delete">Delete</key>
@@ -317,7 +318,7 @@
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorInsert">Name</key>
-        <key alias="assignDomain">Manage hostnames</key>
+        <key alias="confirmExport">Export</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
         <key alias="confirmdisable">Are you sure you want to disable</key>

@@ -20,13 +20,13 @@
          <umb-editor-container>
 
             <umb-tabs-content view="true" class="form-horizontal">
-               <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+                <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-                  <umb-property property="property" ng-repeat="property in tab.properties">
-                     <umb-editor model="property"></umb-editor>
-                  </umb-property>
+                    <umb-property property="property" ng-repeat="property in tab.properties">
+                        <umb-editor model="property"></umb-editor>
+                    </umb-property>
 
-               </umb-tab>
+                </umb-tab>
             </umb-tabs-content>
 
          </umb-editor-container>
