@@ -136,10 +136,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
        };
 
        $scope.sortableOptions = {
+           disabled: !$scope.isMultiPicker,
+           items: "li:not(.add-wrapper)",
+           cancel: ".unsortable",
            update: function(e, ui) {
                var r = [];
-               //TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
-               // content picker. THen we don't have to worry about setting ids, render models, models, we just set one and let the
+               // TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the
+               // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
                // watch do all the rest.
                 $timeout(function(){
                     angular.forEach($scope.images, function(value, key) {
