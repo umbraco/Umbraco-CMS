@@ -782,7 +782,9 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public HttpResponseMessage ExportMemberData(Guid key)
         {
-            return Services.MemberService.ExportMemberData(key);
+            var hasAccessToSensitive = UmbracoContext.Current.Security.CurrentUser.HasAccessToSensitiveData();
+
+            return Services.MemberService.ExportMemberData(key, hasAccessToSensitive);
         }
     }
 }

@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public HttpResponseMessage ExportMemberData(Guid key)
+        public HttpResponseMessage ExportMemberData(Guid key, bool hasAccessToSensitive)
         {
             var memberPropertyFilter = new List<string>
             {
@@ -280,7 +280,6 @@ namespace Umbraco.Core.Services
                 "ProviderUserKey",
                 "ContentType"
             };
-
             var propertiesFilter = new List<string>
             {
                 "PropertyType",
@@ -289,67 +288,75 @@ namespace Umbraco.Core.Services
                 "HasIdentity",
                 "Key"
             };
-            
-            var member = GetByKey(key);
-            var memberProperties = member.GetType().GetProperties();
-            var fileName = $"{member.Name}_{member.Email}.txt";
 
-            using (var memoryStream = new MemoryStream())
+            var httpResponseMessage = new HttpResponseMessage();
+
+            if (hasAccessToSensitive)
             {
-                using (var textWriter = new StreamWriter(memoryStream))
+                var member = GetByKey(key);
+
+                var memberProperties = member.GetType().GetProperties();
+                var fileName = $"{member.Name}_{member.Email}.txt";
+
+
+                using (var memoryStream = new MemoryStream())
                 {
-                    foreach (var memberProp in memberProperties)
+                    using (var textWriter = new StreamWriter(memoryStream))
                     {
-                        if (memberPropertyFilter.Contains(memberProp.Name)) continue;
-
-                        var propValue = memberProp.GetValue(member, null);
-                        var type = propValue?.GetType();
-
-                        if (type == typeof(PropertyCollection))
+                        foreach (var memberProp in memberProperties)
                         {
-                            textWriter.WriteLine("");
-                            textWriter.WriteLine("PROPERTIES");
-                            textWriter.WriteLine("**********");
+                            if (memberPropertyFilter.Contains(memberProp.Name)) continue;
+                            var propValue = memberProp.GetValue(member, null);
+                            var type = propValue?.GetType();
 
-                            if (propValue is PropertyCollection propertyCollection)
+                            if (type == typeof(PropertyCollection))
                             {
-                                foreach (var property in propertyCollection)
+                                textWriter.WriteLine("");
+                                textWriter.WriteLine("PROPERTIES");
+                                textWriter.WriteLine("**********");
+
+                                if (propValue is PropertyCollection propertyCollection)
                                 {
-                                    var propProperties = property.GetType().GetProperties();
-
-                                    //Writing the proerty name
-                                    textWriter.WriteLine("Name : " + property.PropertyType.Name);
-
-                                    foreach (var p in propProperties)
+                                    foreach (var property in propertyCollection)
                                     {
-                                        if (propertiesFilter.Contains(p.Name)) continue;
-                                        var pValue = p.GetValue(property, null);
-                                        textWriter.WriteLine(p.Name + " : " + pValue);
-                                    }
+                                        var propProperties = property.GetType().GetProperties();
 
-                                    textWriter.WriteLine("------------------------");
+                                        textWriter.WriteLine("Name : " + property.PropertyType.Name);
+
+                                        foreach (var p in propProperties)
+                                        {
+                                            if (propertiesFilter.Contains(p.Name)) continue;
+                                            var pValue = p.GetValue(property, null);
+                                            textWriter.WriteLine(p.Name + " : " + pValue);
+                                        }
+
+                                        textWriter.WriteLine("------------------------");
+                                    }
                                 }
                             }
+                            else
+                            {
+                                textWriter.WriteLine(memberProp.Name + " : " + propValue);
+                            }
                         }
-                        else
-                        {
-                            textWriter.WriteLine(memberProp.Name + " : " + propValue);
-                        }
+
+                        textWriter.Flush();
                     }
 
-                    textWriter.Flush();
+                    httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
+                    httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+                    httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                    httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+                    httpResponseMessage.StatusCode = HttpStatusCode.OK;
+
+                    return httpResponseMessage;
                 }
-
-                var httpResponseMessage = new HttpResponseMessage();
-                httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
-                httpResponseMessage.Content.Headers.Add("x-filename", fileName);
-                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
-                httpResponseMessage.StatusCode = HttpStatusCode.OK;
-
-                return httpResponseMessage;
             }
+
+            httpResponseMessage.StatusCode = HttpStatusCode.Forbidden;
+
+            return httpResponseMessage;
         }
 
 

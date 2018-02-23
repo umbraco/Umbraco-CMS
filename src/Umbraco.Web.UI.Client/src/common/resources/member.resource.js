@@ -273,6 +273,8 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         });
 
                         linkElement.dispatchEvent(clickEvent);
+                    }).error(function (data, status, header) {
+
                     }));
         }
     };

@@ -30,7 +30,7 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Content,
         Constants.Applications.Media,
         Constants.Applications.Members)]
-    [LegacyBaseTree(typeof (loadMembers))]
+    [LegacyBaseTree(typeof(loadMembers))]
     [Tree(Constants.Applications.Members, Constants.Trees.Members, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
         public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
-        {   
+        {
             var node = GetSingleTreeNode(id, queryStrings);
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
@@ -117,10 +117,10 @@ namespace Umbraco.Web.Trees
                     "icon-user",
                     false);
 
-                return node;    
+                return node;
             }
 
-            
+
         }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -174,14 +174,18 @@ namespace Umbraco.Web.Trees
                     createMenuItem.NavigateToRoute("/member/member/edit/-1?create=true");
                     menu.Items.Add(createMenuItem);
                 }
-                
+
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
             //add delete option for all members
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-            menu.Items.Add<ActionExportMember>(ui.Text("actions", ActionExportMember.Instance.Alias));
+
+            if (UmbracoContext.Current.Security.CurrentUser.HasAccessToSensitiveData())
+            {
+                menu.Items.Add<ActionExportMember>(ui.Text("actions", ActionExportMember.Instance.Alias));
+            }
 
 
             return menu;

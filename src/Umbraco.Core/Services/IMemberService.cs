@@ -200,7 +200,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeId">Id of the MemberType</param>
         void DeleteMembersOfType(int memberTypeId);
 
-        HttpResponseMessage ExportMemberData(Guid key);
+        HttpResponseMessage ExportMemberData(Guid key, bool hasAccessToSensitive);
 
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
