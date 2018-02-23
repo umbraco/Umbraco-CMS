@@ -144,6 +144,10 @@ namespace Umbraco.Web.Editors
                 {
                     foreach (var prop in props)
                     {
+                        // Id 0 means the property was just added, no need to look it up
+                        if (prop.Id == 0)
+                            continue;
+                        
                         var foundOnContentType = ct.PropertyTypes.FirstOrDefault(x => x.Id == prop.Id);
                         if (foundOnContentType == null)
                             throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "No property type with id " + prop.Id + " found on the content type"));
