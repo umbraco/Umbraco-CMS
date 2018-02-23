@@ -1190,8 +1190,7 @@
         <key alias="deleteUserGroupsSuccess">%0% grupos de usuario borrados</key>
         <key alias="deleteUserGroupSuccess">%0% fue borrado</key>
         <key alias="unlockUsersSuccess">%0% usuarios desbloquedaos</key>
-        <key alias="unlockUsersError">
-            Error desbloqueando usuarios/key>
+        <key alias="unlockUsersError">Error desbloqueando usuarios</key>
             <key alias="unlockUserSuccess">%0% está desbloqueado</key>
             <key alias="unlockUserError">Error desbloqueando usuario</key>
         </area>
