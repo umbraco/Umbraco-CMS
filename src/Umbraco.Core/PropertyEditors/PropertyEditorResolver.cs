@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
@@ -39,10 +40,11 @@ namespace Umbraco.Core.PropertyEditors
             _unioned = new Lazy<List<PropertyEditor>>(() => Values.Union(builder.PropertyEditors).ToList());
         }
 
-        internal PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
+        internal PropertyEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder, IContentSection contentSection)
             : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
-            _unioned = new Lazy<List<PropertyEditor>>(() => SanitizeNames(Values.Union(builder.PropertyEditors).ToList()));
+            _unioned = new Lazy<List<PropertyEditor>>(() => SanitizeNames(Values.Union(builder.PropertyEditors)
+                .Where(x=>x.IsDeprecated == false || contentSection != null && contentSection.ShowDeprecatedPropertyEditors).ToList()));
         }
 
         private static List<PropertyEditor> SanitizeNames(List<PropertyEditor> editors)

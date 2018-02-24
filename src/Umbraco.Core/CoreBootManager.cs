@@ -461,7 +461,7 @@ namespace Umbraco.Core
                 ApplicationCache.RuntimeCache,
                 new ManifestParser(new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), ApplicationCache.RuntimeCache));
 
-            PropertyEditorResolver.Current = new PropertyEditorResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(), builder);
+            PropertyEditorResolver.Current = new PropertyEditorResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(), builder, UmbracoConfig.For.UmbracoSettings().Content);
             ParameterEditorResolver.Current = new ParameterEditorResolver(ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors(), builder);
 
             //setup the validators resolver with our predefined validators
