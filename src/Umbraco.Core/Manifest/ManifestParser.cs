@@ -95,7 +95,7 @@ namespace Umbraco.Core.Manifest
         {
             var scripts = new HashSet<string>();
             var stylesheets = new HashSet<string>();
-            var propertyEditors = new List<IConfiguredDataEditor>();
+            var propertyEditors = new List<IDataEditor>();
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
 

@@ -147,7 +147,7 @@ namespace Umbraco.Web.Editors
             if (dataTypeId == -1)
             {
                 //this is a new data type, so just return the field editors with default values
-                return Mapper.Map<IConfiguredDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
+                return Mapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
             }
 
             //we have a data type associated
@@ -167,7 +167,7 @@ namespace Umbraco.Web.Editors
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return Mapper.Map<IConfiguredDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
+            return Mapper.Map<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(propEd);
         }
 
         /// <summary>

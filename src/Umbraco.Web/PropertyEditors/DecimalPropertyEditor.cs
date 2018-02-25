@@ -9,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a decimal property and parameter editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.Decimal, EditorType.PropertyValue | EditorType.MacroParameter, "Decimal", "decimal", ValueType = ValueTypes.Decimal)]
-    public class DecimalPropertyEditor : ConfiguredDataEditor
+    public class DecimalPropertyEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DecimalPropertyEditor"/> class.

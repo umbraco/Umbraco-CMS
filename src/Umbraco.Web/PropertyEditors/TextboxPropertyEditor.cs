@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a textbox property and parameter editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.Textbox, EditorType.PropertyValue | EditorType.MacroParameter, "Textbox", "textbox", Group = "Common")]
-    public class TextboxPropertyEditor : ConfiguredDataEditor
+    public class TextboxPropertyEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.

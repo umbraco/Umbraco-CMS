@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a property editor for label properties.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.NoEdit, "Label", "readonlyvalue", Icon = "icon-readonly")]
-    public class LabelPropertyEditor : ConfiguredDataEditor
+    public class LabelPropertyEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LabelPropertyEditor"/> class.

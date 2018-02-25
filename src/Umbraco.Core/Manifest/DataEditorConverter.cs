@@ -23,26 +23,31 @@ namespace Umbraco.Core.Manifest
         }
 
         /// <inheritdoc />
-        protected override IDataEditor Create(Type objectType, JObject jobject)
+        protected override IDataEditor Create(Type objectType, string path, JObject jobject)
         {
             // in PackageManifest, property editors are IConfiguredDataEditor[] whereas
             // parameter editors are IDataEditor[] - both will end up here because we handle
             // IDataEditor and IConfiguredDataEditor implements it, but we can check the
             // type to figure out what to create
 
-            if (objectType == typeof(IConfiguredDataEditor))
+            var type = EditorType.PropertyValue;
+
+            var isPropertyEditor = path.StartsWith("propertyEditors[");
+
+            if (isPropertyEditor)
             {
                 // property editor
-                var type = EditorType.PropertyValue;
+                jobject["isPropertyEditor"] = JToken.FromObject(true);
                 if (jobject["isParameterEditor"] is JToken jToken && jToken.Value<bool>())
                     type |= EditorType.MacroParameter;
-                return new ConfiguredDataEditor(_logger, type);
             }
             else
             {
                 // parameter editor
-                return new DataEditor(EditorType.MacroParameter);
+                type = EditorType.MacroParameter;
             }
+
+            return new DataEditor(_logger, type);
         }
 
         /// <inheritdoc />
@@ -50,42 +55,38 @@ namespace Umbraco.Core.Manifest
         {
             // see Create above, target is either DataEditor (parameter) or ConfiguredDataEditor (property)
 
-            if (target is ConfiguredDataEditor configuredEditor)
-            {
-                // property editor
-                PrepareForPropertyEditor(jobject, configuredEditor);
-            }
-            else if (target is DataEditor editor)
-            {
-                // parameter editor
-                PrepareForParameterEditor(jobject, editor);
-            }
-            else throw new Exception("panic.");
+            if (!(target is DataEditor dataEditor))
+                throw new Exception("panic.");
 
+            if (jobject["isPropertyEditor"] is JToken jtoken && jtoken.Value<bool>())
+                PrepareForPropertyEditor(jobject, dataEditor);
+            else
+                PrepareForParameterEditor(jobject, dataEditor);
+ 
             base.Deserialize(jobject, target, serializer);
         }
 
-        private static void PrepareForPropertyEditor(JObject jobject, ConfiguredDataEditor target)
+        private static void PrepareForPropertyEditor(JObject jobject, DataEditor target)
         {
-            if (jobject["editor"] != null)
-            {
-                // explicitely assign a value editor of type ValueEditor
-                // (else the deserializer will try to read it before setting it)
-                // (and besides it's an interface)
-                target.ValueEditor = new DataValueEditor();
+            if (jobject["editor"] == null)
+                throw new InvalidOperationException("Missing 'editor' value.");
 
-                // in the manifest, validators are a simple dictionary eg
-                // {
-                //   required: true,
-                //   regex: '\\d*'
-                // }
-                // and we need to turn this into a list of IPropertyValidator
-                // so, rewrite the json structure accordingly
-                if (jobject["editor"]["validation"] is JObject validation)
-                    jobject["editor"]["validation"] = RewriteValidators(validation);
-            }
+            // explicitely assign a value editor of type ValueEditor
+            // (else the deserializer will try to read it before setting it)
+            // (and besides it's an interface)
+            target.ValueEditor = new DataValueEditor();
 
-            if (jobject["prevalues"] is JObject prevalues)
+            // in the manifest, validators are a simple dictionary eg
+            // {
+            //   required: true,
+            //   regex: '\\d*'
+            // }
+            // and we need to turn this into a list of IPropertyValidator
+            // so, rewrite the json structure accordingly
+            if (jobject["editor"]["validation"] is JObject validation)
+                jobject["editor"]["validation"] = RewriteValidators(validation);
+
+            if (jobject["prevalues"] is JObject config)
             {
                 // explicitely assign a configuration editor of type ConfigurationEditor
                 // (else the deserializer will try to read it before setting it)
@@ -93,12 +94,12 @@ namespace Umbraco.Core.Manifest
                 target.ConfigurationEditor = new ConfigurationEditor();
 
                 // see note about validators, above - same applies to field validators
-                if (jobject["prevalues"]?["fields"] is JArray jarray)
+                if (config["fields"] is JArray jarray)
                 {
                     foreach (var field in jarray)
                     {
-                        if (field["validation"] is JObject validation)
-                            field["validation"] = RewriteValidators(validation);
+                        if (field["validation"] is JObject fvalidation)
+                            field["validation"] = RewriteValidators(fvalidation);
                     }
                 }
 
@@ -106,9 +107,14 @@ namespace Umbraco.Core.Manifest
                 // move it down to configuration editor level so it can be deserialized properly
                 if (jobject["defaultConfig"] is JObject defaultConfig)
                 {
-                    prevalues["defaultConfig"] = defaultConfig;
+                    config["defaultConfig"] = defaultConfig;
                     jobject.Remove("defaultConfig");
                 }
+
+                // in the manifest, configuration is named 'prevalues', rename
+                // it is important to do this LAST
+                jobject["config"] = config;
+                jobject.Remove("prevalues");
             }
         }
 
@@ -134,6 +140,13 @@ namespace Umbraco.Core.Manifest
                 // move the 'view' property
                 jobject["editor"] = new JObject { ["view"] = jobject["view"] };
                 jobject.Property("view").Remove();
+            }
+
+            // in the manifest, default configuration is named 'config', rename
+            if (jobject["config"] is JObject config)
+            {
+                jobject["defaultConfig"] = config;
+                jobject.Remove("config");
             }
         }
 

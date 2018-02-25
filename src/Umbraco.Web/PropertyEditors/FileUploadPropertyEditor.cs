@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(Constants.PropertyEditors.Aliases.UploadField, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
-    public class FileUploadPropertyEditor : ConfiguredDataEditor
+    public class FileUploadPropertyEditor : DataEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
 

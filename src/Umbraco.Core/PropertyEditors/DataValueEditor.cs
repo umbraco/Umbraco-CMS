@@ -45,7 +45,7 @@ namespace Umbraco.Core.PropertyEditors
         public DataValueEditor(DataEditorAttribute attribute)
             : this()
         {
-            if (attribute == null) return;
+            if (attribute == null) throw new ArgumentNullException(nameof(attribute));
 
             var view = attribute.View;
             if (string.IsNullOrWhiteSpace(view))

@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     /// editor is available. Not to be used otherwise. Not discovered, and therefore
     /// not part of the editors collection.</remarks>
     [HideFromTypeFinder]
-    public class VoidEditor : ConfiguredDataEditor
+    public class VoidEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="VoidEditor"/> class.

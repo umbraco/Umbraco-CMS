@@ -6,7 +6,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     // fixme - if deprecated, what's the alternative?
     [DataEditor(Constants.PropertyEditors.Aliases.MacroContainer, "(Obsolete) Macro Picker", "macrocontainer", ValueType = ValueTypes.Text, Group="rich content", Icon="icon-settings-alt", IsDeprecated = true)]
-    public class MacroContainerPropertyEditor : ConfiguredDataEditor
+    public class MacroContainerPropertyEditor : DataEditor
     {
         public MacroContainerPropertyEditor(ILogger logger)
             : base(logger)

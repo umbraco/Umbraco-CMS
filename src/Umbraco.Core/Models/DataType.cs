@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
     {
         private static PropertySelectors _selectors;
 
-        private IConfiguredDataEditor _editor;
+        private IDataEditor _editor;
         private ValueStorageType _databaseType;
         private object _configuration;
         private bool _hasConfiguration;
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
         /// </summary>
-        public DataType(IConfiguredDataEditor editor, int parentId = -1)
+        public DataType(IDataEditor editor, int parentId = -1)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
             ParentId = parentId;
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public IConfiguredDataEditor Editor
+        public IDataEditor Editor
         {
             get => _editor;
             set

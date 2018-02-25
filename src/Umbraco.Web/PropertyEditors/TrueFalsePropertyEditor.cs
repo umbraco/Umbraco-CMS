@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a boolean property and parameter editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.Boolean, EditorType.PropertyValue | EditorType.MacroParameter, "True/False", "boolean", ValueType = ValueTypes.Integer, Group = "Common", Icon="icon-checkbox")]
-    public class TrueFalsePropertyEditor : ConfiguredDataEditor
+    public class TrueFalsePropertyEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.

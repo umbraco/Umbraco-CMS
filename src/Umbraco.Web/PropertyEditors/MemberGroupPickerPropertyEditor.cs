@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(Constants.PropertyEditors.Aliases.MemberGroupPicker, "Member Group Picker", "membergrouppicker", Group="People", Icon="icon-users")]
-    public class MemberGroupPickerPropertyEditor : ConfiguredDataEditor
+    public class MemberGroupPickerPropertyEditor : DataEditor
     {
          public MemberGroupPickerPropertyEditor(ILogger logger)
              : base(logger)

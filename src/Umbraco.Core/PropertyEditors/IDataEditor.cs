@@ -52,5 +52,11 @@ namespace Umbraco.Core.PropertyEditors
         /// Gets the configuration for the value editor.
         /// </summary>
         IDictionary<string, object> DefaultConfiguration { get; }
+
+        /// <summary>
+        /// Gets the editor to edit the value editor configuration.
+        /// </summary>
+        /// <remarks>Is expected to throw if the editor does not support being configured, e.g. for most parameter editors.</remarks>
+        IConfigurationEditor ConfigurationEditor { get; } // fixme should be a method - but, deserialization?
     }
 }

@@ -1,11 +1,13 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.Logging;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
     [DataEditor("tabPicker", EditorType.MacroParameter, "Tab Picker", "entitypicker")]
     public class PropertyGroupParameterEditor : DataEditor
     {
-        public PropertyGroupParameterEditor()
+        public PropertyGroupParameterEditor(ILogger logger)
+            : base(logger)
         {
             // configure
             DefaultConfiguration.Add("multiple", "0");

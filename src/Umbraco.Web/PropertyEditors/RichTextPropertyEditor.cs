@@ -13,7 +13,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a rich text property editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.TinyMce, "Rich Text Editor", "rte", ValueType = ValueTypes.Text,  HideLabel = false, Group="Rich Content", Icon="icon-browser-window")]
-    public class RichTextPropertyEditor : ConfiguredDataEditor
+    public class RichTextPropertyEditor : DataEditor
     {
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found

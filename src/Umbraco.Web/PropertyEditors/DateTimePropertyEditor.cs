@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
@@ -9,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a date and time property editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.DateTime, "Date/Time", "datepicker", ValueType = ValueTypes.DateTime, Icon="icon-time")]
-    public class DateTimePropertyEditor : ConfiguredDataEditor
+    public class DateTimePropertyEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.

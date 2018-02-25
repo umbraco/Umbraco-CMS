@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [DataEditor("Test.Test", "Test", "~/Test.html")]
-        public class TestPropertyEditor : ConfiguredDataEditor
+        public class TestPropertyEditor : DataEditor
         {
             /// <summary>
             /// The constructor will setup the property editor based on the attribute if one is found

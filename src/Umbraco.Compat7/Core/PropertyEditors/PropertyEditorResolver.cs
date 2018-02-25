@@ -15,8 +15,8 @@ namespace Umbraco.Core.PropertyEditors
         public static PropertyEditorResolver Current { get; }
             = new PropertyEditorResolver(CoreCurrent.Container.GetInstance<DataEditorCollectionBuilder>());
 
-        public IEnumerable<IConfiguredDataEditor> PropertyEditors => CoreCurrent.PropertyEditors;
+        public IEnumerable<IDataEditor> PropertyEditors => CoreCurrent.PropertyEditors;
 
-        public IConfiguredDataEditor GetByAlias(string alias) => CoreCurrent.PropertyEditors[alias];
+        public IDataEditor GetByAlias(string alias) => CoreCurrent.PropertyEditors[alias];
     }
 }

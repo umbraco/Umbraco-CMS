@@ -1,11 +1,13 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.Logging;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
     [DataEditor("propertyTypePickerMultiple", EditorType.MacroParameter, "Multiple Property Type Picker", "entitypicker")]
     public class MultiplePropertyTypeParameterEditor : DataEditor
     {
-        public MultiplePropertyTypeParameterEditor()
+        public MultiplePropertyTypeParameterEditor(ILogger logger)
+            : base(logger)
         {
             // configure
             DefaultConfiguration.Add("multiple", "1");

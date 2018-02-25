@@ -7,7 +7,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(Constants.PropertyEditors.Aliases.UserPicker, "User picker", "entitypicker", ValueType = ValueTypes.Integer, Group = "People", Icon = "icon-user")]
-    public class UserPickerPropertyEditor : ConfiguredDataEditor
+    public class UserPickerPropertyEditor : DataEditor
     {
         public UserPickerPropertyEditor(ILogger logger)
             : base(logger)

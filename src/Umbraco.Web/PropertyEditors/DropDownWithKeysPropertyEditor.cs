@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// in cache and not the string value.
     /// </remarks>
     [DataEditor(Constants.PropertyEditors.Aliases.DropdownlistPublishKeys, "Dropdown list, publishing keys", "dropdown", ValueType = ValueTypes.Integer, Group = "lists", Icon = "icon-indent")]
-    public class DropDownWithKeysPropertyEditor : ConfiguredDataEditor
+    public class DropDownWithKeysPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;
 

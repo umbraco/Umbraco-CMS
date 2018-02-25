@@ -337,7 +337,6 @@
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
     <Compile Include="PropertyEditors\IConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\IConfiguredDataEditor.cs" />
     <Compile Include="PropertyEditors\IConfigureValueType.cs" />
     <Compile Include="PropertyEditors\IDataEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
@@ -1199,7 +1198,6 @@
     <Compile Include="PropertyEditors\ConfigurationField.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyCacheLevel.cs" />
-    <Compile Include="PropertyEditors\ConfiguredDataEditor.cs" />
     <Compile Include="PropertyEditors\DataEditorCollection.cs" />
     <Compile Include="PropertyEditors\DataEditorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValueTypes.cs" />

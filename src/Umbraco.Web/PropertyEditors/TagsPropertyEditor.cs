@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     [TagsPropertyEditor]
     [DataEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
-    public class TagsPropertyEditor : ConfiguredDataEditor
+    public class TagsPropertyEditor : DataEditor
     {
         private readonly ManifestValidatorCollection _validators;
 

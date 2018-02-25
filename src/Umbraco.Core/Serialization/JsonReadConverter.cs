@@ -15,9 +15,10 @@ namespace Umbraco.Core.Serialization
         /// Create an instance of objectType, based properties in the JSON object
         /// </summary>
         /// <param name="objectType">type of object expected</param>
+        /// <param name="path">The path of the current json token.</param>
         /// <param name="jObject">contents of JSON object that will be deserialized</param>
         /// <returns></returns>
-        protected abstract T Create(Type objectType, JObject jObject);
+        protected abstract T Create(Type objectType, string path, JObject jObject);
 
         /// <inheritdoc />
         public override bool CanConvert(Type objectType)
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Serialization
             var jObject = JObject.Load(reader);
 
             // Create target object based on JObject
-            var target = Create(objectType, jObject);
+            var target = Create(objectType, reader.Path, jObject);
 
             Deserialize(jObject, target, serializer);
 

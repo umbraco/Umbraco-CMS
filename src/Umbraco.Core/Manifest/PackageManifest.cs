@@ -16,7 +16,7 @@ namespace Umbraco.Core.Manifest
         public string[] Stylesheets { get; set; }= Array.Empty<string>();
 
         [JsonProperty("propertyEditors")]
-        public IConfiguredDataEditor[] PropertyEditors { get; set; } = Array.Empty<IConfiguredDataEditor>();
+        public IDataEditor[] PropertyEditors { get; set; } = Array.Empty<IDataEditor>();
 
         [JsonProperty("parameterEditors")]
         public IDataEditor[] ParameterEditors { get; set; } = Array.Empty<IDataEditor>();

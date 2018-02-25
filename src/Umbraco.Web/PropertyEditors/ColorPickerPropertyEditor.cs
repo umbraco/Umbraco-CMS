@@ -6,7 +6,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
-    public class ColorPickerPropertyEditor : ConfiguredDataEditor
+    public class ColorPickerPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;
 

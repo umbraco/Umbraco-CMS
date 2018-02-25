@@ -20,7 +20,7 @@ namespace Umbraco.Core.Manifest
             _validators = validators;
         }
 
-        protected override IValueValidator Create(Type objectType, JObject jObject)
+        protected override IValueValidator Create(Type objectType, string path, JObject jObject)
         {
             // all validators coming from manifests are ManifestPropertyValidator instances
             return new ManifestValueValidator(_validators);

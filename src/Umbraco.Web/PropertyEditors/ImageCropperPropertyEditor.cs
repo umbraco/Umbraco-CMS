@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents an image cropper property editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.ImageCropper, "Image Cropper", "imagecropper", ValueType = ValueTypes.Json, HideLabel = false, Group="media", Icon="icon-crop")]
-    public class ImageCropperPropertyEditor : ConfiguredDataEditor
+    public class ImageCropperPropertyEditor : DataEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
         private readonly UploadAutoFillProperties _autoFillProperties;

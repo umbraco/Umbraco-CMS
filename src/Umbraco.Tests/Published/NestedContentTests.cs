@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Published
 
             PropertyEditorCollection editors = null;
             var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors));
-            editors = new PropertyEditorCollection(new DataEditorCollection(new ConfiguredDataEditor[] { editor }));
+            editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
             {

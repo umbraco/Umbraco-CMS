@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a nested content property editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.NestedContent, "Nested Content", "nestedcontent", ValueType = "JSON", Group = "lists", Icon = "icon-thumbnail-list")]
-    public class NestedContentPropertyEditor : ConfiguredDataEditor
+    public class NestedContentPropertyEditor : DataEditor
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
 

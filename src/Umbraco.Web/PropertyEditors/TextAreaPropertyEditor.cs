@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Represents a textarea property and parameter editor.
     /// </summary>
     [DataEditor(Constants.PropertyEditors.Aliases.TextboxMultiple, EditorType.PropertyValue | EditorType.MacroParameter, "Textarea", "textarea", ValueType = ValueTypes.Text, Icon="icon-application-window-alt")]
-    public class TextAreaPropertyEditor : ConfiguredDataEditor
+    public class TextAreaPropertyEditor : DataEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.

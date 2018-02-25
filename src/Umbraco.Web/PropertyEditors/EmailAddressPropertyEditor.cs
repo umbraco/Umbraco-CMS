@@ -6,7 +6,7 @@ using Umbraco.Core.PropertyEditors.Validators;
 namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(Constants.PropertyEditors.Aliases.EmailAddress, "Email address", "email", Icon="icon-message")]
-    public class EmailAddressPropertyEditor : ConfiguredDataEditor
+    public class EmailAddressPropertyEditor : DataEditor
     {
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found

@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// in cache and not the int ID.
     /// </remarks>
     [DataEditor(Constants.PropertyEditors.Aliases.CheckBoxList, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
-    public class CheckBoxListPropertyEditor : ConfiguredDataEditor
+    public class CheckBoxListPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;
 
