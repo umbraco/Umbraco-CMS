@@ -822,7 +822,6 @@ namespace Umbraco.Web.Editors
                 using (var textWriter = new StreamWriter(memoryStream))
                 {
                     var output = JsonConvert.SerializeObject(exportProperties, Formatting.Indented);
-                    textWriter.WriteLine("Member export");
                     textWriter.Write(output);
                     textWriter.Flush();
                 }
@@ -897,6 +896,12 @@ namespace Umbraco.Web.Editors
                         CreateDate = null,
                         UpdateDate = null
                     };
+                    if (prop.Name == "Groups")
+                    {
+                        var memberGroups = Roles.GetRolesForUser(owner.Username);
+                        propertyExportModel.Value = memberGroups.ToList();
+                    }
+
                     exportProperties.Add(propertyExportModel);
                 }
 
