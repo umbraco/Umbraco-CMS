@@ -114,7 +114,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <inheritdoc />
-        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDate, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
+        public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
         {
             if (performingUserId < 0) throw new ArgumentOutOfRangeException(nameof(performingUserId));
             if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Services
                 PerformingUserId = performingUserId,
                 PerformingDetails = perfomingDetails,
                 PerformingIp = performingIp,
-                EventDate = eventDate,
+                EventDateUtc = eventDateUtc,
                 AffectedUserId = affectedUserId,
                 AffectedDetails = affectedDetails,
                 EventType = eventType,

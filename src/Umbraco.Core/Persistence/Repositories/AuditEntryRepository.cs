@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql()
                 .Select("*")
                 .From<AuditEntryDto>(SqlSyntax)
-                .OrderByDescending<AuditEntryDto>(x => x.EventDate, SqlSyntax);
+                .OrderByDescending<AuditEntryDto>(x => x.EventDateUtc, SqlSyntax);
 
             var page = Database.Page<AuditEntryDto>(pageIndex + 1, pageCount, sql);
             records = page.TotalItems;

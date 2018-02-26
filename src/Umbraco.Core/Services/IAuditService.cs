@@ -66,7 +66,7 @@ namespace Umbraco.Core.Services
         /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
         /// <param name="perfomingDetails">Free-form details about the user triggering the audited event.</param>
         /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
-        /// <param name="eventDate">The date and time of the audited event.</param>
+        /// <param name="eventDateUtc">The date and time of the audited event.</param>
         /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
         /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
         /// <param name="eventType">
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services
         /// </example>
         /// </param>
         /// <param name="eventDetails">Free-form details about the audited event.</param>
-        IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDate, int affectedUserId, string affectedDetails, string eventType, string eventDetails);
+        IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails);
         
     }
 }

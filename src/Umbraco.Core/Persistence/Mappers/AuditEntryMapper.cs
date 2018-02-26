@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingUserId, dto => dto.PerformingUserId);
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingDetails, dto => dto.PerformingDetails);
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.PerformingIp, dto => dto.PerformingIp);
-            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.EventDate, dto => dto.EventDate);
+            CacheMap<AuditEntry, AuditEntryDto>(entity => entity.EventDateUtc, dto => dto.EventDateUtc);
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.AffectedUserId, dto => dto.AffectedUserId);
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.AffectedDetails, dto => dto.AffectedDetails);
             CacheMap<AuditEntry, AuditEntryDto>(entity => entity.EventType, dto => dto.EventType);

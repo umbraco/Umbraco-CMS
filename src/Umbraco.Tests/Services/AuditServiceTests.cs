@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Services
             var entry = ServiceContext.AuditService.Write(123, "user 123, bob@example.com", null, yesterday, 456, "user 456, alice@example.com", "umbraco/user", "change property whatever value");
             Assert.AreEqual(123, entry.PerformingUserId);
             Assert.AreEqual("user 123, bob@example.com", entry.PerformingDetails);
-            Assert.AreEqual(yesterday, entry.EventDate);
+            Assert.AreEqual(yesterday, entry.EventDateUtc);
             Assert.AreEqual(456, entry.AffectedUserId);
             Assert.AreEqual("user 456, alice@example.com", entry.AffectedDetails);
             Assert.AreEqual("umbraco/user", entry.EventType);

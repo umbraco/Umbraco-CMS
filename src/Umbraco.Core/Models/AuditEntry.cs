@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public DateTime EventDate
+        public DateTime EventDateUtc
         {
             get => CreateDate;
             set => CreateDate = value;

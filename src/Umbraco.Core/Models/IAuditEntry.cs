@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the date and time of the audited event.
         /// </summary>
-        DateTime EventDate { get; set; }
+        DateTime EventDateUtc { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the user affected by the audited event.
