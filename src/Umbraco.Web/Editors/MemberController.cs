@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -822,7 +823,6 @@ namespace Umbraco.Web.Editors
                 using (var textWriter = new StreamWriter(memoryStream))
                 {
                     var output = JsonConvert.SerializeObject(exportProperties, Formatting.Indented);
-                    textWriter.WriteLine("Member export");
                     textWriter.Write(output);
                     textWriter.Flush();
                 }

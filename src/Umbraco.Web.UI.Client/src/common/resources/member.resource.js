@@ -22,8 +22,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
-
-        getPagedResults: function (memberTypeAlias, options) {
+        getPagedResults: function(memberTypeAlias, options) {
 
             if (memberTypeAlias === 'all-members') {
                 memberTypeAlias = null;
@@ -87,7 +86,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve member paged result');
         },
 
-        getListNode: function (listName) {
+        getListNode: function(listName) {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -119,7 +118,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the member item.
           *
           */
-        getByKey: function (key) {
+        getByKey: function(key) {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -150,7 +149,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object.
           *
           */
-        deleteByKey: function (key) {
+        deleteByKey: function(key) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
@@ -190,7 +189,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the member scaffold.
           *
           */
-        getScaffold: function (alias) {
+        getScaffold: function(alias) {
 
             if (alias) {
                 return umbRequestHelper.resourcePromise(
@@ -240,42 +239,8 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the saved media item.
           *
           */
-        save: function (member, isNew, files) {
+        save: function(member, isNew, files) {
             return saveMember(member, "save" + (isNew ? "New" : ""), files);
-        },
-
-        exportMemberData: function (key) {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "memberApiBaseUrl",
-                        "ExportMemberData",
-                        [{ key: key }]))
-                    .success(function (data, status, headers) {
-
-                        headers = headers();
-
-                        var filename = headers['x-filename'];
-                        var contentType = headers['content-type'];
-
-                        var linkElement = document.createElement('a');
-
-                        var blob = new Blob([data], { type: contentType });
-                        var url = window.URL.createObjectURL(blob);
-
-                        linkElement.setAttribute('href', url);
-                        linkElement.setAttribute("download", filename);
-
-                        var clickEvent = new MouseEvent("click", {
-                            "view": window,
-                            "bubbles": true,
-                            "cancelable": false
-                        });
-
-                        linkElement.dispatchEvent(clickEvent);
-                    }).error(function (data, status, header) {
-
-                    }));
         }
     };
 }

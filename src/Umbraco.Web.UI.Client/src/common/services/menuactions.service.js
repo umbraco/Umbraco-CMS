@@ -8,9 +8,18 @@
  * @description
  * Defines the methods that are called when menu items declare only an action to execute
  */
-function umbracoMenuActions($q, treeService, $location, navigationService, appState) {
+function umbracoMenuActions($q, treeService, $location, navigationService, appState, umbRequestHelper) {
     
     return {
+
+        "ExportMember": function(args) {
+            var url = umbRequestHelper.getApiUrl(
+                "memberApiBaseUrl",
+                "ExportMemberData",
+                [{ key: args.entity.id }]);
+
+            umbRequestHelper.downloadFile(url);
+        },
         
         /**
          * @ngdoc method
