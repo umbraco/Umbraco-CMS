@@ -14,7 +14,7 @@ namespace Umbraco.Core.Services
     /// <para>Getter methods return the current state of a consent, i.e. the latest <see cref="IConsent"/>
     /// entity that was created.</para>
     /// </remarks>
-    public interface ILawfulDataProcessService : IService
+    public interface IConsentService : IService
     {
         /// <summary>
         /// Registers consent.

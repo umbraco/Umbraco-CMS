@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Services
 {
     [TestFixture]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
-    public class LawfulDataProcessServiceTests : BaseServiceTest
+    public class ConsentServiceTests : BaseServiceTest
     {
         [SetUp]
         public override void Initialize()
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Services
             // fixme - why isn't this set by the test base class?
             Database.Mapper = new PetaPocoMapper();
 
-            var consentService = ServiceContext.LawfulDataProcessService;
+            var consentService = ServiceContext.ConsentService;
 
             // can register
 

@@ -12,12 +12,12 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Implements <see cref="IContentService"/>.
     /// </summary>
-    internal class LawfulDataProcessService : ScopeRepositoryService, ILawfulDataProcessService
+    internal class ConsentService : ScopeRepositoryService, IConsentService
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentService"/> class.
         /// </summary>
-        public LawfulDataProcessService(IScopeUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public ConsentService(IScopeUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 

@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services
         private Lazy<INotificationService> _notificationService;
         private Lazy<IExternalLoginService> _externalLoginService;
         private Lazy<IRedirectUrlService> _redirectUrlService;
-        private Lazy<ILawfulDataProcessService> _consentService;
+        private Lazy<IConsentService> _consentService;
 
         internal IdkMap IdkMap { get; private set; }
 
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Services
             IExternalLoginService externalLoginService = null,
             IMigrationEntryService migrationEntryService = null,
             IRedirectUrlService redirectUrlService = null,
-            ILawfulDataProcessService lawfulDataProcessService = null)
+            IConsentService consentService = null)
         {
             if (migrationEntryService != null) _migrationEntryService = new Lazy<IMigrationEntryService>(() => migrationEntryService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services
             if (macroService != null) _macroService = new Lazy<IMacroService>(() => macroService);
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
-            if (lawfulDataProcessService != null) _consentService = new Lazy<ILawfulDataProcessService>(() => lawfulDataProcessService);
+            if (consentService != null) _consentService = new Lazy<IConsentService>(() => consentService);
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Services
                 _redirectUrlService = new Lazy<IRedirectUrlService>(() => new RedirectUrlService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_consentService == null)
-                _consentService = new Lazy<ILawfulDataProcessService>(() => new LawfulDataProcessService(provider, repositoryFactory, logger, eventMessagesFactory));
+                _consentService = new Lazy<IConsentService>(() => new ConsentService(provider, repositoryFactory, logger, eventMessagesFactory));
         }
 
         internal IEventMessagesFactory EventMessagesFactory { get; private set; }
@@ -508,8 +508,8 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the <see cref="ILawfulDataProcessService"/> implementation.
+        /// Gets the <see cref="IConsentService"/> implementation.
         /// </summary>
-        public ILawfulDataProcessService LawfulDataProcessService => _consentService.Value;
+        public IConsentService ConsentService => _consentService.Value;
     }
 }
