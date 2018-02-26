@@ -48,8 +48,10 @@ namespace Umbraco.Core.PropertyEditors
         private static List<PropertyEditor> SanitizeNames(List<PropertyEditor> editors)
         {
             var nestedContentEditorFromPackage = editors.FirstOrDefault(x => x.Alias == "Our.Umbraco.NestedContent");
-            if (nestedContentEditorFromPackage != null)
+            if (nestedContentEditorFromPackage != null) { 
                 nestedContentEditorFromPackage.Name = "(Obsolete) " + nestedContentEditorFromPackage.Name;
+                nestedContentEditorFromPackage.IsDeprecated = true;
+            }
             return editors;
 
         }
