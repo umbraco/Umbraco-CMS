@@ -34,6 +34,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Examine;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.Editors
 {
@@ -800,26 +801,29 @@ namespace Umbraco.Web.Editors
             //since we want to write the property types last, we'll re-order this list
             var propertyTypesProperties = memberProperties.Where(x => x.PropertyType == typeof(PropertyCollection)).ToList();
             foreach (var propertyType in propertyTypesProperties)
-            {
                 memberProperties.Remove(propertyType);
-            }
+
             //now re-add them to the end (there will only be one, but we'll do this just to be complete)
             foreach (var propertyTypesProperty in propertyTypesProperties)
-            {
                 memberProperties.Add(propertyTypesProperty);
-            }
 
             var fileName = $"{member.Name}_{member.Email}.txt";
+
+            var exportProperties = new List<PropertyExportModel>();
+            foreach (var memberProperty in memberProperties)
+            {
+                var exportItems = ReportWriter.GetPropertyExportItems(member, memberProperty);
+                if (exportItems != null)
+                    exportProperties.AddRange(exportItems);
+            }
 
             using (var memoryStream = new MemoryStream())
             {
                 using (var textWriter = new StreamWriter(memoryStream))
-                {   
-                    foreach (var memberProperty in memberProperties)
-                    {
-                        ReportWriter.WritePropertyValue(member, memberProperty, textWriter);
-                    }
-
+                {
+                    var output = JsonConvert.SerializeObject(exportProperties, Formatting.Indented);
+                    textWriter.WriteLine("Member export");
+                    textWriter.Write(output);
                     textWriter.Flush();
                 }
 
@@ -832,7 +836,6 @@ namespace Umbraco.Web.Editors
 
                 return httpResponseMessage;
             }
-
         }
 
         private static class ReportWriter
@@ -855,63 +858,60 @@ namespace Umbraco.Web.Editors
                 "ContentType",
                 "DeletedDate"
             };
-            private static readonly List<string> PropertiesFilter = new List<string>
-            {
-                "PropertyType",
-                "Version",
-                "Id",
-                "HasIdentity",
-                "Key",
-                "DeletedDate"
-            };
 
-            public static void WritePropertyValue(object owner, PropertyInfo prop, StreamWriter textWriter)
+            public static List<PropertyExportModel> GetPropertyExportItems(IMember owner, PropertyInfo prop)
             {
                 if (owner == null) throw new ArgumentNullException(nameof(owner));
                 if (prop == null) throw new ArgumentNullException(nameof(prop));
-                if (textWriter == null) throw new ArgumentNullException(nameof(textWriter));
                 if (MemberPropertyFilter.Contains(prop.Name))
-                    return;
+                    return null;
 
+                var exportProperties = new List<PropertyExportModel>();
                 var propertyValue = prop.GetValue(owner, null) ?? string.Empty;
                 var type = prop.PropertyType;
 
-                if (propertyValue is DateTime time)
+                if (type == typeof(PropertyCollection))
                 {
-                    textWriter.WriteLine(prop.Name + " : " + time.ToIsoString());
-                }
-                else if (type == typeof(PropertyCollection))
-                {
-                    textWriter.WriteLine("");
-                    textWriter.WriteLine("PROPERTIES");
-                    textWriter.WriteLine("**********");
-
                     if (propertyValue is PropertyCollection propertyCollection)
                     {
                         foreach (var property in propertyCollection)
                         {
-                            var propProperties = property.GetType().GetProperties();
-
-                            textWriter.WriteLine("Name : " + property.PropertyType.Name);
-
-                            foreach (var p in propProperties)
+                            var propertyExportModel = new PropertyExportModel
                             {
-                                if (PropertiesFilter.Contains(p.Name)) continue;
-
-                                WritePropertyValue(property, p, textWriter); //recurse
-                            }
-
-                            textWriter.WriteLine("------------------------");
+                                Id = property.Id,
+                                Alias = property.Alias,
+                                Value = property.Value,
+                                CreateDate = property.CreateDate,
+                                UpdateDate = property.UpdateDate
+                            };
+                            exportProperties.Add(propertyExportModel);
                         }
                     }
                 }
                 else
                 {
-                    textWriter.WriteLine(prop.Name + " : " + propertyValue);
+                    var propertyExportModel = new PropertyExportModel
+                    {
+                        Name = prop.Name,
+                        Value = propertyValue,
+                        CreateDate = null,
+                        UpdateDate = null
+                    };
+                    exportProperties.Add(propertyExportModel);
                 }
+
+                return exportProperties;
             }
         }
+    }
 
-        
+    internal class PropertyExportModel
+    {
+        public int Id { get; set; }
+        public string Alias { get; set; }
+        public string Name { get; set; }
+        public object Value { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
     }
 }
