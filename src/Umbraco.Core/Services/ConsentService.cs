@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services
         { }
 
         /// <inheritdoc />
-        public IConsent Register(string source, string context, string action, ConsentState state, string comment = null)
+        public IConsent RegisterConsent(string source, string context, string action, ConsentState state, string comment = null)
         {
             // prevent stupid states
             var v = 0;
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent> Get(string source = null, string context = null, string action = null,
+        public IEnumerable<IConsent> LookupConsent(string source = null, string context = null, string action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false)
         {
