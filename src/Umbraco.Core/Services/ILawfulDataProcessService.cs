@@ -4,17 +4,17 @@ using Umbraco.Core.Models;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Represents a service for handling <see cref="IConsent"/> entities.
+    /// A service for handling lawful data processing requirements
     /// </summary>
     /// <remarks>
-    /// <para>Consent can be given or revoked or changed via the <see cref="Register"/> method, which
+    /// <para>Consent can be given or revoked or changed via the <see cref="RegisterConsent"/> method, which
     /// creates a new <see cref="IConsent"/> entity to track the consent. Revoking a consent is performed by
     /// registering a revoked consent.</para>
     /// <para>A consent can be revoked, by registering a revoked consent, but cannot be deleted.</para>
     /// <para>Getter methods return the current state of a consent, i.e. the latest <see cref="IConsent"/>
     /// entity that was created.</para>
     /// </remarks>
-    public interface IConsentService : IService
+    public interface ILawfulDataProcessService : IService
     {
         /// <summary>
         /// Registers consent.
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
         /// <param name="state">The state of the consent.</param>
         /// <param name="comment">Additional free text.</param>
         /// <returns>The corresponding consent entity.</returns>
-        IConsent Register(string source, string context, string action, ConsentState state, string comment = null);
+        IConsent RegisterConsent(string source, string context, string action, ConsentState state, string comment = null);
 
         /// <summary>
         /// Retrieves consents.
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Services
         /// <param name="actionStartsWith">Determines whether <paramref name="action"/> is a start pattern.</param>
         /// <param name="includeHistory">Determines whether to include the history of consents.</param>
         /// <returns>Consents matching the paramters.</returns>
-        IEnumerable<IConsent> Get(string source = null, string context = null, string action = null,
+        IEnumerable<IConsent> LookupConsent(string source = null, string context = null, string action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false);
     }

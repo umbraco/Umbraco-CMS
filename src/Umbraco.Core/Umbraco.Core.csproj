@@ -748,10 +748,10 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\CreateCacheInstructionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
-    <Compile Include="Services\ConsentService.cs" />
+    <Compile Include="Services\LawfulDataProcessService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
-    <Compile Include="Services\IConsentService.cs" />
+    <Compile Include="Services\ILawfulDataProcessService.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
     <Compile Include="Services\IdkMap.cs" />
     <Compile Include="Services\MediaServiceExtensions.cs" />

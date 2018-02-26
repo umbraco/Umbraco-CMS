@@ -12,17 +12,17 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Implements <see cref="IContentService"/>.
     /// </summary>
-    internal class ConsentService : ScopeRepositoryService, IConsentService
+    internal class LawfulDataProcessService : ScopeRepositoryService, ILawfulDataProcessService
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentService"/> class.
         /// </summary>
-        public ConsentService(IScopeUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        public LawfulDataProcessService(IScopeUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
         /// <inheritdoc />
-        public IConsent Register(string source, string context, string action, ConsentState state, string comment = null)
+        public IConsent RegisterConsent(string source, string context, string action, ConsentState state, string comment = null)
         {
             // prevent stupid states
             var v = 0;
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent> Get(string source = null, string context = null, string action = null,
+        public IEnumerable<IConsent> LookupConsent(string source = null, string context = null, string action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false)
         {
