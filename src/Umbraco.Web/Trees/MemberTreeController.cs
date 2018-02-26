@@ -17,10 +17,10 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -182,9 +182,14 @@ namespace Umbraco.Web.Trees
             //add delete option for all members
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
 
-            if (UmbracoContext.Current.Security.CurrentUser.HasAccessToSensitiveData())
+            if (Security.CurrentUser.HasAccessToSensitiveData())
             {
-                menu.Items.Add<ActionExportMember>(ui.Text("actions", ActionExportMember.Instance.Alias));
+                menu.Items.Add(new ExportMember
+                {
+                    Name = Services.TextService.Localize("actions/export"),
+                    Icon = "download-alt",
+                    Alias = "export"
+                });
             }
 
 

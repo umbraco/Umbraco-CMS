@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -31,6 +36,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Examine;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.Editors
 {
@@ -783,8 +789,99 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public HttpResponseMessage ExportMemberData(Guid key)
         {
-            var currentUser = UmbracoContext.Current.Security.CurrentUser;
-            return Services.MemberService.ExportMemberData(key, currentUser);
+            var currentUser = Security.CurrentUser;
+
+            var httpResponseMessage = Request.CreateResponse();
+            if (currentUser.HasAccessToSensitiveData() == false)
+            {
+                httpResponseMessage.StatusCode = HttpStatusCode.Forbidden;
+                return httpResponseMessage;
+            }
+
+            var member = Services.MemberService.GetByKey(key);
+
+            var fileName = $"{member.Name}_{member.Email}.txt";
+
+            var exportProperties = new MemberExportModel
+            {
+                Id = member.Id,
+                Key = member.Key,
+                Name = member.Name,
+                Username = member.Username,
+                Email = member.Email,
+                Groups = Services.MemberService.GetAllRoles(member.Id).ToList(),
+                ContentTypeAlias = member.ContentTypeAlias,
+                CreateDate = member.CreateDate,
+                UpdateDate = member.UpdateDate,
+                Properties = new List<MemberProperty>(GetPropertyExportItems(member))
+            };
+
+            httpResponseMessage.Content = new ObjectContent<MemberExportModel>(exportProperties, new JsonMediaTypeFormatter {Indent = true});
+            httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+            httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+            httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+            httpResponseMessage.StatusCode = HttpStatusCode.OK;
+
+            return httpResponseMessage;
         }
+
+        internal static List<MemberProperty> GetPropertyExportItems(IMember member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+
+            var exportProperties = new List<MemberProperty>();
+            
+            foreach (var property in member.Properties)
+            {
+                //ignore list
+                switch (property.Alias)
+                {
+                    case Constants.Conventions.Member.PasswordQuestion:
+                        continue;
+                }
+
+                var propertyExportModel = new MemberProperty
+                {
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Name = property.PropertyType.Name,
+                    Value = property.Value,
+                    CreateDate = property.CreateDate,
+                    UpdateDate = property.UpdateDate
+                };
+                exportProperties.Add(propertyExportModel);
+            }
+            
+            return exportProperties;
+        }
+
+        internal class MemberExportModel
+        {
+            public int Id { get; set; }
+            public Guid Key { get; set; }
+            public string Name { get; set; }
+            public string Username { get; set; }
+            public string Email { get; set; }
+            public List<string> Groups { get; set; }
+            public string ContentTypeAlias { get; set; }
+            public DateTime CreateDate { get; set; }
+            public DateTime UpdateDate { get; set; }
+            public List<MemberProperty> Properties { get; set; }
+        }
+
+        internal class MemberProperty
+        {
+            public int Id { get; set; }
+            public string Alias { get; set; }
+            public string Name { get; set; }
+            public object Value { get; set; }
+            public DateTime? CreateDate { get; set; }
+            public DateTime? UpdateDate { get; set; }
+        }
+
+
     }
+
+    
 }
