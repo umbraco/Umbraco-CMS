@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -783,8 +786,132 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public HttpResponseMessage ExportMemberData(Guid key)
         {
-            var currentUser = UmbracoContext.Current.Security.CurrentUser;
-            return Services.MemberService.ExportMemberData(key, currentUser);
+            var currentUser = Security.CurrentUser;
+
+            var httpResponseMessage = Request.CreateResponse();
+            if (currentUser.HasAccessToSensitiveData() == false)
+            {
+                httpResponseMessage.StatusCode = HttpStatusCode.Forbidden;
+                return httpResponseMessage;
+            }
+
+            var member = Services.MemberService.GetByKey(key);
+            var memberProperties = member.GetType().GetProperties().ToList();
+            //since we want to write the property types last, we'll re-order this list
+            var propertyTypesProperties = memberProperties.Where(x => x.PropertyType == typeof(PropertyCollection)).ToList();
+            foreach (var propertyType in propertyTypesProperties)
+            {
+                memberProperties.Remove(propertyType);
+            }
+            //now re-add them to the end (there will only be one, but we'll do this just to be complete)
+            foreach (var propertyTypesProperty in propertyTypesProperties)
+            {
+                memberProperties.Add(propertyTypesProperty);
+            }
+
+            var fileName = $"{member.Name}_{member.Email}.txt";
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var textWriter = new StreamWriter(memoryStream))
+                {   
+                    foreach (var memberProperty in memberProperties)
+                    {
+                        ReportWriter.WritePropertyValue(member, memberProperty, textWriter);
+                    }
+
+                    textWriter.Flush();
+                }
+
+                httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
+                httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+                httpResponseMessage.StatusCode = HttpStatusCode.OK;
+
+                return httpResponseMessage;
+            }
+
         }
+
+        private static class ReportWriter
+        {
+            private static readonly List<string> MemberPropertyFilter = new List<string>
+            {
+                "RawPasswordValue",
+                "RawPasswordAnswerValue",
+                "ParentId",
+                "SortOrder",
+                "Level",
+                "Path",
+                "CreatorId",
+                "Version",
+                "ContentTypeId",
+                "HasIdentity",
+                "PropertyGroups",
+                "PropertyTypes",
+                "ProviderUserKey",
+                "ContentType",
+                "DeletedDate"
+            };
+            private static readonly List<string> PropertiesFilter = new List<string>
+            {
+                "PropertyType",
+                "Version",
+                "Id",
+                "HasIdentity",
+                "Key",
+                "DeletedDate"
+            };
+
+            public static void WritePropertyValue(object owner, PropertyInfo prop, StreamWriter textWriter)
+            {
+                if (owner == null) throw new ArgumentNullException(nameof(owner));
+                if (prop == null) throw new ArgumentNullException(nameof(prop));
+                if (textWriter == null) throw new ArgumentNullException(nameof(textWriter));
+                if (MemberPropertyFilter.Contains(prop.Name))
+                    return;
+
+                var propertyValue = prop.GetValue(owner, null) ?? string.Empty;
+                var type = prop.PropertyType;
+
+                if (propertyValue is DateTime time)
+                {
+                    textWriter.WriteLine(prop.Name + " : " + time.ToIsoString());
+                }
+                else if (type == typeof(PropertyCollection))
+                {
+                    textWriter.WriteLine("");
+                    textWriter.WriteLine("PROPERTIES");
+                    textWriter.WriteLine("**********");
+
+                    if (propertyValue is PropertyCollection propertyCollection)
+                    {
+                        foreach (var property in propertyCollection)
+                        {
+                            var propProperties = property.GetType().GetProperties();
+
+                            textWriter.WriteLine("Name : " + property.PropertyType.Name);
+
+                            foreach (var p in propProperties)
+                            {
+                                if (PropertiesFilter.Contains(p.Name)) continue;
+
+                                WritePropertyValue(property, p, textWriter); //recurse
+                            }
+
+                            textWriter.WriteLine("------------------------");
+                        }
+                    }
+                }
+                else
+                {
+                    textWriter.WriteLine(prop.Name + " : " + propertyValue);
+                }
+            }
+        }
+
+        
     }
 }
