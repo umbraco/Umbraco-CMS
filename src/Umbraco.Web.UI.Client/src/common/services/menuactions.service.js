@@ -8,7 +8,7 @@
  * @description
  * Defines the methods that are called when menu items declare only an action to execute
  */
-function umbracoMenuActions($q, treeService, $location, navigationService, appState, umbRequestHelper) {
+function umbracoMenuActions($q, treeService, $location, navigationService, appState, umbRequestHelper, notificationsService, localizationService) {
     
     return {
 
@@ -19,6 +19,11 @@ function umbracoMenuActions($q, treeService, $location, navigationService, appSt
                 [{ key: args.entity.id }]);
 
             umbRequestHelper.downloadFile(url);
+            
+            localizationService.localize("speechBubbles_memberExportedSuccess").then(function (value) {
+                notificationsService.success(value);
+            })
+            
         },
         
         /**
