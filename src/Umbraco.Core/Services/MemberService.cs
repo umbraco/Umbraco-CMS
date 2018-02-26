@@ -1246,6 +1246,75 @@ namespace Umbraco.Core.Services
 
         #endregion
 
+        /// <summary>
+        /// Used to export a member
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is internal for now and is used to export a member in the member editor, it will raise an event so that auditing 
+        /// logs can be created
+        /// </remarks>
+        internal MemberExportModel ExportMember(Guid key)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
+                var query = Query<IMember>.Builder.Where(x => x.Key == key);
+                var member = repository.GetByQuery(query).FirstOrDefault();
+
+                if (member == null) return null;
+
+                var model = new MemberExportModel
+                {
+                    Id = member.Id,
+                    Key = member.Key,
+                    Name = member.Name,
+                    Username = member.Username,
+                    Email = member.Email,
+                    Groups = GetAllRoles(member.Id).ToList(),
+                    ContentTypeAlias = member.ContentTypeAlias,
+                    CreateDate = member.CreateDate,
+                    UpdateDate = member.UpdateDate,
+                    Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
+                };
+
+                uow.Events.Dispatch(Exported, this, new ExportedMemberEventArgs(member, model));
+
+                return model;
+            }
+        }
+
+        private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+
+            var exportProperties = new List<MemberExportProperty>();
+
+            foreach (var property in member.Properties)
+            {
+                //ignore list
+                switch (property.Alias)
+                {
+                    case Constants.Conventions.Member.PasswordQuestion:
+                        continue;
+                }
+
+                var propertyExportModel = new MemberExportProperty
+                {
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Name = property.PropertyType.Name,
+                    Value = property.Value,
+                    CreateDate = property.CreateDate,
+                    UpdateDate = property.UpdateDate
+                };
+                exportProperties.Add(propertyExportModel);
+            }
+
+            return exportProperties;
+        }
+
         private IMemberType FindMemberTypeByAlias(string memberTypeAlias)
         {
             using (var uow = UowProvider.GetUnitOfWork())
@@ -1307,6 +1376,8 @@ namespace Umbraco.Core.Services
 
         public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
         public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
+
+        internal static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
 
         #endregion
 

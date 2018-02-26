@@ -73,6 +73,7 @@ namespace Umbraco.Core.Auditing
             MemberService.Deleted += OnDeletedMember;
             MemberService.AssignedRoles += OnAssignedRoles;
             MemberService.RemovedRoles += OnRemovedRoles;
+            MemberService.Exported += OnMemberExported;
         }
 
         private string FormatEmail(IMember member)
@@ -113,6 +114,17 @@ namespace Umbraco.Core.Auditing
                     -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
                     "umbraco/member/roles/assigned", $"roles modified, assigned {roles}");
             }
+        }
+
+        private void OnMemberExported(IMemberService sender, ExportedMemberEventArgs exportedMemberEventArgs)
+        {
+            var performingUser = CurrentPerformingUser;
+            var member = exportedMemberEventArgs.Member;
+
+            _auditServiceInstance.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
+                DateTime.UtcNow,
+                -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                "umbraco/member/exported", "exported member data");
         }
 
         private void OnSavedUserGroupWithUsers(IUserService sender, SaveEventArgs<UserGroupWithUsers> saveEventArgs)

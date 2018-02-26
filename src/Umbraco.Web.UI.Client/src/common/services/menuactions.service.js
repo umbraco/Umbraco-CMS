@@ -18,11 +18,15 @@ function umbracoMenuActions($q, treeService, $location, navigationService, appSt
                 "ExportMemberData",
                 [{ key: args.entity.id }]);
 
-            umbRequestHelper.downloadFile(url);
-            
-            localizationService.localize("speechBubbles_memberExportedSuccess").then(function (value) {
-                notificationsService.success(value);
-            })
+            umbRequestHelper.downloadFile(url).then(function() {
+                localizationService.localize("speechBubbles_memberExportedSuccess").then(function (value) {
+                    notificationsService.success(value);
+                })    
+            }, function(data) {
+                localizationService.localize("speechBubbles_memberExportedError").then(function (value) {
+                    notificationsService.error(value);
+                })    
+            });
             
         },
         

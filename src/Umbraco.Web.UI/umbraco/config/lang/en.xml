@@ -1404,6 +1404,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUserSuccess">%0% is now unlocked</key>
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
         <key alias="memberExportedSuccess">Member was exported to file</key>
+        <key alias="memberExportedError">An error occurred while exporing the member</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>

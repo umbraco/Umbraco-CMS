@@ -341,6 +341,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * See https://stackoverflow.com/a/24129082/694494
          */
         downloadFile : function (httpPath) {
+
+            var deferred = $q.defer();
+
             // Use an arraybuffer
             $http.get(httpPath, { responseType: 'arraybuffer' })
                 .success(function (data, status, headers) {
@@ -432,13 +435,20 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         console.log("No methods worked for saving the arraybuffer, using last resort window.open");
                         window.open(httpPath, '_blank', '');
                     }
+
+                    deferred.resolve();
                 })
                 .error(function (data, status) {
                     console.log("Request failed with status: " + status);
 
-                    // Optionally write the error out to scope
-                    $scope.errorDetails = "Request failed with status: " + status;
+                    deferred.reject({
+                        errorMsg: "An error occurred downloading the file",
+                        data: data,
+                        status: status
+                    });
                 });
+
+            return deferred.promise;
         }
     };
 }
