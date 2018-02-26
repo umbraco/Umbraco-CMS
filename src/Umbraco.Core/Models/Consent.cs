@@ -97,6 +97,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the previous states of this consent.
         /// </summary>
-        public List<IConsent> HistoryInternal { get; set; }
+        internal List<IConsent> HistoryInternal { get; set; }
     }
 }
