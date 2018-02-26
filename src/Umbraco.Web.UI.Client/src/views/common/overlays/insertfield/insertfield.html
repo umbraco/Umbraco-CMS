@@ -66,13 +66,11 @@
         <div class="control-group umb-control-group">
             <div class="umb-el-wrap">
                 <div class="controls">
-                    <label class="control-label" >
-                        <localize key="templateEditor_recursive">Recursive</localize>
-                    </label>
-                    <label for="recursive"> 
-                        <input id="recursive" type="checkbox" name="recursive" ng-model="vm.recursive">
-                        <localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
-                    </label>
+					<label>
+						<localize class="control-label" key="templateEditor_recursive">Recursive</localize>
+						<input type="checkbox" name="recursive" ng-model="vm.recursive">
+						<localize key="templateEditor_recursiveDescr">Yes, make it recursive</localize>
+					</label>
                 </div>
             </div>
         </div>
@@ -159,16 +157,16 @@
         <div class="control-group umb-control-group">
             <div class="umb-el-wrap">
                 <div class="controls">
-                    <div>
-                        <label class="control-label" for="linebreaks">
-                            <localize key="templateEditor_convertLineBreaks">Convert line breaks</localize>
-                            <small><localize key="templateEditor_convertLineBreaksHelp">Replaces line breaks with break html tag</localize></small>
-                        </label>
-                    </div>
+					<label>
+						<span class="control-label" for="linebreaks">
+							<localize key="templateEditor_convertLineBreaks">Convert line breaks</localize>
+							<small><localize key="templateEditor_convertLineBreaksHelp">Replaces line breaks with break html tag</localize></small>
+						</span>
                     <label for="linebreaks">
                       <input type="checkbox" id="linebreaks" name="linebreaks" ng-model="vm.convertLinebreaks">
                       <localize key="templateEditor_convertLineBreaksDescription">Yes, convert line breaks</localize>
                     </label>
+					</label>
                 </div>
             </div>
         </div>
