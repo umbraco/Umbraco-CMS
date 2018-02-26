@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Length(IpLength)]
         public string PerformingIp { get; set; }
 
-        [Column("eventDateUTC")]
+        [Column("eventDateUtc")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime EventDateUtc { get; set; }
 
