@@ -139,6 +139,7 @@ angular.module("umbraco")
 
             //wait for queue to end
             $q.all(await).then(function () {
+                
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
                     mode: "exact",
@@ -149,14 +150,16 @@ angular.module("umbraco")
                     extended_valid_elements: extendedValidElements,
                     menubar: false,
                     statusbar: false,
+                    relative_urls: false,
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets,
-                    relative_urls: false,
                     style_formats: styleFormats,
-                    language: language
+                    language: language,
+                    //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
                 };
 
                 if (tinyMceConfig.customConfig) {
