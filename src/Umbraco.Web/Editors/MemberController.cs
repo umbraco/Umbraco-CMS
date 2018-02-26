@@ -797,24 +797,30 @@ namespace Umbraco.Web.Editors
             }
 
             var member = Services.MemberService.GetByKey(key);
-            var memberProperties = member.GetType().GetProperties().ToList();
-            //since we want to write the property types last, we'll re-order this list
-            var propertyTypesProperties = memberProperties.Where(x => x.PropertyType == typeof(PropertyCollection)).ToList();
-            foreach (var propertyType in propertyTypesProperties)
-                memberProperties.Remove(propertyType);
-
-            //now re-add them to the end (there will only be one, but we'll do this just to be complete)
-            foreach (var propertyTypesProperty in propertyTypesProperties)
-                memberProperties.Add(propertyTypesProperty);
 
             var fileName = $"{member.Name}_{member.Email}.txt";
 
-            var exportProperties = new List<PropertyExportModel>();
-            foreach (var memberProperty in memberProperties)
+            var exportProperties = new MemberExportModel
             {
-                var exportItems = ReportWriter.GetPropertyExportItems(member, memberProperty);
+                Id = member.Id,
+                Key = member.Key,
+                Name = member.Name,
+                Username = member.Username,
+                Email = member.Email,
+                Groups = Roles.GetRolesForUser(member.Username).ToList(),
+                ContentTypeAlias = member.ContentTypeAlias,
+                CreateDate = member.CreateDate,
+                UpdateDate = member.UpdateDate,
+                Properties = new List<MemberProperty>()
+            };
+
+            var memberProperties = member.GetType().GetProperties().ToList();
+            var properties = memberProperties.Where(x => x.PropertyType == typeof(PropertyCollection)).ToList();
+            foreach (var memberProperty in properties)
+            {
+                var exportItems = GetPropertyExportItems(member, memberProperty);
                 if (exportItems != null)
-                    exportProperties.AddRange(exportItems);
+                    exportProperties.Properties.AddRange(exportItems);
             }
 
             using (var memoryStream = new MemoryStream())
@@ -837,80 +843,49 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        private static class ReportWriter
+        internal static List<MemberProperty> GetPropertyExportItems(IMember member, PropertyInfo prop)
         {
-            private static readonly List<string> MemberPropertyFilter = new List<string>
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            if (prop == null) throw new ArgumentNullException(nameof(prop));
+
+            var exportProperties = new List<MemberProperty>();
+            
+            foreach (var property in (PropertyCollection) prop.GetValue(member))
             {
-                "RawPasswordValue",
-                "RawPasswordAnswerValue",
-                "ParentId",
-                "SortOrder",
-                "Level",
-                "Path",
-                "CreatorId",
-                "Version",
-                "ContentTypeId",
-                "HasIdentity",
-                "PropertyGroups",
-                "PropertyTypes",
-                "ProviderUserKey",
-                "ContentType",
-                "DeletedDate"
-            };
-
-            public static List<PropertyExportModel> GetPropertyExportItems(IMember owner, PropertyInfo prop)
-            {
-                if (owner == null) throw new ArgumentNullException(nameof(owner));
-                if (prop == null) throw new ArgumentNullException(nameof(prop));
-                if (MemberPropertyFilter.Contains(prop.Name))
-                    return null;
-
-                var exportProperties = new List<PropertyExportModel>();
-                var propertyValue = prop.GetValue(owner, null) ?? string.Empty;
-                var type = prop.PropertyType;
-
-                if (type == typeof(PropertyCollection))
+                var propertyExportModel = new MemberProperty
                 {
-                    if (propertyValue is PropertyCollection propertyCollection)
-                    {
-                        foreach (var property in propertyCollection)
-                        {
-                            var propertyExportModel = new PropertyExportModel
-                            {
-                                Id = property.Id,
-                                Alias = property.Alias,
-                                Value = property.Value,
-                                CreateDate = property.CreateDate,
-                                UpdateDate = property.UpdateDate
-                            };
-                            exportProperties.Add(propertyExportModel);
-                        }
-                    }
-                }
-                else
-                {
-                    var propertyExportModel = new PropertyExportModel
-                    {
-                        Name = prop.Name,
-                        Value = propertyValue,
-                        CreateDate = null,
-                        UpdateDate = null
-                    };
-                    if (prop.Name == "Groups")
-                    {
-                        var memberGroups = Roles.GetRolesForUser(owner.Username);
-                        propertyExportModel.Value = memberGroups.ToList();
-                    }
-
-                    exportProperties.Add(propertyExportModel);
-                }
-
-                return exportProperties;
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Name = property.PropertyType.Name,
+                    Value = property.Value,
+                    CreateDate = property.CreateDate,
+                    UpdateDate = property.UpdateDate
+                };
+                exportProperties.Add(propertyExportModel);
             }
+            
+            return exportProperties;
         }
+
+
+
     }
 
-    internal class PropertyExportModel
+    internal class MemberExportModel
+    {
+        public int Id { get; set; }
+        public Guid Key { get; set; }
+        public string Name { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public List<string> Groups { get; set; }
+        public string ContentTypeAlias { get; set; }
+        public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public List<MemberProperty> Properties { get; set; }
+    }
+
+    internal class MemberProperty
     {
         public int Id { get; set; }
         public string Alias { get; set; }
