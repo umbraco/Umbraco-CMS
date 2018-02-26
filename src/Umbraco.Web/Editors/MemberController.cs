@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection;
@@ -823,25 +824,15 @@ namespace Umbraco.Web.Editors
                 if (exportItems != null)
                     exportProperties.Properties.AddRange(exportItems);
             }
+            
+            httpResponseMessage.Content = new ObjectContent<MemberExportModel>(exportProperties, new JsonMediaTypeFormatter {Indent = true});
+            httpResponseMessage.Content.Headers.Add("x-filename", fileName);
+            httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+            httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
+            httpResponseMessage.StatusCode = HttpStatusCode.OK;
 
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var textWriter = new StreamWriter(memoryStream))
-                {
-                    var output = JsonConvert.SerializeObject(exportProperties, Formatting.Indented);
-                    textWriter.Write(output);
-                    textWriter.Flush();
-                }
-
-                httpResponseMessage.Content = new ByteArrayContent(memoryStream.ToArray());
-                httpResponseMessage.Content.Headers.Add("x-filename", fileName);
-                httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
-                httpResponseMessage.StatusCode = HttpStatusCode.OK;
-
-                return httpResponseMessage;
-            }
+            return httpResponseMessage;
         }
 
         internal static List<MemberProperty> GetPropertyExportItems(IMember member, PropertyInfo prop)
