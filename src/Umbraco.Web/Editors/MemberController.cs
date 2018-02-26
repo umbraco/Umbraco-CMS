@@ -809,22 +809,13 @@ namespace Umbraco.Web.Editors
                 Name = member.Name,
                 Username = member.Username,
                 Email = member.Email,
-                Groups = Roles.GetRolesForUser(member.Username).ToList(),
+                Groups = Services.MemberService.GetAllRoles(member.Id).ToList(),
                 ContentTypeAlias = member.ContentTypeAlias,
                 CreateDate = member.CreateDate,
                 UpdateDate = member.UpdateDate,
-                Properties = new List<MemberProperty>()
+                Properties = new List<MemberProperty>(GetPropertyExportItems(member))
             };
 
-            var memberProperties = member.GetType().GetProperties().ToList();
-            var properties = memberProperties.Where(x => x.PropertyType == typeof(PropertyCollection)).ToList();
-            foreach (var memberProperty in properties)
-            {
-                var exportItems = GetPropertyExportItems(member, memberProperty);
-                if (exportItems != null)
-                    exportProperties.Properties.AddRange(exportItems);
-            }
-            
             httpResponseMessage.Content = new ObjectContent<MemberExportModel>(exportProperties, new JsonMediaTypeFormatter {Indent = true});
             httpResponseMessage.Content.Headers.Add("x-filename", fileName);
             httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -835,15 +826,21 @@ namespace Umbraco.Web.Editors
             return httpResponseMessage;
         }
 
-        internal static List<MemberProperty> GetPropertyExportItems(IMember member, PropertyInfo prop)
+        internal static List<MemberProperty> GetPropertyExportItems(IMember member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            if (prop == null) throw new ArgumentNullException(nameof(prop));
 
             var exportProperties = new List<MemberProperty>();
             
-            foreach (var property in (PropertyCollection) prop.GetValue(member))
+            foreach (var property in member.Properties)
             {
+                //ignore list
+                switch (property.Alias)
+                {
+                    case Constants.Conventions.Member.PasswordQuestion:
+                        continue;
+                }
+
                 var propertyExportModel = new MemberProperty
                 {
                     Id = property.Id,
@@ -859,31 +856,32 @@ namespace Umbraco.Web.Editors
             return exportProperties;
         }
 
+        internal class MemberExportModel
+        {
+            public int Id { get; set; }
+            public Guid Key { get; set; }
+            public string Name { get; set; }
+            public string Username { get; set; }
+            public string Email { get; set; }
+            public List<string> Groups { get; set; }
+            public string ContentTypeAlias { get; set; }
+            public DateTime CreateDate { get; set; }
+            public DateTime UpdateDate { get; set; }
+            public List<MemberProperty> Properties { get; set; }
+        }
+
+        internal class MemberProperty
+        {
+            public int Id { get; set; }
+            public string Alias { get; set; }
+            public string Name { get; set; }
+            public object Value { get; set; }
+            public DateTime? CreateDate { get; set; }
+            public DateTime? UpdateDate { get; set; }
+        }
 
 
     }
 
-    internal class MemberExportModel
-    {
-        public int Id { get; set; }
-        public Guid Key { get; set; }
-        public string Name { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public List<string> Groups { get; set; }
-        public string ContentTypeAlias { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime UpdateDate { get; set; }
-        public List<MemberProperty> Properties { get; set; }
-    }
-
-    internal class MemberProperty
-    {
-        public int Id { get; set; }
-        public string Alias { get; set; }
-        public string Name { get; set; }
-        public object Value { get; set; }
-        public DateTime? CreateDate { get; set; }
-        public DateTime? UpdateDate { get; set; }
-    }
+    
 }
