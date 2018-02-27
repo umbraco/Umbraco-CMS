@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.Mvc;
@@ -8,12 +7,10 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.template;
 using System.Collections.Generic;
+using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Mvc
 {
@@ -311,8 +308,8 @@ namespace Umbraco.Web.Mvc
             if (controllerType != null)
             {
                 //ensure the controller is of type IRenderMvcController and ControllerBase
-                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerType)
-                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
+                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerType) &&
+                    TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
                 {
                     //set the controller and name to the custom one
                     def.ControllerType = controllerType;
@@ -337,7 +334,7 @@ namespace Umbraco.Web.Mvc
             }
 
             //store the route definition
-            requestContext.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
+            requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
             return def;
         }
@@ -349,11 +346,11 @@ namespace Umbraco.Web.Mvc
             // missing template, so we're in a 404 here
             // so the content, if any, is a custom 404 page of some sort
 
-            if (!pcr.HasPublishedContent)
+            if (pcr.HasPublishedContent == false)
                 // means the builder could not find a proper document to handle 404
                 return new PublishedContentNotFoundHandler();
 
-            if (!pcr.HasTemplate)
+            if (pcr.HasTemplate == false)
                 // means the engine could find a proper document, but the document has no template
                 // at that point there isn't much we can do and there is no point returning
                 // to Mvc since Mvc can't do much
@@ -398,7 +395,10 @@ namespace Umbraco.Web.Mvc
 
             //here we need to check if there is no hijacked route and no template assigned, if this is the case
             //we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
+            //we also check if we're allowed to render even though there's no template (json render in headless).
+            if (publishedContentRequest.HasTemplate == false &&
+                routeDef.HasHijackedRoute == false &&
+                FeaturesResolver.Current.Features.Enabled.RenderNoTemplate == false)
             {
                 publishedContentRequest.UpdateOnMissingTemplate(); // will go 404
 
@@ -431,7 +431,7 @@ namespace Umbraco.Web.Mvc
             //no post values, just route to the controller/action requried (local)
 
             requestContext.RouteData.Values["controller"] = routeDef.ControllerName;
-            if (!string.IsNullOrWhiteSpace(routeDef.ActionName))
+            if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)
             {
                 requestContext.RouteData.Values["action"] = routeDef.ActionName;
             }

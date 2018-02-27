@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
+using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -353,6 +354,52 @@ namespace Umbraco.Core
 				}
 			}
 		}
+
+        /// <summary>
+        /// Gets the Current Version of the Umbraco Site before an upgrade
+        /// by using the last/most recent Umbraco Migration that has been run
+        /// </summary>
+        /// <returns>A SemVersion of the latest Umbraco DB Migration run</returns>
+        /// <remarks>
+        /// NOTE: This existed in the InstallHelper previously but should really be here so it can be re-used if necessary
+        /// </remarks>
+        internal SemVersion CurrentVersion()
+        {
+            //Set a default version of 0.0.0
+            var version = new SemVersion(0);
+
+            //If we have a db context available, if we don't then we are not installed anyways
+            if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
+                version = DatabaseContext.ValidateDatabaseSchema().DetermineInstalledVersionByMigrations(Services.MigrationEntryService);
+
+            if (version != new SemVersion(0))
+                return version;
+
+            // If we aren't able to get a result from the umbracoMigrations table then use the version in web.config, if it's available
+            if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
+                return version;
+
+            var configuredVersion = GlobalSettings.ConfigurationStatus;
+
+            string currentComment = null;
+
+            var current = configuredVersion.Split('-');
+            if (current.Length > 1)
+                currentComment = current[1];
+
+            Version currentVersion;
+            if (Version.TryParse(current[0], out currentVersion))
+            {
+                version = new SemVersion(
+                    currentVersion.Major,
+                    currentVersion.Minor,
+                    currentVersion.Build,
+                    string.IsNullOrWhiteSpace(currentComment) ? null : currentComment,
+                    currentVersion.Revision > 0 ? currentVersion.Revision.ToString() : null);
+            }
+
+            return version;
+        }
 
         private void AssertIsNotReady()
         {

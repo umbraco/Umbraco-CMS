@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
@@ -14,6 +15,9 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
@@ -25,7 +29,7 @@ namespace Umbraco.Core.Services
     {
         private readonly IMemberGroupService _memberGroupService;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
-        private readonly IDataTypeService _dataTypeService;        
+        private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         //only for unit tests!
@@ -38,7 +42,7 @@ namespace Umbraco.Core.Services
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
             _memberGroupService = memberGroupService;
             _dataTypeService = dataTypeService;
-        }        
+        }
 
         #region IMemberService Implementation
 
@@ -94,7 +98,7 @@ namespace Umbraco.Core.Services
         {
             if (member == null) throw new ArgumentNullException("member");
 
-            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();            
+            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider())
             {
                 provider.ChangePassword(member.Username, "", password);
@@ -588,7 +592,7 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 return repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
@@ -1173,12 +1177,16 @@ namespace Umbraco.Core.Services
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.AssignRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(string username, string roleName)
@@ -1188,12 +1196,16 @@ namespace Umbraco.Core.Services
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.DissociateRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void AssignRole(int memberId, string roleName)
@@ -1209,6 +1221,8 @@ namespace Umbraco.Core.Services
                 repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(int memberId, string roleName)
@@ -1224,11 +1238,82 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
 
 
         #endregion
+
+        /// <summary>
+        /// Used to export a member
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is internal for now and is used to export a member in the member editor, it will raise an event so that auditing 
+        /// logs can be created
+        /// </remarks>
+        internal MemberExportModel ExportMember(Guid key)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
+                var query = Query<IMember>.Builder.Where(x => x.Key == key);
+                var member = repository.GetByQuery(query).FirstOrDefault();
+
+                if (member == null) return null;
+
+                var model = new MemberExportModel
+                {
+                    Id = member.Id,
+                    Key = member.Key,
+                    Name = member.Name,
+                    Username = member.Username,
+                    Email = member.Email,
+                    Groups = GetAllRoles(member.Id).ToList(),
+                    ContentTypeAlias = member.ContentTypeAlias,
+                    CreateDate = member.CreateDate,
+                    UpdateDate = member.UpdateDate,
+                    Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
+                };
+
+                uow.Events.Dispatch(Exported, this, new ExportedMemberEventArgs(member, model));
+
+                return model;
+            }
+        }
+
+        private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+
+            var exportProperties = new List<MemberExportProperty>();
+
+            foreach (var property in member.Properties)
+            {
+                //ignore list
+                switch (property.Alias)
+                {
+                    case Constants.Conventions.Member.PasswordQuestion:
+                        continue;
+                }
+
+                var propertyExportModel = new MemberExportProperty
+                {
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Name = property.PropertyType.Name,
+                    Value = property.Value,
+                    CreateDate = property.CreateDate,
+                    UpdateDate = property.UpdateDate
+                };
+                exportProperties.Add(propertyExportModel);
+            }
+
+            return exportProperties;
+        }
 
         private IMemberType FindMemberTypeByAlias(string memberTypeAlias)
         {
@@ -1288,6 +1373,11 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
+
+        internal static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
 
         #endregion
 

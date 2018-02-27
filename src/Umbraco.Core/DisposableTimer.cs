@@ -11,8 +11,8 @@ namespace Umbraco.Core
 	/// <summary>
 	/// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
 	/// </summary>
-	public class DisposableTimer : DisposableObject
-	{
+	public class DisposableTimer : DisposableObjectSlim
+    {
 	    private readonly ILogger _logger;
 	    private readonly LogType? _logType;
 	    private readonly IProfiler _profiler;
@@ -209,13 +209,13 @@ namespace Umbraco.Core
                 loggerType,
                 startMessage(),
                 completeMessage());
-        } 
+        }
         #endregion
 
-		/// <summary>
-		/// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
-		/// </summary>
-		protected override void DisposeResources()
+        /// <summary>
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObjectSlim"/> which handles common required locking logic.
+        /// </summary>
+        protected override void DisposeResources()
 		{
             if (_profiler != null)
             {

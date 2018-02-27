@@ -223,6 +223,9 @@ namespace Umbraco.Core.Security
                 user.AccessFailedCount = 0;
             await UserManager.UpdateAsync(user);
 
+            //set the current request's principal to the identity just signed in!
+            _request.User = new ClaimsPrincipal(userIdentity);
+
             _logger.WriteCore(TraceEventType.Information, 0,
                 string.Format(
                     "Login attempt succeeded for username {0} from IP address {1}",

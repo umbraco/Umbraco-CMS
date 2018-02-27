@@ -54,8 +54,8 @@ namespace Umbraco.Core.Persistence
 
                     //if the result is already a DeepCloneRuntimeCacheProvider then return it, otherwise
                     //wrap the result with a DeepCloneRuntimeCacheProvider
-                    return cache is DeepCloneRuntimeCacheProvider 
-                        ? cache 
+                    return cache is DeepCloneRuntimeCacheProvider
+                        ? cache
                         : new DeepCloneRuntimeCacheProvider(cache);
                 };
             }
@@ -325,7 +325,7 @@ namespace Umbraco.Core.Persistence
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
-                _logger, 
+                _logger,
                 _sqlSyntax,
                 passwordConfig);
         }
@@ -396,6 +396,16 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger,
                 _sqlSyntax);
+        }
+
+        public IConsentRepository CreateConsentRepository(IScopeUnitOfWork uow)
+        {
+            return new ConsentRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+        }
+
+        public IAuditEntryRepository CreateAuditEntryRepository(IScopeUnitOfWork uow)
+        {
+            return new AuditEntryRepository(uow, _cacheHelper, _logger, _sqlSyntax);
         }
     }
 }

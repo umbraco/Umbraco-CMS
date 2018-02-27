@@ -120,6 +120,7 @@ namespace Umbraco.Tests.Models.Mapping
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
                     Assert.AreEqual(propTypes.ElementAt(j).MemberCanViewProperty, result.MemberCanViewProperty(result.PropertyTypes.ElementAt(j).Alias));
                     Assert.AreEqual(propTypes.ElementAt(j).MemberCanEditProperty, result.MemberCanEditProperty(result.PropertyTypes.ElementAt(j).Alias));
+                    Assert.AreEqual(propTypes.ElementAt(j).IsSensitiveData, result.IsSensitiveProperty(result.PropertyTypes.ElementAt(j).Alias));
                 }
             }
 
@@ -335,7 +336,7 @@ namespace Umbraco.Tests.Models.Mapping
                 .Returns(new[] { new TextboxPropertyEditor() });
 
             var memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true);
+            memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true, true);
             
             MockedContentTypes.EnsureAllIds(memberType, 8888);
 
@@ -539,6 +540,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         MemberCanEditProperty = true,
                         MemberCanViewProperty = true,
+                        IsSensitiveData = true,
                         Id = 33,
                         SortOrder = 1,
                         Alias = "prop1",
@@ -556,6 +558,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         MemberCanViewProperty = false,
                         MemberCanEditProperty = false,
+                        IsSensitiveData = false,
                         Id = 34,
                         SortOrder = 2,
                         Alias = "prop2",
@@ -944,6 +947,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Label = "Prop 1",
                 MemberCanViewProperty = true,
                 MemberCanEditProperty = true,
+                IsSensitiveData = true,
                 Validation = new PropertyTypeValidation()
                 {
                     Mandatory = true,
@@ -963,6 +967,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.Validation, result.Validation);
             Assert.AreEqual(basic.MemberCanViewProperty, result.MemberCanViewProperty);
             Assert.AreEqual(basic.MemberCanEditProperty, result.MemberCanEditProperty);
+            Assert.AreEqual(basic.IsSensitiveData, result.IsSensitiveData);
         }
 
         [Test]
@@ -1029,6 +1034,7 @@ namespace Umbraco.Tests.Models.Mapping
                             {
                                 MemberCanEditProperty = true,
                                 MemberCanViewProperty = true,
+                                IsSensitiveData = true,
                                 Alias = "property1",
                                 Description = "this is property 1",
                                 Inherited = false,

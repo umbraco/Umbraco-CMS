@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, localizationService, serverValidationManager, dialogService, formHelper, appState) {
 
     function isValidIdentifier(id){
         //empty id <= 0
@@ -100,7 +100,35 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             return deferred.promise;
         },
+        
+        /** Used by the content editor and media editor to add an info tab to the tabs array (normally known as the properties tab) */
+        addInfoTab: function (tabs) {
 
+            var infoTab = {
+                "alias": "_umb_infoTab",
+                "id": -1,
+                "label": "Info",
+                "properties": []
+            };
+
+            // first check if tab is already added
+            var foundInfoTab = false;
+
+            angular.forEach(tabs, function (tab) {
+                if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
+                    foundInfoTab = true;
+                }
+            });
+
+            // add info tab if is is not found
+            if (!foundInfoTab) {
+                localizationService.localize("general_info").then(function (value) {
+                    infoTab.label = value;
+                    tabs.push(infoTab);
+                });
+            }
+
+        },
 
         /** Returns the action button definitions based on what permissions the user has.
         The content.allowedActions parameter contains a list of chars, each represents a button by permission so
@@ -134,7 +162,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "saveAndPublish"
                         };
                     case "H":
                         //send to publish
@@ -143,7 +172,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_saveToPublish",
                             handler: args.methods.sendToPublish,
                             hotKey: "ctrl+p",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "sendToPublish"                            
                         };
                     case "A":
                         //save
@@ -152,7 +182,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "buttons_save",
                             handler: args.methods.save,
                             hotKey: "ctrl+s",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "save"                            
                         };
                     case "Z":
                         //unpublish
@@ -161,7 +192,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             labelKey: "content_unPublish",
                             handler: args.methods.unPublish,
                             hotKey: "ctrl+u",
-                            hotKeyWhenHidden: true
+                            hotKeyWhenHidden: true,
+                            alias: "unpublish"                            
                         };
                     default:
                         return null;
@@ -218,6 +250,40 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
+            }
+
+            // If we have a scheduled publish or unpublish date change the default button to 
+            // "save" and update the label to "save and schedule
+            if(args.content.releaseDate || args.content.removeDate) {
+
+                // if save button is alread the default don't change it just update the label
+                if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
+                    buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
+                    return;
+                }
+                
+                if(buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {
+                    // save a copy of the default so we can push it to the sub buttons later
+                    var defaultButtonCopy = angular.copy(buttons.defaultButton);
+                    var newSubButtons = [];
+
+                    // if save button is not the default button - find it and make it the default
+                    angular.forEach(buttons.subButtons, function (subButton) {
+
+                        if (subButton.letter === "A") {
+                            buttons.defaultButton = subButton;
+                            buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
+                        } else {
+                            newSubButtons.push(subButton);
+                        }
+
+                    });
+
+                    // push old default button into subbuttons
+                    newSubButtons.push(defaultButtonCopy);
+                    buttons.subButtons = newSubButtons;
+                }
+
             }
 
             return buttons;

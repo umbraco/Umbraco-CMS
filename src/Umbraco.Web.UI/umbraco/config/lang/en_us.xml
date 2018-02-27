@@ -11,6 +11,7 @@
         <key alias="changeDocType">Change Document Type</key>
         <key alias="copy">Copy</key>
         <key alias="create">Create</key>
+        <key alias="export">Export</key>
         <key alias="createPackage">Create Package</key>
         <key alias="createGroup">Create group</key>
         <key alias="delete">Delete</key>
@@ -127,6 +128,7 @@
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
         <key alias="saveAndPublish">Save and publish</key>
+        <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
         <key alias="saveListView">Save list view</key>
         <key alias="showPage">Preview</key>
@@ -186,18 +188,23 @@
         <key alias="membergroup">Member Group</key>
         <key alias="memberrole">Role</key>
         <key alias="membertype">Member Type</key>
+        <key alias="noChanges">No changes have been made</key>
         <key alias="noDate">No date chosen</key>
         <key alias="nodeName">Page title</key>
+        <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
         <key alias="getUrlException">Could not get the url</key>
         <key alias="routeError">This document is published but its url would collide with content %0%</key>
         <key alias="publish">Publish</key>
+        <key alias="published">Published</key>
+        <key alias="publishedPendingChanges">Published (pending changes)</key>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
         <key alias="removeDate">Clear Date</key>
+        <key alias="setDate">Set date</key>
         <key alias="sortDone">Sortorder is updated</key>
         <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
         <key alias="statistics">Statistics</key>
@@ -205,6 +212,7 @@
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Unpublish</key>
+        <key alias="unpublished">Unpublished</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
         <key alias="uploadClear">Remove file(s)</key>
@@ -220,6 +228,7 @@
         <key alias="addTextBox">Add another text box</key>
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
+        <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -309,7 +318,6 @@
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorInsert">Name</key>
-        <key alias="assignDomain">Manage hostnames</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
         <key alias="confirmdisable">Are you sure you want to disable</key>
@@ -509,6 +517,7 @@
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
+        <key alias="options">Options</key>
         <key alias="about">About</key>
         <key alias="action">Action</key>
         <key alias="actions">Actions</key>
@@ -549,12 +558,15 @@
         <key alias="error">Error</key>
         <key alias="findDocument">Find</key>
         <key alias="first">First</key>
+        <key alias="general">General</key>
         <key alias="groups">Groups</key>
         <key alias="height">Height</key>
         <key alias="help">Help</key>
         <key alias="hide">Hide</key>
+        <key alias="history">History</key>
         <key alias="icon">Icon</key>
         <key alias="import">Import</key>
+        <key alias="info">Info</key>
         <key alias="innerMargin">Inner margin</key>
         <key alias="insert">Insert</key>
         <key alias="install">Install</key>
@@ -564,6 +576,7 @@
         <key alias="language">Language</key>
         <key alias="last">Last</key>
         <key alias="layout">Layout</key>
+        <key alias="links">Links</key>
         <key alias="loading">Loading</key>
         <key alias="locked">Locked</key>
         <key alias="login">Login</key>
@@ -602,9 +615,9 @@
         <key alias="retrieve">Retrieve</key>
         <key alias="retry">Retry</key>
         <key alias="rights">Permissions</key>
+        <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
-        <key alias="clearSearch">Clear search</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
         <key alias="show">Show</key>
@@ -638,7 +651,7 @@
         <key alias="saving">Saving...</key>
         <key alias="current">current</key>
         <key alias="embed">Embed</key>
-    <key alias="retrieve">Retrieve</key>
+        <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
     </area>
     <area alias="colors">
@@ -1387,6 +1400,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUsersError">An error occurred while unlocking the users</key>
         <key alias="unlockUserSuccess">%0% is now unlocked</key>
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
+        <key alias="memberExportedSuccess">Member was exported to file</key>
+        <key alias="memberExportedError">An error occurred while exporting the member</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1501,12 +1516,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="template">Template</key>
     </area>
     <area alias="grid">
-		<key alias="rte">Rich Text Editor</key>
-		<key alias="media">Image</key>
-		<key alias="macro">Macro</key>
-		<key alias="embed">Embed</key>
-		<key alias="headline">Headline</key>
-		<key alias="quote">Quote</key>	
+        <key alias="rte">Rich Text Editor</key>
+        <key alias="media">Image</key>
+        <key alias="macro">Macro</key>
+        <key alias="embed">Embed</key>
+        <key alias="headline">Headline</key>
+        <key alias="quote">Quote</key>
         <key alias="insertControl">Choose type of content</key>
         <key alias="chooseLayout">Choose a layout</key>
         <key alias="addRows">Add a row</key>
@@ -1608,7 +1623,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
         <key alias="memberCanEdit">Member can edit</key>
+        <key alias="memberCanEditDescription">Allow this property value to be edited by the member on their profile page</key>
+        <key alias="isSensitiveData">Is sensitive data</key>
+        <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
+        <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
+        
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
     </area>
 
@@ -1901,7 +1921,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 															Hi %0%,
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															You have been invited by <a href="mailto:%1%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
+															You have been invited by <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Message from <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:

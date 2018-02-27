@@ -16,8 +16,6 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
-
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<PropertyGroup, Tab<ContentPropertyDisplay>>()
                 .ForMember(tab => tab.Label, expression => expression.MapFrom(@group => @group.Name))
@@ -27,15 +25,15 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<Property, ContentPropertyBasic>()
-                  .ConvertUsing(new ContentPropertyBasicConverter<ContentPropertyBasic>(lazyDataTypeService));
+                  .ConvertUsing(new ContentPropertyBasicConverter<ContentPropertyBasic>(applicationContext.Services.DataTypeService));
 
             //FROM Property TO ContentPropertyDto
             config.CreateMap<Property, ContentPropertyDto>()
-                  .ConvertUsing(new ContentPropertyDtoConverter(lazyDataTypeService));
+                  .ConvertUsing(new ContentPropertyDtoConverter(applicationContext.Services.DataTypeService));
 
             //FROM Property TO ContentPropertyDisplay
             config.CreateMap<Property, ContentPropertyDisplay>()
-                  .ConvertUsing(new ContentPropertyDisplayConverter(lazyDataTypeService));
+                  .ConvertUsing(new ContentPropertyDisplayConverter(applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
         }
     }
 }

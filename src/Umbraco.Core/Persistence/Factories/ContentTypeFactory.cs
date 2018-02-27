@@ -84,7 +84,8 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 PropertyTypeId = x.Id,
                 CanEdit = memberType.MemberCanEditProperty(x.Alias),
-                ViewOnProfile = memberType.MemberCanViewProperty(x.Alias)
+                ViewOnProfile = memberType.MemberCanViewProperty(x.Alias),
+                IsSensitive = memberType.IsSensitiveProperty(x.Alias)
             }).ToList();
             return dtos;
         }

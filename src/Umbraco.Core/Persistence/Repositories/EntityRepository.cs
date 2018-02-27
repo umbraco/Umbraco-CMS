@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <remarks>
     /// This is limited to objects that are based in the umbracoNode-table.
     /// </remarks>
-    internal class EntityRepository : DisposableObject, IEntityRepository
+    internal class EntityRepository : DisposableObjectSlim, IEntityRepository
     {
         private readonly IDatabaseUnitOfWork _work;
 

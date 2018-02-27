@@ -72,22 +72,63 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
 
+            //set the default to create
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            //create action
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+            //refresh action
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
+            return menu;
+        }
+
+        protected virtual MenuItemCollection GetMenuForFolder(string path, FormDataCollection queryStrings)
+        {
+            var menu = new MenuItemCollection();
+
+            //set the default to create
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            //create action
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+
+            var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
+
+            //We can only delete folders if it doesn't have any children (folders or files)
+            if (hasChildren == false)
+            {
+                //delete action
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
+            }
+
+            //refresh action
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+
+            return menu;
+        }
+
+        protected virtual MenuItemCollection GetMenuForFile(string path, FormDataCollection queryStrings)
+        {
+            var menu = new MenuItemCollection();
+
+            //if it's not a directory then we only allow to delete the item
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+
+            return menu;
+        }
+
+        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        {
             //if root node no need to visit the filesystem so lets just create the menu and return it
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-                //create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
-
-                return menu;
+                return GetMenuForRootNode(queryStrings);
             }
+
+            var menu = new MenuItemCollection();
 
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
@@ -98,30 +139,10 @@ namespace Umbraco.Web.Trees
 
             if (isDirectory)
             {
-                //set the default to create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-                //create action
-                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-
-                var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
-
-                //We can only delete folders if it doesn't have any children (folders or files)
-                if (hasChildren == false)
-                {
-                    //delete action
-                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
-                }
-
-                //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
-            }
-            else if (isFile)
-            {
-                //if it's not a directory then we only allow to delete the item
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                return GetMenuForFolder(path, queryStrings);
             }
 
-            return menu;
+            return isFile ? GetMenuForFile(path, queryStrings) : menu;
         }
     }
 }

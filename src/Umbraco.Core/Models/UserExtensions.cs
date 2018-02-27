@@ -30,12 +30,11 @@ namespace Umbraco.Core.Models
         /// Tries to lookup the user's gravatar to see if the endpoint can be reached, if so it returns the valid URL
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="userService"></param>
         /// <param name="staticCache"></param>
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        internal static string[] GetCurrentUserAvatarUrls(this IUser user, IUserService userService, ICacheProvider staticCache)
+        internal static string[] GetUserAvatarUrls(this IUser user, ICacheProvider staticCache)
         {
             //check if the user has explicitly removed all avatars including a gravatar, this will be possible and the value will be "none"
             if (user.Avatar == "none")
@@ -260,6 +259,16 @@ namespace Umbraco.Core.Models
         {
             if (user == null) throw new ArgumentNullException("user");
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
+        }
+
+        /// <summary>
+        /// Determines whether this user has access to view sensitive data
+        /// </summary>
+        /// <param name="user"></param>
+        public static bool HasAccessToSensitiveData(this IUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
         }
 
         // calc. start nodes, combining groups' and user's, and excluding what's in the bin

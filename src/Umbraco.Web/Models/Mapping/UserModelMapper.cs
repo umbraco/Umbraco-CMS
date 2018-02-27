@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
@@ -24,13 +25,18 @@ namespace Umbraco.Web.Models.Mapping
         {
             
             config.CreateMap<UserGroupSave, IUserGroup>()
-                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
+                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.UtcNow })
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
-                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))                
-                .ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
+                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
+                //TODO: This is insane - but with our current version of AutoMapper when mapping from an existing object to another existing object, it will map the private fields which means the public setter is not used! wtf. So zpqrtbnk will laugh and say how crappy AutoMapper is... well he'll win this battle this time, so we need to do this in AfterMap to make sure the public setter is used so the property is dirty
+                //.ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
+                .ForMember(dest => dest.Permissions, map => map.Ignore())
                 .AfterMap((save, userGroup) =>
                 {
+                    //TODO: See above comment
+                    userGroup.Permissions = save.DefaultPermissions;
+
                     userGroup.ClearAllowedSections();
                     foreach (var section in save.Sections)
                     {
@@ -42,6 +48,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<UserSave, IUser>()
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
+                .ForMember(detail => detail.TourData, opt => opt.Ignore())
                 .ForMember(detail => detail.SessionTimeout, opt => opt.Ignore())
                 .ForMember(detail => detail.EmailConfirmedDate, opt => opt.Ignore())
                 .ForMember(detail => detail.UserType, opt => opt.Ignore())
@@ -75,6 +82,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<UserInvite, IUser>()
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(detail => detail.Id, opt => opt.Ignore())
+                .ForMember(detail => detail.TourData, opt => opt.Ignore())
                 .ForMember(detail => detail.StartContentIds, opt => opt.Ignore())
                 .ForMember(detail => detail.StartMediaIds, opt => opt.Ignore())
                 .ForMember(detail => detail.UserType, opt => opt.Ignore())
@@ -244,11 +252,13 @@ namespace Umbraco.Web.Models.Mapping
 
             //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
+            
             config.CreateMap<IUser, UserDisplay>()
-                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
+                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
+                .ForMember(detail => detail.Navigation, opt => opt.MapFrom(user => CreateUserEditorNavigation(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.CalculatedStartContentIds,
                     opt => opt.MapFrom(user => GetStartNodeValues(
@@ -306,7 +316,7 @@ namespace Umbraco.Web.Models.Mapping
                 //like the load time is waiting.
                 .ForMember(detail => 
                     detail.Avatars, 
-                    opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
+                    opt => opt.MapFrom(user => user.GetUserAvatarUrls(applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
@@ -326,7 +336,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.AdditionalData, opt => opt.Ignore());
 
             config.CreateMap<IUser, UserDetail>()
-                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetCurrentUserAvatarUrls(applicationContext.Services.UserService, applicationContext.ApplicationCache.RuntimeCache)))
+                .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(detail => detail.StartContentIds, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(detail => detail.StartMediaIds, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
@@ -368,19 +378,21 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IProfile, UserProfile>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
+        }
 
-            config.CreateMap<IUser, UserData>()
-                .ConstructUsing((IUser user) => new UserData())
-                .ForMember(detail => detail.Id, opt => opt.MapFrom(user => user.Id))
-                .ForMember(detail => detail.AllowedApplications, opt => opt.MapFrom(user => user.AllowedSections.ToArray()))
-                .ForMember(detail => detail.RealName, opt => opt.MapFrom(user => user.Name))
-                .ForMember(detail => detail.Roles, opt => opt.MapFrom(user => user.Groups.Select(x => x.Alias).ToArray()))
-                .ForMember(detail => detail.StartContentNodes, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
-                .ForMember(detail => detail.StartMediaNodes, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
-                .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
-                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => user.GetUserCulture(applicationContext.Services.TextService)))
-                .ForMember(detail => detail.SessionId, opt => opt.MapFrom(user => user.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : user.SecurityStamp));
-            
+        private IEnumerable<EditorNavigation> CreateUserEditorNavigation(ILocalizedTextService textService)
+        {
+            return new[]
+            {
+                new EditorNavigation
+                {
+                    Active = true,
+                    Alias = "details",
+                    Icon = "icon-umb-users",
+                    Name = textService.Localize("general/user"),
+                    View = "views/users/views/user/details.html"
+                }
+            };
         }
 
         private IEnumerable<EntityBasic> GetStartNodeValues(int[] startNodeIds,

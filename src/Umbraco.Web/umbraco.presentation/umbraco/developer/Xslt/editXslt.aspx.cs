@@ -33,9 +33,9 @@ namespace umbraco.cms.presentation.developer
 			if (!IsPostBack)
 			{
 				string file = Request.QueryString["file"];
-				string path = DeepLink.GetTreePathFromFilePath(file);
+				string path = DeepLink.GetTreePathFromFilePath(file, false, true);
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadXslt>().Tree.Alias)
+					.SetActiveTreeType(Constants.Trees.Xslt)
 					.SyncTree(path, false);
 			}
 
