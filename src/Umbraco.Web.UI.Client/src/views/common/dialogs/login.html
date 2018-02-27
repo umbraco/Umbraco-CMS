@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.Dialogs.LoginController">
+<div ng-controller="Umbraco.Dialogs.LoginController">
 
   <div id="login" class="umb-modalcolumn umb-dialog" ng-class="{'show-validation': loginForm.$invalid}" ng-cloak konami-code="activateKonamiMode()">
 
@@ -149,9 +149,14 @@
 
             <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
               <label><localize key="general_password">Password</localize></label>
-              <div class="password-toggle">
-                <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" /><a ng-click="togglePassword()">Toggle</a>
-              </div>
+              <input type="password" ng-model="password" name="password" 
+                     class="-full-width-input"
+                     localize="placeholder"
+                     placeholder="@placeholders_password" 
+                     autocorrect="off"
+                     autocapitalize="off"
+                     autocomplete="off"
+                     umb-password-toggle />
             </div>
 
             <div class="flex justify-between items-center">
