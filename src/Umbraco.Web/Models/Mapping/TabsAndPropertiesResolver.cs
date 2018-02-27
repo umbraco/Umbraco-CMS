@@ -217,7 +217,8 @@ namespace Umbraco.Web.Models.Mapping
             MapGenericProperties(umbracoContext, content, tabs);
 
             // activate the first tab
-            tabs[0].IsActive = true;
+            if (tabs.Count > 0)
+                tabs[0].IsActive = true;
 
             return tabs;
         }
