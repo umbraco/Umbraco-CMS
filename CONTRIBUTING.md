@@ -2,7 +2,7 @@
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
 
-The following is a set of guidelines for contributing to Umbraco and.
+The following is a set of guidelines for contributing to Umbraco CMS.
 
 These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
@@ -53,11 +53,11 @@ To find the general areas of something you're looking to fix or improve, have a 
 
 ### What branch should I target for my contributions?
 
-We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The only thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `dev-v7`. Whatever the default is, that's where we'd like you to target your contributions.
+We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `dev-v7`. Whatever the default is, that's where we'd like you to target your contributions.
 
 ![What branch do you want me to target?](tools/contributing/defaultbranch.png)
 
-### Building Umbraco from source
+### Building Umbraco from source code
 
 The easiest way to get started is to run `build.bat` which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
 
@@ -129,13 +129,13 @@ The most successful pull requests usually look a like this:
   * Unit tests, while optional are awesome, thank you!
   * New code is commented with documentation from which [the reference documentation](https://our.umbraco.org/documentation/Reference/) is generated
 
-Again, these are guidelines, not golden rules to live by. 
+Again, these are guidelines, not strict requirements. 
 
 ## Styleguides
 
 To be honest, we don't like rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
 
-That said, we follow the hints that ReSharper gives (no problem if you don't have this installed) us and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc. 
+That said, the Umbraco development team likes to follow the hints that ReSharper gives us (no problem if you don't have this installed) and we've added a `.editorconfig` file so that Visual Studio knows what to do with whitespace, line endings, etc. 
 
 ## How do I even begin?
 
@@ -150,10 +150,10 @@ Great question! The short version goes like this:
   ![Clone the fork](tools/contributing/clonefork.png)
 
   * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](#building-umbraco-from-source-code)
-  * **Change** - make your changes, experiment, have fun, explore and learn, don't be afraid, we welcome all contributions and will happily give feedback
+  * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will happily give feedback
   * **Commit** - done? Yay! 🎉 It is recommended to create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-U4-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `U4-12345`
   * **Push** - great, now you can push the changes up to your fork on GitHub
-  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to move on). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
+  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 
   ![Create a pull request](tools/contributing/createpullrequest.png)
 
