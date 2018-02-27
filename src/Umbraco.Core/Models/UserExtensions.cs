@@ -227,7 +227,7 @@ namespace Umbraco.Core.Models
 
         internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
         {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             hasPathAccess = false;
 
@@ -254,7 +254,7 @@ namespace Umbraco.Core.Models
             var ancestor = startNodePaths.Any(x => x.StartsWith(path));
             if (ancestor)
             {
-                hasPathAccess = false;
+                //hasPathAccess = false;
                 return true;
             }
 
@@ -328,13 +328,11 @@ namespace Umbraco.Core.Models
         private static T FromUserCache<T>(IUser user, string cacheKey)
             where T: class
         {
-            var entityUser = user as User;
-            if (entityUser == null) return null;
+            if (!(user is User entityUser)) return null;
 
             lock (entityUser.AdditionalDataLock)
             {
-                object allContentStartNodes;
-                return entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes)
+                return entityUser.AdditionalData.TryGetValue(cacheKey, out var allContentStartNodes)
                     ? allContentStartNodes as T
                     : null;
             }
@@ -343,8 +341,7 @@ namespace Umbraco.Core.Models
         private static void ToUserCache<T>(IUser user, string cacheKey, T vals)
             where T: class
         {
-            var entityUser = user as User;
-            if (entityUser == null) return;
+            if (!(user is User entityUser)) return;
 
             lock (entityUser.AdditionalDataLock)
             {
@@ -369,7 +366,7 @@ namespace Umbraco.Core.Models
                     binPath += Constants.System.RecycleBinMedia;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("objectType");
+                    throw new ArgumentOutOfRangeException(nameof(objectType));
             }
             return binPath;
         }
@@ -379,7 +376,9 @@ namespace Umbraco.Core.Models
             // assume groupSn and userSn each don't contain duplicates
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
-            var paths = entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
+            var paths = asn.Length > 0
+                ? entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path)
+                : new Dictionary<int, string>();
 
             paths[Constants.System.Root] = Constants.System.Root.ToString(); // entityService does not get that one
 
@@ -388,8 +387,7 @@ namespace Umbraco.Core.Models
             var lsn = new List<int>();
             foreach (var sn in groupSn)
             {
-                string snp;
-                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
+                if (paths.TryGetValue(sn, out var snp) == false) continue; // ignore rogue node (no path)
 
                 if (StartsWithPath(snp, binPath)) continue; // ignore bin
 
@@ -401,8 +399,7 @@ namespace Umbraco.Core.Models
             var usn = new List<int>();
             foreach (var sn in userSn)
             {
-                string snp;
-                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
+                if (paths.TryGetValue(sn, out var snp) == false) continue; // ignore rogue node (no path)
 
                 if (StartsWithPath(snp, binPath)) continue; // ignore bin
 

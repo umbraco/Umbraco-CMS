@@ -18,12 +18,15 @@ namespace Umbraco.Web.PropertyEditors
         public int? MaxItems { get; set; }
 
         [ConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Set whether item deletions should require confirming.")]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)] // do not try to map a null value to a boolean
         public bool ConfirmDeletes { get; set; } = true;
 
         [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Set whether to show the items doc type icon in the list.")]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)] // do not try to map a null value to a boolean
         public bool ShowIcons { get; set; } = true;
 
         [ConfigurationField("hideLabel", "Hide Label", "boolean", Description = "Set whether to hide the editor label and have the list take up the full width of the editor window.")]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)] // do not try to map a null value to a boolean
         public bool HideLabel { get; set; }
 
         public class ContentType

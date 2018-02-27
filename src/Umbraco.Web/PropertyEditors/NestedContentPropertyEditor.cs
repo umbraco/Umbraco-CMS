@@ -115,7 +115,7 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 // convert the value, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-                                var convValue = propEditor.ValueEditor.ConvertDbToString(propType, propValues[propAlias], dataTypeService);
+                                var convValue = propEditor.ValueEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
                                 propValues[propAlias] = convValue;
                             }
                             catch (InvalidOperationException)
