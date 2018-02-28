@@ -1,4 +1,15 @@
-﻿(function () {
+﻿/**
+@ngdoc directive
+@name umbraco.directives.directive:umbPasswordToggle
+@restrict E
+@scope
+
+@description
+<strong>Added in Umbraco v. 7.7.4:</strong> Use this directive to render a password toggle.
+
+**/
+
+(function () {
     'use strict';
 
     // comes from https://codepen.io/jakob-e/pen/eNBQaP

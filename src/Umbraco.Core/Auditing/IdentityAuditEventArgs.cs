@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Security;
@@ -45,12 +46,8 @@ namespace Umbraco.Core.Auditing
         /// </summary>
         public string Username { get; private set; }
 
-        /// <summary>
-        /// Sets the properties on the event being raised, all parameters are optional except for the action being performed
-        /// </summary>
-        /// <param name="action">An action based on the AuditEvent enum</param>
-        /// <param name="ipAddress">The client's IP address. This is usually automatically set but could be overridden if necessary</param>
-        /// <param name="performingUser">The Id of the user performing the action (if different from the user affected by the action)</param>
+        [Obsolete("Use the method that has the affectedUser parameter instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser = -1)
         {
             DateTimeUtc = DateTime.UtcNow;
@@ -63,6 +60,35 @@ namespace Umbraco.Core.Auditing
                 : performingUser;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="ipAddress"></param>
+        /// <param name="comment"></param>
+        /// <param name="performingUser"></param>
+        /// <param name="affectedUser"></param>
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, int performingUser = -1, int affectedUser = -1)
+        {
+            DateTimeUtc = DateTime.UtcNow;
+            Action = action;
+
+            IpAddress = ipAddress;
+            Comment = comment;
+            AffectedUser = affectedUser;
+
+            PerformingUser = performingUser == -1
+                ? GetCurrentRequestBackofficeUserId()
+                : performingUser;
+        }
+
+        /// <summary>
+        /// Creates an instance without a performing or affected user (the id will be set to -1)
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="ipAddress"></param>
+        /// <param name="username"></param>
+        /// <param name="comment"></param>
         public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment)
         {
             DateTimeUtc = DateTime.UtcNow;
@@ -71,6 +97,22 @@ namespace Umbraco.Core.Auditing
             IpAddress = ipAddress;
             Username = username;
             Comment = comment;
+
+            PerformingUser = -1;
+        }
+
+        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string username, string comment, int performingUser)
+        {
+            DateTimeUtc = DateTime.UtcNow;
+            Action = action;
+
+            IpAddress = ipAddress;
+            Username = username;
+            Comment = comment;
+
+            PerformingUser = performingUser == -1
+                ? GetCurrentRequestBackofficeUserId()
+                : performingUser;
         }
 
         /// <summary>

@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -62,6 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 FormatDeleteStatement("cmsTagRelationship", "nodeId"),
                 FormatDeleteStatement("umbracoDomains", "domainRootStructureID"),
                 FormatDeleteStatement("cmsDocument", "nodeId"),
+                FormatDeleteStatement("cmsMedia", "nodeId"),
                 FormatDeleteStatement("cmsPropertyData", "contentNodeId"),
                 FormatDeleteStatement("cmsPreviewXml", "nodeId"),
                 FormatDeleteStatement("cmsContentVersion", "ContentId"),

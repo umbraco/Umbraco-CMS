@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
 
         var vm = this;
 
@@ -16,7 +16,7 @@
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
         vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
-
+        
         //create the initial model for change password
         vm.changePasswordModel = {
           config: {},
@@ -31,8 +31,10 @@
         vm.disableUser = disableUser;
         vm.enableUser = enableUser;
         vm.unlockUser = unlockUser;
+        vm.changeAvatar = changeAvatar;
         vm.clearAvatar = clearAvatar;
         vm.save = save;
+
         vm.toggleChangePassword = toggleChangePassword;
 
         function init() {
@@ -117,38 +119,83 @@
 
         function save() {
 
-            vm.page.saveButtonState = "busy";
-            vm.user.resetPasswordValue = null;
+            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
 
-            //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
-            if(vm.user.changePassword) {
-            vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
+                if (vm.user.changePassword) {
+                    vm.user.changePassword.reset = !vm.user.changePassword.oldPassword && !vm.user.isCurrentUser;
+                }
+
+                vm.page.saveButtonState = "busy";
+                vm.user.resetPasswordValue = null;
+
+                //save current nav to be restored later so that the tabs dont change
+                var currentNav = vm.user.navigation;
+
+                usersResource.saveUser(vm.user)
+                    .then(function (saved) {
+
+                        //if the user saved, then try to execute all extended save options
+                        extendedSave(saved).then(function(result) {
+                            //if all is good, then reset the form
+                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
+                        }, function(err) {
+                            //otherwise show the notifications for the user being saved
+                            formHelper.showNotifications(saved);
+                        });
+                        
+                        vm.user = _.omit(saved, "navigation");
+                        //restore
+                        vm.user.navigation = currentNav;
+                        setUserDisplayState();
+                        formatDatesToLocal(vm.user);
+
+                        vm.changePasswordModel.isChanging = false;
+                        //the user has a password if they are not states: Invited, NoCredentials
+                        vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
+
+                        vm.page.saveButtonState = "success";
+
+                    }, function (err) {
+
+                        contentEditingHelper.handleSaveError({
+                            redirectOnFailure: false,
+                            err: err
+                        });
+                        //show any notifications
+                        if (err.data) {
+                            formHelper.showNotifications(err.data);
+                        }
+                        vm.page.saveButtonState = "error";
+                    });
             }
+        }
 
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: vm.labels.saving,
-                saveMethod: usersResource.saveUser,
-                scope: $scope,
-                content: vm.user,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
-                rebindCallback: function (orignal, saved) { }
-            }).then(function (saved) {
+        /**
+         * Used to emit the save event and await any async operations being performed by editor extensions
+         * @param {any} savedUser
+         */
+        function extendedSave(savedUser) {
 
-                vm.user = saved;
-                setUserDisplayState();
-                formatDatesToLocal(vm.user);
+            //used to track any promises added by the event handlers to be awaited
+            var promises = [];
+            
+            var args = {
+                //getPromise: getPromise,
+                user: savedUser,
+                //a promise can be added by the event handler if the handler needs an async operation to be awaited
+                addPromise: function (p) {
+                    promises.push(p);
+                }
+            };
 
-                vm.changePasswordModel.isChanging = false;
-                vm.page.saveButtonState = "success";
-
-                //the user has a password if they are not states: Invited, NoCredentials
-                vm.changePasswordModel.config.hasPassword = vm.user.userState !== 3 && vm.user.userState !== 4;
-            }, function (err) {
-                vm.page.saveButtonState = "error";
-            });
+            //emit the event
+            eventsService.emit("editors.user.editController.save", args);
+            
+            //await all promises to complete
+            var resultPromise = $q.all(promises);
+            
+            return resultPromise;
         }
 
         function goToPage(ancestor) {
@@ -310,7 +357,7 @@
             });
         }
 
-        $scope.changeAvatar = function (files, event) {
+        function changeAvatar(files, event) {
             if (files && files.length > 0) {
                 upload(files[0]);
             }

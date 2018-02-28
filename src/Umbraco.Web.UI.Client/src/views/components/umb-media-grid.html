@@ -1,9 +1,9 @@
-<div class="umb-media-grid">
-    <div class="umb-media-grid__item" title="{{item.name}}" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-svg': item.extension == 'svg'}">
+<div data-element="media-grid" class="umb-media-grid">
+    <div data-element="media-grid-item-{{$index}}" class="umb-media-grid__item" title="{{item.name}}" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" ng-class="{'-selected': item.selected, '-file': !item.thumbnail, '-svg': item.extension == 'svg'}">
         <div>
             <i ng-show="item.selected" class="icon-check umb-media-grid__checkmark"></i>
 
-            <div class="umb-media-grid__item-overlay" ng-class="{'-locked': item.selected}" ng-click="clickItemName(item, $event, $index)">
+            <div data-element="media-grid-item-edit" class="umb-media-grid__item-overlay" ng-class="{'-locked': item.selected}" ng-click="clickItemName(item, $event, $index)">
                 <i ng-if="onDetailsHover" class="icon-info umb-media-grid__info" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></i>
                 <div class="umb-media-grid__item-name">{{item.name}}</div>
             </div>

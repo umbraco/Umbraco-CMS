@@ -18,8 +18,13 @@ namespace Umbraco.Web.Models.ContentEditing
             AvailableCultures = new Dictionary<string, string>();
             StartContentIds = new List<EntityBasic>();
             StartMediaIds = new List<EntityBasic>();
+            Navigation = new List<EditorNavigation>();
         }
-        
+
+        [DataMember(Name = "navigation")]
+        [ReadOnly(true)]
+        public IEnumerable<EditorNavigation> Navigation { get; set; }
+
         /// <summary>
         /// Gets the available cultures (i.e. to populate a drop down)
         /// The key is the culture stored in the database, the value is the Name

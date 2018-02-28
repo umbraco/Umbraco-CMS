@@ -13,9 +13,9 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class PreValueDisplayResolver : ValueResolver<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>
     {
-        private readonly Lazy<IDataTypeService> _dataTypeService;
+        private readonly IDataTypeService _dataTypeService;
 
-        public PreValueDisplayResolver(Lazy<IDataTypeService> dataTypeService)
+        public PreValueDisplayResolver(IDataTypeService dataTypeService)
         {
             _dataTypeService = dataTypeService;
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             //set up the defaults
-            var dataTypeService = _dataTypeService.Value;
+            var dataTypeService = _dataTypeService;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(source.Id);
             IDictionary<string, object> dictionaryVals = preVals.FormatAsDictionary().ToDictionary(x => x.Key, x => (object)x.Value);
             var result = Enumerable.Empty<PreValueFieldDisplay>().ToArray();

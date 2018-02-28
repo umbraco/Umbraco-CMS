@@ -80,6 +80,7 @@
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
     <key alias="saveAndPublish">Spara och publicera</key>
+    <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="select">Välj</key>
     <key alias="selectCurrentFolder">Välj aktuell mapp</key>
@@ -780,6 +781,12 @@
     <key alias="template">Sidmall</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Lägg till</key>
     <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>

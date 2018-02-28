@@ -1,8 +1,9 @@
 <div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Overlay.PropertySettingsOverlay as vm">
 
-   <div class="umb-control-group">
+   <div class="umb-control-group" ng-if="!model.property.locked">
        <div class="control-group">
            <textarea class="editor-label"
+               data-element="property-name"
                name="propertyLabel"
                ng-model="model.property.label"
                localize="placeholder"
@@ -22,6 +23,7 @@
 
    <div class="umb-control-group control-group">
       <textarea
+          data-element="property-description"
           class="editor-description"
           ng-model="model.property.description"
           localize="placeholder"
@@ -31,9 +33,9 @@
       </textarea>
    </div>
 
-   <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component>
+   <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
 
-      <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">
+      <a data-element="editor-add" href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">
           <localize key="shortcuts_addEditor"></localize>
       </a>
 
@@ -59,7 +61,7 @@
 
    </div>
 
-   <div class="umb-control-group clearfix">
+   <div class="umb-control-group clearfix"  ng-if="!model.property.locked">
 
        <h5><localize key="validation_validation"></localize></h5>
 
@@ -88,21 +90,30 @@
 
    <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
 
-       <h5><localize key="general_rights"></localize></h5>
-
+       <h5><localize key="general_options"></localize></h5>
+       
        <label class="checkbox no-indent">
-          <input type="checkbox" ng-model="model.property.showOnMemberProfile">
-          <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+           <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+           <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+           <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
        </label>
 
-      <label class="checkbox no-indent">
-         <input type="checkbox" ng-model="model.property.memberCanEdit">
-         <localize key="contentTypeEditor_memberCanEdit"></localize>
-      </label>
+       <label class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.memberCanEdit">
+           <localize key="contentTypeEditor_memberCanEdit"></localize>
+           <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
+       </label>
+
+       <label ng-if="vm.showSensitiveData" class="checkbox no-indent">
+           <input type="checkbox" ng-model="model.property.isSensitiveData">
+           <localize key="contentTypeEditor_isSensitiveData"></localize>
+           <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
+       </label>
 
    </div>
 
    <umb-overlay
+      data-element="overlay-editor-picker"
       ng-if="vm.editorPickerOverlay.show"
       model="vm.editorPickerOverlay"
       position="right"
@@ -110,6 +121,7 @@
    </umb-overlay>
 
    <umb-overlay
+      data-element="overlay-editor-settings"
       ng-if="vm.editorSettingsOverlay.show"
       model="vm.editorSettingsOverlay"
       position="right"

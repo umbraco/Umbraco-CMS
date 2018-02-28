@@ -13,7 +13,7 @@ namespace UmbracoExamine.DataServices
 {
     public class UmbracoContentService : IContentService
     {
-        private readonly ApplicationContext _applicationContext;
+        protected ApplicationContext ApplicationContext { get; private set; }
 
 		public UmbracoContentService()
 			: this(ApplicationContext.Current)
@@ -21,7 +21,7 @@ namespace UmbracoExamine.DataServices
 
         public UmbracoContentService(ApplicationContext applicationContext)
 		{
-            _applicationContext = applicationContext;
+            ApplicationContext = applicationContext;
 		}
 
         /// <summary>
@@ -60,11 +60,11 @@ namespace UmbracoExamine.DataServices
             using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             {
                 var xmlContent = XDocument.Parse("<content></content>");
-                var rootContent = _applicationContext.Services.ContentService.GetRootContent();
+                var rootContent = ApplicationContext.Services.ContentService.GetRootContent();
                 foreach (var c in rootContent)
                 {
                     // not sure this uses the database, but better be save
-                    xmlContent.Root.Add(c.ToDeepXml(_applicationContext.Services.PackagingService));
+                    xmlContent.Root.Add(c.ToDeepXml(ApplicationContext.Services.PackagingService));
                 }
                 var result = ((IEnumerable)xmlContent.XPathEvaluate(xpath)).Cast<XElement>();
                 scope.Complete();
@@ -82,7 +82,7 @@ namespace UmbracoExamine.DataServices
         {
             using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             {
-                var ret = _applicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
+                var ret = ApplicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
                 scope.Complete();
                 return ret;
             }
@@ -93,14 +93,26 @@ namespace UmbracoExamine.DataServices
         /// </summary>
         /// <returns></returns>
 		
-		public IEnumerable<string> GetAllUserPropertyNames()
+		public virtual IEnumerable<string> GetAllUserPropertyNames()
 	    {
             using (var scope = ApplicationContext.Current.ScopeProvider.CreateScope())
             {
                 try
 	            {
-	                var result = _applicationContext.DatabaseContext.Database.Fetch<string>("select distinct alias from cmsPropertyType order by alias");
-	                scope.Complete();
+                    //only return the property type aliases for media and content
+
+	                var result = ApplicationContext.DatabaseContext.Database.Fetch<string>(
+                        @"select distinct cmsPropertyType.alias from cmsPropertyType 
+                        inner join cmsContentType on cmsContentType.nodeId = cmsPropertyType.contentTypeId
+                        inner join umbracoNode on umbracoNode.id = cmsContentType.nodeId
+                        where umbracoNode.nodeObjectType = @contentNodeObjectType OR umbracoNode.nodeObjectType = @mediaNodeObjectType
+                        order by alias", new
+                        {
+                            contentNodeObjectType = Constants.ObjectTypes.DocumentType,
+                            mediaNodeObjectType = Constants.ObjectTypes.MediaType
+                        });
+
+                    scope.Complete();
 	                return result;
 	            }
 	            catch (Exception ex)

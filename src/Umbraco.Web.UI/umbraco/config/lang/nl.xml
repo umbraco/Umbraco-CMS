@@ -452,7 +452,7 @@
     <key alias="email">Email</key>
     <key alias="error">Fout</key>
     <key alias="findDocument">Vind</key>
-    <key alias="height">Hogte</key>
+    <key alias="height">Hoogte</key>
     <key alias="help">Help</key>
     <key alias="icon">Icoon</key>
     <key alias="import">Import</key>
@@ -1039,6 +1039,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="template">Sjabloon</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Item toevoegen</key>
     <key alias="chooseLayout">Kies de indeling</key>
     <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>

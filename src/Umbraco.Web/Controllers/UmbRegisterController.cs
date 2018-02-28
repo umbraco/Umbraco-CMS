@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
-using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -19,6 +15,13 @@ namespace Umbraco.Web.Controllers
             if (ModelState.IsValid == false)
             {
                 return CurrentUmbracoPage();
+            }
+
+            // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
+            // If name field is empty, add the email address instead
+            if (string.IsNullOrEmpty(model.Name) && string.IsNullOrEmpty(model.Email) == false)
+            {
+                model.Name = model.Email;
             }
 
             MembershipCreateStatus status;
@@ -36,7 +39,6 @@ namespace Umbraco.Web.Controllers
                         return Redirect(model.RedirectUrl);
                     }
                     //redirect to current page by default
-                    
                     return RedirectToCurrentUmbracoPage();
                 case MembershipCreateStatus.InvalidUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)

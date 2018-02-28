@@ -132,7 +132,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IContent entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(entity.IsBlueprint ? Constants.UdiEntityType.DocumentBluePrint : Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
+            return new GuidUdi(entity.IsBlueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
         }
 
         /// <summary>

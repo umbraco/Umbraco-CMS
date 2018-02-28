@@ -153,6 +153,7 @@
     <key alias="listNumeric">Нумерованный список</key>
     <key alias="macroInsert">Вставить макрос</key>
     <key alias="pictureInsert">Вставить изображение</key>
+    <key alias="redo">Повторить</key>
     <key alias="relations">Править связи</key>
     <key alias="returnToList">Вернуться к списку</key>
     <key alias="save">Сохранить</key>
@@ -168,6 +169,7 @@
     <key alias="styleChoose">Выбрать стиль</key>
     <key alias="styleShow">Показать стили</key>
     <key alias="tableInsert">Вставить таблицу</key>
+    <key alias="undo">Отменить</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">Чтобы сменить тип документа для выбранного узла, сначала выберите тип из списка разрешенных для данного расположения.</key>
@@ -375,6 +377,7 @@
     <key alias="macroContainerSettings">Свойства макроса</key>
     <key alias="macroDoesNotHaveProperties">Этот макрос не имеет редактируемых свойств</key>
     <key alias="nodeNameLinkPicker">Заголовок ссылки</key>
+    <key alias="noIconsFound">Ни одной пиктограммы не найдено</key>
     <key alias="paste">Вставить</key>
     <key alias="permissionsEdit">Изменить разрешения для</key>
     <key alias="permissionsSet">Установить разрешения для</key>
@@ -596,6 +599,7 @@
     <key alias="new">Новый</key>
     <key alias="next">След</key>
     <key alias="no">Нет</key>
+    <key alias="noItemsInList">Здесь пока нет элементов</key>
     <key alias="of">из</key>
     <key alias="off">Выкл</key>
     <key alias="ok">Ok</key>
@@ -663,6 +667,12 @@
     <key alias="text">Текст</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="addElement">Добавить содержимое</key>
     <key alias="dropElement">Сбросить содержимое</key>
     <key alias="addGridLayout">Добавить шаблон сетки</key>
@@ -696,6 +706,8 @@
     <key alias="chooseExtra">Выбрать дополнительно</key>
     <key alias="chooseDefault">Выбрать по-умолчанию</key>
     <key alias="areAdded">добавлены</key>
+    <key alias="maxItemsDescription">Оставьте пустым или задайте 0 для снятия лимита</key>
+    <key alias="maxItems">Максимальное количество</key>
   </area>
   <area alias="headers">
     <key alias="page">Страница</key>
@@ -1049,7 +1061,7 @@
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[
 		Выберите файл пакета на своем компьютере, нажав на кнопку 'Обзор'<br />
-		и указав на нужный файл. Пакеты Umbraco обычно являются архивами с расширением ".umb" или ".zip".
+		и указав на нужный файл. Пакеты Umbraco обычно являются архивами с расширением '.zip'.
 		]]></key>
     <key alias="dropHere">Перетащите сюда</key>
     <key alias="orClickHereToUpload">или нажмите здесь для выбора файла пакета</key>
@@ -1215,12 +1227,12 @@
   </area>
   <area alias="relatedlinks">
     <key alias="caption">Заголовок</key>
-    <key alias="captionPlaceholder">Укажите заголовок</key>
+    <key alias="captionPlaceholder">Укажите заголовок ссылки</key>
     <key alias="chooseInternal">выбрать страницу сайта</key>
     <key alias="enterExternal">указать внешнюю ссылку</key>
     <key alias="externalLinkPlaceholder">Укажите ссылку</key>
     <key alias="link">Ссылка</key>
-    <key alias="newWindow">В новом окне</key>
+    <key alias="newWindow">Открыть в новом окне</key>
   </area>
   <area alias="renamecontainer">
     <key alias="renamed">Переименована</key>
@@ -1393,8 +1405,6 @@
     <key alias="disableUserSuccess">'%0%' сейчас заблокирован</key>
     <key alias="disableUserError">При блокировке пользователя произошла ошибка</key>
     <key alias="setUserGroupOnUsersSuccess">Группы пользователей установлены</key>
-    <key alias="deleteUserGroupsSuccess">Удалено %0% групп пользователей</key>
-    <key alias="deleteUserGroupSuccess">'%0%' была удалена</key>
     <key alias="unlockUsersSuccess">Разблокировано %0% пользователей</key>
     <key alias="unlockUsersError">При разблокировке пользователей произошла ошибка</key>
     <key alias="unlockUserSuccess">'%0%' сейчас разблокирован</key>
@@ -1517,8 +1527,8 @@
     <key alias="fallbackField">Поле замены</key>
     <key alias="addDefaultValue">Добавить значение по-умолчанию</key>
     <key alias="defaultValue">Значение по-умолчанию</key>
-    <key alias="alternativeField">Альтернативное поле</key>
-    <key alias="alternativeText">Текст по-умолчанию</key>
+    <key alias="alternativeField">Поле замены</key>
+    <key alias="alternativeText">Значение по-умолчанию</key>
     <key alias="casing">Регистр</key>
     <key alias="chooseField">Выбрать поле</key>
     <key alias="convertLineBreaks">Преобразовать переводы строк</key>
@@ -1715,11 +1725,22 @@
     <key alias="profile">Профиль</key>
     <key alias="resetPassword">Сбросить пароль</key>
     <key alias="searchAllChildren">Поиск всех дочерних документов</key>
+    <key alias="selectUserGroups">Выбрать группы пользователей</key>
     <key alias="sendInvite">Отправить приглашение</key>
     <key alias="sessionExpires" version="7.0">Сессия истекает через</key>
     <key alias="sectionsHelp">Разделы, доступные пользователю</key>
     <key alias="noStartNode">Начальный узел не задан</key>
     <key alias="noStartNodes">Начальные узлы не заданы</key>
+    <key alias="sortNameAscending">Имя (А-Я)</key>
+    <key alias="sortNameDescending">Имя (Я-А)</key>
+    <key alias="sortCreateDateDescending">Сначала новые</key>
+    <key alias="sortCreateDateAscending">Сначала старые</key>
+    <key alias="sortLastLoginDateDescending">Недавно зашедшие</key>
+    <key alias="stateActive">Активные</key>
+    <key alias="stateAll">Все</key>
+    <key alias="stateDisabled">Отключенные</key>
+    <key alias="stateLockedOut">Заблокированные</key>
+    <key alias="stateInvited">Приглашенные</key>
     <key alias="startnode">Начальный узел содержимого</key>
     <key alias="startnodehelp">Можно ограничить доступ к дереву содержимого (какой-либо его части), задав начальный узел</key>
     <key alias="startnodes">Начальные узлы содержимого</key>
@@ -1736,6 +1757,7 @@
     <key alias="userInvitedSuccessHelp">Новому пользователю было отправлено приглашение, в котором содержатся инструкции для входа в панель Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Здравствуйте и добро пожаловать в Umbraco! Все будет готово в течении пары минут, нам лишь нужно задать Ваш пароль для входа и добавить аватар.</key>
     <key alias="userinviteAvatarMessage">Загрузите изображение, это поможет другим пользователям идентифицировать Вас.</key>
+    <key alias="userManagement">Управление пользователями</key>
     <key alias="userPermissions">Разрешения для пользователя</key>
     <key alias="writer">Автор</key>
     <key alias="yourHistory" version="7.0">Ваша недавняя история</key>

@@ -39,8 +39,16 @@ namespace Umbraco.Core.Services
             int? val;
             using (var uow = _uowProvider.GetUnitOfWork())
             {
-                val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                    new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                //if it's unknown don't include the nodeObjectType in the query
+                if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+                {
+                    val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
+                }
+                else
+                {
+                    val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                        new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                }
                 uow.Commit();
             }
 
@@ -92,8 +100,16 @@ namespace Umbraco.Core.Services
             Guid? val;
             using (var uow = _uowProvider.GetUnitOfWork())
             {
-                val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                    new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                //if it's unknown don't include the nodeObjectType in the query
+                if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+                {
+                    val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
+                }
+                else
+                {
+                    val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                        new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                }
                 uow.Commit();
             }
 

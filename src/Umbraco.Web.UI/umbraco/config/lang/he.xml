@@ -32,11 +32,6 @@
     <key alias="sort">מיין</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
-    <key alias="DeleteCMSImportAction">מחק</key>
-    <key alias="ExecuteCMSImportWizardAction">בצע</key>
-    <key alias="ScheduleCMSImportWizardAction">תזמן</key>
-    <key alias="StartCMSImportWizardAction">ייבא נתונים</key>
-    <key alias="StartCMSImportChildDefinitionAction">צור הגדרות ילדים</key>
     <key alias="LastRunInfoAction">יומן משימות מתוזמנות</key>
   </area>
   <area alias="assignDomain">
@@ -750,6 +745,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">תבנית</key>
   </area>
   <area alias="grid">
+      <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
