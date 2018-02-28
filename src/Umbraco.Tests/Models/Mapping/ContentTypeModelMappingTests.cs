@@ -494,18 +494,18 @@ namespace Umbraco.Tests.Models.Mapping
 
             //TODO: Now we need to assert all of the more complicated parts
 
-            Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count());
-            for (var i = 0; i < contentType.PropertyGroups.Count(); i++)
+            Assert.AreEqual(contentType.PropertyGroups.Count, result.Groups.Count());
+            for (var i = 0; i < contentType.PropertyGroups.Count; i++)
             {
-                Assert.AreEqual(contentType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
-                Assert.AreEqual(contentType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
-                var propTypes = contentType.PropertyGroups.ElementAt(i).PropertyTypes;
+                Assert.AreEqual(contentType.PropertyGroups[i].Id, result.Groups.ElementAt(i).Id);
+                Assert.AreEqual(contentType.PropertyGroups[i].Name, result.Groups.ElementAt(i).Name);
+                var propTypes = contentType.PropertyGroups[i].PropertyTypes;
 
-                Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
-                for (var j = 0; j < propTypes.Count(); j++)
+                Assert.AreEqual(propTypes.Count, result.Groups.ElementAt(i).Properties.Count());
+                for (var j = 0; j < propTypes.Count; j++)
                 {
-                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
-                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    Assert.AreEqual(propTypes[j].Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes[j].DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
                 }
             }
 
