@@ -14,7 +14,7 @@
         }
     }
 
-    var altText = Model.value.altText ?? String.Empty;
+    var altText = Model.value.altText ?? Model.value.caption ?? String.Empty;
     
     <img src="@url" alt="@altText">
     
