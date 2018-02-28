@@ -14,6 +14,10 @@ namespace Umbraco.Web.Editors
         public ActionResult Index()
         {
             ViewData["DisableDevicePreview"] = FeaturesResolver.Current.Features.Disabled.DevicePreview;
+            if (string.IsNullOrWhiteSpace(FeaturesResolver.Current.Features.Enabled.ExtendPreviewHtml) == false)
+            {
+                ViewData["ExtendPreviewHtml"] = FeaturesResolver.Current.Features.Enabled.ExtendPreviewHtml;
+            }
             return View(ViewsPath + "Index.cshtml");
         }
 
