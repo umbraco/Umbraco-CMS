@@ -22,7 +22,7 @@ namespace Umbraco.Web.Mvc
         {
             context.MapRoute(
                 "Umbraco_preview",
-                GlobalSettings.UmbracoMvcArea + "/previews/{action}/{editor}",
+                GlobalSettings.UmbracoMvcArea + "/preview/{action}/{editor}",
                 new {controller = "Preview", action = "Index", editor = UrlParameter.Optional},
                 new[] { "Umbraco.Web.Editors" });
 
