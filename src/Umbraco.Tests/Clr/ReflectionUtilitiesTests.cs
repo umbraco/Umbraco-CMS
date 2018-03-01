@@ -269,15 +269,12 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void SetterCanCastValue()
+        public void SetterCanCastUnsafeValue()
         {
             // test that we can emit property setters that cast from eg 'object'
 
-            // well - no - we don't do this
-
-            /*
-
             var type4 = typeof(Class4);
+            var propInt4 = type4.GetProperty("IntValue");
             var propString4 = type4.GetProperty("StringValue");
             var propClassA4 = type4.GetProperty("ClassAValue");
 
@@ -286,37 +283,70 @@ namespace Umbraco.Tests.Clr
 
             // works with a string property
             Assert.IsNotNull(propString4);
-            var setterString4 = ReflectionUtilities.EmitPropertySetter<Class4, object>(propString4);
+            var setterString4 = ReflectionUtilities.EmitPropertySetterUnsafe<Class4, object>(propString4);
             Assert.IsNotNull(setterString4);
             setterString4(object4, "foo");
             Assert.IsNotNull(object4.StringValue);
             Assert.AreEqual("foo", object4.StringValue);
 
-            setterString4(object4, new Class2());
+            // unsafe is... unsafe
+            Assert.Throws<InvalidCastException>(() => setterString4(object4, new Class2()));
 
             // works with a reference property
             Assert.IsNotNull(propClassA4);
-            var setterClassA4 = ReflectionUtilities.EmitPropertySetter<Class4, object>(propClassA4);
+            var setterClassA4 = ReflectionUtilities.EmitPropertySetterUnsafe<Class4, object>(propClassA4);
             Assert.IsNotNull(setterClassA4);
             setterClassA4(object4, object2A);
             Assert.IsNotNull(object4.ClassAValue);
             Assert.AreEqual(object2A, object4.ClassAValue);
 
-            */
+            // works with a boxed value type
+            Assert.IsNotNull(propInt4);
+            var setterInt4 = ReflectionUtilities.EmitPropertySetterUnsafe<Class4, object>(propInt4);
+            Assert.IsNotNull(setterInt4);
+
+            setterInt4(object4, 42);
+            Assert.AreEqual(42, object4.IntValue);
+
+            // converting works
+            setterInt4(object4, 42.0);
+            Assert.AreEqual(42, object4.IntValue);
+
+            // unsafe is... unsafe
+            Assert.Throws<FormatException>(() => setterInt4(object4, "foo"));
         }
 
         [Test]
         public void SetterCanCastObject()
         {
+            // Class5 inherits from Class4 and ClassValue is defined on Class4
+
             var type5 = typeof(Class5);
             var propClass4 = type5.GetProperty("ClassValue");
 
             var object2 = new Class2();
-            var object4 = new Class5();
 
             // can cast the object type from Class5 to Class4
             var setterClass4 = ReflectionUtilities.EmitPropertySetter<Class5, Class2>(propClass4);
 
+            var object4 = new Class5();
+            setterClass4(object4, object2);
+            Assert.IsNotNull(object4.ClassValue);
+            Assert.AreSame(object2, object4.ClassValue);
+        }
+
+        [Test]
+        public void SetterCanCastUnsafeObject()
+        {
+            var type5 = typeof(Class5);
+            var propClass4 = type5.GetProperty("ClassValue");
+
+            var object2 = new Class2();
+
+            // can cast the object type from object to Class4
+            var setterClass4 = ReflectionUtilities.EmitPropertySetterUnsafe<object, Class2>(propClass4);
+
+            var object4 = new Class5();
             setterClass4(object4, object2);
             Assert.IsNotNull(object4.ClassValue);
             Assert.AreSame(object2, object4.ClassValue);
@@ -516,6 +546,7 @@ namespace Umbraco.Tests.Clr
         // conv.i4
         public void SetIntValue(Class4 object4, double d) => object4.IntValue = (int) d;
 
+        // unbox.any    [mscorlib]System.Double
         // conv.i4
         public void SetIntValue2(Class4 object4, object d) => object4.IntValue = (int) (double) d;
 

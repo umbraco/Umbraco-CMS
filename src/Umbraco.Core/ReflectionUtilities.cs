@@ -296,7 +296,7 @@ namespace Umbraco.Core
             (var dm, var ilgen) = CreateIlGenerator(ctor.DeclaringType?.Module, lambdaParameters, declaring);
             EmitLdargs(ilgen, lambdaParameters, ctorParameters);
             ilgen.Emit(OpCodes.Newobj, ctor); // ok to just return, it's only objects
-            ilgen.Emit(OpCodes.Ret);
+            ilgen.Return();
 
             return (TLambda) (object) dm.CreateDelegate(typeof(TLambda));
         }
@@ -342,7 +342,7 @@ namespace Umbraco.Core
         {
             if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentNullOrEmptyException(nameof(methodName));
 
-            (_, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(true, out var isFunction);
+            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(true, out var isFunction);
 
             // get the method infos
             var method = declaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static, null, lambdaParameters, null);
@@ -353,7 +353,7 @@ namespace Umbraco.Core
             }
 
             // emit
-            return EmitMethod<TLambda>(lambdaReturned, lambdaParameters, method);
+            return EmitMethod<TLambda>(lambdaDeclaring, lambdaReturned, lambdaParameters, method);
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace Umbraco.Core
                 ThrowInvalidLambda<TLambda>(method.Name, methodReturned, methodParameters);
 
             // emit
-            return EmitMethod<TLambda>(lambdaReturned, lambdaParameters, method);
+            return EmitMethod<TLambda>(lambdaDeclaring, lambdaReturned, lambdaParameters, method);
         }
 
         /// <summary>
@@ -408,10 +408,10 @@ namespace Umbraco.Core
             if (method == null) throw new ArgumentNullException(nameof(method));
 
             var isStatic = method.IsStatic;
-            (_, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out _);
+            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out _);
 
             // emit - unsafe - use lambda's args and assume they are correct
-            return EmitMethod<TLambda>(lambdaReturned, lambdaParameters, method);
+            return EmitMethod<TLambda>(lambdaDeclaring, lambdaReturned, lambdaParameters, method);
         }
 
         /// <summary>
@@ -433,30 +433,30 @@ namespace Umbraco.Core
                 throw new ArgumentNullOrEmptyException(nameof(methodName));
 
             // validate lambda type
-            (var declaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(false, out var isFunction);
+            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(false, out var isFunction);
 
             // get the method infos
-            var method = declaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
+            var method = lambdaDeclaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
             if (method == null || isFunction && method.ReturnType != lambdaReturned)
             {
                 if (!mustExist) return default;
-                throw new InvalidOperationException($"Could not find method {declaring}.{methodName}({string.Join(", ", (IEnumerable<Type>) lambdaParameters)}).");
+                throw new InvalidOperationException($"Could not find method {lambdaDeclaring}.{methodName}({string.Join(", ", (IEnumerable<Type>) lambdaParameters)}).");
             }
 
             // emit
-            return EmitMethod<TLambda>(lambdaReturned, lambdaParameters, method);
+            return EmitMethod<TLambda>(lambdaDeclaring, lambdaReturned, lambdaParameters, method);
         }
 
         // lambdaReturned = the lambda returned type (can be void)
         // lambdaArgTypes = the lambda argument types
-        private static TLambda EmitMethod<TLambda>(Type lambdaReturned, Type[] lambdaParameters, MethodInfo method)
+        private static TLambda EmitMethod<TLambda>(Type lambdaDeclaring, Type lambdaReturned, Type[] lambdaParameters, MethodInfo method)
         {
             // non-static methods need the declaring type as first arg
             var parameters = lambdaParameters;
             if (!method.IsStatic)
             {
                 parameters = new Type[lambdaParameters.Length + 1];
-                parameters[0] = method.DeclaringType;
+                parameters[0] = lambdaDeclaring ?? method.DeclaringType;
                 Array.Copy(lambdaParameters, 0, parameters, 1, lambdaParameters.Length);
             }
 
@@ -466,9 +466,9 @@ namespace Umbraco.Core
             // emit IL
             (var dm, var ilgen) = CreateIlGenerator(method.DeclaringType?.Module, parameters, lambdaReturned);
             EmitLdargs(ilgen, parameters, methodArgTypes);
-            ilgen.Emit(method.IsStatic ? OpCodes.Call : OpCodes.Callvirt, method);
+            ilgen.CallMethod(method);
             EmitOutputAdapter(ilgen, lambdaReturned, method.ReturnType);
-            ilgen.Emit(OpCodes.Ret);
+            ilgen.Return();
 
             // create
             return (TLambda) (object) dm.CreateDelegate(typeof(TLambda));
@@ -596,13 +596,104 @@ namespace Umbraco.Core
                     ilgen.Emit(ldargOpCodes[i]);
                 else
                     ilgen.Emit(OpCodes.Ldarg, i);
+
+                var local = false;
+                EmitInputAdapter(ilgen, lambdaArgTypes[i], methodArgTypes[i], ref local);
             }
         }
 
-        // emits adapter opcodes before OpCodes.Ret
+        // emits adapter opcodes after OpCodes.Ldarg
+        //  inputType is the lambda input type
+        //  methodParamType is the actual type expected by the actual method
+        // adding code to do inputType -> methodParamType
+        //  valueType  -> valueType  : not supported ('cos, why?)
+        //  valueType  -> !valueType : not supported ('cos, why?)
+        //  !valueType -> valueType  : unbox and convert
+        //  !valueType -> !valueType : cast (could throw)
+        private static void EmitInputAdapter(ILGenerator ilgen, Type inputType, Type methodParamType, ref bool local)
+        {
+            if (inputType == methodParamType) return;
+
+            if (methodParamType.IsValueType)
+            {
+                if (inputType.IsValueType)
+                {
+                    // both input and parameter are value types
+                    // not supported, use proper input
+                    // (otherwise, would require converting)
+                    throw new NotSupportedException("ValueTypes conversion.");
+                }
+
+                // parameter is value type, but input is reference type
+                // unbox the input to the parameter value type
+                // this is more or less equivalent to the ToT method below
+
+                var unbox = ilgen.DefineLabel();
+
+                if (!local)
+                {
+                    ilgen.DeclareLocal(typeof(object)); // declare local var for st/ld loc_0
+                    local = true;
+                }
+
+                ilgen.Emit(OpCodes.Stloc_0); // pop value
+
+                ilgen.Emit(OpCodes.Ldloc_0); // push value
+                ilgen.Emit(OpCodes.Ldloc_0); // push value
+
+                ilgen.Emit(OpCodes.Isinst, methodParamType); // test, pops value, and pushes either a null ref, or an instance of the type
+                ilgen.Emit(OpCodes.Ldnull); // push null
+                ilgen.Emit(OpCodes.Cgt_Un); // compare what isInst returned to null - pops 2 values, and pushes 1 if greater else 0
+                ilgen.Emit(OpCodes.Brtrue_S, unbox); // pops value, branches to unbox if ok
+
+                // after we poped and whatever the branch, we still have the value on top of the stack
+
+                ilgen.Convert(methodParamType); // convert
+
+                ilgen.MarkLabel(unbox);
+                ilgen.Emit(OpCodes.Unbox_Any, methodParamType);
+            }
+            else
+            {
+                // parameter is reference type, but input is value type
+                // not supported, input should always be less constrained
+                // (otherwise, would require boxing and converting)
+                if (inputType.IsValueType)
+                    throw new NotSupportedException("ValueType boxing.");
+
+                // both input and parameter are reference types
+                // cast the input to the parameter type
+                ilgen.Emit(OpCodes.Castclass, methodParamType);
+            }
+        }
+
+        //private static T ToT<T>(object o)
+        //{
+        //    return o is T t ? t : (T) System.Convert.ChangeType(o, typeof(T));
+        //}
+
+        private static void Convert(this ILGenerator ilgen, Type type)
+        {
+            ilgen.Emit(OpCodes.Ldtoken, type);
+            ilgen.CallMethod(typeof(Convert).GetMethod("ChangeType", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(object), typeof(Type)}, null)); // fixme cache
+        }
+
+        // emits adapter code before OpCodes.Ret
+        //  outputType is the lambda output type
+        //  methodReturnedType is the actual type returned by the actual method
+        // adding code to do methodReturnedType -> outputType
+        //  valueType  -> valueType  : not supported ('cos, why?)
+        //  valueType  -> !valueType : box
+        //  !valueType -> valueType  : not supported ('cos, why?)
+        //  !valueType -> !valueType : implicit cast (could throw)
         private static void EmitOutputAdapter(ILGenerator ilgen, Type outputType, Type methodReturnedType)
         {
             if (outputType == methodReturnedType) return;
+
+            // note: the only important thing to support here, is returning a specific type
+            // as an object, when emitting the method as a Func<..., object> - anything else
+            // is pointless really - so we box value types, and ensure that non value types
+            // can be assigned
 
             if (methodReturnedType.IsValueType)
             {
@@ -636,6 +727,17 @@ namespace Umbraco.Core
         private static void ThrowInvalidLambda<TLambda>(string methodName, Type returned, Type[] args)
         {
             throw new ArgumentException($"Lambda {typeof(TLambda)} does not match {methodName}({string.Join(", ", (IEnumerable<Type>) args)}):{returned}.", nameof(TLambda));
+        }
+
+        private static void CallMethod(this ILGenerator ilgen, MethodInfo method)
+        {
+            var virt = !method.IsStatic && (method.IsVirtual || !method.IsFinal);
+            ilgen.Emit(virt ? OpCodes.Callvirt : OpCodes.Call, method);
+        }
+
+        private static void Return(this ILGenerator ilgen)
+        {
+            ilgen.Emit(OpCodes.Ret);
         }
 
         #endregion
