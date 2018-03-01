@@ -429,6 +429,33 @@ namespace Umbraco.Web.Editors
             var shouldReFetchMember = false;
             var providedUserName = contentItem.PersistedContent.Username;
 
+            //if the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
+            //have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
+            //There's only 3 special ones we need to deal with that are part of the MemberSave instance
+            if (Security.CurrentUser.HasAccessToSensitiveData() == false)
+            {
+                var sensitiveProperties = contentItem.PersistedContent.ContentType
+                    .PropertyTypes.Where(x => contentItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                    .ToList();
+                
+                foreach (var sensitiveProperty in sensitiveProperties)
+                {
+                    //if found, change the value of the contentItem model to the persisted value so it remains unchanged
+                    switch (sensitiveProperty.Alias)
+                    {
+                        case Constants.Conventions.Member.Comments:
+                            contentItem.Comments = contentItem.PersistedContent.Comments;
+                            break;
+                        case Constants.Conventions.Member.IsApproved:
+                            contentItem.IsApproved = contentItem.PersistedContent.IsApproved;
+                            break;
+                        case Constants.Conventions.Member.IsLockedOut:
+                            contentItem.IsLockedOut = contentItem.PersistedContent.IsLockedOut;
+                            break;
+                    }
+                }
+            }
+
             //Update the membership user if it has changed
             try
             {
@@ -638,7 +665,7 @@ namespace Umbraco.Web.Editors
                         contentItem.Email,
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
-                        contentItem.IsApproved,
+                        contentItem.IsApproved, 
                         contentItem.PersistedContent.Key, //custom membership provider, we'll link that based on the IMember unique id (GUID)
                         out status);
 
@@ -655,7 +682,7 @@ namespace Umbraco.Web.Editors
                         contentItem.Email,
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
-                        contentItem.IsApproved,
+                        contentItem.IsApproved, 
                         newKey,
                         out status);
 
