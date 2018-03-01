@@ -208,6 +208,10 @@ namespace Umbraco.Web.Search
             if (sb == null) throw new ArgumentNullException("sb");
             if (entityService == null) throw new ArgumentNullException("entityService");
 
+            Udi udi;
+            Udi.TryParse(searchFrom, true, out udi);
+            searchFrom = udi == null ? searchFrom : entityService.GetIdForUdi(udi).Result.ToString();
+
             int searchFromId;
             var entityPath = int.TryParse(searchFrom, out searchFromId) && searchFromId > 0
                 ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
