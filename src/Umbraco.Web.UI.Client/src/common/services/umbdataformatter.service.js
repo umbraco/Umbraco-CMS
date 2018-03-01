@@ -270,7 +270,7 @@
                                     saveModel.isLockedOut = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
                                     break;
                                 case "umbracoMemberApproved":
-                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
+                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : true;
                                     break;
                                 case "umbracoMemberComments":
                                     saveModel.comments = prop.value;
