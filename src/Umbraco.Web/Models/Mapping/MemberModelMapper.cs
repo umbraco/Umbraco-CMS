@@ -260,7 +260,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     //it's a generic provider so update the locked out property based on our known constant alias
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
-                    if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                    if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                     {
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Models.Mapping
                     // if we just had all of the membeship provider fields on the member table :(
                     // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
-                    if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                    if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                     {
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
