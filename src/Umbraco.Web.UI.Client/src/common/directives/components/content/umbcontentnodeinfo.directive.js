@@ -50,7 +50,7 @@
 
             scope.openDocumentType = function (documentType) {               
                 var url = "/settings/documenttypes/edit/" + documentType.id;
-                $location.path(url);
+                $location.url(url);
             };
 
             scope.updateTemplate = function (templateAlias) {
