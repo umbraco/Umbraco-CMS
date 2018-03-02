@@ -204,10 +204,10 @@ namespace Umbraco.Web.Editors
             var filterQuery = Current.SqlContext.Query<IUser>();
 
             //if the current user is not the administrator, then don't include this in the results.
-            var isAdminUser = Security.CurrentUser.Id == 0;
-            if (isAdminUser == false)
+            if (Security.CurrentUser.IsSuper() == false)
             {
-                filterQuery.Where(x => x.Id != 0);
+                // only super can see super
+                filterQuery.Where(x => x.Id != Constants.Security.SuperId);
             }
 
             if (filter.IsNullOrWhiteSpace() == false)
@@ -580,7 +580,8 @@ namespace Umbraco.Web.Editors
         /// <param name="userIds"></param>
         public HttpResponseMessage PostDisableUsers([FromUri]int[] userIds)
         {
-            if (userIds.Contains(Security.GetUserId()))
+            var tryGetCurrentUserId = Security.GetUserId();
+            if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
             {
                 throw new HttpResponseException(
                     Request.CreateNotificationValidationErrorResponse("The current user cannot disable itself"));

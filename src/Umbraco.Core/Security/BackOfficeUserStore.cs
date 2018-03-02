@@ -99,7 +99,7 @@ namespace Umbraco.Core.Security
 
             _userService.Save(userEntity);
 
-            if (userEntity.Id == 0) throw new DataException("Could not create the user, check logs for details");
+            if (!userEntity.HasIdentity) throw new DataException("Could not create the user, check logs for details");
 
             //re-assign id
             user.Id = userEntity.Id;

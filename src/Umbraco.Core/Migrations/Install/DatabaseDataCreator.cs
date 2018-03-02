@@ -140,7 +140,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateUserData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, new UserDto { Id = Constants.Security.SuperId, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
         }
 
         private void CreateUserGroupData()

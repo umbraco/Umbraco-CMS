@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
                     .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
                 {
                     //remove from teh xml
-                    installed.Delete(Security.GetUserId());
+                    installed.Delete(Security.GetUserId().ResultOr(0));
                 }
             }
             catch (Exception e)
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Editors
                 if (found != null)
                 {
                     removedTemplates.Add(found);
-                    Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
+                    Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId().ResultOr(0));
                 }
                 pack.Data.Templates.Remove(nId.ToString());
             }
@@ -236,7 +236,7 @@ namespace Umbraco.Web.Editors
                 pack.Data.Files.Remove(file);
             }
             pack.Save();
-            pack.Delete(Security.GetUserId());
+            pack.Delete(Security.GetUserId().ResultOr(0));
 
             // create a summary of what was actually removed, for PackagingService.UninstalledPackage
             var summary = new UninstallationSummary
@@ -474,7 +474,7 @@ namespace Umbraco.Web.Editors
             string path = Path.Combine("packages", packageGuid + ".umb");
             if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
             {
-                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId());
+                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId().ResultOr(0));
             }
 
             var model = new LocalPackageInstallModel

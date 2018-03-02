@@ -26,19 +26,25 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            long totalusers;
-            var users = new List<IUser>(Services.UserService.GetAll(0, int.MaxValue, out totalusers));
-
+            var users = new List<IUser>(Services.UserService.GetAll(0, int.MaxValue, out _));
             var currentUser = UmbracoContext.Current.Security.CurrentUser;
-            var currentUserIsAdmin = currentUser.IsAdmin();
+            var hideDisabledUsers = UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice;
 
             foreach (var user in users.OrderBy(x => x.IsApproved == false))
             {
-                if (UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice &&
-                    (UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice == false ||
-                     user.IsApproved == false))
-                {
+                // hide disabled user
+                if (user.IsApproved == false && hideDisabledUsers)
                     continue;
+
+                if (user.IsSuper())
+                {
+                    // only super can see super
+                    if (!currentUser.IsSuper()) continue;
+                }
+                else if (user.IsAdmin())
+                {
+                    // only admins can see admins
+                    if (!currentUser.IsAdmin()) continue;
                 }
 
                 var node = CreateTreeNode(
@@ -50,14 +56,6 @@ namespace Umbraco.Web.Trees
                     false,
                     "/" + queryStrings.GetValue<string>("application") + "/framed/"
                     + Uri.EscapeDataString("users/EditUser.aspx?id=" + user.Id));
-
-                if (user.Id == 0)
-                {
-                    if (currentUser.Id != 0)
-                        continue;
-                }
-                else if (currentUserIsAdmin == false && user.IsAdmin())
-                    continue;
 
                 if (user.IsApproved == false)
                     node.CssClasses.Add("not-published");

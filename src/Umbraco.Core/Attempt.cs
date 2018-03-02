@@ -36,6 +36,16 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Creates a failed attempt.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>
+        /// <returns>The failed attempt.</returns>
+        public static Attempt<TResult> Fail<TResult>()
+        {
+            return Attempt<TResult>.Fail();
+        }
+
+        /// <summary>
         /// Creates a failed attempt with a result.
         /// </summary>
         /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>

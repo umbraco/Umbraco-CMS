@@ -71,11 +71,7 @@ namespace Umbraco.Web.Security
                 if (_currentUser == null)
                 {
                     var id = GetUserId();
-                    if (id == -1)
-                    {
-                        return null;
-                    }
-                    _currentUser = _userService.GetUserById(id);
+                    return id ? _userService.GetUserById(id.Result) : null;
                 }
 
                 return _currentUser;
@@ -203,26 +199,13 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Gets the user id.
-        /// </summary>
-        /// <param name="umbracoUserContextId">This is not used</param>
-        /// <returns></returns>
-        [Obsolete("This method is no longer used, use the GetUserId() method without parameters instead")]
-        public int GetUserId(string umbracoUserContextId)
-        {
-            return GetUserId();
-        }
-
-        /// <summary>
         /// Gets the currnet user's id.
         /// </summary>
         /// <returns></returns>
-        public virtual int GetUserId()
+        public virtual Attempt<int> GetUserId()
         {
             var identity = _httpContext.GetCurrentIdentity(false);
-            if (identity == null)
-                return -1;
-            return Convert.ToInt32(identity.Id);
+            return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(Convert.ToInt32(identity.Id));
         }
 
         /// <summary>
@@ -232,9 +215,7 @@ namespace Umbraco.Web.Security
         public virtual string GetSessionId()
         {
             var identity = _httpContext.GetCurrentIdentity(false);
-            if (identity == null)
-                return null;
-            return identity.SessionId;
+            return identity?.SessionId;
         }
 
         /// <summary>

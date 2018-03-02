@@ -294,7 +294,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId());
+            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
@@ -472,9 +472,9 @@ namespace Umbraco.Web.Editors
 
             EnsureUniqueName(name, content, "name");
 
-            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId());
+            var blueprint = Services.ContentService.CreateContentFromBlueprint(content, name, Security.GetUserId().ResultOr(0));
 
-            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId());
+            Services.ContentService.SaveBlueprint(blueprint, Security.GetUserId().ResultOr(0));
 
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
@@ -669,7 +669,7 @@ namespace Umbraco.Web.Editors
             }
 
             foundContent.PublishValues(); // fixme variants?
-            var publishResult = Services.ContentService.SaveAndPublish(foundContent, Security.GetUserId());
+            var publishResult = Services.ContentService.SaveAndPublish(foundContent, Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -722,7 +722,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.Trashed == false)
             {
-                var moveResult = Services.ContentService.MoveToRecycleBin(foundContent, Security.GetUserId());
+                var moveResult = Services.ContentService.MoveToRecycleBin(foundContent, Security.GetUserId().ResultOr(0));
                 if (moveResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -732,7 +732,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.ContentService.Delete(foundContent, Security.GetUserId());
+                var deleteResult = Services.ContentService.Delete(foundContent, Security.GetUserId().ResultOr(0));
                 if (deleteResult.Success == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending

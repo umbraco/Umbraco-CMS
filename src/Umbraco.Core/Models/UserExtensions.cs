@@ -26,14 +26,21 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Determines whether this user is an admin.
+        /// Determines whether this user is the 'super' user.
         /// </summary>
-        /// <returns>
-        ///     <c>true</c> if this user is admin; otherwise, <c>false</c>.
-        /// </returns>
+        public static bool IsSuper(this IUser user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            return user.Id == Constants.Security.SuperId;
+        }
+
+        /// <summary>
+        /// Determines whether this user belongs to the administrators group.
+        /// </summary>
         public static bool IsAdmin(this IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
+            // fixme should super always be admin?
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
 

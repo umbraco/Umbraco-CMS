@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
         [OverrideAuthorization]
         public async Task<UserDetail> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
-            var result = await UserManager.AddPasswordAsync(Security.GetUserId(), newPassword);
+            var result = await UserManager.AddPasswordAsync(Security.GetUserId().ResultOr(0), newPassword);
 
             if (result.Succeeded == false)
             {
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostSetAvatar()
         {
             //borrow the logic from the user controller
-            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.ApplicationCache.StaticCache, Security.GetUserId());
+            return await UsersController.PostSetAvatarInternal(Request, Services.UserService, Current.ApplicationCache.StaticCache, Security.GetUserId().ResultOr(0));
         }
 
         /// <summary>

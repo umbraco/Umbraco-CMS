@@ -63,7 +63,7 @@ namespace Umbraco.Web.Install.InstallSteps
             var installer = new Installer();
 
             //Go get the package file from the package repo
-            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _security.GetUserId());
+            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _security.GetUserId().ResultOr(0));
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);

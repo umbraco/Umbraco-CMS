@@ -9,6 +9,14 @@ namespace Umbraco.Core
     [Serializable]
     public struct Attempt<TResult>
     {
+        // private - use Succeed() or Fail() methods to create attempts
+        private Attempt(bool success, TResult result, Exception exception)
+        {
+            Success = success;
+            Result = result;
+            Exception = exception;
+        }
+
         /// <summary>
         /// Gets a value indicating whether this <see cref="Attempt{TResult}"/> was successful.
         /// </summary>
@@ -24,16 +32,13 @@ namespace Umbraco.Core
         /// </summary>
         public TResult Result { get; }
 
+        /// <summary>
+        /// Gets the attempt result, if successful, else a default value.
+        /// </summary>
+        public TResult ResultOr(TResult value) => Success ? Result : value;
+
         // optimize, use a singleton failed attempt
         private static readonly Attempt<TResult> Failed = new Attempt<TResult>(false, default(TResult), null);
-
-        // private - use Succeed() or Fail() methods to create attempts
-        private Attempt(bool success, TResult result, Exception exception)
-        {
-            Success = success;
-            Result = result;
-            Exception = exception;
-        }
 
         /// <summary>
         /// Creates a successful attempt.

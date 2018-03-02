@@ -352,7 +352,8 @@ namespace Umbraco.Web.Trees
                 .ToList();
 
             // A user is allowed to delete their own stuff
-            if (dd.CreatorId == Security.GetUserId() && actions.Contains(ActionDelete.Instance) == false)
+            var tryGetCurrentUserId = Security.GetUserId();
+            if (tryGetCurrentUserId && dd.CreatorId == tryGetCurrentUserId.Result && actions.Contains(ActionDelete.Instance) == false)
                 actions.Add(ActionDelete.Instance);
 
             return actions.Select(x => new MenuItem(x));
