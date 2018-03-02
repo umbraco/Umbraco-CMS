@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZero
@@ -353,6 +354,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenSevenZe
                     Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser");
                 }
 
+                //we need to remove the existing FK on the umbracoUser.userType column before dropping the column.
+                //SQL Server allows dropping of a column with an assigned FK implicitly but MySql requires that you drop the FK before the column.
+                Delete.ForeignKey().FromTable("umbracoUser").ForeignColumn("userType").ToTable("umbracoUserType").PrimaryColumn("id");
                 Delete.Column("userType").FromTable("umbracoUser");
                 Delete.Table("umbracoUserType");
             }

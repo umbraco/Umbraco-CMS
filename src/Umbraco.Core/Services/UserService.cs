@@ -207,20 +207,17 @@ namespace Umbraco.Core.Services
                 {
                     return repository.GetByUsername(username, includeSecurityData: true);
                 }
-                catch (Exception ex)
+                catch (DbException ex)
                 {
-                    if (ex is SqlException || ex is SqlCeException)
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    if (ApplicationContext.Current.IsUpgrading)
                     {
-                        //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                        //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                        //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                        //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                        //that method would not be cached.
-                        if (ApplicationContext.Current.IsUpgrading)
-                        {
-                            //NOTE: this will not be cached
-                            return repository.GetByUsername(username, includeSecurityData: false);
-                        }
+                        //NOTE: this will not be cached
+                        return repository.GetByUsername(username, includeSecurityData: false);
                     }
                     throw;
                 }
@@ -789,20 +786,17 @@ namespace Umbraco.Core.Services
                     var result = repository.Get(id);
                     return result;
                 }
-                catch (Exception ex)
+                catch (DbException ex)
                 {
-                    if (ex is SqlException || ex is SqlCeException)
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    if (ApplicationContext.Current.IsUpgrading)
                     {
-                        //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                        //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                        //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                        //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                        //that method would not be cached.
-                        if (ApplicationContext.Current.IsUpgrading)
-                        {
-                            //NOTE: this will not be cached
-                            return repository.Get(id, includeSecurityData: false);
-                        }
+                        //NOTE: this will not be cached
+                        return repository.Get(id, includeSecurityData: false);
                     }
                     throw;
                 }
