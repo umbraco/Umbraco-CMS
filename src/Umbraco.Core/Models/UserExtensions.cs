@@ -261,6 +261,16 @@ namespace Umbraco.Core.Models
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
 
+        /// <summary>
+        /// Determines whether this user has access to view sensitive data
+        /// </summary>
+        /// <param name="user"></param>
+        public static bool HasAccessToSensitiveData(this IUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
+        }
+
         // calc. start nodes, combining groups' and user's, and excluding what's in the bin
         public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService)
         {

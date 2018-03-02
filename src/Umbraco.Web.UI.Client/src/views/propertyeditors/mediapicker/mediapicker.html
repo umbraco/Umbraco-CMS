@@ -3,7 +3,8 @@
     <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
 
-    <div data-element="sortable-thumbnails" class="flex error">
+    <div data-element="sortable-thumbnails" class="flex flex-wrap error">
+
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
@@ -33,6 +34,7 @@
             </li>
             <li style="border: none;">
                 <a data-element="sortable-thumbnails-add" href="#" class="add-link add-link-square" ng-click="add()" ng-if="showAdd()" prevent-default>
+
                     <i class="icon icon-add large"></i>
                 </a>
             </li>

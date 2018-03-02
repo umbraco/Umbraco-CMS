@@ -9,6 +9,7 @@ namespace Umbraco.Core
         {
 
             public const string AdminGroupAlias = "admin";
+            public const string SensitiveDataGroupAlias = "sensitiveData";
             public const string TranslatorGroupAlias = "translator";
 
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";

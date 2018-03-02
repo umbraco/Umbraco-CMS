@@ -410,7 +410,7 @@ namespace Umbraco.Web.Editors
 
             //send the email
 
-            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, user, userSave.Message);
+            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
 
             return display;
         }
@@ -447,7 +447,7 @@ namespace Umbraco.Web.Editors
             return attempt.Result;
         }
 
-        private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, IUser to, string message)
+        private async Task SendUserInviteEmailAsync(UserBasic userDisplay, string from, string fromEmail, IUser to, string message)
         {
             var token = await UserManager.GenerateEmailConfirmationTokenAsync((int)userDisplay.Id);
 
@@ -476,7 +476,7 @@ namespace Umbraco.Web.Editors
             var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService),
-                new[] { userDisplay.Name, from, message, inviteUri.ToString() });
+                new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
             await UserManager.EmailService.SendAsync(
                 //send the special UmbracoEmailMessage which configures it's own sender
@@ -561,18 +561,10 @@ namespace Umbraco.Web.Editors
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
 
+                //this will change the password and raise appropriate events
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
-                    var userMgr = this.TryGetOwinContext().Result.GetBackOfficeUserManager();
-
-                    //raise the event - NOTE that the ChangePassword.Reset value here doesn't mean it's been 'reset', it means
-                    //it's been changed by a back office user
-                    if (userSave.ChangePassword.Reset.HasValue && userSave.ChangePassword.Reset.Value)
-                    {
-                        userMgr.RaisePasswordChangedEvent(intId.Result);
-                    }
-                    
                     //need to re-get the user 
                     found = Services.UserService.GetUserById(intId.Result);
                 }

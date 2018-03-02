@@ -10,8 +10,8 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         return umbRequestHelper.postSaveContent({
             restApiUrl: umbRequestHelper.getApiUrl(
-                   "memberApiBaseUrl",
-                   "PostSave"),
+                "memberApiBaseUrl",
+                "PostSave"),
             content: content,
             action: action,
             files: files,
@@ -22,8 +22,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
-
-        getPagedResults: function (memberTypeAlias, options) {
+        getPagedResults: function(memberTypeAlias, options) {
 
             if (memberTypeAlias === 'all-members') {
                 memberTypeAlias = null;
@@ -67,35 +66,35 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             var params = [
-                   { pageNumber: options.pageNumber },
-                   { pageSize: options.pageSize },
-                   { orderBy: options.orderBy },
-                   { orderDirection: options.orderDirection },
-                   { orderBySystemField: toBool(options.orderBySystemField) },
-                   { filter: options.filter }
+                { pageNumber: options.pageNumber },
+                { pageSize: options.pageSize },
+                { orderBy: options.orderBy },
+                { orderDirection: options.orderDirection },
+                { orderBySystemField: toBool(options.orderBySystemField) },
+                { filter: options.filter }
             ];
             if (memberTypeAlias != null) {
                 params.push({ memberTypeAlias: memberTypeAlias });
             }
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "memberApiBaseUrl",
-                              "GetPagedResults",
-                              params)),
-                  'Failed to retrieve member paged result');
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetPagedResults",
+                        params)),
+                'Failed to retrieve member paged result');
         },
 
-        getListNode: function (listName) {
+        getListNode: function(listName) {
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "memberApiBaseUrl",
-                              "GetListNodeDisplay",
-                              [{ listName: listName }])),
-                  'Failed to retrieve data for member list ' + listName);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetListNodeDisplay",
+                        [{ listName: listName }])),
+                'Failed to retrieve data for member list ' + listName);
         },
 
         /**
@@ -119,15 +118,15 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the member item.
           *
           */
-        getByKey: function (key) {
+        getByKey: function(key) {
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "memberApiBaseUrl",
-                              "GetByKey",
-                              [{ key: key }])),
-                  'Failed to retrieve data for member id ' + key);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetByKey",
+                        [{ key: key }])),
+                'Failed to retrieve data for member id ' + key);
         },
 
         /**
@@ -150,14 +149,14 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object.
           *
           */
-        deleteByKey: function (key) {
+        deleteByKey: function(key) {
             return umbRequestHelper.resourcePromise(
-                   $http.post(
-                         umbRequestHelper.getApiUrl(
-                               "memberApiBaseUrl",
-                               "DeleteByKey",
-                               [{ key: key }])),
-                   'Failed to delete item ' + key);
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "DeleteByKey",
+                        [{ key: key }])),
+                'Failed to delete item ' + key);
         },
 
         /**
@@ -190,24 +189,24 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the member scaffold.
           *
           */
-        getScaffold: function (alias) {
+        getScaffold: function(alias) {
 
             if (alias) {
                 return umbRequestHelper.resourcePromise(
-                        $http.get(
-                              umbRequestHelper.getApiUrl(
-                                    "memberApiBaseUrl",
-                                    "GetEmpty",
-                                    [{ contentTypeAlias: alias }])),
-                        'Failed to retrieve data for empty member item type ' + alias);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "memberApiBaseUrl",
+                            "GetEmpty",
+                            [{ contentTypeAlias: alias }])),
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
             else {
                 return umbRequestHelper.resourcePromise(
-                        $http.get(
-                              umbRequestHelper.getApiUrl(
-                                    "memberApiBaseUrl",
-                                    "GetEmpty")),
-                        'Failed to retrieve data for empty member item type ' + alias);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "memberApiBaseUrl",
+                            "GetEmpty")),
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
 
         },
@@ -240,7 +239,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object containing the saved media item.
           *
           */
-        save: function (member, isNew, files) {
+        save: function(member, isNew, files) {
             return saveMember(member, "save" + (isNew ? "New" : ""), files);
         }
     };

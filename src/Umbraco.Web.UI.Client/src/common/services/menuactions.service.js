@@ -8,9 +8,27 @@
  * @description
  * Defines the methods that are called when menu items declare only an action to execute
  */
-function umbracoMenuActions($q, treeService, $location, navigationService, appState) {
+function umbracoMenuActions($q, treeService, $location, navigationService, appState, umbRequestHelper, notificationsService, localizationService) {
     
     return {
+
+        "ExportMember": function(args) {
+            var url = umbRequestHelper.getApiUrl(
+                "memberApiBaseUrl",
+                "ExportMemberData",
+                [{ key: args.entity.id }]);
+
+            umbRequestHelper.downloadFile(url).then(function() {
+                localizationService.localize("speechBubbles_memberExportedSuccess").then(function (value) {
+                    notificationsService.success(value);
+                })    
+            }, function(data) {
+                localizationService.localize("speechBubbles_memberExportedError").then(function (value) {
+                    notificationsService.error(value);
+                })    
+            });
+            
+        },
         
         /**
          * @ngdoc method
