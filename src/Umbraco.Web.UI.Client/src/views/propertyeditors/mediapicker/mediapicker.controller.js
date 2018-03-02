@@ -4,7 +4,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
     function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService) {
 
         //check the pre-values for multi-picker
-        var multiPicker = $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) > 1 ? true : false;
+        var multiPicker = $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) !== 1 ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
 
