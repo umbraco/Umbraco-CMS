@@ -33,10 +33,14 @@ namespace Umbraco.Web.Models
 
         public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
-
+            if (string.IsNullOrEmpty(alias))
+            {
+                return null;
+            }
+            
             var crop = Crops.GetCrop(alias);
 
-            if (crop == null && string.IsNullOrEmpty(alias) == false)
+            if (crop == null)
             {
                 return null;
             }
