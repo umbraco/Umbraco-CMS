@@ -211,7 +211,7 @@ namespace umbraco.DataLayer
                 }
             }
             // append remainder of the query, uppercased
-            replacedQuery.Append(query.Substring(partStartPos).ToUpper());
+            replacedQuery.Append(query.Substring(partStartPos));
 
             return replacedQuery.ToString();
         }
