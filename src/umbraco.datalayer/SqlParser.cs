@@ -210,7 +210,7 @@ namespace umbraco.DataLayer
                     currentPos = partStartPos = endStringPos;
                 }
             }
-            // append remainder of the query, uppercased
+            // append remainder of the query, uppercased - 4/3/2018 Removed .ToUpper() to fix linux MySQl table name case issue U4-11053
             replacedQuery.Append(query.Substring(partStartPos));
 
             return replacedQuery.ToString();
