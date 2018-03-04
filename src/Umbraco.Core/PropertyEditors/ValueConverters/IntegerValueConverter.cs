@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -14,19 +15,23 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return 0;
-
-            // in XML an integer is a string
-            var sourceString = source as string;
-            if (sourceString != null)
-            {
-                int i;
-                return (int.TryParse(sourceString, out i)) ? i : 0;
-            }
+            if (source == null)
+                return default(int);
 
             // in the database an integer is an integer
+            if (source is int)
+                return source;
+
+            if (source is long)
+                return Convert.ToInt32(source);
+
+            // in XML an integer is a string
+            int i;
+            if (source is string && int.TryParse((string)source, out i))
+                return i;
+
             // default value is zero
-            return (source is int) ? source : 0;
+            return default(int);
         }
     }
 }
