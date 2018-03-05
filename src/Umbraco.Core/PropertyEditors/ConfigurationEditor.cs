@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -99,5 +102,35 @@ namespace Umbraco.Core.PropertyEditors
         /// <inheritdoc />
         public virtual Dictionary<string, object> ToValueEditor(object configuration)
             => ToConfigurationEditor(configuration);
+
+        /// <summary>
+        /// Gets the custom json serializer settings for configurations.
+        /// </summary>
+        public static JsonSerializerSettings ConfigurationJsonSettings { get; } = new JsonSerializerSettings
+        {
+            ContractResolver = new ConfigurationCustomContractResolver(),
+            Converters = new List<JsonConverter>(new[]{new FuzzyBooleanConverter()})
+        };
+
+        private class ConfigurationCustomContractResolver : DefaultContractResolver
+        {
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            {
+                // base.CreateProperty deals with [JsonProperty("name")]
+                var property = base.CreateProperty(member, memberSerialization);
+
+                // override with our custom attribute, if any
+                var attribute = member.GetCustomAttribute<ConfigurationFieldAttribute>();
+                if (attribute != null) property.PropertyName = attribute.Key;
+
+                // for value types,
+                //  don't try to deserialize nulls (in legacy json)
+                //  no impact on serialization (value cannot be null)
+                if (member is PropertyInfo propertyInfo && propertyInfo.PropertyType.IsValueType)
+                    property.NullValueHandling = NullValueHandling.Ignore;
+
+                return property;
+            }
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Color Picker.
                 /// </summary>
-                public const string ColorPicker = "Umbraco.ColorPickerAlias";
+                public const string ColorPicker = "Umbraco.ColorPicker";
 
                 /// <summary>
                 /// Content Picker.

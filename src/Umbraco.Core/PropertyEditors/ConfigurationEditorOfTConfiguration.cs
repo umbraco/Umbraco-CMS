@@ -104,7 +104,7 @@ namespace Umbraco.Core.PropertyEditors
             try
             {
                 if (string.IsNullOrWhiteSpace(configuration)) return new TConfiguration();
-                return JsonConvert.DeserializeObject<TConfiguration>(configuration);
+                return JsonConvert.DeserializeObject<TConfiguration>(configuration, ConfigurationJsonSettings);
             }
             catch (Exception e)
             {

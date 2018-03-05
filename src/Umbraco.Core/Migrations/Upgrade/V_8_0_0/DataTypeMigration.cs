@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
-    public class RefactorDataType : MigrationBase
+    public class DataTypeMigration : MigrationBase
     {
-        public RefactorDataType(IMigrationContext context)
+        public DataTypeMigration(IMigrationContext context)
             : base(context)
         { }
 
@@ -38,6 +37,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             foreach (var x in DatabaseSchemaCreator.OrderedTables)
                 Create.KeysAndIndexes(x.Value).Do();
 
+            // renames
+            Database.Execute(Sql()
+                .Update<DataTypeDto>(u => u.Set(x => x.EditorAlias, "Umbraco.ColorPicker"))
+                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias"));
+
+            // from preValues to configuration...
             var sql = Sql()
                 .Select<DataTypeDto>()
                 .AndSelect<PreValueDto>(x => x.Alias, x => x.SortOrder, x => x.Value)
@@ -64,9 +69,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
                 else
                 {
-                    // fixme deal with null or empty aliases
-                    // fixme deal with duplicate aliases
-                    // in these cases, fallback to array?
+                    // assuming we don't want to fall back to array
+                    if (aliases.Length != group.Count() || aliases.Any(string.IsNullOrWhiteSpace))
+                        throw new InvalidOperationException($"Cannot migrate datatype w/ id={dataType.NodeId} preValues: duplicate or null/empty alias.");
 
                     // dictionary-base prevalues
                     var values = group.ToDictionary(x => x.Alias, x => x.Value);

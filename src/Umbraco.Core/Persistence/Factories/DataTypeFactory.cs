@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -51,7 +53,7 @@ namespace Umbraco.Core.Persistence.Factories
                 EditorAlias = entity.EditorAlias,
                 NodeId = entity.Id,
                 DbType = entity.DatabaseType.ToString(),
-                Configuration = entity.Configuration == null ? null : JsonConvert.SerializeObject(entity.Configuration),
+                Configuration = entity.Configuration == null ? null : JsonConvert.SerializeObject(entity.Configuration, ConfigurationEditor.ConfigurationJsonSettings),
                 NodeDto = BuildNodeDto(entity)
             };
 
