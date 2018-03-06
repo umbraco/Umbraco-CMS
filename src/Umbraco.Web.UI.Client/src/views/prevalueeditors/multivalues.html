@@ -1,13 +1,21 @@
-<div class="umb-editor" ng-controller="Umbraco.PrevalueEditors.MultiValuesController">
-    <div class="control-group">
-        <input name="newItem" type="text" ng-model="newItem" val-highlight="{{hasError}}" />
-        <button class="btn" ng-click="add($event)">Add</button>
+<div class="umb-editor umb-prevalues-multivalues" ng-controller="Umbraco.PrevalueEditors.MultiValuesController">
+    <div class="control-group umb-prevalues-multivalues__add">
+        <div class="umb-prevalues-multivalues__left">
+            <input overlay-submit-on-enter="false" name="newItem" focus-when="{{focusOnNew}}" ng-keydown="createNew($event)" type="text" ng-model="newItem" val-highlight="{{hasError}}" />
+        </div>
+        <div class="umb-prevalues-multivalues__right">
+            <button class="btn btn-info" ng-click="add($event)">Add</button>
+        </div>
     </div>
     <div ui-sortable="sortableOptions">
-        <div class="control-group" ng-repeat="item in model.value">
+        <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="item in model.value">
             <i class="icon icon-navigation handle"></i>
-            <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
-            <button class="btn btn-danger" ng-click="remove(item, $event)">Remove</button>
+            <div class="umb-prevalues-multivalues__left">
+                <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
+            </div>
+            <div class="umb-prevalues-multivalues__right">
+                <a class="umb-node-preview__action" ng-click="remove(item, $event)">Remove</a>
+            </div>
         </div>
     </div>
 </div>
