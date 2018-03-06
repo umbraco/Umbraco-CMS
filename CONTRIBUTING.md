@@ -114,6 +114,15 @@ Some parts of our source code is over 10 years old now. And when we say "old", w
 There's two big areas that you should know about:
 
   1. The Umbraco backoffice is a extensible AngularJS app and requires you to run a `gulp dev` command while you're working with it, so changes are copied over to the appropriate directories and you can refresh your browser to view the results of your changes.
+  You may need to run the following commands to set up gulp properly:
+  ```
+  npm cache clean
+  npm install -g bower
+  npm install -g gulp
+  npm install -g gulp-cli
+  npm install
+  gulp build
+  ```
   2. "The rest" is a C# based codebase, with some traces of our WebForms past but mostly ASP.NET MVC based these days. You can make changes, build them in Visual Studio, and hit `F5` to see the result.
 
 To find the general areas of something you're looking to fix or improve, have a look at the following two parts of the API documentation.
