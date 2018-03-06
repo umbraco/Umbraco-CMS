@@ -55,7 +55,8 @@ namespace Umbraco.Web.PropertyEditors
                 var result = base.ConvertEditorToDb(editorValue, currentValue);
 
                 // get multiple config
-                result.Add(_multipleKey, new PreValue(-1, editorValue[_multipleKey].ToString()));
+                var multipleValue = editorValue[_multipleKey] != null ? editorValue[_multipleKey].ToString() : "0";
+                result.Add(_multipleKey, new PreValue(-1, multipleValue));
 
                 return result;
             }
