@@ -22,19 +22,111 @@ namespace Umbraco.Core.Services
         // note - no need for uow, scope would be enough, but a pain to wire
         // note - for pure read-only we might want to *not* enforce a transaction?
 
-        public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+        // notes
+        //
+        // - this class assumes that the id/guid map is unique; that is, if an id and a guid map
+        //   to each other, then the id will never map to another guid, and the guid will never map
+        //   to another id
+        //
+        // - LeeK's solution in 7.7 was to look for the id/guid in the content cache "on demand" via
+        //   XPath, which is probably fast enough but cannot deal with media ids
+        //   see https://github.com/umbraco/Umbraco-CMS/pull/2398
+        //
+        // - Andy's solution in a package was to prefetch all by sql; it cannot prefecth reserved ids
+        //   as we don't know the corresponding object type, but that's not a big issue
+        //   see https://github.com/AndyButland/UmbracoUdiToIdCache
+        //
+        // - the original IdkMap implementation that was used by services, did a database lookup on
+        //   each cache miss, which is fine enough for services, but would be really slow at content
+        //   cache level - so this implementation prefetches all document and media ids
+        //
+        // - and this implementation works for document and media ids
+        //
+        // - cache is cleared by MediaCacheRefresher, UnpublishedPageCacheRefresher, and other
+        //   refreshers - because id/guid map is unique, we only clear to avoid leaking memory, 'cos
+        //   we don't risk caching obsolete values - and only when actually deleting
+
+        private void PopulateLocked()
         {
-            TypedId<int> id;
+            // don't if not empty
+            if (_key2Id.Count > 0) return;
+
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                // populate content and media items
+                var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
+                var values = uow.Database.Fetch<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
+                foreach (var value in values)
+                {
+                    UmbracoObjectTypes umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(value.NodeObjectType);
+                    _id2Key.Add(value.Id, new TypedId<Guid>(value.UniqueId, umbracoObjectType));
+                    _key2Id.Add(value.UniqueId, new TypedId<int>(value.Id, umbracoObjectType));
+                }
+            }
+        }
+
+        private Attempt<int> PopulateAndGetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+        {
             try
             {
-                _locker.EnterReadLock();
-                if (_key2Id.TryGetValue(key, out id) && id.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(id.Id);
+                _locker.EnterWriteLock();
+
+                PopulateLocked();
+
+                return _key2Id.TryGetValue(key, out var id) && id.UmbracoObjectType == umbracoObjectType
+                    ? Attempt.Succeed(id.Id)
+                    : Attempt<int>.Fail();
+
             }
             finally
             {
                 if (_locker.IsReadLockHeld)
                     _locker.ExitReadLock();
             }
+        }
+
+        private Attempt<Guid> PopulateAndGetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
+        {
+            try
+            {
+                _locker.EnterWriteLock();
+
+                PopulateLocked();
+
+                return _id2Key.TryGetValue(id, out var key) && key.UmbracoObjectType == umbracoObjectType
+                    ? Attempt.Succeed(key.Id)
+                    : Attempt<Guid>.Fail();
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
+            }
+        }
+
+        public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+        {
+            bool empty;
+
+            try
+            {
+                _locker.EnterReadLock();
+                if (_key2Id.TryGetValue(key, out var id) && id.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(id.Id);
+                empty = _key2Id.Count == 0;
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
+            }
+
+            // if cache is empty and looking for a document or a media,
+            // populate the cache at once and return what we found
+            if (empty && (umbracoObjectType == UmbracoObjectTypes.Document || umbracoObjectType == UmbracoObjectTypes.Media))
+                return PopulateAndGetIdForKey(key, umbracoObjectType);
+
+            // optimize for read speed: reading database outside a lock means that we could read
+            // multiple times, but we don't lock the cache while accessing the database = better
 
             int? val;
             using (var uow = _uowProvider.GetUnitOfWork())
@@ -83,19 +175,37 @@ namespace Umbraco.Core.Services
             return GetIdForKey(guidUdi.Guid, umbracoType);
         }
 
+        public Attempt<Udi> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType)
+        {
+            var keyAttempt = GetKeyForId(id, umbracoObjectType);
+            return keyAttempt
+                ? Attempt.Succeed<Udi>(new GuidUdi(Constants.UdiEntityType.FromUmbracoObjectType(umbracoObjectType), keyAttempt.Result))
+                : Attempt<Udi>.Fail();
+        }
+
         public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
         {
-            TypedId<Guid> key;
+            bool empty;
+
             try
             {
                 _locker.EnterReadLock();
-                if (_id2Key.TryGetValue(id, out key) && key.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(key.Id);
+                if (_id2Key.TryGetValue(id, out var key) && key.UmbracoObjectType == umbracoObjectType) return Attempt.Succeed(key.Id);
+                empty = _id2Key.Count == 0;
             }
             finally
             {
                 if (_locker.IsReadLockHeld)
                     _locker.ExitReadLock();
             }
+
+            // if cache is empty and looking for a document or a media,
+            // populate the cache at once and return what we found
+            if (empty && (umbracoObjectType == UmbracoObjectTypes.Document || umbracoObjectType == UmbracoObjectTypes.Media))
+                return PopulateAndGetKeyForId(id, umbracoObjectType);
+
+            // optimize for read speed: reading database outside a lock means that we could read
+            // multiple times, but we don't lock the cache while accessing the database = better
 
             Guid? val;
             using (var uow = _uowProvider.GetUnitOfWork())
@@ -142,6 +252,8 @@ namespace Umbraco.Core.Services
             return guid;
         }
 
+        // invoked on UnpublishedPageCacheRefresher.RefreshAll
+        // anything else will use the id-specific overloads
         public void ClearCache()
         {
             try
@@ -162,8 +274,7 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                TypedId<Guid> key;
-                if (_id2Key.TryGetValue(id, out key) == false) return;
+                if (_id2Key.TryGetValue(id, out var key) == false) return;
                 _id2Key.Remove(id);
                 _key2Id.Remove(key.Id);
             }
@@ -179,8 +290,7 @@ namespace Umbraco.Core.Services
             try
             {
                 _locker.EnterWriteLock();
-                TypedId<int> id;
-                if (_key2Id.TryGetValue(key, out id) == false) return;
+                if (_key2Id.TryGetValue(key, out var id) == false) return;
                 _id2Key.Remove(id.Id);
                 _key2Id.Remove(key);
             }
@@ -191,26 +301,28 @@ namespace Umbraco.Core.Services
             }
         }
 
+        // ReSharper disable ClassNeverInstantiated.Local
+        // ReSharper disable UnusedAutoPropertyAccessor.Local
+        private class TypedIdDto
+        {
+            public int Id { get; set; }
+            public Guid UniqueId { get; set; }
+            public Guid NodeObjectType { get; set; }
+        }
+        // ReSharper restore ClassNeverInstantiated.Local
+        // ReSharper restore UnusedAutoPropertyAccessor.Local
+
         private struct TypedId<T>
         {
-            private readonly T _id;
-            private readonly UmbracoObjectTypes _umbracoObjectType;
-
-            public T Id
-            {
-                get { return _id; }
-            }
-
-            public UmbracoObjectTypes UmbracoObjectType
-            {
-                get { return _umbracoObjectType; }
-            }
-
             public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
             {
-                _umbracoObjectType = umbracoObjectType;
-                _id = id;
+                UmbracoObjectType = umbracoObjectType;
+                Id = id;
             }
+
+            public UmbracoObjectTypes UmbracoObjectType { get; }
+
+            public T Id { get; }
         }
     }
 }

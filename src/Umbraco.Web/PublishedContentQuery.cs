@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -55,6 +56,9 @@ namespace Umbraco.Web
             _dynamicContentQuery = dynamicContentQuery;
         }
 
+        // TODO use this to implement media-by-GUID but is a breaking change?
+        private IdkMap IdkMap => ApplicationContext.Current.Services.IdkMap; // fixme inject - v8
+
         #region Content
 
         public IPublishedContent TypedContent(int id)
@@ -67,7 +71,7 @@ namespace Umbraco.Web
         public IPublishedContent TypedContent(Guid id)
         {
             return _typedContentQuery == null
-                ? TypedDocumentById(id, _contentCache)
+                ? TypedDocumentById(id, _contentCache, UmbracoObjectTypes.Document)
                 : _typedContentQuery.TypedContent(id);
         }
 
@@ -88,7 +92,7 @@ namespace Umbraco.Web
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<Guid> ids)
         {
             return _typedContentQuery == null
-                ? TypedDocumentsByIds(_contentCache, ids)
+                ? TypedDocumentsByIds(_contentCache, ids, UmbracoObjectTypes.Document)
                 : _typedContentQuery.TypedContent(ids);
         }
 
@@ -232,13 +236,10 @@ namespace Umbraco.Web
             return doc;
         }
 
-        private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
+        private IPublishedContent TypedDocumentById(Guid key, ContextualPublishedCache cache, UmbracoObjectTypes umbracoObjectType)
         {
-            // todo: in v8, implement in a more efficient way
-            var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
-            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@key=$guid]";
-            var doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
-            return doc;
+            var idAttempt = IdkMap.GetIdForKey(key, umbracoObjectType);
+            return idAttempt ? TypedDocumentById(idAttempt.Result, cache) : null;
         }
 
         private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
@@ -259,10 +260,9 @@ namespace Umbraco.Web
             return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
         }
 
-        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
+        private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids, UmbracoObjectTypes umbracoObjectType)
         {
-            // todo: in v8, implement in a more efficient way
-            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
+            return ids.Select(eachId => TypedDocumentById(eachId, cache, umbracoObjectType)).WhereNotNull();
         }
 
         private IEnumerable<IPublishedContent> TypedDocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
@@ -292,7 +292,7 @@ namespace Umbraco.Web
 
         private dynamic DocumentById(Guid id, ContextualPublishedCache cache, object ifNotFound)
         {
-            var doc = TypedDocumentById(id, cache);
+            var doc = TypedDocumentById(id, cache, UmbracoObjectTypes.Document);
             return doc == null
                        ? ifNotFound
                        : new DynamicPublishedContent(doc).AsDynamic();
