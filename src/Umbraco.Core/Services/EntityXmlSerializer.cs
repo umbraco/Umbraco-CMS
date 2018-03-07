@@ -47,9 +47,9 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
             xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
 
-            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService).Name));
+            xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(userService)?.Name ?? "??"));
             //xml.Add(new XAttribute("creatorID", content.CreatorId));
-            xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService).Name));
+            xml.Add(new XAttribute("writerName", content.GetWriterProfile(userService)?.Name ?? "??"));
             xml.Add(new XAttribute("writerID", content.WriterId));
 
             xml.Add(new XAttribute("template", content.Template?.Id.ToString(CultureInfo.InvariantCulture) ?? "0"));

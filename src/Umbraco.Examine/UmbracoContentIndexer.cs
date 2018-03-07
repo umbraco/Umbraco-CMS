@@ -325,8 +325,8 @@ namespace Umbraco.Examine
                     {"urlName", new object[] {urlValue}},
                     {"path", new object[] {c.Path}},
                     {"nodeType", new object[] {c.ContentType.Id}},
-                    {"creatorName", new object[] {c.GetCreatorProfile(UserService).Name}},
-                    {"writerName", new object[] {c.GetWriterProfile(UserService).Name}},
+                    {"creatorName", new object[] {c.GetCreatorProfile(UserService)?.Name ?? "??"}},
+                    {"writerName", new object[] {c.GetWriterProfile(UserService)?.Name ?? "??"}},
                     {"writerID", new object[] {c.WriterId}},
                     {"template", new object[] {c.Template?.Id ?? 0}}
                 };
