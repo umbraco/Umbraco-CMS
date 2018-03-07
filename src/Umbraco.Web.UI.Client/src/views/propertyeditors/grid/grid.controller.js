@@ -626,13 +626,15 @@ angular.module("umbraco")
         }
 
         setClipboard();
-  
+
         $scope.copy = function(control) {
           if (!Array.isArray(localStorageService.get(gridClipboardAlias))) {
             localStorageService.set(gridClipboardAlias, []);
           }
 
           var newClipboard = localStorageService.get(gridClipboardAlias);
+
+          control.guid = $scope.setUniqueId();
 
           newClipboard.push(control);
 
