@@ -24,7 +24,7 @@ namespace Umbraco.Web
     /// <remarks>
     /// Used by UmbracoHelper
     /// </remarks>
-    internal class UmbracoComponentRenderer : IUmbracoComponentRendererWithField
+    internal class UmbracoComponentRenderer : IUmbracoComponentRenderer
     {
         private readonly UmbracoContext _umbracoContext;
 

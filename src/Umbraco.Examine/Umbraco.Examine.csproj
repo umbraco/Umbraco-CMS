@@ -53,17 +53,16 @@
     <PackageReference Include="NPoco" Version="3.6.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Name>Umbraco.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="**\*.cs" Exclude="obj\**\*.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

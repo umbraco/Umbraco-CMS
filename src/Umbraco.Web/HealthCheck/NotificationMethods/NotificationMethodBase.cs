@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.HealthChecks;
 

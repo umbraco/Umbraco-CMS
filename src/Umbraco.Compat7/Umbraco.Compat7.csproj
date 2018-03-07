@@ -48,6 +48,7 @@
       <Name>Umbraco.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
+      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>

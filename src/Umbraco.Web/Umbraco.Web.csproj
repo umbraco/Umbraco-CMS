@@ -103,12 +103,13 @@
     <PackageReference Include="xmlrpcnet" Version="3.0.0.266" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Name>Umbraco.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -163,7 +164,6 @@
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
-    <Compile Include="IUmbracoComponentRendererWithField.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Macros\MacroContent.cs" />

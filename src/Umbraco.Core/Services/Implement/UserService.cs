@@ -668,6 +668,7 @@ namespace Umbraco.Core.Services.Implement
         {
             //This is called a TON. Go get the full user from cache which should already be IProfile
             var fullUser = GetUserById(id);
+            if (fullUser == null) return null;
             var asProfile = fullUser as IProfile;
             return asProfile ?? new UserProfile(fullUser.Id, fullUser.Name);
         }

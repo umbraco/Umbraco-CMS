@@ -203,11 +203,10 @@ namespace Umbraco.Web.Editors
 
             var filterQuery = Current.SqlContext.Query<IUser>();
 
-            //if the current user is not the administrator, then don't include this in the results.
-            if (Security.CurrentUser.IsSuper() == false)
+            if (!Security.CurrentUser.IsSuper())
             {
                 // only super can see super
-                filterQuery.Where(x => x.Id != Constants.Security.SuperId);
+                filterQuery.Where(x => !x.IsSuper());
             }
 
             if (filter.IsNullOrWhiteSpace() == false)

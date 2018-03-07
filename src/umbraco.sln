@@ -86,6 +86,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{86DEB346-089F-4106-89C8-D852B9CF2A33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Compat7", "Umbraco.Compat7\Umbraco.Compat7.csproj", "{185E098F-5706-4B97-B404-EB974F05F633}"
+	ProjectSection(ProjectDependencies) = postProject
+		{651E1350-91B6-44B7-BD60-7207006D7003} = {651E1350-91B6-44B7-BD60-7207006D7003}
+		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1} = {31785BC3-256C-4613-B2F5-A1B0BDDED8C1}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

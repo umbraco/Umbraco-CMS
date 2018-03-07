@@ -425,26 +425,26 @@
       <HintPath>..\packages\System.Xml.XmlDocument.4.3.0\lib\net46\System.Xml.XmlDocument.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Xml.XmlDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.XPath">
       <HintPath>..\packages\System.Xml.XPath.4.3.0\lib\net46\System.Xml.XPath.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Xml.XPath, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.XPath.XDocument">
-      <HintPath>../packages/System.Xml.XPath.XDocument.4.0.1/lib/net46/System.Xml.XPath.XDocument.dll</HintPath>
+      <HintPath>../packages/System.Xml.XPath.XDocument.4.3.0/lib/net46/System.Xml.XPath.XDocument.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Name>Umbraco.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
+      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
@@ -1080,10 +1080,10 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
       <!-- the target file eg webapp/.../umbracoSettings.config -->
       <OutputFileName>$(OriginalFileName.Replace("$(ProjectDir)", "$(WebProjectOutputDir)"))</OutputFileName>
     </PropertyGroup>
-    <!-- 
+    <!--
       for each whatever.config file,
       if there is a whatever.(Release|Debug).config file,
-      copy it over as whatever.config 
+      copy it over as whatever.config
     -->
     <Message Text="ConfigFile: $(OriginalFileName) -&gt; $(OutputFileName)" Importance="high" Condition="Exists('$(ModifiedFileName)')" />
     <Copy SourceFiles="$(ModifiedFileName)" DestinationFiles="$(OutputFileName)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="Exists('$(ModifiedFileName)')" />
