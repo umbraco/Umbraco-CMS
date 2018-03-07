@@ -672,10 +672,16 @@ namespace Umbraco.Core
         //    return o is T t ? t : (T) System.Convert.ChangeType(o, typeof(T));
         //}
 
+        private static MethodInfo _convertMethod;
+
         private static void Convert(this ILGenerator ilgen, Type type)
         {
             ilgen.Emit(OpCodes.Ldtoken, type);
-            ilgen.CallMethod(typeof(Convert).GetMethod("ChangeType", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(object), typeof(Type)}, null)); // fixme cache
+
+            if (_convertMethod == null)
+                _convertMethod = typeof(Convert).GetMethod("ChangeType", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(object), typeof(Type) }, null);
+
+            ilgen.CallMethod(_convertMethod);
         }
 
         // emits adapter code before OpCodes.Ret

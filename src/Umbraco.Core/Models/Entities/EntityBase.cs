@@ -38,10 +38,6 @@ namespace Umbraco.Core.Models.Entities
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector);
-
-                // fixme - this is a problem w/ user 'admin' having ID 'zero'
-                // in v7 _hasIdentity becomes true soon as an ID is set, which is... weird
-                // we should NOT have 'admin' have ID 'zero'
                 _hasIdentity = value != 0;
             }
         }
