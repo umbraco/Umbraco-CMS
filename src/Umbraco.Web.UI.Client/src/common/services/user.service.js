@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-  .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
+  .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http) {
 
     var currentUser = null;
     var lastUserId = null;
@@ -273,6 +273,30 @@ angular.module('umbraco.services')
           deferred.resolve(currentUser);
         }
 
+        return deferred.promise;
+      },
+
+      /** Loads the Moment.js Locale for the current user. */
+      loadMomentLocaleForCurrentUser: function () {
+        var deferred = $q.defer();
+
+        var supportedLocales = [];
+
+        this.getCurrentUser()
+            .then(function (user) {
+                var locale = user.locale.toLowerCase();
+                if (locale !== 'en-us') {
+                    var localeUrls = ['lib/moment/' + locale + '.js'];
+                    if (locale.indexOf('-') > -1) {
+                        localeUrls.push('lib/moment/' + locale.split('-')[0] + '.js')
+                    }
+                    assetsService.load(localeUrls).then(function() {
+                        deferred.resolve(localeUrls);
+                    });
+                } else {
+                    deferred.resolve(['']);
+                }
+            });
         return deferred.promise;
       },
 
