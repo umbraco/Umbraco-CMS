@@ -20,5 +20,7 @@ namespace Umbraco.Web.Features
         /// Gets the disabled controllers.
         /// </summary>
         public TypeList<UmbracoApiControllerBase> Controllers { get; private set; }
+
+        public bool DisableTemplate { get; set; }
     }
 }
