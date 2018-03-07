@@ -336,7 +336,7 @@ namespace Umbraco.Web.Editors
                     "disabledFeatures", new Dictionary<string,bool>
                     {
                         {
-                            "disableTemplate", true //FeaturesResolver.Current.Features.Disabled.DisableTemplate
+                            "disableTemplate", FeaturesResolver.Current.Features.Disabled.DisableTemplate
                         }
                     }
                 }
