@@ -8,6 +8,8 @@
             var evts = [];
             var isInfoTab = false;
             scope.publishStatus = {};
+
+            scope.disableTemplate = Umbraco.Sys.ServerVariables.disabledFeatures.disableTemplate;
             
             function onInit() {
 
