@@ -17,6 +17,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.nameLocked = false;
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
+    $scope.page.exportButton = "init";
     $scope.busy = false;
 
     $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
@@ -170,6 +171,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         }
 
     };
+
+    $scope.export = function() {
+        var memberKey = $scope.content.key;
+        memberResource.exportMemberData(memberKey);
+    }
 
 }
 

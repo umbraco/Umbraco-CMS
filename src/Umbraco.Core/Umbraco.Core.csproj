@@ -15,6 +15,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -137,6 +139,7 @@
     <Compile Include="AsyncLock.cs" />
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\Audit.cs" />
+    <Compile Include="Auditing\AuditEventHandler.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
     <Compile Include="Auditing\IdentityAuditEventArgs.cs" />
     <Compile Include="BindingRedirects.cs" />
@@ -352,7 +355,9 @@
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
+    <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
+    <Compile Include="Events\UserGroupWithUsers.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
     <Compile Include="Events\SendEmailEventArgs.cs" />
@@ -363,20 +368,30 @@
     <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
+    <Compile Include="Models\AuditEntry.cs" />
+    <Compile Include="Models\Consent.cs" />
+    <Compile Include="Models\ConsentExtensions.cs" />
+    <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\IAuditEntry.cs" />
     <Compile Include="Models\IAuditItem.cs" />
+    <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
     <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
+    <Compile Include="Models\Membership\MemberExportModel.cs" />
+    <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
+    <Compile Include="Models\Rdbms\AuditEntryDto.cs" />
+    <Compile Include="Models\Rdbms\ConsentDto.cs" />
     <Compile Include="Models\Rdbms\MediaDto.cs" />
     <Compile Include="Models\Rdbms\UserLoginDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
@@ -530,6 +545,7 @@
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\DatabaseDebugHelper.cs" />
+    <Compile Include="Persistence\Factories\AuditEntryFactory.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
@@ -540,7 +556,9 @@
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
+    <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
     <Compile Include="Persistence\Mappers\AuditMapper.cs" />
+    <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
@@ -552,6 +570,10 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddInstructionCountColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddCmsMediaTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddUserLoginTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoAuditTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoConsentTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddIsSensitiveMemberTypeColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\CreateSensitiveDataUserGroup.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\ReduceDictionaryKeyColumnsSize.cs" />
@@ -622,12 +644,17 @@
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Relators\UserGroupRelator.cs" />
     <Compile Include="Persistence\Relators\UserGroupSectionRelator.cs" />
+    <Compile Include="Persistence\Repositories\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\BaseQueryType.cs" />
+    <Compile Include="Persistence\Factories\ConsentFactory.cs" />
+    <Compile Include="Persistence\Repositories\ConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentBlueprintRepository.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
+    <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
+    <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentTypeCompositionRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
@@ -724,8 +751,10 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\CreateCacheInstructionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
+    <Compile Include="Services\ConsentService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
+    <Compile Include="Services\IConsentService.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
     <Compile Include="Services\IdkMap.cs" />
     <Compile Include="Services\MediaServiceExtensions.cs" />
@@ -749,6 +778,7 @@
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\OperationStatus.cs" />
     <Compile Include="Services\OperationStatusType.cs" />
+    <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Services\ScopeRepositoryService.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
@@ -1643,7 +1673,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

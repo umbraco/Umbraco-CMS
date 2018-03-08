@@ -115,7 +115,9 @@ angular.module("umbraco.directives")
                                 toolbar: toolbar,
                                 content_css: stylesheets,
                                 style_formats: styleFormats,
-                                autoresize_bottom_margin: 0
+                                autoresize_bottom_margin: 0,
+                                //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                                cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
                             };
 
 

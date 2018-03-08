@@ -35,12 +35,18 @@ namespace Umbraco.Web.Trees
         public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
         {
             int asInt;
+            Guid asGuid = Guid.Empty;
             if (int.TryParse(id, out asInt) == false)
             {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                if (Guid.TryParse(id, out asGuid) == false)
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
             }
 
-            var entity = Services.EntityService.Get(asInt, UmbracoObjectType);
+            var entity = asGuid == Guid.Empty
+                    ? Services.EntityService.Get(asInt, UmbracoObjectType)
+                    : Services.EntityService.GetByKey(asGuid, UmbracoObjectType);
             if (entity == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));

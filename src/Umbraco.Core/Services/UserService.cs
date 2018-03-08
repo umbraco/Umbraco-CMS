@@ -838,13 +838,9 @@ namespace Umbraco.Core.Services
                 repository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 uow.Commit();
 
-                uow.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(
-                    entityIds.Select(
-                            x => new EntityPermission(
-                                groupId,
-                                x,
-                                permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray()))
-                        .ToArray(), false));
+                var assigned = permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
+                uow.Events.Dispatch(UserGroupPermissionsAssigned, this,
+                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
             }
         }
 
@@ -865,13 +861,9 @@ namespace Umbraco.Core.Services
                 repository.AssignGroupPermission(groupId, permission, entityIds);
                 uow.Commit();
 
-                uow.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(
-                    entityIds.Select(
-                            x => new EntityPermission(
-                                groupId,
-                                x,
-                                new[] { permission.ToString(CultureInfo.InvariantCulture) }))
-                        .ToArray(), false));
+                var assigned = new[] { permission.ToString(CultureInfo.InvariantCulture) };
+                uow.Events.Dispatch(UserGroupPermissionsAssigned, this,
+                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
             }
         }
 
@@ -941,7 +933,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="userGroup">UserGroup to save</param>
         /// <param name="userIds">
-        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in 
+        /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
         /// <param name="raiseEvents">Optional parameter to raise events.
@@ -950,8 +942,28 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                // we need to figure out which users have been added / removed, for audit purposes
+                var empty = new IUser[0];
+                var addedUsers = empty;
+                var removedUsers = empty;
+
+                if (userIds != null)
+                {
+                    var urepository = RepositoryFactory.CreateUserRepository(uow);
+
+                    var groupUsers = userGroup.HasIdentity ? urepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
+                    var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
+                    var groupIds = groupUsers.Select(x => x.Id).ToArray();
+
+                    addedUsers = urepository.GetAll(userIds.Except(groupIds).ToArray()).Where(x => x.Id != 0).ToArray();
+                    removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
+                }
+
+                //raise 2x events - the old and new one for backwards compat reasons
                 var saveEventArgs = new SaveEventArgs<IUserGroup>(userGroup);
-                if (raiseEvents && uow.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
+                var saveEventArgs2 = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers));
+                if (raiseEvents &&
+                    (uow.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs) || uow.Events.DispatchCancelable(SavingUserGroup2, this, saveEventArgs2)))
                 {
                     uow.Commit();
                     return;
@@ -965,7 +977,10 @@ namespace Umbraco.Core.Services
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
+
+                    //raise 2x events - the old and new one for backwards compat reasons
                     uow.Events.Dispatch(SavedUserGroup, this, saveEventArgs);
+                    uow.Events.Dispatch(SavedUserGroup2, this, saveEventArgs2);
                 }
             }
         }
@@ -1161,8 +1176,8 @@ namespace Umbraco.Core.Services
                     if (byGroup.Value.TryGetValue(pathId, out permissionsForNodeAndGroup) == false)
                         continue;
 
-                    //In theory there will only be one EntityPermission in this group 
-                    // but there's nothing stopping the logic of this method 
+                    //In theory there will only be one EntityPermission in this group
+                    // but there's nothing stopping the logic of this method
                     // from having more so we deal with it here
                     foreach (var entityPermission in permissionsForNodeAndGroup)
                     {
@@ -1198,7 +1213,7 @@ namespace Umbraco.Core.Services
         /// Returns the resulting permission set for a group for the path based on all permissions provided for the branch
         /// </summary>
         /// <param name="pathPermissions">
-        /// The collective set of permissions provided to calculate the resulting permissions set for the path 
+        /// The collective set of permissions provided to calculate the resulting permissions set for the path
         /// based on a single group
         /// </param>
         /// <param name="pathIds">Must be ordered deepest to shallowest (right to left)</param>
@@ -1296,12 +1311,24 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
+        //TODO: In v8, change this event to be SaveEventArgs<UserGroupWithUsers> and remove SavingUserGroup2
         public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
+        //TODO: In v8, change this event to be SaveEventArgs<UserGroupWithUsers> and remove SavedUserGroup2
         public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavedUserGroup;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup2;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup2;
 
         /// <summary>
         /// Occurs before Delete

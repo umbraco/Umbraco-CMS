@@ -29,11 +29,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMedia>()))
                 .ForMember(display => display.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
                 .ForMember(display => display.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
-                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())
+                .ForMember(display => display.IsChildOfListView, expression => expression.ResolveUsing(new ChildOfListViewResolver(applicationContext.Services.MediaService, applicationContext.Services.ContentTypeService)))
                 .ForMember(display => display.Trashed, expression => expression.MapFrom(content => content.Trashed))
                 .ForMember(display => display.ContentTypeName, expression => expression.MapFrom(content => content.ContentType.Name))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
-                .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                .ForMember(display => display.TreeNodeUrl, opt => opt.ResolveUsing(new ContentTreeNodeUrlResolver<IMedia, MediaTreeController>()))
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Published, expression => expression.Ignore())
@@ -41,11 +41,17 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
                 .ForMember(display => display.HasPublishedVersion, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver<IMedia>(applicationContext.Services.TextService)))
                 .ForMember(display => display.ContentType, expression => expression.ResolveUsing<MediaTypeBasicResolver>())
                 .ForMember(display => display.MediaLink, expression => expression.ResolveUsing(
                     content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, applicationContext.ProfilingLogger.Logger))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService, applicationContext.ProfilingLogger.Logger));
+                .AfterMap((media, display) =>
+                {
+                    if (media.ContentType.IsContainer)
+                    {
+                        TabsAndPropertiesResolver<IMedia>.AddListView(display, "media", applicationContext.Services.DataTypeService, applicationContext.Services.TextService);
+                    }
+                });
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -68,30 +74,27 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Icon, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());            
-        }
+        }        
 
-        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService, ILogger logger)
+        private class ChildOfListViewResolver : ValueResolver<IMedia, bool>
         {
-            // Adapted from ContentModelMapper
-            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
-            var parent = media.Parent();
-            display.IsChildOfListView = parent != null && (parent.ContentType.IsContainer || contentTypeService.HasContainerInPath(parent.Path));
+            private readonly IMediaService _mediaService;
+            private readonly IContentTypeService _contentTypeService;
 
-            //map the tree node url
-            if (HttpContext.Current != null)
+            public ChildOfListViewResolver(IMediaService mediaService, IContentTypeService contentTypeService)
             {
-                var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
-                var url = urlHelper.GetUmbracoApiService<MediaTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
-                display.TreeNodeUrl = url;
+                _mediaService = mediaService;
+                _contentTypeService = contentTypeService;
             }
 
-            if (media.ContentType.IsContainer)
+            protected override bool ResolveCore(IMedia source)
             {
-                TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
+                // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+                var parent = _mediaService.GetParent(source);
+                return parent != null && (parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(parent.Path));
             }
-
-            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText);
         }
+
 
         /// <summary>
         /// Resolves a <see cref="ContentTypeBasic"/> from the <see cref="IContent"/> item and checks if the current user
@@ -101,9 +104,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override ContentTypeBasic ResolveCore(IMedia source)
             {
-                //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                //If this is a web request and there's a user signed in and the 
-                // user has access to the settings section, we will 
+                //TODO: We can resolve the UmbracoContext from the IValueResolver options!
                 if (HttpContext.Current != null && UmbracoContext.Current != null &&
                     UmbracoContext.Current.Security.CurrentUser != null
                     && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants

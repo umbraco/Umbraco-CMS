@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, UmbracoUser.Id);
-            var mapped = Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
+            var mapped = AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(emptyContent, UmbracoContext);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinMedia
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "media", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver<IMedia>.AddListView(display, "media", Services.DataTypeService, Services.TextService);
 
             return display;
         }
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Editors
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<IMedia, MediaItemDisplay>(foundContent);
+            return AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(foundContent, UmbracoContext);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Editors
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return Mapper.Map<IMedia, MediaItemDisplay>(foundContent);
+            return AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(foundContent, UmbracoContext);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
-            return foundMedia.Select(Mapper.Map<IMedia, MediaItemDisplay>);
+            return foundMedia.Select(media => AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(media, UmbracoContext));
         }
 
         /// <summary>
@@ -488,7 +488,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw validation response
-                    var forDisplay = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
+                    var forDisplay = AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                 }
@@ -498,7 +498,7 @@ namespace Umbraco.Web.Editors
             var saveStatus = Services.MediaService.WithResult().Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
-            var display = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
+            var display = AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -607,7 +607,7 @@ namespace Umbraco.Web.Editors
             var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
             mediaService.Save(f, Security.CurrentUser.Id);
 
-            return Mapper.Map<IMedia, MediaItemDisplay>(f);
+            return AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(f, UmbracoContext);
         }
 
         /// <summary>

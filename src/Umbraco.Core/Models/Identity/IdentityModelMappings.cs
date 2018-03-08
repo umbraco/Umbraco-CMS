@@ -34,6 +34,15 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.CalculatedContentStartNodeIds, expression => expression.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(user => user.CalculatedMediaStartNodeIds, expression => expression.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()))
+
+                .ForMember(user => user.LockoutEnabled, expression => expression.Ignore())
+                .ForMember(user => user.Logins, expression => expression.Ignore())
+                .ForMember(user => user.Roles, expression => expression.Ignore())
+                .ForMember(user => user.PhoneNumber, expression => expression.Ignore())
+                .ForMember(user => user.PhoneNumberConfirmed, expression => expression.Ignore())
+                .ForMember(user => user.TwoFactorEnabled, expression => expression.Ignore())
+                .ForMember(user => user.Claims, expression => expression.Ignore())
+
                 .AfterMap((user, identityUser) =>
                 {
                     identityUser.ResetDirtyProperties(true);

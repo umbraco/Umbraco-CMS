@@ -243,7 +243,7 @@ ul.color-picker li a  {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 5px 0 0;
+    margin: 0 5px 5px 0;
     padding: 5px;
 }
 
@@ -282,8 +282,8 @@ ul.color-picker li a  {
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
-    width: 120px;
-    height: 114px;
+    width: 124px;
+    height: 124px;
     overflow: hidden;
 }
 
@@ -297,6 +297,12 @@ ul.color-picker li a  {
     opacity: 0;
     visibility: hidden;
 }
+
+.umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
+    > li:not(.unsortable) {
+        cursor: move;
+    }
+} 
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
     opacity: 1;

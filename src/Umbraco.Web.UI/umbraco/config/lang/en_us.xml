@@ -11,6 +11,7 @@
         <key alias="changeDocType">Change Document Type</key>
         <key alias="copy">Copy</key>
         <key alias="create">Create</key>
+        <key alias="export">Export</key>
         <key alias="createPackage">Create Package</key>
         <key alias="createGroup">Create group</key>
         <key alias="delete">Delete</key>
@@ -227,6 +228,7 @@
         <key alias="addTextBox">Add another text box</key>
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
+        <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -316,7 +318,6 @@
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorInsert">Name</key>
-        <key alias="assignDomain">Manage hostnames</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
         <key alias="confirmdisable">Are you sure you want to disable</key>
@@ -516,6 +517,7 @@
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
+        <key alias="options">Options</key>
         <key alias="about">About</key>
         <key alias="action">Action</key>
         <key alias="actions">Actions</key>
@@ -1398,6 +1400,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUsersError">An error occurred while unlocking the users</key>
         <key alias="unlockUserSuccess">%0% is now unlocked</key>
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
+        <key alias="memberExportedSuccess">Member was exported to file</key>
+        <key alias="memberExportedError">An error occurred while exporting the member</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1619,7 +1623,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
         <key alias="memberCanEdit">Member can edit</key>
+        <key alias="memberCanEditDescription">Allow this property value to be edited by the member on their profile page</key>
+        <key alias="isSensitiveData">Is sensitive data</key>
+        <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
+        <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
+        
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
     </area>
 
@@ -1912,7 +1921,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 															Hi %0%,
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															You have been invited by <a href="mailto:%1%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
+															You have been invited by <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Message from <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
