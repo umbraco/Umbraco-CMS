@@ -24,7 +24,7 @@ Remember, we're a friendly bunch and are happy with whatever contribution you mi
   * [Working with the source code](#working-with-the-source-code)
   * [What branch should I target for my contributions?](#what-branch-should-i-target-for-my-contributions)
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
-  * [Keeping your Umbraco fork in sync with the main repository](keeping-your-umbraco-fork-in-sync-with-the-main-repository)
+  * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
   
 [How do I even begin?](#how-do-i-even-begin)
 
