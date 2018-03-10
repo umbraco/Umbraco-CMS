@@ -149,6 +149,10 @@ After this build completes, you should be able to hit `F5` in Visual Studio to b
 
 ### Keeping your Umbraco fork in sync with the main repository
 
+We recommend you sync with our repository before you submit your pull request. That way, you can fix any potential merge conflicts and make our lives a little bit easier.
+
+Also, if you've submitted a pull request three weeks ago and want to work on something new, you'll want to get the latest code to build against of course.
+
 To sync your fork with this original one, you'll have to add the upstream url, you only have to do this once:
 
 ```
