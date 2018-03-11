@@ -109,7 +109,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             else {
                 if (dialogOptions.filter.startsWith("!")) {
                     dialogOptions.filterExclude = true;
-                    dialogOptions.filter = dialogOptions.filter.substring(1);
+                    //dialogOptions.filter = dialogOptions.filter.substring(1); // Can't substring the value on dialogoptions.filter as it then keeps it's modified value next time the dialog opens
+                    dialogOptions.filterTypes = dialogOptions.filter.substring(1);
                 }
 
                 //used advanced filtering
@@ -315,7 +316,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     }
                 });
             } else {
-                var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
+                var a = dialogOptions.filterTypes.toLowerCase().replace(/\s/g, '').split(',');
                 angular.forEach(nodes, function (value, key) {
 
                     var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
