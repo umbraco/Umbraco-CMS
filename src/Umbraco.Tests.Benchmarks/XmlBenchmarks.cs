@@ -1,42 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnostics.Windows;
-using BenchmarkDotNet.Jobs;
+using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class XmlBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-                //Add(ExecutionValidator.FailOnError);
-
-                //The 'quick and dirty' settings, so it runs a little quicker
-                // see benchmarkdotnet FAQ
-                Add(Job.Default
-                    .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(100) // 100ms per iteration
-                    .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration                
-            }
-        }
-
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             var templateId = 0;
             var xmlText = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<!DOCTYPE root[ 
+<!DOCTYPE root[
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
 <!ELEMENT CustomDocument ANY>
@@ -49,7 +26,7 @@ namespace Umbraco.Tests.Benchmarks
 		<umbracoNaviHide>1</umbracoNaviHide>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
-			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
+			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
@@ -70,7 +47,7 @@ namespace Umbraco.Tests.Benchmarks
             _xml.LoadXml(xmlText);
         }
 
-        [Cleanup]
+        [GlobalCleanup]
         public void Cleanup()
         {
             _xml = null;
@@ -90,7 +67,7 @@ namespace Umbraco.Tests.Benchmarks
         public void XmlWithNavigation()
         {
             var elt = _xml.DocumentElement;
-            var id = NavigateElementRoute(elt, new[] {"home", "sub1", "sub2"});
+            var id = NavigateElementRoute(elt, new[] { "home", "sub1", "sub2" });
             if (id <= 0) Console.WriteLine("ERR");
         }
 

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using System.Web.Script.Serialization;
+using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -83,36 +83,28 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(string jsonPayload)
         {
-            ClearCache(DeserializeFromJsonPayload(jsonPayload));
+            ClearCache();
             base.Refresh(jsonPayload);
         }
 
         public override void Refresh(int id)
         {
-            ClearCache(FromMemberGroup(ApplicationContext.Current.Services.MemberGroupService.GetById(id)));
+            ClearCache();
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearCache(FromMemberGroup(ApplicationContext.Current.Services.MemberGroupService.GetById(id)));
+            ClearCache();
             base.Remove(id);
         }
 
-        private void ClearCache(params JsonPayload[] payloads)
+        private void ClearCache()
         {
-            if (payloads == null) return;
-
-            var memberGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMemberGroup>();
-            payloads.ForEach(payload =>
-            {
-                if (payload != null && memberGroupCache)
-                {
-                    memberGroupCache.Result.ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
-                    memberGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMemberGroup>(payload.Id));
-                }                
-            });
-            
+            // Since we cache by group name, it could be problematic when renaming to
+            // previously existing names - see http://issues.umbraco.org/issue/U4-10846.
+            // To work around this, just clear all the cache items
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMemberGroup>();
         }
     }
 }

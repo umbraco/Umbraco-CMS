@@ -35,7 +35,7 @@ namespace Umbraco.Web.Scheduling
                 return;
 
             // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", applicationContext.ProfilingLogger.Logger);
+            _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive", applicationContext.ProfilingLogger.Logger);            
             _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing", applicationContext.ProfilingLogger.Logger);
             _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks", applicationContext.ProfilingLogger.Logger);
             _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber", applicationContext.ProfilingLogger.Logger);
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Scheduling
                     new KeepAlive(_keepAliveRunner, delayMilliseconds, 300000, e.UmbracoContext.Application),
                     new ScheduledPublishing(_publishingRunner, delayMilliseconds, 60000, e.UmbracoContext.Application, settings),
                     new ScheduledTasks(_tasksRunner, delayMilliseconds, 60000, e.UmbracoContext.Application, settings),
-                    new LogScrubber(_scrubberRunner, delayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings), e.UmbracoContext.Application, settings),
+                    new LogScrubber(_scrubberRunner, delayMilliseconds, LogScrubber.GetLogScrubbingInterval(settings), e.UmbracoContext.Application, settings)
                 };
 
                 if (healthCheckConfig.NotificationSettings.Enabled)
@@ -116,10 +116,20 @@ namespace Umbraco.Web.Scheduling
                 if (healthCheckConfig.NotificationSettings.Enabled)
                 {
                     _healthCheckRunner.TryAdd(tasks[4]);
-                }                    
+                }
+
+                OnInitializing(tasks);
 
                 return tasks.ToArray();
             });
+        }
+
+        public static event EventHandler<List<IBackgroundTask>> Initializing;
+
+        private static void OnInitializing(List<IBackgroundTask> e)
+        {
+            var handler = Initializing;
+            if (handler != null) handler(null, e);
         }
     }
 }

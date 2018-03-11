@@ -16,9 +16,9 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicConverter<T> : TypeConverter<Property, T>
         where T : ContentPropertyBasic, new()
     {
-        protected Lazy<IDataTypeService> DataTypeService { get; private set; }
+        protected IDataTypeService DataTypeService { get; private set; }
 
-        public ContentPropertyBasicConverter(Lazy<IDataTypeService> dataTypeService)
+        public ContentPropertyBasicConverter(IDataTypeService dataTypeService)
         {
             DataTypeService = dataTypeService;
         }
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
             var result = new T
                 {
                     Id = property.Id,
-                    Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService.Value),
+                    Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService),
                     Alias = property.Alias, 
                     PropertyEditor = editor,
                     Editor = editor.Alias

@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.DocumentTypes.EditController as vm">
+<div data-element="editor-document-types" ng-controller="Umbraco.Editors.DocumentTypes.EditController as vm">
 
     <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
@@ -40,6 +40,7 @@
                 <umb-editor-footer-content-right>
 
                     <umb-button
+                        alias="save"
                         ng-if="!vm.page.modelsBuilder"
                         type="button" 
                         action="vm.save()"

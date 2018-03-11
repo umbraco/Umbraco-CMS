@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.UI;
+using Semver;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -30,7 +31,6 @@ namespace Umbraco.Web.Install
             _umbContext = umbContext;
         }
 
-
         /// <summary>
         /// Get the installer steps
         /// </summary>
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Install
             return new List<InstallSetupStep>
             {
                 new NewInstallStep(_umbContext.HttpContext, _umbContext.Application),
-                new UpgradeStep(),
+                new UpgradeStep(_umbContext.Application),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_umbContext.Application),
                 new Version73FileCleanup(_umbContext.HttpContext, _umbContext.Application.ProfilingLogger.Logger),

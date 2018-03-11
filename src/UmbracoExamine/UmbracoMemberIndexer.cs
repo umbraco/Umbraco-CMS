@@ -197,7 +197,7 @@ namespace UmbracoExamine
                                 AddNodesToIndex(GetSerializedMembers(members), type);
 
                                 pageIndex++;
-                            } while (members.Length == pageSize);
+                            } while (members.Length == pageSize && IsCancellationRequested == false); //don't continue if the app is shutting down
                         }
                     }
                     else
@@ -211,7 +211,7 @@ namespace UmbracoExamine
                             AddNodesToIndex(GetSerializedMembers(members), type);
 
                             pageIndex++;
-                        } while (members.Length == pageSize);
+                        } while (members.Length == pageSize && IsCancellationRequested == false); //don't continue if the app is shutting down
                     }
                 }
             }

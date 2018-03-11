@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient;
 using StackExchange.Profiling.Data;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence

@@ -53,6 +53,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
                 editorState.set($scope.content);
 
+                // We don't get the info tab from the server from version 7.8 so we need to manually add it
+                contentEditingHelper.addInfoTab($scope.content.tabs);
+
                 $scope.page.loading = false;
 
             });
@@ -89,6 +92,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                             $scope.ancestors = anc;
                         });
                 }
+
+                // We don't get the info tab from the server from version 7.8 so we need to manually add it
+                contentEditingHelper.addInfoTab($scope.content.tabs);
 
                 $scope.page.loading = false;
 
@@ -145,6 +151,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         }
         
     };
+
 }
 
 angular.module("umbraco")

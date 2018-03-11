@@ -43,29 +43,55 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="robots" content="noindex, nofollow">
+    <meta name="pinterest" content="nopin" />
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
-
-
 </head>
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
-<body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
-        <umb-navigation></umb-navigation>
+    <div ng-hide="!authenticated" ng-cloak>
+    
+        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
+        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
+        
+        <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
-        <section id="contentwrapper">
-            <div id="contentcolumn" ng-view>
-            </div>
-        </section>
+            <umb-navigation></umb-navigation>
 
-        <umb-notifications></umb-notifications>
+            <section id="contentwrapper">
+                <div id="contentcolumn" ng-view></div>
+            </section>
 
+            <umb-tour
+                ng-if="tour.show"
+                model="tour">
+            </umb-tour>
+
+            <umb-notifications></umb-notifications>
+
+        </div>
+        
     </div>
+
+    <umb-backdrop
+        ng-if="backdrop.show"
+        backdrop-opacity="backdrop.opacity"
+        highlight-element="backdrop.element"
+        highlight-prevent-click="backdrop.elementPreventClick"
+        disable-events-on-click="backdrop.disableEventsOnClick">
+    </umb-backdrop>
+
+    <umb-overlay
+        ng-if="ysodOverlay.show"
+        model="ysodOverlay"
+        position="right"
+        view="ysodOverlay.view">
+    </umb-overlay>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
@@ -87,13 +113,6 @@
         <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
-
-    <umb-overlay
-        ng-if="ysodOverlay.show"
-        model="ysodOverlay"
-        position="right"
-        view="ysodOverlay.view">
-    </umb-overlay>
 
 </body>
 </html>

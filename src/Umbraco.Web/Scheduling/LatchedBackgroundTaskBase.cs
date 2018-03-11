@@ -12,7 +12,7 @@ namespace Umbraco.Web.Scheduling
     /// depending on whether the task is implemented as a sync or async method, and then
     /// optionnally overriding RunsOnShutdown, to indicate whether the latched task should run
     /// immediately on shutdown, or just be abandonned (default).</remarks>
-    public abstract class LatchedBackgroundTaskBase : DisposableObject, ILatchedBackgroundTask
+    public abstract class LatchedBackgroundTaskBase : DisposableObjectSlim, ILatchedBackgroundTask
     {
         private TaskCompletionSource<bool> _latch;
 

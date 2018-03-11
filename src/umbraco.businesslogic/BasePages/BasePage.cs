@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Web;
 using System.Linq;
@@ -53,6 +54,7 @@ namespace umbraco.BasePages
         /// Unused, please do not use
         /// </summary>
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected static ISqlHelper SqlHelper
         {
             get { return BusinessLogic.Application.SqlHelper; }
@@ -87,6 +89,7 @@ namespace umbraco.BasePages
         /// This assumes that the current page is a BasePage, otherwise, returns null;
         /// </summary>
         [Obsolete("Should use the Umbraco.Web.UmbracoContext.Current singleton instead to access common methods and properties")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static BasePage Current
         {
             get
@@ -131,6 +134,7 @@ namespace umbraco.BasePages
         }
 
         [Obsolete("Use ClientTools instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void RefreshPage(int Seconds)
         {
             ClientTools.RefreshAdmin(Seconds);
@@ -172,6 +176,7 @@ namespace umbraco.BasePages
         /// <param name="umbracoUserContextID">This is not used</param>
         /// <returns></returns>
         [Obsolete("This method is no longer used, use the GetUserId() method without parameters instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static int GetUserId(string umbracoUserContextID)
         {
             return GetUserId();
@@ -203,6 +208,7 @@ namespace umbraco.BasePages
         /// <param name="currentUmbracoUserContextID">This doesn't do anything</param>
         /// <returns></returns>
         [Obsolete("This method is no longer used, use the ValidateCurrentUser() method instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
             return ValidateCurrentUser();
@@ -244,6 +250,7 @@ namespace umbraco.BasePages
         /// </summary>
         /// <value>The umbraco user context ID.</value>
         [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static string umbracoUserContextID
         {
             get
@@ -264,33 +271,41 @@ namespace umbraco.BasePages
         }
 
 
-        /// <summary>
-        /// Clears the login.
-        /// </summary>
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearLogin()
         {
             Context.UmbracoLogout();
         }
 
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         private void UpdateLogin()
         {
             Context.RenewUmbracoAuthTicket();
         }
 
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RenewLoginTimeout()
         {
             HttpContext.Current.RenewUmbracoAuthTicket();
         }
 
-        /// <summary>
-        /// Logs a user in.
-        /// </summary>
-        /// <param name="u">The user</param>
+        [Obsolete("This should not be used and will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void doLogin(User u)
         {
-            HttpContext.Current.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
+            var httpContextBase = new HttpContextWrapper(HttpContext.Current);
+            
+            //This is legacy code but might still be used by some old webforms things (hopefully not though!), in any case we still need to generate a valid sessionid for
+            //the user so it's stored in the db and the cookie.
+            var sessionId = ApplicationContext.Current.Services.UserService.CreateLoginSession(u.Id, httpContextBase.GetCurrentRequestIpAddress());
+
+            httpContextBase.CreateUmbracoAuthTicket(new UserData(sessionId.ToString("N"))
             {
                 Id = u.Id,
+                SecurityStamp = u.SecurityStamp,
                 AllowedApplications = u.GetApplications().Select(x => x.alias).ToArray(),
                 RealName = u.Name,
                 Roles = u.GetGroups(),

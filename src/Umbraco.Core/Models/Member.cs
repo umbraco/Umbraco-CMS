@@ -170,7 +170,19 @@ namespace Umbraco.Core.Models
         public string RawPasswordValue
         {
             get { return _rawPasswordValue; }
-            set { SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector); }
+            set
+            {
+                if (value == null)
+                {
+                    //special case, this is used to ensure that the password is not updated when persisting, in this case
+                    //we don't want to track changes either
+                    _rawPasswordValue = null;
+                }
+                else
+                {
+                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector);
+                }
+            }
         }
 
         /// <summary>

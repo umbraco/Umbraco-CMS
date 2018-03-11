@@ -38,7 +38,7 @@
     <key alias="update">Bijwerken</key>
   </area>
   <area alias="assignDomain">
-    <key alias="permissionDenied">Permission denied.</key>
+    <key alias="permissionDenied">Toegang geweigerd.</key>
     <key alias="addNew">Nieuw domein toevoegen</key>
     <key alias="remove">verwijderen</key>
     <key alias="invalidNode">Ongeldige node.</key>
@@ -452,7 +452,7 @@
     <key alias="email">Email</key>
     <key alias="error">Fout</key>
     <key alias="findDocument">Vind</key>
-    <key alias="height">Hogte</key>
+    <key alias="height">Hoogte</key>
     <key alias="help">Help</key>
     <key alias="icon">Icoon</key>
     <key alias="import">Import</key>
@@ -1039,6 +1039,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="template">Sjabloon</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Item toevoegen</key>
     <key alias="chooseLayout">Kies de indeling</key>
     <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>
@@ -1373,10 +1379,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="httpsCheckEnableHttpsDescription">Zet in de appSettings van de web.config de umbracoSSL instelling op 'true'.</key>
     <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'umbracoUseSSL' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
 
-    <key alias="rectifyButton">Fix</key>
-    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
-    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+    <key alias="rectifyButton">Herstellen</key>
+    <key alias="cannotRectifyShouldNotEqual">Kan een controle met vergelijkingstype 'ShouldNotEqual' niet herstellen.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Kan een controle met vergelijkingstype 'ShouldNotEqual' en gedefinieerde waarde niet herstellen.</key>
+    <key alias="valueToRectifyNotProvided">Waarde om te herstellen niet gedefinieerd.</key>
 
     <key alias="compilationDebugCheckSuccessMessage">Debug compiliate mode staat uit.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compiliate mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
