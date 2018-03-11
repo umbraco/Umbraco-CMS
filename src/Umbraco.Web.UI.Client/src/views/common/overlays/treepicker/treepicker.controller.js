@@ -83,11 +83,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //if a alternative startnode is used, we need to check if it is a container
         if ($scope.enableSearh && dialogOptions.startNodeId && dialogOptions.startNodeId !== -1 && dialogOptions.startNodeId !== "-1") {
             entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function(node) {
-                    if (node.metaData.IsContainer) {
-                        openMiniListView(node);
-                    }
-                    initTree();
-                });
+                if (node.metaData.IsContainer) {
+                    openMiniListView(node);
+                }
+                initTree();
+            });
         }
         else {
             initTree();
@@ -120,6 +120,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     dialogOptions.filter = angular.fromJson(dialogOptions.filter);
                 }
             }
+
+            $scope.filter = {
+                filterAdvanced: dialogOptions.filterAdvanced,
+                filterExclude: dialogOptions.filterExclude,
+                filter: dialogOptions.filterTypes
+            };
         }
 
         function initTree() {
