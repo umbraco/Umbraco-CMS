@@ -25,26 +25,21 @@
                 <div style="position: relative;">
                     <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
                     <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
-                    <!--<ul class="nav nav-stacked" style="margin-bottom: 0;" ng-show="hasRedirects">
-                        <li ng-repeat="redirectUrl in redirectUrls">
-                            <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a> <button type="button" class="umb-era-button umb-button--s -red" ng-click="removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
-                        </li>
-                        </ul>-->
-                        <div class="umb-table" ng-show="hasRedirects" style="border:none">
-                            <div class="umb-table-body" style="border:none">
-                                <div class="umb-table-row -solid" ng-repeat="redirectUrl in redirectUrls"  style="border-top:none">
-                                    <div class="umb-table-cell  not-fixed flx-s1 flx-g1 flx-b4">
-                                        <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
-                                    </div>
-                                    <div class="umb-table-cell">
-                                  
-                                        <button type="button" class="umb-era-button umb-button--s -red" ng-click="removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  
                     <div ng-show="!hasRedirects && !loadingRedirectUrls"><localize key="redirectUrls_noRedirects"></localize></div>
-</div>                  
+                    <ul ng-show="hasRedirects" class="nav nav-stacked" style="margin-bottom: 0;">
+                        <li ng-repeat="redirectUrl in redirectUrls">
+                            <a  href="{{redirectUrl.originalUrl}}" target="_blank">
+                                <i ng-class="value.icon" class="icon-out"></i>
+                                <span>{{redirectUrl.originalUrl}}</span>
+                            </a>
+                            </li>
+                        </ul>
+                               
+      
+                    <div><a class="btn pull-right" style="text-align:right" ng-click="showRedirectOverlay()">Manage Redirects</a></div>
+                    <br class="clearfix" />
+</div>                 
 </umb-box-content>
         </umb-box>
 

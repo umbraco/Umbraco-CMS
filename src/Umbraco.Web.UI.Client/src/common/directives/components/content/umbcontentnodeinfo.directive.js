@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource, notificationsService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource, notificationsService, dialogService) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -74,11 +74,11 @@
 
             scope.clearUnpublishDate = function () {
                 clearUnpublishDate();
+            };   
+            scope.showRedirectOverlay = function () {
+                showRedirectOverlay();
             };
-            scope.removeRedirect = function (redirectToDelete) {
-                removeRedirect(redirectToDelete);
-            };
-
+            
             function loadAuditTrail() {
 
                 scope.loadingAuditTrail = true;
@@ -114,26 +114,40 @@
                         scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
                         scope.loadingRedirectUrls = false;                        
                     });
-            }
+            } 
+
+            function showRedirectOverlay() {
+   
+                var dialog = dialogService.open({ template: 'views/common/overlays/redirecturlmanagementoverlay/redirecturlmanagementoverlay.html', show: true, dialogData: scope.node, callback: redirectManagementManaged });
   
-            function removeRedirect(redirectToDelete) {
-                localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, scope.node.name]).then(function (value) {
-                    var toggleConfirm = confirm(value);
-
-                    if (toggleConfirm) {
-                        redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
-
-                            var index = scope.redirectUrls.indexOf(redirectToDelete);
-                            scope.redirectUrls.splice(index, 1);
-                            notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
-                            loadRedirectUrls();
-                        }, function (error) {
-                            notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
-                            loadRedirectUrls();
-                            });
-                    }
-                });
             }
+            ///manages the callback from the Manage Url Redirect dialog
+            function redirectManagementManaged(data) {
+                if (data.redirectAction === "Create") {
+                    if (data.actionSuccess) {
+                        //localize status messages?
+                        notificationsService.remove(0);
+                        notificationsService.success(data.statusMessage);
+                    }
+                    else {
+                        notificationsService.remove(0);
+                        notificationsService.error(data.statusMessage);
+                    }
+                }
+                if (data.redirectAction === "Remove") {
+                    if (data.actionSuccess) {
+                        notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
+                    }
+                    else {
+                        notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
+
+                    }
+
+                }               
+                loadRedirectUrls();
+            }
+
+
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
                     switch (item.logType) {

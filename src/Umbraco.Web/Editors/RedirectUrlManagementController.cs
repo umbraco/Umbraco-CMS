@@ -88,7 +88,45 @@ namespace Umbraco.Web.Editors
             redirectUrlService.Delete(id);
             return Ok();
         }
+        /// <summary>
+        /// Creates a redirect in the Redirect Url Tracking table for a particular relative Url to a specific content item identified by Udi
+        /// </summary>
+        /// <param name="url">Relative url to redirect from</param>
+        /// <param name="id">Udi of content item to redirect to</param>
+        /// <returns></returns>
+        [HttpPost]
+        public IHttpActionResult CreateRedirectUrl(string url, string id)
+        {
+            if (String.IsNullOrEmpty(url)){
+                //should we be validating this url here, to make sure people not passing http or /oldsystem.php style urls, this is just for nice vanity redirects, or Url changes not tracked
+                return BadRequest("Missing RedirectFromUrl");
+            }
+            var redirectUrlService = Services.RedirectUrlService;
+            Guid contentKey = default(Guid);
+            if (!String.IsNullOrEmpty(id))
+            {
+                GuidUdi guidIdi;
+                contentKey = GuidUdi.TryParse(id, out guidIdi) ? guidIdi.Guid : default(Guid);
+            }
+            try
+            {
+                if (contentKey != Guid.Empty)
+                {
+                    redirectUrlService.Register(url, contentKey);
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(id + " not a valid Guid Udi");
+                }
+             
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
+        }
         [HttpPost]
         public IHttpActionResult ToggleUrlTracker(bool disable)
         {

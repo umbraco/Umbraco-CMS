@@ -1,0 +1,52 @@
+<div ng-controller="Umbraco.Overlays.RedirectUrlManagementOverlay as vm">
+
+    <div class="umb-dialog-body">
+        <div class="umb-pane">
+            <h3 class="title"><localize key="redirectUrls_redirectUrlManagement">Redirect Url Management</localize></h3>
+        </div>
+        <umb-load-indicator ng-if="vm.status.loading">
+        </umb-load-indicator>
+        <div ng-show="vm.status.hasRedirects" class="umb-pane">
+            <div class="umb-table">
+                <div class="umb-table-head">
+                    <div class="umb-table-row">
+
+                        <div class="umb-table-cell  not-fixed flx-s1 flx-g1 flx-b4">
+                            Redirected Url
+                        </div>
+                        <div class="umb-table-cell">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="umb-table-body">
+                    <div class="umb-table-row -solid" ng-repeat="redirectUrl in vm.data.redirects">
+                        <div class="umb-table-cell  not-fixed flx-s1 flx-g1 flx-b4">
+                            <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                        </div>
+                        <div class="umb-table-cell">
+                            <button type="button" class="umb-era-button umb-button--s -red" ng-click="vm.removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="vm.status.loaded && !vm.status.hasRedirects" class="umb-pane">
+            <localize key="redirectUrls_noRedirects"></localize>
+        </div>
+        <div class="umb-pane">
+            <h3 class="subhead">Add redirect</h3>
+         
+            <form class="form" novalidate>
+                <div class="umb-el-wrap">
+                    <label class="control-label">Url to redirect from:</label>
+                    <input type="text" class="form-control" ng-model="vm.data.redirectFromUrl" prevent-enter-submit no-dirty-check />
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+        <a class="btn btn-link" ng-click="close()"><localize key="general_cancel">Cancel</localize></a> <button ng-show="vm.data.redirectFromUrl.length > 3" class="btn btn-primary" ng-click="vm.addRedirect()">Add Redirect</button>
+    </div>
+</div>

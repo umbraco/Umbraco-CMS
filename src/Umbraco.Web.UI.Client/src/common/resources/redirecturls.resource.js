@@ -40,7 +40,7 @@
                         { searchTerm: searchTerm, page: pageIndex, pageSize: pageSize })),
                 'Failed to retrieve data for searching redirect urls');
         }
-        /**
+   /**
    * @ngdoc function
    * @name umbraco.resources.redirectUrlResource#getRedirectsForContentItem
    * @methodOf umbraco.resources.redirectUrlResource
@@ -102,7 +102,32 @@
                         "DeleteRedirectUrl", { id: id })),
                 'Failed to remove redirect');
         }
-
+        /**
+       * @ngdoc function
+       * @name umbraco.resources.redirectUrlResource#createRedirectUrl
+       * @methodOf umbraco.resources.redirectUrlResource
+       * @function
+       *
+       * @description
+       * Called to create a manual redirect
+       * ##usage
+       * <pre>
+       * redirectUrlsResource.createRedirectUrl("/myrelative/niceurl","umb://document/4fed18d8c5e34d5e88cfff3a5b457bf2")
+       *    .then(function() {
+       *
+       *    });
+       * </pre>
+        * @param {String} url relative url to redirect from
+       * @param {String} id Udi of the Content Item to redirect to
+       */
+        function createRedirectUrl(url, id) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "redirectUrlManagementApiBaseUrl",
+                        "CreateRedirectUrl", { url: url, id: id })),
+                'Failed to create redirect');
+        }
         /**
          * @ngdoc function
          * @name umbraco.resources.redirectUrlResource#toggleUrlTracker
@@ -132,6 +157,7 @@
         var resource = {
             searchRedirectUrls: searchRedirectUrls,
             deleteRedirectUrl: deleteRedirectUrl,
+            createRedirectUrl: createRedirectUrl,
             toggleUrlTracker: toggleUrlTracker,
             getEnableState: getEnableState,
             getRedirectsForContentItem: getRedirectsForContentItem
