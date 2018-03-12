@@ -79,7 +79,7 @@
         </div>
 
         <!--  Umbraco tv content -->
-        <div data-element="help-videos" style="margin-bottom: 20px;">
+        <div data-element="help-videos" style="margin-bottom: 20px;" ng-if="vm.usertype==='admin'">
             <h5 style="margin-bottom: 10px; margin-top: 0;" ng-if="vm.videos.length > 0">Videos</h5>
             <ul class="umb-help-list">
                 <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
