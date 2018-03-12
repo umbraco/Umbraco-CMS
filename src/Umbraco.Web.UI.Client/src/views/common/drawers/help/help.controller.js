@@ -83,10 +83,13 @@
         }
 
         function findHelp(section, tree, usertype, userLang) {
+
+            if (vm.usertype === 'admin') {
+                helpService.getContextHelpForPage(section, tree).then(function (topics) {
+                    vm.topics = topics;
+                });
+            }
             
-            helpService.getContextHelpForPage(section, tree).then(function (topics) {
-                vm.topics = topics;
-            });
 
             var rq = {};
             rq.section = vm.section;
