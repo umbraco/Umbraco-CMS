@@ -80,17 +80,21 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
-                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
+                .ForMember(display => display.Udi,
+                    expression =>
+                        expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
-                .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(dto => dto.ContentTypeAlias,
+                    expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(dto => dto.Email, expression => expression.MapFrom(content => content.Email))
                 .ForMember(dto => dto.Username, expression => expression.MapFrom(content => content.Username))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(dto => dto.Published, expression => expression.Ignore())
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
-                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore())
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberSensitivePropertiesResolver()));
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
@@ -477,8 +481,41 @@ namespace Umbraco.Web.Models.Mapping
                 return AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(member, context.GetUmbracoContext());
             }
         }
+
+        internal class MemberSensitivePropertiesResolver : SensitivePropertiesResolver<IMember>
+        {
+
+            /// <summary>
+            /// Overridden to assign the IsSensitive property values
+            /// </summary>
+            /// <param name="umbracoContext"></param>
+            /// <param name="content"></param>
+            /// <param name="properties"></param>
+            /// <returns></returns>
+            protected override List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties)
+            {
+                var result = base.MapProperties(umbracoContext, content, properties);
+                var member = (IMember)content;
+                var memberType = member.ContentType;
+
+                //now update the IsSensitive value
+                foreach (var prop in result)
+                {
+                    //check if this property is flagged as sensitive
+                    var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
+                    //check permissions for viewing sensitive data
+                    if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                    {
+                        //mark this property as readonly so that it does not post any data
+                        prop.Readonly = true;
+                        //replace this editor with a sensitivevalue
+                        prop.View = "sensitivevalue";
+                        //clear the value
+                        prop.Value = null;
+                    }
+                }
+                return result;
+            }
+        }
     }
 }
-
-
-
