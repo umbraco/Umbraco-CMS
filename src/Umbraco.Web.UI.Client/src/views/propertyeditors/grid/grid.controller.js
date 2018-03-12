@@ -641,7 +641,7 @@ angular.module("umbraco")
 
           var newClipboard = localStorageService.get(gridClipboardAlias);
 
-          control.guid = $scope.setUniqueId();
+          control.guid = guid();
 
           newClipboard.push(control);
 
