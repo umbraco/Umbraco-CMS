@@ -108,10 +108,12 @@
                 rq.path = rq.section + "/" + $routeParams.tree + "/" + $routeParams.method;
             }
 
-            helpService.findVideos(rq).then(function(videos){
-    	        vm.videos = videos;
-            });
-            
+
+            if (vm.usertype === 'admin') {
+                helpService.findVideos(rq).then(function (videos) {
+                    vm.videos = videos;
+                });
+            }                       
         }
 
         function setSectionName() {
