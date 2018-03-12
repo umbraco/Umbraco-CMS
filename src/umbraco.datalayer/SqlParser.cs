@@ -199,8 +199,8 @@ namespace umbraco.DataLayer
                 // String start?
                 if (query[currentPos] == StringDelimiter)
                 {
-                    // append part before string, uppercased
-                    replacedQuery.Append(query.Substring(partStartPos, currentPos - partStartPos).ToUpper());
+                    // append part before string, uppercased - Removed .ToUpper() to fix linux MySQL table name issue
+                    replacedQuery.Append(query.Substring(partStartPos, currentPos - partStartPos));
 
                     // append string, case unchanged
                     int endStringPos = FindStringEndPosition(query, currentPos);
