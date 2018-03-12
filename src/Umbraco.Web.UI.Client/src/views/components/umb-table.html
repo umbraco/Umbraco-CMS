@@ -47,7 +47,17 @@
                     </a>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in itemProperties">
-                    <span title="{{column.header}}: {{item[column.alias]}}">{{item[column.alias]}}</span>
+                    <span title="{{column.header}}: {{item[column.alias]}}">
+
+                        <div ng-if="!column.isSensitive">
+                            {{item[column.alias]}}
+                        </div>
+
+                        <em ng-show="column.isSensitive" class="muted">
+                            <localize key="content_isSensitiveValue_short"></localize>
+                        </em>
+
+                    </span>
                 </div>
             </div>
         </div>
