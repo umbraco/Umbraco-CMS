@@ -260,6 +260,19 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByQuery(query);
         }
 
+        public Dictionary<string, Guid> GetDictionaryItemKeyMap()
+        {
+            var columns = new[] { "key", "id" }.Select(x => (object) SqlSyntax.GetQuotedColumnName(x)).ToArray();
+            var sql = new Sql().Select(columns).From<DictionaryDto>(SqlSyntax);
+            return Database.Fetch<DictionaryItemKeyIdDto>(sql).ToDictionary(x => x.Key, x => x.Id);
+        }
+
+        private class DictionaryItemKeyIdDto
+        {
+            public string Key { get; set; }
+            public Guid Id { get; set; }
+        }
+
         public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
         {
             //This methods will look up children at each level, since we do not store a path for dictionary (ATM), we need to do a recursive

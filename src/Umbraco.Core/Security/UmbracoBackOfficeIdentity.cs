@@ -36,30 +36,40 @@ namespace Umbraco.Core.Security
 
             var username = identity.GetUserName();
             var session = identity.FindFirstValue(Constants.Security.SessionIdClaimType);
-            var startContentId = identity.FindFirstValue(Constants.Security.StartContentNodeIdClaimType);            
+            var securityStamp = identity.FindFirstValue(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType);
+            var startContentId = identity.FindFirstValue(Constants.Security.StartContentNodeIdClaimType);
             var startMediaId = identity.FindFirstValue(Constants.Security.StartMediaNodeIdClaimType);
 
             var culture = identity.FindFirstValue(ClaimTypes.Locality);
-            var id = identity.FindFirstValue(ClaimTypes.NameIdentifier);            
+            var id = identity.FindFirstValue(ClaimTypes.NameIdentifier);
             var realName = identity.FindFirstValue(ClaimTypes.GivenName);
 
-            if (username == null || startContentId == null || startMediaId == null 
-                || culture == null || id == null 
+            if (username == null || startContentId == null || startMediaId == null
+                || culture == null || id == null
                 || realName == null || session == null)
                 throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since there are missing required claims");
 
-            int startContentIdAsInt;
-            int startMediaIdAsInt;
-            if (int.TryParse(startContentId, out startContentIdAsInt) == false || int.TryParse(startMediaId, out startMediaIdAsInt) == false)
+            int[] startContentIdsAsInt;
+            int[] startMediaIdsAsInt;
+            if (startContentId.DetectIsJson() == false || startMediaId.DetectIsJson() == false)
+                throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly - either content or media start Ids are not JSON");
+
+            try
             {
-                throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly");
+                startContentIdsAsInt = JsonConvert.DeserializeObject<int[]>(startContentId);
+                startMediaIdsAsInt = JsonConvert.DeserializeObject<int[]>(startMediaId);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Cannot create a " + typeof(UmbracoBackOfficeIdentity) + " from " + typeof(ClaimsIdentity) + " since the data is not formatted correctly - either content or media start Ids could not be parsed as JSON", e);
             }
 
             var roles = identity.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToList();
             var allowedApps = identity.FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToList();
 
-            var userData = new UserData(session)
+            var userData = new UserData
             {
+                SecurityStamp = securityStamp,
                 SessionId = session,
                 AllowedApplications = allowedApps.ToArray(),
                 Culture = culture,
@@ -67,8 +77,8 @@ namespace Umbraco.Core.Security
                 Roles = roles.ToArray(),
                 Username = username,
                 RealName = realName,
-                StartContentNode = startContentIdAsInt,
-                StartMediaNode = startMediaIdAsInt
+                StartContentNodes = startContentIdsAsInt,
+                StartMediaNodes = startMediaIdsAsInt
             };
 
             return new UmbracoBackOfficeIdentity(identity, userData);
@@ -155,7 +165,7 @@ namespace Umbraco.Core.Security
         {
             foreach (var claim in claimsIdentity.Claims)
             {
-                //In one special case we will replace a claim if it exists already and that is the 
+                //In one special case we will replace a claim if it exists already and that is the
                 // Forms auth claim for name which automatically gets added
                 TryRemoveClaim(FindFirst(x => x.Type == claim.Type && x.Issuer == "Forms"));
 
@@ -177,14 +187,15 @@ namespace Umbraco.Core.Security
                 {
                     ClaimTypes.NameIdentifier, //id
                     ClaimTypes.Name,  //username
-                    ClaimTypes.GivenName, 
+                    ClaimTypes.GivenName,
                     Constants.Security.StartContentNodeIdClaimType,
-                    Constants.Security.StartMediaNodeIdClaimType, 
-                    ClaimTypes.Locality, 
-                    Constants.Security.SessionIdClaimType
+                    Constants.Security.StartMediaNodeIdClaimType,
+                    ClaimTypes.Locality,
+                    Constants.Security.SessionIdClaimType,
+                    Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType
                 };
             }
-        } 
+        }
 
         /// <summary>
         /// Adds claims based on the UserData data
@@ -202,32 +213,28 @@ namespace Umbraco.Core.Security
                 AddClaim(new Claim(ClaimTypes.GivenName, UserData.RealName, ClaimValueTypes.String, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false)
-                AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, StartContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, JsonConvert.SerializeObject(StartContentNodes), ClaimValueTypes.Integer32, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false)
-                AddClaim(new Claim(Constants.Security.StartMediaNodeIdClaimType, StartMediaNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, this));
+                AddClaim(new Claim(Constants.Security.StartMediaNodeIdClaimType, JsonConvert.SerializeObject(StartMediaNodes), ClaimValueTypes.Integer32, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, Culture, ClaimValueTypes.String, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
-            {
                 AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
 
-                //The security stamp claim is also required... this is because this claim type is hard coded 
-                // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
-                if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
-                {
-                    AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
-                }
-            }
+            //The security stamp claim is also required... this is because this claim type is hard coded
+            // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
+            if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
+                AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SecurityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false)
             {
                 foreach (var application in AllowedApplications)
                 {
-                    AddClaim(new Claim(Constants.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, this));    
+                    AddClaim(new Claim(Constants.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, this));
                 }
             }
 
@@ -242,8 +249,8 @@ namespace Umbraco.Core.Security
                 }
             }
 
-            
-            
+
+
         }
 
         protected internal UserData UserData { get; private set; }
@@ -259,14 +266,14 @@ namespace Umbraco.Core.Security
             get { return _currentIssuer; }
         }
 
-        public int StartContentNode
+        public int[] StartContentNodes
         {
-            get { return UserData.StartContentNode; }
+            get { return UserData.StartContentNodes; }
         }
 
-        public int StartMediaNode
+        public int[] StartMediaNodes
         {
-            get { return UserData.StartMediaNode; }
+            get { return UserData.StartMediaNodes; }
         }
 
         public string[] AllowedApplications
@@ -297,6 +304,11 @@ namespace Umbraco.Core.Security
         public string SessionId
         {
             get { return UserData.SessionId; }
+        }
+
+        public string SecurityStamp
+        {
+            get { return UserData.SecurityStamp; }
         }
 
         public string[] Roles

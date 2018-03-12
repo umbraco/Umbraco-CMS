@@ -126,10 +126,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPicker2Alias))
                 return true;
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                return propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaPickerAlias);
-            }
             return false;
         }
 

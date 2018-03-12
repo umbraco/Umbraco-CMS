@@ -251,7 +251,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 // move to parent node
                 e = (XmlElement) e.ParentNode;
-                id = int.Parse(e.GetAttribute("id"));
+                id = int.Parse(e.GetAttribute("id"), CultureInfo.InvariantCulture);
                 hasDomains = id != -1 && domainHelper.NodeHasDomains(id);
             }
 

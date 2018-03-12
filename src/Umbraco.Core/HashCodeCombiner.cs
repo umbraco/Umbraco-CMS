@@ -2,17 +2,19 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Used to create a hash code from multiple objects.
+    /// Used to create a .NET HashCode from multiple objects.
     /// </summary>
     /// <remarks>
     /// .Net has a class the same as this: System.Web.Util.HashCodeCombiner and of course it works for all sorts of things
     /// which we've not included here as we just need a quick easy class for this in order to create a unique
     /// hash of directories/files to see if they have changed.
+    /// 
+    /// NOTE: It's probably best to not relying on the hashing result across AppDomains! If you need a constant/reliable hash value
+    /// between AppDomains use SHA1. This is perfect for hashing things in a very fast way for a single AppDomain.
     /// </remarks>
     internal class HashCodeCombiner
     {

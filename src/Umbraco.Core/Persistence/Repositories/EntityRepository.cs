@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <remarks>
     /// This is limited to objects that are based in the umbracoNode-table.
     /// </remarks>
-    internal class EntityRepository : DisposableObject, IEntityRepository
+    internal class EntityRepository : DisposableObjectSlim, IEntityRepository
     {
         private readonly IDatabaseUnitOfWork _work;
 
@@ -48,17 +48,17 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IUmbracoEntity> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId, long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection, IQuery<IUmbracoEntity> filter = null)
         {   
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
             var factory = new UmbracoEntityFactory();
             
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, sql =>
             {
                 if (filter != null)
                 {
-                    foreach (var filterClaus in filter.GetWhereClauses())
+                    foreach (var filterClause in filter.GetWhereClauses())
                     {
-                        sql.Where(filterClaus.Item1, filterClaus.Item2);
+                        sql.Where(filterClause.Item1, filterClause.Item2);
                     }
                 }
             }, objectTypeId);
@@ -149,9 +149,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     if (filter != null)
                     {
-                        foreach (var filterClaus in filter.GetWhereClauses())
+                        foreach (var filterClause in filter.GetWhereClauses())
                         {
-                            sql.Where(filterClaus.Item1, filterClaus.Item2);
+                            sql.Where(filterClause.Item1, filterClause.Item2);
                         }
                     }
                 }, objectTypeId);
@@ -178,8 +178,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IUmbracoEntity GetByKey(Guid key, Guid objectTypeId)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sql = GetFullSqlForEntityType(key, isContent, isMedia, objectTypeId);
 
@@ -225,8 +225,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sql = GetFullSqlForEntityType(id, isContent, isMedia, objectTypeId);
 
@@ -256,32 +256,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
-            if (ids.Any())
-            {
-                return PerformGetAll(objectTypeId, sql1 => sql1.Where(" umbracoNode.id in (@ids)", new {ids = ids}));
-            }
-            else
-            {
-                return PerformGetAll(objectTypeId);
-            }
+            return ids.Any() 
+                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.id in (@ids)", new { ids })) 
+                : PerformGetAll(objectTypeId);
         }
 
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params Guid[] keys)
         {
-            if (keys.Any())
-            {
-                return PerformGetAll(objectTypeId, sql1 => sql1.Where(" umbracoNode.uniqueID in (@keys)", new { keys = keys }));
-            }
-            else
-            {
-                return PerformGetAll(objectTypeId);
-            }
+            return keys.Any() 
+                ? PerformGetAll(objectTypeId, sql => sql.Where(" umbracoNode.uniqueID in (@keys)", new { keys })) 
+                : PerformGetAll(objectTypeId);
         }
 
         private IEnumerable<IUmbracoEntity> PerformGetAll(Guid objectTypeId, Action<Sql> filter = null)
         {
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            var isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, filter);
 
             var factory = new UmbracoEntityFactory();
@@ -306,6 +296,26 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params int[] ids)
+        {
+            return ids.Any()
+                ? PerformGetAllPaths(objectTypeId, sql => sql.Append(" AND umbracoNode.id in (@ids)", new { ids }))
+                : PerformGetAllPaths(objectTypeId);
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params Guid[] keys)
+        {
+            return keys.Any()
+                ? PerformGetAllPaths(objectTypeId, sql => sql.Append(" AND umbracoNode.uniqueID in (@keys)", new { keys }))
+                : PerformGetAllPaths(objectTypeId);
+        }
+
+        private IEnumerable<EntityPath> PerformGetAllPaths(Guid objectTypeId, Action<Sql> filter = null)
+        {
+            var sql = new Sql("SELECT id, path FROM umbracoNode WHERE umbracoNode.nodeObjectType=@type", new { type = objectTypeId });
+            if (filter != null) filter(sql);
+            return _work.Database.Fetch<EntityPath>(sql);
+        }
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {
@@ -324,8 +334,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId)
         {
 
-            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            bool isContent = objectTypeId == Constants.ObjectTypes.DocumentGuid || objectTypeId == Constants.ObjectTypes.DocumentBlueprintGuid;
+            bool isMedia = objectTypeId == Constants.ObjectTypes.MediaGuid;
 
             var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, null, objectTypeId);
             

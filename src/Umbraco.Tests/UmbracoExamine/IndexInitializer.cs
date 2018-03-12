@@ -96,7 +96,7 @@ namespace Umbraco.Tests.UmbracoExamine
             }
             if (userService == null)
             {
-                userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == (object)0 && p.Name == "admin"));
+                userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == 0 && p.Name == "admin"));
             }
             if (mediaService == null)
             {

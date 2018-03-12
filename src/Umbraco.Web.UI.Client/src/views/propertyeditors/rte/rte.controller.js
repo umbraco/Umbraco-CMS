@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
 
         $scope.isLoading = true;
 
@@ -100,9 +100,46 @@ angular.module("umbraco")
             //stores a reference to the editor
             var tinyMceEditor = null;
 
+            // these languages are available for localization
+            var availableLanguages = [
+                'da',
+                'de',
+                'en',
+                'en_us',
+                'fi',
+                'fr',
+                'he',
+                'it',
+                'ja',
+                'nl',
+                'no',
+                'pl',
+                'pt',
+                'ru',
+                'sv',
+                'zh'
+            ];
+
+            //define fallback language
+            var language = 'en_us';
+            //get locale from angular and match tinymce format. Angular localization is always in the format of ru-ru, de-de, en-gb, etc.
+            //wheras tinymce is in the format of ru, de, en, en_us, etc.
+            var localeId = $locale.id.replace('-', '_');
+            //try matching the language using full locale format
+            var languageMatch = _.find(availableLanguages, function(o) { return o === localeId; });
+            //if no matches, try matching using only the language
+            if (languageMatch === undefined) {
+                var localeParts = localeId.split('_');
+                languageMatch = _.find(availableLanguages, function(o) { return o === localeParts[0]; });
+            }
+            //if a match was found - set the language
+            if (languageMatch !== undefined) {
+                language = languageMatch;
+            }
+
             //wait for queue to end
             $q.all(await).then(function () {
-
+                
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
                     mode: "exact",
@@ -113,15 +150,17 @@ angular.module("umbraco")
                     extended_valid_elements: extendedValidElements,
                     menubar: false,
                     statusbar: false,
+                    relative_urls: false,
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets,
-                    relative_urls: false,
-                    style_formats: styleFormats
+                    style_formats: styleFormats,
+                    language: language,
+                    //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
                 };
-
 
                 if (tinyMceConfig.customConfig) {
 
@@ -250,7 +289,8 @@ angular.module("umbraco")
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaId,
+                            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                            startNodeIsVirtual: userData.startMediaIds.length !== 1,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -295,10 +335,7 @@ angular.module("umbraco")
 
                     });
                 };
-
-
-
-
+                
                 /** Loads in the editor */
                 function loadTinyMce() {
 
@@ -332,7 +369,7 @@ angular.module("umbraco")
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                     // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                    $scope.model.value = tinyMceEditor.getContent();
+                    $scope.model.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
                 });
 
                 //when the element is disposed we need to unsubscribe!
@@ -340,6 +377,9 @@ angular.module("umbraco")
                 // element might still be there even after the modal has been hidden.
                 $scope.$on('$destroy', function () {
                     unsubscribe();
+					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+						tinyMceEditor.destroy()
+					}
                 });
             });
         });

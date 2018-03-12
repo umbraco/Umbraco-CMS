@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using System.Security.AccessControl;
 using Umbraco.Core.IO;
 using umbraco;
 
@@ -38,7 +39,18 @@ namespace Umbraco.Web.Install
             return errorReport.Any() == false;
         }
 
-        public static bool TestDirectories(string[] directories, out List<string> errorReport)
+        /// <summary>
+        /// This will test the directories for write access
+        /// </summary>
+        /// <param name="directories"></param>
+        /// <param name="errorReport"></param>
+        /// <param name="writeCausesRestart">
+        /// If this is false, the easiest way to test for write access is to write a temp file, however some folder will cause
+        /// an App Domain restart if a file is written to the folder, so in that case we need to use the ACL APIs which aren't as
+        /// reliable but we cannot write a file since it will cause an app domain restart.
+        /// </param>
+        /// <returns></returns>
+        public static bool TestDirectories(string[] directories, out List<string> errorReport, bool writeCausesRestart = false)
         {
             errorReport = new List<string>();
             bool succes = true;
@@ -46,7 +58,11 @@ namespace Umbraco.Web.Install
             {
                 if (Directory.Exists(dir) == false) continue;
 
-                bool result = SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
+                var folder = IOHelper.MapPath(dir);
+
+                var result = writeCausesRestart
+                    ? HasWritePermissionOnDir(folder)
+                    : SaveAndDeleteFile(Path.Combine(folder, "configWizardPermissionTest.txt"));
 
                 if (result == false)
                 {
@@ -131,7 +147,42 @@ namespace Umbraco.Web.Install
             {
                 return false;
             }
+        }
 
+        private static bool HasWritePermissionOnDir(string path)
+        {
+            var writeAllow = false;
+            var writeDeny = false;
+            var accessControlList = Directory.GetAccessControl(path);
+            if (accessControlList == null)
+                return false;
+            AuthorizationRuleCollection accessRules;
+            try
+            {
+                accessRules = accessControlList.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+                if (accessRules == null)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                //This is not 100% accurate btw because it could turn out that the current user doesn't
+                //have access to read the current permissions but does have write access.
+                //I think this is an edge case however
+                return false;
+            }
+
+            foreach (FileSystemAccessRule rule in accessRules)
+            {
+                if ((FileSystemRights.Write & rule.FileSystemRights) != FileSystemRights.Write)
+                    continue;
+
+                if (rule.AccessControlType == AccessControlType.Allow)
+                    writeAllow = true;
+                else if (rule.AccessControlType == AccessControlType.Deny)
+                    writeDeny = true;
+            }
+
+            return writeAllow && writeDeny == false;
         }
 
         private static bool OpenFileForWrite(string file)

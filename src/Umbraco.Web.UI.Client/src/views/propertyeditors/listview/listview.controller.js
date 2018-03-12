@@ -20,8 +20,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       getListResultsCallback = contentResource.getPagedResults;
       deleteItemCallback = contentResource.deleteByKey;
       getIdCallback = function (selected) {
-         var selectedKey = getItemKey(selected.id);
-         return selectedKey;
+         return selected.key;
       };
       createEditUrlCallback = function (item) {
          return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.key + "?page=" + $scope.options.pageNumber + "&listName=" + $scope.contentId;

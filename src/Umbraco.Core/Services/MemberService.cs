@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
@@ -14,6 +15,9 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
@@ -27,6 +31,9 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
+        //only for unit tests!
+        internal MembershipProviderBase MembershipProvider { get; set; }
 
         public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
@@ -91,7 +98,7 @@ namespace Umbraco.Core.Services
         {
             if (member == null) throw new ArgumentNullException("member");
 
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var provider = MembershipProvider ?? MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider())
             {
                 provider.ChangePassword(member.Username, "", password);
@@ -234,7 +241,8 @@ namespace Umbraco.Core.Services
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
 
-                    if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(members)))
+                    var deleteEventArgs = new DeleteEventArgs<IMember>(members);
+                    if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -584,7 +592,7 @@ namespace Umbraco.Core.Services
             Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
 
-            using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
                 return repository.GetPagedXmlEntriesByPath("-1", pageIndex, pageSize, null, out totalRecords);
@@ -691,7 +699,7 @@ namespace Umbraco.Core.Services
                 IQuery<IMember> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
                 {
-                    filterQuery = Query<IMember>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                    filterQuery = Query<IMember>.Builder.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter) || x.Email.Contains(filter));
                 }
 
                 var repository = RepositoryFactory.CreateMemberRepository(uow);
@@ -827,6 +835,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Creates and persists a new <see cref="IMember"/>
+        /// </summary>
+        /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
+        /// <param name="username">Username of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="email">Email of the <see cref="IMembershipUser"/> to create</param>
+        /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
+        /// <param name="memberTypeAlias">Alias of the Type</param>
+        /// <param name="isApproved">Is the member approved</param>
+        /// <returns><see cref="IMember"/></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
+        {
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, username, passwordValue, memberType, isApproved);
+        }
+
+        /// <summary>
         /// Creates and persists a Member
         /// </summary>
         /// <remarks>Using this method will persist the Member object before its returned
@@ -836,16 +860,18 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name of the Member to create</param>
         /// <param name="passwordValue">This value should be the encoded/encrypted/hashed value for the password that will be stored in the database</param>
         /// <param name="memberType">MemberType the Member should be based on</param>
+        /// <param name="isApproved">Optional IsApproved of the Member to create</param>
         /// <returns><see cref="IMember"/></returns>
-        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType)
+        private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType);
+            var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(member)))
+                var saveEventArgs = new SaveEventArgs<IMember>(member);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     member.WasCancelled = true;
@@ -864,7 +890,8 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
                 uow.Events.Dispatch(Created, this, new NewEventArgs<IMember>(member, false, memberType.Alias, -1));
             }
 
@@ -941,7 +968,8 @@ namespace Umbraco.Core.Services
 
         private void Delete(IScopeUnitOfWork uow, IMember member)
         {
-            if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMember>(member)))
+            var deleteEventArgs = new DeleteEventArgs<IMember>(member);
+            if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
             {
                 uow.Commit();
                 return;
@@ -951,8 +979,8 @@ namespace Umbraco.Core.Services
             repository.Delete(member);
             uow.Commit();
 
-            var args = new DeleteEventArgs<IMember>(member, false);
-            uow.Events.Dispatch(Deleted, this, args);
+            deleteEventArgs.CanCancel = false;
+            uow.Events.Dispatch(Deleted, this, deleteEventArgs);
         }
 
         /// <summary>
@@ -963,11 +991,16 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember entity, bool raiseEvents = true)
         {
+            //trimming username and email to make sure we have no trailing space
+            entity.Username = entity.Username.Trim();
+            entity.Email = entity.Email.Trim();
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                var saveEventArgs = new SaveEventArgs<IMember>(entity);
                 if (raiseEvents)
                 {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(entity)))
+                    if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -991,7 +1024,10 @@ namespace Umbraco.Core.Services
                 uow.Commit();
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(entity, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                }
             }
 
         }
@@ -1010,7 +1046,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMember>(asArray)))
+                    var saveEventArgs = new SaveEventArgs<IMember>(asArray);
+                    if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -1032,7 +1069,10 @@ namespace Umbraco.Core.Services
                     uow.Commit();
 
                     if (raiseEvents)
-                        uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(asArray, false));
+                    {
+                        saveEventArgs.CanCancel = false;
+                        uow.Events.Dispatch(Saved, this, saveEventArgs);
+                    }
                 }
 
 
@@ -1137,12 +1177,16 @@ namespace Umbraco.Core.Services
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.AssignRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(string username, string roleName)
@@ -1152,12 +1196,16 @@ namespace Umbraco.Core.Services
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
+            int[] memberIds;
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateMemberGroupRepository(uow);
-                repository.DissociateRoles(usernames, roleNames);
+                memberIds = repository.GetMemberIds(usernames);
+                repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void AssignRole(int memberId, string roleName)
@@ -1173,6 +1221,8 @@ namespace Umbraco.Core.Services
                 repository.AssignRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            AssignedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
         public void DissociateRole(int memberId, string roleName)
@@ -1188,11 +1238,82 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(memberIds, roleNames);
                 uow.Commit();
             }
+
+            RemovedRoles?.Invoke(this, new RolesEventArgs(memberIds, roleNames));
         }
 
 
 
         #endregion
+
+        /// <summary>
+        /// Used to export a member
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is internal for now and is used to export a member in the member editor, it will raise an event so that auditing 
+        /// logs can be created
+        /// </remarks>
+        internal MemberExportModel ExportMember(Guid key)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateMemberRepository(uow);
+                var query = Query<IMember>.Builder.Where(x => x.Key == key);
+                var member = repository.GetByQuery(query).FirstOrDefault();
+
+                if (member == null) return null;
+
+                var model = new MemberExportModel
+                {
+                    Id = member.Id,
+                    Key = member.Key,
+                    Name = member.Name,
+                    Username = member.Username,
+                    Email = member.Email,
+                    Groups = GetAllRoles(member.Id).ToList(),
+                    ContentTypeAlias = member.ContentTypeAlias,
+                    CreateDate = member.CreateDate,
+                    UpdateDate = member.UpdateDate,
+                    Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
+                };
+
+                uow.Events.Dispatch(Exported, this, new ExportedMemberEventArgs(member, model));
+
+                return model;
+            }
+        }
+
+        private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+
+            var exportProperties = new List<MemberExportProperty>();
+
+            foreach (var property in member.Properties)
+            {
+                //ignore list
+                switch (property.Alias)
+                {
+                    case Constants.Conventions.Member.PasswordQuestion:
+                        continue;
+                }
+
+                var propertyExportModel = new MemberExportProperty
+                {
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Name = property.PropertyType.Name,
+                    Value = property.Value,
+                    CreateDate = property.CreateDate,
+                    UpdateDate = property.UpdateDate
+                };
+                exportProperties.Add(propertyExportModel);
+            }
+
+            return exportProperties;
+        }
 
         private IMemberType FindMemberTypeByAlias(string memberTypeAlias)
         {
@@ -1252,6 +1373,11 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
+
+        internal static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
 
         #endregion
 

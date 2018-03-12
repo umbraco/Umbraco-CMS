@@ -54,6 +54,11 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
             public readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
+                (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
+                templates => templates.GetHashCode());
         }
 
         /// <summary>
@@ -90,11 +95,10 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<ITemplate>>(
-                        (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
-                        templates => templates.GetHashCode()));
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
+
+                if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
+                    DefaultTemplateId = 0;
             }
         }
 

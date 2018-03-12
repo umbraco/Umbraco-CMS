@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Overlays.LinkPickerController">
 
-    <umb-control-group label="@content_urls">
+    <umb-control-group label="@defaultdialogs_urlLinkPicker">
         <input type="text"
             localize="placeholder"
             placeholder="@general_url"
@@ -10,7 +10,7 @@
             focus-when="{{true}} "/>
     </umb-control-group>
 
-    <umb-control-group label="@content_nodeName">
+    <umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
         <input type="text"
             localize="placeholder"
             placeholder="@placeholders_entername"
@@ -18,7 +18,7 @@
             ng-model="model.target.name" />
     </umb-control-group>
 
-    <umb-control-group label="@content_target">
+    <umb-control-group ng-if="showTarget" label="@content_target">
         <label class="checkbox no-indent">
             <input type="checkbox" ng-model="model.target.target" ng-true-value="_blank" ng-false-value="" /> <localize key="defaultdialogs_openInNewWindow">Opens the linked document in a new window or tab</localize>
         </label>

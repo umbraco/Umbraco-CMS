@@ -7,58 +7,25 @@
     app.authenticated
     app.notAuthenticated
     app.closeDialogs
+    app.ysod
+    app.reInitialize
+    app.userRefresh
 */
 
 function eventsService($q, $rootScope) {
 	
     return {
         
-        /** raise an event with a given name, returns an array of promises for each listener */
-        emit: function (name, args) {            
+        /** raise an event with a given name */
+        emit: function (name, args) {
 
             //there are no listeners
             if (!$rootScope.$$listeners[name]) {
                 return;
-                //return [];
             }
 
             //send the event
             $rootScope.$emit(name, args);
-
-
-            //PP: I've commented out the below, since we currently dont
-            // expose the eventsService as a documented api
-            // and think we need to figure out our usecases for this
-            // since the below modifies the return value of the then on() method
-            /*
-            //setup a deferred promise for each listener
-            var deferred = [];
-            for (var i = 0; i < $rootScope.$$listeners[name].length; i++) {
-                deferred.push($q.defer());
-            }*/
-
-            //create a new event args object to pass to the 
-            // $emit containing methods that will allow listeners
-            // to return data in an async if required
-            /*
-            var eventArgs = {
-                args: args,
-                reject: function (a) {
-                    deferred.pop().reject(a);
-                },
-                resolve: function (a) {
-                    deferred.pop().resolve(a);
-                }
-            };*/
-            
-            
-            
-            /*
-            //return an array of promises
-            var promises = _.map(deferred, function(p) {
-                return p.promise;
-            });
-            return promises;*/
         },
 
         /** subscribe to a method, or use scope.$on = same thing */

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -617,6 +618,10 @@ namespace umbraco
         {
             get
             {
+                // if there's a current enlisted reader/writer, use its xml
+                var safeXml = SafeXmlReaderWriter.Get(_scopeProvider);
+                if (safeXml != null) return safeXml.Xml;
+
                 var items = HttpContextItems;
                 if (items == null)
                     return XmlContentInternal;

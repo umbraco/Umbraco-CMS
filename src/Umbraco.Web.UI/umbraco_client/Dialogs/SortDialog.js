@@ -105,6 +105,7 @@
             
             //wire up the submit button
             self._opts.submitButton.click(function() {
+                this.disabled = true;
                 self._saveSort();
             });
             

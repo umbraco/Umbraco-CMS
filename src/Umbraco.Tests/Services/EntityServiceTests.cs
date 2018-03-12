@@ -26,15 +26,15 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
-        }      
+        }
 
         [Test]
         public void EntityService_Can_Get_Paged_Content_Children()
         {
-            
+
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
-            
-            var root = MockedContent.CreateSimpleContent(contentType);            
+
+            var root = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(root);
             for (int i = 0; i < 10; i++)
             {
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
             var service = ServiceContext.EntityService;
 
             long total;
-            var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();            
+            var entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 0, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(6));
             Assert.That(total, Is.EqualTo(10));
             entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Document, 1, 6, out total).ToArray();
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Services
                     var c2 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), c1);
                     ServiceContext.ContentService.Save(c2);
                     count++;
-                }                
+                }
             }
 
             var service = ServiceContext.EntityService;
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Services
 
             var root = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(root);
-            
+
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedContent.CreateSimpleContent(contentType, "ssss" + Guid.NewGuid(), root);
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Services
             Assert.That(entities.Length, Is.EqualTo(50));
             Assert.That(total, Is.EqualTo(50));
         }
-       
+
         [Test]
         public void EntityService_Can_Get_Paged_Media_Children()
         {
@@ -227,7 +227,7 @@ namespace Umbraco.Tests.Services
             Assert.That(total, Is.EqualTo(10));
             entities = service.GetPagedChildren(root.Id, UmbracoObjectTypes.Media, 1, 6, out total).ToArray();
             Assert.That(entities.Length, Is.EqualTo(4));
-            Assert.That(total, Is.EqualTo(10));            
+            Assert.That(total, Is.EqualTo(10));
         }
 
         [Test]
@@ -362,7 +362,7 @@ namespace Umbraco.Tests.Services
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
             ServiceContext.MediaService.Save(root);
-            
+
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
@@ -519,7 +519,7 @@ namespace Umbraco.Tests.Services
             Assert.That(
                 entities.Any(
                     x =>
-                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty 
+                    x.AdditionalData.Any(y => y.Value is UmbracoEntity.EntityProperty
                         && ((UmbracoEntity.EntityProperty)y.Value).PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
@@ -531,6 +531,16 @@ namespace Umbraco.Tests.Services
 
             Assert.NotNull(mediaObjectType);
             Assert.AreEqual(mediaObjectType, UmbracoObjectTypes.MediaType);
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Key_For_Id_With_Unknown_Type()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetKeyForId(1060, UmbracoObjectTypes.Unknown);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
         }
 
         [Test]
@@ -547,9 +557,21 @@ namespace Umbraco.Tests.Services
         public void EntityService_Cannot_Get_Key_For_Id_With_Incorrect_Object_Type()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetKeyForId(1060, UmbracoObjectTypes.MediaType);
+            var result1 = service.GetKeyForId(1060, UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetKeyForId(1060, UmbracoObjectTypes.MediaType);
 
-            Assert.IsFalse(result.Success);
+            Assert.IsTrue(result1.Success);
+            Assert.IsFalse(result2.Success);
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Id_For_Key_With_Unknown_Type()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1060, result.Result);
         }
 
         [Test]
@@ -566,9 +588,35 @@ namespace Umbraco.Tests.Services
         public void EntityService_Cannot_Get_Id_For_Key_With_Incorrect_Object_Type()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
+            var result1 = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.DocumentType);
+            var result2 = service.GetIdForKey(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.MediaType);
 
-            Assert.IsFalse(result.Success);
+            Assert.IsTrue(result1.Success);
+            Assert.IsFalse(result2.Success);
+        }
+
+        [Test]
+        public void ReserveId()
+        {
+            var service = ServiceContext.EntityService;
+            var guid = Guid.NewGuid();
+
+            // can reserve
+            var reservedId = service.ReserveId(guid);
+            Assert.IsTrue(reservedId > 0);
+
+            // can get it back
+            var id = service.GetIdForKey(guid, UmbracoObjectTypes.DocumentType);
+            Assert.IsTrue(id.Success);
+            Assert.AreEqual(reservedId, id.Result);
+
+            // anything goes
+            id = service.GetIdForKey(guid, UmbracoObjectTypes.Media);
+            Assert.IsTrue(id.Success);
+            Assert.AreEqual(reservedId, id.Result);
+
+            // a random guid won't work
+            Assert.IsFalse(service.GetIdForKey(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
         }
 
         private static bool _isSetup = false;
@@ -585,7 +633,7 @@ namespace Umbraco.Tests.Services
 
                 //Create and Save folder-Media -> 1050
                 var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
-                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);                
+                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
                 ServiceContext.MediaService.Save(folder, 0);
                 folderId = folder.Id;
 
@@ -603,9 +651,9 @@ namespace Umbraco.Tests.Services
                 ServiceContext.MediaService.Save(subfolder, 0);
                 var subfolder2 = MockedMedia.CreateMediaFolder(folderMediaType, subfolder.Id);
                 ServiceContext.MediaService.Save(subfolder2, 0);
-                
+
             }
-            
+
         }
     }
 }

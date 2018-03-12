@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -32,7 +33,8 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "scripts", "Scripts", "icon-folder", "icon-folder", sortOrder: 2)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadScripts : FileSystemTree
     {
         public loadScripts(string application) : base(application) { }

@@ -42,6 +42,22 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Convert a path to node ids in the order from right to left (deepest to shallowest)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal static int[] GetIdsFromPathReversed(this string path)
+        {
+            var nodeIds = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.TryConvertTo<int>())
+                .Where(x => x.Success)
+                .Select(x => x.Result)
+                .Reverse()
+                .ToArray();
+            return nodeIds;
+        }
+
+        /// <summary>
         /// Removes new lines and tabs
         /// </summary>
         /// <param name="txt"></param>
@@ -759,7 +775,7 @@ namespace Umbraco.Core
                 foreach (var b in hashedByteArray)
                 {
                     //append it to our StringBuilder
-                    stringBuilder.Append(b.ToString("x2").ToLower());
+                    stringBuilder.Append(b.ToString("x2"));
                 }
 
                 //return the hashed value
@@ -874,7 +890,7 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Ensures that the folder path endds with a DirectorySeperatorChar
+        /// Ensures that the folder path ends with a DirectorySeperatorChar
         /// </summary>
         /// <param name="currentFolder"></param>
         /// <returns></returns>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
@@ -11,11 +12,8 @@ using Action = umbraco.BusinessLogic.Actions.Action;
 
 namespace umbraco
 {
-    /// <summary>
-    /// Handles loading the content tree into umbraco's application tree
-    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("This is no longer used and will be removed from the codebase in the future")]
-    //[Tree(Constants.Applications.Content, "content", "Content", silent: true)]
     public class loadContent : BaseContentTree
     {
 

@@ -27,7 +27,8 @@
             expect(valEmailExpression.EMAIL_REGEXP.test('a@3b.c')).toBe(true);
             expect(valEmailExpression.EMAIL_REGEXP.test('a@b')).toBe(true);
             expect(valEmailExpression.EMAIL_REGEXP.test('abc@xyz.financial')).toBe(true);
-            
+            expect(valEmailExpression.EMAIL_REGEXP.test('admin@c.pizza')).toBe(true);
+            expect(valEmailExpression.EMAIL_REGEXP.test('admin+gmail-syntax@c.pizza')).toBe(true);            
         });
     });
 

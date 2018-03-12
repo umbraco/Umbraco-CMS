@@ -197,7 +197,7 @@ module.exports = function (grunt) {
                 src: ['src/installer/**/*.js'],
                 dest: '<%= distdir %>/js/umbraco.installer.js',
                 options: {
-                    banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.install', []); \n",
+                    banner: "<%= banner %>\n(function() { \n\n",
                     footer: "\n\n})();"
                 }
             },
@@ -382,6 +382,9 @@ module.exports = function (grunt) {
             html: {
                 files: ['src/views/**/*.html', 'src/*.html'],
                 tasks: ['watch-html', 'timestamp']
+            },
+			options: { 
+                interval: 500
             }
         },
 
@@ -553,7 +556,15 @@ module.exports = function (grunt) {
                                 
                                 'src-min-noconflict/worker-javascript.js',
                             ]
-                       }
+                        },
+                        'clipboard': {
+                            keepExpandedHierarchy: false,
+                            files: ['dist/clipboard.min.js']
+                       },
+                       'angular-moment': {
+                            keepExpandedHierarchy: false,
+                            files: ['angular-moment.min.js']
+                        }
                     }
                 }
             },

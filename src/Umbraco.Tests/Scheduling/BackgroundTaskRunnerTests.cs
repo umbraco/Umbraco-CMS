@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Scheduling
     [Timeout(30000)]
     public class BackgroundTaskRunnerTests
     {
-        private ILogger _logger; 
+        private ILogger _logger;
 
         [TestFixtureSetUp]
         public void InitializeFixture()
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Scheduling
                 {
                     runner.Add(new MyTask());
                 });
-            } 
+            }
         }
 
         [Test]
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public void Create_IsNotRunning()
         {
@@ -252,16 +252,18 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public async void Create_AutoStart_IsRunning()
         {
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions
             {
-                AutoStart = true
+                AutoStart = true,
+                KeepAlive = true // else stops!
             }, _logger))
             {
                 Assert.IsTrue(runner.IsRunning); // because AutoStart is true
+                runner.Stop(false); // keepalive = must be stopped
                 await runner.StoppedAwaitable; // runner stops, within test's timeout
             }
         }
@@ -296,7 +298,7 @@ namespace Umbraco.Tests.Scheduling
             // so that we don't have a runaway task in tests, etc - but it does NOT terminate
             // the runner - it really is NOT a nice way to end a runner - it's there for tests
         }
-      
+
         [Test]
         public void Startup_KeepAlive_IsRunning()
         {
@@ -359,7 +361,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public async void WaitOnRunner_Tasks()
         {
@@ -504,7 +506,7 @@ namespace Umbraco.Tests.Scheduling
 
                 //wait till the thread is done
                 await tManager.CurrentThreadingTask;
-      
+
                 foreach (var task in tasks)
                 {
                     Assert.IsTrue(task.Ended != default(DateTime));
@@ -516,7 +518,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public void RecurringTaskTest()
         {
@@ -532,7 +534,7 @@ namespace Umbraco.Tests.Scheduling
                 };
 
                 var task = new MyRecurringTask(runner, 200, 500);
-                
+
                 runner.Add(task);
 
                 Assert.IsTrue(runner.IsRunning); // waiting on delay
@@ -546,7 +548,7 @@ namespace Umbraco.Tests.Scheduling
                 runner.Shutdown(false, true);
 
                 // check that task has been disposed (timer has been killed, etc)
-                Assert.IsTrue(task.IsDisposed);
+                Assert.IsTrue(task.Disposed);
             }
         }
 
@@ -577,7 +579,7 @@ namespace Umbraco.Tests.Scheduling
                 runner.Add(task);
                 Assert.IsTrue(runner.IsRunning);
                 Thread.Sleep(5000);
-                Assert.IsTrue(runner.IsRunning); // still waiting for the task to release               
+                Assert.IsTrue(runner.IsRunning); // still waiting for the task to release
                 Assert.IsFalse(task.HasRun);
                 runner.Shutdown(false, false);
                 await runner.StoppedAwaitable; // wait for the entire runner operation to complete
@@ -585,7 +587,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        
+
         [Test]
         public void LatchedRecurring()
         {
@@ -842,7 +844,7 @@ namespace Umbraco.Tests.Scheduling
             }
 
             public override bool PerformRun()
-            {                
+            {
                 Thread.Sleep(_runMilliseconds);
                 return true; // repeat
             }
@@ -976,7 +978,7 @@ namespace Umbraco.Tests.Scheduling
             public virtual Task RunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
-                //return Task.Delay(500); 
+                //return Task.Delay(500);
             }
 
             public virtual bool IsAsync

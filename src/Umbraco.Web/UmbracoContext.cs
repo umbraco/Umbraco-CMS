@@ -20,7 +20,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
+    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd
     {
         internal const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
@@ -259,7 +259,7 @@ namespace Umbraco.Web
 
             var requestUrl = new Uri("http://localhost");
             var request = GetRequestFromContext();
-            if (request != null)
+            if (request != null && request.Url != null)
             {
                 requestUrl = request.Url;
             }

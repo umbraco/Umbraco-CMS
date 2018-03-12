@@ -30,6 +30,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NugetPackages Condition="$(NugetPackages) == '' Or $(NugetPackages) == '*Undefined*'">$(SolutionDir)\packages</NugetPackages>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,7 +42,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -61,9 +62,8 @@
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.0.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.83.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.83\lib\net45\Examine.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -77,8 +77,26 @@
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.HttpListener, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.HttpListener.3.1.0\lib\net45\Microsoft.Owin.Host.HttpListener.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Hosting, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Hosting.3.1.0\lib\net45\Microsoft.Owin.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Testing, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Testing.3.1.0\lib\net45\Microsoft.Owin.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -129,9 +147,14 @@
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http.SelfHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.SelfHost.4.0.30506.0\lib\net40\System.Web.Http.SelfHost.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Web.Http.Owin, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Owin.5.2.3\lib\net45\System.Web.Http.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.SelfHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.SelfHost.5.2.3\lib\net45\System.Web.Http.SelfHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Tracing, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Tracing.5.2.3\lib\net45\System.Web.Http.Tracing.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
@@ -162,9 +185,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeExtensionsTests.cs" />
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
+    <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
+    <Compile Include="Packaging\PackageExtractionTests.cs" />
+    <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
+    <Compile Include="Services\AuditServiceTests.cs" />
+    <Compile Include="Services\ConsentServiceTests.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestControllerActivator.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestControllerActivatorBase.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestRunner.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
+    <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
+    <Compile Include="Web\Controllers\UserEditorAuthorizationHelperTests.cs" />
+    <Compile Include="Web\Controllers\UsersControllerTests.cs" />
     <Compile Include="Dependencies\NuGet.cs" />
     <Compile Include="CallContextTests.cs" />
+    <Compile Include="HashGeneratorTests.cs" />
     <Compile Include="Issues\U9560.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
     <Compile Include="IO\ShadowFileSystemTests.cs" />
@@ -181,6 +221,8 @@
     <Compile Include="Persistence\Repositories\RedirectUrlRepositoryTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
+    <Compile Include="Services\SectionServiceTests.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />
     <Compile Include="Scoping\LeakTests.cs" />
     <Compile Include="Scoping\ScopedRepositoryTests.cs" />
@@ -191,7 +233,7 @@
     <Compile Include="Scoping\ScopeTests.cs" />
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
-    <Compile Include="TryConvertToTests.cs" />
+    <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRAMDirectory.cs" />
     <Compile Include="UmbracoExamine\UmbracoContentIndexerTests.cs" />
@@ -210,6 +252,9 @@
     <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="DelegateExtensionsTests.cs" />
+    <Compile Include="Web\HealthChecks\HealthCheckResultsTests.cs" />
+    <Compile Include="Web\HttpCookieExtensionsTests.cs" />
+    <Compile Include="Web\Mvc\HtmlStringUtilitiesTests.cs" />
     <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
@@ -260,7 +305,6 @@
     <Compile Include="Models\TemplateTests.cs" />
     <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Models\UserTests.cs" />
-    <Compile Include="Models\UserTypeTests.cs" />
     <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
@@ -315,8 +359,6 @@
     <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\HelpElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\HelpElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
@@ -338,9 +380,9 @@
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
-    <Compile Include="Web\Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\ContentControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\FilterAllowedOutgoingContentAttributeTests.cs" />
+    <Compile Include="Web\Controllers\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
@@ -361,7 +403,6 @@
     <Compile Include="Persistence\Repositories\NotificationsRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
-    <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="Persistence\SyntaxProvider\MySqlSyntaxProviderTests.cs" />
     <Compile Include="PropertyEditors\ImageCropperTest.cs" />
@@ -491,7 +532,6 @@
     <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
-    <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="TestHelpers\MockHelper.cs" />
     <Compile Include="TestHelpers\RequiresAutoMapperMappingsAttribute.cs" />
     <Compile Include="TestHelpers\TestProfiler.cs" />
@@ -770,12 +810,10 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
-xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\amd64\*.*" "$(TargetDir)amd64\" /Y /F /E /I /C /D
+xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\x86\*.*" "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

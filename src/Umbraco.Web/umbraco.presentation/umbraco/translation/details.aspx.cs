@@ -1,24 +1,10 @@
 ﻿using System;
 using System.Data;
-using System.IO;
-using System.Text;
-using System.Xml;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.translation;
 using umbraco.cms.businesslogic.web;
-
-using ICSharpCode.SharpZipLib.BZip2;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : BasePages.UmbracoEnsuredPage {

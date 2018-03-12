@@ -5,6 +5,6 @@
     /// </summary>
     [ActionMenuItem("umbracoMenuActions")]
     public sealed class RefreshNode : ActionMenuItem
-    {        
+    {
     }
 }

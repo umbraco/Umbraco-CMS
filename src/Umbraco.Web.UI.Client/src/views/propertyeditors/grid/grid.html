@@ -226,27 +226,25 @@
                                                       <!-- Controls repeat end -->
 
                                                       <!-- if area is empty tools -->
-                                                      <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode">
-                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement"/>
+                                                     <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode && (area.maxItems == undefined || area.maxItems == '' || area.maxItems == 0 || area.maxItems > area.controls.length)">
+                                                         <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></div>
+                                                          <div class="cell-tools-button btn-group dropup" ng-if="allowedEditorsInClipboard(area).length > 0">
+                                                              <button type="button" class="btn umb-button__button" ng-click="paste($event, area, 0)">
+                                                                  <i class="icon icon-paste-in"></i>
+                                                                  <localize key="grid_pasteElement" />
+                                                            </button>
+                                                              <button ng-if="allowedEditorsInClipboard(area).length > 1" type="button" class="btn umb-button__button dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                  <span class="caret"></span>
+                                                              </button>
+                                                              <ul ng-if="allowedEditorsInClipboard(area).length > 1" class="dropdown-menu dropdown-menu-right">
+                                                                  <li ng-repeat="control in allowedEditorsInClipboard(area)">
+                                                                      <a ng-click="paste($event, area, 0, control)">
+                                                                          <i class="icon {{ control.editor.icon }}"></i>
+                                                                          <span ng-bind="control.editor.name"></span>
+                                                                      </a>
+                                                                  </li>
+                                                              </ul>
                                                           </div>
-                                                      <div class="cell-tools-button btn-group dropup" ng-if="allowedEditorsInClipboard(area).length > 0">
-                                                          <button type="button" class="btn umb-button__button" ng-click="paste($event, area, 0)">
-                                                              <i class="icon icon-paste-in"></i>
-                                                              <localize key="grid_pasteElement" />
-                                                        </button>
-                                                          <button ng-if="allowedEditorsInClipboard(area).length > 1" type="button" class="btn umb-button__button dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                              <span class="caret"></span>
-                                                          </button>
-                                                          <ul ng-if="allowedEditorsInClipboard(area).length > 1" class="dropdown-menu dropdown-menu-right">
-                                                              <li ng-repeat="control in allowedEditorsInClipboard(area)">
-                                                                  <a ng-click="paste($event, area, 0, control)">
-                                                                      <i class="icon {{ control.editor.icon }}"></i>
-                                                                      <span ng-bind="control.editor.name"></span>
-                                                                  </a>
-                                                              </li>
-                                                          </ul>
-                                                      </div>
-                                                          <div><i class="icon icon-paste-in" ng-click="paste($event, area, 0, area.$uniqueId)"></i></div>
                                                       </div>
 
                                                  </div>

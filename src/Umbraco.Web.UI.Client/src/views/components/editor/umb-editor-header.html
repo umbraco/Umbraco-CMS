@@ -1,22 +1,25 @@
-﻿<div class="umb-editor-header umb-panel-header">
+﻿<div data-element="editor-header" class="umb-editor-header umb-panel-header">
 
     <div class="umb-panel-header-content-wrapper">
 
         <div class="umb-panel-header-content">
 
             <div class="umb-panel-header-left-side" ng-class="{'-top-position': tabs || !icon && hideDescription}">
-
-               <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
-                   <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
-                   <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
-                       <localize key="settings_addIcon"></localize>
-                   </div>
-               </div>
+              
+              <ng-form data-element="editor-icon" name="iconForm">
+                 <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
+                     <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                     <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                         <localize key="settings_addIcon"></localize>
+                     </div>
+                 </div>
+              </ng-form>
 
                <div class="umb-panel-header-title-wrapper">
 
                    <ng-form name="headerNameForm">
                        <input
+                        data-element="editor-name-field"
                         title="{{key}}"
                         type="text"
                         class="umb-panel-header-name-input"
@@ -33,15 +36,19 @@
 
                   <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
 
-                  <umb-generate-alias class="umb-panel-header-alias"
-                                      ng-if="!hideAlias"
-                                      alias="$parent.alias"
-                                      alias-from="$parent.name"
-                                      enable-lock="true"
-                                      server-validation-field="Alias"></umb-generate-alias>
+                  <umb-generate-alias
+                    data-element="editor-alias"
+                    class="umb-panel-header-alias"
+                    ng-if="!hideAlias"
+                    alias="$parent.alias"
+                    alias-from="$parent.name"
+                    enable-lock="true"
+                    server-validation-field="Alias">
+                    </umb-generate-alias>
                 
 
                         <input
+                            data-element="editor-description"
                             type="text"
                             class="umb-panel-header-description"
                             localize="placeholder"
@@ -56,6 +63,7 @@
 
                <div class="umb-editor-header__actions-menu">
                     <umb-editor-menu
+                        data-element="editor-actions"
                         ng-if="menu.currentNode"
                         current-node="menu.currentNode"
                         current-section="{{menu.currentSection}}">
@@ -65,6 +73,7 @@
             </div>
 
             <umb-editor-navigation
+                data-element="editor-sub-views"
                 ng-if="navigation"
                 navigation="navigation">
             </umb-editor-navigation>
@@ -72,6 +81,7 @@
         </div>
 
         <umb-tabs-nav
+            data-element="editor-tabs"
             ng-if="tabs"
             model="tabs">
         </umb-tabs-nav>
@@ -79,10 +89,11 @@
     </div>
 
     <umb-overlay
-      ng-if="dialogModel.show"
-      model="dialogModel"
-      position="right"
-      view="dialogModel.view">
+        data-element="editor-overlay-icon-picker"
+        ng-if="dialogModel.show"
+        model="dialogModel"
+        position="right"
+        view="dialogModel.view">
     </umb-overlay>
 
 </div>

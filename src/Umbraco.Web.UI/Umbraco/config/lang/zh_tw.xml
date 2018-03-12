@@ -1,0 +1,1353 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="zh_tw" intName="Chinese (Taiwan)" localName="中文（正體，台灣）" lcid="0404" culture="zh-TW">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assignDomain">管理主機名稱</key>
+    <key alias="auditTrail">跟蹤審計</key>
+    <key alias="browse">流覽節點</key>
+    <key alias="changeDocType">改變文檔類型</key>
+    <key alias="copy">複製</key>
+    <key alias="create">創建</key>
+    <key alias="createPackage">創建擴展包</key>
+    <key alias="delete">刪除</key>
+    <key alias="disable">禁用</key>
+    <key alias="emptyTrashcan">清空回收站</key>
+    <key alias="exportDocumentType">匯出文檔類型</key>
+    <key alias="importDocumentType">導入文檔類型</key>
+    <key alias="importPackage">導入擴展包</key>
+    <key alias="liveEdit">即時編輯模式</key>
+    <key alias="logout">退出</key>
+    <key alias="move">移動</key>
+    <key alias="notify">提醒</key>
+    <key alias="protect">公眾存取權限</key>
+    <key alias="publish">發佈</key>
+    <key alias="unpublish">取消發佈</key>
+    <key alias="refreshNode">重新載入節點</key>
+    <key alias="republish">重新發佈整站</key>
+    <key alias="restore" version="7.3.0">回復</key>
+    <key alias="rights">許可權</key>
+    <key alias="rollback">回滾</key>
+    <key alias="sendtopublish">提交至發佈者</key>
+    <key alias="sendToTranslate">發送給翻譯</key>
+    <key alias="sort">排序</key>
+    <key alias="toPublish">提交至發佈者</key>
+    <key alias="translate">翻譯</key>
+    <key alias="update">更新</key>
+    <key alias="defaultValue">預設值</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="permissionDenied">禁止訪問</key>
+    <key alias="addNew">添加功能變數名稱</key>
+    <key alias="remove">移除</key>
+    <key alias="invalidNode">錯誤的節點</key>
+    <key alias="invalidDomain">功能變數名稱錯誤</key>
+    <key alias="duplicateDomain">功能變數名稱重複</key>
+    <key alias="language">語言</key>
+    <key alias="domain">功能變數名稱</key>
+    <key alias="domainCreated">新功能變數名稱 '%0%' 已創建</key>
+    <key alias="domainDeleted">功能變數名稱 '%0%' 已刪除</key>
+    <key alias="domainExists">功能變數名稱 '%0%' 已使用</key>
+    <key alias="domainUpdated">功能變數名稱 '%0%' 已更新</key>
+    <key alias="orEdit">編輯當前功能變數名稱</key>
+    <key alias="domainHelp"><![CDATA[合格的網域名稱："example.com"，"www.example.com"，"example.com:8080" 或
+        "https://www.example.com/"。也可以使用一層路徑，如： "example.com/en"。但是，最好避免。
+        建議使用上面的文化設定。]]></key>
+    <key alias="inherit">繼承</key>
+    <key alias="setLanguage">語言</key>
+    <key alias="setLanguageHelp"><![CDATA[改變目前節點以下其餘節點的文化設定，<br />或從父節點繼承文化設定。<br />
+    也會改變目前節點設定，除非下方網域有其他項目。]]></key>
+    <key alias="setDomains">功能變數名稱</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">查看</key>
+  </area>
+  <area alias="buttons">
+    <key alias="clearSelection">清除選擇</key>
+    <key alias="select">選擇</key>
+    <key alias="selectCurrentFolder">選擇目前資料夾</key>
+    <key alias="somethingElse">做別的事情</key>
+    <key alias="bold">粗體</key>
+    <key alias="deindent">取消段落縮進</key>
+    <key alias="formFieldInsert">插入表單字段</key>
+    <key alias="graphicHeadline">插入圖片標題</key>
+    <key alias="htmlEdit">編輯Html</key>
+    <key alias="indent">段落縮進</key>
+    <key alias="italic">斜體</key>
+    <key alias="justifyCenter">居中</key>
+    <key alias="justifyLeft">左對齊</key>
+    <key alias="justifyRight">右對齊</key>
+    <key alias="linkInsert">插入連結</key>
+    <key alias="linkLocal">插入本地連結（錨點）</key>
+    <key alias="listBullet">圓點列表</key>
+    <key alias="listNumeric">數字清單</key>
+    <key alias="macroInsert">插入巨集</key>
+    <key alias="pictureInsert">插入圖片</key>
+    <key alias="relations">編輯關聯</key>
+    <key alias="returnToList">回到清單</key>
+    <key alias="save">保存</key>
+    <key alias="saveAndPublish">保存並發佈</key>
+    <key alias="saveToPublish">保存並提交審核</key>
+    <key alias="saveListView">保存清單檢視</key>
+    <key alias="showPage">預覽</key>
+    <key alias="showPageDisabled">因未設置範本無法預覽</key>
+    <key alias="styleChoose">選擇樣式</key>
+    <key alias="styleShow">顯示樣式</key>
+    <key alias="tableInsert">插入表格</key>
+    <key alias="generateModels">產生模組</key>
+  </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">要更改所選節點的文檔類型，先在列表中選擇合適的文檔類型。</key>
+    <key alias="changeDocTypeInstruction2">然後設置當前文檔類型到新文檔類型的各欄位間的對應映射關係並保存。</key>
+    <key alias="contentRepublished">內容已被重新發佈</key>
+    <key alias="currentProperty">當前屬性</key>
+    <key alias="currentType">當前類型</key>
+    <key alias="docTypeCannotBeChanged">不能改變文檔類型，因為沒有可替代的類型。</key>
+    <key alias="docTypeChanged">文檔類型已更改</key>
+    <key alias="mapProperties">要映射的欄位</key>
+    <key alias="mapToProperty">映射欄位</key>
+    <key alias="newTemplate">新範本</key>
+    <key alias="newType">新類型</key>
+    <key alias="none">無</key>
+    <key alias="selectedContent">內容</key>
+    <key alias="selectNewDocType">選擇新的文檔類型</key>
+    <key alias="successMessage">選中文檔的類型已被成功更改為[new type]，以下欄位被映射：</key>
+    <key alias="to">至</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成欄位映射，因為存在一個欄位映射至多欄位的問題。</key>
+    <key alias="validDocTypesNote">僅顯示可作為替代的文檔類型。</key>
+  </area>
+  <area alias="content">
+    <key alias="isPublished" version="7.2">已發表</key>
+    <key alias="about">關於本頁</key>
+    <key alias="alias">別名</key>
+    <key alias="alternativeTextHelp">（圖片的替代文本）</key>
+    <key alias="alternativeUrls">替代連結</key>
+    <key alias="clickToEdit">點擊編輯</key>
+    <key alias="createBy">創建者</key>
+    <key alias="createByDesc" version="7.0">創建者</key>
+    <key alias="updatedBy" version="7.0">更新者</key>
+    <key alias="createDate">創建時間</key>
+    <key alias="createDateDesc" version="7.0">此文件創建的日期時間</key>
+    <key alias="documentType">文檔類型</key>
+    <key alias="editing">編輯</key>
+    <key alias="expireDate">過期於</key>
+    <key alias="itemChanged">該項發佈之後有更改</key>
+    <key alias="itemNotPublished">該項沒有發佈</key>
+    <key alias="lastPublished">最近發佈</key>
+    <key alias="noItemsToShow">沒有可供顯示的項目</key>
+    <key alias="listViewNoItems" version="7.1.5">此列表中沒有可供顯示的項目</key>
+    <key alias="mediatype">媒體類型</key>
+    <key alias="mediaLinks">媒體連結位址</key>
+    <key alias="membergroup">會員組</key>
+    <key alias="memberrole">角色</key>
+    <key alias="membertype">會員類型</key>
+    <key alias="noDate">沒有選擇時間</key>
+    <key alias="nodeName">頁標題</key>
+    <key alias="otherElements">屬性</key>
+    <key alias="parentNotPublished">該文檔不可見，因為其上級 '%0%' 未發佈。</key>
+    <key alias="parentNotPublishedAnomaly">糟糕：該文檔已發佈，但是沒有更新至緩存（內部錯誤）</key>
+    <key alias="getUrlException">糟糕：沒辦法連結到此網址（內部錯誤-請參見記錄）</key>
+    <key alias="routeError">糟糕：此文件已經發表，但是網址和其他內容相衝 %0%</key>
+    <key alias="publish">發佈</key>
+    <key alias="publishStatus">發佈狀態</key>
+    <key alias="releaseDate">發佈於</key>
+    <key alias="unpublishDate">取消發表於</key>
+    <key alias="removeDate">清空時間</key>
+    <key alias="sortDone">排序完成</key>
+    <key alias="sortHelp">拖拽項目或按一下列頭即可排序，可以按住Shift多選。</key>
+    <key alias="statistics">統計</key>
+    <key alias="titleOptional">標題（可選）</key>
+    <key alias="altTextOptional">其他說明文字（可選）</key>
+    <key alias="type">類型</key>
+    <key alias="unPublish">取消發佈</key>
+    <key alias="updateDate">最近編輯</key>
+    <key alias="updateDateDesc" version="7.0">本文件修改時間</key>
+    <key alias="uploadClear">移除文件</key>
+    <key alias="urls">連結到文檔</key>
+    <key alias="memberof">會員組成員</key>
+    <key alias="notmemberof">非會員組成員</key>
+    <key alias="childItems" version="7.0">子項目</key>
+    <key alias="target" version="7.0">目標</key>
+    <key alias="scheduledPublishServerTime">預計發表的時間（伺服器端）</key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">這是什麼意思？</a>]]></key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">點選以便上傳</key>
+    <key alias="dropFilesHere">拖曳檔案至此...</key>
+    <key alias="urls">媒體連結</key>
+    <key alias="orClickHereToUpload">或按這裡選擇檔案</key>
+    <key alias="onlyAllowedFiles">只允許檔案類型為</key>
+    <key alias="maxFileSize">檔案大小上限為</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">新增一位會員</key>
+    <key alias="allMembers">所有會員</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">您想在哪裡創建 %0%</key>
+    <key alias="createUnder">創建在</key>
+    <key alias="updateData">選擇類型和標題</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[此處沒有被允許的文檔類型。請至設定中的 <strong>"文檔類型"</strong>處變更。]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[此處沒有被允許的媒體類型。請至設定中的 <strong>"媒體類型"</strong>處變更。]]></key>
+    <key alias="documentTypeWithoutTemplate">文檔類型沒有相關範本</key>
+    <key alias="newFolder">沒有資料夾</key>
+    <key alias="newDataType">新資料類別</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">流覽您的網站</key>
+    <key alias="dontShowAgain">- 隱藏</key>
+    <key alias="nothinghappens">如果Umbraco沒有打開，您可能需要允許彈出式視窗。</key>
+    <key alias="openinnew">已經在新視窗中打開</key>
+    <key alias="restart">重啟</key>
+    <key alias="visit">訪問</key>
+    <key alias="welcome">歡迎</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">留下</key>
+    <key alias="discardChanges">放棄變更</key>
+    <key alias="unsavedChanges">您有未存檔的變更</key>
+    <key alias="unsavedChangesWarning">您確定要離開本頁？ - 您有未存檔的變更</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">完成</key>
+    <key alias="deletedItem">刪除 %0% 個項目</key>
+    <key alias="deletedItems">刪除 %0% 個項目</key>
+    <key alias="deletedItemOfItem">刪除 %1% 個中的 %0% 個項目</key>
+    <key alias="deletedItemOfItems">刪除 %1% 個中的 %0% 個項目</key>
+    <key alias="publishedItem">已發佈 %0% 個項目</key>
+    <key alias="publishedItems">已發佈 %0% 個項目</key>
+    <key alias="publishedItemOfItem">已發佈 %1% 個中的 %0% 個項目</key>
+    <key alias="publishedItemOfItems">已發佈 %1% 個中的 %0% 個項目</key>
+    <key alias="unpublishedItem">取消發佈 %0% 個項目</key>
+    <key alias="unpublishedItems">取消發佈 %0% 個項目</key>
+    <key alias="unpublishedItemOfItem">取消發佈 %1 個中的 %0% 個項目</key>
+    <key alias="unpublishedItemOfItems">取消發佈 %1 個中的 %0% 個項目</key>
+    <key alias="movedItem">移動 %0% 個項目</key>
+    <key alias="movedItems">移動 %0% 個項目</key>
+    <key alias="movedItemOfItem">移動 %1 個中的 %0% 個項目</key>
+    <key alias="movedItemOfItems">移動 %1 個中的 %0% 個項目</key>
+    <key alias="copiedItem">複製 %0% 個項目</key>
+    <key alias="copiedItems">複製 %0% 個項目</key>
+    <key alias="copiedItemOfItem">複製 %1 個中的 %0% 個項目</key>
+    <key alias="copiedItemOfItems">複製 %1 個中的 %0% 個項目</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="anchorInsert">錨點名稱</key>
+    <key alias="assignDomain">管理主機名稱</key>
+    <key alias="closeThisWindow">關閉窗口</key>
+    <key alias="confirmdelete">您確定要刪除嗎</key>
+    <key alias="confirmdisable">您確定要禁用嗎</key>
+    <key alias="confirmEmptyTrashcan">按一下此框確定刪除%0%項</key>
+    <key alias="confirmlogout">您確定嗎?</key>
+    <key alias="confirmSure">您確定嗎？</key>
+    <key alias="cut">剪切</key>
+    <key alias="editdictionary">編輯字典項</key>
+    <key alias="editlanguage">編輯語言</key>
+    <key alias="insertAnchor">插入本地連結</key>
+    <key alias="insertCharacter">插入字元</key>
+    <key alias="insertgraphicheadline">插入圖片標題</key>
+    <key alias="insertimage">插入圖片</key>
+    <key alias="insertlink">插入連結</key>
+    <key alias="insertMacro">插入巨集</key>
+    <key alias="inserttable">插入表格</key>
+    <key alias="lastEdited">最近編輯</key>
+    <key alias="link">連結</key>
+    <key alias="linkinternal">內部連結：</key>
+    <key alias="linklocaltip">本地連結請用“#”號開頭</key>
+    <key alias="linknewwindow">在新視窗中打開？</key>
+    <key alias="macroContainerSettings">巨集設置</key>
+    <key alias="macroDoesNotHaveProperties">本巨集沒有包含您可以編輯的屬性</key>
+    <key alias="paste">粘貼</key>
+    <key alias="permissionsEdit">編輯許可權</key>
+    <key alias="recycleBinDeleting">正在清空回收站，請不要關閉窗口。</key>
+    <key alias="recycleBinIsEmpty">回收站已清空</key>
+    <key alias="recycleBinWarning">從回收站刪除的項目將不可恢復</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>的網站服務目前出現些狀況，而我們無能為力。我們對此不便感到十分抱歉。]]></key>
+    <key alias="regexSearchHelp">查找規則運算式來驗證輸入，如: 'email、'zip-code'、'url'。</key>
+    <key alias="removeMacro">移除巨集</key>
+    <key alias="requiredField">必填項目</key>
+    <key alias="sitereindexed">網站已重建索引</key>
+    <key alias="siterepublished">網站緩存已刷新，所有已發佈的內容更新生效。</key>
+    <key alias="siterepublishHelp">網站緩存將會刷新，所有已發佈的內容將會更新。</key>
+    <key alias="tableColumns">表格列數</key>
+    <key alias="tableRows">表格行數</key>
+    <key alias="templateContentAreaHelp"><![CDATA[<strong>設定預留位置代碼</strong> 以便您要在子範本中插入內容到本範本時，填入此代碼到 <code>&lt;asp:content /&gt;</code> 裡面。]]></key>
+    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>選擇預留位置代碼</strong> 於此清單中。您只能選擇目前父範本中的代碼。]]></key>
+    <key alias="thumbnailimageclickfororiginal">點擊圖片查看完整大小</key>
+    <key alias="treepicker">拾取項</key>
+    <key alias="viewCacheItem">查看緩存項</key>
+    <key alias="createFolder">新增資料夾...</key>
+    <key alias="relateToOriginalLabel">與原本相關</key>
+    <key alias="theFriendliestCommunity">最友善的社群</key>
+    <key alias="linkToPage">頁面連結</key>
+    <key alias="openInNewWindow">打開此連結文檔至新視窗或標籤頁</key>
+    <key alias="openInFullBody">打開此連結文檔至全新視窗</key>
+    <key alias="openInParentFrame">打開此連結文檔在原本視窗中</key>
+    <key alias="linkToMedia">媒體連結</key>
+    <key alias="selectMedia">選擇媒體</key>
+    <key alias="selectIcon">選擇圖示</key>
+    <key alias="selectItem">選擇項目</key>
+    <key alias="selectLink">選擇連結</key>
+    <key alias="selectMacro">選擇巨集</key>
+    <key alias="selectContent">選擇內容</key>
+    <key alias="selectMember">選擇會員</key>
+    <key alias="selectMemberGroup">選擇會員群組</key>
+    <key alias="noIconsFound">沒有找到任何圖示</key>
+    <key alias="noMacroParams">本巨集沒有需要參數</key>
+    <key alias="externalLoginProviders">外部登入提供者</key>
+    <key alias="exceptionDetail">例外細節</key>
+    <key alias="stacktrace">詳細記錄</key>
+    <key alias="innerException">內部例外</key>
+    <key alias="linkYour">連結您的</key>
+    <key alias="unLinkYour">取消連結您的</key>
+    <key alias="account">帳戶</key>
+    <key alias="selectEditor">選擇編輯器</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+      為此字典項目 '<em>%0%</em>' 編輯不同語言版本，<br />您可以在左方選單「語言」中增添新的語言      
+   ]]></key>
+    <key alias="displayName">語言名稱</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">輸入您的使用者名稱</key>
+    <key alias="password">輸入您的密碼</key>
+    <key alias="confirmPassword">確認您的密碼</key>
+    <key alias="nameentity">命名此 %0%...</key>
+    <key alias="entername">輸入一個名稱</key>
+    <key alias="label">標籤...</key>
+    <key alias="enterDescription">輸入一段描述...</key>
+    <key alias="search">搜尋請輸入...</key>
+    <key alias="filter">過濾請輸入...</key>
+    <key alias="enterTags">增加標籤（每個標籤後請按輸入鍵）...</key>
+    <key alias="email">輸入您的電子郵件</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">允許放置於根節點</key>
+    <key alias="allowAtRootDesc" version="7.2">只有勾選「允許放置於根節點」的內容種類可以放在內容樹或媒體樹的最頂端</key>
+    <key alias="allowedchildnodetypes">允許子項節點類型</key>
+    <key alias="contenttypecompositions">文檔種類集合</key>
+    <key alias="create">創建</key>
+    <key alias="deletetab">刪除選項卡</key>
+    <key alias="description">描述</key>
+    <key alias="newtab">新建選項卡</key>
+    <key alias="tab">選項卡</key>
+    <key alias="thumbnail">縮略圖</key>
+    <key alias="hasListView">允許清單檢視</key>
+    <key alias="hasListViewDesc" version="7.2">允許內容項目顯示成可以排列及搜尋的清單，子項目不會被顯示</key>
+    <key alias="currentListView" version="7.2">目前清單檢視</key>
+    <key alias="currentListViewDesc" version="7.2">作用中的清單檢視資料類別</key>
+    <key alias="createListView" version="7.2">新增自訂清單檢視</key>
+    <key alias="removeListView" version="7.2">移除自訂清單檢視</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">添加預設值</key>
+    <key alias="dataBaseDatatype">資料庫資料類型</key>
+    <key alias="guid">資料類型唯一標識</key>
+    <key alias="renderControl">渲染控制項</key>
+    <key alias="rteButtons">按鈕</key>
+    <key alias="rteEnableAdvancedSettings">允許高級設置</key>
+    <key alias="rteEnableContextMenu">允許快顯功能表</key>
+    <key alias="rteMaximumDefaultImgSize">插入圖片預設最大</key>
+    <key alias="rteRelatedStylesheets">關聯的樣式表</key>
+    <key alias="rteShowLabel">顯示標籤</key>
+    <key alias="rteWidthAndHeight">寬和高</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">資料已保存，但是發佈前您需要修正一些錯誤：</key>
+    <key alias="errorChangingProviderPassword">當前成員提供程式不支援修改密碼(EnablePasswordRetrieval的值應該為true)</key>
+    <key alias="errorExistsWithoutTab">%0% 已存在</key>
+    <key alias="errorHeader">發現錯誤：</key>
+    <key alias="errorHeaderWithoutTab">發現錯誤：</key>
+    <key alias="errorInPasswordFormat">密碼最少%0%位元，且至少包含%1%位元非字母數位記號</key>
+    <key alias="errorIntegerWithoutTab">%0% 必須是整數</key>
+    <key alias="errorMandatory">%1% 中的 %0% 欄位是必填項</key>
+    <key alias="errorMandatoryWithoutTab">%0% 是必填項</key>
+    <key alias="errorRegExp">%1% 中的 %0% 格式不正確</key>
+    <key alias="errorRegExpWithoutTab">%0% 格式不正確</key>
+  </area>
+  <area alias="errors">
+    <key alias="receivedErrorFromServer">收到伺服器傳來的錯誤</key>
+    <key alias="dissallowedMediaType">該檔案類型已被管理員禁用</key>
+    <key alias="codemirroriewarning">注意，儘管配置中允許CodeMirror，但是它在IE上不夠穩定，所以無法在IE運行。</key>
+    <key alias="contentTypeAliasAndNameNotNull">請為新的屬性類型填寫名稱和別名！</key>
+    <key alias="filePermissionsError">許可權有問題，訪問指定文檔或資料夾失敗！</key>
+    <key alias="macroErrorLoadingPartialView">讀取片段視圖腳本錯誤（檔案：%0%）</key>
+    <key alias="macroErrorLoadingUsercontrol">讀取使用者控制項 %0% 錯誤</key>
+    <key alias="macroErrorLoadingCustomControl">讀取使用者控制項 %0% 錯誤（組件：%0%，類別：%1%）</key>
+    <key alias="macroErrorLoadingMacroEngineScript">讀取巨集引擎腳本錯誤（檔案：%0%）</key>
+    <key alias="macroErrorParsingXSLTFile">分析XSLT檔案錯誤：%0%</key>
+    <key alias="macroErrorReadingXSLTFile">讀取XSLT檔案錯誤：%0%</key>
+    <key alias="missingTitle">請輸入標題</key>
+    <key alias="missingType">請選擇類型</key>
+    <key alias="pictureResizeBiggerThanOrg">圖片尺寸大於原始尺寸不會提高圖片品質，您確定要把圖片尺寸變大嗎?</key>
+    <key alias="pythonErrorHeader">python腳本錯誤</key>
+    <key alias="pythonErrorText">python腳本未保存，因為包含錯誤。</key>
+    <key alias="startNodeDoesNotExists">預設打開頁面不存在，請聯繫管理員</key>
+    <key alias="stylesMustMarkBeforeSelect">請先選擇內容，再設置樣式。</key>
+    <key alias="stylesNoStylesOnPage">沒有可用的樣式</key>
+    <key alias="tableColMergeLeft">請把游標放在您要合併的兩個儲存格中的左邊儲存格</key>
+    <key alias="tableSplitNotSplittable">非合併儲存格不能分離。</key>
+    <key alias="xsltErrorHeader">XSLT源碼出錯</key>
+    <key alias="xsltErrorText">XSLT未保存，因為包含錯誤。</key>
+    <key alias="missingPropertyEditorErrorMessage">這是此屬性所使用的資料類別設定錯誤，請檢查資料類別</key>
+  </area>
+  <area alias="general">
+    <key alias="about">關於</key>
+    <key alias="action">操作</key>
+    <key alias="actions">操作</key>
+    <key alias="add">添加</key>
+    <key alias="alias">別名</key>
+    <key alias="all">所有</key>
+    <key alias="areyousure">您確定嗎？</key>
+    <key alias="back">回去</key>
+    <key alias="border">邊框</key>
+    <key alias="by">或</key>
+    <key alias="cancel">取消</key>
+    <key alias="cellMargin">儲存格邊距</key>
+    <key alias="choose">選擇</key>
+    <key alias="close">關閉</key>
+    <key alias="closewindow">關閉窗口</key>
+    <key alias="comment">備註</key>
+    <key alias="confirm">確認</key>
+    <key alias="constrainProportions">強制屬性</key>
+    <key alias="continue">繼續</key>
+    <key alias="copy">複製</key>
+    <key alias="create">創建</key>
+    <key alias="database">資料庫</key>
+    <key alias="date">時間</key>
+    <key alias="default">默認</key>
+    <key alias="delete">刪除</key>
+    <key alias="deleted">已刪除</key>
+    <key alias="deleting">正在刪除…</key>
+    <key alias="design">設計</key>
+    <key alias="dimensions">規格</key>
+    <key alias="down">下</key>
+    <key alias="download">下載</key>
+    <key alias="edit">編輯</key>
+    <key alias="edited">已編輯</key>
+    <key alias="elements">元素</key>
+    <key alias="email">郵箱</key>
+    <key alias="error">錯誤</key>
+    <key alias="findDocument">查找文檔</key>
+    <key alias="height">高</key>
+    <key alias="help">幫助</key>
+    <key alias="icon">圖示</key>
+    <key alias="import">導入</key>
+    <key alias="innerMargin">內邊距</key>
+    <key alias="insert">插入</key>
+    <key alias="install">安裝</key>
+    <key alias="invalid">不合格</key>
+    <key alias="justify">對齊</key>
+    <key alias="language">語言</key>
+    <key alias="layout">佈局</key>
+    <key alias="loading">載入中</key>
+    <key alias="locked">鎖定</key>
+    <key alias="login">登入</key>
+    <key alias="logoff">退出</key>
+    <key alias="logout">登出</key>
+    <key alias="macro">巨集</key>
+    <key alias="mandatory">必要</key>
+    <key alias="move">移動</key>
+    <key alias="more">更多</key>
+    <key alias="name">名稱</key>
+    <key alias="new">新的</key>
+    <key alias="next">下一步</key>
+    <key alias="no">否</key>
+    <key alias="of">屬於</key>
+    <key alias="ok">確定</key>
+    <key alias="open">打開</key>
+    <key alias="or">或</key>
+    <key alias="password">密碼</key>
+    <key alias="path">路徑</key>
+    <key alias="placeHolderID">預留位置代碼</key>
+    <key alias="pleasewait">請稍候…</key>
+    <key alias="previous">上一步</key>
+    <key alias="properties">屬性</key>
+    <key alias="reciept">接收資料郵箱</key>
+    <key alias="recycleBin">回收站</key>
+    <key alias="remaining">保持狀態中</key>
+    <key alias="rename">重命名</key>
+    <key alias="renew">更新</key>
+    <key alias="required" version="7.0">必要</key>
+    <key alias="retry">重試</key>
+    <key alias="rights">許可權</key>
+    <key alias="search">搜索</key>
+    <key alias="server">伺服器</key>
+    <key alias="show">顯示</key>
+    <key alias="showPageOnSend">在發送時預覽</key>
+    <key alias="size">大小</key>
+    <key alias="sort">排序</key>
+    <key alias="submit">送出</key>
+    <key alias="type">類型</key>
+    <key alias="typeToSearch">輸入內容開始搜尋…</key>
+    <key alias="up">上</key>
+    <key alias="update">更新</key>
+    <key alias="upgrade">更新</key>
+    <key alias="upload">上傳</key>
+    <key alias="url">連結位址</key>
+    <key alias="user">用戶</key>
+    <key alias="username">用戶名</key>
+    <key alias="value">值</key>
+    <key alias="view">查看</key>
+    <key alias="welcome">歡迎…</key>
+    <key alias="width">寬</key>
+    <key alias="yes">是</key>
+    <key alias="folder">資料夾</key>
+    <key alias="searchResults">搜尋結果</key>
+    <key alias="reorder">重新排列</key>
+    <key alias="reorderDone">我已經完成排列</key>
+    <key alias="preview">預覽</key>
+    <key alias="changePassword">更改密碼</key>
+    <key alias="to">到</key>
+    <key alias="listView">清單檢視</key>
+    <key alias="saving">存檔中...</key>
+    <key alias="current">目前</key>
+    <key alias="embed">內嵌</key>
+    <key alias="selected">選取的</key>
+  </area>
+  <area alias="colors">
+    <key alias="black">黑</key>
+    <key alias="green">綠</key>
+    <key alias="yellow">黃</key>
+    <key alias="orange">橘</key>
+    <key alias="blue">藍</key>
+    <key alias="red">紅</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addTab">增加標籤頁</key>
+    <key alias="addProperty">增加屬性</key>
+    <key alias="addEditor">增加編輯器</key>
+    <key alias="addTemplate">增加範本</key>
+    <key alias="addChildNode">增加子節點</key>
+    <key alias="addChild">增加子項目</key>
+    <key alias="editDataType">編輯資料類別</key>
+    <key alias="navigateSections">瀏覽區塊</key>
+    <key alias="shortcut">捷徑</key>
+    <key alias="showShortcuts">顯示捷徑</key>
+    <key alias="toggleListView">開關清單檢視</key>
+    <key alias="toggleAllowAsRoot">開關是否允許為根項目</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">背景色</key>
+    <key alias="bold">粗體</key>
+    <key alias="color">前景色</key>
+    <key alias="font">字體</key>
+    <key alias="text">文本</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">頁面</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">無法連接到資料庫。</key>
+    <key alias="databaseErrorWebConfig">無法保存web.config檔，請手工修改。</key>
+    <key alias="databaseFound">發現資料庫</key>
+    <key alias="databaseHeader">資料庫配置</key>
+    <key alias="databaseInstall"><![CDATA[
+      請按 <strong>安裝</strong> 按鈕來安裝Umbraco資料庫 %0%
+    ]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% 已經複製到您的資料庫了。請按<strong>下一步</strong>繼續。]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>沒有找到資料庫！請確認檔案"web.config"中的字串"connection string"是否正確。</p>
+              <p>請編輯檔案"web.config" (例如使用Visual Studio或您喜歡的編輯器)，移動到檔案底部，並在名稱為"UmbracoDbDSN"的字串中設定資料庫連結資訊，並存檔。</p>
+              <p>
+              點選<strong>重試</strong>按鈕當上述步驟完成。<br />
+              <a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+			              在此查詢更多編輯web.config的資訊。</a></p>]]></key>
+    <key alias="databaseText"><![CDATA[要完成此步驟，您必須瞭解連結資料庫伺服器的重要資訊("connection string")。<br />
+        若需要時，請聯繫您的網路公司。如果您在本地機器或伺服器安裝的話，您也許需要聯絡系統管理者。]]></key>
+    <key alias="databaseUpgrade"><![CDATA[
+      <p>
+      點選<strong>升級</strong>按鈕來升級Umbraco資料庫 %0%</p>
+      <p>
+      請別擔心 - 不會刪除任何資料而且馬上就會繼續運作！
+      </p>
+      ]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[您的資料庫已經升級至最新版本%0%。<br />點選<strong>下一步</strong>繼續。]]></key>
+    <key alias="databaseUpToDate"><![CDATA[目前資料庫是最新的！點選<strong>下一步</strong>繼續設定精靈。]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>預設使用者的密碼必須更改！</strong>]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>預設使用者已經被暫停或沒有Umbraco的使用權！</strong></p><p>不需更多的操作步驟。點選<b>下一步</b>繼續。]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>安裝後預設使用者的密碼已經成功修改！</strong></p><p>不需更多的操作步驟。點選<b>下一步</b>繼續。]]></key>
+    <key alias="defaultUserPasswordChanged">密碼已更改</key>
+    <key alias="greatStart">作為入門者，從視頻教程開始吧！</key>
+    <key alias="licenseText">點擊下一步 (或在Web.config中自行修改UmbracoConfigurationStatus)，意味著您接受上述授權合約。</key>
+    <key alias="None">安裝失敗。</key>
+    <key alias="permissionsAffectedFolders">受影響的檔和資料夾</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">此處查看更多資訊</key>
+    <key alias="permissionsAffectedFoldersText">您需要對以下檔和資料夾授於ASP.NET用戶修改許可權</key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>您的權限設定幾近完美！</strong><br /><br />
+        您可以正常執行Umbraco沒有任何問題，只差您將沒有辦法安裝那些建議需要全部許可權的插件。]]></key>
+    <key alias="permissionsHowtoResolve">如何解決</key>
+    <key alias="permissionsHowtoResolveLink">點擊閱讀文字版</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[觀賞我們的<strong>影片教學</strong>來瞭解如何設定Umbraco的資料夾權限或閱讀文字版本。]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>您的權限可能有點小問題！</strong>
+      <br/><br />
+      您可以正常執行Umbraco沒有任何問題，然而您將無法新增資料夾或安裝那些可以讓Umbraco發揮全力的插件。]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>您的權限設定尚未未完成！</strong>
+          <br /><br />
+         您需要更新權限設定才能執行Umbraco。]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>您的權限設定完美無瑕！</strong><br /><br />
+              您已經準備好執行Umbraco和安裝插件！]]></key>
+    <key alias="permissionsResolveFolderIssues">解決資料夾問題</key>
+    <key alias="permissionsResolveFolderIssuesLink">點此查看ASP.NET和創建資料夾的問題解決方案</key>
+    <key alias="permissionsSettingUpPermissions">設置資料夾許可權</key>
+    <key alias="permissionsText"><![CDATA[
+      Umbraco需要某些資料夾的寫和修改權限來儲存檔案，好比圖片或文檔。
+      它也需要儲存暫時性資料（快取暫存）來增強網站的表現。
+    ]]></key>
+    <key alias="runwayFromScratch">我要從頭開始</key>
+    <key alias="runwayFromScratchText"><![CDATA[
+        您的網站目前完全沒有資料，所以如果您想要從頭開始並增添您自己的文檔種類和範本，現在正是絕佳時機。
+        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">學習該怎麼做</a>)
+        您晚點仍可以選擇安裝Runway，請至開發者區域選擇安裝。
+      ]]></key>
+    <key alias="runwayHeader">您剛剛安裝了一個乾淨的系統，要繼續嗎？</key>
+    <key alias="runwayInstalled">“Runway”已安裝</key>
+    <key alias="runwayInstalledText"><![CDATA[
+      您已經有了良好的基礎。請選擇您想要在其上安裝哪些模組。<br />
+      這是我們的模組推薦清單，選取您想要安裝的項目，或者至 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList"> 查詢完整清單</a>。
+      ]]></key>
+    <key alias="runwayOnlyProUsers">僅推薦高級用戶使用</key>
+    <key alias="runwaySimpleSite">給我一個簡單的網站</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[
+      <p>
+      "Runway"是一個提供基本檔案類別和範本的簡單網站。安裝程式會自動幫您設定Runway，
+      但你仍可輕易編輯，擴充或移除它。它並非必要項目而且您可以在沒它的情況下完美執行Umbraco。然而，
+      Runway提供一個輕鬆簡便但基於寶貴經驗的平台讓您可以更快開始。
+      如果您安裝Runway，您還可以選擇名為「Runway模組」的基本區塊來加強Runway頁面。
+        </p>
+        <small>
+        <em>內含於Runway：</em> 首頁，準備開始頁面，模組安裝頁面。<br />
+        <em>可選模組：</em> 上方瀏覽列，網站地圖，聯絡，藝廊。
+        </small>
+      ]]></key>
+    <key alias="runwayWhatIsRunway">“Runway”是什麼？</key>
+    <key alias="step1">步驟 1/5：接受授權合約</key>
+    <key alias="step2">步驟 2/5：資料庫配置</key>
+    <key alias="step3">步驟 3/5：文件許可權驗證</key>
+    <key alias="step4">步驟 4/5：系統安全性</key>
+    <key alias="step5">步驟 5/5：一切就緒，可以開始使用系統。</key>
+    <key alias="thankYou">感謝選擇我們的產品</key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>參觀您的新網站</h3>
+您剛安裝好Runway，何不瞧瞧它的模樣。]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>更多的幫忙與資訊</h3>
+從我們獲獎的社群得到幫助，瀏覽文件，或觀看免費影片來瞭解如何輕鬆架設網站，如何使用插件，和瞭解Umbraco項目名稱的快速上手指引。]]></key>
+    <key alias="theEndHeader">系統 %0% 安裝完畢</key>
+    <key alias="theEndInstallFailed"><![CDATA[欲完成安裝，您會需要手動修改<strong>/web.config 檔案</strong>並且更新AppSetting中的字串<strong>UmbracoConfigurationStatus</strong> 內容為 <strong>'%0%'</strong>。]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[您可以點選下方按鈕「啟動Umbraco」來獲得<strong>快速開始指引</strong>。<br />如果您是<strong>Umbraco的新成員</strong>，
+您可以在其中找到相當多的資源。]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>啟動Umbraco</h3>
+想要管理您的網站時，只需開啟Umbraco後台便可增加內容，更新範本和樣式表，或增添新功能。]]></key>
+    <key alias="Unavailable">無法連接到資料庫。</key>
+    <key alias="Version3">系統版本 3</key>
+    <key alias="Version4">系統版本 4</key>
+    <key alias="watch">觀看</key>
+    <key alias="welcomeIntro"><![CDATA[精靈會指引您完成設定Umbraco的過程，以便重新開始或升級到3.0。<br /><br />
+                               點選<strong>"下一步"</strong>來啟動精靈。]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">語言代碼</key>
+    <key alias="displayName">語言名稱</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">使用者在空閒狀態下將會自動登出</key>
+    <key alias="renewSession">已更新，繼續工作。</key>
+  </area>
+  <area alias="login">
+    <key alias="greeting0">超級星期天快樂</key>
+    <key alias="greeting1">瘋狂星期一快樂</key>
+    <key alias="greeting2">熱鬧星期二快樂</key>
+    <key alias="greeting3">美妙星期三快樂</key>
+    <key alias="greeting4">悅耳星期四快樂</key>
+    <key alias="greeting5">時髦星期五快樂</key>
+    <key alias="greeting6">喵喵星期六快樂</key>
+    <key alias="instruction">下方登入</key>
+    <key alias="signInWith">登入使用</key>
+    <key alias="timeout">連線時間過了</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="forgottenPassword">忘記密碼？</key>
+    <key alias="forgottenPasswordInstruction">一封內有重設密碼連結的電子郵件已經寄出給您</key>
+    <key alias="requestPasswordResetConfirmation">一封內有重設密碼連結的電子郵件已經寄到此信箱</key>
+    <key alias="returnToLogin">回到登入畫面</key>
+    <key alias="setPasswordInstruction">請輸入新密碼</key>
+    <key alias="setPasswordConfirmation">您的密碼已經更新</key>
+    <key alias="resetCodeExpired">您點選的連結是無效或過期的</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco：重設密碼</key>
+    <key alias="resetPasswordEmailCopyFormat"><![CDATA[<p>您登入到後台的使用者名稱是：<strong>%0%</strong></p><p>點選<a href="%1%"><strong>這裡</strong></a>來重設您的密碼或將此連結複製/貼上到您的瀏覽器：</p><p><em>%1%</em></p>]]></key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">儀錶板</key>
+    <key alias="sections">區域</key>
+    <key alias="tree">內容</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">選擇上面的頁面…</key>
+    <key alias="copyDone">%0% 被複製到 %1%</key>
+    <key alias="copyTo">將 %0% 複製到</key>
+    <key alias="moveDone">%0% 已被移動到 %1%</key>
+    <key alias="moveTo">將 %0% 移動到</key>
+    <key alias="nodeSelected">作為內容的根結點，點“確定”。</key>
+    <key alias="noNodeSelected">尚未選擇節點，請選擇一個節點點擊“確定”。</key>
+    <key alias="notAllowedByContentType">類型不符不允許選擇</key>
+    <key alias="notAllowedByPath">該項不能移到其子項</key>
+    <key alias="notAllowedAtRoot">當前節點不能建在根節點下</key>
+    <key alias="notValid">您在子項的許可權不夠，不允許該操作。</key>
+    <key alias="relateToOriginal">複本和原本建立關聯</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications">為 %0% 編寫通知</key>
+    <key alias="mailBody"><![CDATA[
+      哈嘍 %0%
+
+      這是一封自動產生的信件來通知您 %1% 工作
+      已經在頁面 %2% 上由使用者 %3% 執行完成
+      
+
+      請移至下列網址編輯： http://%4%/#/content/content/edit/%5%
+
+      祝您有美好的一天！
+
+      Umbraco機器人 謹上
+    ]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>哈嘍 %0%</p>
+
+		  <p>這是一封自動產生的信件來通知您<strong> %1% </strong>工作
+		 已經在頁面 <strong>%2%</strong> 上由使用者 <strong>%3%</strong> 執行完成
+	  </p>
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編輯&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<br />
+		  </div>
+		  <p>
+			  <h3>更新摘要：</h3>
+			  <table style="width: 100%;">
+						   %6%
+				</table>
+			 </p>
+
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編輯&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<br />
+		  </div>
+
+		  <p>祝您有美好的一天！<br /><br />
+			  Umbraco機器人 謹上
+		  </p>]]></key>
+    <key alias="mailSubject">在 %2%，[%0%] 關於 %1% 的通告已執行。</key>
+    <key alias="notifications">通知</key>
+  </area>
+  <area alias="packager">
+    <key alias="chooseLocalPackageText"><![CDATA[
+      要從您的電腦上選擇擴展包，請按瀏覽<br />
+         按鈕並點選該檔案。Umbraco擴展包通常有「.zip」的副檔名。
+      ]]></key>
+    <key alias="packageAuthor">作者</key>
+    <key alias="packageDemonstration">演示</key>
+    <key alias="packageDocumentation">文檔</key>
+    <key alias="packageMetaData">中繼資料</key>
+    <key alias="packageName">名稱</key>
+    <key alias="packageNoItemsHeader">擴展包不含任何項</key>
+    <key alias="packageNoItemsText"><![CDATA[這個擴展包檔案裡面沒有任何移除項目資訊。<br/><br/>
+      您可以點選下方「移除擴展包」來安全地移除此項目。]]></key>
+    <key alias="packageNoUpgrades">無可用更新</key>
+    <key alias="packageOptions">選項</key>
+    <key alias="packageReadme">說明</key>
+    <key alias="packageRepository">程式庫</key>
+    <key alias="packageUninstallConfirm">確認卸載</key>
+    <key alias="packageUninstalledHeader">已卸載</key>
+    <key alias="packageUninstalledText">擴展包卸載成功</key>
+    <key alias="packageUninstallHeader">卸載</key>
+    <key alias="packageUninstallText"><![CDATA[您可以取消選取任何不想要現在移除的項目。當您點選「確認移除」按鈕後，所有點選項目將被移除。<br />
+      <span style="color: Red; font-weight: bold;">注意：</span> 任何文檔，媒體或需要這些項目才能運作的物件將會停止運作，並可能使得系統不穩定，
+      請小心移除。若有疑慮，請聯絡擴展包作者。]]></key>
+    <key alias="packageUpgradeDownload">從程式庫下載更新</key>
+    <key alias="packageUpgradeHeader">更新擴展包</key>
+    <key alias="packageUpgradeInstructions">更新說明</key>
+    <key alias="packageUpgradeText">擴展包有可用的更新，您可以從程式庫網站更新。</key>
+    <key alias="packageVersion">版本</key>
+    <key alias="packageVersionHistory">版本歷史</key>
+    <key alias="viewPackageWebsite">訪問擴展包網站</key>
+    <key alias="packageAlreadyInstalled">擴展包已安裝</key>
+    <key alias="targetVersionMismatch">這個擴展包無法安裝，它需要Umbraco至少是版本 %0%</key>
+    <key alias="installStateUninstalling">移除中...</key>
+    <key alias="installStateDownloading">下載中...</key>
+    <key alias="installStateImporting">匯入中...</key>
+    <key alias="installStateInstalling">安裝中...</key>
+    <key alias="installStateRestarting">重新啟動中，請稍後...</key>
+    <key alias="installStateComplete">都好了，您的瀏覽器將重新整理，請稍待...</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">帶格式粘貼（不推薦）</key>
+    <key alias="errorMessage">您所粘貼的文本含有特殊字元或格式，Umbraco將清除以適應網頁。</key>
+    <key alias="removeAll">無格式粘貼</key>
+    <key alias="removeSpecialFormattering">粘貼並移除格式（推薦）</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paAdvanced">基於角色的保護</key>
+    <key alias="paAdvancedHelp"><![CDATA[如果您希望使用角色來控制登入訪問權限，<br /> 請使用Umbraco的會員群組。]]></key>
+    <key alias="paAdvancedNoGroups">使用基於角色的授權需要首先建立會員組。</key>
+    <key alias="paErrorPage">錯誤頁</key>
+    <key alias="paErrorPageHelp">當用戶登錄後訪問沒有許可權的頁時顯示該頁</key>
+    <key alias="paHowWould">選擇限制訪問此頁的方式</key>
+    <key alias="paIsProtected">%0% 現在處於受保護狀態</key>
+    <key alias="paIsRemoved">%0% 的保護被取消 </key>
+    <key alias="paLoginPage">登錄頁</key>
+    <key alias="paLoginPageHelp">選擇公開的登錄入口</key>
+    <key alias="paRemoveProtection">取消保護</key>
+    <key alias="paSelectPages">選擇一個包含登錄表單和提示資訊的頁</key>
+    <key alias="paSelectRoles">選擇訪問該頁的角色類型</key>
+    <key alias="paSetLogin">為此頁設置帳號和密碼</key>
+    <key alias="paSimple">單用戶保護</key>
+    <key alias="paSimpleHelp">如果您只希望提供一個用戶名和密碼就能訪問</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+      %0% 無法現在發佈，因為它已經設定發佈時程。
+    ]]></key>
+    <key alias="contentPublishedFailedExpired"><![CDATA[
+      %0% 無法發佈，因為已經過期。
+    ]]></key>
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      %0% 無法發佈，因為屬性：%1% 沒有通過驗證規則。
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[
+      %0% 無法發佈，因為第三方擴充元件取消這項操作。
+    ]]></key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[
+      %0% 無法發佈，因為父頁面並沒有發佈。
+    ]]></key>
+    <key alias="includeUnpublished">包含未發佈的子項</key>
+    <key alias="inProgress">正在發佈，請稍候…</key>
+    <key alias="inProgressCounter">%0% 中的 %1% 頁面已發佈…</key>
+    <key alias="nodePublish">%0% 已發佈</key>
+    <key alias="nodePublishAll">%0% 及其子項已發佈</key>
+    <key alias="publishAll">發佈 %0% 及其子項</key>
+    <key alias="publishHelp"><![CDATA[點選<em>發佈</em>按鈕來將<strong>%0%</strong>的內容設定為公開。<br/><br />
+      您可以同時發佈本頁以及其子項目若您點選下面的<em>包含子頁</em>。
+      ]]></key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">您尚未設定任何許可顏色</key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="enterExternal">輸入外部連結</key>
+    <key alias="chooseInternal">選擇內部連結</key>
+    <key alias="caption">標題</key>
+    <key alias="link">連結</key>
+    <key alias="newWindow">新視窗</key>
+    <key alias="captionPlaceholder">輸入新標題</key>
+    <key alias="externalLinkPlaceholder">輸入連結</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">重設</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">當前版本</key>
+    <key alias="diffHelp"><![CDATA[這顯示目前版本以及所選版本的差異。<br /><del>紅色</del> 文字將不會顯示於所選版本，而<ins>綠色</ins>表示增加部分。]]></key>
+    <key alias="documentRolledBack">文檔已回滾</key>
+    <key alias="htmlHelp">這顯示所選版本的HTML格式，如果您想要比較兩版本的差異，請使用比較檢視</key>
+    <key alias="rollbackTo">回滾至</key>
+    <key alias="selectVersion">選擇版本</key>
+    <key alias="view">查看</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">編輯腳本</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">Concierge</key>
+    <key alias="content">內容</key>
+    <key alias="courier">Courier</key>
+    <key alias="developer">開發</key>
+    <key alias="installer">設定精靈</key>
+    <key alias="media">媒體</key>
+    <key alias="member">會員</key>
+    <key alias="newsletters">消息</key>
+    <key alias="settings">設置</key>
+    <key alias="statistics">統計</key>
+    <key alias="translation">翻譯</key>
+    <key alias="users">用戶</key>
+    <key alias="help" version="7.0">說明</key>
+    <key alias="forms">表單</key>
+    <key alias="analytics">統計</key>
+  </area>
+  <area alias="help">
+    <key alias="goTo">移至</key>
+    <key alias="helpTopicsFor">說明主題為</key>
+    <key alias="videoChaptersFor">影片主題為</key>
+    <key alias="theBestUmbracoVideoTutorials">最好的Umbraco影片教學</key>
+  </area>
+  <area alias="settings">
+    <key alias="defaulttemplate">預設範本</key>
+    <key alias="dictionary editor egenskab">字典鍵</key>
+    <key alias="importDocumentTypeHelp">要導入文檔類型，請點擊“流覽”按鈕，再點擊“導入”，然後在您電腦上查找 ".udt"檔導入（下一頁中需要您再次確認）</key>
+    <key alias="newtabname">新建選項卡標題</key>
+    <key alias="nodetype">節點類型</key>
+    <key alias="objecttype">類型</key>
+    <key alias="stylesheet">樣式表</key>
+    <key alias="script">腳本</key>
+    <key alias="stylesheet editor egenskab">樣式表屬性</key>
+    <key alias="tab">選項卡</key>
+    <key alias="tabname">選項卡標題</key>
+    <key alias="tabs">選項卡</key>
+    <key alias="contentTypeEnabled">主控文件類型啟動</key>
+    <key alias="contentTypeUses">該文檔類型使用</key>
+    <key alias="asAContentMasterType">作為主控文件類型. 主控文件類型的標籤只能在主控文件類型裡修改。</key>
+    <key alias="noPropertiesDefinedOnTab">沒有欄位設置在該標籤頁</key>
+    <key alias="masterDocumentType">主文檔類別</key>
+    <key alias="createMatchingTemplate">新增對應範本</key>
+    <key alias="addIcon">增加圖示</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortOrder">排列順序</key>
+    <key alias="sortCreationDate">增添時間</key>
+    <key alias="sortDone">排序完成。</key>
+    <key alias="sortHelp">上下拖拽項目或按一下列頭進行排序</key>
+    <key alias="sortPleaseWait"><![CDATA[ 請稍後。項目正在排序，這需要一點時間。]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="validationFailedHeader">驗證</key>
+    <key alias="validationFailedMessage">驗證錯誤一定要修正才能儲存項目</key>
+    <key alias="operationFailedHeader">失敗</key>
+    <key alias="invalidUserPermissionsText">使用者權限不足，無法完成操作</key>
+    <key alias="operationCancelledHeader">已取消</key>
+    <key alias="operationCancelledText">操作被協力廠商外掛程式取消</key>
+    <key alias="contentPublishedFailedByEvent">發佈被協力廠商外掛程式取消</key>
+    <key alias="contentTypeDublicatePropertyType">屬性類型已存在</key>
+    <key alias="contentTypePropertyTypeCreated">屬性類型已創建</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[名稱：%0% <br />資料類別：%1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">屬性類型已刪除</key>
+    <key alias="contentTypeSavedHeader">內容類別型已保存</key>
+    <key alias="contentTypeTabCreated">選項卡已創建</key>
+    <key alias="contentTypeTabDeleted">選項卡已刪除</key>
+    <key alias="contentTypeTabDeletedText">id為%0%的選項卡已刪除</key>
+    <key alias="cssErrorHeader">樣式表未保存</key>
+    <key alias="cssSavedHeader">樣式表已保存</key>
+    <key alias="cssSavedText">樣式表保存，無錯誤。</key>
+    <key alias="dataTypeSaved">資料類型已保存</key>
+    <key alias="dictionaryItemSaved">字典項已保存</key>
+    <key alias="editContentPublishedFailedByParent">因為上級頁面未發佈導致發佈失敗！</key>
+    <key alias="editContentPublishedHeader">內容已發佈</key>
+    <key alias="editContentPublishedText">公眾可見</key>
+    <key alias="editContentSavedHeader">內容已保存</key>
+    <key alias="editContentSavedText">請發佈以使更改生效</key>
+    <key alias="editContentSendToPublish">提交審核</key>
+    <key alias="editContentSendToPublishText">更改已提交審核</key>
+    <key alias="editMediaSaved">媒體已保存</key>
+    <key alias="editMediaSavedText">媒體已保存</key>
+    <key alias="editMemberSaved">會員已保存</key>
+    <key alias="editStylesheetPropertySaved">樣式表屬性已保存</key>
+    <key alias="editStylesheetSaved">樣式表已保存</key>
+    <key alias="editTemplateSaved">範本已保存</key>
+    <key alias="editUserError">保存使用者出錯（請查看日誌）</key>
+    <key alias="editUserSaved">用戶已保存</key>
+    <key alias="editUserTypeSaved">用戶類型已保存</key>
+    <key alias="fileErrorHeader">檔未保存</key>
+    <key alias="fileErrorText">檔無法保存，請檢查許可權。</key>
+    <key alias="fileSavedHeader">檔保存</key>
+    <key alias="fileSavedText">檔保存，無錯誤。</key>
+    <key alias="languageSaved">語言已保存</key>
+    <key alias="mediaTypeSavedHeader">媒體類別已儲存</key>
+    <key alias="memberTypeSavedHeader">會員類別已儲存</key>
+    <key alias="pythonErrorHeader">Python腳本未保存</key>
+    <key alias="pythonErrorText">Python腳本因為錯誤未能保存</key>
+    <key alias="pythonSavedHeader">Python已保存</key>
+    <key alias="pythonSavedText">Python腳本無錯誤</key>
+    <key alias="templateErrorHeader">範本未保存</key>
+    <key alias="templateErrorText">範本別名相同</key>
+    <key alias="templateSavedHeader">範本已保存</key>
+    <key alias="templateSavedText">範本保存，無錯誤。</key>
+    <key alias="xsltErrorHeader">XSLT未保存</key>
+    <key alias="xsltErrorText">XSLT有錯誤</key>
+    <key alias="xsltPermissionErrorText">XSLT無法保存，請檢查許可權。</key>
+    <key alias="xsltSavedHeader">XSLT已保存</key>
+    <key alias="xsltSavedText">XSLT無錯誤</key>
+    <key alias="contentUnpublished">內容已取消發佈</key>
+    <key alias="partialViewSavedHeader">片段視圖已保存</key>
+    <key alias="partialViewSavedText">片段視圖保存，無錯誤。</key>
+    <key alias="partialViewErrorHeader">片段視圖未保存</key>
+    <key alias="partialViewErrorText">片段視圖因為錯誤未能保存</key>
+    <key alias="scriptSavedHeader">腳本視圖已儲存</key>
+    <key alias="scriptSavedText">腳本視圖已儲存，沒有任何錯誤！</key>
+    <key alias="scriptErrorHeader">腳本視圖未儲存</key>
+    <key alias="scriptErrorText">儲存檔案時發生錯誤</key>
+    <key alias="cssErrorText">儲存檔案時發生錯誤</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="aliasHelp">使用CSS語法，如：h1、.redHeader、.blueTex。</key>
+    <key alias="editstylesheet">編輯樣式表</key>
+    <key alias="editstylesheetproperty">編輯樣式屬性</key>
+    <key alias="nameHelp">編輯器中的樣式屬性名 </key>
+    <key alias="preview">預覽</key>
+    <key alias="styles">樣式</key>
+  </area>
+  <area alias="template">
+    <key alias="edittemplate">編輯範本</key>
+    <key alias="insertContentArea">插入內容區</key>
+    <key alias="insertContentAreaPlaceHolder">插入內容預留位置</key>
+    <key alias="insertDictionaryItem">插入字典項</key>
+    <key alias="insertMacro">插入巨集</key>
+    <key alias="insertPageField">插入頁欄位</key>
+    <key alias="mastertemplate">母版</key>
+    <key alias="quickGuide">範本標籤快速指南</key>
+    <key alias="template">範本</key>
+  </area>
+  <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
+    <key alias="insertControl">選擇內容類別</key>
+    <key alias="chooseLayout">選擇排列方式</key>
+    <key alias="addRows">新增一行</key>
+    <key alias="addElement">新增內容</key>
+    <key alias="dropElement">放棄內容</key>
+    <key alias="settingsApplied">設定已儲存</key>
+    <key alias="contentNotAllowed">此處不允許有內容</key>
+    <key alias="contentAllowed">此處允許有內容</key>
+    <key alias="clickToEmbed">點選來內嵌</key>
+    <key alias="clickToInsertImage">點選來插入圖片</key>
+    <key alias="placeholderImageCaption">圖片標題...</key>
+    <key alias="placeholderWriteHere">在此填寫...</key>
+    <key alias="gridLayouts">網格排列方式</key>
+    <key alias="gridLayoutsDetail">排列是指網格編輯器的整體工作區域，通常您只需要一種或兩種排列方式</key>
+    <key alias="addGridLayout">增加網格排列方式</key>
+    <key alias="addGridLayoutDetail">藉由設定列寬以及增加新的區域來調整排列方式</key>
+    <key alias="rowConfigurations">行設定</key>
+    <key alias="rowConfigurationsDetail">行是預先水平排列的格子</key>
+    <key alias="addRowConfiguration">增加行設定</key>
+    <key alias="addRowConfigurationDetail">藉由設定小格寬度和增添小格來調整此行</key>
+    <key alias="columns">列</key>
+    <key alias="columnsDetails">網格排列方式的列總數</key>
+    <key alias="settings">設定</key>
+    <key alias="settingsDetails">調整設定編輯器可以改變的項目</key>
+    <key alias="styles">樣式</key>
+    <key alias="stylesDetails">調整樣式編輯器可以改變的項目</key>
+    <key alias="settingDialogDetails">當JSON格式正確時設定才可以儲存</key>
+    <key alias="allowAllEditors">允許所有編輯器</key>
+    <key alias="allowAllRowConfigurations">允許所有行設定</key>
+    <key alias="setAsDefault">定為預設</key>
+    <key alias="chooseExtra">選擇額外</key>
+    <key alias="chooseDefault">選擇預設</key>
+    <key alias="areAdded">已增加</key>
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="compositions">組合</key>
+    <key alias="noTabs">您沒有增加任何選項卡</key>
+    <key alias="addNewTab">增加新的選項卡</key>
+    <key alias="addAnotherTab">增加另外的選項卡</key>
+    <key alias="inheritedFrom">繼承的表格</key>
+    <key alias="addProperty">增加屬性</key>
+    <key alias="requiredLabel">必要標籤</key>
+    <key alias="enableListViewHeading">允許清單檢視</key>
+    <key alias="enableListViewDescription">允許內容項目顯示成可以排列及搜尋的清單，子項目不會被顯示</key>
+    <key alias="allowedTemplatesHeading">允許的範本</key>
+    <key alias="allowedTemplatesDescription">選擇哪些範本編輯器可以使用於此類別的內容</key>
+    <key alias="allowAsRootHeading">允許為根項目</key>
+    <key alias="allowAsRootDescription">允許編輯器新增此類別的內容為根項目</key>
+    <key alias="allowAsRootCheckbox">是的 - 允許此類別內容為根項目</key>
+    <key alias="childNodesHeading">允許子節點種類</key>
+    <key alias="childNodesDescription">允許某些特定種類能夠成為此種類內容的子項目</key>
+    <key alias="chooseChildNode">選擇子節點</key>
+    <key alias="compositionsDescription">從已存在的文檔類別中繼承選項卡以及屬性。新選項卡將被新增至目前文檔種類或合併至已存在同名的選項卡中。</key>
+    <key alias="compositionInUse">此內容種類已經用於集合中，因此不能重複添加本身。</key>
+    <key alias="noAvailableCompositions">沒有可用於集合的內容種類。</key>
+    <key alias="availableEditors">可用的編輯器</key>
+    <key alias="reuse">重複使用</key>
+    <key alias="editorSettings">編輯器設定</key>
+    <key alias="configuration">設定</key>
+    <key alias="yesDelete">是，刪除</key>
+    <key alias="movedUnderneath">已移至下層</key>
+    <key alias="copiedUnderneath">已複製至下層</key>
+    <key alias="folderToMove">選擇要移動的資料夾</key>
+    <key alias="folderToCopy">選擇要複製的資料夾</key>
+    <key alias="structureBelow">至下方樹狀結構</key>
+    <key alias="allDocumentTypes">所有文檔種類</key>
+    <key alias="allDocuments">所有文檔</key>
+    <key alias="allMediaItems">所有媒體項目</key>
+    <key alias="usingThisDocument">使用此文檔種類的將被永久刪除，請確認您也想要將它們刪除。</key>
+    <key alias="usingThisMedia">使用此媒體種類的將被永久刪除，請確認您也想要將它們刪除。</key>
+    <key alias="usingThisMember">使用此會員種類的將被永久刪除，請確認您也想要將它們刪除。</key>
+    <key alias="andAllDocuments">以及所有使用此種類的文件項目</key>
+    <key alias="andAllMediaItems">以及所有使用此種類的媒體項目</key>
+    <key alias="andAllMembers">以及所有使用此種類的會員項目</key>
+    <key alias="thisEditorUpdateSettings">使用此編輯器將會套用新設定</key>
+    <key alias="memberCanEdit">會員可以編輯</key>
+    <key alias="showOnMemberProfile">顯示於會員資料</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="alternativeField">替代欄位</key>
+    <key alias="alternativeText">替代文本</key>
+    <key alias="casing">大小寫</key>
+    <key alias="encoding">編碼</key>
+    <key alias="chooseField">選取欄位</key>
+    <key alias="convertLineBreaks">轉換分行符號</key>
+    <key alias="convertLineBreaksHelp">將換行符號取代成為HTML標籤 &amp;lt;br&amp;gt;</key>
+    <key alias="customFields">自訂欄位</key>
+    <key alias="dateOnly">是，僅日期</key>
+    <key alias="formatAsDate">格式化時間</key>
+    <key alias="htmlEncode">HTML編碼</key>
+    <key alias="htmlEncodeHelp">將替換HTML中的特殊字元</key>
+    <key alias="insertedAfter">將在欄位值後插入</key>
+    <key alias="insertedBefore">將在欄位值前插入</key>
+    <key alias="lowercase">小寫</key>
+    <key alias="none">無</key>
+    <key alias="postContent">欄位後插入</key>
+    <key alias="preContent">欄位前插入</key>
+    <key alias="recursive">遞迴</key>
+    <key alias="standardFields">標準欄位</key>
+    <key alias="uppercase">大寫</key>
+    <key alias="urlEncode">URL編碼</key>
+    <key alias="urlEncodeHelp">將格式化URL中的特殊字元</key>
+    <key alias="usedIfAllEmpty">當上面欄位值為空時使用</key>
+    <key alias="usedIfEmpty">該欄位僅在主欄位為空時使用</key>
+    <key alias="withTime">是，含時間，分隔符號為： </key>
+  </area>
+  <area alias="translation">
+    <key alias="assignedTasks">標記為您的任務</key>
+    <key alias="assignedTasksHelp"><![CDATA[ 此清單顯示這些翻譯任務是<strong>指派給您</strong>。請按「翻譯詳情」或頁面名稱觀看包含回應的詳細檢視畫面。
+    您也可以將此頁面下載成為XML格式檔案，請按「下載XML」按鈕。<br/>
+    若想要關閉翻譯任務，請至細節頁面點選「結束」按鈕。
+    ]]></key>
+    <key alias="closeTask">關閉任務</key>
+    <key alias="details">翻譯詳情</key>
+    <key alias="downloadAllAsXml">將翻譯任務下載為XML</key>
+    <key alias="downloadTaskAsXml">下載 XML</key>
+    <key alias="DownloadXmlDTD">下載 XML DTD</key>
+    <key alias="fields">欄位</key>
+    <key alias="includeSubpages">包含子頁</key>
+    <key alias="mailBody"><![CDATA[
+      哈嘍 %0%
+
+      這是一封自動產生的郵件通知您文檔 %1%
+      已經被 %2 要求翻譯成 %5% 
+
+      請移至此網址來編輯： http://%3%/translation/details.aspx?id=%4%
+
+      或登入系統以獲取您的翻譯任務簡報。
+
+      http://%3%
+
+      祝您有美好的一天
+
+      Umbraco機器人 謹上
+    ]]></key>
+    <key alias="mailSubject">[%0%]翻譯任務：%1%</key>
+    <key alias="noTranslators">沒有翻譯員，請創建翻譯員角色的用戶。</key>
+    <key alias="ownedTasks">您創建的任務</key>
+    <key alias="ownedTasksHelp"><![CDATA[ 本清單顯示<strong>由您創建</strong>的頁面。要瀏覽包含回應的詳細檢視畫面，
+    點選「詳情」或頁面名稱。您可以下載此頁面成為XML格式檔案，請點選「下載XML」連結。
+    若要關閉翻譯任務，請至詳情檢視並點選「關閉」按鈕。
+    ]]></key>
+    <key alias="pageHasBeenSendToTranslation">頁面'%0%'已經發送給翻譯</key>
+    <key alias="noLanguageSelected">請選擇本內容應該被翻譯成的語言</key>
+    <key alias="sendToTranslate">發送頁面'%0%'以便翻譯</key>
+    <key alias="taskAssignedBy">分配者</key>
+    <key alias="taskOpened">任務開啟</key>
+    <key alias="totalWords">總字數</key>
+    <key alias="translateTo">翻譯到</key>
+    <key alias="translationDone">翻譯完成。</key>
+    <key alias="translationDoneHelp">您可以流覽剛翻譯的頁面，如果原始頁存在，您將得到兩者的比較。</key>
+    <key alias="translationFailed">翻譯失敗，XML可能損壞了。</key>
+    <key alias="translationOptions">翻譯選項</key>
+    <key alias="translator">翻譯員</key>
+    <key alias="uploadTranslationXml">上傳翻譯的xml</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="cacheBrowser">緩存流覽</key>
+    <key alias="contentRecycleBin">回收站</key>
+    <key alias="createdPackages">創建擴展包</key>
+    <key alias="dataTypes">資料類型</key>
+    <key alias="dictionary">字典</key>
+    <key alias="installedPackages">已安裝的擴展包</key>
+    <key alias="installSkin">安裝皮膚</key>
+    <key alias="installStarterKit">安裝新手套件</key>
+    <key alias="languages">語言</key>
+    <key alias="localPackage">安裝本地擴展包</key>
+    <key alias="macros">巨集</key>
+    <key alias="mediaTypes">媒體類型</key>
+    <key alias="member">會員</key>
+    <key alias="memberGroups">會員組</key>
+    <key alias="memberRoles">角色</key>
+    <key alias="memberTypes">會員類型</key>
+    <key alias="documentTypes">文檔類型</key>
+    <key alias="relationTypes">相關類型</key>
+    <key alias="packager">擴展包</key>
+    <key alias="packages">擴展包</key>
+    <key alias="python">Python文件</key>
+    <key alias="repositories">從線上程式庫安裝</key>
+    <key alias="runway">安裝Runway</key>
+    <key alias="runwayModules">Runway模組</key>
+    <key alias="scripting">Scripting文件</key>
+    <key alias="scripts">腳本</key>
+    <key alias="stylesheets">樣式表</key>
+    <key alias="templates">範本</key>
+    <key alias="xslt">XSLT文件</key>
+    <key alias="analytics">統計</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">有可用更新</key>
+    <key alias="updateDownloadText">%0%已就緒，點擊這裡下載</key>
+    <key alias="updateNoServer">無到伺服器的連接</key>
+    <key alias="updateNoServerError">檢查更新失敗</key>
+  </area>
+  <area alias="user">
+    <key alias="administrators">管理員</key>
+    <key alias="categoryField">分類欄位</key>
+    <key alias="changePassword">更改密碼</key>
+    <key alias="newPassword">更改密碼</key>
+    <key alias="confirmNewPassword">確認新密碼</key>
+    <key alias="changePasswordDescription">要改變密碼，請在框中輸入新密碼，然後按一下“更改密碼”。</key>
+    <key alias="contentChannel">內容頻道</key>
+    <key alias="descriptionField">描述欄位</key>
+    <key alias="disabled">禁用用戶</key>
+    <key alias="documentType">文檔類型</key>
+    <key alias="editors">編輯</key>
+    <key alias="excerptField">排除欄位</key>
+    <key alias="language">語言</key>
+    <key alias="loginname">登錄</key>
+    <key alias="mediastartnode">默認打開媒體項</key>
+    <key alias="modules">區域</key>
+    <key alias="noConsole">禁用後臺管理介面</key>
+    <key alias="oldPassword">舊的密碼</key>
+    <key alias="password">密碼</key>
+    <key alias="resetPassword">重設密碼</key>
+    <key alias="passwordChanged">您的密碼已更改！</key>
+    <key alias="passwordConfirm">重輸密碼</key>
+    <key alias="passwordEnterNew">輸入新密碼</key>
+    <key alias="passwordIsBlank">新密碼不能為空！</key>
+    <key alias="passwordCurrent">當前密碼</key>
+    <key alias="passwordInvalid">密碼錯誤</key>
+    <key alias="passwordIsDifferent">新密碼和重輸入的密碼不一致，請重試！</key>
+    <key alias="passwordMismatch">重輸的密碼和原密碼不一致！</key>
+    <key alias="permissionReplaceChildren">替換子項許可權設置</key>
+    <key alias="permissionSelectedPages">您正在修改存取權限的頁面：</key>
+    <key alias="permissionSelectPages">選擇要修改許可權的頁</key>
+    <key alias="searchAllChildren">搜索子物件</key>
+    <key alias="startnode">預設打開內容項</key>
+    <key alias="username">用戶名</key>
+    <key alias="userPermissions">用戶許可權</key>
+    <key alias="writer">撰稿人</key>
+    <key alias="translator">翻譯者</key>
+    <key alias="change">改變</key>
+    <key alias="yourProfile" version="7.0">您的個人檔案</key>
+    <key alias="yourHistory" version="7.0">您的歷程記錄</key>
+    <key alias="sessionExpires" version="7.0">連線到期於</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">驗證</key>
+    <key alias="validateAsEmail">以電子郵件驗證</key>
+    <key alias="validateAsNumber">以數字驗證</key>
+    <key alias="validateAsUrl">以網址驗證</key>
+    <key alias="enterCustomValidation">...或輸入自訂驗證</key>
+    <key alias="fieldIsMandatory">必要欄位</key>
+  </area>
+  <area alias="healthcheck">
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+    <key alias="checkSuccessMessage">數值已設為推薦值：%0%</key>
+    <key alias="rectifySuccessMessage">在設定檔 %3% 中XPath %2% 的數值設為 %1% 。</key>
+    <key alias="checkErrorMessageDifferentExpectedValue">在設定檔 %3% 中XPath %2% 的預期值設為 %1% ，但卻是 %0%。</key>
+    <key alias="checkErrorMessageUnexpectedValue">在設定檔 %3% 中XPath %2% 的值為非預期值 %0%。</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+    <key alias="customErrorsCheckSuccessMessage">自訂錯誤設定為 %0%</key>
+    <key alias="customErrorsCheckErrorMessage">自訂錯誤設定為 %0。建議在上線前改為 %1%。</key>
+    <key alias="customErrorsCheckRectifySuccessMessage">自訂錯誤成功設定為 %0%</key>
+    <key alias="macroErrorModeCheckSuccessMessage">巨集錯誤設為 %0%</key>
+    <key alias="macroErrorModeCheckErrorMessage">巨集錯誤設為 %0%，如此一來，當巨集有任何錯誤時會阻止某些或全部頁面正常載入。改正會將此設定 %1%。</key>
+    <key alias="macroErrorModeCheckRectifySuccessMessage">巨集錯誤已設為 %0%</key>
+    <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">嘗試略過IIS自訂錯誤目前設為 %0%，而且您使用的IIS版本為 %1%。</key>
+    <key alias="trySkipIisCustomErrorsCheckErrorMessage">嘗試略過IIS自訂錯誤目前設為 %0%，然而在您使用的IIS版本為 %2% 時，建議設定是 %1%。</key>
+    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">嘗試略過IIS自訂錯誤已成功設為 %0%。</key>
+    <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">檔案不存在：%0%。</key>
+    <key alias="configurationServiceNodeNotFound"><![CDATA[於設定檔<strong>'%1%'</strong>中無法找到<strong>'%0%'</strong>。]]></key>
+    <key alias="configurationServiceError">有錯誤產生，請參閱下列錯誤的紀錄：%0%。</key>
+    <key alias="xmlDataIntegrityCheckMembers">成員 - 所有XML：%0%，總共：%1%，不合格：%2%</key>
+    <key alias="xmlDataIntegrityCheckMedia">媒體 - 所有XML：%0%，總共發佈：%1%，不合格：%2%</key>
+    <key alias="xmlDataIntegrityCheckContent">內容 - 所有XML：%0%，總共發佈：%1%，不合格：%2%</key>
+    <key alias="httpsCheckInvalidCertificate">憑證驗證錯誤：%0%</key>
+    <key alias="httpsCheckInvalidUrl">網址探查錯誤：%0% - '%1%'</key>
+    <key alias="httpsCheckIsCurrentSchemeHttps">您目前使用HTTPS瀏覽本站：%0%</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">在您的web.config檔案中，appSetting的umbracoUseSSL是設為false。當您開始使用HTTPS時，應將其改為 true。</key>
+    <key alias="httpsCheckConfigurationCheckResult">在您的web.config檔案中，appSetting的umbracoUseSSL是設為 %0%，您的cookies %0% 標成安全。</key>
+    <key alias="httpsCheckEnableHttpsError">無法在您的web.config檔案中，更新appSetting的umbracoUseSSL設定，錯誤訊息：%0%</key>
+    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckEnableHttpsButton">開啟HTTPS</key>
+    <key alias="httpsCheckEnableHttpsDescription">在web.config檔案中，將appSetting的umbracoUseSSL設true。</key>
+    <key alias="httpsCheckEnableHttpsSuccess">在您的web.config檔案中，appSetting的umbracoUseSSL已設為 true，您的cookies 將被標成安全。</key>
+    <key alias="rectifyButton">修正</key>
+    <key alias="cannotRectifyShouldNotEqual">無法修正比較種類檢查為'ShouldNotEqual'。</key>
+    <key alias="cannotRectifyShouldEqualWithValue">用提供的數值無法修正比較種類檢查為'ShouldEqual'。</key>
+    <key alias="valueToRectifyNotProvided">沒有提供要修正檢查的數值。</key>
+    <key alias="compilationDebugCheckSuccessMessage">偵錯編輯模式關閉。</key>
+    <key alias="compilationDebugCheckErrorMessage">偵錯編輯模式目前已開啟。上線前建議將其關閉。</key>
+    <key alias="compilationDebugCheckRectifySuccessMessage">偵錯編輯模式已成功關閉。</key>
+    <key alias="traceModeCheckSuccessMessage">詳細記錄模式已關閉。</key>
+    <key alias="traceModeCheckErrorMessage">詳細記錄模式目前已開啟。上線前建議將其關閉。</key>
+    <key alias="traceModeCheckRectifySuccessMessage">詳細記錄模式已成功關閉。</key>
+    <key alias="folderPermissionsCheckMessage">所有資料夾已有正確權限設定。</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFolderPermissionFailed"><![CDATA[以下資料夾必須擁有修改權限，但無法連接：<strong>%0%</strong>。]]></key>
+    <key alias="optionalFolderPermissionFailed"><![CDATA[以下資料夾必須擁有修改權限好讓系統可以正常運作，但無法連接：<strong>%0%</strong>。如果無須寫入，不需採取行動。]]></key>
+    <key alias="filePermissionsCheckMessage">所有檔案已有正確權限設定。</key>
+    <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+    <key alias="requiredFilePermissionFailed"><![CDATA[以下檔案必須擁有寫入權限，但無法連接：<strong>%0%</strong>。]]></key>
+    <key alias="optionalFilePermissionFailed"><![CDATA[以下檔案必須擁有寫入權限好讓系統可以正常運作，但無法連接：<strong>%0%</strong>。如果無須寫入，不需採取行動。]]></key>
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd已找到。]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd沒有找到。]]></key>
+    <key alias="clickJackingSetHeaderInConfig">調整設定的標頭</key>
+    <key alias="clickJackingSetHeaderInConfigDescription">在 web.config 的 httpProtocol/customHeaders 區域增加設定來防止本站被別的網站IFRAMEd。</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">在 web.config 的 httpProtocol/customHeaders 區域已經增加設定來防止本站被別的網站IFRAMEd。</key>
+    <key alias="clickJackingSetHeaderInConfigError">無法更新web.config檔案，錯誤：%0%</key>
+    <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+    <key alias="excessiveHeadersFound"><![CDATA[在標頭中有找到揭露網站技術的資訊：<strong>%0%</strong>。]]></key>
+    <key alias="excessiveHeadersNotFound">在標頭中沒有找到揭露網站技術的資訊。</key>
+    <key alias="smtpMailSettingsNotFound">在 Web.config 檔案中，找不到 system.net/mailsettings。</key>
+    <key alias="smtpMailSettingsHostNotConfigured">在 Web.config 檔案中的 system.net/mailsettings，沒有設定 host 。</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP設定正確，而且服務正常運作。</key>
+    <key alias="smtpMailSettingsConnectionFail">SMTP伺服器 %0% : %1% 無法連接。請確認在Web.config 檔案中 system.net/mailsettings 設定正確。</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[提醒郵件已經設為 <strong>%0%</strong>。]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[提醒郵件仍為預設值<strong>%0%</strong>。]]></key>
+  </area>
+  <area alias="redirectUrls">
+    <key alias="disableUrlTracker">停止網址追蹤器</key>
+    <key alias="enableUrlTracker">啟動網址追蹤器</key>
+    <key alias="originalUrl">原本網址</key>
+    <key alias="redirectedTo">轉址成</key>
+    <key alias="noRedirects">沒有任何轉址</key>
+    <key alias="noRedirectsDescription">當發佈後的頁面改名或移動時，會自動轉址至新網頁。</key>
+    <key alias="removeButton">移除</key>
+    <key alias="confirmRemove">您確定要移除從 %0% 到 %1% 的轉址嗎？</key>
+    <key alias="redirectRemoved">轉址已移除。</key>
+    <key alias="redirectRemoveError">移除轉址錯誤。
+</key>
+    <key alias="confirmDisable">您確定要停止轉址追蹤器？</key>
+    <key alias="disabledConfirm">轉址追蹤器已停止。</key>
+    <key alias="disableError">停止轉址追蹤器錯誤，更多資訊請參閱您的紀錄檔。</key>
+    <key alias="enabledConfirm">轉址追蹤器已開啟。</key>
+    <key alias="enableError">啟動轉址追蹤器錯誤，更多資訊請參閱您的紀錄檔。</key>
+  </area>
+</language>

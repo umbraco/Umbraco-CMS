@@ -47,10 +47,25 @@ h5.-black {
     background: none;
     border: none
 }
-.datepicker td.active,
-.datepicker td span.active {
-    background: @turquoise !important;
+.bootstrap-datetimepicker-widget {
+    td {
+        &.active, span.active {
+            background: @turquoise !important;
+        }
+        &.today:not(.active):before {
+            border-bottom-color: @purple-l1 !important;
+        }
+        a[data-action] {
+            padding: 0 !important;
+        }
+        .timepicker-hour,
+        .timepicker-minute,
+        .timepicker-second {
+            margin: 8px 0;
+        }
+    }
 }
+
 .umb-datetime-picker div.info {
     vertical-align: middle
 }
@@ -113,6 +128,18 @@ h5.-black {
   border: none;
 }
 
+/* BLOCK MODE */
+.block-form .umb-control-group {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.block-form .umb-control-group label .help-block, 
+.block-form .umb-control-group label small {
+  font-size: 13px;
+  padding-top: 2px;
+  margin-bottom: 5px;
+}
 
 /*COMPACT MODE */
 .compact .umb-pane{margin: 0px 0px 15px 0px;}

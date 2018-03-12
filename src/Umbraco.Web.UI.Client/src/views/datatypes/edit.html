@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.DataType.EditController">
+<div data-element="editor-data-types" ng-controller="Umbraco.Editors.DataType.EditController">
 
    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
@@ -12,7 +12,6 @@
          <umb-editor-header
             menu="page.menu"
             name="content.name"
-            key="content.key"
             name-locked="page.nameLocked"
             hide-icon="true"
             hide-description="true"
@@ -28,7 +27,7 @@
                            ng-model="content.selectedEditor"
                            required
                            ng-options="e.alias as e.name for e in content.availableEditors"></select>
-                    <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
+                    <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
                 </div>
 
             </umb-property>

@@ -150,7 +150,7 @@ namespace UmbracoExamine
             {
                 //By default, we will be using the UmbracoDataService
                 //generally this would only need to be set differently for unit testing
-                DataService = new UmbracoDataService();
+                DataService = CreateDefaultUmbracoDataService();
             }
 
             DataService.LogService.LogLevel = LoggingLevel.Normal;
@@ -209,6 +209,11 @@ namespace UmbracoExamine
         }
 
         #endregion
+
+        protected virtual IDataService CreateDefaultUmbracoDataService()
+        {
+            return new UmbracoDataService();
+        }
 
         /// <summary>
         /// Used to aquire the internal searcher

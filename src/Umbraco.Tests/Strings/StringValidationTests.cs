@@ -17,6 +17,8 @@ namespace Umbraco.Tests.Strings
             Assert.IsTrue(foo.IsValid("futureTLD@somewhere.fooo"));
 
             Assert.IsTrue(foo.IsValid("abc@xyz.financial"));
+            Assert.IsTrue(foo.IsValid("admin+gmail-syntax@c.pizza"));
+            Assert.IsTrue(foo.IsValid("admin@c.pizza"));
 
             Assert.IsFalse(foo.IsValid("fdsa"));
             Assert.IsFalse(foo.IsValid("fdsa@"));

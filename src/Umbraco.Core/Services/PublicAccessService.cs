@@ -148,7 +148,8 @@ namespace Umbraco.Core.Services
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
                 }
 
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail(
@@ -158,8 +159,8 @@ namespace Umbraco.Core.Services
                 repo.AddOrUpdate(entry);
 
                 uow.Commit();
-
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
                 return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
                     new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
             }
@@ -193,7 +194,8 @@ namespace Umbraco.Core.Services
 
                 entry.RemoveRule(existingRule);
 
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -202,8 +204,8 @@ namespace Umbraco.Core.Services
                 repo.AddOrUpdate(entry);
 
                 uow.Commit();
-
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
                 return OperationStatus.Success(evtMsgs);
             }
 
@@ -219,7 +221,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -228,7 +231,8 @@ namespace Umbraco.Core.Services
                 var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 repo.AddOrUpdate(entry);
                 uow.Commit();
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
                 return OperationStatus.Success(evtMsgs);
             }
 
@@ -245,7 +249,8 @@ namespace Umbraco.Core.Services
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs)))
+                var deleteEventArgs = new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return OperationStatus.Cancelled(evtMsgs);
@@ -254,7 +259,8 @@ namespace Umbraco.Core.Services
                 var repo = RepositoryFactory.CreatePublicAccessRepository(uow);
                 repo.Delete(entry);
                 uow.Commit();
-                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<PublicAccessEntry>(entry, false, evtMsgs));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
                 return OperationStatus.Success(evtMsgs);
             }
 

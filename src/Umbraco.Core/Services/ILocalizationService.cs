@@ -136,5 +136,11 @@ namespace Umbraco.Core.Services
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the language</param>
         void Delete(ILanguage language, int userId = 0);
+
+        /// <summary>
+        /// Gets the full dictionary key map.
+        /// </summary>
+        /// <returns>The full dictionary key map.</returns>
+        Dictionary<string, Guid> GetDictionaryItemKeyMap();
     }
 }

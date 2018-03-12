@@ -14,8 +14,8 @@
       <umb-empty-state
           ng-if="!items && options.filter.length === 0 && !vm.isRecycleBin"
           position="center">
-          <div ng-if="entityType === 'content'">No content has been added</div>
-          <div ng-if="entityType === 'member'">No members have been added</div>
+          <div ng-if="entityType === 'content'"><localize key="content_listViewNoContent">No content has been added</localize></div>
+          <div ng-if="entityType === 'member'"><localize key="content_listViewNoMembers">No members have been added</localize></div>
       </umb-empty-state>
 
       <umb-empty-state

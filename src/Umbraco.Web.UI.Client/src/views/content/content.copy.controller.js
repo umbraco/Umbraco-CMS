@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
-	function ($scope, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
+    function ($scope, userService, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
 
 	    var dialogOptions = $scope.dialogOptions;
 	    var searchText = "Search...";
@@ -18,6 +18,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	        results: [],
 	        selectedSearchResults: []
 	    }
+	    $scope.treeModel = {
+	        hideHeader: false
+	    }
+	    userService.getCurrentUser().then(function (userData) {
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
+	    });
 
 	    var node = dialogOptions.currentNode;
 

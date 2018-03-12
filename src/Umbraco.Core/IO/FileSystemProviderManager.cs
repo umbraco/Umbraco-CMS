@@ -11,7 +11,7 @@ namespace Umbraco.Core.IO
 {
     public class FileSystemProviderManager
     {
-        private readonly FileSystemProvidersSection _config;
+        private readonly IFileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
 
         private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
@@ -19,6 +19,8 @@ namespace Umbraco.Core.IO
 
         private ShadowWrapper _macroPartialFileSystem;
         private ShadowWrapper _partialViewsFileSystem;
+        private ShadowWrapper _macroScriptsFileSystem;
+        private ShadowWrapper _userControlsFileSystem;
         private ShadowWrapper _stylesheetsFileSystem;
         private ShadowWrapper _scriptsFileSystem;
         private ShadowWrapper _xsltFileSystem;
@@ -27,15 +29,44 @@ namespace Umbraco.Core.IO
 
         #region Singleton & Constructor
 
-        private static readonly FileSystemProviderManager Instance = new FileSystemProviderManager();
+        private static volatile FileSystemProviderManager _instance;
+        private static readonly object _instanceLocker = new object();
 
         public static FileSystemProviderManager Current
         {
-            get { return Instance; }
+            get
+            {
+                if (_instance != null) return _instance;
+                lock (_instanceLocker)
+                {
+                    return _instance ?? (_instance = new FileSystemProviderManager());
+                }
+            }
+        }
+
+        /// <summary>
+        /// For tests only, allows setting the value of the singleton "Current" property
+        /// </summary>
+        /// <param name="instance"></param>
+        public static void SetCurrent(FileSystemProviderManager instance)
+        {
+            lock (_instanceLocker)
+            {
+                _instance = instance;
+            }
+        }
+
+        internal static void ResetCurrent()
+        {
+            lock (_instanceLocker)
+            {
+                if (_instance != null)
+                _instance.Reset();                
+            }
         }
 
         // for tests only, totally unsafe
-        internal void Reset()
+        private void Reset()
         {
             _wrappers.Clear();
             _providerLookup.Clear();
@@ -51,9 +82,23 @@ namespace Umbraco.Core.IO
             get { return ApplicationContext.Current == null ? null : ApplicationContext.Current.ScopeProvider as IScopeProviderInternal; }
         }
 
-        internal FileSystemProviderManager()
+        /// <summary>
+        /// Constructor that can be used for tests
+        /// </summary>
+        /// <param name="configSection"></param>
+        public FileSystemProviderManager(IFileSystemProvidersSection configSection)
         {
-            _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
+            if (configSection == null) throw new ArgumentNullException("configSection");
+            _config = configSection;
+            CreateWellKnownFileSystems();
+        }
+
+        /// <summary>
+        /// Default constructor that will read the config from the locally found config section
+        /// </summary>
+        public FileSystemProviderManager()
+        {
+            _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
             CreateWellKnownFileSystems();
         }
 
@@ -61,6 +106,8 @@ namespace Umbraco.Core.IO
         {
             var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
+            var macroScriptsFileSystem = new PhysicalFileSystem(SystemDirectories.MacroScripts);
+            var userControlsFileSystem = new PhysicalFileSystem(SystemDirectories.UserControls);
             var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
@@ -69,6 +116,8 @@ namespace Umbraco.Core.IO
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", ScopeProvider);
+            _macroScriptsFileSystem = new ShadowWrapper(macroScriptsFileSystem, "macroScripts", ScopeProvider);
+            _userControlsFileSystem = new ShadowWrapper(userControlsFileSystem, "usercontrols", ScopeProvider);
             _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", ScopeProvider);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", ScopeProvider);
             _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", ScopeProvider);
@@ -85,6 +134,10 @@ namespace Umbraco.Core.IO
 
         public IFileSystem2 MacroPartialsFileSystem { get { return _macroPartialFileSystem; } }
         public IFileSystem2 PartialViewsFileSystem { get { return _partialViewsFileSystem; } }
+        // Legacy /macroScripts folder
+        public IFileSystem2 MacroScriptsFileSystem { get { return _macroScriptsFileSystem; } }
+        // Legacy /usercontrols folder
+        public IFileSystem2 UserControlsFileSystem { get { return _userControlsFileSystem; } }
         public IFileSystem2 StylesheetsFileSystem { get { return _stylesheetsFileSystem; } }
         public IFileSystem2 ScriptsFileSystem { get { return _scriptsFileSystem; } }
         public IFileSystem2 XsltFileSystem { get { return _xsltFileSystem; } }
@@ -140,8 +193,9 @@ namespace Umbraco.Core.IO
         private ProviderConstructionInfo GetUnderlyingFileSystemCtor(string alias, Func<IFileSystem> fallback)
         {
             // get config
-            var providerConfig = _config.Providers[alias];
-            if (providerConfig == null)
+            IFileSystemProviderElement providerConfig;
+            
+            if (_config.Providers.TryGetValue(alias, out providerConfig) == false)
             {
                 if (fallback != null) return null;
                 throw new ArgumentException(string.Format("No provider found with alias {0}.", alias));
@@ -156,17 +210,21 @@ namespace Umbraco.Core.IO
             if (providerType.IsAssignableFrom(typeof(IFileSystem)))
                 throw new InvalidOperationException(string.Format("Type {0} does not implement IFileSystem.", providerType.FullName));
 
-            // find a ctor matching the config parameters
+            // find a ctor matching the config parameters            
             var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
             var constructor = providerType.GetConstructors().SingleOrDefault(x
-                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
+                => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.Keys.Contains(y.Name)));
             if (constructor == null)
                 throw new InvalidOperationException(string.Format("Type {0} has no ctor matching the {1} configuration parameter(s).", providerType.FullName, paramCount));
 
             var parameters = new object[paramCount];
-            if (providerConfig.Parameters != null) // keeps ReSharper happy
+
+            if (providerConfig.Parameters != null)
+            {
+                var allKeys = providerConfig.Parameters.Keys.ToArray();
                 for (var i = 0; i < paramCount; i++)
-                    parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
+                    parameters[i] = providerConfig.Parameters[allKeys[i]];
+            }
 
             return new ProviderConstructionInfo
             {
@@ -252,13 +310,15 @@ namespace Umbraco.Core.IO
         internal ICompletable Shadow(Guid id)
         {
             var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var wrappers = new ShadowWrapper[typed.Length + 9];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;
+            wrappers[i++] = _macroScriptsFileSystem;
             wrappers[i++] = _partialViewsFileSystem;
             wrappers[i++] = _stylesheetsFileSystem;
             wrappers[i++] = _scriptsFileSystem;
+            wrappers[i++] = _userControlsFileSystem;
             wrappers[i++] = _xsltFileSystem;
             wrappers[i++] = _masterPagesFileSystem;
             wrappers[i] = _mvcViewsFileSystem;

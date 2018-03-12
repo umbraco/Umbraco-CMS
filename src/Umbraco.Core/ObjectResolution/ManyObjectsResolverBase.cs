@@ -394,7 +394,7 @@ namespace Umbraco.Core.ObjectResolution
         /// WARNING! Do not use this unless you know what you are doing, clear all types registered and instances
         /// created. Typically only used if a resolver is no longer used in an application and memory is to be GC'd
         /// </summary>
-        internal void ResetCollections()
+        internal virtual void ResetCollections()
         {
             using (new WriteLock(_lock))
             {

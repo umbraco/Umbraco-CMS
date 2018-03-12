@@ -14,7 +14,7 @@ using Umbraco.Core.IO;
 namespace umbraco.cms.businesslogic.packager.repositories
 {
     [Obsolete("This should not be used and will be removed in future Umbraco versions")]
-    public class Repository : DisposableObject
+    public class Repository : DisposableObjectSlim
     {        
         public string Guid { get; private set; }
 
@@ -289,7 +289,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
         }
 
         /// <summary>
-        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObjectSlim"/> which handles common required locking logic.
         /// </summary>
         protected override void DisposeResources()
         {

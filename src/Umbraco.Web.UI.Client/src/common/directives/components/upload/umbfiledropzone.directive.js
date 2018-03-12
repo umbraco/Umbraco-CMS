@@ -142,12 +142,14 @@ angular.module("umbraco.directives")
                                 file: file
                             })
                             .progress(function(evt) {
-                                // calculate progress in percentage
-                                var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
-                                // set percentage property on file
-                                file.uploadProgress = progressPercentage;
-                                // set uploading status on file
-                                file.uploadStatus = "uploading";
+                                if (file.uploadStat !== "done" && file.uploadStat !== "error") {
+                                  // calculate progress in percentage
+                                  var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
+                                  // set percentage property on file
+                                  file.uploadProgress = progressPercentage;
+                                  // set uploading status on file
+                                  file.uploadStatus = "uploading"; 
+                                }                                
                             })
                             .success(function(data, status, headers, config) {
                                 if (data.notifications && data.notifications.length > 0) {
@@ -160,6 +162,7 @@ angular.module("umbraco.directives")
                                 } else {
                                     // set done status on file
                                     file.uploadStatus = "done";
+                                    file.uploadProgress = 100;
                                     // set date/time for when done - used for sorting
                                     file.doneDate = new Date();
                                     // Put the file in the done pool

@@ -401,9 +401,10 @@ namespace Umbraco.Core.Publishing
                                   content.Name, content.Id));
             }
 
-            // if newest is published, unpublish
-            if (content.Published)
-                content.ChangePublishedState(PublishedState.Unpublished);
+            // make sure we dirty .Published and always unpublish
+            // the version we have here could be the newest, !Published
+            content.ChangePublishedState(PublishedState.Published);
+            content.ChangePublishedState(PublishedState.Unpublished);
 
             _logger.Info<PublishingStrategy>(
                 string.Format("Content '{0}' with Id '{1}' has been unpublished.",

@@ -218,15 +218,7 @@ AnotherContentFinder
             //ensure they are all found
             Assert.IsTrue(plugins.Result.ContainsAll(shouldContain));
         }
-
-        [Test]
-        public void PluginHash_From_String()
-        {
-            var s = "hello my name is someone".GetHashCode().ToString("x", CultureInfo.InvariantCulture);
-            var output = PluginManager.ConvertHashToInt64(s);
-            Assert.AreNotEqual(0, output);
-        }
-
+        
         [Test]
         public void Get_Plugins_Hash()
         {
@@ -279,7 +271,7 @@ AnotherContentFinder
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.ResolveAssignedMapperTypes();
-            Assert.AreEqual(28, foundTypes1.Count());
+            Assert.AreEqual(31, foundTypes1.Count());
         }
 
         [Test]
@@ -294,21 +286,21 @@ AnotherContentFinder
         {
             var trees = _manager.ResolveAttributedTrees();
             // commit 6c5e35ec2cbfa31be6790d1228e0c2faf5f55bc8 brings the count down to 14
-            Assert.AreEqual(12, trees.Count());
+            Assert.AreEqual(6, trees.Count());
         }
 
         [Test]
         public void Resolves_Actions()
         {
             var actions = _manager.ResolveActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(38, actions.Count());
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(37, trees.Count());
+            Assert.AreEqual(35, trees.Count());
         }
 
         [Test]

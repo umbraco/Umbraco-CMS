@@ -66,8 +66,9 @@ label.control-label, .control-label {
 }
 .form-search .icon, .form-search .icon-search {
   position: absolute;
+  z-index: 1;
   top: 6px;
-  left: 4px;
+  left: 6px;
   color: @gray-8;
 }
 
@@ -86,6 +87,9 @@ label.control-label, .control-label {
   background: @white
 }
 
+.form-search .icon-search + .search-input {
+    padding-left: 25px !important;
+}
 
 .form-search .search-input {
     font-weight: bold;
@@ -191,7 +195,7 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
   display: inline-block;
-  height: 30px;
+  height: @inputHeight;
   padding: 4px 6px;
   margin-bottom: @baseLineHeight / 2;
   font-size: @baseFontSize;
@@ -206,7 +210,6 @@ input.-full-width-input {
    width: 100%;
    box-sizing: border-box;
    padding: 4px 6px;
-   height: 30px;
 }
 
 // Reset appearance properties for textual inputs and textarea
@@ -579,9 +582,9 @@ input[type="checkbox"][readonly] {
   .add-on {
     display: inline-block;
     width: auto;
-    height: @baseLineHeight;
-    min-width: 16px;
-    padding: 4px 5px;
+    height: 22px;
+    min-width: 18px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
@@ -653,29 +656,21 @@ input.search-query {
   padding-left: 14px;
   padding-left: 4px \9; /* IE7-8 doesn't have border-radius, so don't indent the padding */
   margin: 0; // Remove the default margin on all inputs
-  .border-radius(0px);
 }
 
 /* Allow for input prepend/append in search forms */
-.form-search .input-append .search-query,
-.form-search .input-prepend .search-query {
-  .border-radius(0); // Override due to specificity
+.form-search {
+    .input-prepend {
+        .btn {
+            .border-radius(0 @borderRadiusSmall @borderRadiusSmall 0);
+        }
+    }
+    .input-append {
+        .btn {
+            .border-radius(0 @borderRadiusSmall @borderRadiusSmall 0);
+        }
+    } 
 }
-.form-search .input-append .search-query {
-  .border-radius(14px 0 0 14px);
-}
-.form-search .input-append .btn {
-  .border-radius(0 14px 14px 0);
-}
-.form-search .input-prepend .search-query {
-  .border-radius(0 14px 14px 0);
-}
-.form-search .input-prepend .btn {
-  .border-radius(14px 0 0 14px);
-}
-
-
-
 
 // HORIZONTAL & VERTICAL FORMS
 // ---------------------------
@@ -780,6 +775,8 @@ legend + .control-group {
       *padding-left: @horizontalComponentOffset;
     }
   }
+
+ 
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
     margin-bottom: 0;
@@ -800,6 +797,14 @@ legend + .control-group {
     padding-left: @horizontalComponentOffset;
   }
 }
+
+// adjustments for properties tab
+.form-horizontal .block-form .control-label {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
 //make sure buttons are always on top
 .umb-panel-buttons .umb-btn-toolbar .btn {
     position: relative;
@@ -819,3 +824,8 @@ legend + .control-group {
   }
 
 }
+
+/* User/group selector */
+.group-selector .group-selector-list { float: left; }
+.group-selector .group-selector-list div { height: 24px; }
+.group-selector .group-selector-buttons { float: left; margin: 24px 16px; }

@@ -14,6 +14,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using umbraco.interfaces;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Sync
@@ -39,6 +40,7 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
         private readonly ProfilingLogger _profilingLogger;
+        private readonly Lazy<string> _distCacheFilePath = new Lazy<string>(GetDistCacheFilePath);
 
         protected DatabaseServerMessengerOptions Options { get; private set; }
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
@@ -85,7 +87,8 @@ namespace Umbraco.Core.Sync
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);
@@ -163,10 +166,10 @@ namespace Umbraco.Core.Sync
                 }
                 else
                 {
-                    //check for how many instructions there are to process
-                    //TODO: In 7.6 we need to store the count of instructions per row since this is not affective because there can be far more than one (if not thousands)
-                    // of instructions in a single row.
-                    var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    //row so we will sum these numbers to get the actual count.
+                    var count = _appContext.DatabaseContext.Database
+                        .ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
@@ -203,7 +206,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Synchronize the server (throttled).
         /// </summary>
-        protected void Sync()
+        protected internal void Sync()
         {
             lock (_locko)
             {
@@ -460,10 +463,9 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void ReadLastSynced()
         {
-            var path = SyncFilePath;
-            if (File.Exists(path) == false) return;
+            if (File.Exists(_distCacheFilePath.Value) == false) return;
 
-            var content = File.ReadAllText(path);
+            var content = File.ReadAllText(_distCacheFilePath.Value);
             int last;
             if (int.TryParse(content, out last))
                 _lastId = last;
@@ -478,7 +480,7 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void SaveLastSynced(int id)
         {
-            File.WriteAllText(SyncFilePath, id.ToString(CultureInfo.InvariantCulture));
+            File.WriteAllText(_distCacheFilePath.Value, id.ToString(CultureInfo.InvariantCulture));
             _lastId = id;
         }
 
@@ -498,20 +500,40 @@ namespace Umbraco.Core.Sync
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-        /// <summary>
-        /// Gets the sync file path for the local server.
-        /// </summary>
-        /// <returns>The sync file path for the local server.</returns>
-        private static string SyncFilePath
+        private static string GetDistCacheFilePath()
         {
-            get
-            {
-                var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/DistCache/" + NetworkHelper.FileSafeMachineName);
-                if (Directory.Exists(tempFolder) == false)
-                    Directory.CreateDirectory(tempFolder);
+            var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
-                return Path.Combine(tempFolder, HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt");
+            string distCacheFilePath;
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {
+                case LocalTempStorage.AspNetTemp:
+                    distCacheFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData", fileName);
+                    break;
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    distCacheFilePath = Path.Combine(cachePath, fileName);
+                    break;
+                case LocalTempStorage.Default:
+                default:
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/DistCache");
+                    distCacheFilePath = Path.Combine(tempFolder, fileName);
+                    break;
             }
+
+            //ensure the folder exists
+            var folder = Path.GetDirectoryName(distCacheFilePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + distCacheFilePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+
+            return distCacheFilePath;
         }
 
         #endregion

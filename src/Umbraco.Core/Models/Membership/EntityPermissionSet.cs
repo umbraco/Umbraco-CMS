@@ -1,59 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
-    /// Represents an entity -> user & permission key value pair collection
-    /// </summary>
+    /// Represents an entity -> user group & permission key value pair collection
+    /// </summary>    
     public class EntityPermissionSet
     {
+        private static readonly Lazy<EntityPermissionSet> EmptyInstance = new Lazy<EntityPermissionSet>(() => new EntityPermissionSet(-1, new EntityPermissionCollection()));
+        /// <summary>
+        /// Returns an empty permission set
+        /// </summary>
+        /// <returns></returns>
+        public static EntityPermissionSet Empty()
+        {
+            return EmptyInstance.Value;
+        }
+
+        public EntityPermissionSet(int entityId, EntityPermissionCollection permissionsSet)
+        {
+            EntityId = entityId;
+            PermissionsSet = permissionsSet;
+        }
+
         /// <summary>
         /// The entity id with permissions assigned
         /// </summary>
-        public int EntityId { get; private set; }
+        public virtual int EntityId { get; private set; }
 
         /// <summary>
-        /// The key/value pairs of user id & single permission
+        /// The key/value pairs of user group id & single permission
         /// </summary>
-        public IEnumerable<UserPermission> UserPermissionsSet { get; private set; }
+        public EntityPermissionCollection PermissionsSet { get; private set; }
 
-        public EntityPermissionSet(int entityId, IEnumerable<UserPermission> userPermissionsSet)
+
+        /// <summary>
+        /// Returns the aggregate permissions in the permission set
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This value is only calculated once
+        /// </remarks>
+        public IEnumerable<string> GetAllPermissions()
         {
-            EntityId = entityId;
-            UserPermissionsSet = userPermissionsSet;
+            return PermissionsSet.GetAllPermissions();
         }
 
-        public class UserPermission
-        {
-            public UserPermission(int userId, string permission)
-            {
-                UserId = userId;
-                Permission = permission;
-            }
 
-            public int UserId { get; private set; }
-            public string Permission { get; private set; }
 
-            protected bool Equals(UserPermission other)
-            {
-                return UserId == other.UserId && string.Equals(Permission, other.Permission);
-            }
 
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((UserPermission) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (UserId*397) ^ Permission.GetHashCode();
-                }
-            }
-        }
     }
 }

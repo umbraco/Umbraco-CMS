@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 
@@ -7,6 +8,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
     public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
+        [ConfigurationProperty("backOffice")]
+        internal BackOfficeElement BackOffice
+        {
+            get { return (BackOfficeElement)this["backOffice"]; }
+        }
+
         [ConfigurationProperty("content")]
         internal ContentElement Content
         {
@@ -148,6 +155,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Templates; }
         }
 
+        IBackOfficeSection IUmbracoSettingsSection.BackOffice
+        {
+            get { return BackOffice; }
+        }
+
         IDeveloperSection IUmbracoSettingsSection.Developer
         {
             get { return Developer; }
@@ -183,6 +195,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Providers; }
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This is no longer used and will be removed in future versions")]
         IHelpSection IUmbracoSettingsSection.Help
         {
             get { return Help; }

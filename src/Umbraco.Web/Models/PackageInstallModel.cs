@@ -24,6 +24,10 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "zipFilePath")]
         public string ZipFilePath { get; set; }
 
-        
+        /// <summary>
+        /// During installation this can be used to track any pending appdomain restarts
+        /// </summary>
+        [DataMember(Name = "isRestarting")]
+        public bool IsRestarting { get; set; }
     }
 }

@@ -8,7 +8,7 @@ angular.module("umbraco.directives")
 .directive('umbTabs', function () {
     return {
 		restrict: 'A',
-		controller: function ($scope, $element, $attrs) {
+        controller: function ($scope, $element, $attrs, eventsService) {
             
 		    var callbacks = [];
 		    this.onTabShown = function(cb) {
@@ -19,14 +19,21 @@ angular.module("umbraco.directives")
 
                 var curr = $(event.target);         // active tab
                 var prev = $(event.relatedTarget);  // previous tab
+				
+				// emit tab change event
+				var tabId = Number(curr.context.hash.replace("#tab", ""));
+				var args = { id: tabId, hash: curr.context.hash };
+				
+                eventsService.emit("app.tabChange", args);
 
 				$scope.$apply();
 
                 for (var c in callbacks) {
                     callbacks[c].apply(this, [{current: curr, previous: prev}]);
                 }
+                
             }
-
+            
 		    //NOTE: it MUST be done this way - binding to an ancestor element that exists
 		    // in the DOM to bind to the dynamic elements that will be created.
 		    // It would be nicer to create this event handler as a directive for which child

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Web;
 using System.Web.Compilation;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -15,6 +16,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
+using Umbraco.Core.Configuration;
 using File = System.IO.File;
 
 namespace Umbraco.Core
@@ -39,13 +41,14 @@ namespace Umbraco.Core
         private readonly IServiceProvider _serviceProvider;
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly ProfilingLogger _logger;
-        private readonly string _tempFolder;
+        private readonly Lazy<string> _pluginListFilePath = new Lazy<string>(GetPluginListFilePath);
+        private readonly Lazy<string> _pluginHashFilePath = new Lazy<string>(GetPluginHashFilePath);
 
         private readonly object _typesLock = new object();
         private readonly Dictionary<TypeListKey, TypeList> _types = new Dictionary<TypeListKey, TypeList>();
 
-        private long _cachedAssembliesHash = -1;
-        private long _currentAssembliesHash = -1;
+        private string _cachedAssembliesHash = null;
+        private string _currentAssembliesHash = null;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
 
@@ -65,26 +68,20 @@ namespace Umbraco.Core
             _serviceProvider = serviceProvider;
             _runtimeCache = runtimeCache;
             _logger = logger;
-
-            // the temp folder where the cache file lives
-            _tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            if (Directory.Exists(_tempFolder) == false)
-                Directory.CreateDirectory(_tempFolder);
-
-            var pluginListFile = GetPluginListFilePath();
-
+            
             if (detectChanges)
             {
-                //first check if the cached hash is 0, if it is then we ne
+                //first check if the cached hash is string.Empty, if it is then we need
                 //do the check if they've changed
-                RequiresRescanning = (CachedAssembliesHash != CurrentAssembliesHash) || CachedAssembliesHash == 0;
+                RequiresRescanning = (CachedAssembliesHash != CurrentAssembliesHash) || CachedAssembliesHash == string.Empty;
                 //if they have changed, we need to write the new file
                 if (RequiresRescanning)
                 {
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all plugin types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
-                    File.Delete(pluginListFile);
+                    if(File.Exists(_pluginListFilePath.Value))
+                        File.Delete(_pluginListFilePath.Value);
 
                     WriteCachePluginsHash();
                 }
@@ -94,7 +91,8 @@ namespace Umbraco.Core
                 // if the hash has changed, clear out the persisted list no matter what, this will force
                 // rescanning of all plugin types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
-                File.Delete(pluginListFile);
+                if (File.Exists(_pluginListFilePath.Value))
+                    File.Delete(_pluginListFilePath.Value);
 
                 // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
@@ -180,23 +178,19 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the currently cached hash value of the scanned assemblies.
         /// </summary>
-        /// <value>The cached hash value, or 0 if no cache is found.</value>
-        internal long CachedAssembliesHash
+        /// <value>The cached hash value, or string.Empty if no cache is found.</value>
+        internal string CachedAssembliesHash
         {
             get
             {
-                if (_cachedAssembliesHash != -1)
+                if (_cachedAssembliesHash != null)
                     return _cachedAssembliesHash;
+                
+                if (File.Exists(_pluginHashFilePath.Value) == false) return string.Empty;
 
-                var filePath = GetPluginHashFilePath();
-                if (File.Exists(filePath) == false) return 0;
+                var hash = File.ReadAllText(_pluginHashFilePath.Value, Encoding.UTF8);
 
-                var hash = File.ReadAllText(filePath, Encoding.UTF8);
-
-                long val;
-                if (long.TryParse(hash, out val) == false) return 0;
-
-                _cachedAssembliesHash = val;
+                _cachedAssembliesHash = hash;
                 return _cachedAssembliesHash;
             }
         }
@@ -205,15 +199,15 @@ namespace Umbraco.Core
         /// Gets the current assemblies hash based on creating a hash from the assemblies in various places.
         /// </summary>
         /// <value>The current hash.</value>
-        internal long CurrentAssembliesHash
+        internal string CurrentAssembliesHash
         {
             get
             {
-                if (_currentAssembliesHash != -1)
+                if (_currentAssembliesHash != null)
                     return _currentAssembliesHash;
 
                 _currentAssembliesHash = GetFileHash(new List<Tuple<FileSystemInfo, bool>>
-					{
+                    {
 						// the bin folder and everything in it
 						new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)), false),
 						// the app code folder and everything in it
@@ -222,7 +216,7 @@ namespace Umbraco.Core
 						new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
                         // trees.config - use the contents to create the hash since this gets resaved on every app startup!
                         new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
-					}, _logger);
+                    }, _logger);
 
                 return _currentAssembliesHash;
             }
@@ -232,9 +226,8 @@ namespace Umbraco.Core
         /// Writes the assembly hash file.
         /// </summary>
         private void WriteCachePluginsHash()
-        {
-            var filePath = GetPluginHashFilePath();
-            File.WriteAllText(filePath, CurrentAssembliesHash.ToString(), Encoding.UTF8);
+        {        
+            File.WriteAllText(_pluginHashFilePath.Value, CurrentAssembliesHash, Encoding.UTF8);
         }
 
         /// <summary>
@@ -245,41 +238,40 @@ namespace Umbraco.Core
         /// <returns>The hash.</returns>
         /// <remarks>Each file is a tuple containing the FileInfo object and a boolean which indicates whether to hash the
         /// file properties (false) or the file contents (true).</remarks>
-        internal static long GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
+        internal static string GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders, ProfilingLogger logger)
         {
             using (logger.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
             {
-                var hashCombiner = new HashCodeCombiner();
-
                 // get the distinct file infos to hash
                 var uniqInfos = new HashSet<string>();
                 var uniqContent = new HashSet<string>();
-
-                foreach (var fileOrFolder in filesAndFolders)
+                using (var generator = new HashGenerator())
                 {
-                    var info = fileOrFolder.Item1;
-                    if (fileOrFolder.Item2)
+                    foreach (var fileOrFolder in filesAndFolders)
                     {
-                        // add each unique file's contents to the hash
-                        // normalize the content for cr/lf and case-sensitivity
-
-                        if (uniqContent.Contains(info.FullName)) continue;
-                        uniqContent.Add(info.FullName);
-                        if (File.Exists(info.FullName) == false) continue;
-                        var content = RemoveCrLf(File.ReadAllText(info.FullName));
-                        hashCombiner.AddCaseInsensitiveString(content);
+                        var info = fileOrFolder.Item1;
+                        if (fileOrFolder.Item2)
+                        {
+                            // add each unique file's contents to the hash
+                            // normalize the content for cr/lf and case-sensitivity
+                            if (uniqContent.Add(info.FullName))
+                            {
+                                if (File.Exists(info.FullName) == false) continue;
+                                var content = RemoveCrLf(File.ReadAllText(info.FullName));
+                                generator.AddCaseInsensitiveString(content);
+                            }
+                        }
+                        else
+                        {
+                            // add each unique folder/file to the hash
+                            if (uniqInfos.Add(info.FullName))
+                            {
+                                generator.AddFileSystemItem(info);
+                            }
+                        }
                     }
-                    else
-                    {
-                        // add each unique folder/file to the hash
-
-                        if (uniqInfos.Contains(info.FullName)) continue;
-                        uniqInfos.Add(info.FullName);
-                        hashCombiner.AddFileSystemItem(info);
-                    }
-                } 
-
-                return ConvertHashToInt64(hashCombiner.GetCombinedHashCode());
+                    return generator.GenerateHash();
+                }
             }
         }
 
@@ -303,38 +295,32 @@ namespace Umbraco.Core
         /// <param name="filesAndFolders">A collection of files.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <returns>The hash.</returns>
-        internal static long GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, ProfilingLogger logger)
+        internal static string GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders, ProfilingLogger logger)
         {
             using (logger.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
             {
-                var hashCombiner = new HashCodeCombiner();
-
-                // get the distinct file infos to hash
-                var uniqInfos = new HashSet<string>();
-
-                foreach (var fileOrFolder in filesAndFolders)
+                using (var generator = new HashGenerator())
                 {
-                    if (uniqInfos.Contains(fileOrFolder.FullName)) continue;
-                    uniqInfos.Add(fileOrFolder.FullName);
-                    hashCombiner.AddFileSystemItem(fileOrFolder);
+                    // get the distinct file infos to hash
+                    var uniqInfos = new HashSet<string>();
+
+                    foreach (var fileOrFolder in filesAndFolders)
+                    {
+                        if (uniqInfos.Contains(fileOrFolder.FullName)) continue;
+                        uniqInfos.Add(fileOrFolder.FullName);
+                        generator.AddFileSystemItem(fileOrFolder);
+                    }
+                    return generator.GenerateHash();
                 }
-
-                return ConvertHashToInt64(hashCombiner.GetCombinedHashCode());
             }
-        }
-
-        /// <summary>
-        /// Converts a string hash value into an Int64.
-        /// </summary>
-        internal static long ConvertHashToInt64(string val)
-        {
-            long outVal;
-            return long.TryParse(val, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out outVal) ? outVal : 0;
         }
 
         #endregion
 
         #region Cache
+
+        private const int ListFileOpenReadTimeout = 4000; // milliseconds
+        private const int ListFileOpenWriteTimeout = 2000; // milliseconds
 
         /// <summary>
         /// Attemps to retrieve the list of types from the cache.
@@ -357,12 +343,11 @@ namespace Umbraco.Core
             {
                 return ReadCache();
             }
-            catch
+            catch (Exception ex)
             {
                 try
                 {
-                    var filePath = GetPluginListFilePath();
-                    File.Delete(filePath);
+                    File.Delete(_pluginListFilePath.Value);
                 }
                 catch
                 {
@@ -376,12 +361,11 @@ namespace Umbraco.Core
         internal Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
         {
             var cache = new Dictionary<Tuple<string, string>, IEnumerable<string>>();
-
-            var filePath = GetPluginListFilePath();
-            if (File.Exists(filePath) == false)
+            
+            if (File.Exists(_pluginListFilePath.Value) == false)
                 return cache;
 
-            using (var stream = File.OpenRead(filePath))
+            using (var stream = GetFileStream(_pluginListFilePath.Value, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
             using (var reader = new StreamReader(stream))
             {
                 while (true)
@@ -424,34 +408,86 @@ namespace Umbraco.Core
         /// <remarks>Generally only used for resetting cache, for example during the install process.</remarks>
         public void ClearPluginCache()
         {
-            var path = GetPluginListFilePath();
-            if (File.Exists(path))
-                File.Delete(path);
-
-            path = GetPluginHashFilePath();
-            if (File.Exists(path))
-                File.Delete(path);
+            if (File.Exists(_pluginListFilePath.Value))
+                File.Delete(_pluginListFilePath.Value);
+            
+            if (File.Exists(_pluginHashFilePath.Value))
+                File.Delete(_pluginHashFilePath.Value);
 
             _runtimeCache.ClearCacheItem(CacheKey);
         }
 
-        private string GetPluginListFilePath()
+        private static string GetPluginListFilePath()
         {
-            var filename = "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list";
-            return Path.Combine(_tempFolder, filename);
+            string pluginListFilePath;
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {                
+                case LocalTempStorage.AspNetTemp:
+                    pluginListFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.list");
+                    break;
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    pluginListFilePath = Path.Combine(cachePath, "umbraco-plugins.list");
+                    break;
+                case LocalTempStorage.Default:                    
+                default:
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
+                    pluginListFilePath = Path.Combine(tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".list");
+                    break;
+            }
+
+            //ensure the folder exists
+            var folder = Path.GetDirectoryName(pluginListFilePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + pluginListFilePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+
+            return pluginListFilePath;
         }
 
-        private string GetPluginHashFilePath()
+        private static string GetPluginHashFilePath()
         {
-            var filename = "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash";
-            return Path.Combine(_tempFolder, filename);
+            string pluginHashFilePath;
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {
+                case LocalTempStorage.AspNetTemp:
+                    pluginHashFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco-plugins.hash");
+                    break;
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    pluginHashFilePath = Path.Combine(cachePath, "umbraco-plugins.hash");
+                    break;
+                case LocalTempStorage.Default:
+                default:
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
+                    pluginHashFilePath =  Path.Combine(tempFolder, "umbraco-plugins." + NetworkHelper.FileSafeMachineName + ".hash");
+                    break;
+            }
+
+            //ensure the folder exists
+            var folder = Path.GetDirectoryName(pluginHashFilePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + pluginHashFilePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+            
+            return pluginHashFilePath;
         }
 
         internal void WriteCache()
         {
-            var filePath = GetPluginListFilePath();
-
-            using (var stream = File.Open(filePath, FileMode.Create, FileAccess.ReadWrite))
+            using (var stream = GetFileStream(_pluginListFilePath.Value, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
                 foreach (var typeList in _types.Values)
@@ -467,11 +503,31 @@ namespace Umbraco.Core
 
         internal void UpdateCache()
         {
-            // note
-            // at the moment we write the cache to disk every time we update it. ideally we defer the writing
+            // TODO: at the moment we write the cache to disk every time we update it. ideally we defer the writing
             // since all the updates are going to happen in a row when Umbraco starts. that being said, the
             // file is small enough, so it is not a priority.
-            WriteCache();            
+            WriteCache();
+        }
+
+        private static Stream GetFileStream(string path, FileMode fileMode, FileAccess fileAccess, FileShare fileShare, int timeoutMilliseconds)
+        {
+            const int pauseMilliseconds = 250;
+            var attempts = timeoutMilliseconds / pauseMilliseconds;
+            while (true)
+            {
+                try
+                {
+                    return new FileStream(path, fileMode, fileAccess, fileShare);
+                }
+                catch (Exception ex)
+                {
+                    if (--attempts == 0)
+                        throw;
+
+                    LogHelper.Debug<PluginManager>(string.Format("Attempted to get filestream for file {0} failed, {1} attempts left, pausing for {2} milliseconds", path, attempts, pauseMilliseconds));
+                    Thread.Sleep(pauseMilliseconds);
+                }
+            }
         }
 
         #endregion
@@ -545,7 +601,7 @@ namespace Umbraco.Core
             if (cache == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
                 return ResolveTypesInternal(
-                    typeof (T), null,
+                    typeof(T), null,
                     () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
                     cache);
             }
@@ -554,14 +610,14 @@ namespace Umbraco.Core
             // filter the cached discovered types (and cache the result)
 
             var discovered = ResolveTypesInternal(
-                typeof (IDiscoverable), null,
+                typeof(IDiscoverable), null,
                 () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
                 true);
 
             return ResolveTypesInternal(
-                typeof (T), null,
+                typeof(T), null,
                 () => discovered
-                    .Where(x => typeof (T).IsAssignableFrom(x)),
+                    .Where(x => typeof(T).IsAssignableFrom(x)),
                 true);
         }
 
@@ -584,7 +640,7 @@ namespace Umbraco.Core
             if (cache == false || typeof(IDiscoverable).IsAssignableFrom(typeof(T)) == false)
             {
                 return ResolveTypesInternal(
-                    typeof (T), typeof (TAttribute),
+                    typeof(T), typeof(TAttribute),
                     () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(specificAssemblies ?? AssembliesToScan),
                     cache);
             }
@@ -593,12 +649,12 @@ namespace Umbraco.Core
             // filter the cached discovered types (and cache the result)
 
             var discovered = ResolveTypesInternal(
-                typeof (IDiscoverable), null,
+                typeof(IDiscoverable), null,
                 () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
                 true);
 
             return ResolveTypesInternal(
-                typeof (T), typeof (TAttribute),
+                typeof(T), typeof(TAttribute),
                 () => discovered
                     .Where(x => typeof(T).IsAssignableFrom(x))
                     .Where(x => x.GetCustomAttributes<TAttribute>(false).Any()),
@@ -620,7 +676,7 @@ namespace Umbraco.Core
             cache &= specificAssemblies == null;
 
             return ResolveTypesInternal(
-                typeof (object), typeof (TAttribute),
+                typeof(object), typeof(TAttribute),
                 () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 cache);
         }
@@ -638,13 +694,13 @@ namespace Umbraco.Core
             var name = ResolvedName(baseType, attributeType);
 
             lock (_typesLock)
-            using (_logger.TraceDuration<PluginManager>(
-                "Resolving " + name,
-                "Resolved " + name)) // cannot contain typesFound.Count as it's evaluated before the find
-            {
-                // resolve within a lock & timer
-                return ResolveTypesInternalLocked(baseType, attributeType, finder, cache);
-            }
+                using (_logger.TraceDuration<PluginManager>(
+                    "Resolving " + name,
+                    "Resolved " + name)) // cannot contain typesFound.Count as it's evaluated before the find
+                {
+                    // resolve within a lock & timer
+                    return ResolveTypesInternalLocked(baseType, attributeType, finder, cache);
+                }
         }
 
         private static string ResolvedName(Type baseType, Type attributeType)
@@ -676,7 +732,7 @@ namespace Umbraco.Core
             // else proceed,
             typeList = new TypeList(baseType, attributeType);
 
-            var scan = RequiresRescanning || File.Exists(GetPluginListFilePath()) == false;
+            var scan = RequiresRescanning || File.Exists(_pluginListFilePath.Value) == false;
 
             if (scan)
             {
@@ -780,7 +836,7 @@ namespace Umbraco.Core
 
             public TypeListKey(Type baseType, Type attributeType)
             {
-                BaseType = baseType ?? typeof (object);
+                BaseType = baseType ?? typeof(object);
                 AttributeType = attributeType;
             }
 
@@ -798,7 +854,7 @@ namespace Umbraco.Core
 
                 var hash = 5381;
                 hash = ((hash << 5) + hash) ^ BaseType.GetHashCode();
-                hash = ((hash << 5) + hash) ^ (AttributeType ?? typeof (TypeListKey)).GetHashCode();
+                hash = ((hash << 5) + hash) ^ (AttributeType ?? typeof(TypeListKey)).GetHashCode();
                 return hash;
             }
         }
@@ -861,7 +917,7 @@ namespace Umbraco.Core
         {
             // look for IParameterEditor (fast, IDiscoverable) then filter
 
-            var propertyEditor = typeof (PropertyEditor);
+            var propertyEditor = typeof(PropertyEditor);
 
             return mgr.ResolveTypes<IParameterEditor>()
                 .Where(x => propertyEditor.IsAssignableFrom(x) && x != propertyEditor);
@@ -876,8 +932,8 @@ namespace Umbraco.Core
         /// </remarks>
         public static IEnumerable<Type> ResolveParameterEditors(this PluginManager mgr)
         {
-            var propertyEditor = typeof (PropertyEditor);
-            var parameterEditor = typeof (ParameterEditor);
+            var propertyEditor = typeof(PropertyEditor);
+            var parameterEditor = typeof(ParameterEditor);
 
             return mgr.ResolveTypes<IParameterEditor>()
                 .Where(x => x != propertyEditor && x != parameterEditor);

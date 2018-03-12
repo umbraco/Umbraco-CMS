@@ -80,8 +80,7 @@ namespace Umbraco.Tests.Scoping
             var service = ApplicationContext.Services.UserService;
             var globalCache = ApplicationContext.ApplicationCache.IsolatedRuntimeCache.GetOrCreateCache(typeof(IUser));
 
-            var userType = service.GetUserTypeByAlias("admin");
-            var user = (IUser) new User("name", "email", "username", "rawPassword", userType);
+            var user = (IUser) new User("name", "email", "username", "rawPassword");
             service.Save(user);
 
             // global cache contains the entity

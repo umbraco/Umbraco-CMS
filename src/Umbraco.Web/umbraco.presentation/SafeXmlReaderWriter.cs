@@ -19,6 +19,10 @@ namespace umbraco
         private bool _using;
         private bool _registerXmlChange;
 
+        // the default enlist priority is 100
+        // enlist with a lower priority to ensure that anything "default" has a clean xml
+        private const int EnlistPriority = 60;
+
         private SafeXmlReaderWriter(IDisposable releaser, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool isWriter, bool scoped)
         {
             _releaser = releaser;
@@ -28,6 +32,12 @@ namespace umbraco
             _scoped = scoped;
 
             _xml = _isWriter ? Clone(xml) : xml;
+        }
+
+        public static SafeXmlReaderWriter Get(IScopeProviderInternal scopeProvider)
+        {
+            var scopeContext = scopeProvider.Context;
+            return scopeContext == null ? null : scopeContext.GetEnlisted<SafeXmlReaderWriter>("safeXmlReaderWriter");
         }
 
         public static SafeXmlReaderWriter Get(IScopeProviderInternal scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool writer)
@@ -53,7 +63,7 @@ namespace umbraco
                 (completed, item) => // action
                 {
                     item.DisposeForReal(completed);
-                });
+                }, EnlistPriority);
 
             // ensure it's not already in-use - should never happen, just being super safe
             if (rw._using)

@@ -87,6 +87,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
+                stateSelector: 'img',
                 onclick: function () {
 
                     var selectedElm = editor.selection.getNode(),

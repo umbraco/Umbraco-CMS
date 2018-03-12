@@ -127,7 +127,7 @@
                 var i2 = parseFloat($scope.model.config.initVal2);
                 sliderVal = [
                     isNaN(i1) ? $scope.model.config.minVal : (i1 >= $scope.model.config.minVal ? i1 : $scope.model.config.minVal),
-                    isNaN(i2) ? $scope.model.config.maxVal : (i2 > i1 ? (i2 <= $scope.model.config.maxVal ? i2 : $scope.model.config.maxVal) : $scope.model.config.maxVal)
+                    isNaN(i2) ? $scope.model.config.maxVal : (i2 >= i1 ? (i2 <= $scope.model.config.maxVal ? i2 : $scope.model.config.maxVal) : $scope.model.config.maxVal)
                 ];
             }
             else {

@@ -21,7 +21,6 @@
         vm.encodeHtml = false;
         vm.encodeUrl = false;
         vm.convertLinebreaks = false;
-        vm.removeParagraphTags = false;
 
         vm.showAltField = false;
         vm.showAltText = false;
@@ -130,7 +129,6 @@
                 + (vm.encodeHtml !== false ? ', encoding: ' + "RenderFieldEncodingType.Html" : "")
                 + (vm.encodeUrl !== false ? ', encoding: ' + "RenderFieldEncodingType.Url" : "")
                 + (vm.convertLinebreaks !== false ? ', convertLineBreaks: ' + "true" : "")
-                + (vm.removeParagraphTags !== false ? ', removeParagraphTags: ' + "true": "")
                 + (vm.field ? ')' : "");
 
             $scope.model.umbracoField = pageField;

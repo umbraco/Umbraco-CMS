@@ -12,12 +12,12 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 
 using System.IO;
+using System.IO.Compression;
 using System.Xml;
 
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
-using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
@@ -59,7 +59,7 @@ namespace umbraco.cms.businesslogic.packager
             requirements.AppendChild(CreateNode("minor", pack.UmbracoVersion == null ? "0" : pack.UmbracoVersion.Minor.ToInvariantString(), doc));
             requirements.AppendChild(CreateNode("patch", pack.UmbracoVersion == null ? "0" : pack.UmbracoVersion.Build.ToInvariantString(), doc));
             if (pack.UmbracoVersion != null)
-            {                
+            {
                 requirements.Attributes.Append(CreateAttribute("type", "strict", doc));
             }
             package.AppendChild(requirements);
@@ -278,58 +278,30 @@ namespace umbraco.cms.businesslogic.packager
         /// <param name="savePath">The save path.</param>
         public static void ZipPackage(string Path, string savePath)
         {
-            string OutPath = savePath;
-
             ArrayList ar = GenerateFileList(Path);
             // generate file list
             // find number of chars to remove from orginal file path
-            int TrimLength = (Directory.GetParent(Path)).ToString().Length;
 
-            TrimLength += 1;
-
-            //remove '\'
-            FileStream ostream;
-
-            byte[] obuffer;
-
-            ZipOutputStream oZipStream = new ZipOutputStream(System.IO.File.Create(OutPath));
-            // create zip stream
-
-
-            oZipStream.SetLevel(9);
-            // 9 = maximum compression level
-            ZipEntry oZipEntry;
-
-            foreach (string Fil in ar) // for each file, generate a zipentry
-            {
-                oZipEntry = new ZipEntry(Fil.Remove(0, TrimLength));
-                oZipStream.PutNextEntry(oZipEntry);
-
-
-                if (!Fil.EndsWith(@"/")) // if a file ends with '/' its a directory
+            using (var memoryStream = new MemoryStream())
+            {   
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                 {
-                    ostream = File.OpenRead(Fil);
+                    foreach (string file in ar)
+                    {
+                        if (file.EndsWith(@"/") != true) // it's not a directory
+                        {
+                            archive.CreateEntryFromFile(file, System.IO.Path.GetFileName(file));
+                        }
+                    }
+                }
 
-                    obuffer = new byte[ostream.Length];
-
-                    // byte buffer
-                    ostream.Read(obuffer, 0, obuffer.Length);
-
-                    oZipStream.Write(obuffer, 0, obuffer.Length);
-                    ostream.Close();
+                using (var fileStream = new FileStream(savePath, FileMode.Create))
+                {
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    memoryStream.CopyTo(fileStream);
                 }
             }
-            oZipStream.Finish();
-            oZipStream.Close();
-            oZipStream.Dispose();
-            oZipStream = null;
 
-            oZipEntry = null;
-
-
-            ostream = null;
-            ar.Clear();
-            ar = null;
         }
 
         private static ArrayList GenerateFileList(string Dir)

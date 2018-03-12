@@ -29,6 +29,8 @@ namespace Umbraco.Core.Services
         Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
 
         Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameContentTypeContainer(int id, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameDataTypeContainer(int id, string name, int userId = 0);
         Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
         Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0);
         Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0);
@@ -61,6 +63,13 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <returns></returns>
         IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
+
+        /// <summary>
+        /// Returns all content type Ids for the aliases given
+        /// </summary>
+        /// <param name="aliases"></param>
+        /// <returns></returns>        
+        IEnumerable<int> GetAllContentTypeIds(string[] aliases);
 
         /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
@@ -300,5 +309,6 @@ namespace Umbraco.Core.Services
         Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int containerId);
         Attempt<OperationStatus<IMediaType, MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId);
         Attempt<OperationStatus<IContentType, MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameMediaTypeContainer(int id, string name, int userId = 0);
     }
 }

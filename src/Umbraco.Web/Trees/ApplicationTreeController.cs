@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -40,9 +37,9 @@ namespace Umbraco.Web.Trees
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
-            var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
+            var appTrees = Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
 
-            if (appTrees.Count() == 1 || string.IsNullOrEmpty(tree) == false )
+            if (string.IsNullOrEmpty(tree) == false || appTrees.Length == 1)
             {
                 var apptree = string.IsNullOrEmpty(tree) == false 
                     ? appTrees.SingleOrDefault(x => x.Alias == tree)
@@ -56,9 +53,10 @@ namespace Umbraco.Web.Trees
                     queryStrings, 
                     application);
 
-                return result;
+                //this will be null if it cannot convert to ta single root section
+                if (result != null)
+                    return result;
             }
-
 
             var collection = new TreeNodeCollection();
             foreach (var apptree in appTrees)
@@ -86,10 +84,19 @@ namespace Umbraco.Web.Trees
         private async Task<TreeNode> GetRootForMultipleAppTree(ApplicationTree configTree, FormDataCollection queryStrings)
         {
             if (configTree == null) throw new ArgumentNullException("configTree");
-            var byControllerAttempt = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
-            if (byControllerAttempt.Success)
+            try
             {
-                return byControllerAttempt.Result;
+                var byControllerAttempt = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
+                if (byControllerAttempt.Success)
+                {
+                    return byControllerAttempt.Result;
+                }
+            }
+            catch (HttpResponseException)
+            {
+                //if this occurs its because the user isn't authorized to view that tree, in this case since we are loading multiple trees we
+                //will just return null so that it's not added to the list.
+                return null;
             }
 
             var legacyAttempt = configTree.TryGetRootNodeFromLegacyTree(queryStrings, Url, configTree.ApplicationAlias);
@@ -107,6 +114,7 @@ namespace Umbraco.Web.Trees
         /// <param name="configTree"></param>
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
+        /// <param name="application"></param>
         /// <returns></returns>
         private async Task<SectionRootNode> GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
         {
@@ -122,12 +130,26 @@ namespace Umbraco.Web.Trees
                     throw new InvalidOperationException("Could not create root node for tree " + configTree.Alias);
                 }
 
+                //if the root node has a route path, we cannot create a single root section because by specifying the route path this would
+                //override the dashboard route and that means there can be no dashboard for that section which is a breaking change.
+                if (rootNode.Result.RoutePath.IsNullOrWhiteSpace() == false 
+                    && rootNode.Result.RoutePath != "#" 
+                    && rootNode.Result.RoutePath != application)
+                {
+                    //null indicates this cannot be converted
+                    return null;
+                }
+
                 var sectionRoot = SectionRootNode.CreateSingleTreeSectionRoot(
                     rootId, 
                     rootNode.Result.ChildNodesUrl, 
                     rootNode.Result.MenuUrl, 
                     rootNode.Result.Name,
                     byControllerAttempt.Result);
+
+                //This can't be done currently because the root will default to routing to a dashboard and if we disable dashboards for a section
+                //that is really considered a breaking change. See above.
+                //sectionRoot.RoutePath = rootNode.Result.RoutePath;
 
                 foreach (var d in rootNode.Result.AdditionalData)
                 {

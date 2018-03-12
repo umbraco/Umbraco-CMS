@@ -17,24 +17,25 @@
     <dependencies>
       <dependency id="UmbracoCms.Core" version="[$version$]" />
       <dependency id="Newtonsoft.Json" version="[10.0.2, 11.0.0)" />
-      <dependency id="Umbraco.ModelsBuilder" version="[3.0.7, 4.0.0)" />
+      <dependency id="Umbraco.ModelsBuilder" version="[3.0.10, 4.0.0)" />
       <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.1, 3.0.0)" />
-	    <dependency id="ImageProcessor.Web.Config" version="[2.3.0, 3.0.0)" />
+	  <dependency id="ImageProcessor.Web.Config" version="[2.3.1, 3.0.0)" />
     </dependencies>
   </metadata>
   <files>
-    <file src="..\_BuildOutput\Configs\**" target="Content\Config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
-    <file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" exclude="..\_BuildOutput\WebApp\Views\Web.config" />
-    <file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
-    <file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
-    <file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
-    <file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
-    <file src="..\_BuildOutput\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
-    <file src="..\_BuildOutput\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
-    <file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
-    <file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
-    <file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
-    <file src="..\_BuildOutput\WebApp\Media\Web.config" target="Content\Media\Web.config" />
+    <file src="$BuildTmp$\Configs\**" target="Content\Config" exclude="$BuildTmp$\Configs\Web.config.transform" />
+    <file src="$BuildTmp$\WebApp\Views\**" target="Content\Views" exclude="$BuildTmp$\WebApp\Views\Web.config" />
+    <file src="$BuildTmp$\WebApp\default.aspx" target="Content\default.aspx" />
+    <file src="$BuildTmp$\WebApp\Global.asax" target="Content\Global.asax" />
+    <file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
+    <file src="$BuildTmp$\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
+    <file src="$BuildTmp$\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
+    <file src="$BuildTmp$\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
+    <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
+    <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
+    <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
+    <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
+    <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
     <file src="tools\ReadmeUpgrade.txt" target="tools\ReadmeUpgrade.txt" />
