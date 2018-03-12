@@ -51,7 +51,7 @@
                     handleSectionChange();
                 }));
 
-                findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
             
@@ -76,7 +76,7 @@
                     vm.tree = $routeParams.tree;
 
                     setSectionName();
-                    findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                    findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
                 }
             });
@@ -84,7 +84,7 @@
 
         function findHelp(section, tree, usertype, userLang) {
 
-            if (vm.usertype === 'admin') {
+            if (usertype === 'admin') {
                 helpService.getContextHelpForPage(section, tree).then(function (topics) {
                     vm.topics = topics;
                 });
@@ -112,7 +112,7 @@
             }
 
 
-            if (vm.usertype === 'admin') {
+            if (usertype === 'admin') {
                 helpService.findVideos(rq).then(function (videos) {
                     vm.videos = videos;
                 });
