@@ -268,6 +268,10 @@ namespace Umbraco.Web.Editors
                         {
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
+                        },
+                        {
+                            "momentApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MomentController>(
+                                controller => controller.GetSupportedLocales())
                         }
                     }
                 },
