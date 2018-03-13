@@ -25,8 +25,6 @@
             return deferred.promise;
         }
 
-        ////////////
-
         var service = {
             getSupportedLocales: getSupportedLocales
         };
