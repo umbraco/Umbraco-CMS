@@ -1,4 +1,6 @@
-﻿var gulp = require('gulp');
+﻿var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
+var gulp = require('gulp');
 var watch = require('gulp-watch');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
@@ -27,8 +29,33 @@ var karmaServer = require('karma').Server;
 Helper functions
 ***************************************************************/
 function processJs(files, out) {
-    
+
+    var jsHintOptions = {
+        "validthis": true, // Tolerate using this in a non-constructor 
+        curly: false, //Allow single line if statements without { }
+        eqeqeq: true,
+        immed: true,
+        latedef: "nofunc",
+        newcap: true,
+        noarg: true,
+        sub: true,
+        boss: true,
+        //NOTE: This is required so it doesn't barf on reserved words like delete when doing $http.delete
+        es5: true,
+        eqnull: true,
+        //NOTE: we need to use eval sometimes so ignore it
+        evil: true,
+        //NOTE: we need to check for strings such as "javascript:" so don't throw errors regarding those
+        scripturl: true,
+        //NOTE: we ignore tabs vs spaces because enforcing that causes lots of errors depending on the text editor being used
+        smarttabs: true,
+        globals: {}
+    };
+
     return gulp.src(files)
+     .pipe(jshint(jsHintOptions))
+     .pipe(jshint.reporter(stylish))
+     .pipe(jshint.reporter('fail'))
      .pipe(sort())
      .pipe(concat(out))
      .pipe(wrap('(function(){\n%= body %\n})();'))
