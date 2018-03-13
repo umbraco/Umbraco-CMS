@@ -17,7 +17,7 @@ namespace Umbraco.Web.WebApi.Filters
             if (FeaturesResolver.HasCurrent == false) return true;
 
             var controllerType = actionContext.ControllerContext.ControllerDescriptor.ControllerType;
-            return FeaturesResolver.Current.Features.IsEnabled(controllerType);
+            return FeaturesResolver.Current.Features.IsControllerEnabled(controllerType);
         }
     }
 }
