@@ -661,7 +661,20 @@
         <key alias="yellow">Yellow</key>
         <key alias="orange">Orange</key>
         <key alias="blue">Blue</key>
+        <key alias="bluegrey">Blue Grey</key>
+        <key alias="grey">Grey</key>
+        <key alias="brown">Brown</key>
+        <key alias="lightblue">Light Blue</key>
+        <key alias="cyan">Cyan</key>
+        <key alias="lightgreen">Light Green</key>
+        <key alias="lime">Lime</key>
+        <key alias="amber">Amber</key>
+        <key alias="deeporange">Deep Orange</key>
         <key alias="red">Red</key>
+        <key alias="pink">Pink</key>
+        <key alias="purple">Purple</key>
+        <key alias="deeppurple">Deep Purple</key>
+        <key alias="indigo">Indigo</key>
     </area>
     <area alias="shortcuts">
         <key alias="addTab">Add tab</key>
