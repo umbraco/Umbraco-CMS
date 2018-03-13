@@ -117,7 +117,7 @@ angular.module("umbraco")
                 var allowedEditors = area.allowed;
 
                 if (($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
-                        (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
+                        (startingArea !== area && area.maxItems !== '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                     $scope.$apply(function () {
                         $(event.target).scope().area.dropNotAllowed = true;
@@ -127,7 +127,7 @@ angular.module("umbraco")
                     cancelMove = true;
                 }
                 else {
-                    if ($(event.target).scope().area.controls.length == 0){
+                    if ($(event.target).scope().area.controls.length === 0){
 
                         $scope.$apply(function () {
                             $(event.target).scope().area.dropOnEmpty = true;
@@ -350,7 +350,7 @@ angular.module("umbraco")
             }
         };
 
-        var shouldApply = function(item, itemType, gridItem) {
+        var shouldApply = function (item, itemType, gridItem) {
             if (item.applyTo === undefined || item.applyTo === null || item.applyTo === "") {
                 return true;
             }
@@ -379,7 +379,7 @@ angular.module("umbraco")
                 var cellSize = gridItem.grid.toString();
                 return _.indexOf(cells, cellSize) !== -1;
             }
-        }
+        };
 
         $scope.editGridItemSettings = function (gridItem, itemType) {
 
@@ -458,7 +458,7 @@ angular.module("umbraco")
                 return val;
             } else {
                 var paddArray = modifier.split(placeHolder);
-                if(paddArray.length == 1){
+                if(paddArray.length === 1){
                     if (modifier.indexOf(placeHolder) === 0) {
                         return val.slice(0, -paddArray[0].length);
                     } else {
@@ -473,13 +473,13 @@ angular.module("umbraco")
             }
         }
 
-        var addModifier = function(val, modifier){
+        function addModifier (val, modifier){
             if (!modifier || modifier.indexOf(placeHolder) < 0) {
                 return val;
             } else {
                 return modifier.replace(placeHolder, val);
             }
-        };
+        }
 
         function gridItemHasConfig(styles, config) {
 

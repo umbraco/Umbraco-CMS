@@ -58,7 +58,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       items: []
    };
 
-   $scope.currentNodePermissions = {}
+    $scope.currentNodePermissions = {};
 
    //Just ensure we do have an editorState
    if (editorState.current) {
@@ -137,7 +137,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.options = {
       displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
       pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
-      pageNumber: ($routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
+      pageNumber: ($routeParams.page && !isNaN(Number($routeParams.page)) && Number($routeParams.page) > 0) ? $routeParams.page : 1,
       filter: '',
       orderBy: ($scope.model.config.orderBy ? $scope.model.config.orderBy : 'VersionDate').trim(),
       orderDirection: $scope.model.config.orderDirection ? $scope.model.config.orderDirection.trim() : "desc",
@@ -172,13 +172,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
         // to do that, we'd need to update the base query for content to include the content type alias column
         // which requires another join and would be slower. BUT We are doing this for members so not sure it makes a diff?
-        if (e.alias != "contentTypeAlias") {
+        if (e.alias !== "contentTypeAlias") {
             e.allowSorting = true;
         }
 
         // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
-        if (e.isSystem && $scope.entityType == "member") {
-            e.allowSorting = e.alias == 'username' || e.alias == 'email';
+       if (e.isSystem && $scope.entityType === "member") {
+           e.allowSorting = e.alias === 'username' || e.alias === 'email';
         }
 
         if (e.isSystem) {
@@ -249,9 +249,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
    with simple values */
 
-   $scope.getContent = function() {
-       $scope.reloadView($scope.contentId, true);
-   }
+    $scope.getContent = function () {
+        $scope.reloadView($scope.contentId, true);
+    };
 
    $scope.reloadView = function (id, reloadFolders) {
 
@@ -543,7 +543,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       var index = 0;
       var foundAlias = false;
       for (var i = 0; i < properties.length; i++) {
-         if (properties[i].alias == alias) {
+         if (properties[i].alias === alias) {
             foundAlias = true;
             break;
          }

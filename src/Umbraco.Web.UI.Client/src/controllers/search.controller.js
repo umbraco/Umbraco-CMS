@@ -33,7 +33,7 @@ function SearchController($scope, searchService, $log, $location, navigationServ
         }
     };
 
-    var group = undefined;
+    var group;
     var groupNames = [];
     var groupIndex = -1;
     var itemIndex = -1;

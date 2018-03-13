@@ -14,11 +14,11 @@
                 nameTemplate: ""
             }
             );
-        }
+        };
 
         $scope.remove = function (index) {
             $scope.model.value.splice(index, 1);
-        }
+        };
 
         $scope.sortableOptions = {
             axis: 'y',
@@ -64,9 +64,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         var inited = false;
 
         _.each($scope.model.config.contentTypes, function (contentType) {
-            contentType.nameExp = !!contentType.nameTemplate
-                ? $interpolate(contentType.nameTemplate)
-                : undefined;
+            contentType.nameExp = !!contentType.nameTemplate ?
+                $interpolate(contentType.nameTemplate) :
+                undefined;
         });
 
         $scope.editIconTitle = '';
@@ -97,12 +97,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.minItems = $scope.model.config.minItems || 0;
         $scope.maxItems = $scope.model.config.maxItems || 0;
 
-        if ($scope.maxItems == 0)
+        if ($scope.maxItems === 0)
             $scope.maxItems = 1000;
 
-        $scope.singleMode = $scope.minItems == 1 && $scope.maxItems == 1;
+        $scope.singleMode = $scope.minItems === 1 && $scope.maxItems === 1;
         $scope.showIcons = $scope.model.config.showIcons || true;
-        $scope.wideMode = $scope.model.config.hideLabel == "1";
+        $scope.wideMode = $scope.model.config.hideLabel === "1";
 
         $scope.overlayMenu = {
             show: false,
@@ -142,11 +142,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 });
             });
 
-            if ($scope.overlayMenu.scaffolds.length == 0) {
+            if ($scope.overlayMenu.scaffolds.length === 0) {
                 return;
             }
 
-            if ($scope.overlayMenu.scaffolds.length == 1) {
+            if ($scope.overlayMenu.scaffolds.length === 1) {
                 // only one scaffold type - no need to display the picker
                 $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                 return;
@@ -160,7 +160,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         };
 
         $scope.editNode = function (idx) {
-            if ($scope.currentNode && $scope.currentNode.key == $scope.nodes[idx].key) {
+            if ($scope.currentNode && $scope.currentNode.key === $scope.nodes[idx].key) {
                 $scope.currentNode = undefined;
             } else {
                 $scope.currentNode = $scope.nodes[idx];
@@ -169,7 +169,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.deleteNode = function (idx) {
             if ($scope.nodes.length > $scope.model.config.minItems) {
-                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes == 1) {
+                if ($scope.model.config.confirmDeletes && $scope.model.config.confirmDeletes === 1) {
                     localizationService.localize('content_nestedContentDeleteItem').then(function (value) {
                         if (confirm(value)) {
                             $scope.nodes.splice(idx, 1);
@@ -223,7 +223,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.getIcon = function (idx) {
             var scaffold = $scope.getScaffold($scope.model.value[idx].ncContentTypeAlias);
             return scaffold && scaffold.icon ? iconHelper.convertFromLegacyIcon(scaffold.icon) : "icon-folder";
-        }
+        };
 
         $scope.sortableOptions = {
             axis: 'y',
@@ -256,15 +256,15 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.getScaffold = function (alias) {
             return _.find($scope.scaffolds, function (scaffold) {
-                return scaffold.contentTypeAlias == alias;
+                return scaffold.contentTypeAlias === alias;
             });
-        }
+        };
 
         $scope.getContentTypeConfig = function (alias) {
             return _.find($scope.model.config.contentTypes, function (contentType) {
-                return contentType.ncAlias == alias;
+                return contentType.ncAlias === alias;
             });
-        }
+        };
 
         var notSupported = [
           "Umbraco.CheckBoxList",
@@ -284,7 +284,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
                 // remove all tabs except the specified tab
                 var tab = _.find(scaffold.tabs, function (tab) {
-                    return tab.id != 0 && (tab.alias.toLowerCase() == contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias == "");
+                    return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
                 });
                 scaffold.tabs = [];
                 if (tab) {
@@ -311,9 +311,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         });
 
-        var initIfAllScaffoldsHaveLoaded = function () {
+        function initIfAllScaffoldsHaveLoaded () {
             // Initialize when all scaffolds have loaded
-            if ($scope.model.config.contentTypes.length == scaffoldsLoaded) {
+            if ($scope.model.config.contentTypes.length === scaffoldsLoaded) {
                 // Because we're loading the scaffolds async one at a time, we need to
                 // sort them explicitly according to the sort order defined by the data type.
                 var contentTypeAliases = [];
@@ -339,13 +339,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
                 // Enforce min items
                 if ($scope.nodes.length < $scope.model.config.minItems) {
-                    for (var i = $scope.nodes.length; i < $scope.model.config.minItems; i++) {
+                    for (var i = $scope.nodes.length; i < $scope.model.config.minItems; i++) { // jshint ignore:line
                         $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                     }
                 }
 
                 // If there is only one item, set it as current node
-                if ($scope.singleMode || ($scope.nodes.length == 1 && $scope.maxItems == 1)) {
+                if ($scope.singleMode || ($scope.nodes.length === 1 && $scope.maxItems === 1)) {
                     $scope.currentNode = $scope.nodes[0];
                 }
 
@@ -353,7 +353,24 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             }
         }
 
-        var initNode = function (scaffold, item) {
+        //TODO: Move this into a shared location?
+        var UUID = (function () {
+            var self = {};
+            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? '0' : '') + (i).toString(16); }
+            self.generate = function () {
+                var d0 = Math.random() * 0xffffffff | 0;
+                var d1 = Math.random() * 0xffffffff | 0;
+                var d2 = Math.random() * 0xffffffff | 0;
+                var d3 = Math.random() * 0xffffffff | 0;
+                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
+                    lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
+                    lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
+                    lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
+            };
+            return self;
+        })();
+
+        function initNode (scaffold, item) {
             var node = angular.copy(scaffold);
 
             node.key = item && item.key ? item.key : UUID.generate();
@@ -385,7 +402,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             return node;
         }
 
-        var updateModel = function () {
+        function updateModel  () {
             if ($scope.realCurrentNode) {
                 $scope.$broadcast("ncSyncVal", { key: $scope.realCurrentNode.key });
             }
@@ -426,22 +443,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             unsubscribe();
         });
 
-        //TODO: Move this into a shared location?
-        var UUID = (function () {
-            var self = {};
-            var lut = []; for (var i = 0; i < 256; i++) { lut[i] = (i < 16 ? '0' : '') + (i).toString(16); }
-            self.generate = function () {
-                var d0 = Math.random() * 0xffffffff | 0;
-                var d1 = Math.random() * 0xffffffff | 0;
-                var d2 = Math.random() * 0xffffffff | 0;
-                var d3 = Math.random() * 0xffffffff | 0;
-                return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
-                  lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
-                  lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
-                  lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
-            }
-            return self;
-        })();
+        
     }
 
 ]);

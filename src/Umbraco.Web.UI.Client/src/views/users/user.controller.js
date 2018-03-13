@@ -361,7 +361,7 @@
             if (files && files.length > 0) {
                 upload(files[0]);
             }
-        };
+        }
 
         function upload(file) {
 
@@ -400,7 +400,7 @@
                 if (status === 404) {
                     vm.avatarFile.serverErrorMessage = "File not found";
                 }
-                else if (status == 400) {
+                else if (status === 400) {
                     //it's a validation error
                     vm.avatarFile.serverErrorMessage = evt.message;
                 }

@@ -369,7 +369,7 @@ angular.module("umbraco.directives")
                             scope.$on('$destroy', function () {
                                 unsubscribe();
 								if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-									tinyMceEditor.destroy()
+                                    tinyMceEditor.destroy();
 								}
                             });
 

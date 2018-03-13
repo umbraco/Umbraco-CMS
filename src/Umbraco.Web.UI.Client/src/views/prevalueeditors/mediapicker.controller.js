@@ -51,7 +51,7 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
          $scope.contentPickerOverlay.show = false;
          $scope.contentPickerOverlay = null;
       };
-    }
+    };
 
     $scope.remove =function(index){
         $scope.renderModel.splice(index, 1);

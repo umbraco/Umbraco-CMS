@@ -79,7 +79,7 @@ angular.module("umbraco")
         function codeLatLng(latLng, geocoder) {
             geocoder.geocode({ 'latLng': latLng },
                 function (results, status) {
-                    if (status == google.maps.GeocoderStatus.OK) {
+                    if (status === google.maps.GeocoderStatus.OK) {
                         var location = results[0].formatted_address;
                         $rootScope.$apply(function () {
                             notificationsService.success("Peter just went to: ", location);

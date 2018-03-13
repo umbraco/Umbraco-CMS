@@ -84,7 +84,7 @@ angular.module("Umbraco.canvasdesigner")
             e.preventDefault();
             $scope.$parent.data.showFolderInput = false;
 
-            if ($scope.$parent.data.newFolder && $scope.$parent.data.newFolder != "") {
+            if ($scope.$parent.data.newFolder && $scope.$parent.data.newFolder !== "") {
                 mediaResource
                     .addFolder($scope.$parent.data.newFolder, $scope.currentFolder.id)
                     .then(function (data) {
@@ -103,7 +103,7 @@ angular.module("Umbraco.canvasdesigner")
 
         if (folder.id > 0) {
             var matches = _.filter($scope.currentPath, function (value, index) {
-                if (value.id == folder.id) {
+                if (value.id === folder.id) {
                     value.indexInPath = index;
                     return value;
                 }
@@ -126,15 +126,15 @@ angular.module("Umbraco.canvasdesigner")
                 folder.children = data.items ? data.items : [];
 
                 angular.forEach(folder.children, function (child) {
-                    child.isFolder = child.contentTypeAlias == "Folder" ? true : false;
+                    child.isFolder = child.contentTypeAlias === "Folder" ? true : false;
                     if (!child.isFolder) {
                         angular.forEach(child.properties, function (property) {       
-                            if (property.alias == "umbracoFile" && property.value)
+                            if (property.alias === "umbracoFile" && property.value)
                             {
                                 child.thumbnail = mediaHelper.resolveFile(child, true);
                                 child.image = property.value;
                             }
-                        })
+                        });
                     }
                 });
 
@@ -143,7 +143,7 @@ angular.module("Umbraco.canvasdesigner")
             });
     };
 
-    $scope.iconFolder = "glyphicons-icon folder-open"
+    $scope.iconFolder = "glyphicons-icon folder-open";
 
     $scope.selectMedia = function (media) {
 
@@ -165,7 +165,7 @@ angular.module("Umbraco.canvasdesigner")
     }
 
     $scope.submitAndClose = function () {
-        if (modalFieldvalue != "") {
+        if (modalFieldvalue !== "") {
             $scope.submit(modalFieldvalue);
         } else {
             $scope.cancel();
@@ -175,6 +175,6 @@ angular.module("Umbraco.canvasdesigner")
 
     $scope.cancelAndClose = function () {
         $scope.cancel();
-    }
+    };
 
-})
+});

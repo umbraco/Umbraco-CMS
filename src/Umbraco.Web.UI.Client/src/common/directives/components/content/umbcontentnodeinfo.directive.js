@@ -142,7 +142,7 @@
                 // published node with pending changes
                 if(node.hasPublishedVersion === true && node.publishDate && node.published === false) {
                     scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
-                    scope.publishStatus.color = "success"
+                    scope.publishStatus.color = "success";
                 }
 
             }

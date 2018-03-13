@@ -44,6 +44,12 @@ angular.module("umbraco.directives")
 						};
 					};
 
+                    var lazyEndEvent = _.debounce(function () {
+                        scope.$apply(function () {
+                            scope.$emit("imageFocalPointStop");
+                        });
+                    }, 2000);
+
 					scope.setFocalPoint = function(event) {
 
 						scope.$emit("imageFocalPointStart");
@@ -57,7 +63,7 @@ angular.module("umbraco.directives")
 
 					};
 
-					var setDimensions = function(){
+                    function setDimensions (){
 						scope.dimensions.width = $image.width();
 						scope.dimensions.height = $image.height();
 
@@ -67,21 +73,17 @@ angular.module("umbraco.directives")
 						}else{
 							scope.center = { left: 0.5, top: 0.5 };
 						}
-					};
+					}
 
-					var calculateGravity = function(offsetX, offsetY){
+                    function calculateGravity (offsetX, offsetY){
 						scope.dimensions.left = offsetX;
 						scope.dimensions.top =  offsetY;
 
 						scope.center.left =  (scope.dimensions.left+10) / scope.dimensions.width;
 						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
-					};
+					}
 
-					var lazyEndEvent = _.debounce(function(){
-						scope.$apply(function(){
-							scope.$emit("imageFocalPointStop");
-						});
-					}, 2000);
+					
 
 
 					//Drag and drop positioning, using jquery ui draggable

@@ -13,20 +13,23 @@ function windowResizeListener($rootScope) {
 
     var WinReszier = (function () {
         var registered = [];
-        var inited = false;        
-        var resize = _.debounce(function(ev) {
-            notify();
-        }, 100);
+        var inited = false;
+
         var notify = function () {
             var h = $(window).height();
             var w = $(window).width();
             //execute all registrations inside of a digest
-            $rootScope.$apply(function() {
+            $rootScope.$apply(function () {
                 for (var i = 0, cnt = registered.length; i < cnt; i++) {
                     registered[i].apply($(window), [{ width: w, height: h }]);
                 }
             });
         };
+
+        var resize = _.debounce(function(ev) {
+            notify();
+        }, 100);
+        
         return {
             register: function (fn) {
                 registered.push(fn);

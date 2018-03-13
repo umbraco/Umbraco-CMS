@@ -11,18 +11,18 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	    $scope.recursive = true;
 	    $scope.dialogTreeEventHandler = $({});
 	    $scope.busy = false;
-	    $scope.searchInfo = {
-	        searchFromId: null,
-	        searchFromName: null,
-	        showSearch: false,
-	        results: [],
-	        selectedSearchResults: []
-	    }
-	    $scope.treeModel = {
-	        hideHeader: false
-	    }
+        $scope.searchInfo = {
+            searchFromId: null,
+            searchFromName: null,
+            showSearch: false,
+            results: [],
+            selectedSearchResults: []
+        };
+        $scope.treeModel = {
+            hideHeader: false
+        };
 	    userService.getCurrentUser().then(function (userData) {
-            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) === -1;	     
 	    });
 
 	    var node = dialogOptions.currentNode;
@@ -53,12 +53,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 			}
 	    }
 
-	    $scope.hideSearch = function () {
-	        $scope.searchInfo.showSearch = false;
-	        $scope.searchInfo.searchFromId = null;
-	        $scope.searchInfo.searchFromName = null;
-	        $scope.searchInfo.results = [];
-	    }
+        $scope.hideSearch = function () {
+            $scope.searchInfo.showSearch = false;
+            $scope.searchInfo.searchFromId = null;
+            $scope.searchInfo.searchFromName = null;
+            $scope.searchInfo.results = [];
+        };
 
 	    // method to select a search result
 	    $scope.selectResult = function (evt, result) {

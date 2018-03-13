@@ -17,32 +17,32 @@ angular.module("Umbraco.canvasdesigner")
 
     $scope.setSelectedradius = function (radiustype) {
 
-        if (radiustype == "all") {
-            $scope.selectedradius.name="all";
-            $scope.selectedradius.value= $scope.item.values.radiusvalue;
+        if (radiustype === "all") {
+            $scope.selectedradius.name = "all";
+            $scope.selectedradius.value = $scope.item.values.radiusvalue;
         }
 
-        if (radiustype == "topleft") {
+        if (radiustype === "topleft") {
             $scope.selectedradius.name = "topleft";
             $scope.selectedradius.value = $scope.item.values.topleftradiusvalue;
         }
 
-        if (radiustype == "topright") {
+        if (radiustype === "topright") {
             $scope.selectedradius.name = "topright";
             $scope.selectedradius.value = $scope.item.values.toprightradiusvalue;
         }
 
-        if (radiustype == "bottomleft") {
+        if (radiustype === "bottomleft") {
             $scope.selectedradius.name = "bottomleft";
             $scope.selectedradius.value = $scope.item.values.bottomleftradiusvalue;
         }
 
-        if (radiustype == "bottomright") {
+        if (radiustype === "bottomright") {
             $scope.selectedradius.name = "bottomright";
             $scope.selectedradius.value = $scope.item.values.bottomrightradiusvalue;
         }
 
-    }
+    };
 
     if (!$scope.item.values) {
         $scope.item.values = {
@@ -59,7 +59,7 @@ angular.module("Umbraco.canvasdesigner")
             if ($.inArray(key, $scope.item.enable) >= 0) {
                 $scope.radiusList.splice($scope.radiusList.length + 1, 0, key);
             }
-        })
+        });
     }
     else {
         $scope.radiusList = $scope.defaultRadiusList;
@@ -69,28 +69,28 @@ angular.module("Umbraco.canvasdesigner")
         $scope.setSelectedradius($scope.radiusList[0]);
     }, false);
 
-    $scope.$watch( "selectedradius", function () {
+    $scope.$watch("selectedradius", function () {
 
-        if ($scope.selectedradius.name == "all") {
+        if ($scope.selectedradius.name === "all") {
             $scope.item.values.radiusvalue = $scope.selectedradius.value;
         }
 
-        if ($scope.selectedradius.name == "topleft") {
+        if ($scope.selectedradius.name === "topleft") {
             $scope.item.values.topleftradiusvalue = $scope.selectedradius.value;
         }
 
-        if ($scope.selectedradius.name == "topright") {
+        if ($scope.selectedradius.name === "topright") {
             $scope.item.values.toprightradiusvalue = $scope.selectedradius.value;
         }
 
-        if ($scope.selectedradius.name == "bottomleft") {
+        if ($scope.selectedradius.name === "bottomleft") {
             $scope.item.values.bottomleftradiusvalue = $scope.selectedradius.value;
         }
 
-        if ($scope.selectedradius.name == "bottomright") {
+        if ($scope.selectedradius.name === "bottomright") {
             $scope.item.values.bottomrightradiusvalue = $scope.selectedradius.value;
         }
 
-    }, true)
+    }, true);
 
-})
+});

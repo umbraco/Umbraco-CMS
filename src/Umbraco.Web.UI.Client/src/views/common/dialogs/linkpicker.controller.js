@@ -10,13 +10,13 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 	    $scope.dialogTreeEventHandler = $({});
 	    $scope.target = {};
-	    $scope.searchInfo = {
-	        searchFromId: null,
-	        searchFromName: null,
-	        showSearch: false,
-	        results: [],
-	        selectedSearchResults: []
-	    }
+        $scope.searchInfo = {
+            searchFromId: null,
+            searchFromName: null,
+            showSearch: false,
+            results: [],
+            selectedSearchResults: []
+        };
 
 	    if (dialogOptions.currentTarget) {
 	        $scope.target = dialogOptions.currentTarget;
@@ -109,7 +109,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	    $scope.switchToMediaPicker = function () {
 	        userService.getCurrentUser().then(function (userData) {
 	          dialogService.mediaPicker({
-	            startNodeId: userData.startMediaIds.length == 0 ? -1 : userData.startMediaIds[0],
+	            startNodeId: userData.startMediaIds.length === 0 ? -1 : userData.startMediaIds[0],
 	            callback: function(media) {
 	              $scope.target.id = media.id;
 	              $scope.target.isMedia = true;
@@ -120,12 +120,12 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        });
 	    };
 
-	    $scope.hideSearch = function () {
-	        $scope.searchInfo.showSearch = false;
-	        $scope.searchInfo.searchFromId = null;
-	        $scope.searchInfo.searchFromName = null;
-	        $scope.searchInfo.results = [];
-	    }
+        $scope.hideSearch = function () {
+            $scope.searchInfo.showSearch = false;
+            $scope.searchInfo.searchFromId = null;
+            $scope.searchInfo.searchFromName = null;
+            $scope.searchInfo.results = [];
+        };
 
 	    // method to select a search result 
 	    $scope.selectResult = function (evt, result) {

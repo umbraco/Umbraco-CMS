@@ -16,7 +16,7 @@ angular.module('umbraco')
             } else if ($scope.model.value.crops) {
                 //sync any config changes with the editor and drop outdated crops
                 _.each($scope.model.value.crops, function (saved) {
-                    var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
+                    var configured = _.find(config.crops, function (item) { return item.alias === saved.alias; });
 
                     if (configured && configured.height === saved.height && configured.width === saved.width) {
                         configured.coordinates = saved.coordinates;

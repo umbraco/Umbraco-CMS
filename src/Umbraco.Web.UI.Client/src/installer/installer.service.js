@@ -8,7 +8,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 		progress: "100%"
 	};
 
-	var factTimer = undefined;
+	var factTimer;
 	var _installerModel = {
 	    installId: undefined,
         instructions: {
@@ -51,7 +51,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
     /* Returns the description for the given step name */ 
 	function getDescriptionForStepName(steps, name) {
 	    var found = _.find(steps, function(i) {
-	        return i.name == name;
+	        return i.name === name;
 	    });
 	    return (found) ? found.description : null;
 	}
@@ -62,7 +62,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 
 		var pct = "100%";
 		for (var i = sorted.length - 1; i >= 0; i--) {
-			if(sorted[i].name == next){
+			if(sorted[i].name === next){
 				pct = Math.floor((i+1) / steps.length  * 100) + "%";
 				break;
 			}

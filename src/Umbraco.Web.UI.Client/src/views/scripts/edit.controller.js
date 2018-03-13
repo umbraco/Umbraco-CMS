@@ -172,7 +172,7 @@
                     vm.editor.on("change", changeAceEditor);
 
             	}
-            }
+            };
 
             function changeAceEditor() {
                 setFormState("dirty");

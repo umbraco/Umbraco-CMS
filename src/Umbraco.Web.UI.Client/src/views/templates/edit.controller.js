@@ -269,7 +269,7 @@
                     vm.editor.on("focus", persistCurrentLocation);
                     vm.editor.on("change", changeAceEditor);
             	}
-            }
+            };
             
         };
 
@@ -299,6 +299,8 @@
                 show: true,
                 submit: function(model) {
 
+                    var code;
+
                     switch(model.insert.type) {
 
                         case "macro":
@@ -307,12 +309,12 @@
                             break;
 
                         case "dictionary":
-                        	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
+                        	code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
 
                         case "partial":
-                            var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
+                            code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
                             insert(code);
                             break;
                             
@@ -481,18 +483,20 @@
                 show: true,
                 submit: function(model) {
 
+                    var code;
+
                     if (model.insertType === 'renderBody') {
-                        var code = templateHelper.getRenderBodySnippet();
+                        code = templateHelper.getRenderBodySnippet();
                         insert(code);
                     }
 
                     if (model.insertType === 'renderSection') {
-                        var code = templateHelper.getRenderSectionSnippet(model.renderSectionName, model.mandatoryRenderSection);
+                        code = templateHelper.getRenderSectionSnippet(model.renderSectionName, model.mandatoryRenderSection);
                         insert(code);
                     }
 
                     if (model.insertType === 'addSection') {
-                        var code = templateHelper.getAddSectionSnippet(model.sectionName);
+                        code = templateHelper.getAddSectionSnippet(model.sectionName);
                         wrap(code);
                     }
 
@@ -507,7 +511,7 @@
                     // focus editor
                     vm.editor.focus();
                 }
-            }
+            };
         }
 
         function openMasterTemplateOverlay() {

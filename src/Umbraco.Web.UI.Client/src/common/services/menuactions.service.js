@@ -21,11 +21,11 @@ function umbracoMenuActions($q, treeService, $location, navigationService, appSt
             umbRequestHelper.downloadFile(url).then(function() {
                 localizationService.localize("speechBubbles_memberExportedSuccess").then(function (value) {
                     notificationsService.success(value);
-                })    
+                });
             }, function(data) {
                 localizationService.localize("speechBubbles_memberExportedError").then(function (value) {
                     notificationsService.error(value);
-                })    
+                });
             });
             
         },

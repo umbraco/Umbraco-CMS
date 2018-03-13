@@ -52,7 +52,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         $scope.originalValue = $scope.model.value;
 
         //create the property to show the list of files currently saved
-        if ($scope.model.value != "" && $scope.model.value != undefined) {
+        if ($scope.model.value !== "" && $scope.model.value !== undefined) {
 
             var images = $scope.model.value.split(",");
 
@@ -89,11 +89,11 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             errorMsg: "Value cannot be empty",
             errorKey: "required"
         };
-    }
+    };
 
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
-        if (isCleared == true) {
+        if (isCleared === true) {
             $scope.model.value = { clearFiles: true };
             clearFiles();
         }
@@ -152,7 +152,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             }
         }
     });
-};
+}
 angular.module("umbraco")
     .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
     .run(function(mediaHelper, umbRequestHelper, assetsService){

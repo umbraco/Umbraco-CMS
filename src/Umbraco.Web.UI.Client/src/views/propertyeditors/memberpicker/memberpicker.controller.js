@@ -16,7 +16,7 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
         section: "member",
         treeAlias: "member",
         filter: function(i) {
-            return i.metaData.isContainer == true;
+            return i.metaData.isContainer === true;
         },
         filterCssClass: "not-allowed",
         callback: function(data) {

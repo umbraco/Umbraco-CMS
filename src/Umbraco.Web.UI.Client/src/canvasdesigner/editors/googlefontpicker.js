@@ -13,16 +13,16 @@ angular.module("Umbraco.canvasdesigner")
             fontType: '',
             fontWeight: '',
             fontStyle: '',
-        }
+        };
     }
 
     $scope.setStyleVariant = function () {
-        if ($scope.item.values != undefined) {
+        if ($scope.item.values !== undefined) {
             return {
                 'font-family': $scope.item.values.fontFamily,
                 'font-weight': $scope.item.values.fontWeight,
                 'font-style': $scope.item.values.fontStyle
-            }
+            };
         }
     };
 
@@ -56,12 +56,12 @@ angular.module("Umbraco.canvasdesigner")
     $scope.selectedFont = {};
 
     var googleGetWeight = function (googleVariant) {
-        return (googleVariant != undefined && googleVariant != "") ? googleVariant.replace("italic", "") : "";
+        return (googleVariant !== undefined && googleVariant !== "") ? googleVariant.replace("italic", "") : "";
     };
 
     var googleGetStyle = function (googleVariant) {
         var variantStyle = "";
-        if (googleVariant != undefined && googleVariant != "" && googleVariant.indexOf("italic") >= 0) {
+        if (googleVariant !== undefined && googleVariant !== "" && googleVariant.indexOf("italic") >= 0) {
             variantWeight = googleVariant.replace("italic", "");
             variantStyle = "italic";
         }
@@ -95,12 +95,12 @@ angular.module("Umbraco.canvasdesigner")
     });
 
     $scope.setStyleVariant = function () {
-        if ($scope.dialogItem != undefined) {
+        if ($scope.dialogItem !== undefined) {
             return {
                 'font-family': $scope.selectedFont.fontFamily,
                 'font-weight': $scope.selectedFont.fontWeight,
                 'font-style': $scope.selectedFont.fontStyle
-            }
+            };
         }
     };
 
@@ -130,21 +130,22 @@ angular.module("Umbraco.canvasdesigner")
     var webFontScriptLoaded = false;
     $scope.showFontPreview = function (font, variant) {
 
-        if (!variant)
+        if (!variant) {
             variant = font.variant;
+        }
 
-        if (font != undefined && font.fontFamily != "" && font.fontType == "google") {
+        if (font !== undefined && font.fontFamily !== "" && font.fontType === "google") {
 
             // Font needs to be independently loaded in the iframe for live preview to work.
             document.getElementById("resultFrame").contentWindow.getFont(font.fontFamily + ":" + variant);
 
             if (!webFontScriptLoaded) {
                 $.getScript('https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
-                    .done(function() {
+                    .done(function () {
                         webFontScriptLoaded = true;
                         loadFont(font, variant);
                     })
-                    .fail(function() {
+                    .fail(function () {
                         console.log('error loading webfont');
                     });
             }
@@ -167,11 +168,11 @@ angular.module("Umbraco.canvasdesigner")
 
 
 
-    }
+    };
 
     $scope.cancelAndClose = function () {
         $scope.cancel();
-    }
+    };
 
     $scope.submitAndClose = function () {
         $scope.submit({
@@ -182,9 +183,9 @@ angular.module("Umbraco.canvasdesigner")
         });
     };
 
-    if ($scope.dialogItem != undefined) {
+    if ($scope.dialogItem !== undefined) {
         angular.forEach($scope.fonts, function (value, key) {
-            if (value.fontFamily == $scope.dialogItem.fontFamily) {
+            if (value.fontFamily === $scope.dialogItem.fontFamily) {
                 $scope.selectedFont = value;
                 $scope.selectedFont.variant = $scope.dialogItem.fontWeight + $scope.dialogItem.fontStyle;
                 $scope.selectedFont.fontWeight = $scope.dialogItem.fontWeight;

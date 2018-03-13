@@ -115,17 +115,17 @@
             ourPackageRepositoryResource.getDetails(selectedPackage.id)
                 .then(function (pack) {
                     packageResource.validateInstalled(pack.name, pack.latestVersion)
-                        .then(function() {
+                        .then(function () {
                             //ok, can install
                             vm.package = pack;
                             vm.package.isValid = true;
                             vm.packageViewState = "packageDetails";
-                        }, function() {
+                        }, function () {
                             //nope, cannot install
                             vm.package = pack;
                             vm.package.isValid = false;
                             vm.packageViewState = "packageDetails";
-                        })
+                        });
                 });
         }
 
@@ -171,7 +171,7 @@
                         vm.localPackage.allowed = true;
                 }, function (evt, status, headers, config) {
                     
-                    if (status == 400) {
+                    if (status === 400) {
                         //it's a validation error
                         vm.installState.type = "error";
                         vm.zipFile.serverErrorMessage = evt.message;
@@ -309,7 +309,7 @@
             $timeout(function () {
                 window.location.reload(true);
             });
-        }
+        };
 
         init();
 

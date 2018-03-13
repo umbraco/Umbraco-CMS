@@ -295,14 +295,14 @@
                 advanced: {
                     fontSize: '14px'
                 },
-                onLoad: function(_editor) {
+                onLoad: function (_editor) {
                     vm.editor = _editor;
 
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!$routeParams.create) {
-                        $timeout(function(){
+                    if (!$routeParams.create) {
+                        $timeout(function () {
                             vm.editor.navigateFileEnd();
                             vm.editor.focus();
                             persistCurrentLocation();
@@ -314,8 +314,8 @@
                     vm.editor.on("focus", persistCurrentLocation);
                     vm.editor.on("change", changeAceEditor);
 
-            	}
-            }
+                }
+            };
 
         }
 

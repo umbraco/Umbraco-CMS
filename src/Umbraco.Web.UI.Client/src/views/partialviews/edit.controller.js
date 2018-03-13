@@ -286,12 +286,12 @@
                 advanced: {
                     fontSize: '14px'
                 },
-                onLoad: function(_editor) {
+                onLoad: function (_editor) {
                     vm.editor = _editor;
 
                     //Update the auto-complete method to use ctrl+alt+space
                     _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
+
                     //Unassigns the keybinding (That was previously auto-complete)
                     //As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
@@ -353,12 +353,12 @@
                         },
 
                     ]);
-                    
+
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!$routeParams.create) {
-                        $timeout(function(){
+                    if (!$routeParams.create) {
+                        $timeout(function () {
                             vm.editor.navigateFileEnd();
                             vm.editor.focus();
                             persistCurrentLocation();
@@ -370,8 +370,8 @@
                     vm.editor.on("focus", persistCurrentLocation);
                     vm.editor.on("change", changeAceEditor);
 
-            	}
-            }
+                }
+            };
 
         }
 

@@ -214,12 +214,12 @@ In the following example you see how to run some custom logic before a step goes
                 });
             };
 
-            scope.model.disableTour = function() {
+            scope.model.disableTour = function () {
                 unbindEvent();
-                tourService.disableTour(scope.model).then(function() {
-                    backdropService.close();    
+                tourService.disableTour(scope.model).then(function () {
+                    backdropService.close();
                 });
-            }
+            };
 
             function onInit() {
                 popover = el.find(".umb-tour__popover");

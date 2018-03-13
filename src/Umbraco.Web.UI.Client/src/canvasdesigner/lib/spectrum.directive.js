@@ -63,4 +63,4 @@ angular.module('spectrumcolorpicker', [])
           '      <div class="spectrumcolorpicker"><div class="real-color-preview" style="background-color:{{colorselected}}"></div><input type=\'text\' ng-model=\'colorselected\' /></div>',
           replace: true
       };
-  })
+  });

@@ -144,10 +144,10 @@
                         // extend existing group if it is already added
                         if(group.group === item.group) {
                             if(item.groupOrder) {
-                                group.groupOrder = item.groupOrder
+                                group.groupOrder = item.groupOrder;
                             }
                             groupExists = true;
-                            group.tours.push(item)
+                            group.tours.push(item);
                         }
                     });
 
@@ -155,7 +155,7 @@
                     if(!groupExists) {
                         newGroup.group = item.group;
                         if(item.groupOrder) {
-                            newGroup.groupOrder = item.groupOrder
+                            newGroup.groupOrder = item.groupOrder;
                         }
                         newGroup.tours.push(item);
                         groupedTours.push(newGroup);

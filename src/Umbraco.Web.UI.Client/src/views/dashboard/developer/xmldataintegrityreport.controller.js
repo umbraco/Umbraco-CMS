@@ -28,7 +28,7 @@ function XmlDataIntegrityReportController($scope, umbRequestHelper, $log, $http)
                     });
             }
         }
-    }
+    };
 
     $scope.items = {
         "contentXml": {

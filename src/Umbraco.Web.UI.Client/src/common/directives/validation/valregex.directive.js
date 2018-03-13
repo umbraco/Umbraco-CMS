@@ -45,7 +45,7 @@ function valRegex() {
                 }
             }));
 
-            var patternValidator = function (viewValue) {
+            function patternValidator (viewValue) {
                 if (regex) {
                     //NOTE: we don't validate on empty values, use required validator for that
                 if (!viewValue || regex.test(viewValue.toString())) {
@@ -63,7 +63,7 @@ function valRegex() {
                         return undefined;
                     }
                 }
-            };
+            }
 
             scope.$on('$destroy', function(){
               // unbind watchers

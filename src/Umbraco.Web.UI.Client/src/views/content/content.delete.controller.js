@@ -34,12 +34,13 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
             }
             
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
-            if (editorState.current && editorState.current.id == $scope.currentNode.id) {
+            if (editorState.current && editorState.current.id === $scope.currentNode.id) {
 
                 //If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
                 var location = "/content";
-                if ($scope.currentNode.parentId.toString() !== "-1")
+                if ($scope.currentNode.parentId.toString() !== "-1") {
                     location = "/content/content/edit/" + $scope.currentNode.parentId;
+                }
 
                 $location.path(location);
             }

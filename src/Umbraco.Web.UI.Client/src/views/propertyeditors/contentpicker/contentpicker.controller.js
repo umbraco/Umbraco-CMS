@@ -92,11 +92,11 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
  
-    var entityType = $scope.model.config.startNode.type === "member"
-        ? "Member"
-        : $scope.model.config.startNode.type === "media"
-        ? "Media"
-        : "Document";
+    var entityType = $scope.model.config.startNode.type === "member" ?
+        "Member" :
+        $scope.model.config.startNode.type === "media" ?
+            "Media" :
+            "Document";
     $scope.allowOpenButton = entityType === "Document";
     $scope.allowEditButton = entityType === "Document";
     $scope.allowRemoveButton = true;
@@ -134,7 +134,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         dialogOptions.filterCssClass = "not-allowed";
         var currFilter = dialogOptions.filter;
         //now change the filter to be a method
-        dialogOptions.filter = function(i) {
+        dialogOptions.filter = function (i) {
             //filter out the list view nodes
             if (i.metaData.isContainer) {
                 return true;
@@ -151,7 +151,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
 
             return false;
-        }
+        };
     }
 
     if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
@@ -184,12 +184,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
           $scope.contentPickerOverlay.show = false;
           $scope.contentPickerOverlay = null;
-      }
+      };
 
       $scope.contentPickerOverlay.close = function(oldModel) {
           $scope.contentPickerOverlay.show = false;
           $scope.contentPickerOverlay = null;
-      }
+      };
 
     };
 
@@ -211,7 +211,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             var routePath = section + "/" + section + "/edit/" + id.toString();
             $location.path(routePath).search("");
         });
-    }
+    };
 
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
@@ -259,7 +259,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
                 function(id, i) {
                     var entity = _.find(data,
                         function(d) {
-                            return $scope.model.config.idType === "udi" ? (d.udi == id) : (d.id == id);
+                            return $scope.model.config.idType === "udi" ? (d.udi === id) : (d.id === id);
                         });
 
                     if (entity) {

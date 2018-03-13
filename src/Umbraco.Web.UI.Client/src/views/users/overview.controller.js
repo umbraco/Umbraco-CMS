@@ -21,7 +21,7 @@
                 "name": localizationService.localize("sections_users"),
                 "icon": "icon-user",
                 "action": function() {
-                  $location.search("subview", "users")
+                    $location.search("subview", "users");
                 },
                 "view": !usersUri || usersUri === "users" ? "views/users/views/users/users.html" : null,
                 "active": !usersUri || usersUri === "users"
@@ -30,7 +30,7 @@
                 "name": localizationService.localize("general_groups"),
                 "icon": "icon-users",
                 "action": function () {
-                  $location.search("subview", "groups")
+                    $location.search("subview", "groups");
                 },
                 "view": usersUri === "groups" ? "views/users/views/groups/groups.html" : null,
                 "active": usersUri === "groups"
