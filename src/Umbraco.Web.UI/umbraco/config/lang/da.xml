@@ -1473,7 +1473,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="noLogin">har endnu ikke logget ind</key>
     <key alias="oldPassword">Gammelt kodeord</key>
     <key alias="password">Adgangskode</key>
-    <key alias="removePhoto">Fjern billede</key>
     <key alias="resetPassword">Nulstil kodeord</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
