@@ -9,7 +9,7 @@
             var isInfoTab = false;
             scope.publishStatus = {};
 
-            scope.disableTemplate = Umbraco.Sys.ServerVariables.disabledFeatures.disableTemplate;
+            scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             
             function onInit() {
 

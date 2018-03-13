@@ -15,7 +15,7 @@
         var localizeSaving = localizationService.localize("general_saving");
         var evts = [];
 
-        var disableTemplate = Umbraco.Sys.ServerVariables.disabledFeatures.disableTemplate;
+        var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
 
         var buttons = [
             {
@@ -218,7 +218,7 @@
             angular.forEach(buttons,
                 function (val, index) {
 
-                    if (disableTemplate === true && val.alias === "templates") {
+                    if (disableTemplates === true && val.alias === "templates") {
                         buttons.splice(index, 1);
                     }
 

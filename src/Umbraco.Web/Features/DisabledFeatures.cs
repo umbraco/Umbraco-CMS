@@ -21,6 +21,9 @@ namespace Umbraco.Web.Features
         /// </summary>
         public TypeList<UmbracoApiControllerBase> Controllers { get; private set; }
 
-        public bool DisableTemplate { get; set; }
+        /// <summary>
+        /// If true, all references to templates will be removed in the back office and routing
+        /// </summary>
+        public bool DisableTemplates { get; set; }
     }
 }

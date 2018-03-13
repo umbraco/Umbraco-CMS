@@ -14,8 +14,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         creatingFolder: false,
     };
 
-    var disableTemplate = Umbraco.Sys.ServerVariables.disabledFeatures.disableTemplate;
-    $scope.model.disableTemplate = disableTemplate;
+    var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+    $scope.model.disableTemplates = disableTemplates;
 
     var node = $scope.dialogOptions.currentNode,
         localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
@@ -61,8 +61,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         }
     };
 
-    // Disabling logic for creating document type with template if disableTemplate is set to true
-    if (!disableTemplate) {
+    // Disabling logic for creating document type with template if disableTemplates is set to true
+    if (!disableTemplates) {
         $scope.createDocType = function () {
             $location.search('create', null);
             $location.search('notemplate', null);

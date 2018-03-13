@@ -4,7 +4,7 @@
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">
-            <li data-element="action-documentType" ng-hide="model.disableTemplate">
+            <li data-element="action-documentType" ng-hide="model.disableTemplates">
                 <a href="" ng-click="createDocType()" umb-auto-focus>
 
                     <i class="large icon-item-arrangement"></i>
@@ -19,8 +19,8 @@
                     <i class="large icon-item-arrangement"></i>
 
                     <span class="menu-label">
-                        <localize ng-if="model.disableTemplate == false" key="create_documentTypeWithoutTemplate"></localize>
-                        <localize ng-if="model.disableTemplate == true" key="content_documentType">Document type></localize>
+                        <localize ng-if="model.disableTemplates == false" key="create_documentTypeWithoutTemplate"></localize>
+                        <localize ng-if="model.disableTemplates == true" key="content_documentType">Document type></localize>
                     </span>
                 </a>
             </li>

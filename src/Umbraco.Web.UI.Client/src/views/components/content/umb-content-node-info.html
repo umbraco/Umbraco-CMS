@@ -185,7 +185,7 @@
                     </umb-node-preview>
                 </umb-control-group>
 
-                    <umb-control-group ng-if="disableTemplate == false" data-element="node-info-template" label="@template_template">
+                    <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
                     <select class="input-block-level"
                             ng-model="node.template"
                             ng-options="key as value for (key, value) in availableTemplates"

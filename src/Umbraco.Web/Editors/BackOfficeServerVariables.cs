@@ -32,7 +32,6 @@ namespace Umbraco.Web.Editors
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
-        private readonly DisabledFeatures _disabledFeatures;
 
         public BackOfficeServerVariables(UrlHelper urlHelper, ApplicationContext applicationContext, IUmbracoSettingsSection umbracoSettings)
         {
@@ -55,7 +54,7 @@ namespace Umbraco.Web.Editors
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
-                {"disabledFeatures", new [] {"disableTemplate"}}
+                {"features", new [] {"disabledFeatures"}}
             };
             //now do the filtering...
             var defaults = GetServerVariables();
@@ -333,11 +332,15 @@ namespace Umbraco.Web.Editors
                     }
                 },
                 {
-                    "disabledFeatures", new Dictionary<string,bool>
+                    "features", new Dictionary<string,object>
                     {
                         {
-                            "disableTemplate", FeaturesResolver.Current.Features.Disabled.DisableTemplate
+                            "disabledFeatures", new Dictionary<string,object>
+                            {
+                                { "disableTemplates", true/*FeaturesResolver.Current.Features.Disabled.DisableTemplates*/}
+                            }
                         }
+
                     }
                 }
             };
