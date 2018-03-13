@@ -94,7 +94,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
                 .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore())
-                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberSensitivePropertiesResolver()));
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberBasicPropertiesResolver()));
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
@@ -399,6 +399,8 @@ namespace Umbraco.Web.Models.Mapping
                     //check permissions for viewing sensitive data
                     if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                     {
+                        //mark this property as sensitive
+                        prop.IsSensitive = true;
                         //mark this property as readonly so that it does not post any data
                         prop.Readonly = true;
                         //replace this editor with a sensitivevalue
@@ -482,19 +484,31 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
-        internal class MemberSensitivePropertiesResolver : SensitivePropertiesResolver<IMember>
+        /// <summary>
+        /// A resolver to map <see cref="IMember"/> properties to a collection of <see cref="ContentPropertyBasic"/>
+        /// </summary>
+        internal class MemberBasicPropertiesResolver : IValueResolver
         {
-
-            /// <summary>
-            /// Overridden to assign the IsSensitive property values
-            /// </summary>
-            /// <param name="umbracoContext"></param>
-            /// <param name="content"></param>
-            /// <param name="properties"></param>
-            /// <returns></returns>
-            protected override List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties)
+            public ResolutionResult Resolve(ResolutionResult source)
             {
-                var result = base.MapProperties(umbracoContext, content, properties);
+                if (source.Value != null && (source.Value is IMember) == false)
+                    throw new AutoMapperMappingException(string.Format("Value supplied is of type {0} but expected {1}.\nChange the value resolver source type, or redirect the source value supplied to the value resolver using FromMember.", new object[]
+                    {
+                    source.Value.GetType(),
+                    typeof (IMember)
+                    }));
+                return source.New(
+                    //perform the mapping with the current umbraco context
+                    ResolveCore(source.Context.GetUmbracoContext(), (IMember)source.Value), typeof(IEnumerable<ContentPropertyDisplay>));
+            }
+
+            private IEnumerable<ContentPropertyBasic> ResolveCore(UmbracoContext umbracoContext, IMember content)
+            {
+                var result = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyBasic>>(
+                    // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
+                    content.Properties.OrderBy(prop => prop.PropertyType.SortOrder))
+                .ToList();
+
                 var member = (IMember)content;
                 var memberType = member.ContentType;
 
@@ -506,10 +520,8 @@ namespace Umbraco.Web.Models.Mapping
                     //check permissions for viewing sensitive data
                     if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                     {
-                        //mark this property as readonly so that it does not post any data
-                        prop.Readonly = true;
-                        //replace this editor with a sensitivevalue
-                        prop.View = "sensitivevalue";
+                        //mark this property as sensitive
+                        prop.IsSensitive = true;
                         //clear the value
                         prop.Value = null;
                     }

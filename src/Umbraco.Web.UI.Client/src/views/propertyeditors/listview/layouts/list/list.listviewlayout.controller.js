@@ -97,7 +97,7 @@
                             function (property) {
 
                                 if (option.alias === property.alias) {
-                                    option.isSensitive = property.view === "sensitivevalue" ? true : false;
+                                    option.isSensitive = property.isSensitive;
                                 }
 
                             });

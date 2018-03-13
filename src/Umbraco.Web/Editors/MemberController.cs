@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
                 var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize)
                 {
                     Items = members
-                        .Select(Mapper.Map<IMember, MemberBasic>)
+                        .Select(x => AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberBasic>(x, UmbracoContext))
                 };
                 return pagedResult;
             }
