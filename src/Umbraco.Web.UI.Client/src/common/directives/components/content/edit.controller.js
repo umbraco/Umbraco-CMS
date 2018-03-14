@@ -255,11 +255,9 @@
         else {
             $scope.save().then(function (data) {
                 previewWindow.location.href = redirect;
-            });    
+            });
         }
-
       }
-
     };
 
     $scope.restore = function (content) {

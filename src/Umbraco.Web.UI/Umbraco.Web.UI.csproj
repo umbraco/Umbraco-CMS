@@ -837,6 +837,18 @@
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap2-Fluid.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Background.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Border.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Color.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Googlefontpicker.cshtml" />
+    <Content Include="Umbraco\Views\Preview\GridRow.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Index.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Layout.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Margin.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Padding.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -994,7 +1006,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Umbraco\preview\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>

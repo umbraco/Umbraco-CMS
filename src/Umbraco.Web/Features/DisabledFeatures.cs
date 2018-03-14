@@ -22,8 +22,14 @@ namespace Umbraco.Web.Features
         public TypeList<UmbracoApiControllerBase> Controllers { get; private set; }
 
         /// <summary>
+        /// Disables the device preview feature of previewing.
+        /// </summary>
+        public bool DevicePreview { get; set; }
+        
+        /// <summary>
         /// If true, all references to templates will be removed in the back office and routing
         /// </summary>
         public bool DisableTemplates { get; set; }
+
     }
 }
