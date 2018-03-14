@@ -4,7 +4,7 @@
             class="alert alert-block alert-{{notification.type}} umb-notifications__notification animated -half-second fadeIn"
             ng-class="{'-no-border -extra-padding': notification.type === 'form'}">
 
-            <a class='close -align-right' hotkey="esc" ng-click="removeNotification($index)" prevent-default href>&times;</a>
+            <a class='close -align-right' ng-click="removeNotification($index)" prevent-default href>&times;</a>
 
             <div ng-if="notification.view">
                 <div ng-include="notification.view"></div>

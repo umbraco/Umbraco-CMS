@@ -130,6 +130,9 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             // in the description of this controller, it states that this value isn't actually used for persistence,
             // but we need to set it so that the editor and the server can detect that it's been changed, and it is used for validation.
             $scope.model.value = { selectedFiles: newVal.trimEnd(",") };
+
+            //need to explicity setDirty here as file upload field can't track dirty & we can't use the fileCount (hidden field/model)
+            $scope.propertyForm.$setDirty();
         });
     });
 

@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -52,7 +53,8 @@ namespace Umbraco.Web.Editors
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
-                {"isDebuggingEnabled", new string[] { }}
+                {"isDebuggingEnabled", new string[] { }},
+                {"features", new [] {"disabledFeatures"}}
             };
             //now do the filtering...
             var defaults = GetServerVariables();
@@ -81,7 +83,7 @@ namespace Umbraco.Web.Editors
 
             //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
             // so based on compat and how things are currently working we need to replace the serverVarsJs one
-            ((Dictionary<string, object>) defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
+            ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
 
             return defaults;
         }
@@ -328,6 +330,18 @@ namespace Umbraco.Web.Editors
                                 .ToArray()
                         }
                     }
+                },
+                {
+                    "features", new Dictionary<string,object>
+                    {
+                        {
+                            "disabledFeatures", new Dictionary<string,object>
+                            {
+                                { "disableTemplates", true/*FeaturesResolver.Current.Features.Disabled.DisableTemplates*/}
+                            }
+                        }
+
+                    }
                 }
             };
             return defaultVals;
@@ -352,9 +366,9 @@ namespace Umbraco.Web.Editors
                 .ToArray();
 
             return (from p in pluginTreesWithAttributes
-                let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
-                let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
-                select new Dictionary<string, string>
+                    let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
+                    let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
+                    select new Dictionary<string, string>
                 {
                     {"alias", treeAttr.Alias}, {"packageFolder", pluginAttr.AreaName}
                 }).ToArray();
@@ -376,9 +390,6 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private Dictionary<string, object> GetApplicationState()
         {
-            if (_applicationContext.IsConfigured == false)
-                return null;
-
             var app = new Dictionary<string, object>
             {
                 {"assemblyVersion", UmbracoVersion.AssemblyVersion}
@@ -386,7 +397,9 @@ namespace Umbraco.Web.Editors
 
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
-            app.Add("cacheBuster", string.Format("{0}.{1}", version, ClientDependencySettings.Instance.Version).GenerateHash());
+            //the value is the hash of the version, cdf version and the configured state
+            app.Add("cacheBuster", $"{version}.{_applicationContext.IsConfigured}.{ClientDependencySettings.Instance.Version}".GenerateHash());
+
             app.Add("version", version);
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially

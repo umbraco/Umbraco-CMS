@@ -445,7 +445,7 @@ function Restore-NuGet
   Write-Host ">> Restore NuGet"
   Write-Host "Logging to $tmp\nuget.restore.log" 
   
-  &$uenv.NuGet restore "$src\Umbraco.sln" > "$tmp\nuget.restore.log"
+  &$uenv.NuGet restore "$src\Umbraco.sln" -configfile "$src\NuGet.config" > "$tmp\nuget.restore.log"
 }
 
 #
