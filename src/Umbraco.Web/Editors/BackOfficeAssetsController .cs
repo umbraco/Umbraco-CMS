@@ -7,14 +7,14 @@ using Umbraco.Web.Mvc;
 namespace Umbraco.Web.Editors
 {
     [PluginController("UmbracoApi")]
-    public class MomentController : UmbracoAuthorizedJsonController
+    public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
     {
         
         [HttpGet]
-        public IEnumerable<string> GetSupportedLocales()
+        public IEnumerable<string> GetSupportedMomentLocales()
         {
             var momentLocaleFolder = "moment";
-            var fileSystem = FileSystemProviderManager.Current.LibFileSystem;
+            var fileSystem = FileSystemProviderManager.Current.JavaScriptLibraryFileSystem;
             var cultures = fileSystem.GetFiles(momentLocaleFolder, "*.js").ToList();
             for (var i = 0; i < cultures.Count(); i++)
             {

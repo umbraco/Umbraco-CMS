@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, momenthelperService) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, javascriptLibraryHelperService) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -281,31 +281,36 @@ angular.module('umbraco.services')
                 var deferred = $q.defer();
 
 
-                this.getCurrentUser()
-                    .then(function(user) {
-                        var locale = user.locale.toLowerCase();
-
-                        momenthelperService.getSupportedLocales().then(function(supportedLocales) {
-
-                            if (locale !== 'en-us') {
-                                var localeUrls = [];
-                                if (supportedLocales.indexOf(locale + '.js') > -1) {
-                                    localeUrls.push('lib/moment/' + locale + '.js');
-                                }
-                                if (locale.indexOf('-') > -1) {
-                                    var majorLocale = locale.split('-')[0] + '.js';
-                                    if (supportedLocales.indexOf(majorLocale) > -1) {
-                                        localeUrls.push('lib/moment/' + majorLocale);
-                                    }
-                                }
-                                assetsService.load(localeUrls).then(function() {
-                                    deferred.resolve(localeUrls);
-                                });
-                            } else {
-                                deferred.resolve(['']);
+                function loadLocales(currentUser, supportedLocales) {
+                    var locale = currentUser.locale.toLowerCase();
+                    if (locale !== 'en-us') {
+                        var localeUrls = [];
+                        if (supportedLocales.indexOf(locale + '.js') > -1) {
+                            localeUrls.push('lib/moment/' + locale + '.js');
+                        }
+                        if (locale.indexOf('-') > -1) {
+                            var majorLocale = locale.split('-')[0] + '.js';
+                            if (supportedLocales.indexOf(majorLocale) > -1) {
+                                localeUrls.push('lib/moment/' + majorLocale);
                             }
+                        }
+                        assetsService.load(localeUrls).then(function () {
+                            deferred.resolve(localeUrls);
                         });
-                    });
+                    } else {
+                        deferred.resolve(['']);
+                    }
+                }
+
+                var promises = {
+                    currentUser: this.getCurrentUser(),
+                    supportedLocales: javascriptLibraryHelperService.getSupportedLocalesForMoment()
+                }
+
+                $q.all(promises).then((values) => {
+                    loadLocales(values.currentUser, values.supportedLocales);
+                });
+                
                 return deferred.promise;
 
             },

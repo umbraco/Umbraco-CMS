@@ -1,19 +1,19 @@
 ﻿(function () {
     'use strict';
 
-    function momenthelperService($q, $http, umbRequestHelper) {
+    function javascriptLibraryHelperService($q, $http, umbRequestHelper) {
 
         var existingLocales = [];
 
-        function getSupportedLocales() {
+        function getSupportedLocalesForMoment() {
             var deferred = $q.defer();
 
             if (existingLocales.length === 0) {
                 umbRequestHelper.resourcePromise(
                     $http.get(
                         umbRequestHelper.getApiUrl(
-                            "momentApiBaseUrl",
-                            "GetSupportedLocales")),
+                            "backOfficeAssetsApiBaseUrl",
+                            "GetSupportedMomentLocales")),
                     'Failed to get cultures').then(function(locales) {
                     existingLocales = locales;
                     deferred.resolve(existingLocales);
@@ -26,14 +26,14 @@
         }
 
         var service = {
-            getSupportedLocales: getSupportedLocales
+            getSupportedLocalesForMoment: getSupportedLocalesForMoment
         };
 
         return service;
 
     }
 
-    angular.module('umbraco.services').factory('momenthelperService', momenthelperService);
+    angular.module('umbraco.services').factory('javascriptLibraryHelperService', javascriptLibraryHelperService);
 
 
 })();
