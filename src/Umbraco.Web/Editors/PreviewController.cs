@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml");
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         [AllowAnonymous]
