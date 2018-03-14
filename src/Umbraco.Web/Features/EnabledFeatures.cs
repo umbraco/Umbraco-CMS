@@ -7,8 +7,11 @@ namespace Umbraco.Web.Features
     {
         
         /// <summary>
-        /// This allows us to inject html into the preview function extending the view with custom data.
+        /// This allows us to inject a razor view into the Umbraco preview view to extend it
         /// </summary>
-        public string ExtendPreviewHtml { get; set; }
+        /// <remarks>
+        /// This is set to a virtual path of a razor view file
+        /// </remarks>
+        public string PreviewExtendedView { get; set; }
     }
 }

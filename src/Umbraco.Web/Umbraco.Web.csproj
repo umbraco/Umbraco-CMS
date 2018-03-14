@@ -334,6 +334,7 @@
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
+    <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />

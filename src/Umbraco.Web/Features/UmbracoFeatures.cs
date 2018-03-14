@@ -14,6 +14,7 @@ namespace Umbraco.Web.Features
         public UmbracoFeatures()
         {
             Disabled = new DisabledFeatures();
+            Enabled = new EnabledFeatures();
         }
         
         /// <summary>

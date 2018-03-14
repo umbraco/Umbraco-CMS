@@ -24,7 +24,7 @@ namespace Umbraco.Web.Features
         /// <summary>
         /// Disables the device preview feature of previewing.
         /// </summary>
-        public bool DevicePreview { get; set; }
+        public bool DisableDevicePreview { get; set; }
         
         /// <summary>
         /// If true, all references to templates will be removed in the back office and routing
