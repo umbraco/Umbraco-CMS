@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Features;
 using Umbraco.Web.Mvc;
 
@@ -9,8 +11,7 @@ namespace Umbraco.Web.Editors
     [DisableBrowserCache]
     public class PreviewController : Controller
     {
-        private const string ViewsPath = "~/Umbraco/Views/Preview/";
-
+        
         public ActionResult Index()
         {
             ViewData["DisableDevicePreview"] = FeaturesResolver.Current.Features.Disabled.DevicePreview;
@@ -18,14 +19,14 @@ namespace Umbraco.Web.Editors
             {
                 ViewData["ExtendPreviewHtml"] = FeaturesResolver.Current.Features.Enabled.ExtendPreviewHtml;
             }
-            return View(ViewsPath + "Index.cshtml");
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml");
         }
 
         [AllowAnonymous]
         public ActionResult Editors(string editor)
         {
             if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException("editor");
-            return View(ViewsPath + editor.Replace(".html", string.Empty) + ".cshtml");
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
         }
     }
 }
