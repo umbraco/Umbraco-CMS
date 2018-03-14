@@ -18,15 +18,15 @@ namespace Umbraco.Web.Editors
             var model = new BackOfficePreview
             {
                 DisableDevicePreview = FeaturesResolver.Current.Features.Disabled.DisableDevicePreview,
-                PreviewExtendedView = FeaturesResolver.Current.Features.Enabled.PreviewExtendedView
+                PreviewExtendedHeaderView = FeaturesResolver.Current.Features.Enabled.PreviewExtendedView
             };
 
-            if (model.PreviewExtendedView.IsNullOrWhiteSpace() == false)
+            if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
-                var viewEngineResult = ViewEngines.Engines.FindPartialView(ControllerContext, model.PreviewExtendedView);
+                var viewEngineResult = ViewEngines.Engines.FindPartialView(ControllerContext, model.PreviewExtendedHeaderView);
                 if (viewEngineResult.View == null)
                 {
-                    throw new InvalidOperationException("Could not find the view " + model.PreviewExtendedView + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
+                    throw new InvalidOperationException("Could not find the view " + model.PreviewExtendedHeaderView + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
                 }
             }
 
