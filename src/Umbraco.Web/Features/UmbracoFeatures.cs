@@ -14,6 +14,7 @@ namespace Umbraco.Web.Features
         public UmbracoFeatures()
         {
             Disabled = new DisabledFeatures();
+            Enabled = new EnabledFeatures();
         }
 
         // note
@@ -27,11 +28,16 @@ namespace Umbraco.Web.Features
         /// Gets the disabled features.
         /// </summary>
         public DisabledFeatures Disabled { get; set; }
-        
+
         /// <summary>
-        /// Determines whether a controller is enabled.
+        /// Gets the enabled features.
         /// </summary>
-        public bool IsControllerEnabled(Type feature)
+        public EnabledFeatures Enabled { get; set; }
+
+        /// <summary>
+        /// Determines whether a feature is enabled.
+        /// </summary>
+        public bool IsEnabled(Type feature)
         {
             if (typeof(UmbracoApiControllerBase).IsAssignableFrom(feature))
                 return Disabled.Controllers.Contains(feature) == false;
