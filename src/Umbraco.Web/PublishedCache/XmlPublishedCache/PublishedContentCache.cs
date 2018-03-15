@@ -351,8 +351,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         // populate the idkmap by indexing the content cache
         // assuming that the content cache cannot be corrupted
-        // PROBLEM: still, the idk map on-demand will do a DB lookup, is it bad?
-        // OR should we register PROVIDERS for the map FFS what a mess
         private void EnsureIdkMap(UmbracoContext umbracoContext)
         {
             lock (_idkMapLocker)

@@ -74,7 +74,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, Guid nodeKey)
         {
-            // fixme optimize with Lucene and stuff?
+            // TODO optimize with Examine?
             var mapAttempt = ApplicationContext.Current.Services.IdkMap.GetIdForKey(nodeKey, UmbracoObjectTypes.Media);
             return mapAttempt ? GetById(umbracoContext, preview, mapAttempt.Result) : null;
         }
