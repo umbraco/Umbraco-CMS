@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Models;
@@ -29,23 +30,64 @@ namespace Umbraco.Core.Services
         //   to another id
         //
         // - LeeK's solution in 7.7 was to look for the id/guid in the content cache "on demand" via
-        //   XPath, which is probably fast enough but cannot deal with media ids
+        //   XPath, which is probably fast enough but cannot deal with media ids + it maintains a
+        //   separate, duplicate cache
         //   see https://github.com/umbraco/Umbraco-CMS/pull/2398
         //
         // - Andy's solution in a package was to prefetch all by sql; it cannot prefecth reserved ids
-        //   as we don't know the corresponding object type, but that's not a big issue
+        //   as we don't know the corresponding object type, but that's not a big issue - but then we
+        //   have a full database query on startup
         //   see https://github.com/AndyButland/UmbracoUdiToIdCache
         //
         // - the original IdkMap implementation that was used by services, did a database lookup on
         //   each cache miss, which is fine enough for services, but would be really slow at content
-        //   cache level - so this implementation prefetches all document and media ids
-        //
-        // - and this implementation works for document and media ids
+        //   cache level
         //
         // - cache is cleared by MediaCacheRefresher, UnpublishedPageCacheRefresher, and other
         //   refreshers - because id/guid map is unique, we only clear to avoid leaking memory, 'cos
         //   we don't risk caching obsolete values - and only when actually deleting
+        //
+        // so...
+        //
+        // - there's a single caching point, and it's idkMap
+        // - there are no "helper methods" - the published content cache itself knows about Guids
+        // - when the published content cache is instanciated, it populates the idkMap with what it knows
+        //   and it registers a way for the idkMap to look for id/keys in the published content cache
+        // - we do NOT prefetch anything from database
+        // - when a request comes in:
+        //   the published content cache uses the idkMap to map id/key
+        //   if the idkMap already knows about the map, it returns the value
+        //   else it tries the published cache via XPath
+        //   else it hits the database
 
+
+        private readonly ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)> _dictionary
+            = new ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)>();
+
+        internal void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id)
+        {
+            _dictionary[umbracoObjectType] = (id2key, key2id);
+        }
+
+        internal void Set(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
+        {
+            try
+            {
+                _locker.EnterWriteLock();
+                foreach (var pair in pairs)
+                {
+                    _id2Key.Add(pair.id, new TypedId<Guid>(pair.key, umbracoObjectType));
+                    _key2Id.Add(pair.key, new TypedId<int>(pair.id, umbracoObjectType));
+                }
+            }
+            finally
+            {
+                if (_locker.IsWriteLockHeld)
+                    _locker.ExitWriteLock();
+            }
+        }
+
+#if POPULATE_FROM_DATABASE
         private void PopulateLocked()
         {
             // don't if not empty
@@ -58,7 +100,7 @@ namespace Umbraco.Core.Services
                 var values = uow.Database.Fetch<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
                 foreach (var value in values)
                 {
-                    UmbracoObjectTypes umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(value.NodeObjectType);
+                    var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(value.NodeObjectType);
                     _id2Key.Add(value.Id, new TypedId<Guid>(value.UniqueId, umbracoObjectType));
                     _key2Id.Add(value.UniqueId, new TypedId<int>(value.Id, umbracoObjectType));
                 }
@@ -103,6 +145,7 @@ namespace Umbraco.Core.Services
                     _locker.ExitReadLock();
             }
         }
+#endif
 
         public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
         {
@@ -120,28 +163,37 @@ namespace Umbraco.Core.Services
                     _locker.ExitReadLock();
             }
 
+#if POPULATE_FROM_DATABASE
             // if cache is empty and looking for a document or a media,
             // populate the cache at once and return what we found
             if (empty && (umbracoObjectType == UmbracoObjectTypes.Document || umbracoObjectType == UmbracoObjectTypes.Media))
                 return PopulateAndGetIdForKey(key, umbracoObjectType);
+#endif
 
             // optimize for read speed: reading database outside a lock means that we could read
             // multiple times, but we don't lock the cache while accessing the database = better
 
-            int? val;
-            using (var uow = _uowProvider.GetUnitOfWork())
+            int? val = null;
+
+            if (_dictionary.TryGetValue(umbracoObjectType, out var mappers))
+                if ((val = mappers.key2id(key)) == default(int)) val = null;
+
+            if (val == null)
             {
-                //if it's unknown don't include the nodeObjectType in the query
-                if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+                using (var uow = _uowProvider.GetUnitOfWork())
                 {
-                    val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
+                    //if it's unknown don't include the nodeObjectType in the query
+                    if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+                    {
+                        val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
+                    }
+                    else
+                    {
+                        val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                    }
+                    uow.Commit();
                 }
-                else
-                {
-                    val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                        new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
-                }
-                uow.Commit();
             }
 
             if (val == null) return Attempt<int>.Fail();
@@ -199,28 +251,37 @@ namespace Umbraco.Core.Services
                     _locker.ExitReadLock();
             }
 
+#if POPULATE_FROM_DATABASE
             // if cache is empty and looking for a document or a media,
             // populate the cache at once and return what we found
             if (empty && (umbracoObjectType == UmbracoObjectTypes.Document || umbracoObjectType == UmbracoObjectTypes.Media))
                 return PopulateAndGetKeyForId(id, umbracoObjectType);
+#endif
 
             // optimize for read speed: reading database outside a lock means that we could read
             // multiple times, but we don't lock the cache while accessing the database = better
 
-            Guid? val;
-            using (var uow = _uowProvider.GetUnitOfWork())
+            Guid? val = null;
+
+            if (_dictionary.TryGetValue(umbracoObjectType, out var mappers))
+                if ((val = mappers.id2key(id)) == default(Guid)) val = null;
+
+            if (val == null)
             {
-                //if it's unknown don't include the nodeObjectType in the query
-                if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+                using (var uow = _uowProvider.GetUnitOfWork())
                 {
-                    val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
+                    //if it's unknown don't include the nodeObjectType in the query
+                    if (umbracoObjectType == UmbracoObjectTypes.Unknown)
+                    {
+                        val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
+                    }
+                    else
+                    {
+                        val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                    }
+                    uow.Commit();
                 }
-                else
-                {
-                    val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                        new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
-                }
-                uow.Commit();
             }
 
             if (val == null) return Attempt<Guid>.Fail();
