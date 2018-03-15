@@ -270,6 +270,10 @@ namespace Umbraco.Web.Editors
                         {
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
+                        },
+                        {
+                            "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
+                                controller => controller.GetSupportedMomentLocales())
                         }
                     }
                 },
