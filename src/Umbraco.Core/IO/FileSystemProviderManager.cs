@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Configuration;
@@ -26,6 +27,7 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _xsltFileSystem;
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
+        private ShadowWrapper _javaScriptLibraryFileSystem;
 
         #region Singleton & Constructor
 
@@ -113,6 +115,7 @@ namespace Umbraco.Core.IO
             var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
+            var javaScriptLibraryFileSystem = new PhysicalFileSystem(Path.Combine(SystemDirectories.Umbraco, "lib"));
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", ScopeProvider);
@@ -123,6 +126,7 @@ namespace Umbraco.Core.IO
             _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", ScopeProvider);
             _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", ScopeProvider);
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", ScopeProvider);
+            _javaScriptLibraryFileSystem = new ShadowWrapper(javaScriptLibraryFileSystem, "Lib", ScopeProvider);
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
@@ -143,6 +147,7 @@ namespace Umbraco.Core.IO
         public IFileSystem2 XsltFileSystem { get { return _xsltFileSystem; } }
         public IFileSystem2 MasterPagesFileSystem { get { return _mvcViewsFileSystem; } }
         public IFileSystem2 MvcViewsFileSystem { get { return _mvcViewsFileSystem; } }
+        internal IFileSystem2 JavaScriptLibraryFileSystem { get { return _javaScriptLibraryFileSystem; } }
         public MediaFileSystem MediaFileSystem { get; private set; }
 
         #endregion
