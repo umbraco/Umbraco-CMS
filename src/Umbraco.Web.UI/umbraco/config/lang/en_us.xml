@@ -229,6 +229,7 @@
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
         <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
+        <key alias="isSensitiveValue_short">This value is hidden.</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -660,7 +661,20 @@
         <key alias="yellow">Yellow</key>
         <key alias="orange">Orange</key>
         <key alias="blue">Blue</key>
+        <key alias="bluegrey">Blue Grey</key>
+        <key alias="grey">Grey</key>
+        <key alias="brown">Brown</key>
+        <key alias="lightblue">Light Blue</key>
+        <key alias="cyan">Cyan</key>
+        <key alias="lightgreen">Light Green</key>
+        <key alias="lime">Lime</key>
+        <key alias="amber">Amber</key>
+        <key alias="deeporange">Deep Orange</key>
         <key alias="red">Red</key>
+        <key alias="pink">Pink</key>
+        <key alias="purple">Purple</key>
+        <key alias="deeppurple">Deep Purple</key>
+        <key alias="indigo">Indigo</key>
     </area>
     <area alias="shortcuts">
         <key alias="addTab">Add tab</key>

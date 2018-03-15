@@ -661,7 +661,7 @@
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
     <key alias="bold">Fed</key>
-    <key alias="color">Tekst farve</key>
+    <key alias="color">Tekstfarve</key>
     <key alias="font">Skrifttype</key>
     <key alias="text">Tekst</key>
   </area>
@@ -1259,9 +1259,9 @@ Mange hilsner fra Umbraco robotten
 
 
     <key alias="styles">Typografi</key>
-    <key alias="stylesDetails">Vælg, hvilke typografiværdier, en redaktør kan ændre</key>
+    <key alias="stylesDetails">Vælg hvilke typografiværdier en redaktør kan ændre</key>
 
-    <key alias="settingDialogDetails">Indstillinger gemmes kun, hvis den indtaste json-konfiguration er gyldig</key>
+    <key alias="settingDialogDetails">Indstillinger gemmes kun, hvis den indtastede json-konfiguration er gyldig</key>
 
     <key alias="allowAllEditors">Tillad alle editorer</key>
     <key alias="allowAllRowConfigurations">Tillad alle rækkekonfigurationer</key>
@@ -1272,7 +1272,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areAdded">er tilføjet</key>
 
     <key alias="maxItems">Maksimalt emner</key>
-    <key alias="maxItemsDescription">Efterlad blank eller sat til 0 ubegrænset for</key>
+    <key alias="maxItemsDescription">Efterlad blank eller sæt til 0 for ubegrænset</key>
 
   </area>
   <area alias="contentTypeEditor">
@@ -1282,7 +1282,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addNewTab">Tilføj ny fane</key>
     <key alias="addAnotherTab">Tilføj endnu en fane</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
-    <key alias="addProperty">Tilføj property</key>
+    <key alias="addProperty">Tilføj egenskab</key>
     <key alias="requiredLabel">Påkrævet label</key>
 
     <key alias="enableListViewHeading">Aktiver listevisning</key>
@@ -1473,7 +1473,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="noLogin">har endnu ikke logget ind</key>
     <key alias="oldPassword">Gammelt kodeord</key>
     <key alias="password">Adgangskode</key>
-    <key alias="removePhoto">Fjern billede</key>
     <key alias="resetPassword">Nulstil kodeord</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
