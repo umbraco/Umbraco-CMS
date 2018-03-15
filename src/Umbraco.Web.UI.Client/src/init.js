@@ -18,26 +18,23 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
         eventsService.on("app.authenticated", function(evt, data) {
             
             assetsService._loadInitAssets().then(function() {
-
-                // Loads the user's locale settings for Moment.
-                userService.loadMomentLocaleForCurrentUser().then(function() {
-
-                    //Register all of the tours on the server
-                    tourService.registerAllTours().then(function () {
-                        appReady(data);
-                        
-                        // Auto start intro tour
-                        tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
-                            // start intro tour if it hasn't been completed or disabled
-                            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                                tourService.startTour(introTour);
-                            }
-                        });
-
-                    }, function(){
-                        appReady(data);
+                
+                //Register all of the tours on the server
+                tourService.registerAllTours().then(function () {
+                    appReady(data);
+                    
+                    // Auto start intro tour
+                    tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+                        // start intro tour if it hasn't been completed or disabled
+                        if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                            tourService.startTour(introTour);
+                        }
                     });
+
+                }, function(){
+                    appReady(data);
                 });
+
             });
 
         });
