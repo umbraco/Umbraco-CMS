@@ -1,7 +1,7 @@
 ﻿(function () {
-    'use strict';
+    "use strict";
 
-    function javascriptLibraryHelperService($q, $http, umbRequestHelper) {
+    function javascriptLibraryService($q, $http, umbRequestHelper) {
 
         var existingLocales = [];
 
@@ -14,7 +14,7 @@
                         umbRequestHelper.getApiUrl(
                             "backOfficeAssetsApiBaseUrl",
                             "GetSupportedMomentLocales")),
-                    'Failed to get cultures').then(function(locales) {
+                    "Failed to get cultures").then(function(locales) {
                     existingLocales = locales;
                     deferred.resolve(existingLocales);
                 });
@@ -30,11 +30,8 @@
         };
 
         return service;
-
     }
 
-    angular.module('umbraco.services').factory('javascriptLibraryHelperService', javascriptLibraryHelperService);
-
+    angular.module("umbraco.services").factory("javascriptLibraryService", javascriptLibraryService);
 
 })();
-
