@@ -307,7 +307,7 @@ angular.module('umbraco.services')
                     supportedLocales: javascriptLibraryService.getSupportedLocalesForMoment()
                 }
 
-                $q.all(promises).then((values) => {
+                $q.all(promises).then(function (values) {
                     loadLocales(values.currentUser, values.supportedLocales);
                 });
                 
