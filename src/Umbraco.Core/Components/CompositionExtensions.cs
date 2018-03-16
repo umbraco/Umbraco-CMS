@@ -67,8 +67,8 @@ namespace Umbraco.Core.Components
         /// Gets the validators collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        internal static ManifestValidatorCollectionBuilder Validators(this Composition composition)
-            => composition.Container.GetInstance<ManifestValidatorCollectionBuilder>();
+        internal static ManifestValueValidatorCollectionBuilder Validators(this Composition composition)
+            => composition.Container.GetInstance<ManifestValueValidatorCollectionBuilder>();
 
         /// <summary>
         /// Gets the post-migrations collection builder.

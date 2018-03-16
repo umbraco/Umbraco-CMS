@@ -74,7 +74,7 @@ namespace Umbraco.Core.Manifest
             // explicitely assign a value editor of type ValueEditor
             // (else the deserializer will try to read it before setting it)
             // (and besides it's an interface)
-            target.ValueEditor = new DataValueEditor();
+            target.ExplicitValueEditor = new DataValueEditor();
 
             // in the manifest, validators are a simple dictionary eg
             // {
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Manifest
                 // explicitely assign a configuration editor of type ConfigurationEditor
                 // (else the deserializer will try to read it before setting it)
                 // (and besides it's an interface)
-                target.ConfigurationEditor = new ConfigurationEditor();
+                target.ExplicitConfigurationEditor = new ConfigurationEditor();
 
                 // see note about validators, above - same applies to field validators
                 if (config["fields"] is JArray jarray)
@@ -135,7 +135,7 @@ namespace Umbraco.Core.Manifest
             if (jobject.Property("view") != null)
             {
                 // explicitely assign a value editor of type ParameterValueEditor
-                target.ValueEditor = new DataValueEditor();
+                target.ExplicitValueEditor = new DataValueEditor();
 
                 // move the 'view' property
                 jobject["editor"] = new JObject { ["view"] = jobject["view"] };
@@ -157,8 +157,8 @@ namespace Umbraco.Core.Manifest
             foreach (var v in validation)
             {
                 var key = v.Key;
-                var val = v.Value?.Type == JTokenType.Boolean ? string.Empty : v.Value;
-                var jo = new JObject { { "type", key }, { "config", val } };
+                var val = v.Value;
+                var jo = new JObject { { "type", key }, { "configuration", val } };
                 jarray.Add(jo);
             }
 

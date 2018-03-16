@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
             Validators.Add(new DateTimeValidator());
         }
 
-        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService)
         {
             var date = property.GetValue().TryConvertTo<DateTime?>();
             if (date.Success == false || date.Result == null)

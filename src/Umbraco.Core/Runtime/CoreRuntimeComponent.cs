@@ -59,10 +59,10 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<ManifestParser>();
 
             // register our predefined validators
-            composition.Container.RegisterCollectionBuilder<ManifestValidatorCollectionBuilder>()
-                .Add<RequiredManifestValueValidator>()
+            composition.Container.RegisterCollectionBuilder<ManifestValueValidatorCollectionBuilder>()
+                .Add<RequiredValidator>()
                 .Add<RegexValidator>()
-                .Add<DelimitedManifestValueValidator>()
+                .Add<DelimitedValueValidator>()
                 .Add<EmailValidator>()
                 .Add<IntegerValidator>()
                 .Add<DecimalValidator>();

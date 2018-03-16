@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
@@ -116,35 +118,48 @@ namespace Umbraco.Core.PropertyEditors
         [JsonProperty("valueType")]
         public string ValueType { get; set; }
 
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(object value, bool required, string format)
+        {
+            List<ValidationResult> results = null;
+            var r = Validators.SelectMany(v => v.Validate(value, ValueType, Configuration)).ToList();
+            if (r.Any()) { results = r; }
+
+            // mandatory and regex validators cannot be part of valueEditor.Validators because they
+            // depend on values that are not part of the configuration, .Mandatory and .ValidationRegEx,
+            // so they have to be explicitely invoked here.
+
+            if (required)
+            {
+                r = RequiredValidator.ValidateRequired(value, ValueType).ToList();
+                if (r.Any()) { if (results == null) results = r; else results.AddRange(r); }
+            }
+
+            var stringValue = value?.ToString();
+            if (!string.IsNullOrWhiteSpace(format) && !string.IsNullOrWhiteSpace(stringValue))
+            {
+                r = FormatValidator.ValidateFormat(value, ValueType, format).ToList();
+                if (r.Any()) { if (results == null) results = r; else results.AddRange(r); }
+            }
+
+            return results ?? Enumerable.Empty<ValidationResult>();
+        }
+
         /// <summary>
         /// A collection of validators for the pre value editor
         /// </summary>
         [JsonProperty("validation")]
         public List<IValueValidator> Validators { get; private set; }
 
-        // fixme - need to explain and understand these two + what is "overridable pre-values"
+        /// <summary>
+        /// Gets the validator used to validate the special property type -level "required".
+        /// </summary>
+        public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator();
 
         /// <summary>
-        /// Returns the validator used for the required field validation which is specified on the PropertyType
+        /// Gets the validator used to validate the special property type -level "format".
         /// </summary>
-        /// <remarks>
-        /// This will become legacy as soon as we implement overridable pre-values.
-        ///
-        /// The default validator used is the RequiredValueValidator but this can be overridden by property editors
-        /// if they need to do some custom validation, or if the value being validated is a json object.
-        /// </remarks>
-        public virtual ManifestValidator RequiredValidator => new RequiredManifestValueValidator();
-
-        /// <summary>
-        /// Returns the validator used for the regular expression field validation which is specified on the PropertyType
-        /// </summary>
-        /// <remarks>
-        /// This will become legacy as soon as we implement overridable pre-values.
-        ///
-        /// The default validator used is the RegexValueValidator but this can be overridden by property editors
-        /// if they need to do some custom validation, or if the value being validated is a json object.
-        /// </remarks>
-        public virtual ManifestValidator RegexValidator => new RegexValidator();
+        public virtual IValueFormatValidator FormatValidator => new RegexValidator();
 
         /// <summary>
         /// If this is is true than the editor will be displayed full width without a label
@@ -229,7 +244,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
         /// value to the DB will fail when it tries to validate the value type.
         /// </remarks>
-        public virtual object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+        public virtual object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             //if it's json but it's empty json, then return null
             if (ValueType.InvariantEquals(ValueTypes.Json) && editorValue.Value != null && editorValue.Value.ToString().DetectIsEmptyJson())
@@ -257,7 +272,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public virtual object ToEditor(Property property, IDataTypeService dataTypeService)
         {
             if (property.GetValue() == null) return string.Empty;
 

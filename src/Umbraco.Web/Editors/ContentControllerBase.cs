@@ -82,7 +82,7 @@ namespace Umbraco.Web.Editors
 
                 // get the value editor
                 // nothing to save/map if it is readonly
-                var valueEditor = propertyDto.PropertyEditor.ValueEditor;
+                var valueEditor = propertyDto.PropertyEditor.GetValueEditor();
                 if (valueEditor.IsReadOnly) continue;
 
                 // get the property
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Editors
                 };
 
                 // let the editor convert the value that was received, deal with files, etc
-                var value = valueEditor.ConvertEditorToDb(data, property.GetValue());
+                var value = valueEditor.FromEditor(data, property.GetValue());
 
                 // set the value - tags are special
                 var tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();

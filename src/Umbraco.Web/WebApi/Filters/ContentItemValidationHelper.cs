@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -117,64 +114,23 @@ namespace Umbraco.Web.WebApi.Filters
             foreach (var p in postedItem.ContentDto.Properties)
             {
                 var editor = p.PropertyEditor;
+
                 if (editor == null)
                 {
-                    var message = string.Format("The property editor with alias: {0} was not found for property with id {1}", p.DataType.EditorAlias, p.Id);
+                    var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
                     Current.Logger.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
                     //actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                     //return false;
                     continue;
                 }
 
-                //get the posted value for this property
+                // get the posted value
                 var postedValue = postedItem.Properties.Single(x => x.Alias == p.Alias).Value;
 
-                //get the pre-values for this property
-                var preValues = p.DataType.Configuration;
-
-                // fixme what does this mean?
-                //TODO: when we figure out how to 'override' certain pre-value properties we'll either need to:
-                // * Combine the preValues with the overridden values stored with the document type property (but how to combine?)
-                // * Or, pass in the overridden values stored with the doc type property separately
-
-                foreach (var result in editor.ValueEditor.Validators.SelectMany(v => v.Validate(postedValue, editor.ValueEditor.ValueType, preValues)))
-                {
-                    actionContext.ModelState.AddPropertyError(result, p.Alias);
-                }
-
-                //Now we need to validate the property based on the PropertyType validation (i.e. regex and required)
-                // NOTE: These will become legacy once we have pre-value overrides.
-                if (p.IsRequired)
-                {
-                    foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, editor.ValueEditor.ValueType, preValues, null))
-                    {
-                        actionContext.ModelState.AddPropertyError(result, p.Alias);
-                    }
-                }
-
-                if (p.ValidationRegExp.IsNullOrWhiteSpace() == false)
-                {
-
-                    //We only want to execute the regex statement if:
-                    // * the value is null or empty AND it is required OR
-                    // * the value is not null or empty
-                    //See: http://issues.umbraco.org/issue/U4-4669
-
-                    var asString = postedValue as string;
-
-                    if (
-                        //Value is not null or empty
-                        (postedValue != null && asString.IsNullOrWhiteSpace() == false)
-                        //It's required
-                        || (p.IsRequired))
-                    {
-                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, null, preValues, p.ValidationRegExp))
-                        {
-                            actionContext.ModelState.AddPropertyError(result, p.Alias);
-                        }
-                    }
-
-                }
+                // validate
+                var valueEditor = editor.GetValueEditor(p.DataType.Configuration);
+                foreach (var r in valueEditor.Validate(postedValue, p.IsRequired, p.ValidationRegExp))
+                    actionContext.ModelState.AddPropertyError(r, p.Alias);
             }
 
             return actionContext.ModelState.IsValid;

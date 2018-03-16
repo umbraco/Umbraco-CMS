@@ -126,7 +126,7 @@ namespace Umbraco.Web.Models.Mapping
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
                     Label = localizedText.Localize("content/documentType"),
                     Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
-                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].ValueEditor.View
+                    View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].GetValueEditor().View
                 },
                 new ContentPropertyDisplay
                 {
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/releaseDate"),
                     Value = display.ReleaseDate?.ToIsoString(),
                     //Not editible for people without publish permission (U4-287)
-                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].ValueEditor.View,
+                    View =  display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].GetValueEditor().View,
                     Config = new Dictionary<string, object>
                     {
                         {"offsetTime", "1"}
@@ -147,7 +147,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = localizedText.Localize("content/unpublishDate"),
                     Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                     //Not editible for people without publish permission (U4-287)
-                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].ValueEditor.View,
+                    View = display.AllowedActions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)) ? "datepicker"  : Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].GetValueEditor().View,
                     Config = new Dictionary<string, object>
                     {
                         {"offsetTime", "1"}

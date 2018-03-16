@@ -57,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
             //store the current props to append to the newly inserted ones
             var currProps = genericProps.Properties.ToArray();
 
-            var labelEditor = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].ValueEditor.View;
+            var labelEditor = Current.PropertyEditors[Constants.PropertyEditors.Aliases.NoEdit].GetValueEditor().View;
 
             var contentProps = new List<ContentPropertyDisplay>
             {
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Models.Mapping
                 IsActive = true
             };
 
-            var listViewConfig = editor.ConfigurationEditor.ToConfigurationEditor(dt.Configuration);
+            var listViewConfig = editor.GetConfigurationEditor().ToConfigurationEditor(dt.Configuration);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
 
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Models.Mapping
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
                 Label = "",
                 Value = null,
-                View = editor.ValueEditor.View,
+                View = editor.GetValueEditor().View,
                 HideLabel = true,
                 Config = listViewConfig
             });

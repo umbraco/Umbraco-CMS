@@ -36,6 +36,7 @@ using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Editors
 {
@@ -481,7 +482,7 @@ namespace Umbraco.Web.Editors
             //      a message indicating this
             if (ModelState.IsValid == false)
             {
-                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
+                if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem)
                     && (contentItem.Action == ContentSaveAction.SaveNew))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!

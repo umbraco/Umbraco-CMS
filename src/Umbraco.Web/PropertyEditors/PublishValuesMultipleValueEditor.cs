@@ -72,9 +72,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="propertyType"></param>
         /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService)
         {
-            var delimited = base.ConvertDbToEditor(property, propertyType, dataTypeService).ToString();
+            var delimited = base.ToEditor(property, dataTypeService).ToString();
             return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
@@ -85,7 +85,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
-        public override object ConvertEditorToDb(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+        public override object FromEditor(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
         {
             var json = editorValue.Value as JArray;
             if (json == null)

@@ -20,7 +20,6 @@ namespace Umbraco.Core.PropertyEditors
     {
         private IDictionary<string, object> _defaultConfiguration;
         private IDataValueEditor _valueEditorAssigned;
-        private IConfigurationEditor _configurationEditorAssigned;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
@@ -82,49 +81,67 @@ namespace Umbraco.Core.PropertyEditors
 
         /// <inheritdoc />
         /// <remarks>
-        /// <para>If an instance of a value editor is assigned to the property,
-        /// then this instance is returned when getting the property value. Otherwise, a
-        /// new instance is created by CreateValueEditor.</para>
+        /// <para>If an explicit value editor has been assigned, then this explicit
+        /// instance is returned. Otherwise, a new instance is created by CreateValueEditor.</para>
         /// <para>The instance created by CreateValueEditor is not cached, i.e.
         /// a new instance is created each time the property value is retrieved. The
         /// property editor is a singleton, and the value editor cannot be a singleton
         /// since it depends on the datatype configuration.</para>
         /// <para>Technically, it could be cached by datatype but let's keep things
         /// simple enough for now.</para>
-        /// <para>The property is *not* marked with json ObjectCreationHandling = ObjectCreationHandling.Replace,
-        /// so by default the deserializer will first try to read it before assigning it, which is why
-        /// all deserialization *should* set the property before anything (see manifest deserializer).</para>
         /// </remarks>
-        [JsonProperty("editor")]
-        public IDataValueEditor ValueEditor
-        {
-            // create a new value editor each time - the property editor can be a
-            // singleton, but the value editor will get a configuration which depends
-            // on the datatype, so it cannot be a singleton really
-            get => CreateValueEditor();
-            set => _valueEditorAssigned = value;
-        }
+        // fixme point of that one? shouldn't we always configure?
+        public IDataValueEditor GetValueEditor() => ExplicitValueEditor ?? CreateValueEditor();
 
         /// <inheritdoc />
         /// <remarks>
-        /// <para>If an instance of a configuration editor is assigned to the property,
-        /// then this instance is returned when getting the property value. Otherwise, a
-        /// new instance is created by CreateConfigurationEditor.</para>
-        /// <para>The instance created by CreateConfigurationEditor is not cached, i.e.
+        /// <para>If an explicit value editor has been assigned, then this explicit
+        /// instance is returned. Otherwise, a new instance is created by CreateValueEditor,
+        /// and configured with the configuration.</para>
+        /// <para>The instance created by CreateValueEditor is not cached, i.e.
         /// a new instance is created each time the property value is retrieved. The
-        /// property editor is a singleton, and although the configuration editor could
-        /// technically be a singleton too, we'd rather not keep configuration editor
-        /// cached.</para>
-        /// <para>The property is *not* marked with json ObjectCreationHandling = ObjectCreationHandling.Replace,
-        /// so by default the deserializer will first try to read it before assigning it, which is why
-        /// all deserialization *should* set the property before anything (see manifest deserializer).</para>
+        /// property editor is a singleton, and the value editor cannot be a singleton
+        /// since it depends on the datatype configuration.</para>
+        /// <para>Technically, it could be cached by datatype but let's keep things
+        /// simple enough for now.</para>
         /// </remarks>
-        [JsonProperty("config")]
-        public IConfigurationEditor ConfigurationEditor
+        public IDataValueEditor GetValueEditor(object configuration)
         {
-            get => CreateConfigurationEditor();
-            set => _configurationEditorAssigned = value;
+            // if an explicit value editor has been set (by the manifest parser)
+            // then return it, and ignore the configuration, which is going to be
+            // empty anyways
+            if (ExplicitValueEditor != null)
+                return ExplicitValueEditor;
+
+            var editor = CreateValueEditor();
+            ((DataValueEditor) editor).Configuration = configuration; // fixme casting is bad
+            return editor;
         }
+
+        /// <summary>
+        /// Gets or sets an explicit value editor.
+        /// </summary>
+        /// <remarks>Used for manifest data editors.</remarks>
+        [JsonProperty("editor")]
+        public IDataValueEditor ExplicitValueEditor { get; set; }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// <para>If an explicit configuration editor has been assigned, then this explicit
+        /// instance is returned. Otherwise, a new instance is created by CreateConfigurationEditor.</para>
+        /// <para>The instance created by CreateConfigurationEditor is not cached, i.e.
+        /// a new instance is created each time. The property editor is a singleton, and although the
+        /// configuration editor could technically be a singleton too, we'd rather not keep configuration editor
+        /// cached.</para>
+        /// </remarks>
+        public IConfigurationEditor GetConfigurationEditor() => ExplicitConfigurationEditor ?? CreateConfigurationEditor();
+
+        /// <summary>
+        /// Gets or sets an explicit configuration editor.
+        /// </summary>
+        /// <remarks>Used for manifest data editors.</remarks>
+        [JsonProperty("config")]
+        public IConfigurationEditor ExplicitConfigurationEditor { get; set; }
 
         /// <inheritdoc />
         [JsonProperty("defaultConfig")]
@@ -133,7 +150,7 @@ namespace Umbraco.Core.PropertyEditors
             // for property value editors, get the ConfigurationEditor.DefaultConfiguration
             // else fallback to a default, empty dictionary
 
-            get => _defaultConfiguration ?? ((Type & EditorType.PropertyValue) > 0 ? ConfigurationEditor.DefaultConfiguration : (_defaultConfiguration = new Dictionary<string, object>()));
+            get => _defaultConfiguration ?? ((Type & EditorType.PropertyValue) > 0 ? GetConfigurationEditor().DefaultConfiguration : (_defaultConfiguration = new Dictionary<string, object>()));
             set => _defaultConfiguration = value;
         }
 
@@ -158,35 +175,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         protected virtual IConfigurationEditor CreateConfigurationEditor()
         {
-            // handle assigned editor
-            if (_configurationEditorAssigned != null)
-                return _configurationEditorAssigned;
-
-            // else return an empty one
             return new ConfigurationEditor();
-        }
-
-        // fixme why are we implementing equality here?
-
-        protected bool Equals(DataEditor other)
-        {
-            return string.Equals(Alias, other.Alias);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((DataEditor) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            // an internal setter is required for de-serialization from manifests
-            // but we are never going to change the alias once the editor exists
-            // ReSharper disable once NonReadonlyMemberInGetHashCode
-            return Alias.GetHashCode();
         }
 
         /// <summary>

@@ -37,10 +37,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Determines whether this user belongs to the administrators group.
         /// </summary>
+        /// <remarks>The 'super' user does not automatically belongs to the administrators group.</remarks>
         public static bool IsAdmin(this IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            // fixme should super always be admin?
             return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
 

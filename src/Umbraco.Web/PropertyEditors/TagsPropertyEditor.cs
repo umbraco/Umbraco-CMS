@@ -17,9 +17,9 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(Constants.PropertyEditors.Aliases.Tags, "Tags", "tags", Icon="icon-tags")]
     public class TagsPropertyEditor : DataEditor
     {
-        private readonly ManifestValidatorCollection _validators;
+        private readonly ManifestValueValidatorCollection _validators;
 
-        public TagsPropertyEditor(ManifestValidatorCollection validators, ILogger logger)
+        public TagsPropertyEditor(ManifestValueValidatorCollection validators, ILogger logger)
             : base(logger)
         {
             _validators = validators;
@@ -36,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors
             { }
 
             /// <inheritdoc />
-            public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 return editorValue.Value is JArray json
                     ? json.Select(x => x.Value<string>())
@@ -44,41 +44,29 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             /// <inheritdoc />
-            public override ManifestValidator RequiredValidator => new RequiredTagsValueValidator();
+            public override IValueRequiredValidator RequiredValidator => new RequiredJsonValueValidator();
 
             /// <summary>
-            /// Custom validator to validate a required value against an empty json value
+            /// Custom validator to validate a required value against an empty json value.
             /// </summary>
             /// <remarks>
-            /// This is required because the Tags property editor is not of type 'JSON', it's just string so the underlying
-            /// validator does not validate against an empty json string
+            /// <para>This validator is required because the default RequiredValidator uses ValueType to
+            /// determine whether a property value is JSON, and for tags the ValueType is string although
+            /// the underlying data is JSON. Yes, this makes little sense.</para>
             /// </remarks>
-            private class RequiredTagsValueValidator : ManifestValidator
+            private class RequiredJsonValueValidator : IValueRequiredValidator
             {
                 /// <inheritdoc />
-                public override string ValidationName => "Required";
-
-                /// <inheritdoc />
-                public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
+                public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
                 {
                     if (value == null)
                     {
-                        yield return new ValidationResult("Value cannot be null", new[] { "value" });
+                        yield return new ValidationResult("Value cannot be null", new[] {"value"});
+                        yield break;
                     }
-                    else
-                    {
-                        var asString = value.ToString();
 
-                        if (asString.DetectIsEmptyJson())
-                        {
-                            yield return new ValidationResult("Value cannot be empty", new[] { "value" });
-                        }
-
-                        if (asString.IsNullOrWhiteSpace())
-                        {
-                            yield return new ValidationResult("Value cannot be empty", new[] { "value" });
-                        }
-                    }
+                    if (value.ToString().DetectIsEmptyJson())
+                        yield return new ValidationResult("Value cannot be empty", new[] { "value" });
                 }
             }
         }

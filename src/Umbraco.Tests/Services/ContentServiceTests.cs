@@ -1848,7 +1848,7 @@ namespace Umbraco.Tests.Services
             editorGroup.StartContentId = content1.Id;
             ServiceContext.UserService.Save(editorGroup);
 
-            var admin = ServiceContext.UserService.GetUserById(0);
+            var admin = ServiceContext.UserService.GetUserById(Constants.Security.SuperId);
             admin.StartContentIds = new[] {content1.Id};
             ServiceContext.UserService.Save(admin);
 
@@ -1865,7 +1865,7 @@ namespace Umbraco.Tests.Services
             }));
             Assert.IsTrue(ServiceContext.PublicAccessService.AddRule(content1, "test2", "test2").Success);
 
-            var user = ServiceContext.UserService.GetUserById(0);
+            var user = ServiceContext.UserService.GetUserById(Constants.Security.SuperId);
             var userGroup = ServiceContext.UserService.GetUserGroupByAlias(user.Groups.First().Alias);
             Assert.IsNotNull(ServiceContext.NotificationService.CreateNotification(user, content1, "X"));
 

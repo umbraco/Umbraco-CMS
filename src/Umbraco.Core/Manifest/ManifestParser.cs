@@ -21,21 +21,21 @@ namespace Umbraco.Core.Manifest
 
         private readonly IRuntimeCacheProvider _cache;
         private readonly ILogger _logger;
-        private readonly ManifestValidatorCollection _validators;
+        private readonly ManifestValueValidatorCollection _validators;
 
         private string _path;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        public ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, ILogger logger)
+        public ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, ILogger logger)
             : this(cache, validators, "~/App_Plugins", logger)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(IRuntimeCacheProvider cache, ManifestValidatorCollection validators, string path, ILogger logger)
+        private ManifestParser(IRuntimeCacheProvider cache, ManifestValueValidatorCollection validators, string path, ILogger logger)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Manifest
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
                 new DataEditorConverter(_logger),
-                new ManifestValidatorConverter(_validators));
+                new ValueValidatorConverter(_validators));
 
             // scripts and stylesheets are raw string, must process here
             for (var i = 0; i < manifest.Scripts.Length; i++)

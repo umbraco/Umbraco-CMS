@@ -133,6 +133,7 @@
     <Compile Include="Editors\DashboardHelper.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
+    <Compile Include="Editors\EditorValidatorOfT.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
@@ -812,7 +813,6 @@
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Editors\SectionController.cs" />
     <Compile Include="Editors\UmbracoAuthorizedJsonController.cs" />
-    <Compile Include="Editors\ValidationHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentItemDisplayBase.cs" />
     <Compile Include="Models\ContentEditing\ContentSaveAction.cs" />

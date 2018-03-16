@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
             var configurationDisplayResolver = new DataTypeConfigurationFieldDisplayResolver();
             var databaseTypeResolver = new DatabaseTypeResolver();
 
-            CreateMap<DataEditor, PropertyEditorBasic>();
+            CreateMap<IDataEditor, PropertyEditorBasic>();
 
             // map the standard properties, not the values
             CreateMap<ConfigurationField, DataTypeConfigurationFieldDisplay>()
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 Constants.DataTypes.DefaultMembersListView
             };
 
-            CreateMap<DataEditor, DataTypeBasic>()
+            CreateMap<IDataEditor, DataTypeBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.Ignore())
                 .ForMember(dest => dest.HasPrevalues, opt => opt.Ignore())
                 .ForMember(dest => dest.IsSystemDataType, opt => opt.Ignore())
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Editor, opt => opt.MapFrom(src => propertyEditors[src.EditorAlias]));
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
-            CreateMap<DataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
+            CreateMap<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>()
                 .ConvertUsing(src =>
                     {
                         // this is a new data type, initialize default configuration
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Models.Mapping
                         // get the configuration fields and map to UI,
                         // get the configuration default values and map to UI
 
-                        var configurationEditor = src.ConfigurationEditor;
+                        var configurationEditor = src.GetConfigurationEditor();
 
                         var fields = configurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
 

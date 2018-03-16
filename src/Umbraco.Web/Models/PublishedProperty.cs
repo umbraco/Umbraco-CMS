@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models
                         // nothing ensures that the two methods are consistent.
 
                         if (e != null)
-                            v = e.ValueEditor.ConvertDbToString(p.PropertyType, v, dataTypeService);
+                            v = e.GetValueEditor().ConvertDbToString(p.PropertyType, v, dataTypeService);
                     }
 
                     return map(x, v);

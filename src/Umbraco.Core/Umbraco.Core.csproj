@@ -333,7 +333,6 @@
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
-    <Compile Include="PropertyEditors\ConfigurationWithAdditionalData.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EditorType.cs" />
@@ -341,6 +340,9 @@
     <Compile Include="PropertyEditors\IConfigureValueType.cs" />
     <Compile Include="PropertyEditors\IDataEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfiguration.cs" />
+    <Compile Include="PropertyEditors\IManifestValueValidator.cs" />
+    <Compile Include="PropertyEditors\IValueFormatValidator.cs" />
+    <Compile Include="PropertyEditors\IValueRequiredValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTagsExtensions.cs" />
@@ -515,7 +517,7 @@
     <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
-    <Compile Include="Manifest\ManifestValidatorConverter.cs" />
+    <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
     <Compile Include="Manifest\PackageManifest.cs" />
     <Compile Include="Manifest\DataEditorConverter.cs" />
@@ -1186,15 +1188,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyEditors\Validators\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
-    <Compile Include="PropertyEditors\Validators\DelimitedManifestValueValidator.cs" />
+    <Compile Include="PropertyEditors\Validators\DelimitedValueValidator.cs" />
     <Compile Include="PropertyEditors\Validators\EmailValidator.cs" />
     <Compile Include="PropertyEditors\GridEditor.cs" />
     <Compile Include="PropertyEditors\Validators\IntegerValidator.cs" />
     <Compile Include="PropertyEditors\IValueValidator.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\IDataValueEditor.cs" />
-    <Compile Include="PropertyEditors\ManifestValueValidator.cs" />
-    <Compile Include="PropertyEditors\ManifestValidator.cs" />
     <Compile Include="PropertyEditors\DataEditor.cs" />
     <Compile Include="PropertyEditors\ConfigurationField.cs" />
     <Compile Include="PropertyEditors\ConfigurationFieldAttribute.cs" />
@@ -1207,10 +1207,10 @@
     <Compile Include="PropertyEditors\PropertyValueConverterCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\DataValueEditor.cs" />
     <Compile Include="PropertyEditors\Validators\RegexValidator.cs" />
-    <Compile Include="PropertyEditors\RequiredManifestValueValidator.cs" />
+    <Compile Include="PropertyEditors\Validators\RequiredValidator.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditorAttribute.cs" />
-    <Compile Include="PropertyEditors\ManifestValidatorCollection.cs" />
-    <Compile Include="PropertyEditors\ManifestValidatorCollectionBuilder.cs" />
+    <Compile Include="PropertyEditors\ManifestValueValidatorCollection.cs" />
+    <Compile Include="PropertyEditors\ManifestValueValidatorCollectionBuilder.cs" />
     <Compile Include="PropertyEditors\ValueConverters\CheckboxListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ColorPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DatePickerValueConverter.cs" />

@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
                 var configuration = Configuration;
                 var json = JsonConvert.SerializeObject(configuration);
                 _editor = value;
-                Configuration = _editor.ConfigurationEditor.FromDatabase(json);
+                Configuration = _editor.GetConfigurationEditor().FromDatabase(json);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
 
                 if (_hasConfiguration) return _configuration;
 
-                _configuration = _editor.ConfigurationEditor.FromDatabase(_configurationJson);
+                _configuration = _editor.GetConfigurationEditor().FromDatabase(_configurationJson);
                 _hasConfiguration = true;
                 _configurationJson = null;
 
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Models
                     throw new ArgumentException("Configurations are kinda non-mutable. Do not reassign the same object.", nameof(value));
 
                 // validate configuration type
-                if (!_editor.ConfigurationEditor.IsConfiguration(value))
+                if (!_editor.GetConfigurationEditor().IsConfiguration(value))
                     throw new ArgumentException($"Value of type {value.GetType().Name} cannot be a configuration for editor {_editor.Alias}, expecting.", nameof(value));
 
                 // extract database type from configuration object, if appropriate
@@ -167,7 +167,7 @@ namespace Umbraco.Core.Models
                 // else, create a Lazy de-serializer
                 var capturedConfiguration = _configurationJson;
                 var capturedEditor = _editor;
-                return new Lazy<object>(() => capturedEditor.ConfigurationEditor.FromDatabase(capturedConfiguration));
+                return new Lazy<object>(() => capturedEditor.GetConfigurationEditor().FromDatabase(capturedConfiguration));
             }
         }
     }

@@ -447,7 +447,7 @@ namespace Umbraco.Core.Services
             var propertyEditor = Current.PropertyEditors[propertyType.PropertyEditorAlias];
             return propertyEditor == null
                 ? Array.Empty<XElement>()
-                : propertyEditor.ValueEditor.ConvertDbToXml(property, dataTypeService, localizationService, published);
+                : propertyEditor.GetValueEditor().ConvertDbToXml(property, dataTypeService, localizationService, published);
         }
 
         // exports an IContent item descendants.

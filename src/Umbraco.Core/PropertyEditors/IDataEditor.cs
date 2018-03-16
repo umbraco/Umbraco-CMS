@@ -44,9 +44,14 @@ namespace Umbraco.Core.PropertyEditors
         bool IsDeprecated { get; }
 
         /// <summary>
-        /// Gets the value editor.
+        /// Gets a value editor.
         /// </summary>
-        IDataValueEditor ValueEditor { get; } // fixme should be a method - but, deserialization?
+        IDataValueEditor GetValueEditor(); // fixme - should be configured?!
+
+        /// <summary>
+        /// Gets a configured value editor.
+        /// </summary>
+        IDataValueEditor GetValueEditor(object configuration);
 
         /// <summary>
         /// Gets the configuration for the value editor.
@@ -54,9 +59,11 @@ namespace Umbraco.Core.PropertyEditors
         IDictionary<string, object> DefaultConfiguration { get; }
 
         /// <summary>
-        /// Gets the editor to edit the value editor configuration.
+        /// Gets an editor to edit the value editor configuration.
         /// </summary>
-        /// <remarks>Is expected to throw if the editor does not support being configured, e.g. for most parameter editors.</remarks>
-        IConfigurationEditor ConfigurationEditor { get; } // fixme should be a method - but, deserialization?
+        /// <remarks>
+        /// <para>Is expected to throw if the editor does not support being configured, e.g. for most parameter editors.</para>
+        /// </remarks>
+        IConfigurationEditor GetConfigurationEditor();
     }
 }

@@ -25,7 +25,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// The object returned will always be a string and if the database type is not a valid string type an exception is thrown
         /// </remarks>
-        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService)
         {
             if (property.GetValue() == null) return string.Empty;
 

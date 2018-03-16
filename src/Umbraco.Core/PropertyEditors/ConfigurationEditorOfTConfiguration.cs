@@ -167,13 +167,7 @@ namespace Umbraco.Core.PropertyEditors
                 return json?.PropertyName ?? property.Name;
             }
 
-            var dictionary = ObjectExtensions.ToObjectDictionary(configuration, FieldNamer);
-
-            if (configuration is ConfigurationWithAdditionalData withAdditionalData)
-                foreach (var kv in withAdditionalData.GetAdditionalValues())
-                    dictionary[kv.Key] = kv.Value;
-
-            return dictionary;
+            return ObjectExtensions.ToObjectDictionary(configuration, FieldNamer);
         }
     }
 }

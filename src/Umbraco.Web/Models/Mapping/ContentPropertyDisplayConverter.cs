@@ -23,18 +23,16 @@ namespace Umbraco.Web.Models.Mapping
         {
             var display = base.Convert(originalProp, dest, context);
 
-            var dataTypeService = DataTypeService.Value;
-            var config = dataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
+            var config = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId).Configuration;
 
-            //configure the editor for display with the pre-values
-            var valEditor = display.PropertyEditor.ValueEditor;
-            // fixme - the value editor REQUIRES the configuration to operate
-            //  at the moment, only for richtext and nested, where it's used to set HideLabel
-            //  but, this is the ONLY place where it's assigned? it is also the only place where
-            //  .HideLabel is used - and basically all the rest kinda never depends on config,
-            //  but... it should?
-            var ve = (DataValueEditor) valEditor;
-            ve.Configuration = config;
+            // fixme - IDataValueEditor configuration - general issue
+            // GetValueEditor() returns a non-configured IDataValueEditor
+            // - for richtext and nested, configuration determines HideLabel, so we need to configure the value editor
+            // - could configuration also determines ValueType, everywhere?
+            // - does it make any sense to use a IDataValueEditor without configuring it?
+
+            // configure the editor for display with configuration
+            var valEditor = display.PropertyEditor.GetValueEditor(config);
 
             //set the display properties after mapping
             display.Alias = originalProp.Alias;
@@ -56,7 +54,7 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.ConfigurationEditor.ToValueEditor(config);
+                display.Config = display.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
                 display.View = valEditor.View;
             }
 

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -12,9 +13,9 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
     {
-        public TagConfigurationEditor(ManifestValidatorCollection validators)
+        public TagConfigurationEditor(ManifestValueValidatorCollection validators)
         {
-            Fields.Add(new ConfigurationField(new ManifestValueValidator(validators) { ValidationName = "Required" })
+            Fields.Add(new ConfigurationField(new RequiredValidator())
             {
                 Description = "Define a tag group",
                 Key = "group",
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
                 View = "requiredfield"
             });
 
-            Fields.Add(new ConfigurationField(new ManifestValueValidator(validators) {ValidationName = "Required"})
+            Fields.Add(new ConfigurationField(new RequiredValidator())
             {
                 Description = "Select whether to store the tags in cache as CSV (default) or as JSON. The only benefits of storage as JSON is that you are able to have commas in a tag value but this will require parsing the json in your views or using a property value converter",
                 Key = "storageType",

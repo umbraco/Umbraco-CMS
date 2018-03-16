@@ -918,7 +918,7 @@ namespace Umbraco.Core.Services.Implement
 
                     var configurationAttributeValue = dataTypeElement.Attribute("Configuration")?.Value;
                     if (!string.IsNullOrWhiteSpace(configurationAttributeValue))
-                        dataType.Configuration = editor.ConfigurationEditor.FromDatabase(configurationAttributeValue);
+                        dataType.Configuration = editor.GetConfigurationEditor().FromDatabase(configurationAttributeValue);
 
                     dataTypes.Add(dataType);
                 }

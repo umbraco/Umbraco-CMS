@@ -19,13 +19,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             var propertyDto = base.Convert(originalProperty, dest, context);
 
-            var dataTypeService = DataTypeService.Value;
-
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
-            propertyDto.DataType = dataTypeService.GetDataType(originalProperty.PropertyType.DataTypeId);
+            propertyDto.DataType = DataTypeService.GetDataType(originalProperty.PropertyType.DataTypeId);
 
             return propertyDto;
         }

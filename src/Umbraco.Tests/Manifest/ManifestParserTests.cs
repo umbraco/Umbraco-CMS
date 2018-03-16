@@ -9,6 +9,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Tests.Manifest
 {
@@ -21,7 +22,12 @@ namespace Umbraco.Tests.Manifest
         [SetUp]
         public void Setup()
         {
-            _parser = new ManifestParser(NullCacheProvider.Instance, new ManifestValidatorCollection(Enumerable.Empty<ManifestValidator>()), Mock.Of<ILogger>());
+            var validators = new IManifestValueValidator[]
+            {
+                new RequiredValidator(),
+                new RegexValidator()
+            };
+            _parser = new ManifestParser(NullCacheProvider.Instance, new ManifestValueValidatorCollection(validators), Mock.Of<ILogger>());
         }
 
         [Test]
@@ -170,7 +176,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("Test 1", editor.Name);
             Assert.IsFalse((editor.Type & EditorType.MacroParameter) > 0);
 
-            var valueEditor = editor.ValueEditor;
+            var valueEditor = editor.GetValueEditor();
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", valueEditor.View);
             Assert.AreEqual("int", valueEditor.ValueType);
             Assert.IsTrue(valueEditor.HideLabel);
@@ -182,21 +188,20 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var validators = valueEditor.Validators;
             Assert.AreEqual(2, validators.Count);
             var validator = validators[0];
-            var v = validator as ManifestValueValidator;
-            Assert.IsNotNull(v);
-            Assert.AreEqual("required", v.ValidationName);
-            Assert.AreEqual("", v.Config);
+            var v1 = validator as RequiredValidator;
+            Assert.IsNotNull(v1);
+            Assert.AreEqual("Required", v1.ValidationName);
             validator = validators[1];
-            v = validator as ManifestValueValidator;
-            Assert.IsNotNull(v);
-            Assert.AreEqual("Regex", v.ValidationName);
-            Assert.AreEqual("\\d*", v.Config);
+            var v2 = validator as RegexValidator;
+            Assert.IsNotNull(v2);
+            Assert.AreEqual("Regex", v2.ValidationName);
+            Assert.AreEqual("\\d*", v2.Configuration);
 
             // this is not part of the manifest
-            var preValues = editor.ConfigurationEditor.DefaultConfiguration;
+            var preValues = editor.GetConfigurationEditor().DefaultConfiguration;
             Assert.IsEmpty(preValues);
 
-            var preValueEditor = editor.ConfigurationEditor;
+            var preValueEditor = editor.GetConfigurationEditor();
             Assert.IsNotNull(preValueEditor);
             Assert.IsNotNull(preValueEditor.Fields);
             Assert.AreEqual(2, preValueEditor.Fields.Count);
@@ -208,10 +213,9 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var fvalidators = f.Validators;
             Assert.IsNotNull(fvalidators);
             Assert.AreEqual(1, fvalidators.Count);
-            var fv = fvalidators[0] as ManifestValueValidator;
+            var fv = fvalidators[0] as RequiredValidator;
             Assert.IsNotNull(fv);
-            Assert.AreEqual("required", fv.ValidationName);
-            Assert.AreEqual("", fv.Config);
+            Assert.AreEqual("Required", fv.ValidationName);
 
             f = preValueEditor.Fields[1];
             Assert.AreEqual("key2", f.Key);
@@ -257,13 +261,13 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.IsTrue(config.ContainsKey("key1"));
             Assert.AreEqual("some config val", config["key1"]);
 
-            var valueEditor = editor.ValueEditor;
+            var valueEditor = editor.GetValueEditor();
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html", valueEditor.View);
 
             editor = manifest.ParameterEditors[2];
             Assert.Throws<InvalidOperationException>(() =>
             {
-                var _ = editor.ValueEditor;
+                var _ = editor.GetValueEditor();
             });
         }
 

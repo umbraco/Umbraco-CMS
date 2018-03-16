@@ -10,7 +10,9 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
@@ -96,6 +98,28 @@ namespace Umbraco.Tests.Web.Controllers
             }
         }
 
+        private void MockForGetPagedUsers()
+        {
+            Mock.Get(Current.SqlContext)
+                .Setup(x => x.Query<IUser>())
+                .Returns(new Query<IUser>(Current.SqlContext));
+
+            var syntax = new SqlCeSyntaxProvider();
+
+            Mock.Get(Current.SqlContext)
+                .Setup(x => x.SqlSyntax)
+                .Returns(syntax);
+
+            var mappers = new MapperCollection(new []
+            {
+                new UserMapper()
+            });
+
+            Mock.Get(Current.SqlContext)
+                .Setup(x => x.Mappers)
+                .Returns(mappers);
+        }
+
         [Test]
         public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
@@ -109,6 +133,8 @@ namespace Umbraco.Tests.Web.Controllers
                 Container.InjectProperties(usersController);
                 return usersController;
             }
+
+            MockForGetPagedUsers();
 
             var runner = new TestRunner(Factory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
@@ -139,6 +165,8 @@ namespace Umbraco.Tests.Web.Controllers
                 Container.InjectProperties(usersController);
                 return usersController;
             }
+
+            MockForGetPagedUsers();
 
             var runner = new TestRunner(Factory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);

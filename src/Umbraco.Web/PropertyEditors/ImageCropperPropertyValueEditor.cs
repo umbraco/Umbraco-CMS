@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
 
-        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService)
         {
             ImageCropperValue value;
             try
@@ -45,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors
                 value = new ImageCropperValue { Src = property.GetValue().ToString() };
             }
 
-            var dataType = dataTypeService.GetDataType(propertyType.DataTypeId);
+            var dataType = dataTypeService.GetDataType(property.PropertyType.DataTypeId);
             if (dataType?.Configuration != null)
                 value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
 
@@ -62,7 +62,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <para>editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
         /// it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.</para>
         /// </remarks>
-        public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             // get the current path
             var currentPath = string.Empty;

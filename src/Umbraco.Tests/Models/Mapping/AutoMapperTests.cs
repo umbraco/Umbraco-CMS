@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             var manifestBuilder = new ManifestParser(
                 CacheHelper.CreateDisabledCacheHelper().RuntimeCache,
-                new ManifestValidatorCollection(Enumerable.Empty<ManifestValidator>()),
+                new ManifestValueValidatorCollection(Enumerable.Empty<IManifestValueValidator>()),
                 Logger)
             {
                 Path = TestHelper.CurrentAssemblyDirectory

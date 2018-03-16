@@ -1,13 +1,18 @@
 ﻿using System;
+using LightInject;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.Validators;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
-    // fixme - need to reorg our tests!
-    // fixme - test IsDirty on properties
-
     [TestFixture]
     public class VariationTests
     {
@@ -16,6 +21,42 @@ namespace Umbraco.Tests.Models
         {
             // annoying, but content type wants short string helper ;(
             SettingsForTests.Reset();
+
+            // well, this is also annoying, but...
+            // validating a value is performed by its data editor,
+            // based upon the configuration in the data type, so we
+            // need to be able to retrieve them all...
+
+            Current.Reset();
+            var container = Mock.Of<IServiceContainer>();
+            Current.Container = container;
+
+            var dataEditors = new DataEditorCollection(new IDataEditor[]
+            {
+                new DataEditor(Mock.Of<ILogger>()) { Alias = "editor", ExplicitValueEditor = new DataValueEditor("view") }
+            });
+            var propertyEditors = new PropertyEditorCollection(dataEditors);
+
+            var dataType = Mock.Of<IDataType>();
+            Mock.Get(dataType)
+                .Setup(x => x.Configuration)
+                .Returns(null);
+
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns<int>(x => dataType);
+
+            var serviceContext = new ServiceContext(dataTypeService: dataTypeService);
+
+            Mock.Get(container)
+                .Setup(x => x.GetInstance(It.IsAny<Type>()))
+                .Returns<Type>(x =>
+                {
+                    if (x == typeof(PropertyEditorCollection)) return propertyEditors;
+                    if (x == typeof(ServiceContext)) return serviceContext;
+                    throw new Exception("oops");
+                });
         }
 
         [Test]

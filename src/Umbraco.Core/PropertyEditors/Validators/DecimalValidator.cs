@@ -6,16 +6,10 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates that the value is a valid decimal
     /// </summary>
-    internal sealed class DecimalValidator : ManifestValidator, IValueValidator
+    internal sealed class DecimalValidator : IManifestValueValidator
     {
         /// <inheritdoc />
-        public override string ValidationName => "Decimal";
-
-        /// <inheritdoc />
-        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
-        {
-            return Validate(value, valueType, dataTypeConfiguration);
-        }
+        public string ValidationName => "Decimal";
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)

@@ -34,7 +34,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return _propertyEditors.TryGet(propertyType.EditorAlias, out var editor)
-                   && editor.ValueEditor.ValueType.InvariantEquals(ValueTypes.Json);
+                   && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json);
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)

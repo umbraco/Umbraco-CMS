@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
@@ -393,32 +397,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         public bool IsPropertyValueValid(object value)
         {
-            var stringValue = Mandatory || !string.IsNullOrWhiteSpace(ValidationRegExp)
-                ? value?.ToString()
-                : null;
-
-            // validate mandatory property value
-            if (Mandatory && string.IsNullOrWhiteSpace(stringValue))
-                return false;
-
-            // validate regular expression if appropriate (have a regex and a string value)
-            if (!string.IsNullOrWhiteSpace(ValidationRegExp) && !string.IsNullOrWhiteSpace(stringValue))
-            {
-                try
-                {
-                    return new Regex(ValidationRegExp).IsMatch(stringValue);
-                }
-                catch
-                {
-                    throw new Exception($"Invalid validation expression on property {Alias}.");
-                }
-            }
-
-            // fixme - todo
-            // ensure that the property value complies with the value storage type, ie can be saved
-            // plug PropertyEditor validation - when it's a thing
-
-            return true;
+            var editor = Current.PropertyEditors[_propertyEditorAlias]; // fixme inject?
+            var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // fixme inject?
+            var valueEditor = editor.GetValueEditor(configuration);
+            return !valueEditor.Validate(value, Mandatory, ValidationRegExp).Any();
         }
 
         /// <summary>

@@ -211,7 +211,7 @@ namespace Umbraco.Web.Editors
             // and map to an actual configuration object
             var currentConfiguration = dataType.PersistedDataType.Configuration;
             var configurationDictionary = dataType.ConfigurationFields.ToDictionary(x => x.Key, x => x.Value);
-            var configuration = dataType.PropertyEditor.ConfigurationEditor.FromConfigurationEditor(configurationDictionary, currentConfiguration);
+            var configuration = dataType.PropertyEditor.GetConfigurationEditor().FromConfigurationEditor(configurationDictionary, currentConfiguration);
 
             dataType.PersistedDataType.Configuration = configuration;
 
@@ -320,7 +320,7 @@ namespace Umbraco.Web.Editors
             {
                 var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
                 if (propertyEditor != null)
-                    dataType.HasPrevalues = propertyEditor.ConfigurationEditor.Fields.Any(); ;
+                    dataType.HasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any(); ;
             }
 
             var grouped = dataTypes
@@ -347,7 +347,7 @@ namespace Umbraco.Web.Editors
             var propertyEditors = Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
-                var hasPrevalues = propertyEditor.ConfigurationEditor.Fields.Any();
+                var hasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();
                 var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
                 basic.HasPrevalues = hasPrevalues;
                 datatypes.Add(basic);

@@ -88,7 +88,7 @@ namespace Umbraco.Core.PropertyEditors
         public string Name { get; }
 
         /// <summary>
-        /// Gets the view to use to render the editor. fixme - but that's for the VALUE really?
+        /// Gets the view to use to render the editor.
         /// </summary>
         public string View { get; }
 

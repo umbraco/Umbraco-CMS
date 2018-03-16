@@ -50,10 +50,10 @@ namespace Umbraco.Web.PropertyEditors
                         throw new ArgumentNullException(nameof(value));
                     if (!(value is RichTextConfiguration configuration))
                         throw new ArgumentException($"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
-                    HideLabel = configuration.HideLabel;
                     base.Configuration = value;
-                }
 
+                    HideLabel = configuration.HideLabel;
+                }
             }
 
             /// <summary>
@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="propertyType"></param>
             /// <param name="dataTypeService"></param>
             /// <returns></returns>
-            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService)
             {
                 if (property.GetValue() == null)
                     return null;
@@ -78,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object ConvertEditorToDb(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+            public override object FromEditor(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null)
                     return null;

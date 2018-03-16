@@ -153,7 +153,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateUser2UserGroupData()
         {
-            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = 0 });
+            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = Constants.Security.SuperId });
         }
 
         private void CreateUserGroup2AppData()

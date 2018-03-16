@@ -117,8 +117,8 @@ namespace Umbraco.Core.Composing
         public static ParameterEditorCollection ParameterEditors
             => Container.GetInstance<ParameterEditorCollection>();
 
-        internal static ManifestValidatorCollection ManifestValidators
-            => Container.GetInstance<ManifestValidatorCollection>();
+        internal static ManifestValueValidatorCollection ManifestValidators
+            => Container.GetInstance<ManifestValueValidatorCollection>();
 
         internal static PackageActionCollection PackageActions
             => Container.GetInstance<PackageActionCollection>();

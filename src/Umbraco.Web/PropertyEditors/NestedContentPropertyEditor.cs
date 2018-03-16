@@ -74,9 +74,10 @@ namespace Umbraco.Web.PropertyEditors
                     if (value == null)
                         throw new ArgumentNullException(nameof(value));
                     if (!(value is NestedContentConfiguration configuration))
-                        throw new ArgumentException($"Expected a {typeof(RichTextConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
-                    HideLabel = configuration.HideLabel.TryConvertTo<bool>().Result;
+                        throw new ArgumentException($"Expected a {typeof(NestedContentConfiguration).Name} instance, but got {value.GetType().Name}.", nameof(value));
                     base.Configuration = value;
+
+                    HideLabel = configuration.HideLabel.TryConvertTo<bool>().Result;
                 }
             }
 
@@ -115,7 +116,9 @@ namespace Umbraco.Web.PropertyEditors
                             {
                                 // convert the value, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-                                var convValue = propEditor.ValueEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
+                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var valEditor = propEditor.GetValueEditor(tempConfig);
+                                var convValue = valEditor.ConvertDbToString(propType, propValues[propAlias]?.ToString(), dataTypeService);
                                 propValues[propAlias] = convValue;
                             }
                             catch (InvalidOperationException)
@@ -136,7 +139,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
-            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService)
             {
                 if (property.GetValue() == null || string.IsNullOrWhiteSpace(property.GetValue().ToString()))
                     return string.Empty;
@@ -173,7 +176,9 @@ namespace Umbraco.Web.PropertyEditors
 
                                 // convert that temp property, and store the converted value
                                 var propEditor = _propertyEditors[propType.PropertyEditorAlias];
-                                var convValue = propEditor.ValueEditor.ConvertDbToEditor(tempProp, propType, dataTypeService);
+                                var tempConfig = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
+                                var valEditor = propEditor.GetValueEditor(tempConfig);
+                                var convValue = valEditor.ToEditor(tempProp, dataTypeService);
                                 propValues[propAlias] = convValue == null ? null : JToken.FromObject(convValue);
                             }
                             catch (InvalidOperationException)
@@ -190,7 +195,7 @@ namespace Umbraco.Web.PropertyEditors
                 return value;
             }
 
-            public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
@@ -240,7 +245,7 @@ namespace Umbraco.Web.PropertyEditors
                             var contentPropData = new ContentPropertyData(propValues[propKey], propConfiguration);
 
                             // Get the property editor to do it's conversion
-                            var newValue = propEditor.ValueEditor.ConvertEditorToDb(contentPropData, propValues[propKey]);
+                            var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, propValues[propKey]);
 
                             // Store the value back
                             propValues[propKey] = (newValue == null) ? null : JToken.FromObject(newValue);
@@ -289,9 +294,9 @@ namespace Umbraco.Web.PropertyEditors
                             var config = dataTypeService.GetDataType(propType.DataTypeId).Configuration;
                             var propertyEditor = _propertyEditors[propType.PropertyEditorAlias];
 
-                            foreach (var validator in propertyEditor.ValueEditor.Validators)
+                            foreach (var validator in propertyEditor.GetValueEditor().Validators)
                             {
-                                foreach (var result in validator.Validate(propValues[propKey], propertyEditor.ValueEditor.ValueType, config))
+                                foreach (var result in validator.Validate(propValues[propKey], propertyEditor.GetValueEditor().ValueType, config))
                                 {
                                     result.ErrorMessage = "Item " + (i + 1) + " '" + propType.Name + "' " + result.ErrorMessage;
                                     yield return result;

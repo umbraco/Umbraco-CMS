@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -26,8 +24,8 @@ namespace Umbraco.Web.Models.Mapping
             {
                 if (configuration.TryGetValue(field.Key, out var value))
                     field.Value = value;
-                else // fixme should this be fatal?
-                    Current.Logger.Warn<DataTypeConfigurationFieldDisplayResolver>($"Could not find persisted pre-value for field \"{field.Key}\".");
+                else // weird - just leave the field without a value - but warn
+                    Current.Logger.Warn<DataTypeConfigurationFieldDisplayResolver>($"Could not find a value for configuration field \"{field.Key}\".");
             }
         }
 
@@ -36,26 +34,17 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         public IEnumerable<DataTypeConfigurationFieldDisplay> Resolve(IDataType dataType)
         {
-            if (string.IsNullOrWhiteSpace(dataType.EditorAlias) || !Current.PropertyEditors.TryGet(dataType.EditorAlias, out var e) || !(e is DataEditor editor))
+            // in v7 it was apparently fine to have an empty .EditorAlias here, in which case we would map onto
+            // an empty fields list, which made no sense since there would be nothing to map to - and besides,
+            // a datatype without an editor alias is a serious issue - v8 wants an editor here
+
+            if (string.IsNullOrWhiteSpace(dataType.EditorAlias) || !Current.PropertyEditors.TryGet(dataType.EditorAlias, out var editor))
                 throw new InvalidOperationException($"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
  
-            var configuration = dataType.Configuration;
-            Dictionary<string, object> configurationDictionary = null;
-            var fields = Array.Empty<DataTypeConfigurationFieldDisplay>();
+            var configurationEditor = editor.GetConfigurationEditor();
+            var fields = configurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
+            var configurationDictionary = configurationEditor.ToConfigurationEditor(dataType.Configuration);
 
-            // if we have a property editor,
-            // map the configuration editor field to display,
-            // and convert configuration to editor
-            if (editor != null)
-            {
-                var configurationEditor = editor.ConfigurationEditor;
-                fields = configurationEditor.Fields.Select(Mapper.Map<DataTypeConfigurationFieldDisplay>).ToArray();
-                configurationDictionary = configurationEditor.ToConfigurationEditor(configuration);
-            }
-
-            if (configurationDictionary == null)
-                configurationDictionary = new Dictionary<string, object>();
- 
             MapConfigurationFields(fields, configurationDictionary);
 
             return fields;

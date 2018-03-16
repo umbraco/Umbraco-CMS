@@ -11,14 +11,5 @@ namespace Umbraco.Web.Editors
         public EditorValidatorCollection(IEnumerable<IEditorValidator> items)
             : base(items)
         { }
-
-        public IEnumerable<ValidationResult> Validate(object model)
-        {
-            var modelType = model.GetType();
-            return this
-                .Where(x => x.ModelType == modelType)
-                .WhereNotNull()
-                .SelectMany(x => x.Validate(model));
-        }
     }
 }

@@ -5,8 +5,11 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using AutoMapper;
+using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
@@ -18,20 +21,23 @@ namespace Umbraco.Web.Editors
     /// </summary>
     internal sealed class DataTypeValidateAttribute : ActionFilterAttribute
     {
+        // LightInject can inject dependencies into properties
+
+        [Inject]
+        public IDataTypeService DataTypeService { get; set; }
+
+        [Inject]
+        public PropertyEditorCollection PropertyEditors { get; set; }
+
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            // injecting in attributes is not easy.
-            // eventually, actionContext should give access to the service factory
-            // but for the time being, have to rely on the global locator
-            var dataTypeService = Current.Services.DataTypeService;
-
             var dataType = (DataTypeSave) actionContext.ActionArguments["dataType"];
 
             dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
             dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
 
             // get the property editor, ensuring that it exits
-            if (!Current.PropertyEditors.TryGet(dataType.EditorAlias, out var propertyEditor))
+            if (!PropertyEditors.TryGet(dataType.EditorAlias, out var propertyEditor))
             {
                 var message = $"Property editor \"{dataType.EditorAlias}\" was not found.";
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
@@ -46,7 +52,7 @@ namespace Umbraco.Web.Editors
             switch (dataType.Action)
             {
                 case ContentSaveAction.Save:
-                    persisted = dataTypeService.GetDataType(Convert.ToInt32(dataType.Id));
+                    persisted = DataTypeService.GetDataType(Convert.ToInt32(dataType.Id));
                     if (persisted == null)
                     {
                         var message = $"Data type with id {dataType.Id} was not found.";
@@ -73,14 +79,15 @@ namespace Umbraco.Web.Editors
 
             // validate the configuration
             // which is posted as a set of fields with key (string) and value (object)
+            var configurationEditor = propertyEditor.GetConfigurationEditor();
             foreach (var field in dataType.ConfigurationFields)
             {
-                var value = field.Value;
-                var editorField = propertyEditor.ConfigurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
+                var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
                 if (editorField == null) continue;
 
+                // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here) - fixme - editing
                 foreach (var validator in editorField.Validators)
-                foreach (var result in validator.Validate(value, null, null))
+                foreach (var result in validator.Validate(field.Value, null, null))
                     actionContext.ModelState.AddValidationError(result, "Properties", field.Key);
             }
 

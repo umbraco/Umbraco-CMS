@@ -13,13 +13,11 @@ namespace Umbraco.Web.Models.Mapping
     {
         public ValueStorageType Resolve(DataTypeSave source)
         {
-            var propertyEditor = Current.PropertyEditors[source.EditorAlias];
-            if (propertyEditor == null)
-            {
-                throw new InvalidOperationException("Could not find property editor with id " + source.EditorAlias);
-            }
+            if (!Current.PropertyEditors.TryGet(source.EditorAlias, out var editor))
+                throw new InvalidOperationException($"Could not find property editor \"{source.EditorAlias}\".");
 
-            var valueType = propertyEditor.ValueEditor.ValueType;
+            // fixme - what about source.PropertyEditor? can we get the configuration here? 'cos it may change the storage type?!
+            var valueType = editor.GetValueEditor().ValueType;
             return ValueTypes.ToStorageType(valueType);
         }
     }

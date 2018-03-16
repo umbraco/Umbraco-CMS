@@ -6,16 +6,10 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// <summary>
     /// A validator that validates an email address
     /// </summary>
-    internal sealed class EmailValidator : ManifestValidator, IValueValidator
+    internal sealed class EmailValidator : IManifestValueValidator
     {
         /// <inheritdoc />
-        public override string ValidationName => "Email";
-
-        /// <inheritdoc />
-        public override IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration, object validatorConfiguration)
-        {
-            return Validate(value, valueType, dataTypeConfiguration);
-        }
+        public string ValidationName => "Email";
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)

@@ -48,7 +48,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = ValueTypes.String
             };
 
-            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = valueEditor.ToEditor(prop, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(isOk, !(result is string));
         }
 
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = valueType
                 };
 
-            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = valueEditor.ToEditor(prop, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(expected, result);
         }
 
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType("test", ValueStorageType.Decimal));
             prop.SetValue(value);
 
-            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = valueEditor.ToEditor(prop, new Mock<IDataTypeService>().Object);
             Assert.AreEqual("12.34", result);
         }
 
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType("test", ValueStorageType.Decimal));
             prop.SetValue(string.Empty);
 
-            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = valueEditor.ToEditor(prop, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(string.Empty, result);
         }
 
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.PropertyEditors
             var prop = new Property(1, new PropertyType("test", ValueStorageType.Date));
             prop.SetValue(now);
 
-            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
+            var result = valueEditor.ToEditor(prop, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(now.ToIsoString(), result);
         }
     }

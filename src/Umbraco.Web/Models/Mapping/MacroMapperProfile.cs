@@ -44,7 +44,7 @@ namespace Umbraco.Web.Models.Mapping
                         Current.Logger.Warn<MacroMapperProfile>("Could not resolve a parameter editor with alias " + property.EditorAlias + ", a textbox will be rendered in it's place");
                     }
 
-                    parameter.View = paramEditor.ValueEditor.View;
+                    parameter.View = paramEditor.GetValueEditor().View;
                     //set the config
                     parameter.Configuration = paramEditor.DefaultConfiguration;
                 });
