@@ -5,7 +5,6 @@ namespace Umbraco.Web.Features
     /// </summary>
     internal class EnabledFeatures
     {
-        
         /// <summary>
         /// This allows us to inject a razor view into the Umbraco preview view to extend it
         /// </summary>
