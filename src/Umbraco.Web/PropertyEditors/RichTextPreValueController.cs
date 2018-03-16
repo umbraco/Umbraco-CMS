@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
         private static readonly object Locker = new object();
         private static readonly Dictionary<string, RichTextEditorCommand> Commands = new Dictionary<string,RichTextEditorCommand>();
         private static readonly Dictionary<string, RichTextEditorPlugin> Plugins = new Dictionary<string, RichTextEditorPlugin>();
-        private static readonly Dictionary<string, string> ConfigOptions = new Dictionary<string, string>();
+        private static readonly Dictionary<string, object> ConfigOptions = new Dictionary<string, object>();
        
         private static string _invalidElements = "";
         private static string _validElements = "";
@@ -105,13 +105,22 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             if (!ConfigOptions.ContainsKey(n.Attributes["key"].FirstChild.Value))
                             {
-                                var value = "";
                                 if (n.FirstChild != null)
-                                    value = n.FirstChild.Value;
+                                {
+                                    object value;
 
-                                ConfigOptions.Add(
-                                    n.Attributes["key"].FirstChild.Value.ToLower(),
-                                    value);
+                                    if (n.FirstChild.Value.ToLower() == "false" || n.FirstChild.Value.ToLower() == "true")
+                                    {
+                                        value = n.FirstChild.Value.ToLower().Equals("true");
+                                    }else
+                                    {
+                                        value = n.FirstChild.Value;
+                                    }
+
+                                    ConfigOptions.Add(
+                                        n.Attributes["key"].FirstChild.Value.ToLower(),
+                                        value);
+                                }
                             }
                         }
 

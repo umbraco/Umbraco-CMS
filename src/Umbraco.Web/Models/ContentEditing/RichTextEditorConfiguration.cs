@@ -23,6 +23,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string InvalidElements { get; set; }
 
         [DataMember(Name = "customConfig")]
-        public IDictionary<string,string> CustomConfig { get; set; }
+        public IDictionary<string,object> CustomConfig { get; set; }
     }
 }
