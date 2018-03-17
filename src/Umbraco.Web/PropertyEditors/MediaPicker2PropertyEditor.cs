@@ -37,18 +37,10 @@ namespace Umbraco.Web.PropertyEditors
             {
                 Fields.Add(new PreValueField()
                 {
-                    Key = "minNumber",
-                    View = "number",
-                    Name = "Min. items",
-                    Description = "Mininum number of items allowed."
-                });
-                Fields.Add(new PreValueField()
-                {
-                    Key = "maxNumber",
-                    View = "number",
-                    Name = "Max. items",
-                    Description = "Maximum number of items allowed."
-                });
+                    Key = "multiPicker",
+                    View = "multiItem",
+                    Name = "Pick multiple items"
+                });                    
                 Fields.Add(new PreValueField()
                 {
                     Key = "onlyImages",
