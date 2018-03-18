@@ -4,7 +4,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
     function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService) {
 
         //check the pre-values for multi-picker
-        var multiPicker = $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) !== 1 ? true : false;
+        var multiPicker = $scope.model.config.multiPicker.isMultiItem && $scope.model.config.multiPicker.isMultiItem !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
 
@@ -22,8 +22,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
             $scope.isMultiPicker = multiPicker;
 
-            $scope.maxNumber = $scope.model.config.maxNumber ? parseInt($scope.model.config.maxNumber) : 0;
-            $scope.minNumber = $scope.model.config.minNumber ? parseInt($scope.model.config.minNumber) : 0;
+            $scope.minNumber = $scope.model.config.multiPicker.minNumber ? parseInt($scope.model.config.multiPicker.minNumber) : 0;
+            $scope.maxNumber = $scope.model.config.multiPicker.maxNumber || $scope.isMultiPicker ? parseInt($scope.model.config.multiPicker.maxNumber) : 1;
 
             if ($scope.model.value) {
                 var ids = $scope.model.value.split(',');
@@ -118,7 +118,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
                 show: true,
-                submit: function (model) {                    
+                submit: function (model) {
                     _.each(model.selectedImages, function (media, i) {
                         // if there is no thumbnail, try getting one if the media is not a placeholder item
                         if (!media.thumbnail && media.id && media.metaData) {
@@ -164,6 +164,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
         $scope.showAdd = function () {
+
+            //no item limit
+            if ($scope.maxNumber == 0) return true;
+
             if ($scope.images.length >= $scope.maxNumber) {
                 if ($scope.model.value && $scope.model.value !== "") {
                     return false;
@@ -185,8 +189,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 return _.map($scope.images, function (i) {
                     return $scope.model.config.idType === "udi" ? i.udi : i.id;
                 }).join();
-            } , function () {
-          
+            }, function () {
+
                 //Validate!
                 if ($scope.model.config && $scope.minNumber && $scope.minNumber > $scope.images.length) {
                     $scope.mediaPickerForm.minCount.$setValidity("minCount", false);

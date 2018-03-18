@@ -46,11 +46,11 @@
         <input type="hidden" name="maxCount" ng-model="images" />
 
         <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
-            <localize key="validation_minCount">You need to add at least</localize> {{model.config.minNumber}} <localize key="validation_items">items</localize>
+            <localize key="validation_minCount">You need to add at least</localize> {{minNumber}} <localize key="validation_items">items</localize>
         </div>
 
         <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
-            <localize key="validation_maxCount">You can only have</localize> {{model.config.maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
+            <localize key="validation_maxCount">You can only have</localize> {{maxNumber}} <localize key="validation_itemsSelected">items selected</localize>
         </div>
     </ng-form>
 
