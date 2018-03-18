@@ -1,48 +1,44 @@
 ﻿<div ng-controller="Umbraco.PrevalueEditors.MultiItemController" class="umb-editor umb-mediapicker">
     <div class="control-group">
-        <input name="boolean" type="checkbox" ng-model="model.value.multiPicker" ng-true-value="1" ng-false-value="0" />
+        <input name="boolean" type="checkbox" ng-model="model.value.isMultiItem" ng-true-value="1" ng-false-value="0" />
     </div>
-    <ng-form name="multiItemForm" ng-show="model.value.multiPicker">
+    <ng-form name="multiItemForm" ng-show="model.value.isMultiItem">
         <div class="control-group umb-control-group">
-            <div class="umb-el-wrap">
-                <label class="control-label ng-binding" ng-hide="property.hideLabel" for="minNumber" ng-attr-title="{{propertyAlias}}" title="minNumber">
-                    Min. items
-                    <small>Mininum number of items allowed. 0 for unlimited.</small>
-                </label>
+            <label class="control-label ng-binding" ng-hide="property.hideLabel" for="minNumber" ng-attr-title="{{propertyAlias}}" title="minNumber">
+                Min. items
+                <small>Mininum number of items required.</small>
+            </label>
 
-                <div class="controls">
-                    <input name="minNumberField" class="umb-editor umb-number"
-                           type="number"
-                           ng-model="model.value.minNumber"
-                           val-server="value"
-                           fix-number
-                           required
-                           ng-change="validate()" />
-                    <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="number">Not a number</span>
-                    <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="ing">Min. Items must be greater than Max. Items</span>
-
-                </div>
+            <div class="controls">
+                <input name="minNumberField" class="umb-editor umb-number"
+                       type="number"
+                       ng-model="model.value.minNumber"
+                       val-server="value"
+                       fix-number
+                       required
+                       ng-change="validate()" />
+                <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="number">Not a number</span>
+                <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="maxval">Min. Items must be greater than Max. Items</span>
+                <span class="help-inline" val-msg-for="maxNumberField" val-toggle-msg="required">Required</span>
             </div>
         </div>
 
         <div class="control-group umb-control-group">
-            <div class="umb-el-wrap">
-                <label class="control-label ng-binding" ng-hide="property.hideLabel" for="minNumber" ng-attr-title="{{propertyAlias}}" title="minNumber">
-                    Max. items
-                    <small>Maximum number of items allowed. 0 for unlimited.</small>
-                </label>
+            <label class="control-label ng-binding" ng-hide="property.hideLabel" for="minNumber" ng-attr-title="{{propertyAlias}}" title="minNumber">
+                Max. items
+                <small>Maximum number of items allowed. 0 for unlimited.</small>
+            </label>
 
-                <div class="controls">
-                    <input name="maxNumberField" class="umb-editor umb-number"
-                           type="number"
-                           ng-model="model.value.maxNumber"
-                           val-server="value"
-                           fix-number
-                           required
-                           ng-change="validate()"/>
-                    <span class="help-inline" val-msg-for="maxNumberField" val-toggle-msg="number">Not a number</span>
-
-                </div>
+            <div class="controls">
+                <input name="maxNumberField" class="umb-editor umb-number"
+                       type="number"
+                       ng-model="model.value.maxNumber"
+                       val-server="value"
+                       fix-number
+                       required
+                       ng-change="validate()" />
+                <span class="help-inline" val-msg-for="maxNumberField" val-toggle-msg="number">Not a number</span>
+                <span class="help-inline" val-msg-for="maxNumberField" val-toggle-msg="required">Required</span>
             </div>
         </div>
 
