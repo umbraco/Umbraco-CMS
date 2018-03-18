@@ -281,7 +281,6 @@
                 if (item.key) {
                     obj.key = item.key;
                 }
-                console.log("obj", obj);
 
                 selection.push(obj);
                 item.selected = true;
