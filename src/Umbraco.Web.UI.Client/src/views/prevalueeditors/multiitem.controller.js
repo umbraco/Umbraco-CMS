@@ -10,7 +10,7 @@
         }
 
         $scope.model.value = {
-            multiPicker: legacyValue
+            isMultiItem: legacyValue
         }
 
     }
@@ -18,11 +18,12 @@
 
 
     $scope.validate = function () {
-        if ($scope.model.value.minNumber > $scope.model.value.maxNumber) {
-            $scope.multiItemForm.minNumberField.$setValidity("ing", false);
+
+        if ($scope.model.value.maxNumber != 0 && ($scope.model.value.minNumber > $scope.model.value.maxNumber)) {
+            $scope.multiItemForm.minNumberField.$setValidity("maxval", false);
         }
         else {
-            $scope.multiItemForm.minNumberField.$setValidity("ing", true);
+            $scope.multiItemForm.minNumberField.$setValidity("maxval", true);
         }
     }
 }
