@@ -1162,7 +1162,7 @@ namespace Umbraco.Core.Services.Implement
                 Name = "Membership",
                 Id = --identity
             };
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.Textbox, ValueStorageType.Ntext, Constants.Conventions.Member.Comments)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, Constants.Conventions.Member.Comments)
             {
                 Name = Constants.Conventions.Member.CommentsLabel,
                 SortOrder = 0,

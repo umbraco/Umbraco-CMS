@@ -225,7 +225,7 @@ namespace Umbraco.Core
                         {
                             {
                                 Comments,
-                                new PropertyType(PropertyEditors.Aliases.TextboxMultiple, ValueStorageType.Ntext, true, Comments)
+                                new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
                                     {
                                         Name = CommentsLabel
                                     }

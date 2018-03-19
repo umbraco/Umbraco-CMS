@@ -239,7 +239,7 @@
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
-    <Compile Include="PropertyEditors\ContentPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ContentPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ContentPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DateConfiguration.cs" />
@@ -261,14 +261,14 @@
     <Compile Include="PropertyEditors\MacroContainerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownConfiguration.cs" />
     <Compile Include="PropertyEditors\MarkdownConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MediaPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MediaPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MediaPickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MemberPicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\MultiNodeTreePicker2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTestStringConfiguration.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentConfiguration.cs" />
@@ -276,7 +276,7 @@
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
-    <Compile Include="PropertyEditors\RelatedLinks2PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RelatedLinksConfiguration.cs" />
     <Compile Include="PropertyEditors\RelatedLinksConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\RichTextConfiguration.cs" />

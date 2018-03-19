@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2);
+            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2))
+            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
             {
                 var nodeIds = source.ToString()
                     .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
@@ -67,7 +67,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             //TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
             if (UmbracoContext.Current != null)
             {
-                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker2))
+                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
                 {
                     var udis = (Udi[])source;
 

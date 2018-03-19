@@ -24,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(PublishedPropertyType propertyType)
-            => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker2Alias);
+            => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
             => typeof (IPublishedContent);

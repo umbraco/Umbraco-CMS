@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MediaPicker2);
+            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MediaPicker);
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)

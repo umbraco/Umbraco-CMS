@@ -40,7 +40,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (paramEditor == null)
                     {
                         //we'll just map this to a text box
-                        paramEditor = Current.ParameterEditors[Constants.PropertyEditors.Aliases.Textbox];
+                        paramEditor = Current.ParameterEditors[Constants.PropertyEditors.Aliases.TextBox];
                         Current.Logger.Warn<MacroMapperProfile>("Could not resolve a parameter editor with alias " + property.EditorAlias + ", a textbox will be rendered in it's place");
                     }
 

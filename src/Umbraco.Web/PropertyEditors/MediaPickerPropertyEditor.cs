@@ -7,13 +7,13 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a media picker property editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.MediaPicker2, EditorType.PropertyValue | EditorType.MacroParameter, "mediapicker", ValueTypes.Text, Group = "media", Icon = "icon-picture")]
-    public class MediaPicker2PropertyEditor : DataEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.MediaPicker, EditorType.PropertyValue | EditorType.MacroParameter, "mediapicker", ValueTypes.Text, Group = "media", Icon = "icon-picture")]
+    public class MediaPickerPropertyEditor : DataEditor
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MediaPicker2PropertyEditor"/> class.
+        /// Initializes a new instance of the <see cref="MediaPickerPropertyEditor"/> class.
         /// </summary>
-        public MediaPicker2PropertyEditor(ILogger logger)
+        public MediaPickerPropertyEditor(ILogger logger)
             : base(logger)
         { }
 

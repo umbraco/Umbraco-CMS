@@ -19,7 +19,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     {
         private static readonly string[] Aliases =
         {
-            Constants.PropertyEditors.Aliases.MultiNodeTreePicker2
+            Constants.PropertyEditors.Aliases.MultiNodeTreePicker
         };
 
         public override bool IsConverter(PublishedPropertyType propertyType)

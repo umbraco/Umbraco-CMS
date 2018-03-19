@@ -88,10 +88,10 @@ namespace Umbraco.Core.Models.PublishedContent
         // fixme - this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
         private static readonly Dictionary<string, (int, string)> BuiltinMemberProperties = new Dictionary<string, (int, string)>
         {
-            { "Email", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
-            { "Username", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
-            { "PasswordQuestion", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
-            { "Comments", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.Textbox) },
+            { "Email", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.TextBox) },
+            { "Username", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.TextBox) },
+            { "PasswordQuestion", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.TextBox) },
+            { "Comments", (Constants.DataTypes.Textbox, Constants.PropertyEditors.Aliases.TextBox) },
             { "IsApproved", (Constants.DataTypes.Boolean, Constants.PropertyEditors.Aliases.Boolean) },
             { "IsLockedOut", (Constants.DataTypes.Boolean, Constants.PropertyEditors.Aliases.Boolean) },
             { "LastLockoutDate", (Constants.DataTypes.Datetime, Constants.PropertyEditors.Aliases.DateTime) },

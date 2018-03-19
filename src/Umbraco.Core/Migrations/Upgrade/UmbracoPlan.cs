@@ -8,9 +8,6 @@ using Umbraco.Core.Migrations.Upgrade.V_7_5_5;
 using Umbraco.Core.Migrations.Upgrade.V_7_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_7_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
-using AddLockObjects = Umbraco.Core.Migrations.Upgrade.V_8_0_0.AddLockObjects;
-using AddLockTable = Umbraco.Core.Migrations.Upgrade.V_8_0_0.AddLockTable;
-using UpdateUniqueIndexOnPropertyData = Umbraco.Core.Migrations.Upgrade.V_7_5_0.UpdateUniqueIndexOnPropertyData;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -67,7 +64,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             //
             // when installing, the source state is empty, and the target state should be the final state.
 
-            Add(string.Empty, "{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
+            Add(string.Empty, "{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
 
             // UPGRADE FROM 7
             //
@@ -79,14 +76,15 @@ namespace Umbraco.Core.Migrations.Upgrade
             // upgrade paths, etc).
 
             From("{init-7.8.0}")
-                .Chain<AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}") // add more lock objects
+                .Chain<V_8_0_0.AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}") // add more lock objects
                 .Chain<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}")
                 .Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}")
                 .Chain<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}")
                 .Chain<DropMigrationsTable>("{F0C42457-6A3B-4912-A7EA-F27ED85A2092}")
                 .Chain<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}")
                 .Chain<TagsMigration>("{DD1B99AF-8106-4E00-BAC7-A43003EA07F8}")
-                .Chain<SuperZero>("{CC1B1201-1328-443C-954A-E0BBB8CCC1B5}");
+                .Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}")
+                .Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");;
 
             // 7.8.1 = same as 7.8.0
             From("{init-7.8.1}")
@@ -117,14 +115,14 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // 8.0.0
             From("{init-origin}");
-            Chain<AddLockTable>("{98347B5E-65BF-4DD7-BB43-A09CB7AF4FCA}");
-            Chain<AddLockObjects>("{1E8165C4-942D-40DC-AC76-C5FF8831E400}");
+            Chain<V_8_0_0.AddLockTable>("{98347B5E-65BF-4DD7-BB43-A09CB7AF4FCA}");
+            Chain<V_8_0_0.AddLockObjects>("{1E8165C4-942D-40DC-AC76-C5FF8831E400}");
             Chain<AddContentNuTable>("{39E15568-7AAD-4D54-81D0-758CCFC529F8}");
             Chain<RefactorXmlColumns>("{55C3F97D-BDA7-4FB1-A743-B0456B56EAA3}");
 
             // 7.5.0
             Chain<RemoveStylesheetDataAndTablesAgain>("{287F9E39-F673-42F7-908C-21659AB13B13}");
-            Chain<UpdateUniqueIndexOnPropertyData>("{2D08588A-AD90-479C-9F6E-A99B60BA7226}");
+            Chain<V_7_5_0.UpdateUniqueIndexOnPropertyData>("{2D08588A-AD90-479C-9F6E-A99B60BA7226}");
             Chain<AddRedirectUrlTable>("{2D917FF8-AC81-4C00-A407-1F4B1DF6089C}");
 
             // 7.5.5
@@ -157,6 +155,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<DataTypeMigration>("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
             Chain<TagsMigration>("{139F26D7-7E08-48E3-81D9-E50A21A72F67}");
             Chain<SuperZero>("{CC1B1201-1328-443C-954A-E0BBB8CCC1B5}");
+            Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
         }
     }
 }

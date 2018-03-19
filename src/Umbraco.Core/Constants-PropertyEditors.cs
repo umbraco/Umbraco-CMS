@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core
 {
@@ -32,7 +32,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Content Picker.
                 /// </summary>
-                public const string ContentPicker2Alias = "Umbraco.ContentPicker2"; // fixme
+                public const string ContentPicker = "Umbraco.ContentPicker";
 
                 /// <summary>
                 /// Date.
@@ -102,12 +102,12 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Media Picker.
                 /// </summary>
-                public const string MediaPicker2 = "Umbraco.MediaPicker2"; // fixme
+                public const string MediaPicker = "Umbraco.MediaPicker";
 
                 /// <summary>
                 /// Member Picker.
                 /// </summary>
-                public const string MemberPicker2 = "Umbraco.MemberPicker2"; // fixme
+                public const string MemberPicker = "Umbraco.MemberPicker";
 
                 /// <summary>
                 /// Member Group Picker.
@@ -117,7 +117,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// MultiNode Tree Picker.
                 /// </summary>
-                public const string MultiNodeTreePicker2 = "Umbraco.MultiNodeTreePicker2"; // fixme
+                public const string MultiNodeTreePicker = "Umbraco.MultiNodeTreePicker";
 
                 /// <summary>
                 /// Multiple TextString.
@@ -142,7 +142,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Related Links.
                 /// </summary>
-                public const string RelatedLinks2 = "Umbraco.RelatedLinks2"; // fixme
+                public const string RelatedLinks = "Umbraco.RelatedLinks";
 
                 /// <summary>
                 /// Slider.
@@ -157,12 +157,12 @@ namespace Umbraco.Core
                 /// <summary>
                 /// Textbox.
                 /// </summary>
-                public const string Textbox = "Umbraco.Textbox";
+                public const string TextBox = "Umbraco.TextBox";
 
                 /// <summary>
                 /// Textbox Multiple.
                 /// </summary>
-                public const string TextboxMultiple = "Umbraco.TextboxMultiple"; // fixme TextArea?
+                public const string TextArea = "Umbraco.TextArea";
 
                 /// <summary>
                 /// TinyMCE
@@ -216,9 +216,9 @@ namespace Umbraco.Core
             public static class ConfigurationKeys
             {
                 /// <summary>
-                /// The value type of property data (i.e., string, etc)
-                /// fixme - values?
+                /// The value type of property data (i.e., string, integer, etc)
                 /// </summary>
+                /// <remarks>Must be a valid <see cref="ValueTypes"/> value.</remarks>
                 public const string DataValueType = "umbracoDataValueType";
             }
         }

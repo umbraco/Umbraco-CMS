@@ -41,7 +41,7 @@ namespace Umbraco.Tests.PublishedContent
                 new DataType(new RichTextPropertyEditor(logger)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
                 new DataType(new TextboxPropertyEditor(logger)) { Id = 1004 },
-                new DataType(new MediaPicker2PropertyEditor(logger)) { Id = 1005 });
+                new DataType(new MediaPickerPropertyEditor(logger)) { Id = 1005 });
             Container.RegisterSingleton<IDataTypeService>(f => dataTypeService);
         }
 

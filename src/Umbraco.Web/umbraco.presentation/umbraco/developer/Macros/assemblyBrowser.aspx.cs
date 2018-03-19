@@ -195,7 +195,7 @@ namespace umbraco.developer
                     return Constants.PropertyEditors.Aliases.Boolean;
                 case "String":
                 default:
-                    return Constants.PropertyEditors.Aliases.Textbox;
+                    return Constants.PropertyEditors.Aliases.TextBox;
             }
         }
 
