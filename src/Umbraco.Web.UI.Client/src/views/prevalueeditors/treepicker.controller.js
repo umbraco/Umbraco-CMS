@@ -66,7 +66,7 @@ angular.module('umbraco')
 				$scope.treePickerOverlay = null;
 			};
 
-		}
+		};
 		
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);

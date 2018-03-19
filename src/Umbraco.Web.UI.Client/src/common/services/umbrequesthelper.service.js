@@ -350,6 +350,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     var octetStreamMime = 'application/octet-stream';
                     var success = false;
+                    var blob, url;
 
                     // Get the headers
                     headers = headers();
@@ -363,13 +364,16 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     try {
                         // Try using msSaveBlob if supported
                         console.log("Trying saveBlob method ...");
-                        var blob = new Blob([data], { type: contentType });
-                        if (navigator.msSaveBlob)
+                        blob = new Blob([data], { type: contentType });
+                        if (navigator.msSaveBlob) {
                             navigator.msSaveBlob(blob, filename);
+                        }
                         else {
                             // Try using other saveBlob implementations, if available
                             var saveBlob = navigator.webkitSaveBlob || navigator.mozSaveBlob || navigator.saveBlob;
-                            if (saveBlob === undefined) throw "Not supported";
+                            if (saveBlob === undefined) {
+                                throw "Not supported";
+                            }
                             saveBlob(blob, filename);
                         }
                         console.log("saveBlob succeeded");
@@ -390,8 +394,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                                 try {
                                     // Prepare a blob URL
                                     console.log("Trying download link method with simulated click ...");
-                                    var blob = new Blob([data], { type: contentType });
-                                    var url = urlCreator.createObjectURL(blob);
+                                    blob = new Blob([data], { type: contentType });
+                                    url = urlCreator.createObjectURL(blob);
                                     link.setAttribute('href', url);
 
                                     // Set the download attribute (Supported in Chrome 14+ / Firefox 20+)
@@ -416,8 +420,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                                     // Prepare a blob URL
                                     // Use application/octet-stream when using window.location to force download
                                     console.log("Trying download link method with window.location ...");
-                                    var blob = new Blob([data], { type: octetStreamMime });
-                                    var url = urlCreator.createObjectURL(blob);
+                                    blob = new Blob([data], { type: octetStreamMime });
+                                    url = urlCreator.createObjectURL(blob);
                                     window.location = url;
                                     console.log("Download link method with window.location succeeded");
                                     success = true;

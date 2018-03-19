@@ -17,32 +17,32 @@ angular.module("Umbraco.canvasdesigner")
 
     $scope.setSelectedpadding = function (paddingtype) {
 
-        if (paddingtype == "all") {
-            $scope.selectedpadding.name="all";
-            $scope.selectedpadding.value= $scope.item.values.paddingvalue;
+        if (paddingtype === "all") {
+            $scope.selectedpadding.name = "all";
+            $scope.selectedpadding.value = $scope.item.values.paddingvalue;
         }
 
-        if (paddingtype == "left") {
-            $scope.selectedpadding.name= "left";
-            $scope.selectedpadding.value= $scope.item.values.leftpaddingvalue;
+        if (paddingtype === "left") {
+            $scope.selectedpadding.name = "left";
+            $scope.selectedpadding.value = $scope.item.values.leftpaddingvalue;
         }
 
-        if (paddingtype == "right") {
-            $scope.selectedpadding.name= "right";
-            $scope.selectedpadding.value= $scope.item.values.rightpaddingvalue;
+        if (paddingtype === "right") {
+            $scope.selectedpadding.name = "right";
+            $scope.selectedpadding.value = $scope.item.values.rightpaddingvalue;
         }
 
-        if (paddingtype == "top") {
-            $scope.selectedpadding.name= "top";
-            $scope.selectedpadding.value= $scope.item.values.toppaddingvalue;
+        if (paddingtype === "top") {
+            $scope.selectedpadding.name = "top";
+            $scope.selectedpadding.value = $scope.item.values.toppaddingvalue;
         }
 
-        if (paddingtype == "bottom") {
-            $scope.selectedpadding.name= "bottom";
-            $scope.selectedpadding.value= $scope.item.values.bottompaddingvalue;
+        if (paddingtype === "bottom") {
+            $scope.selectedpadding.name = "bottom";
+            $scope.selectedpadding.value = $scope.item.values.bottompaddingvalue;
         }
 
-    }
+    };
 
     if (!$scope.item.values) {
         $scope.item.values = {
@@ -59,7 +59,7 @@ angular.module("Umbraco.canvasdesigner")
             if ($.inArray(key, $scope.item.enable) >= 0) {
                 $scope.paddingList.splice($scope.paddingList.length + 1, 0, key);
             }
-        })
+        });
     }
     else {
         $scope.paddingList = $scope.defaultPaddingList;
@@ -69,30 +69,30 @@ angular.module("Umbraco.canvasdesigner")
         $scope.setSelectedpadding($scope.paddingList[0]);
     }, false);
 
-    $scope.$watch( "selectedpadding", function () {
+    $scope.$watch("selectedpadding", function () {
 
-        if ($scope.selectedpadding.name == "all") {
+        if ($scope.selectedpadding.name === "all") {
             $scope.item.values.paddingvalue = $scope.selectedpadding.value;
         }
 
-        if ($scope.selectedpadding.name == "left") {
+        if ($scope.selectedpadding.name === "left") {
             $scope.item.values.leftpaddingvalue = $scope.selectedpadding.value;
         }
 
-        if ($scope.selectedpadding.name == "right") {
+        if ($scope.selectedpadding.name === "right") {
             $scope.item.values.rightpaddingvalue = $scope.selectedpadding.value;
         }
 
-        if ($scope.selectedpadding.name == "top") {
+        if ($scope.selectedpadding.name === "top") {
             $scope.item.values.toppaddingvalue = $scope.selectedpadding.value;
         }
 
-        if ($scope.selectedpadding.name == "bottom") {
+        if ($scope.selectedpadding.name === "bottom") {
             $scope.item.values.bottompaddingvalue = $scope.selectedpadding.value;
         }
 
-    }, true)
+    }, true);
 
 
 
-})
+});

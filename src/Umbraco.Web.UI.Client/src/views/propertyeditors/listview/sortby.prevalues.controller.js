@@ -30,7 +30,7 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
         // Populate list of options for the default sort (all the columns plus then node name)
         $scope.sortByFields = [];
         $scope.sortByFields.push({ value: "name", name: "Name", isSystem: 1 });
-        if (propsPreValue != undefined) {
+        if (propsPreValue !== undefined) {
             for (var i = 0; i < propsPreValue.value.length; i++) {
                 var value = propsPreValue.value[i];
                 $scope.sortByFields.push({

@@ -17,32 +17,32 @@ angular.module("Umbraco.canvasdesigner")
 
     $scope.setSelectedmargin = function (margintype) {
 
-        if (margintype == "all") {
+        if (margintype === "all") {
             $scope.selectedmargin.name = "all";
             $scope.selectedmargin.value = $scope.item.values.marginvalue;
         }
 
-        if (margintype == "left") {
+        if (margintype === "left") {
             $scope.selectedmargin.name = "left";
             $scope.selectedmargin.value = $scope.item.values.leftmarginvalue;
         }
 
-        if (margintype == "right") {
+        if (margintype === "right") {
             $scope.selectedmargin.name = "right";
             $scope.selectedmargin.value = $scope.item.values.rightmarginvalue;
         }
 
-        if (margintype == "top") {
+        if (margintype === "top") {
             $scope.selectedmargin.name = "top";
             $scope.selectedmargin.value = $scope.item.values.topmarginvalue;
         }
 
-        if (margintype == "bottom") {
+        if (margintype === "bottom") {
             $scope.selectedmargin.name = "bottom";
             $scope.selectedmargin.value = $scope.item.values.bottommarginvalue;
         }
 
-    }
+    };
 
     if (!$scope.item.values) {
         $scope.item.values = {
@@ -59,7 +59,7 @@ angular.module("Umbraco.canvasdesigner")
             if ($.inArray(key, $scope.item.enable) >= 0) {
                 $scope.marginList.splice($scope.marginList.length + 1, 0, key);
             }
-        })
+        });
     }
     else {
         $scope.marginList = $scope.defaultmarginList;
@@ -71,28 +71,28 @@ angular.module("Umbraco.canvasdesigner")
 
     $scope.$watch("selectedmargin", function () {
 
-        if ($scope.selectedmargin.name == "all") {
+        if ($scope.selectedmargin.name === "all") {
             $scope.item.values.marginvalue = $scope.selectedmargin.value;
         }
 
-        if ($scope.selectedmargin.name == "left") {
+        if ($scope.selectedmargin.name === "left") {
             $scope.item.values.leftmarginvalue = $scope.selectedmargin.value;
         }
 
-        if ($scope.selectedmargin.name == "right") {
+        if ($scope.selectedmargin.name === "right") {
             $scope.item.values.rightmarginvalue = $scope.selectedmargin.value;
         }
 
-        if ($scope.selectedmargin.name == "top") {
+        if ($scope.selectedmargin.name === "top") {
             $scope.item.values.topmarginvalue = $scope.selectedmargin.value;
         }
 
-        if ($scope.selectedmargin.name == "bottom") {
+        if ($scope.selectedmargin.name === "bottom") {
             $scope.item.values.bottommarginvalue = $scope.selectedmargin.value;
         }
 
-    }, true)
+    }, true);
 
 
 
-})
+});

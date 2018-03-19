@@ -70,9 +70,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 $scope.content = data;
                 
                 if (data.isChildOfListView && data.trashed === false) {
-                    $scope.page.listViewPath = ($routeParams.page)
-                        ? "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page
-                        : "/media/media/edit/" + data.parentId;
+                    $scope.page.listViewPath = ($routeParams.page) ?
+                        "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page :
+                        "/media/media/edit/" + data.parentId;
                 }
 
                 editorState.set($scope.content);
@@ -85,7 +85,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
                 syncTreeNode($scope.content, data.path, true);
                
-                if ($scope.content.parentId && $scope.content.parentId != -1) {
+                if ($scope.content.parentId && $scope.content.parentId !== -1) {
                     //We fetch all ancestors of the node to generate the footer breadcrump navigation
                     entityResource.getAncestors($routeParams.id, "media")
                         .then(function (anc) {

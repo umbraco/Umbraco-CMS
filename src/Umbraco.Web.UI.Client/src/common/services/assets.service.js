@@ -55,7 +55,7 @@ angular.module('umbraco.services')
         var _op = (url.indexOf("?") > 0) ? "&" : "?";
         url = url + _op + "umb__rnd=" + rnd;
         return url;
-    };
+    }
 
     function convertVirtualPath(path) {
         //make this work for virtual paths
@@ -266,12 +266,12 @@ angular.module('umbraco.services')
             }
 
             if (cssAssets.length > 0) {
-                var cssPaths = _.map(cssAssets, function (asset) { return appendRnd(asset.path) });
+                var cssPaths = _.map(cssAssets, function (asset) { return appendRnd(asset.path); });
                 LazyLoad.css(cssPaths, function() { _.each(cssAssets, assetLoaded); });
             }
 
             if (jsAssets.length > 0) {
-                var jsPaths = _.map(jsAssets, function (asset) { return appendRnd(asset.path) });
+                var jsPaths = _.map(jsAssets, function (asset) { return appendRnd(asset.path); });
                 LazyLoad.js(jsPaths, function () { _.each(jsAssets, assetLoaded); });
             }
 

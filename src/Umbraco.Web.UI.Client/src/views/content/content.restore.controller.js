@@ -9,20 +9,20 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 
 		relationResource.getByChildId(node.id, "relateParentDocumentOnDelete").then(function (data) {
 
-            if (data.length == 0) {
+            if (data.length === 0) {
                 $scope.success = false;
                 $scope.error = {
                     errorMsg: "Cannot automatically restore this item",
                     data: {
                         Message: "There is no 'restore' relation found for this node. Use the Move menu item to move it manually."
                     }
-                }
+                };
                 return;
             }
 
 		    $scope.relation = data[0];
 
-			if ($scope.relation.parentId == -1) {
+			if ($scope.relation.parentId === -1) {
 				$scope.target = { id: -1, name: "Root" };
 
 			} else {

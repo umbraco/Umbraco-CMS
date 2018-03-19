@@ -4,14 +4,14 @@
 /*********************************************************************************************************/
 
 /* Called for every canvasdesigner-over click */
-var onClickCanvasdesignerItem = function (schema) {
+function onClickCanvasdesignerItem  (schema) {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 
     //if (scope.schemaFocus != schema.toLowerCase()) {
     //var notFound = true;
         $.each(scope.canvasdesignerModel.configs, function (indexConfig, config) {
-            if (config.schema && schema.toLowerCase() == config.schema.toLowerCase()) {
+            if (config.schema && schema.toLowerCase() === config.schema.toLowerCase()) {
                 scope.currentSelected = config;
             }
         });
@@ -26,13 +26,13 @@ var onClickCanvasdesignerItem = function (schema) {
 }
 
 /* Called for every canvasdesigner-over rollover */
-var onMouseoverCanvasdesignerItem = function (name) {
+function onMouseoverCanvasdesignerItem  (name) {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 
     $.each(scope.canvasdesignerModel.configs, function (indexConfig, config) {
         config.highlighted = false;
-        if (config.name && name.toLowerCase() == config.name.toLowerCase()) {
+        if (config.name && name.toLowerCase() === config.name.toLowerCase()) {
             config.highlighted = true;
         }
     });
@@ -42,7 +42,7 @@ var onMouseoverCanvasdesignerItem = function (name) {
 }
 
 /* Called when the iframe is first loaded */
-var setFrameIsLoaded = function (canvasdesignerConfig, canvasdesignerPalette) {
+function setFrameIsLoaded (canvasdesignerConfig, canvasdesignerPalette) {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 
@@ -53,7 +53,7 @@ var setFrameIsLoaded = function (canvasdesignerConfig, canvasdesignerPalette) {
 }
 
 /* Iframe body click */
-var iframeBodyClick = function () {
+function iframeBodyClick  () {
 
     var scope = angular.element($("#canvasdesignerPanel")).scope();
 

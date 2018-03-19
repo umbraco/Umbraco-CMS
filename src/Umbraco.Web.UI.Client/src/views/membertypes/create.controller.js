@@ -17,9 +17,9 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
         localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
 
-    $scope.showCreateFolder = function() {
+    $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
-    }
+    };
 
     $scope.createContainer = function () {
         if (formHelper.submitForm({
@@ -37,18 +37,18 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
                 var section = appState.getSectionState("currentSection");
 
-            }, function(err) {
+            }, function (err) {
 
-               //TODO: Handle errors
+                //TODO: Handle errors
             });
-        };
-    }
+        }
+    };
 
-    $scope.createMemberType = function() {
+    $scope.createMemberType = function () {
         $location.search('create', null);
         $location.path("/settings/membertypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.MemberTypes.CreateController", MemberTypesCreateController);

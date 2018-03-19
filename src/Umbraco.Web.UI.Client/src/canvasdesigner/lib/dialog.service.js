@@ -67,20 +67,20 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
                     $compile(dialog.element)(scope);
                 });
 
-                dialog.element.addClass("selected")
+                dialog.element.addClass("selected");
 
                 scope.cancel = function () {
                     if (dialog.cancel) {
                         dialog.cancel(originalDialogItem);
                     }
                     closeDialog(dialog, destroyScope);
-                }
+                };
 
                 scope.change = function (data) {
                     if (dialog.change) {
                         dialog.change(data);
                     }
-                }
+                };
 
                 scope.submit = function (data) {
                     if (dialog.callback) {
@@ -91,7 +91,7 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
 
                 scope.close = function () {
                     closeDialog(dialog, destroyScope);
-                }
+                };
 
                 scope.dialogData = dialog.dialogData;
                 scope.dialogItem = dialog.dialogItem;
@@ -106,10 +106,10 @@ angular.module("Umbraco.canvasdesigner").factory('dialogService', function ($roo
 
         close: function() {
             var modal = $(".float-panel");
-            modal.removeClass("selected")
+            modal.removeClass("selected");
         }
 
-    }
+    };
 
 
 });

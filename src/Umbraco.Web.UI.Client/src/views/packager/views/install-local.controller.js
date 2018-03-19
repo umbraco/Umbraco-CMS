@@ -81,7 +81,7 @@
                 if (status === 404) {
                     vm.zipFile.serverErrorMessage = "File not found";
                 }
-                else if (status == 400) {
+                else if (status === 400) {
                     //it's a validation error
                     vm.zipFile.serverErrorMessage = evt.message;
                 }
@@ -186,12 +186,12 @@
             return $q.reject();
         }
 
-        vm.reloadPage = function() {
+        vm.reloadPage = function () {
             //reload on next digest (after cookie)
             $timeout(function () {
                 $window.location.reload(true);
             });
-        }
+        };
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Packages.InstallLocalController", PackagesInstallLocalController);

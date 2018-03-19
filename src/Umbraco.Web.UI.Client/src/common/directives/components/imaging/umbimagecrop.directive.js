@@ -166,7 +166,7 @@ angular.module("umbraco.directives")
 
 
 
-					var validatePosition = function(left, top){
+                    function validatePosition (left, top){
 						if(left > constraints.left.max)
 						{
 							left = constraints.left.max;
@@ -191,7 +191,7 @@ angular.module("umbraco.directives")
 						if(scope.dimensions.image.top !== top){
 							scope.dimensions.image.top = top;
 						}
-					};
+					}
 
 
 					//sets scope.crop to the recalculated % based crop

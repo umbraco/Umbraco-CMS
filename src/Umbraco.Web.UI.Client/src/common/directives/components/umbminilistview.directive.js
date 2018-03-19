@@ -157,6 +157,13 @@
             }
 
             /* Search */
+
+            var searchMiniListView = _.debounce(function (miniListView) {
+                scope.$apply(function () {
+                    getChildrenForMiniListView(miniListView);
+                });
+            }, 500);
+
             scope.searchMiniListView = function(search, miniListView) {
                 // set search value
                 miniListView.pagination.filter = search;
@@ -166,12 +173,6 @@
                 miniListView.loading = true;
                 searchMiniListView(miniListView);
             };
-
-            var searchMiniListView = _.debounce(function (miniListView) {
-                scope.$apply(function () {
-                    getChildrenForMiniListView(miniListView);
-                });
-            }, 500);
 
             /* Animation */
             scope.getMiniListViewAnimation = function() {

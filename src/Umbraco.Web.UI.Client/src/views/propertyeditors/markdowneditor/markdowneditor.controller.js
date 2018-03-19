@@ -75,7 +75,7 @@ function MarkdownEditorController($scope, $element, assetsService, dialogService
 
             //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
             assetsService.loadCss("lib/markdown/markdown.css");
-        })
+        });
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MarkdownEditorController", MarkdownEditorController);

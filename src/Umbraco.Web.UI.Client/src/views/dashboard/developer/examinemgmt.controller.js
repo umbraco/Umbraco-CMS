@@ -54,15 +54,15 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
                 searcher.isSearching = true;
                 searcher.searchResults = searchResults;
             });
-    }
+    };
 
-    $scope.toggle = function(provider, propName) {
+    $scope.toggle = function (provider, propName) {
         if (provider[propName] !== undefined) {
             provider[propName] = !provider[propName];
         } else {
             provider[propName] = true;
         }
-    }
+    };
 
     $scope.rebuildIndex = function(indexer) {
         if (confirm("This will cause the index to be rebuilt. " +
@@ -89,7 +89,7 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
 
                 });
         }
-    }
+    };
 
     $scope.optimizeIndex = function(indexer) {
         if (confirm("This will cause the index to be optimized which will improve its performance. " +
@@ -113,11 +113,11 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
 
                 });
         }
-    }
+    };
 
-    $scope.closeSearch = function(searcher) {
+    $scope.closeSearch = function (searcher) {
         searcher.isSearching = true;
-    }
+    };
 
     //go get the data
 

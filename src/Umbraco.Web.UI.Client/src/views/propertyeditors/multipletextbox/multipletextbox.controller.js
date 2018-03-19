@@ -44,7 +44,7 @@
                     var remainder = [];
 
                     // Used to require an extra hit on backspace for the field to be removed
-                    if(txtBoxValue.value === "") {
+                    if (txtBoxValue.value === "") {
                         backspaceHits++;
                     } else {
                         backspaceHits = 0;
@@ -62,7 +62,7 @@
                         var prevItemIndex = index - 1;
 
                         //Set focus back on false as the directive only watches for true
-                        if(prevItemIndex >= 0) {
+                        if (prevItemIndex >= 0) {
                             $scope.model.value[prevItemIndex].hasFocus = false;
                             $timeout(function () {
                                 //Focus on the previous value
@@ -77,7 +77,7 @@
                 break;
             default:
         }
-    }
+    };
 
     $scope.add = function () {
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {

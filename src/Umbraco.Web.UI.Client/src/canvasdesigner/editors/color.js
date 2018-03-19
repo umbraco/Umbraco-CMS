@@ -13,4 +13,4 @@ angular.module("Umbraco.canvasdesigner")
         };
     }
 
-})
+});

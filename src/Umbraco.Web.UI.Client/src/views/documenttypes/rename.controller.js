@@ -11,9 +11,9 @@
 
             function reportSuccessAndClose(treeName) {
                 var lastComma = scope.currentNode.path.lastIndexOf(","),
-                    path = lastComma === -1
-                        ? scope.currentNode.path
-                        : scope.currentNode.path.substring(0, lastComma - 1);
+                    path = lastComma === -1 ?
+                        scope.currentNode.path :
+                        scope.currentNode.path.substring(0, lastComma - 1);
 
                 navigationService.syncTree({
                     tree: treeName,
@@ -41,7 +41,7 @@
 
             scope.model = {
                 folderName: scope.currentNode.name
-            }
+            };
 
             scope.renameContainer = function (resourceKey, treeName) {
                 var resource = injector.get(resourceKey);
@@ -58,6 +58,6 @@
                             }
                         }
                     });
-            }
+            };
         }
     ]);

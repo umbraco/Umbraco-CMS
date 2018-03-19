@@ -2,9 +2,9 @@
 /* Global function and variable for panel/page com */
 /*********************************************************************************************************/
 
-var currentTarget = undefined;
+var currentTarget;
 
-var refreshLayout = function (parameters) {
+function refreshLayout(parameters) {
 
     // hide preview badget
     $("#umbracoPreviewBadge").hide();
@@ -17,17 +17,17 @@ var refreshLayout = function (parameters) {
  * the content iframe to allow live previewing.
  */
 var webFontScriptLoaded = false;
-var getFont = function (font) {
+function getFont(font) {
     if (!webFontScriptLoaded) {
         $.getScript('https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
-        .done(function () {
-            webFontScriptLoaded = true;
-            // Recursively call once webfont script is available.
-            getFont(font);
-        })
-        .fail(function () {
-            console.log('error loading webfont');
-        });
+            .done(function () {
+                webFontScriptLoaded = true;
+                // Recursively call once webfont script is available.
+                getFont(font);
+            })
+            .fail(function () {
+                console.log('error loading webfont');
+            });
     }
     else {
         WebFont.load({
@@ -47,7 +47,7 @@ var getFont = function (font) {
     }
 }
 
-var closeIntelCanvasdesigner = function (canvasdesignerModel) {
+function closeIntelCanvasdesigner(canvasdesignerModel) {
 
     if (canvasdesignerModel) {
 
@@ -64,7 +64,7 @@ var closeIntelCanvasdesigner = function (canvasdesignerModel) {
 
 }
 
-var initBodyClickEvent = function () {
+function initBodyClickEvent() {
     $("body").on("click", function () {
         if (parent.iframeBodyClick) {
             parent.iframeBodyClick();
@@ -72,7 +72,7 @@ var initBodyClickEvent = function () {
     });
 }
 
-var initIntelCanvasdesigner = function (canvasdesignerModel) {
+function initIntelCanvasdesigner(canvasdesignerModel) {
 
     if (canvasdesignerModel) {
 
@@ -92,11 +92,11 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
             e.stopPropagation();
 
             var target = $(e.target);
-            while (target.length > 0 && (target.attr('canvasdesigner-over') == undefined || target.attr('canvasdesigner-over') == '')) {
+            while (target.length > 0 && (target.attr('canvasdesigner-over') === undefined || target.attr('canvasdesigner-over') === '')) {
                 target = target.parent();
             }
 
-            if (target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
+            if (target.attr('canvasdesigner-over') !== undefined && target.attr('canvasdesigner-over') !== '') {
                 target.unbind();
                 outlinePosition(target);
 
@@ -123,21 +123,21 @@ var initIntelCanvasdesigner = function (canvasdesignerModel) {
 
 }
 
-var refreshOutlinePosition = function(schema) {
+function refreshOutlinePosition (schema) {
     outlinePosition($(schema));
 }
 
-var outlinePosition = function (oTarget) {
+function outlinePosition (oTarget) {
 
     var target = oTarget;
 
-    if (target.length > 0 && target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
+    if (target.length > 0 && target.attr('canvasdesigner-over') !== undefined && target.attr('canvasdesigner-over') !== '') {
 
         var localname = target[0].localName;
         var height = $(target).outerHeight();
         var width = $(target).outerWidth();
         var position = $(target).offset();
-        var posY = position.top ;
+        var posY = position.top;
         //$(window).scrollTop();
         var posX = position.left;
         //+ $(window).scrollLeft();
@@ -158,11 +158,11 @@ var outlinePosition = function (oTarget) {
     }
 }
 
-var refreshOutlineSelected = function (schema) {
+function refreshOutlineSelected (schema) {
     outlineSelected($(schema));
 }
 
-var outlineSelected = function (oTarget) {
+function outlineSelected (oTarget) {
 
     var target = currentTarget;
 
@@ -171,7 +171,7 @@ var outlineSelected = function (oTarget) {
         target = oTarget;
     }
 
-    if (target && target.length > 0 && target.attr('canvasdesigner-over') != undefined && target.attr('canvasdesigner-over') != '') {
+    if (target && target.length > 0 && target.attr('canvasdesigner-over') !== undefined && target.attr('canvasdesigner-over') !== '') {
 
         var localname = target[0].localName;
         var height = $(target).outerHeight();
@@ -199,16 +199,16 @@ var outlineSelected = function (oTarget) {
 
 }
 
-var outlinePositionHide = function () {
+function outlinePositionHide () {
     $(".canvasdesigner-overlay").css('display', "none");
 }
 
-var outlineSelectedHide = function () {
+function outlineSelectedHide () {
     currentTarget = undefined;
     $(".canvasdesigner-overlay-selected").css('display', "none");
 }
 
-var initCanvasdesignerPanel = function () {
+function initCanvasdesignerPanel  () {
 
     $('link[data-title="canvasdesignerCss"]').attr('disabled', 'disabled');
 
@@ -248,7 +248,7 @@ var initCanvasdesignerPanel = function () {
         type: 'POST',
         dataType: "json",
         error: function (err) {
-            alert(err.responseText)
+            alert(err.responseText);
         },
         data: {
             config: JSON.stringify(canvasdesignerConfig),
@@ -288,7 +288,7 @@ $(function () {
         $("body").append("<div class=\"canvasdesigner-overlay-selected\" style=\"display:none; pointer-events: none; position: absolute; z-index: 9998; border: 2px solid #2ebdff; border-radius: 3px;\"><span style=\"position:absolute;background: #2ebdff; font-family: Helvetica, Arial, sans-serif; color: #fff; padding: 0 5px; font-size: 10px; line-height: 16px; display: inline-block; border-radius: 0 0 3px 0;\"></span></div>");
 
         // Set event for any body click
-        initBodyClickEvent()
+        initBodyClickEvent();
 
         // Init canvasdesigner panel
         initCanvasdesignerPanel();

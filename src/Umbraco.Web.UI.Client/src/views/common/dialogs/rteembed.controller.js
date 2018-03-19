@@ -59,7 +59,7 @@
         if ($scope.form.constrain) {
             width = parseInt($scope.form.width, 10);
             height = parseInt($scope.form.height, 10);
-            if (type == 'width') {
+            if (type === 'width') {
                 origHeight = Math.round((width / origWidth) * height);
                 $scope.form.height = origHeight;
             } else {
@@ -67,7 +67,7 @@
                 $scope.form.width = origWidth;
             }
         }
-        if ($scope.form.url != "") {
+        if ($scope.form.url !== "") {
             $scope.showPreview();
         }
 

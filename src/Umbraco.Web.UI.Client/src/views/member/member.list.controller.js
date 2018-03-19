@@ -23,7 +23,7 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
             $scope.content = data;
 
             //translate "All Members"
-            if ($scope.content != null && $scope.content.name != null && $scope.content.name.replace(" ", "").toLowerCase() == "allmembers") {
+            if ($scope.content != null && $scope.content.name != null && $scope.content.name.replace(" ", "").toLowerCase() === "allmembers") {
                 localizationService.localize("member_allMembers").then(function (value) {
                     $scope.content.name = value;
                 });

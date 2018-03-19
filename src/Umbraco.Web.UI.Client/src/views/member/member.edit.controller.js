@@ -20,9 +20,9 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.exportButton = "init";
     $scope.busy = false;
 
-    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
-        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
-        : null;
+    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName) ?
+        "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page :
+        null;
 
     //build a path to sync the tree with
     function buildTreePath(data) {
@@ -172,10 +172,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
     };
 
-    $scope.export = function() {
+    $scope.export = function () {
         var memberKey = $scope.content.key;
         memberResource.exportMemberData(memberKey);
-    }
+    };
 
 }
 

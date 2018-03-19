@@ -8,10 +8,10 @@
             buttonState: "",
             passwordPolicies: null,
             passwordPolicyText: ""
-        }
+        };
         $scope.loginStates = {
             submitButton: "init"
-        }
+        };
         $scope.avatarFile = {
             filesHolder: null,
             uploadStatus: null,
@@ -19,11 +19,11 @@
             maxFileSize: Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB",
             acceptedFileTypes: mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes),
             uploaded: false
-        }
+        };
         $scope.togglePassword = function () {
             var elem = $("form[name='loginForm'] input[name='password']");
             elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
-        }
+        };
 
         function init() {
             // Check if it is a new user
@@ -69,7 +69,7 @@
         $scope.getStarted = function () {
             $location.search('invite', null);
             $scope.submit(true);
-        }
+        };
 
         function upload(file) {
 
@@ -112,7 +112,7 @@
                 if (status === 404) {
                     $scope.avatarFile.serverErrorMessage = "File not found";
                 }
-                else if (status == 400) {
+                else if (status === 400) {
                     //it's a validation error
                     $scope.avatarFile.serverErrorMessage = evt.message;
                 }
@@ -167,7 +167,7 @@
             $timeout(function () {
                 $("form[name='" + form + "'] input[name='" + field + "']").focus();
             });
-        }
+        };
 
         var twoFactorloginDialog = null;
         function show2FALoginDialog(view, callback) {
@@ -210,7 +210,7 @@
             resetInputValidation();
             $scope.view = "login";
             setFieldFocus("loginForm", "username");
-        }
+        };
 
         $scope.showRequestPasswordReset = function () {
             $scope.errorMsg = "";
@@ -218,19 +218,19 @@
             $scope.view = "request-password-reset";
             $scope.showEmailResetConfirmation = false;
             setFieldFocus("requestPasswordResetForm", "email");
-        }
+        };
 
         $scope.showSetPassword = function () {
             $scope.errorMsg = "";
             resetInputValidation();
             $scope.view = "set-password";
             setFieldFocus("setPasswordForm", "password");
-        }
+        };
 
         var d = new Date();
         var konamiGreetings = new Array("Suze Sunday", "Malibu Monday", "Tequila Tuesday", "Whiskey Wednesday", "Negroni Day", "Fernet Friday", "Sancerre Saturday");
         var konamiMode = $cookies.konamiLogin;
-        if (konamiMode == "1") {
+        if (konamiMode === "1") {
             $scope.greeting = "Happy " + konamiGreetings[d.getDay()];
         } else {
             localizationService.localize("login_greeting" + d.getDay()).then(function (label) {
@@ -246,7 +246,7 @@
         $scope.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
 
         $scope.activateKonamiMode = function () {
-            if ($cookies.konamiLogin == "1") {
+            if ($cookies.konamiLogin === "1") {
                 // somehow I can't update the cookie value using $cookies, so going native
                 document.cookie = "konamiLogin=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
                 document.location.reload();
@@ -256,7 +256,7 @@
                     $scope.greeting = "Happy " + konamiGreetings[d.getDay()];
                 });
             }
-        }
+        };
 
         $scope.loginSubmit = function (login, password) {
 
@@ -392,7 +392,7 @@
                     $scope.setPasswordForm.confirmPassword.$setValidity('auth', true);
                 }
             });
-        }
+        };
 
 
         //Now, show the correct panel:

@@ -29,12 +29,12 @@ angular.module('colorpicker', ['spectrumcolorpicker'])
                   };
 
                   dialogService.open(config);
-              }
+              };
 
               scope.setColor = false;
 
               scope.submitAndClose = function () {
-                  if (scope.ngModel != "") {
+                  if (scope.ngModel !== "") {
                       scope.setColor = true;
                       scope.submit(scope.ngModel);
                   } else {
@@ -45,7 +45,7 @@ angular.module('colorpicker', ['spectrumcolorpicker'])
 
               scope.cancelAndClose = function () {
                   scope.cancel();
-              }
+              };
 
           },
           template:
@@ -66,4 +66,4 @@ angular.module('colorpicker', ['spectrumcolorpicker'])
             '</div>',
           replace: true
       };
-  }])
+  }]);

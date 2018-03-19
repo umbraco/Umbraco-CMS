@@ -84,7 +84,7 @@
             vm.selectedUserGroups.push(group);
             //remove from the removed groups if it's been re-added
             vm.removedUserGroups = _.reject(vm.removedUserGroups, function (g) {
-              return g.id == group.id;
+              return g.id === group.id;
             });
           }
         }

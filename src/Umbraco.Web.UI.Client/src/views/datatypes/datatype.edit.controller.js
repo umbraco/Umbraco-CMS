@@ -109,7 +109,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
 
         //when the value changes, we need to dynamically load in the new editor
-        if (newVal && (newVal != oldVal && (oldVal || $routeParams.create))) {
+        if (newVal && (newVal !== oldVal && (oldVal || $routeParams.create))) {
             //we are editing so get the content item from the server
             var currDataTypeId = $routeParams.create ? undefined : $routeParams.id;
             dataTypeResource.getPreValues(newVal, currDataTypeId)
@@ -128,7 +128,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
     function setHeaderNameState(content) {
 
-      if(content.isSystem == 1) {
+      if(content.isSystem === 1) {
          $scope.page.nameLocked = true;
       }
 

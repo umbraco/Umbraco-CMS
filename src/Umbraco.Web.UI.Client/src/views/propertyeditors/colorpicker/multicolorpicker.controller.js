@@ -61,7 +61,7 @@
         }
 
         // ensure labels
-        for (var i = 0; i < $scope.model.value.length; i++) {
+        for (var i = 0; i < $scope.model.value.length; i++) { // jshint ignore:line
             var item = $scope.model.value[i];
             item.label = item.hasOwnProperty("label") ? item.label : item.value;
         }

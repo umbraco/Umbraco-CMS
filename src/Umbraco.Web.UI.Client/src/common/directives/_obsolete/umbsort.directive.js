@@ -36,7 +36,7 @@ angular.module("umbraco.directives")
                 scope.opts.nested= cfg.nested || true,
                 scope.opts.drop= cfg.drop || true,
                 scope.opts.drag= cfg.drag || true,
-                scope.opts.clone = cfg.clone || "<li/>";
+                scope.opts.clone = cfg.clone || "<li/>"; // jshint ignore:line
                 scope.opts.mode = cfg.mode || "list";
 
                 scope.opts.itemSelectorFull = $.trim(scope.opts.itemPath + " " + scope.opts.itemSelector);

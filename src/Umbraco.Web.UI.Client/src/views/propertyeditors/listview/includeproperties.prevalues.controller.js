@@ -43,13 +43,13 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                 return "general_username";
         }
         return alias;
-    }
+    };
 
-    $scope.removeField = function(e) {
+    $scope.removeField = function (e) {
         $scope.model.value = _.reject($scope.model.value, function (x) {
             return x.alias === e.alias;
-        }); 
-    }
+        });
+    };
 
     //now we'll localize these strings, for some reason the directive doesn't work inside of the select group with an ng-model declared
     _.each($scope.systemFields, function (e, i) {
@@ -137,7 +137,7 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
                 isSystem: isSystem ? 1 : 0
             });
         }
-    }
+    };
 
     function getAliasIndexByText(value) {
         for (var i = 0; i < $scope.model.value.length; i++) {

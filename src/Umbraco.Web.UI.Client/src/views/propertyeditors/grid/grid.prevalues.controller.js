@@ -109,7 +109,7 @@ angular.module("umbraco")
 
               $scope.layoutConfigOverlay.show = false;
               $scope.layoutConfigOverlay = null;
-           }
+           };
 
         };
 
@@ -189,7 +189,7 @@ angular.module("umbraco")
             if(toggle){
                 collection = [];
             }else{
-                delete collection;
+                delete collection; // jshint ignore:line
             }
         };
 
@@ -219,7 +219,7 @@ angular.module("umbraco")
 
            $scope.editConfigCollectionOverlay.submit = function(model) {
 
-              callback(model.config)
+              callback(model.config);
 
               $scope.editConfigCollectionOverlay.show = false;
               $scope.editConfigCollectionOverlay = null;

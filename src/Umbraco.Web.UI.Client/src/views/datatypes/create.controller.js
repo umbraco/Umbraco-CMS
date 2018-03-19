@@ -15,9 +15,9 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
     var node = $scope.dialogOptions.currentNode;
 
-    $scope.showCreateFolder = function() {
+    $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
-    }
+    };
 
     $scope.createContainer = function () {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
@@ -31,18 +31,18 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
                 var section = appState.getSectionState("currentSection");
 
-            }, function(err) {
+            }, function (err) {
 
-               //TODO: Handle errors
+                //TODO: Handle errors
             });
-        };
-    }
+        }
+    };
 
-    $scope.createDataType = function() {
+    $scope.createDataType = function () {
         $location.search('create', null);
         $location.path("/developer/datatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DataType.CreateController", DataTypeCreateController);

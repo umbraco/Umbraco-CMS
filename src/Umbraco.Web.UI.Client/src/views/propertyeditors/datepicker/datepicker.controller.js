@@ -87,12 +87,12 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     var picker = null;
 
-    $scope.clearDate = function() {
+    $scope.clearDate = function () {
         $scope.hasDatetimePickerValue = false;
         $scope.datetimePickerValue = null;
         $scope.model.value = null;
         $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
-    }
+    };
 
     $scope.serverTime = null;
     $scope.serverTimeNeedsOffsetting = false;
@@ -148,7 +148,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			        }
 			        else {
                         //create a normal moment , no offset required
-			            var dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
+			            dateVal = $scope.model.value ? moment($scope.model.value, "YYYY-MM-DD HH:mm:ss") : moment();
 			        }
 
 			        element.datetimepicker("setValue", dateVal);

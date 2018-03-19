@@ -234,23 +234,31 @@
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.id = savedContentType.id;
                         vm.contentType.groups.forEach(function(group) {
-                            if (!group.name) return;
+                            if (!group.name) {
+                                return;
+                            }
                             var k = 0;
-                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
+                            while (k < savedContentType.groups.length && savedContentType.groups[k].name !== group.name) {
                                 k++;
-                            if (k == savedContentType.groups.length) {
+                            }
+                            if (k === savedContentType.groups.length) {
                                 group.id = 0;
                                 return;
                             }
                             var savedGroup = savedContentType.groups[k];
-                            if (!group.id) group.id = savedGroup.id;
+                            if (!group.id) {
+                                group.id = savedGroup.id;
+                            }
 
                             group.properties.forEach(function (property) {
-                                if (property.id || !property.alias) return;
+                                if (property.id || !property.alias) {
+                                    return;
+                                }
                                 k = 0;
-                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias !== property.alias) {
                                     k++;
-                                if (k == savedGroup.properties.length) {
+                                }
+                                if (k === savedGroup.properties.length) {
                                     property.id = 0;
                                     return;
                                 }

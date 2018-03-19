@@ -28,7 +28,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                     if ($scope.dialogData && $scope.dialogData.macroData && $scope.dialogData.macroData.macroParamsDictionary) {
                         _.each($scope.dialogData.macroData.macroParamsDictionary, function (val, key) {
                             var prop = _.find($scope.macroParams, function (item) {
-                                return item.alias == key;
+                                return item.alias === key;
                             });
                             if (prop) {
 
@@ -73,7 +73,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
 
             var val = item.value;
 
-            if (item.value != null && item.value != undefined && !_.isString(item.value)) {
+            if (item.value != null && item.value !== undefined && !_.isString(item.value)) {
                 try {
                     val = angular.toJson(val);
                 }
