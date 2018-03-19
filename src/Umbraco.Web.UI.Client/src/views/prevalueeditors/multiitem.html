@@ -1,8 +1,8 @@
 ﻿<div ng-controller="Umbraco.PrevalueEditors.MultiItemController" class="umb-editor umb-mediapicker">
     <div class="control-group">
-        <input name="boolean" type="checkbox" ng-model="model.value.isMultiItem" ng-true-value="1" ng-false-value="0" />
+        <input name="boolean" type="checkbox" ng-model="model.value.isMultiItem" ng-true-value="1" ng-false-value="0" ng-change="resetIfSingle()" />
     </div>
-    <ng-form name="multiItemForm" ng-show="model.value.isMultiItem">
+    <ng-form name="multiItemForm" ng-if="model.value.isMultiItem">
         <div class="control-group umb-control-group">
             <label class="control-label ng-binding" ng-hide="property.hideLabel" for="minNumber" ng-attr-title="{{propertyAlias}}" title="minNumber">
                 Min. items
@@ -19,7 +19,7 @@
                        ng-change="validate()" />
                 <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="number">Not a number</span>
                 <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="maxval">Min. Items must be greater than Max. Items</span>
-                <span class="help-inline" val-msg-for="maxNumberField" val-toggle-msg="required">Required</span>
+                <span class="help-inline" val-msg-for="minNumberField" val-toggle-msg="required">Required</span>
             </div>
         </div>
 

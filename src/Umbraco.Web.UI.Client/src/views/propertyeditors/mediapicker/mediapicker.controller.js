@@ -22,8 +22,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
             $scope.isMultiPicker = multiPicker;
 
-            $scope.minNumber = $scope.model.config.multiPicker.minNumber ? parseInt($scope.model.config.multiPicker.minNumber) : 0;
-            $scope.maxNumber = $scope.model.config.multiPicker.maxNumber || $scope.isMultiPicker ? parseInt($scope.model.config.multiPicker.maxNumber) : 1;
+            $scope.minNumber = $scope.isMultiPicker && $scope.model.config.multiPicker.minNumber != null ? parseInt($scope.model.config.multiPicker.minNumber) : 0;
+            $scope.maxNumber = $scope.isMultiPicker && $scope.model.config.multiPicker.maxNumber != null ? parseInt($scope.model.config.multiPicker.maxNumber) : 1;
 
             if ($scope.model.value) {
                 var ids = $scope.model.value.split(',');
