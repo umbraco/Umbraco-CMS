@@ -92,7 +92,6 @@
         $scope.model.config.ticksPositions = _.map($scope.model.config.ticksPositions.split(','), function (item) {
             return parseInt(item.trim());
         });
-        console.log($scope.model.config.ticksPositions);
     }
 
     if (!$scope.model.config.ticksLabels) {
