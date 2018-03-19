@@ -44,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     Key = "multiple",
                     Name = "Enable multiple choice",
-                    Description = "When checked, the dropdown will be a select multiple / combobox style dropdown",
+                    Description = "When checked, the dropdown will be a select multiple / combo box style dropdown",
                     View = "boolean"
                 });
             }
