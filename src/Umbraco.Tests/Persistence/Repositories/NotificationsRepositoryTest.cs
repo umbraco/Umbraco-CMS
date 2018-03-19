@@ -27,7 +27,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repo = new NotificationsRepository((IScopeAccessor) provider);
 
-                var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,123", SortOrder = 1, Text = "hello", Trashed = false, UniqueId = Guid.NewGuid(), UserId = 0 };
+                var node = new NodeDto // create bogus item so we can add a notification
+                {
+                    CreateDate = DateTime.Now,
+                    Level = 1,
+                    NodeObjectType = Constants.ObjectTypes.ContentItem,
+                    ParentId = -1,
+                    Path = "-1,123",
+                    SortOrder = 1,
+                    Text = "hello",
+                    Trashed = false,
+                    UniqueId = Guid.NewGuid(),
+                    UserId = Constants.Security.SuperId
+                };
                 var result = scope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
                 var user = Mock.Of<IUser>(e => e.Id == node.UserId);
@@ -54,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 scope.Database.Insert(userDto);
 
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var userAdmin = Mock.Of<IUser>(e => e.Id == 0);
+                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperId);
 
                 for (var i = 0; i < 10; i++)
                 {
@@ -143,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 scope.Database.Insert(userDto);
 
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var userAdmin = Mock.Of<IUser>(e => e.Id == 0);
+                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperId);
 
                 for (var i = 0; i < 10; i++)
                 {

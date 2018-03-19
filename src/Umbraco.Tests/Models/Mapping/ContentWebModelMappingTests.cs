@@ -39,11 +39,22 @@ namespace Umbraco.Tests.Models.Mapping
             { }
         }
 
+        private void FixUsers(IContentBase content)
+        {
+            // CreateSimpleContentType leaves CreatorId == 0
+            // which used to be both the "super" user and the "default" user
+            // v8 is changing this, so the test would report a <null> creator
+            // temp. fixing by assigning super here
+            //
+            content.CreatorId = Constants.Security.SuperId;
+        }
+
         [Test]
         public void To_Media_Item_Simple()
         {
             var contentType = MockedContentTypes.CreateImageMediaType();
             var content = MockedMedia.CreateMediaImage(contentType, -1);
+            FixUsers(content);
 
             var result = Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>(content);
 
@@ -60,6 +71,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
 
             var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content);
 
@@ -76,6 +88,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
 
             var result = Mapper.Map<IContent, ContentItemDto<IContent>>(content);
 
@@ -87,6 +100,7 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateImageMediaType();
             var content = MockedMedia.CreateMediaImage(contentType, -1);
+            FixUsers(content);
 
             var result = Mapper.Map<IMedia, ContentItemDto<IMedia>>(content);
 
@@ -98,6 +112,8 @@ namespace Umbraco.Tests.Models.Mapping
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
+
             //need ids for tabs
             var id = 1;
             foreach (var g in content.PropertyGroups)
@@ -135,6 +151,8 @@ namespace Umbraco.Tests.Models.Mapping
                 idSeed++;
             }
             var content = MockedContent.CreateSimpleContent(contentType);
+            FixUsers(content);
+
             foreach (var p in content.Properties)
             {
                 p.Id = idSeed;
@@ -187,7 +205,8 @@ namespace Umbraco.Tests.Models.Mapping
             where TPersisted : IContentBase
         {
             Assert.AreEqual(content.Id, result.Id);
-            Assert.AreEqual(0, result.Owner.UserId);
+            Assert.IsNotNull(result.Owner);
+            Assert.AreEqual(Constants.Security.SuperId, result.Owner.UserId);
             Assert.AreEqual("Administrator", result.Owner.Name);
             Assert.AreEqual(content.ParentId, result.ParentId);
             Assert.AreEqual(content.UpdateDate, result.UpdateDate);

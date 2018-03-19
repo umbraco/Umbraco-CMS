@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -27,11 +28,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var created = DateTime.Now;
                 var task = new Task(taskType)
                 {
-                    AssigneeUserId = 0,
+                    AssigneeUserId = Constants.Security.SuperId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = 0
+                    OwnerUserId = Constants.Security.SuperId
                 };
                 repo.Save(task);
                 

@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Models
             ServiceContext.ContentTypeService.Save(contentType);
 
             var content = MockedContent.CreateTextpageContent(contentType, "Root Home", -1);
-            ServiceContext.ContentService.Save(content, 0);
+            ServiceContext.ContentService.Save(content, Constants.Security.SuperId);
 
             var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
             var urlName = content.GetUrlSegment(new[]{new DefaultUrlSegmentProvider() });

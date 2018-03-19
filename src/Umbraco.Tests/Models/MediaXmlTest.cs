@@ -32,7 +32,8 @@ namespace Umbraco.Tests.Models
             var ignored = new FileUploadPropertyEditor(Mock.Of<ILogger>(), new MediaFileSystem(Mock.Of<IFileSystem>()));
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
-            ServiceContext.MediaService.Save(media, 0);
+            media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests
+            ServiceContext.MediaService.Save(media, Constants.Security.SuperId);
 
             // so we have to force-reset these values because the property editor has cleared them
             media.SetValue(Constants.Conventions.Media.Width, "200");

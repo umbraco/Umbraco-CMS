@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
 
             //xml.Add(new XAttribute("creatorName", media.GetCreatorProfile(userService).Name));
             //xml.Add(new XAttribute("creatorID", media.CreatorId));
-            xml.Add(new XAttribute("writerName", media.GetWriterProfile(userService).Name));
+            xml.Add(new XAttribute("writerName", media.GetWriterProfile(userService)?.Name ?? string.Empty));
             xml.Add(new XAttribute("writerID", media.WriterId));
 
             //xml.Add(new XAttribute("template", 0)); // no template for media

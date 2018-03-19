@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.PropertyEditors;
 using File = System.IO.File;
 
 namespace Umbraco.Tests.TestHelpers
@@ -148,6 +149,13 @@ namespace Umbraco.Tests.TestHelpers
                     Assert.AreEqual(expectedPropertyValues[i].EditedValue, actualPropertyValues[i].EditedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
                     Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue, $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
                 }
+            }
+            else if (expected is IDataEditor expectedEditor)
+            {
+                Assert.IsInstanceOf<IDataEditor>(actual);
+                var actualEditor = (IDataEditor) actual;
+                Assert.AreEqual(expectedEditor.Alias,  actualEditor.Alias);
+                // what else shall we test?
             }
             else
             {
