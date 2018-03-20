@@ -4,7 +4,7 @@
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">
-            <li>
+            <li data-element="action-documentType">
                 <a href="" ng-click="createDocType()" umb-auto-focus>
 
                     <i class="large icon-item-arrangement"></i>
@@ -14,13 +14,13 @@
                     </span>
                 </a>
             </li>
-            <li>
+            <li data-element="action-documentTypeWithoutTemplate">
               <a href="" ng-click="createComponent()">
                 <i class="large icon-item-arrangement"></i>
                 <span class="menu-label"><localize key="create_documentTypeWithoutTemplate"></localize></span>
               </a>
             </li>
-            <li ng-if="model.allowCreateFolder">
+            <li data-element="action-folder" ng-if="model.allowCreateFolder">
                 <a href="" ng-click="showCreateFolder()">
                     <i class="large icon-folder"></i>
                     <span class="menu-label"><localize key="general_folder"></localize></span>

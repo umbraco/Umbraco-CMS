@@ -31,6 +31,7 @@
     <file src="$BuildTmp$\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
     <file src="$BuildTmp$\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
     <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
+    <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
     <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
     <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />

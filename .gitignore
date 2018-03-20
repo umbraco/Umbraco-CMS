@@ -136,6 +136,7 @@ src/Umbraco.Tests/media
 tools/docfx/*
 apidocs/_site/*
 src/*/project.lock.json
+src/.idea/*
 
 apidocs/api/*
 build/docs.zip

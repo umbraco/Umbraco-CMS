@@ -11,7 +11,7 @@ var app = angular.module('umbraco', [
     'ngMobile',
     'tmh.dynamicLocale',
     'ngFileUpload',
-	'LocalStorageModule'
+    'LocalStorageModule'
 ]);
 
 var packages = angular.module("umbraco.packages", []);
@@ -22,11 +22,20 @@ var packages = angular.module("umbraco.packages", []);
 //module is initilized.
 angular.module("umbraco.views", ["umbraco.viewcache"]);
 angular.module("umbraco.viewcache", [])
-    .run(function($rootScope, $templateCache) {
+    .run(function ($rootScope, $templateCache, localStorageService) {
         /** For debug mode, always clear template cache to cut down on
             dev frustration and chrome cache on templates */
         if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
             $templateCache.removeAll();
+        }
+        else {
+            var storedVersion = localStorageService.get("umbVersion");
+            if (!storedVersion || storedVersion !== Umbraco.Sys.ServerVariables.application.cacheBuster) {
+                //if the stored version doesn't match our cache bust version, clear the template cache
+                $templateCache.removeAll();
+                //store the current version
+                localStorageService.set("umbVersion", Umbraco.Sys.ServerVariables.application.cacheBuster);
+            }
         }
     })
     .config([

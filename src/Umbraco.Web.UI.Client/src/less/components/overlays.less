@@ -2,7 +2,7 @@
     position: fixed;
     overflow: hidden;
     background: @white;
-    z-index: 7500;
+    z-index: @zindexUmbOverlay;
     animation: fadeIn 0.2s;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
@@ -134,6 +134,11 @@
     border: none;
     box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
     margin-left: 81px;
+}
+
+// push left overlay when drawer is open
+.umb-drawer-is-visible .umb-overlay.umb-overlay-left {
+    left: @drawerWidth;
 }
 
 .umb-overlay.umb-overlay-left .umb-overlay-header {

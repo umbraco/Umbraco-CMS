@@ -7,9 +7,10 @@
                    style="width: 100%"
                    ng-model="searchTerm"
                    class="umb-search-field search-query input-block-level"
-         localize="placeholder"
-         placeholder="@placeholders_filter"
-                   umb-auto-focus>
+                   localize="placeholder"
+                   placeholder="@placeholders_filter"
+                   umb-auto-focus
+                   no-dirty-check />
         </div>
     </div>
 
@@ -17,20 +18,17 @@
         <localize key="contentTypeEditor_compositionsDescription"></localize>
     </div>
 
-    <umb-empty-state
-        ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
-        position="center">
-    <localize key="contentTypeEditor_noAvailableCompositions"></localize>
+    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
+                     position="center">
+        <localize key="contentTypeEditor_noAvailableCompositions"></localize>
     </umb-empty-state>
-    <umb-empty-state
-        ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1"
-        position="center">
-    <localize key="contentTypeEditor_compositionInUse"></localize>
+    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1"
+                     position="center">
+        <localize key="contentTypeEditor_compositionInUse"></localize>
     </umb-empty-state>
 
     <ul class="umb-checkbox-list">
         <li class="umb-checkbox-list__item"
-
             ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm"
             ng-class="{'-disabled': compositeContentType.allowed===false || compositeContentType.inherited, '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
 
@@ -41,7 +39,7 @@
                        checklist-model="model.compositeContentTypes"
                        checklist-value="compositeContentType.contentType.alias"
                        ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
-                       ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited"/>
+                       ng-disabled="compositeContentType.allowed===false || compositeContentType.inherited" />
             </div>
 
             <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed===false}">

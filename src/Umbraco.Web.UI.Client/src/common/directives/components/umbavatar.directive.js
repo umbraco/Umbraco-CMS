@@ -66,9 +66,13 @@ Use this directive to render an avatar.
 
             function getNameInitials(name) {
                 if(name) {
-                    var initials = name.match(/\b\w/g) || [];
-                    initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
-                    return initials;
+                    var names = name.split(' '),
+                        initials = names[0].substring(0, 1);
+
+                    if (names.length > 1) {
+                        initials += names[names.length - 1].substring(0, 1);
+                    }
+                    return initials.toUpperCase();
                 }
                 return null;
             }

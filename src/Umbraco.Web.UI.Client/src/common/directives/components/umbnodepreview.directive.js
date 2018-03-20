@@ -77,7 +77,7 @@
 
 @param {string} icon (<code>binding</code>): The node icon.
 @param {string} name (<code>binding</code>): The node name.
-@param {boolean} published (<code>binding</code>): The node pusblished state.
+@param {boolean} published (<code>binding</code>): The node published state.
 @param {string} description (<code>binding</code>): A short description.
 @param {boolean} sortable (<code>binding</code>): Will add a move cursor on the node preview. Can used in combination with ui-sortable.
 @param {boolean} allowRemove (<code>binding</code>): Show/Hide the remove button.

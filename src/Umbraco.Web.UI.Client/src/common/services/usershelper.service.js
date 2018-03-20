@@ -11,6 +11,18 @@
             { "value": 3, "name": "Invited", "key": "Invited", "color": "warning" }
         ];
 
+        angular.forEach(userStates, function (userState) {
+            var key = "user_state" + userState.key;
+            localizationService.localize(key).then(function (value) {
+                var reg = /^\[[\S\s]*]$/g;
+                var result = reg.test(value);
+                if (result === false) {
+                    // Only translate if key exists
+                    userState.name = value;
+                }
+            });
+        });
+
         function getUserStateFromValue(value) {
             var foundUserState;
             angular.forEach(userStates, function (userState) {

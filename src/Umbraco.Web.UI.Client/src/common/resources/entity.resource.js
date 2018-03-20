@@ -41,7 +41,7 @@ function entityResource($q, $http, umbRequestHelper) {
             if (!value) {
                 return "";
             }
-
+            value = value.replace("#", "");
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(

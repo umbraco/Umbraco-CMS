@@ -7,12 +7,22 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
 
 .controller("Umbraco.canvasdesignerController", function ($scope, $http, $window, $timeout, $location, dialogService) {
 
+    var isInit = $location.search().init;
+    if (isInit === "true") {
+        //do not continue, this is the first load of this new window, if this is passed in it means it's been
+        //initialized by the content editor and then the content editor will actually re-load this window without
+        //this flag. This is a required trick to get around chrome popup mgr. We don't want to double load preview.aspx
+        //since that will double prepare the preview documents
+        return;
+    }
+
     $scope.isOpen = false;
     $scope.frameLoaded = false;
     $scope.enableCanvasdesigner = 0;
     $scope.googleFontFamilies = {};
-    $scope.pageId = $location.search().id;
-    $scope.pageUrl = "../dialogs/Preview.aspx?id=" + $location.search().id;
+    var pageId = $location.search().id;    
+    $scope.pageId = pageId;
+    $scope.pageUrl = "../dialogs/Preview.aspx?id=" + pageId;
     $scope.valueAreLoaded = false;
     $scope.devices = [
         { name: "desktop", css: "desktop", icon: "icon-display", title: "Desktop" },

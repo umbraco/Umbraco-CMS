@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.Templates.EditController as vm">
+<div data-element="editor-templates" ng-controller="Umbraco.Editors.Templates.EditController as vm">
 
     <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
@@ -30,6 +30,7 @@
                         <div ng-class="{'btn-group umb-era-button-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
                             
                             <button
+                                data-element="button-masterTemplate"
                                 type="button"
                                 class="umb-era-button umb-button--s"
                                 ng-click="vm.openMasterTemplateOverlay()">
@@ -53,6 +54,7 @@
                         <div class="btn-group umb-era-button-group dropdown" style="margin-right: 10px;">
                             
                             <button
+                                data-element="button-insert"
                                 type="button"
                                 class="umb-era-button umb-button--s"
                                 ng-click="vm.openInsertOverlay()">
@@ -73,6 +75,7 @@
                         </div>
 
                         <button
+                            data-element="button-queryBuilder"
                             type="button"
                             style="margin-right: 10px;"
                             class="umb-era-button umb-button--s"
@@ -81,6 +84,7 @@
                         </button>
 
                         <button
+                            data-element="button-sections"
                             type="button"
                             class="umb-era-button umb-button--s"
                             ng-click="vm.openSectionsOverlay()">
@@ -92,6 +96,7 @@
                 </div>
 
                 <div
+                    data-element="code-editor"
                     auto-scale="85"
                     umb-ace-editor="vm.aceOption"
                     model="vm.template.content">
@@ -113,6 +118,7 @@
             <umb-editor-footer-content-right>
 
                <umb-button
+                  alias="save"
                   type="submit"
                   button-style="success"
                   state="vm.page.saveButtonState"

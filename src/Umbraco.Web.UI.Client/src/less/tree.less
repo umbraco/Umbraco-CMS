@@ -119,6 +119,7 @@
 
 .umb-tree div > a.umb-options {
 	visibility: hidden;
+    flex: 1 0 auto;
 }
 .umb-tree div:hover > a.umb-options {
 	visibility: visible;
@@ -156,8 +157,8 @@
 
 .umb-tree li > div a:not(.umb-options) {
 	padding: 6px 0;
-	width: 100%;
 	display: flex;
+    flex: 1 1 100%;
 }
 
 .umb-tree li > div:hover a:not(.umb-options) {
@@ -239,6 +240,7 @@
 .umb-tree .umb-tree-node-checked i:before {
 	/*check box*/
     content: "\e165" !important;
+	font-family: inherit;
 }
 
 a.umb-options {
