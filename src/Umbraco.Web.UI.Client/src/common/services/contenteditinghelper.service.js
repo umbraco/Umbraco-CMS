@@ -243,10 +243,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
 
 
-                //if we are not creating, then we should add unpublish too,
+                // if we are not creating, then we should add unpublish too,
                 // so long as it's already published and if the user has access to publish
+                // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    if (args.content.publishDate && _.contains(args.content.allowedActions, "Z")) {
+                    if (args.content.publishDate && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
                 }
