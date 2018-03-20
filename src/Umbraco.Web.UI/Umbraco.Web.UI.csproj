@@ -152,7 +152,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Umbraco.ModelsBuilder, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.8.0.0-alpha.14\lib\Umbraco.ModelsBuilder.dll</HintPath>
+      <HintPath>..\packages\Umbraco.ModelsBuilder.8.0.0-alpha.15\lib\Umbraco.ModelsBuilder.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
