@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Linq;
 using System.Web.Security;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
@@ -7,6 +8,8 @@ using umbraco.DataLayer;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco
 {
@@ -21,13 +24,32 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
+            var roleDeleted = false;
+
             // only built-in roles can be deleted
             if (Member.IsUsingUmbracoRoles())
             {
                 MemberGroup.GetByName(Alias).delete();
-                return true;
+                roleDeleted = true;
             }
-            return false;            
+
+            // Need to delete the member group from any content item that has it assigned in public access settings
+            var publicAccessService = UmbracoContext.Current.Application.Services.PublicAccessService;
+            var allPublicAccessRules = publicAccessService.GetAll();
+
+            // Find only rules which have the current role name (alias) assigned to them
+            var rulesWithDeletedRoles = allPublicAccessRules.Where(x => x.Rules.Any(r => r.RuleValue == Alias));
+
+            var contentService = UmbracoContext.Current.Application.Services.ContentService;
+            foreach (var publicAccessEntry in rulesWithDeletedRoles)
+            {
+                var contentItem = contentService.GetById(publicAccessEntry.ProtectedNodeId);
+                var rulesToDelete = publicAccessEntry.Rules.ToList();
+                foreach (var rule in rulesToDelete)
+                    publicAccessService.RemoveRule(contentItem, rule.RuleType, rule.RuleValue);
+            }
+
+            return roleDeleted;
         }
 
         private string _returnUrl = "";
