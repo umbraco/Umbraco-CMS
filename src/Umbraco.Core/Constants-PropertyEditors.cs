@@ -63,6 +63,11 @@ namespace Umbraco.Core
                 /// DropDown List Multiple, Publish Keys.
                 /// </summary>
                 public const string DropdownlistMultiplePublishKeys = "Umbraco.DropdownlistMultiplePublishKeys";
+            
+                /// <summary>
+                /// DropDown List.
+                /// </summary>
+                public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
 
                 /// <summary>
                 /// Folder Browser.

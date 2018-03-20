@@ -7,7 +7,7 @@ namespace Umbraco.Core
     /// <summary>
     /// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
     /// </summary>
-    public class DisposableTimer : DisposableObject
+	public class DisposableTimer : DisposableObjectSlim
     {
         private readonly ILogger _logger;
         private readonly LogType? _logType;

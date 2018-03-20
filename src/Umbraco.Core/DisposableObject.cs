@@ -6,6 +6,9 @@ namespace Umbraco.Core
     /// Abstract implementation of IDisposable.
     /// </summary>
     /// <remarks>
+    /// This is for objects that DO have unmanaged resources. Use <see cref="DisposableObjectSlim"/>
+    /// for objects that do NOT have unmanaged resources, and avoid creating a finalizer.
+    ///
     /// Can also be used as a pattern for when inheriting is not possible.
     ///
     /// See also: https://msdn.microsoft.com/en-us/library/b1yfkh5e%28v=vs.110%29.aspx

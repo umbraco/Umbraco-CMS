@@ -79,16 +79,30 @@ namespace Umbraco.Core.Scoping
 
             var enlistedObjects = _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 
-            if (enlistedObjects.TryGetValue(key, out IEnlistedObject enlisted))
+            if (enlistedObjects.TryGetValue(key, out var enlisted))
             {
-                var enlistedAs = enlisted as EnlistedObject<T>;
-                if (enlistedAs == null) throw new InvalidOperationException("An item with the key already exists, but with a different type.");
-                if (enlistedAs.Priority != priority) throw new InvalidOperationException("An item with the key already exits, but with a different priority.");
+                if (!(enlisted is EnlistedObject<T> enlistedAs))
+                    throw new InvalidOperationException("An item with the key already exists, but with a different type.");
+                if (enlistedAs.Priority != priority)
+                    throw new InvalidOperationException("An item with the key already exits, but with a different priority.");
                 return enlistedAs.Item;
             }
-            var enlistedOfT = new EnlistedObject<T>(creator == null ? default(T) : creator(), action, priority);
+            var enlistedOfT = new EnlistedObject<T>(creator == null ? default : creator(), action, priority);
             Enlisted[key] = enlistedOfT;
             return enlistedOfT.Item;
+        }
+
+        public T GetEnlisted<T>(string key)
+        {
+            var enlistedObjects = _enlisted;
+            if (enlistedObjects == null) return default;
+
+            if (enlistedObjects.TryGetValue(key, out var enlisted) == false)
+                return default;
+
+            if (!(enlisted is EnlistedObject<T> enlistedAs))
+                throw new InvalidOperationException("An item with the key exists, but with a different type.");
+            return enlistedAs.Item;
         }
     }
 }

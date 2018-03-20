@@ -13,10 +13,21 @@ namespace Umbraco.Core.IO
 {
     public static class IOHelper
     {
+        /// <summary>
+        /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
+        /// </summary>
+        /// <remarks>This should always be false, unless unit testing.</remarks>
+	    public static bool ForceNotHosted { get; set; }
+
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
         //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        /// <summary>
+        /// Gets a value indicating whether Umbraco is hosted.
+        /// </summary>
+	    public static bool IsHosted => !ForceNotHosted && (HttpContext.Current != null || HostingEnvironment.IsHosted);
 
         public static char DirSepChar => Path.DirectorySeparatorChar;
 
@@ -80,6 +91,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
+            useHttpContext = useHttpContext && IsHosted;
 
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
