@@ -84,7 +84,7 @@ namespace Umbraco.Web.Templates
             htmlDoc.LoadHtml(text);
 
             var textModified = false;
-            var dataUdiTags = htmlDoc.DocumentNode.SelectNodes("//a[@data-udi]");
+            var dataUdiTags = htmlDoc.DocumentNode.SelectNodes("//a[@data-udi] | //img[@data-udi]");
 
             if(dataUdiTags == null)
             {
