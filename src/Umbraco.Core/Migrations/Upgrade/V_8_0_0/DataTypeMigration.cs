@@ -35,7 +35,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // re-create *all* keys and indexes
             foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x.Value).Do();
+                Create.KeysAndIndexes(x).Do();
 
             // renames
             Database.Execute(Sql()

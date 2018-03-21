@@ -97,11 +97,13 @@ namespace Umbraco.Core.Models
         [DataMember]
         public IEnumerable<ITemplate> AllowedTemplates
         {
-            get { return _allowedTemplates; }
+            get => _allowedTemplates;
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector,
-                   Ps.Value.TemplateComparer);
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
+
+                if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
+                    DefaultTemplateId = 0;
             }
         }
 

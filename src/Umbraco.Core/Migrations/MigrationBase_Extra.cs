@@ -11,6 +11,14 @@ namespace Umbraco.Core.Migrations
     {
         // provides extra methods for migrations
 
+        protected void AddColumn<T>(string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            var column = table.Columns.First(x => x.Name == columnName);
+            var createSql = SqlSyntax.Format(column);
+            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(table.Name), createSql));
+        }
+
         protected void AddColumn<T>(string tableName, string columnName)
         {
             //if (ColumnExists(tableName, columnName))

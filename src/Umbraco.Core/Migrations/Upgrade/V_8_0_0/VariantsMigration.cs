@@ -52,7 +52,7 @@ HAVING COUNT(v2.id) <> 1").Any())
 
             // re-create *all* keys and indexes
             foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x.Value).Do();
+                Create.KeysAndIndexes(x).Do();
         }
 
         private void MigratePropertyData()

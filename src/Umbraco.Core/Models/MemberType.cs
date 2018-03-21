@@ -79,7 +79,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile) by the PropertyTypes' alias.
+        /// Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile, IsSensitive) by the PropertyTypes' alias.
         /// </summary>
         [DataMember]
         internal IDictionary<string, MemberTypePropertyProfileAccess> MemberTypePropertyTypes { get; private set; }
@@ -91,7 +91,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanEditProperty(string propertyTypeAlias)
         {
-            return MemberTypePropertyTypes.ContainsKey(propertyTypeAlias) && MemberTypePropertyTypes[propertyTypeAlias].IsEditable;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsEditable;
         }
 
         /// <summary>
@@ -101,7 +101,16 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public bool MemberCanViewProperty(string propertyTypeAlias)
         {
-            return MemberTypePropertyTypes.ContainsKey(propertyTypeAlias) && MemberTypePropertyTypes[propertyTypeAlias].IsVisible;
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsVisible;
+        }
+        /// <summary>
+        /// Gets a boolean indicating whether a Property is marked as storing sensitive values on the Members profile.
+        /// </summary>
+        /// <param name="propertyTypeAlias">PropertyType Alias of the Property to check</param>
+        /// <returns></returns>
+        public bool IsSensitiveProperty(string propertyTypeAlias)
+        {
+            return MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile) && propertyProfile.IsSensitive;
         }
 
         /// <summary>
@@ -111,13 +120,13 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanEditProperty(string propertyTypeAlias, bool value)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
-                MemberTypePropertyTypes[propertyTypeAlias].IsEditable = value;
+                propertyProfile.IsEditable = value;
             }
             else
             {
-                var tuple = new MemberTypePropertyProfileAccess(false, value);
+                var tuple = new MemberTypePropertyProfileAccess(false, value, false);
                 MemberTypePropertyTypes.Add(propertyTypeAlias, tuple);
             }
         }
@@ -129,13 +138,31 @@ namespace Umbraco.Core.Models
         /// <param name="value">Boolean value, true or false</param>
         public void SetMemberCanViewProperty(string propertyTypeAlias, bool value)
         {
-            if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
             {
-                MemberTypePropertyTypes[propertyTypeAlias].IsVisible = value;
+                propertyProfile.IsVisible = value;
             }
             else
             {
-                var tuple = new MemberTypePropertyProfileAccess(value, false);
+                var tuple = new MemberTypePropertyProfileAccess(value, false, false);
+                MemberTypePropertyTypes.Add(propertyTypeAlias, tuple);
+            }
+        }
+
+        /// <summary>
+        /// Sets a boolean indicating whether a Property is a sensitive value on the Members profile.
+        /// </summary>
+        /// <param name="propertyTypeAlias">PropertyType Alias of the Property to set</param>
+        /// <param name="value">Boolean value, true or false</param>
+        public void SetIsSensitiveProperty(string propertyTypeAlias, bool value)
+        {
+            if (MemberTypePropertyTypes.TryGetValue(propertyTypeAlias, out var propertyProfile))
+            {
+                propertyProfile.IsSensitive = value;
+            }
+            else
+            {
+                var tuple = new MemberTypePropertyProfileAccess(false, false, true);
                 MemberTypePropertyTypes.Add(propertyTypeAlias, tuple);
             }
         }

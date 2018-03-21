@@ -28,6 +28,7 @@ namespace Umbraco.Core
                 public const string ContentVersion = TableNamePrefix + "ContentVersion";
                 public const string Document = TableNamePrefix + "Document";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
+                public const string MediaVersion = TableNamePrefix + "MediaVersion";
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";

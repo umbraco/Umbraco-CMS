@@ -28,71 +28,60 @@ namespace Umbraco.Core.Migrations.Install
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
 
         // all tables, in order
-        public static readonly Dictionary<int, Type> OrderedTables = new Dictionary<int, Type>
+        public static readonly List<Type> OrderedTables = new List<Type>
         {
-            {0, typeof (NodeDto)},
-            {1, typeof (ContentTypeDto)},
-            {2, typeof (TemplateDto)},
-            {3, typeof (ContentDto)},
-            {4, typeof (ContentVersionDto)},
-            {5, typeof (DocumentDto)},
-            {6, typeof (ContentTypeTemplateDto)},
-            {7, typeof (DataTypeDto)},
-            //removed: {8, typeof (DataTypePreValueDto)},
-            {9, typeof (DictionaryDto)},
-
-            {10, typeof (LanguageDto)},
-            {11, typeof (LanguageTextDto)},
-            {12, typeof (DomainDto)},
-            {13, typeof (LogDto)},
-            {14, typeof (MacroDto)},
-            {15, typeof (MacroPropertyDto)},
-            {16, typeof (MemberTypeDto)},
-            {17, typeof (MemberDto)},
-            {18, typeof (Member2MemberGroupDto)},
-            {19, typeof (ContentXmlDto)},
-
-            {20, typeof (PreviewXmlDto)},
-            {21, typeof (PropertyTypeGroupDto)},
-            {22, typeof (PropertyTypeDto)},
-            {23, typeof (PropertyDataDto)},
-            {24, typeof (RelationTypeDto)},
-            {25, typeof (RelationDto)},
-            //removed: {26...
-            //removed: {27...
-            {28, typeof (TagDto)},
-            {29, typeof (TagRelationshipDto)},
-
-            //removed: {30...
-            //removed in 7.6: {31, typeof (UserTypeDto)},
-            {32, typeof (UserDto)},
-            {33, typeof (TaskTypeDto)},
-            {34, typeof (TaskDto)},
-            {35, typeof (ContentType2ContentTypeDto)},
-            {36, typeof (ContentTypeAllowedContentTypeDto)},
-            //removed in 7.6: {37, typeof (User2AppDto)},
-            {38, typeof (User2NodeNotifyDto)},
-            //removed in 7.6: {39, typeof (User2NodePermissionDto)},
-
-            {40, typeof (ServerRegistrationDto)},
-            {41, typeof (AccessDto)},
-            {42, typeof (AccessRuleDto)},
-            {43, typeof (CacheInstructionDto)},
-            {44, typeof (ExternalLoginDto)},
-            //removed: {45, typeof (MigrationDto)},
-            //removed: {46, typeof (UmbracoDeployChecksumDto)},
-            //removed: {47, typeof (UmbracoDeployDependencyDto)},
-            {48, typeof (RedirectUrlDto) },
-            {49, typeof (LockDto) },
-
-            {50, typeof (UserGroupDto) },
-            {51, typeof (User2UserGroupDto) },
-            {52, typeof (UserGroup2NodePermissionDto) },
-            {53, typeof (UserGroup2AppDto) },
-            {54, typeof (UserStartNodeDto) },
-            {55, typeof (ContentNuDto) },
-            {56, typeof (DocumentVersionDto) },
-            {57, typeof (KeyValueDto) }
+            typeof (NodeDto),
+            typeof (ContentTypeDto),
+            typeof (TemplateDto),
+            typeof (ContentDto),
+            typeof (ContentVersionDto),
+            typeof (MediaVersionDto),
+            typeof (DocumentDto),
+            typeof (ContentTypeTemplateDto),
+            typeof (DataTypeDto),
+            typeof (DictionaryDto),
+            typeof (LanguageDto),
+            typeof (LanguageTextDto),
+            typeof (DomainDto),
+            typeof (LogDto),
+            typeof (MacroDto),
+            typeof (MacroPropertyDto),
+            typeof (MemberTypeDto),
+            typeof (MemberDto),
+            typeof (Member2MemberGroupDto),
+            typeof (ContentXmlDto),
+            typeof (PreviewXmlDto),
+            typeof (PropertyTypeGroupDto),
+            typeof (PropertyTypeDto),
+            typeof (PropertyDataDto),
+            typeof (RelationTypeDto),
+            typeof (RelationDto),
+            typeof (TagDto),
+            typeof (TagRelationshipDto),
+            typeof (UserDto),
+            typeof (TaskTypeDto),
+            typeof (TaskDto),
+            typeof (ContentType2ContentTypeDto),
+            typeof (ContentTypeAllowedContentTypeDto),
+            typeof (User2NodeNotifyDto),
+            typeof (ServerRegistrationDto),
+            typeof (AccessDto),
+            typeof (AccessRuleDto),
+            typeof (CacheInstructionDto),
+            typeof (ExternalLoginDto),
+            typeof (RedirectUrlDto),
+            typeof (LockDto),
+            typeof (UserGroupDto),
+            typeof (User2UserGroupDto),
+            typeof (UserGroup2NodePermissionDto),
+            typeof (UserGroup2AppDto),
+            typeof (UserStartNodeDto),
+            typeof (ContentNuDto),
+            typeof (DocumentVersionDto),
+            typeof (KeyValueDto),
+            typeof (UserLoginDto),
+            typeof (ConsentDto),
+            typeof (AuditEntryDto)
         };
 
         /// <summary>
@@ -102,11 +91,10 @@ namespace Umbraco.Core.Migrations.Install
         {
             _logger.Info<DatabaseSchemaCreator>("Start UninstallDatabaseSchema");
 
-            foreach (var item in OrderedTables.OrderByDescending(x => x.Key))
+            foreach (var table in OrderedTables.AsEnumerable().Reverse())
             {
-                var tableNameAttribute = item.Value.FirstAttribute<TableNameAttribute>();
-
-                var tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
+                var tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
+                var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
 
                 _logger.Info<DatabaseSchemaCreator>("Uninstall" + tableName);
 
@@ -135,8 +123,8 @@ namespace Umbraco.Core.Migrations.Install
             if (e.Cancel == false)
             {
                 var dataCreation = new DatabaseDataCreator(_database, _logger);
-                foreach (var item in OrderedTables.OrderBy(x => x.Key))
-                    CreateTable(false, item.Value, dataCreation);
+                foreach (var table in OrderedTables)
+                    CreateTable(false, table, dataCreation);
             }
 
             FireAfterCreation(e);
@@ -160,8 +148,7 @@ namespace Umbraco.Core.Migrations.Install
                 }).ToArray();
 
             result.TableDefinitions.AddRange(OrderedTables
-                .OrderBy(x => x.Key)
-                .Select(x => DefinitionFactory.GetTableDefinition(x.Value, SqlSyntax)));
+                .Select(x => DefinitionFactory.GetTableDefinition(x, SqlSyntax)));
 
             ValidateDbTables(result);
             ValidateDbColumns(result);

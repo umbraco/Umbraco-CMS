@@ -223,9 +223,8 @@ namespace Umbraco.Core.Models
 
         #region Dirty
 
-        /// <summary>
-        /// Resets dirty properties.
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override void ResetDirtyProperties(bool rememberDirty)
         {
             base.ResetDirtyProperties(rememberDirty);
@@ -235,17 +234,15 @@ namespace Umbraco.Core.Models
                 prop.ResetDirtyProperties(rememberDirty);
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the current entity is dirty.
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool IsDirty()
         {
             return IsEntityDirty() || this.IsAnyUserPropertyDirty();
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the current entity was dirty.
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool WasDirty()
         {
             return WasEntityDirty() || this.WasAnyUserPropertyDirty();
@@ -267,9 +264,8 @@ namespace Umbraco.Core.Models
             return base.WasDirty();
         }
 
-        /// <summary>
-        /// Gets a value indicating whether a user property is dirty.
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool IsPropertyDirty(string propertyName)
         {
             if (base.IsPropertyDirty(propertyName))
@@ -278,15 +274,32 @@ namespace Umbraco.Core.Models
             return Properties.Contains(propertyName) && Properties[propertyName].IsDirty();
         }
 
-        /// <summary>
-        /// Gets a value indicating whether a user property was dirty.
-        /// </summary>
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
         public override bool WasPropertyDirty(string propertyName)
         {
             if (base.WasPropertyDirty(propertyName))
                 return true;
 
             return Properties.Contains(propertyName) && Properties[propertyName].WasDirty();
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
+        public override IEnumerable<string> GetDirtyProperties()
+        {
+            var instanceProperties = base.GetDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Overriden to include user properties.</remarks>
+        public override IEnumerable<string> GetWereDirtyProperties()
+        {
+            var instanceProperties = base.GetWereDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.WasDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
         }
 
         #endregion
