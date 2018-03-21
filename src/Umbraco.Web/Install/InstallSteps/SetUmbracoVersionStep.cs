@@ -37,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
             // us that it is in 'upgrade' because we already have a database conn configured and a database.
             if (security.IsAuthenticated() == false && GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace())
             {
-                security.PerformLogin(0);
+                security.PerformLogin(-1);
             }
 
             // Some upgrade scripts "may modify the database (cmsContentXml...) tables directly" - not sure
