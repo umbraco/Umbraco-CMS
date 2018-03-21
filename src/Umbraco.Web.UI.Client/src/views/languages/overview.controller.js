@@ -94,12 +94,14 @@
         }
 
         function deleteLanguage(language, event) {
-            confirm("Are you sure you want to delete " + language.cultureDisplayName + "?");
-            language.deleteButtonState = "busy";
-            $timeout(function(){
-                var index = vm.languages.indexOf(language);
-                vm.languages.splice(index, 1);
-            }, 1000);
+            var confirmed = confirm("Are you sure you want to delete " + language.cultureDisplayName + "?");
+            if(confirmed) {
+                language.deleteButtonState = "busy";
+                $timeout(function(){
+                    var index = vm.languages.indexOf(language);
+                    vm.languages.splice(index, 1);
+                }, 1000);
+            }
             event.preventDefault()
             event.stopPropagation();
         }
