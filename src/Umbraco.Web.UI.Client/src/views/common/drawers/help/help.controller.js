@@ -43,9 +43,13 @@
             setSectionName();
 
             userService.getCurrentUser().then(function (user) {
-
+                
                 vm.userType = user.userType;
                 vm.userLang = user.locale;
+
+                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');
+
+                console.log(vm.hasAccessToSettings);
 
                 evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
                     handleSectionChange();
@@ -84,7 +88,7 @@
 
         function findHelp(section, tree, usertype, userLang) {
 
-            if (usertype === 'admin') {
+            if (vm.hasAccessToSettings) {
                 helpService.getContextHelpForPage(section, tree).then(function (topics) {
                     vm.topics = topics;
                 });
@@ -112,7 +116,7 @@
             }
 
 
-            if (usertype === 'admin') {
+            if (vm.hasAccessToSettings) {
                 helpService.findVideos(rq).then(function (videos) {
                     vm.videos = videos;
                 });
