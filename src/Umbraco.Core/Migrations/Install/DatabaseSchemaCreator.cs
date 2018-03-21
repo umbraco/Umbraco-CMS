@@ -91,7 +91,8 @@ namespace Umbraco.Core.Migrations.Install
             {53, typeof (UserGroup2AppDto) },
             {54, typeof (UserStartNodeDto) },
             {55, typeof (ContentNuDto) },
-            {56, typeof (DocumentVersionDto) }
+            {56, typeof (DocumentVersionDto) },
+            {57, typeof (KeyValueDto) }
         };
 
         /// <summary>
