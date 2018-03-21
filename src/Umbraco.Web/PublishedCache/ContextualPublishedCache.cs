@@ -60,7 +60,7 @@ namespace Umbraco.Web.PublishedCache
 
         // same with Guid
         // cannot make this public nor abstract without breaking backward compatibility
-        protected virtual IPublishedContent GetById(bool preview, Guid contentKey)
+        public virtual IPublishedContent GetById(bool preview, Guid contentKey)
         {
             // original implementation - override in concrete classes
             var intId = UmbracoContext.Application.Services.EntityService.GetIdForKey(contentKey, UmbracoObjectTypes.Document);

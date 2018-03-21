@@ -366,7 +366,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 var xml = GetXml(umbracoContext, false);
                 var nav = xml.CreateNavigator();
                 var iter = nav.SelectDescendants(XPathNodeType.Element, true);
-                _idkMap.Set(Enumerate(iter), UmbracoObjectTypes.Document);
+                _idkMap.Populate(Enumerate(iter), UmbracoObjectTypes.Document);
             }
         }
 

@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
             _dictionary[umbracoObjectType] = (id2key, key2id);
         }
 
-        internal void Set(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
+        internal void Populate(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Services
             {
                 // populate content and media items
                 var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
-                var values = uow.Database.Fetch<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
+                var values = uow.Database.Query<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
                 foreach (var value in values)
                 {
                     var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(value.NodeObjectType);

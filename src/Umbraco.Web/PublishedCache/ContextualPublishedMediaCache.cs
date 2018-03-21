@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache
             : base(umbracoContext, cache)
         { }
 
-        protected override IPublishedContent GetById(bool preview, Guid contentKey)
+        public override IPublishedContent GetById(bool preview, Guid contentKey)
         {
             if (InnerCache is PublishedMediaCache cc)
                 return cc.GetById(UmbracoContext, preview, contentKey);
