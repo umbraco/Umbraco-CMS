@@ -98,6 +98,8 @@
             if(vm.language.isDefault) {
                 vm.language.isMandatory = true;
                 vm.showDefaultLanguageInfo = true;
+            } else {
+                vm.showDefaultLanguageInfo = false;
             }
         }
 
