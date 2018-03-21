@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using Umbraco.Core.IO;
@@ -13,16 +14,15 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<string> GetSupportedMomentLocales()
         {
-            var momentLocaleFolder = "moment";
+            const string momentLocaleFolder = "moment";
             var fileSystem = FileSystemProviderManager.Current.JavaScriptLibraryFileSystem;
             var cultures = fileSystem.GetFiles(momentLocaleFolder, "*.js").ToList();
-            for (var i = 0; i < cultures.Count(); i++)
+            for (var i = 0; i < cultures.Count; i++)
             {
                 cultures[i] = cultures[i]
-                    .Substring(cultures[i].IndexOf(momentLocaleFolder) + momentLocaleFolder.Length + 1);
+                    .Substring(cultures[i].IndexOf(momentLocaleFolder, StringComparison.Ordinal) + momentLocaleFolder.Length + 1);
             }
             return cultures;
         }
-
     }
 }

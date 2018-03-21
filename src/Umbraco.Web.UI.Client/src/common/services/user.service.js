@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, javascriptLibraryHelperService) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, javascriptLibraryService) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -304,10 +304,10 @@ angular.module('umbraco.services')
 
                 var promises = {
                     currentUser: this.getCurrentUser(),
-                    supportedLocales: javascriptLibraryHelperService.getSupportedLocalesForMoment()
+                    supportedLocales: javascriptLibraryService.getSupportedLocalesForMoment()
                 }
 
-                $q.all(promises).then((values) => {
+                $q.all(promises).then(function (values) {
                     loadLocales(values.currentUser, values.supportedLocales);
                 });
                 

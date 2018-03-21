@@ -459,6 +459,22 @@ namespace Umbraco.Core
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             var connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
 
+            // honour configSource, if its set, change the xml file we are saving the configuration
+            // to the one set in the configSource attribute
+            if (connectionstrings.Attribute("configSource") != null)
+            {
+                var source = connectionstrings.Attribute("configSource").Value;
+                var configFile = IOHelper.MapPath(string.Format("{0}/{1}", SystemDirectories.Root, source));
+                LogHelper.Info<DatabaseContext>("storing ConnectionString in {0}", () => configFile);
+                if (System.IO.File.Exists(configFile))
+                {
+                    xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+                    fileName = configFile; 
+                }
+
+                connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
+            }
+
             // Update connectionString if it exists, or else create a new appSetting for the given key and value
             var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == Constants.System.UmbracoConnectionName);
             if (setting == null)
