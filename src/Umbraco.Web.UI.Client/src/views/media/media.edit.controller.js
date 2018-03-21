@@ -131,7 +131,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
         $scope.content.apps = [];
 
-        if($scope.content.contentType.alias === "Folder") {
+        if($scope.content.contentTypeAlias === "Folder") {
           // add list view app
           $scope.content.apps.push(listview);
             
