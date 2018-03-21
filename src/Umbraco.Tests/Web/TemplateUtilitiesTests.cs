@@ -34,6 +34,10 @@ namespace Umbraco.Tests.Web
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
         //this one has an invalid char so won't match
         [TestCase("hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
+        // with a-tag with data-udi attribute, that needs to be stripped
+        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a href=\"/my-test-url\"> world</a> ")]
+        // with a-tag with data-udi attribute spelled wrong, so don't need stripping
+        [TestCase("hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ")]
         public void ParseLocalLinks(string input, string result)
         {
             var serviceCtxMock = MockHelper.GetMockedServiceContext();
