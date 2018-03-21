@@ -25,12 +25,15 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTenZero
             if (Directory.Exists(previewFolderPath))
             {
                 var newPath = previewFolderPath.Replace("preview", "preview.old");
-                Directory.Move(previewFolderPath, newPath);
-                var readmeText =
-                    $"Static html files used for preview and canvas editing functionality no longer live in this directory.\r\n" +
-                    $"Instead they have been recreated as MVC views and can now be found in '~/Umbraco/Views/Preview'.\r\n" +
-                    $"See issue: http://issues.umbraco.org/issue/UAASSCRUM-1405";
-                File.WriteAllText(Path.Combine(newPath, "readme.txt"), readmeText);
+                if (Directory.Exists(newPath) == false)
+                {
+                    Directory.Move(previewFolderPath, newPath);
+                    var readmeText =
+                        $"Static html files used for preview and canvas editing functionality no longer live in this directory.\r\n" +
+                        $"Instead they have been recreated as MVC views and can now be found in '~/Umbraco/Views/Preview'.\r\n" +
+                        $"See issue: http://issues.umbraco.org/issue/U4-11090";
+                    File.WriteAllText(Path.Combine(newPath, "readme.txt"), readmeText);
+                }                
             }
         }
 
