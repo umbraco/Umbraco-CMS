@@ -7,6 +7,9 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
 
 .controller("Umbraco.canvasdesignerController", function ($scope, $http, $window, $timeout, $location, dialogService) {
 
+    if (typeof(Umbraco) === "undefined") {
+        window.location.href = '/umbraco';
+    }
     var isInit = $location.search().init;
     if (isInit === "true") {
         //do not continue, this is the first load of this new window, if this is passed in it means it's been
