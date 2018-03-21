@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.Entities
+﻿using System.Collections.Generic;
+
+namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Defines an entity that tracks property changes and can be dirty, and remembers
@@ -29,5 +31,10 @@
         /// <param name="rememberDirty">A value indicating whether to remember dirty properties.</param>
         /// <remarks>When <paramref name="rememberDirty"/> is true, dirty properties are saved so they can be checked with WasDirty.</remarks>
         void ResetDirtyProperties(bool rememberDirty);
+
+        /// <summary>
+        /// Gets properties that were dirty.
+        /// </summary>
+        IEnumerable<string> GetWereDirtyProperties();
     }
 }

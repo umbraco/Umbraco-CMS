@@ -100,7 +100,7 @@ namespace Umbraco.Core.Sync
             return null;
         }
 
-        private static string GetApplicationUrlFromCurrentRequest(HttpRequestBase request)
+        public static string GetApplicationUrlFromCurrentRequest(HttpRequestBase request)
         {
             // if (HTTP and SSL not required) or (HTTPS and SSL required),
             //  use ports from request

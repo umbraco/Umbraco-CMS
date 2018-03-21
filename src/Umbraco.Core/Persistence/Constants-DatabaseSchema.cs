@@ -71,6 +71,10 @@ namespace Umbraco.Core
                 public const string TaskType = /*TableNamePrefix*/ "cms" + "TaskType";
 
                 public const string KeyValue = TableNamePrefix + "KeyValue";
+
+                public const string AuditEntry = /*TableNamePrefix*/ "umbraco" + "Audit";
+                public const string Consent = /*TableNamePrefix*/ "umbraco" + "Consent";
+                public const string UserLogin = /*TableNamePrefix*/ "umbraco" + "UserLogin";
             }
         }
     }

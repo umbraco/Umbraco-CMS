@@ -2,16 +2,29 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
     public class BackOfficeClaimsIdentityFactory<T> : ClaimsIdentityFactory<T, int>
         where T: BackOfficeIdentityUser
     {
+        private readonly ApplicationContext _appCtx;
+
+        [Obsolete("Use the overload specifying all dependencies instead")]
         public BackOfficeClaimsIdentityFactory()
+            :this(ApplicationContext.Current)
         {
+        }
+
+        public BackOfficeClaimsIdentityFactory(ApplicationContext appCtx)
+        {
+            if (appCtx == null) throw new ArgumentNullException("appCtx");
+            _appCtx = appCtx;
+
             SecurityStampClaimType = Constants.Security.SessionIdClaimType;
             UserNameClaimType = ClaimTypes.Name;
         }
@@ -24,9 +37,9 @@ namespace Umbraco.Core.Security
         public override async Task<ClaimsIdentity> CreateAsync(UserManager<T, int> manager, T user, string authenticationType)
         {
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
-
+            
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
-                //set a new session id
+                //NOTE - there is no session id assigned here, this is just creating the identity, a session id will be generated when the cookie is written
                 new UserData
                 {
                     Id = user.Id,
@@ -37,15 +50,22 @@ namespace Umbraco.Core.Security
                     Roles = user.Roles.Select(x => x.RoleId).ToArray(),
                     StartContentNodes = user.CalculatedContentStartNodeIds,
                     StartMediaNodes = user.CalculatedMediaStartNodeIds,
-                    SessionId = user.SecurityStamp
+                    SecurityStamp = user.SecurityStamp
                 });
 
             return umbracoIdentity;
-        }
+        }        
     }
 
     public class BackOfficeClaimsIdentityFactory : BackOfficeClaimsIdentityFactory<BackOfficeIdentityUser>
     {
+        [Obsolete("Use the overload specifying all dependencies instead")]
+        public BackOfficeClaimsIdentityFactory()
+        {
+        }
 
+        public BackOfficeClaimsIdentityFactory(ApplicationContext appCtx) : base(appCtx)
+        {
+        }
     }
 }

@@ -36,6 +36,7 @@ namespace Umbraco.Core.Security
 
             var username = identity.GetUserName();
             var session = identity.FindFirstValue(Constants.Security.SessionIdClaimType);
+            var securityStamp = identity.FindFirstValue(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType);
             var startContentId = identity.FindFirstValue(Constants.Security.StartContentNodeIdClaimType);
             var startMediaId = identity.FindFirstValue(Constants.Security.StartMediaNodeIdClaimType);
 
@@ -66,8 +67,9 @@ namespace Umbraco.Core.Security
             var roles = identity.FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToList();
             var allowedApps = identity.FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToList();
 
-            var userData = new UserData(session)
+            var userData = new UserData
             {
+                SecurityStamp = securityStamp,
                 SessionId = session,
                 AllowedApplications = allowedApps.ToArray(),
                 Culture = culture,
@@ -189,7 +191,8 @@ namespace Umbraco.Core.Security
                     Constants.Security.StartContentNodeIdClaimType,
                     Constants.Security.StartMediaNodeIdClaimType,
                     ClaimTypes.Locality,
-                    Constants.Security.SessionIdClaimType
+                    Constants.Security.SessionIdClaimType,
+                    Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType
                 };
             }
         }
@@ -219,16 +222,12 @@ namespace Umbraco.Core.Security
                 AddClaim(new Claim(ClaimTypes.Locality, Culture, ClaimValueTypes.String, Issuer, Issuer, this));
 
             if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
-            {
                 AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
 
-                //The security stamp claim is also required... this is because this claim type is hard coded
-                // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
-                if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
-                {
-                    AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
-                }
-            }
+            //The security stamp claim is also required... this is because this claim type is hard coded
+            // by the SecurityStampValidator, see: https://katanaproject.codeplex.com/workitem/444
+            if (HasClaim(x => x.Type == Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType) == false)
+                AddClaim(new Claim(Microsoft.AspNet.Identity.Constants.DefaultSecurityStampClaimType, SecurityStamp, ClaimValueTypes.String, Issuer, Issuer, this));
 
             //Add each app as a separate claim
             if (HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false)
@@ -305,6 +304,11 @@ namespace Umbraco.Core.Security
         public string SessionId
         {
             get { return UserData.SessionId; }
+        }
+
+        public string SecurityStamp
+        {
+            get { return UserData.SecurityStamp; }
         }
 
         public string[] Roles

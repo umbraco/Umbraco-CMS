@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
@@ -677,11 +679,7 @@ namespace Umbraco.Core.Security
 
         internal static bool IsEmailValid(string email)
         {
-            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
-                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
-                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
-
-            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return new EmailAddressAttribute().IsValid(email);
         }
 
         protected internal string EncryptOrHashPassword(string pass, string salt)

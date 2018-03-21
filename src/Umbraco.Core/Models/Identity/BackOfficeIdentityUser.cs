@@ -60,6 +60,14 @@ namespace Umbraco.Core.Models.Identity
 
         private BackOfficeIdentityUser()
         {
+            _startMediaIds = new int[] { };
+            _startContentIds = new int[] { };
+            _groups = new IReadOnlyUserGroup[] { };
+            _allowedSections = new string[] { };
+            _culture = Configuration.GlobalSettings.DefaultUILanguage;
+            _groups = new IReadOnlyUserGroup[0];
+            _roles = new ObservableCollection<IdentityUserRole<string>>();
+            _roles.CollectionChanged += _roles_CollectionChanged;
         }
 
         /// <summary>

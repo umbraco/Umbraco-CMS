@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Security;
+using Microsoft.AspNet.Identity;
 using AutoMapper;
 using Microsoft.Owin;
 using Newtonsoft.Json;
@@ -18,6 +19,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Logging;
+using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Core.Security
 {
@@ -224,8 +226,11 @@ namespace Umbraco.Core.Security
         /// <param name="userdata"></param>
         public static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
         {
+            //ONLY used by BasePage.doLogin!
+
             if (http == null) throw new ArgumentNullException("http");
             if (userdata == null) throw new ArgumentNullException("userdata");
+            
             var userDataString = JsonConvert.SerializeObject(userdata);
             return CreateAuthTicketAndCookie(
                 http,
@@ -237,14 +242,7 @@ namespace Umbraco.Core.Security
                 1440,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
-        }
-
-        internal static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
-        {
-            if (http == null) throw new ArgumentNullException("http");
-            if (userdata == null) throw new ArgumentNullException("userdata");
-            return new HttpContextWrapper(http).CreateUmbracoAuthTicket(userdata);
-        }
+        }        
 
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
@@ -315,6 +313,22 @@ namespace Umbraco.Core.Security
         /// <param name="cookieName"></param>
         private static void Logout(this HttpContextBase http, string cookieName)
         {
+            //We need to clear the sessionId from the database. This is legacy code to do any logging out and shouldn't really be used at all but in any case
+            //we need to make sure the session is cleared. Due to the legacy nature of this it means we need to use singletons
+            if (http.User != null)
+            {
+                var claimsIdentity = http.User.Identity as ClaimsIdentity;
+                if (claimsIdentity != null)
+                {
+                    var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
+                    Guid guidSession;
+                    if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
+                    {
+                        ApplicationContext.Current.Services.UserService.ClearLoginSession(guidSession);
+                    }
+                }
+            }
+
             if (http == null) throw new ArgumentNullException("http");
             //clear the preview cookie and external login
             var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName };

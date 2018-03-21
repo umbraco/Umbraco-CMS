@@ -87,6 +87,15 @@ namespace Umbraco.Core.Models.Entities
             _currentChanges = null;
         }
 
+        /// <inheritdoc />
+        public virtual IEnumerable<string> GetWereDirtyProperties()
+        {
+            // ReSharper disable once MergeConditionalExpression
+            return _savedChanges == null
+                ? Enumerable.Empty<string>()
+                : _savedChanges.Where(x => x.Value).Select(x => x.Key);
+        }
+
         #endregion
 
         #region Change Tracking

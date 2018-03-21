@@ -18,7 +18,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObject,
+    public class BackOfficeUserStore : DisposableObjectSlim, 
         IUserStore<BackOfficeIdentityUser, int>,
         IUserPasswordStore<BackOfficeIdentityUser, int>,
         IUserEmailStore<BackOfficeIdentityUser, int>,
@@ -26,12 +26,13 @@ namespace Umbraco.Core.Security
         IUserRoleStore<BackOfficeIdentityUser, int>,
         IUserSecurityStampStore<BackOfficeIdentityUser, int>,
         IUserLockoutStore<BackOfficeIdentityUser, int>,
-        IUserTwoFactorStore<BackOfficeIdentityUser, int>
+        IUserTwoFactorStore<BackOfficeIdentityUser, int>,
+        IUserSessionStore<BackOfficeIdentityUser, int>
 
-        //TODO: This would require additional columns/tables for now people will need to implement this on their own
-        //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
-        //TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
-        //IQueryableUserStore<BackOfficeIdentityUser, int>
+    //TODO: This would require additional columns/tables for now people will need to implement this on their own
+    //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
+    //TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
+    //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
         private readonly IUserService _userService;
         private readonly IMemberTypeService _memberTypeService;
@@ -59,7 +60,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObjectSlim"/> which handles common required locking logic.
         /// </summary>
         protected override void DisposeResources()
         {
@@ -126,12 +127,15 @@ namespace Umbraco.Core.Security
             var found = _userService.GetUserById(asInt.Result);
             if (found != null)
             {
+                // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                var isLoginsPropertyDirty = user.IsPropertyDirty("Logins");
+
                 if (UpdateMemberProperties(found, user))
                 {
                     _userService.Save(found);
                 }
 
-                if (user.IsPropertyDirty("Logins"))
+                if (isLoginsPropertyDirty)
                 {
                     var logins = await GetLoginsAsync(user);
                     _externalLoginService.SaveUserLogins(found.Id, logins);
@@ -751,6 +755,16 @@ namespace Umbraco.Core.Security
         {
             if (_disposed)
                 throw new ObjectDisposedException(GetType().Name);
+        }
+
+        public Task<bool> ValidateSessionIdAsync(int userId, string sessionId)
+        {
+            Guid guidSessionId;
+            if (Guid.TryParse(sessionId, out guidSessionId))
+            {
+                return Task.FromResult(_userService.ValidateLoginSession(userId, guidSessionId));
+            }
+            return Task.FromResult(false);
         }
     }
 }

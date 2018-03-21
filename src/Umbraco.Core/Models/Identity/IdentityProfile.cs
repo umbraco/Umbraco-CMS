@@ -46,20 +46,6 @@ namespace Umbraco.Core.Models.Identity
                     dest.ResetDirtyProperties(true);
                     dest.EnableChangeTracking();
                 });
-
-            CreateMap<BackOfficeIdentityUser, UserData>()
-                .ConstructUsing(source => new UserData(Guid.NewGuid().ToString("N"))) //this is the 'session id'
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.AllowedApplications, opt => opt.MapFrom(src => src.AllowedSections))
-                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => new[] { src.Roles.Select(x => x.RoleId).ToArray()}))
-                .ForMember(dest => dest.RealName, opt => opt.MapFrom(src => src.Name))
-                //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
-                .ForMember(dest => dest.StartContentNodes, opt => opt.MapFrom(src => src.CalculatedContentStartNodeIds))
-                //When mapping to UserData which is used in the authcookie we want ALL start nodes including ones defined on the groups
-                .ForMember(dest => dest.StartMediaNodes, opt => opt.MapFrom(src => src.CalculatedMediaStartNodeIds))
-                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.Culture, opt => opt.MapFrom(src => src.Culture))
-                .ForMember(dest => dest.SessionId, opt => opt.MapFrom(src => src.SecurityStamp.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString("N") : src.SecurityStamp));
         }
 
         private static string GetPasswordHash(string storedPass)
