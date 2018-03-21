@@ -23,7 +23,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
         public string Name => Plan.Name;
 
-        public string StateValueKey => "Umbraco.Core.Upgrader.State+" + Plan.Name;
+        public string StateValueKey => GetStateValueKey(Plan);
 
         protected IScopeProvider ScopeProvider { get; }
 
@@ -71,5 +71,7 @@ namespace Umbraco.Core.Migrations.Upgrade
                 scope.Complete();
             }
         }
+
+        public static string GetStateValueKey(MigrationPlan plan) => "Umbraco.Core.Upgrader.State+" + plan.Name;
     }
 }

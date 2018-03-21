@@ -330,17 +330,19 @@ namespace Umbraco.Core.Runtime
         {
             // no scope, no key value service - just directly accessing the database
 
+            var umbracoPlan = new UmbracoPlan();
+            var stateValueKey = Upgrader.GetStateValueKey(umbracoPlan);
+
             string state;
             using (var database = databaseFactory.CreateDatabase())
             {
                 var sql = databaseFactory.SqlContext.Sql()
                     .Select<KeyValueDto>()
                     .From<KeyValueDto>()
-                    .Where<KeyValueDto>(x => x.Key == "Umbraco.Core.Upgrader.State+Umbraco.Core");
+                    .Where<KeyValueDto>(x => x.Key == stateValueKey);
                 state = database.FirstOrDefault<KeyValueDto>(sql)?.Value;
             }
 
-            var umbracoPlan = new UmbracoPlan();
             var finalState = umbracoPlan.FinalState;
 
             logger.Debug<CoreRuntime>($"Final upgrade state is \"{finalState}\", database contains \"{state ?? "<null>"}\".");

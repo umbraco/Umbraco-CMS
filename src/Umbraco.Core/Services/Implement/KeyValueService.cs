@@ -39,23 +39,28 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = _scopeProvider.CreateScope())
             {
-                // assume that if the lock object exists, then everything is ok
+                // assume that if the lock object for key/value exists, then everything is ok
                 if (scope.Database.Exists<LockDto>(Constants.Locks.KeyValues))
                 {
                     scope.Complete();
                     return;
                 }
 
-                // drop the 'identity' on primary key
+                // drop the 'identity' on umbracoLock primary key
                 foreach (var sql in new[]
                 {
+                    // create a temp. id column and copy values
                     "alter table umbracoLock add column nid int null;",
                     "update umbracoLock set nid = id;",
+                    // drop the id column entirely (cannot just drop identity)
                     "alter table umbracoLock drop constraint PK_umbracoLock;",
                     "alter table umbracoLock drop column id;",
+                    // recreate the id column without identity and copy values
                     "alter table umbracoLock add column id int null;",
                     "update umbracoLock set id = nid;",
+                    // drop the temp. id column
                     "alter table umbracoLock drop column nid;",
+                    // complete the primary key
                     "alter table umbracoLock alter column id int not null;",
                     "alter table umbracoLock add constraint PK_umbracoLock primary key (id);"
                 })
@@ -73,6 +78,7 @@ VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
             }
         }
 
+        /// <inheritdoc />
         public string GetValue(string key)
         {
             EnsureInitialized();
@@ -86,6 +92,7 @@ VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
             }
         }
 
+        /// <inheritdoc />
         public void SetValue(string key, string value)
         {
             EnsureInitialized();
@@ -119,7 +126,15 @@ VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
             }
         }
 
+        /// <inheritdoc />
         public void SetValue(string key, string originValue, string newValue)
+        {
+            if (!TrySetValue(key, originValue, newValue))
+                throw new InvalidOperationException("Could not set the value.");
+        }
+
+        /// <inheritdoc />
+        public bool TrySetValue(string key, string originValue, string newValue)
         {
             EnsureInitialized();
 
@@ -130,11 +145,8 @@ VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
                 var sql = scope.SqlContext.Sql().Select<KeyValueDto>().From<KeyValueDto>().Where<KeyValueDto>(x => x.Key == key);
                 var dto = scope.Database.Fetch<KeyValueDto>(sql).FirstOrDefault();
 
-                if (dto == null)
-                    throw new InvalidOperationException("Key not found.");
-
-                if (dto.Value != originValue)
-                    throw new InvalidOperationException("Value has changed.");
+                if (dto == null || dto.Value != originValue)
+                    return false;
 
                 dto.Value = newValue;
                 dto.Updated = DateTime.Now;
@@ -142,6 +154,8 @@ VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
 
                 scope.Complete();
             }
+
+            return true;
         }
     }
 }

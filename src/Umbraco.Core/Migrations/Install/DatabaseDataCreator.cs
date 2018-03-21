@@ -2,6 +2,7 @@
 using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -71,6 +72,9 @@ namespace Umbraco.Core.Migrations.Install
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.TaskType))
                 CreateTaskTypeData();
+
+            if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
+                CreateKeyValueData();
 
             _logger.Info<DatabaseDataCreator>($"Done creating table {tableName} data.");
         }
@@ -277,6 +281,17 @@ namespace Umbraco.Core.Migrations.Install
         private void CreateTaskTypeData()
         {
             _database.Insert(Constants.DatabaseSchema.Tables.TaskType, "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
+        }
+
+        private void CreateKeyValueData()
+        {
+            // on install, initialize the umbraco migration plan with the final state
+
+            var plan = new UmbracoPlan();
+            var stateValueKey = Upgrader.GetStateValueKey(plan);
+            var finalState = plan.FinalState;
+
+            _database.Insert(Constants.DatabaseSchema.Tables.KeyValue, "key", false, new KeyValueDto { Key = stateValueKey, Value = finalState, Updated = DateTime.Now });
         }
     }
 }
