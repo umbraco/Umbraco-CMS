@@ -21,8 +21,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll
     /// display a simple continue installation view.
     /// </remarks>
-    [InstallSetupStep(InstallationType.NewInstall,
-        "User", 20, "")]
+    [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly HttpContextBase _http;
@@ -48,16 +47,16 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(UserModel user)
         {
-            var admin = _userService.GetUserById(0);
+            var admin = _userService.GetUserById(Constants.Security.SuperId);
             if (admin == null)
             {
-                throw new InvalidOperationException("Could not find the admi user!");
+                throw new InvalidOperationException("Could not find the super user!");
             }
 
-            var membershipUser = CurrentProvider.GetUser(0, true);
+            var membershipUser = CurrentProvider.GetUser(Constants.Security.SuperId, true);
             if (membershipUser == null)
             {
-                throw new InvalidOperationException("No user found in membership provider with id of 0");
+                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperId}.");
             }
 
             try

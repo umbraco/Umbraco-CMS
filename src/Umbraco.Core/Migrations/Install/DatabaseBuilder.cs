@@ -10,6 +10,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
@@ -94,8 +95,12 @@ namespace Umbraco.Core.Migrations.Install
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                // look for the default user with default password
-                var result = scope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
+                // look for the super user with default password
+                var sql = scope.Database.SqlContext.Sql()
+                    .SelectCount()
+                    .From<UserDto>()
+                    .Where<UserDto>(x => x.Id == Constants.Security.SuperId && x.Password == "default");
+                var result = scope.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)
                 {
