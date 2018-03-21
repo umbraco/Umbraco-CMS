@@ -22,8 +22,7 @@ namespace Umbraco.Web.umbraco.presentation.umbraco.create
             // only built-in roles can be deleted
             if (Member.IsUsingUmbracoRoles())
             {
-                Roles.DeleteRole(Alias);
-                roleDeleted = true;
+                roleDeleted = Roles.DeleteRole(Alias);
             }
 
             // Need to delete the member group from any content item that has it assigned in public access settings
