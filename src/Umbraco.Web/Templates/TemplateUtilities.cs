@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -46,6 +47,11 @@ namespace Umbraco.Web.Templates
         {
             if (urlProvider == null) throw new ArgumentNullException("urlProvider");
 
+            if(string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
             // Parse internal links
             var tags = LocalLinkPattern.Matches(text);
             foreach (Match tag in tags)
@@ -72,6 +78,28 @@ namespace Umbraco.Web.Templates
                         text = text.Replace(tag.Value, "href=\"" + newLink);
                     }                    
                 }
+            }
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(text);
+
+            var textModified = false;
+            var dataUdiTags = htmlDoc.DocumentNode.SelectNodes("//a[@data-udi]");
+
+            if(dataUdiTags == null)
+            {
+                return text;
+            }
+
+            foreach(var tag in dataUdiTags)
+            {
+                tag.Attributes.Remove("data-udi");
+                textModified = true;
+            }
+
+            if(textModified)
+            {
+                text = htmlDoc.DocumentNode.OuterHtml;
             }
 
             return text;
