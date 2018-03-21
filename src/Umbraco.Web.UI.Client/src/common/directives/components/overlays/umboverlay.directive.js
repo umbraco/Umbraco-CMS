@@ -59,7 +59,6 @@
 </pre>
 
 <h1>General Options</h1>
-Lorem ipsum dolor sit amet..
 <table>
     <thead>
         <tr>
@@ -74,7 +73,7 @@ Lorem ipsum dolor sit amet..
         <td>Set the title of the overlay.</td>
     </tr>
     <tr>
-        <td>model.subTitle</td>
+        <td>model.subtitle</td>
         <td>String</td>
         <td>Set the subtitle of the overlay.</td>
     </tr>

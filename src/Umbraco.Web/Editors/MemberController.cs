@@ -1,29 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
 using AutoMapper;
-using Examine.LuceneEngine.SearchCriteria;
-using Examine.SearchCriteria;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -33,10 +22,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
 using Constants = Umbraco.Core.Constants;
-using Examine;
-using Newtonsoft.Json;
 
 namespace Umbraco.Web.Editors
 {
@@ -96,16 +82,18 @@ namespace Umbraco.Web.Editors
 
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
-                long totalRecords;
                 var members = Services.MemberService
-                    .GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();
+                    .GetAll((pageNumber - 1), pageSize, out var totalRecords, orderBy, orderDirection, orderBySystemField, memberTypeAlias, filter).ToArray();
                 if (totalRecords == 0)
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);
                 }
-                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize);
-                pagedResult.Items = members
-                    .Select(Mapper.Map<IMember, MemberBasic>);
+
+                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize)
+                {
+                    Items = members
+                        .Select(x => AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberBasic>(x, UmbracoContext))
+                };
                 return pagedResult;
             }
             else
@@ -133,10 +121,13 @@ namespace Umbraco.Web.Editors
                 {
                     return new PagedResult<MemberBasic>(0, 0, 0);
                 }
-                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize);
-                pagedResult.Items = members
-                    .Cast<MembershipUser>()
-                    .Select(Mapper.Map<MembershipUser, MemberBasic>);
+
+                var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize)
+                {
+                    Items = members
+                        .Cast<MembershipUser>()
+                        .Select(Mapper.Map<MembershipUser, MemberBasic>)
+                };
                 return pagedResult;
             }
 
@@ -437,7 +428,7 @@ namespace Umbraco.Web.Editors
                 var sensitiveProperties = contentItem.PersistedContent.ContentType
                     .PropertyTypes.Where(x => contentItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
                     .ToList();
-                
+
                 foreach (var sensitiveProperty in sensitiveProperties)
                 {
                     //if found, change the value of the contentItem model to the persisted value so it remains unchanged
@@ -665,7 +656,7 @@ namespace Umbraco.Web.Editors
                         contentItem.Email,
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
-                        contentItem.IsApproved, 
+                        contentItem.IsApproved,
                         contentItem.PersistedContent.Key, //custom membership provider, we'll link that based on the IMember unique id (GUID)
                         out status);
 
@@ -682,7 +673,7 @@ namespace Umbraco.Web.Editors
                         contentItem.Email,
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
                         "TEMP", //some membership provider's require something here even if q/a is disabled!
-                        contentItem.IsApproved, 
+                        contentItem.IsApproved,
                         newKey,
                         out status);
 
@@ -828,17 +819,17 @@ namespace Umbraco.Web.Editors
             var member = ((MemberService)Services.MemberService).ExportMember(key);
 
             var fileName = $"{member.Name}_{member.Email}.txt";
-            
-            httpResponseMessage.Content = new ObjectContent<MemberExportModel>(member, new JsonMediaTypeFormatter {Indent = true});
+
+            httpResponseMessage.Content = new ObjectContent<MemberExportModel>(member, new JsonMediaTypeFormatter { Indent = true });
             httpResponseMessage.Content.Headers.Add("x-filename", fileName);
             httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
             httpResponseMessage.Content.Headers.ContentDisposition.FileName = fileName;
             httpResponseMessage.StatusCode = HttpStatusCode.OK;
-            
+
             return httpResponseMessage;
         }
     }
 
-    
+
 }
