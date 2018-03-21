@@ -47,9 +47,7 @@
                 vm.userType = user.userType;
                 vm.userLang = user.locale;
 
-                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');
-
-                console.log(vm.hasAccessToSettings);
+                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
 
                 evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
                     handleSectionChange();
