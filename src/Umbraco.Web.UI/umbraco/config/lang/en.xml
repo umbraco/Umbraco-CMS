@@ -621,6 +621,7 @@
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
+        <key alias="settings">Settings</key>
         <key alias="show">Show</key>
         <key alias="showPageOnSend">Show page on Send</key>
         <key alias="size">Size</key>
