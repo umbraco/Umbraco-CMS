@@ -70,14 +70,20 @@ namespace Umbraco.Web.Editors
             //Checking to see if the user has access to the required tour sections, else we remove the tour
             foreach (var backOfficeTourFile in result)
             {
-                foreach (var tour in backOfficeTourFile.Tours)
+                if (backOfficeTourFile.Tours != null)
                 {
-                    foreach (var toursRequiredSection in tour.RequiredSections)
+                    foreach (var tour in backOfficeTourFile.Tours)
                     {
-                        if (allowedSections.Contains(toursRequiredSection) == false)
+                        if (tour.RequiredSections != null)
                         {
-                            toursToBeRemoved.Add(backOfficeTourFile);
-                            break;
+                            foreach (var toursRequiredSection in tour.RequiredSections)
+                            {
+                                if (allowedSections.Contains(toursRequiredSection) == false)
+                                {
+                                    toursToBeRemoved.Add(backOfficeTourFile);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
