@@ -24,6 +24,7 @@ Remember, we're a friendly bunch and are happy with whatever contribution you mi
   * [Working with the source code](#working-with-the-source-code)
   * [What branch should I target for my contributions?](#what-branch-should-i-target-for-my-contributions)
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
+  * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
   
 [How do I even begin?](#how-do-i-even-begin)
 
@@ -145,6 +146,29 @@ Alternatively, you can open `src\umbraco.sln` in Visual Studio 2017 ([the commun
 ![Gulp build in Visual Studio](tools/contributing/gulpbuild.png)
 
 After this build completes, you should be able to hit `F5` in Visual Studio to build and run the project. A IISExpress webserver will start and the Umbraco installer will pop up in your browser, follow the directions there to get a working Umbraco install up and running.
+
+### Keeping your Umbraco fork in sync with the main repository
+
+We recommend you sync with our repository before you submit your pull request. That way, you can fix any potential merge conflicts and make our lives a little bit easier.
+
+Also, if you've submitted a pull request three weeks ago and want to work on something new, you'll want to get the latest code to build against of course.
+
+To sync your fork with this original one, you'll have to add the upstream url, you only have to do this once:
+
+```
+git remote add upstream https://github.com/umbraco/Umbraco-CMS.git
+```
+
+Then when you want to get the changes from the main repository:
+
+```
+git fetch upstream
+git rebase upstream/dev-v7
+```
+
+In this command we're syncing with the `dev-v7` branch, but you can of course choose another one if needed.
+
+(More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
 
 ## How do I even begin?
 
