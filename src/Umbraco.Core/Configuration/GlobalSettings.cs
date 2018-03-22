@@ -483,7 +483,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                var setting = ConfigurationManager.AppSettings.ContainsKey("umbracoLocalTempStorage");
+                var setting = ConfigurationManager.AppSettings["umbracoLocalTempStorage"];
                 if (!string.IsNullOrWhiteSpace(setting))
                     return Enum<LocalTempStorage>.Parse(setting);
 

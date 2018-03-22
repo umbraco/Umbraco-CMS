@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -32,8 +33,13 @@ namespace Umbraco.Core.Services.Implement
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
-            foreach (var typeId in typeIds)
-                ContentService.DeleteOfType(typeId);
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var typeIdsA = typeIds.ToArray();
+                ContentService.DeleteOfTypes(typeIdsA);
+                ContentService.DeleteBlueprintsOfTypes(typeIdsA);
+                scope.Complete();
+            }
         }
 
         /// <summary>
@@ -82,6 +88,5 @@ namespace Umbraco.Core.Services.Implement
                 return Repository.GetAllContentTypeIds(aliases);
             }
         }
-
     }
 }

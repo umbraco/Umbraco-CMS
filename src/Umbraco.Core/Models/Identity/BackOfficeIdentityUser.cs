@@ -390,6 +390,10 @@ namespace Umbraco.Core.Models.Identity
             _beingDirty.ResetDirtyProperties(rememberDirty);
         }
 
+        /// <inheritdoc />
+        public IEnumerable<string> GetWereDirtyProperties()
+            => _beingDirty.GetWereDirtyProperties();
+
         /// <summary>
         /// Disables change tracking.
         /// </summary>

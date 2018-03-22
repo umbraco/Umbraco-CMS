@@ -445,7 +445,7 @@ namespace Umbraco.Core.Services.Implement
             //null check otherwise we get exceptions
             if (media.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IMedia>();
 
-            var rootId = Constants.System.Root.ToInvariantString();
+            var rootId = Constants.System.RootString;
             var ids = media.Path.Split(',')
                 .Where(x => x != rootId && x != media.Id.ToString(CultureInfo.InvariantCulture))
                 .Select(int.Parse)
@@ -616,7 +616,7 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IMedia>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith(mediaPath[0] + ",", TextColumnType.NVarchar));
+                    query.Where(x => x.Path.SqlStartsWith(mediaPath[0].Path + ",", TextColumnType.NVarchar));
                 }
                 return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
@@ -706,8 +706,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
-                var bin = $"{Constants.System.Root},{Constants.System.RecycleBinMedia},";
-                var query = Query<IMedia>().Where(x => x.Path.StartsWith(bin));
+                var query = Query<IMedia>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
                 return _mediaRepository.Get(query);
             }
         }
@@ -734,7 +733,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetMediaByPath(string mediaPath)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _mediaRepository.GetMediaByPath(mediaPath);
             }

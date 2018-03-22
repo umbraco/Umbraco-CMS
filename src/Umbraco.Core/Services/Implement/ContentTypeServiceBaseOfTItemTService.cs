@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services.Implement
 
         protected void OnDeletedContainer(IScope scope, DeleteEventArgs<EntityContainer> args)
         {
-            scope.Events.Dispatch(DeletedContainer, This, args);
+            scope.Events.Dispatch(DeletedContainer, This, args, "DeletedContainer");
         }
     }
 }

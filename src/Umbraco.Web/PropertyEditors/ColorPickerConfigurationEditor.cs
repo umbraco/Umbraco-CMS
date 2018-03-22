@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
@@ -9,12 +10,11 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal class ColorPickerConfigurationEditor : ValueListConfigurationEditor
+    internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
     {
-        public ColorPickerConfigurationEditor(ILocalizedTextService textService)
-            : base(textService)
+        public ColorPickerConfigurationEditor()
         {
-            var field = Fields.First();
+            var field = Fields.First(x => x.Key == "items");
 
             //use a custom editor too
             field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
@@ -26,21 +26,82 @@ namespace Umbraco.Web.PropertyEditors
             field.Validators.Add(new ColorListValidator());
         }
 
-        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(ColorPickerConfiguration configuration)
         {
             if (configuration == null)
                 return new Dictionary<string, object>
                 {
-                    { "items", new object() }
+                    { "items", new object() },
+                    { "useLabel", false }
                 };
 
-            // for now, we have to do this, because the color picker is weird, but it's fixed in 7.7 at some point
-            // and then we probably don't need this whole override method anymore - base shouls be enough?
+            var items = configuration.Items.ToDictionary(x => x.Id.ToString(), x => GetItemValue(x, configuration.UseLabel));
 
             return new Dictionary<string, object>
             {
-                { "items", configuration.Items.ToDictionary(x => x.Id.ToString(), x => x.Value) }
+                { "items", items },
+                { "useLabel", configuration.UseLabel }
             };
+        }
+
+        private object GetItemValue(ValueListConfiguration.ValueListItem item, bool useLabel)
+        {
+            if (useLabel)
+            {
+                return item.Value.DetectIsJson()
+                    ? JsonConvert.DeserializeObject(item.Value)
+                    : new JObject { { "color", item.Value }, { "label", item.Value } };
+            }
+
+            if (!item.Value.DetectIsJson())
+                return item.Value;
+
+            var jobject = (JObject) JsonConvert.DeserializeObject(item.Value);
+            return jobject.Property("color").Value.Value<string>();
+        }
+
+        public override ColorPickerConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, ColorPickerConfiguration configuration)
+        {
+            var output = new ColorPickerConfiguration();
+
+            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+                return output; // oops
+
+            // handle useLabel
+            if (editorValues.TryGetValue("useLabel", out var useLabelObj))
+                output.UseLabel = useLabelObj.TryConvertTo<bool>();
+
+            // auto-assigning our ids, get next id from existing values
+            var nextId = 1;
+            if (configuration?.Items != null && configuration.Items.Count > 0)
+                nextId = configuration.Items.Max(x => x.Id) + 1;
+
+            // create ValueListItem instances - sortOrder is ignored here
+            foreach (var item in jItems.OfType<JObject>())
+            {
+                var value = item.Property("value")?.Value?.Value<string>();
+                if (string.IsNullOrWhiteSpace(value)) continue;
+
+                var id = item.Property("id")?.Value?.Value<int>() ?? 0;
+                if (id >= nextId) nextId = id + 1;
+
+                // if using a label, replace color by json blob
+                // (a pity we have to serialize here!)
+                if (output.UseLabel)
+                {
+                    var label = item.Property("label")?.Value?.Value<string>();
+                    value = JsonConvert.SerializeObject(new { value, label });
+                }
+
+                output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });
+            }
+
+            // ensure ids
+            foreach (var item in output.Items)
+                if (item.Id == 0)
+                    item.Id = nextId++;
+
+            return output;
         }
 
         internal class ColorListValidator : IValueValidator

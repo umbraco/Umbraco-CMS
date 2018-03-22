@@ -403,7 +403,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var query1 = memberTypeAlias == null ? null : Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
+                var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter) || x.Email.Contains(filter));
                 return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, query2);
             }
         }
@@ -815,6 +815,10 @@ namespace Umbraco.Core.Services.Implement
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember member, bool raiseEvents = true)
         {
+            //trimming username and email to make sure we have no trailing space
+            member.Username = member.Username.Trim();
+            member.Email = member.Email.Trim();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
@@ -866,7 +870,13 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
 
                 foreach (var member in membersA)
+                {
+                    //trimming username and email to make sure we have no trailing space
+                    member.Username = member.Username.Trim();
+                    member.Email = member.Email.Trim();
+
                     _memberRepository.Save(member);
+                }
 
                 if (raiseEvents)
                 {
@@ -1018,7 +1028,9 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
-                _memberGroupRepository.AssignRoles(usernames, roleNames);
+                var ids = _memberGroupRepository.GetMemberIds(usernames);
+                _memberGroupRepository.AssignRoles(ids, roleNames);
+                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames));
                 scope.Complete();
             }
         }
@@ -1033,7 +1045,9 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
-                _memberGroupRepository.DissociateRoles(usernames, roleNames);
+                var ids = _memberGroupRepository.GetMemberIds(usernames);
+                _memberGroupRepository.DissociateRoles(ids, roleNames);
+                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames));
                 scope.Complete();
             }
         }
@@ -1049,6 +1063,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
+                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames));
                 scope.Complete();
             }
         }
@@ -1064,6 +1079,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
+                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames));
                 scope.Complete();
             }
         }
@@ -1109,6 +1125,21 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+
+        /// <summary>
+        /// Occurs after roles have been assigned.
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
+
+        /// <summary>
+        /// Occurs after roles have been removed.
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
+
+        /// <summary>
+        /// Occurs after members have been exported.
+        /// </summary>
+        internal static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
 
         #endregion
 
@@ -1217,6 +1248,72 @@ namespace Umbraco.Core.Services.Implement
             }
 
             return member;
+        }
+
+        /// <summary>
+        /// Exports a member.
+        /// </summary>
+        /// <remarks>
+        /// This is internal for now and is used to export a member in the member editor, 
+        /// it will raise an event so that auditing logs can be created.
+        /// </remarks>
+        internal MemberExportModel ExportMember(Guid key)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var query = Query<IMember>().Where(x => x.Key == key);
+                var member = _memberRepository.Get(query).FirstOrDefault();
+
+                if (member == null) return null;
+
+                var model = new MemberExportModel
+                {
+                    Id = member.Id,
+                    Key = member.Key,
+                    Name = member.Name,
+                    Username = member.Username,
+                    Email = member.Email,
+                    Groups = GetAllRoles(member.Id).ToList(),
+                    ContentTypeAlias = member.ContentTypeAlias,
+                    CreateDate = member.CreateDate,
+                    UpdateDate = member.UpdateDate,
+                    Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
+                };
+
+                scope.Events.Dispatch(Exported, this, new ExportedMemberEventArgs(member, model));
+
+                return model;
+            }
+        }
+
+        private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+
+            var exportProperties = new List<MemberExportProperty>();
+
+            foreach (var property in member.Properties)
+            {
+                //ignore list
+                switch (property.Alias)
+                {
+                    case Constants.Conventions.Member.PasswordQuestion:
+                        continue;
+                }
+
+                var propertyExportModel = new MemberExportProperty
+                {
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Name = property.PropertyType.Name,
+                    Value = property.GetValue(), // fixme ignoring variants
+                    CreateDate = property.CreateDate,
+                    UpdateDate = property.UpdateDate
+                };
+                exportProperties.Add(propertyExportModel);
+            }
+
+            return exportProperties;
         }
 
         #endregion

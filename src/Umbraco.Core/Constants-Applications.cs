@@ -126,8 +126,6 @@
 
             public const string Languages = "languages";
 
-            public const string Macros = "macros";
-
             /// <summary>
             /// alias for the user types tree.
             /// </summary>

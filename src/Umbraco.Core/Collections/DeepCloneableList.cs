@@ -136,5 +136,11 @@ namespace Umbraco.Core.Collections
                 dc.ResetDirtyProperties(rememberDirty);
             }
         }
+
+        /// <remarks>Always return an empty enumerable, the list has no properties that can be dirty.</remarks>
+        public IEnumerable<string> GetWereDirtyProperties()
+        {
+            return Enumerable.Empty<string>();
+        }
     }
 }

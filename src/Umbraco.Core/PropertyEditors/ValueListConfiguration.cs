@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the ValueList editor configuration.
     /// </summary>
-    class ValueListConfiguration
+    public class ValueListConfiguration
     {
         [JsonProperty("items")]
         public List<ValueListItem> Items { get; set; } = new List<ValueListItem>();

@@ -324,7 +324,7 @@ namespace Umbraco.Core.Security
                     Guid guidSession;
                     if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
                     {
-                        ApplicationContext.Current.Services.UserService.ClearLoginSession(guidSession);
+                        Current.Services.UserService.ClearLoginSession(guidSession);
                     }
                 }
             }

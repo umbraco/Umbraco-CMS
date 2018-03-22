@@ -298,7 +298,6 @@
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />

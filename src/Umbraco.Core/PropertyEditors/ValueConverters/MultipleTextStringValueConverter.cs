@@ -18,6 +18,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
+        private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
+
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             // data is (both in database and xml):
@@ -52,7 +54,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             // fall back on normal behaviour
             return values.Any() == false
-                ? sourceString.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
+                ? sourceString.Split(NewLineDelimiters, StringSplitOptions.None)
                 : values.ToArray();
         }
 

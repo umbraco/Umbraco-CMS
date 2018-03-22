@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -152,7 +153,7 @@ namespace Umbraco.Core
             }
             catch (ArgumentException ex)
             {
-                LogHelper.Error(typeof(UriExtensions), "Failed to determine if request was client side", ex);
+                Current.Logger.Error(typeof(UriExtensions), "Failed to determine if request was client side", ex);
                 return false;
             }
         }

@@ -98,7 +98,7 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
-    <Compile Include="Auditing\AuditEventHandler.cs" />
+    <Compile Include="Auditing\AuditEventsComponent.cs" />
     <Compile Include="Auditing\IdentityAuditEventArgs.cs" />
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
@@ -377,6 +377,7 @@
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
+    <Compile Include="PropertyEditors\ColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
@@ -395,6 +396,7 @@
     <Compile Include="PropertyEditors\TagConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
+    <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
@@ -1349,6 +1351,7 @@
     <Compile Include="Serialization\UdiJsonConverter.cs" />
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
+    <Compile Include="Services\IConsentService.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
@@ -1357,6 +1360,7 @@
     <Compile Include="Services\Changes\TreeChange.cs" />
     <Compile Include="Services\Changes\TreeChangeExtensions.cs" />
     <Compile Include="Services\Changes\TreeChangeTypes.cs" />
+    <Compile Include="Services\Implement\ConsentService.cs" />
     <Compile Include="Services\Implement\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
     <Compile Include="Services\Implement\ContentTypeService.cs" />

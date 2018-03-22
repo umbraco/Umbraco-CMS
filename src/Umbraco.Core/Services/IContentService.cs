@@ -44,6 +44,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
 
+        /// <summary>
+        /// Deletes blueprints for a content type.
+        /// </summary>
+        void DeleteBlueprintsOfType(int contentTypeId, int userId = 0);
+
+        /// <summary>
+        /// Deletes blueprints for content types.
+        /// </summary>
+        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
+
         #endregion
 
         #region Get, Count Documents
@@ -325,6 +335,11 @@ namespace Umbraco.Core.Services
         /// Sorts documents.
         /// </summary>
         bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Sorts documents.
+        /// </summary>
+        bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
 
         #endregion
 

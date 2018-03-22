@@ -1,30 +1,16 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
     public class BackOfficeClaimsIdentityFactory<T> : ClaimsIdentityFactory<T, int>
         where T: BackOfficeIdentityUser
     {
-        private readonly ApplicationContext _appCtx;
-
-        [Obsolete("Use the overload specifying all dependencies instead")]
         public BackOfficeClaimsIdentityFactory()
-            :this(ApplicationContext.Current)
         {
-        }
-
-        public BackOfficeClaimsIdentityFactory(ApplicationContext appCtx)
-        {
-            if (appCtx == null) throw new ArgumentNullException("appCtx");
-            _appCtx = appCtx;
-
             SecurityStampClaimType = Constants.Security.SessionIdClaimType;
             UserNameClaimType = ClaimTypes.Name;
         }
@@ -58,14 +44,5 @@ namespace Umbraco.Core.Security
     }
 
     public class BackOfficeClaimsIdentityFactory : BackOfficeClaimsIdentityFactory<BackOfficeIdentityUser>
-    {
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public BackOfficeClaimsIdentityFactory()
-        {
-        }
-
-        public BackOfficeClaimsIdentityFactory(ApplicationContext appCtx) : base(appCtx)
-        {
-        }
-    }
+    { }
 }
