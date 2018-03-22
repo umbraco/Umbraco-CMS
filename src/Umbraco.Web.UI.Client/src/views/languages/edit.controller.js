@@ -27,7 +27,8 @@
                 "languages_mandatoryLanguage",
                 "languages_mandatoryLanguageHelp",
                 "languages_defaultLanguage",
-                "languages_defaultLanguageHelp"
+                "languages_defaultLanguageHelp",
+                "languages_addLanguage"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -36,11 +37,16 @@
                 vm.labels.mandatoryLanguageHelp = values[2];
                 vm.labels.defaultLanguage = values[3];
                 vm.labels.defaultLanguageHelp = values[4];
+                vm.labels.addLanguage = values[5];
+
+                if($routeParams.create) {
+                    vm.page.name = vm.labels.addLanguage;
+                }
+
             });
 
-            if($routeParams.create) {
-                vm.page.name = "Add language";
-            } else {
+            if(!$routeParams.create) {
+
                 vm.loading = true;
 
                 // fake loading the language
