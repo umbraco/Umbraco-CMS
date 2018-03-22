@@ -152,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // unpublish = no impact on versions
                 ((Content) content1).PublishedState = PublishedState.Unpublishing;
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(false, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = version
                 ((Content) content1).PublishValues();
@@ -214,7 +214,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // change something
                 // save = update the current (draft) version
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // publish = new version
                 content1.Name = "name-4";
@@ -250,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(versions[versions.Count - 1], repository.Get(content1.Id).VersionId);
 
                 // misc checks
-                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>("SELECT published FROM uDocument WHERE nodeId=@id", new { id = content1.Id }));
+                Assert.AreEqual(true, scope.Database.ExecuteScalar<bool>($"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id", new { id = content1.Id }));
 
                 // all versions
                 var allVersions = repository.GetAllVersions(content1.Id).ToArray();

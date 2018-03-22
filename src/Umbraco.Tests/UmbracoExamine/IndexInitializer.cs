@@ -168,7 +168,7 @@ namespace Umbraco.Tests.UmbracoExamine
             //var query = new Mock<IQuery<IContent>>();
             //query
             //    .Setup(x => x.GetWhereClauses())
-            //    .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>("uDocument.published", new object[] { 1 }) });
+            //    .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>($"{Constants.DatabaseSchema.Tables.Document}.published", new object[] { 1 }) });
             var scopeProvider = new Mock<IScopeProvider>();
             //scopeProvider
             //    .Setup(x => x.Query<IContent>())

@@ -1251,12 +1251,12 @@ WHERE cmsContentNu.nodeId IN (
             {
                 // assume number of ctypes won't blow IN(...)
                 // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
+                db.Execute($@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = contentObjectType, ctypes = contentTypeIdsA });
             }
@@ -1318,12 +1318,12 @@ WHERE cmsContentNu.nodeId IN (
             {
                 // assume number of ctypes won't blow IN(...)
                 // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
+                db.Execute($@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = mediaObjectType, ctypes = contentTypeIdsA });
             }
@@ -1376,12 +1376,12 @@ WHERE cmsContentNu.nodeId IN (
             {
                 // assume number of ctypes won't blow IN(...)
                 // must support SQL-CE
-                db.Execute(@"DELETE FROM cmsContentNu
+                db.Execute($@"DELETE FROM cmsContentNu
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = memberObjectType, ctypes = contentTypeIdsA });
             }
@@ -1423,13 +1423,13 @@ WHERE cmsContentNu.nodeId IN (
             var contentObjectType = Constants.ObjectTypes.Document;
             var db = scope.Database;
 
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
+            var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN uDocument ON umbracoNode.id=uDocument.nodeId
+JOIN {Constants.DatabaseSchema.Tables.Document} ON umbracoNode.id={Constants.DatabaseSchema.Tables.Document}.nodeId
 LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.published=0)
 LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=1)
 WHERE umbracoNode.nodeObjectType=@objType
-AND nuEdited.nodeId IS NULL OR (uDocument.published=1 AND nuPublished.nodeId IS NULL);"
+AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.published=1 AND nuPublished.nodeId IS NULL);"
                 , new { objType = contentObjectType });
 
             return count == 0;

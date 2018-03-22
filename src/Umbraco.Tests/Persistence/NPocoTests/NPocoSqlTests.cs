@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -202,7 +203,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_Select_From_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[uContent]");
+            expected.SelectAll().From($"[{Constants.DatabaseSchema.Tables.Content}]");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>();
@@ -217,9 +218,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             var expected = Sql();
             expected.SelectAll()
-                .From("[uDocumentVersion]")
-                .InnerJoin("[uContentVersion]")
-                .On("[uDocumentVersion].[id] = [uContentVersion].[id]");
+                .From($"[{Constants.DatabaseSchema.Tables.DocumentVersion}]")
+                .InnerJoin($"[{Constants.DatabaseSchema.Tables.ContentVersion}]")
+                .On($"[{Constants.DatabaseSchema.Tables.DocumentVersion}].[id] = [{Constants.DatabaseSchema.Tables.ContentVersion}].[id]");
 
             var sql = Sql();
             sql.SelectAll().From<DocumentVersionDto>()
@@ -235,7 +236,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_OrderBy_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[uContent]").OrderBy("([uContent].[contentTypeId])");
+            expected.SelectAll().From($"[{Constants.DatabaseSchema.Tables.Content}]").OrderBy($"([{Constants.DatabaseSchema.Tables.Content}].[contentTypeId])");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().OrderBy<ContentDto>(x => x.ContentTypeId);
@@ -249,7 +250,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_GroupBy_With_Type()
         {
             var expected = Sql();
-            expected.SelectAll().From("[uContent]").GroupBy("[uContent].[contentTypeId]");
+            expected.SelectAll().From($"[{Constants.DatabaseSchema.Tables.Content}]").GroupBy($"[{Constants.DatabaseSchema.Tables.Content}].[contentTypeId]");
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().GroupBy<ContentDto>(x => x.ContentTypeId);
@@ -263,7 +264,7 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         public void Can_Use_Where_Predicate()
         {
             var expected = Sql();
-            expected.SelectAll().From("[uContent]").Where("([uContent].[nodeId] = @0)", 1045);
+            expected.SelectAll().From($"[{Constants.DatabaseSchema.Tables.Content}]").Where($"([{Constants.DatabaseSchema.Tables.Content}].[nodeId] = @0)", 1045);
 
             var sql = Sql();
             sql.SelectAll().From<ContentDto>().Where<ContentDto>(x => x.NodeId == 1045);
@@ -278,9 +279,9 @@ namespace Umbraco.Tests.Persistence.NPocoTests
         {
             var expected = Sql();
             expected.SelectAll()
-                .From("[uContent]")
-                .Where("([uContent].[nodeId] = @0)", 1045)
-                .Where("([uContent].[contentTypeId] = @0)", 1050);
+                .From($"[{Constants.DatabaseSchema.Tables.Content}]")
+                .Where($"([{Constants.DatabaseSchema.Tables.Content}].[nodeId] = @0)", 1045)
+                .Where($"([{Constants.DatabaseSchema.Tables.Content}].[contentTypeId] = @0)", 1050);
 
             var sql = Sql();
             sql.SelectAll()

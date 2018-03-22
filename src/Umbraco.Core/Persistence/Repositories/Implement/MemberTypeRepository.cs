@@ -148,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.mandatory", "cmsPropertyType.UniqueID",
                     "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                     "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
-                    "uDataType.propertyEditorAlias", "uDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId",
+                    $"{Constants.DatabaseSchema.Tables.DataType}.propertyEditorAlias", $"{Constants.DatabaseSchema.Tables.DataType}.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId",
                     "cmsPropertyTypeGroup.text AS PropertyGroupName", "cmsPropertyTypeGroup.uniqueID AS PropertyGroupUniqueID",
                     "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
                 .From<NodeDto>()

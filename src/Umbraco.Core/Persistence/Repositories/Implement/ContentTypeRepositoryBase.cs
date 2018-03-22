@@ -1091,11 +1091,11 @@ ORDER BY contentTypeId, id";
     pt.contentTypeId AS contentTypeId,
     pt.id AS id, pt.uniqueID AS " + sqlSyntax.GetQuotedColumnName("key") + @",
     pt.propertyTypeGroupId AS groupId,
-    pt.Alias AS alias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" AS " + sqlSyntax.GetQuotedColumnName("desc") + @", pt.mandatory AS mandatory,
+    pt.Alias AS alias, pt." + sqlSyntax.GetQuotedColumnName("Description") + @" AS " + sqlSyntax.GetQuotedColumnName("desc") + $@", pt.mandatory AS mandatory,
     pt.Name AS name, pt.sortOrder AS sortOrder, pt.validationRegExp AS regexp, pt.variations as variations,
     dt.nodeId as dataTypeId, dt.dbType as dbType, dt.propertyEditorAlias as editorAlias
 FROM cmsPropertyType pt
-INNER JOIN uDataType as dt ON pt.dataTypeId = dt.nodeId
+INNER JOIN {Constants.DatabaseSchema.Tables.DataType} as dt ON pt.dataTypeId = dt.nodeId
 WHERE pt.contentTypeId IN (@ids)
 ORDER BY contentTypeId, groupId, id";
 
@@ -1238,9 +1238,9 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         public bool HasContainerInPath(string contentPath)
         {
             var ids = contentPath.Split(',').Select(int.Parse);
-            var sql = new Sql(@"SELECT COUNT(*) FROM cmsContentType
-INNER JOIN uContent ON cmsContentType.nodeId=uContent.contentTypeId
-WHERE uContent.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
+            var sql = new Sql($@"SELECT COUNT(*) FROM cmsContentType
+INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
+WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
