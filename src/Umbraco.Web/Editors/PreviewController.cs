@@ -8,11 +8,10 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
 {
-    [UmbracoAuthorize]
     [DisableBrowserCache]
     public class PreviewController : Controller
     {
-        
+        [UmbracoAuthorize(redirectToUmbracoLogin: true)]
         public ActionResult Index()
         {
             var model = new BackOfficePreview
@@ -33,7 +32,6 @@ namespace Umbraco.Web.Editors
             return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
-        [AllowAnonymous]
         public ActionResult Editors(string editor)
         {
             if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException("editor");
