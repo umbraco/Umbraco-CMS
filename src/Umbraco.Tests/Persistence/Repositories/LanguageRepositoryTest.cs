@@ -246,6 +246,36 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Add_On_LanguageRepository_With_New_Deafult()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+                                
+                var languageBR = (ILanguage)new Language("pt-BR") { CultureName = "pt-BR", IsDefaultVariantLanguage = true, Mandatory = true };
+                repository.Save(languageBR);
+                var languageEN = new Language("en-AU") { CultureName = "en-AU" };
+                repository.Save(languageEN);
+
+                Assert.IsTrue(languageBR.IsDefaultVariantLanguage);
+                Assert.IsTrue(languageBR.Mandatory);
+
+                // Act
+
+                var languageNZ = new Language("en-NZ") { CultureName = "en-NZ", IsDefaultVariantLanguage = true, Mandatory = true };
+                repository.Save(languageNZ);
+                languageBR = repository.Get(languageBR.Id);
+
+                // Assert
+
+                Assert.IsFalse(languageBR.IsDefaultVariantLanguage);
+                Assert.IsTrue(languageNZ.IsDefaultVariantLanguage);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Update_On_LanguageRepository()
         {
             // Arrange

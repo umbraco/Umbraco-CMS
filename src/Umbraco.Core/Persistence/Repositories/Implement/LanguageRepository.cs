@@ -107,6 +107,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             ((EntityBase)entity).AddingEntity();
 
+            if (entity.IsDefaultVariantLanguage)
+            {
+                //if this entity is flagged as the default, we need to set all others to false
+                Database.Execute($"UPDATE {SqlSyntax.GetQuotedColumnName(Constants.DatabaseSchema.Tables.Language)} SET {SqlSyntax.GetQuotedColumnName("isDefaultVariantLang")} = 0");
+                //We need to clear the whole cache since all languages will be updated
+                IsolatedCache.ClearAllCache();
+            }
+
             var factory = new LanguageFactory();
             var dto = factory.BuildDto(entity);
 
@@ -114,11 +122,20 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Id = id;
 
             entity.ResetDirtyProperties();
+
         }
 
         protected override void PersistUpdatedItem(ILanguage entity)
         {
             ((EntityBase)entity).UpdatingEntity();
+
+            if (entity.IsDefaultVariantLanguage)
+            {
+                //if this entity is flagged as the default, we need to set all others to false
+                Database.Execute($"UPDATE {SqlSyntax.GetQuotedColumnName(Constants.DatabaseSchema.Tables.Language)} SET {SqlSyntax.GetQuotedColumnName("isDefaultVariantLang")} = 0");
+                //We need to clear the whole cache since all languages will be updated
+                IsolatedCache.ClearAllCache();
+            }
 
             var factory = new LanguageFactory();
             var dto = factory.BuildDto(entity);
