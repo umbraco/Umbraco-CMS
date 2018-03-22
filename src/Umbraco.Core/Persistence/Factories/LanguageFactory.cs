@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public ILanguage BuildEntity(LanguageDto dto)
         {
-            var lang = new Language(dto.IsoCode) { CultureName = dto.CultureName, Id = dto.Id };
+            var lang = new Language(dto.IsoCode) { CultureName = dto.CultureName, Id = dto.Id, IsDefaultVariantLanguage = dto.IsDefaultVariantLanguage, Mandatory = dto.Mandatory };
             // reset dirty initial properties (U4-1946)
             lang.ResetDirtyProperties(false);
             return lang;
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public LanguageDto BuildDto(ILanguage entity)
         {
-            var dto = new LanguageDto { CultureName = entity.CultureName, IsoCode = entity.IsoCode };
+            var dto = new LanguageDto { CultureName = entity.CultureName, IsoCode = entity.IsoCode, IsDefaultVariantLanguage = entity.IsDefaultVariantLanguage, Mandatory = entity.Mandatory };
             if (entity.HasIdentity)
                 dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
 
