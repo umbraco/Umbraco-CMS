@@ -80,10 +80,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
         {
-            return GetBaseQuery(queryType, true);
+            return GetBaseQuery(queryType);
         }
 
-        protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
+        protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current = true, bool joinMediaVersion = false)
         {
             var sql = SqlContext.Sql();
 
@@ -108,6 +108,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<ContentVersionDto>().On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId);
 
+            if (joinMediaVersion)
+                sql.InnerJoin<MediaVersionDto>().On<ContentVersionDto, MediaVersionDto>((left, right) => left.Id == right.Id);
 
             sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
@@ -143,6 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.MediaVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
@@ -157,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public override IEnumerable<IMedia> GetAllVersions(int nodeId)
         {
-            var sql = GetBaseQuery(QueryType.Many, false)
+            var sql = GetBaseQuery(QueryType.Many, current: false)
                 .Where<NodeDto>(x => x.NodeId == nodeId)
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
@@ -188,29 +191,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
             }
 
-            // If the stripped-down url returns null, we try again with the original url.
-            // Previously, the function would fail on e.g. "my_x_image.jpg"
-            var nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue == umbracoFileValue));
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where<PropertyDataDto>(x => x.VarcharValue == mediaPath));
+            var sql = GetBaseQuery(QueryType.Single, joinMediaVersion: true)
+                .Where<MediaVersionDto>(x => x.Path == umbracoFileValue)
+                .SelectTop(1);
 
-            // If no result so far, try getting from a json value stored in the ntext / nvarchar column
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("textValue LIKE @0", "%" + umbracoFileValue + "%"));
-            if (nodeId < 0) nodeId = GetMediaNodeIdByPath(Sql().Where("varcharValue LIKE @0", "%" + umbracoFileValue + "%"));
-
-            return nodeId < 0 ? null : Get(nodeId);
-        }
-
-        private int GetMediaNodeIdByPath(Sql query)
-        {
-            var sql = Sql().Select<ContentVersionDto>(x => x.NodeId)
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .InnerJoin<ContentVersionDto>().On<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id)
-                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                .Append(query);
-
-            var nodeId = Database.Fetch<int?>(sql).FirstOrDefault();
-            return nodeId ?? -1;
+            var dto = Database.Fetch<ContentDto>(sql).FirstOrDefault();
+            return dto == null
+                ? null
+                : MapDtoToContent(dto);
         }
 
         protected override void PerformDeleteVersion(int id, int versionId)
@@ -249,7 +237,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sortOrder = GetNewChildSortOrder(entity.ParentId, 0);
 
             // persist the node dto
-            var nodeDto = dto.NodeDto;
+            var nodeDto = dto.ContentDto.NodeDto;
             nodeDto.Path = parent.Path;
             nodeDto.Level = Convert.ToInt16(level);
             nodeDto.SortOrder = sortOrder;
@@ -258,21 +246,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // and then either update or insert the node dto
             var id = GetReservedId(nodeDto.UniqueId);
             if (id > 0)
-            {
                 nodeDto.NodeId = id;
-                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-                nodeDto.ValidatePathWithException();
-                Database.Update(nodeDto);
-            }
             else
-            {
                 Database.Insert(nodeDto);
 
-                // update path, now that we have an id
-                nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
-                nodeDto.ValidatePathWithException();
-                Database.Update(nodeDto);
-            }
+            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            nodeDto.ValidatePathWithException();
+            Database.Update(nodeDto);
 
             // update entity
             entity.Id = nodeDto.NodeId;
@@ -281,16 +261,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Level = level;
 
             // persist the content dto
-            dto.NodeId = nodeDto.NodeId;
-            Database.Insert(dto);
+            var contentDto = dto.ContentDto;
+            contentDto.NodeId = nodeDto.NodeId;
+            Database.Insert(contentDto);
 
             // persist the content version dto
             // assumes a new version id and version date (modified date) has been set
-            var contentVersionDto = dto.ContentVersionDto;
+            var contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
             media.VersionId = contentVersionDto.Id;
+
+            // persist the media version dto
+            var mediaVersionDto = dto.MediaVersionDto;
+            mediaVersionDto.Id = media.VersionId;
+            Database.Insert(mediaVersionDto);
 
             // persist the property data
             var propertyDataDtos = PropertyFactory.BuildDtos(media.VersionId, 0, entity.Properties, out _);
@@ -333,17 +319,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dto = ContentBaseFactory.BuildDto(entity);
 
             // update the node dto
-            var nodeDto = dto.NodeDto;
+            var nodeDto = dto.ContentDto.NodeDto;
             nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
             // update the content dto
-            Database.Update(dto);
+            Database.Update(dto.ContentDto);
 
-            // update the content version dto
-            var contentVersionDto = dto.ContentVersionDto;
+            // update the content & media version dtos
+            var contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
+            var mediaVersionDto = dto.MediaVersionDto;
             contentVersionDto.Current = true;
             Database.Update(contentVersionDto);
+            Database.Update(mediaVersionDto);
 
             // replace the property data
             var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == media.VersionId);

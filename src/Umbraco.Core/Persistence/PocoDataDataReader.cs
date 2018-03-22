@@ -40,7 +40,12 @@ namespace Umbraco.Core.Persistence
             _tableDefinition = DefinitionFactory.GetTableDefinition(pd.Type, sqlSyntaxProvider);
             if (_tableDefinition == null) throw new InvalidOperationException("No table definition found for type " + pd.Type);
 
-            _readerColumns = pd.Columns.Select(x => x.Value).ToArray();
+            // only real columns, exclude result columns
+            _readerColumns = pd.Columns
+                .Where(x => x.Value.ResultColumn == false)
+                .Select(x => x.Value)
+                .ToArray();
+
             _sqlSyntaxProvider = sqlSyntaxProvider;
             _enumerator = dataSource.GetEnumerator();
             _columnDefinitions = _tableDefinition.Columns.ToArray();
