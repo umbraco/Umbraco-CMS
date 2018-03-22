@@ -217,7 +217,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        [Ignore("has bugs")]
         public void Can_Perform_Get_On_UserRepository()
         {
             // Arrange
