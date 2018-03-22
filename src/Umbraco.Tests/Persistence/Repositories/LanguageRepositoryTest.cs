@@ -2,14 +2,10 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -32,8 +28,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             return new LanguageRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
-
-
 
         [Test]
         public void Can_Perform_Get_On_LanguageRepository()
@@ -109,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Get_WhenIdDoesntExist_ReturnsNull()
+        public void Get_When_Id_Doesnt_Exist_Returns_Null()
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
@@ -246,7 +240,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Add_On_LanguageRepository_With_New_Deafult()
+        public void Can_Perform_Add_On_LanguageRepository_With_New_Default()
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
