@@ -7,10 +7,12 @@
 }
 
 .umb-modalcolumn-header {
-  background: @gray-10;
-  border-bottom: 1px solid @purple-l3;
-  height: 94px;
-  padding: 5px 20px 0px 20px;
+  border-bottom: 1px solid @gray-9;
+  height: @editorHeaderHeight;
+  box-sizing: border-box;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
   white-space: nowrap
 }
 
@@ -19,13 +21,12 @@
   white-space: nowrap;
   font-size: @fontSizeLarge;
   font-weight: 400;
-  padding-top: 10px !important;
 }
 
 .umb-modalcolumn-body {
 	padding: 0px;
 	background: @white;
-	top: 100px;
+	top: @editorHeaderHeight;
 	position: absolute;
 	left: 0px;
 	right: 0px;
