@@ -365,6 +365,28 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Set_Default_Language()
+        {
+            var localizationService = ServiceContext.LocalizationService;
+            var language = new Core.Models.Language("en-AU");
+            language.IsDefaultVariantLanguage = true;
+            localizationService.Save(language);
+            var result = localizationService.GetLanguageById(language.Id);
+
+            Assert.IsTrue(result.IsDefaultVariantLanguage);
+
+            var language2 = new Core.Models.Language("en-NZ");
+            language2.IsDefaultVariantLanguage = true;
+            localizationService.Save(language2);
+            var result2 = localizationService.GetLanguageById(language2.Id);
+            //re-get
+            result = localizationService.GetLanguageById(language.Id);
+
+            Assert.IsTrue(result2.IsDefaultVariantLanguage);
+            Assert.IsFalse(result.IsDefaultVariantLanguage);
+        }
+
+        [Test]
         public void Deleted_Language_Should_Not_Exist()
         {
             var localizationService = ServiceContext.LocalizationService;

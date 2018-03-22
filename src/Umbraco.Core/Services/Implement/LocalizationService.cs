@@ -411,7 +411,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        #region Event Handlers
+        #region Events
         /// <summary>
         /// Occurs before Delete
         /// </summary>

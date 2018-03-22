@@ -17,6 +17,8 @@ namespace Umbraco.Core.Models
 
         private string _isoCode;
         private string _cultureName;
+        private bool _isDefaultVariantLanguage;
+        private bool _mandatory;
 
         public Language(string isoCode)
         {
@@ -28,6 +30,8 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo IsoCodeSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.IsoCode);
             public readonly PropertyInfo CultureNameSelector = ExpressionHelper.GetPropertyInfo<Language, string>(x => x.CultureName);
+            public readonly PropertyInfo IsDefaultVariantLanguageSelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.IsDefaultVariantLanguage);
+            public readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<Language, bool>(x => x.Mandatory);
         }
 
         /// <summary>
@@ -55,5 +59,17 @@ namespace Umbraco.Core.Models
         /// </summary>
         [IgnoreDataMember]
         public CultureInfo CultureInfo => CultureInfo.GetCultureInfo(IsoCode);
+
+        public bool IsDefaultVariantLanguage
+        {
+            get => _isDefaultVariantLanguage;
+            set => SetPropertyValueAndDetectChanges(value, ref _isDefaultVariantLanguage, Ps.Value.IsDefaultVariantLanguageSelector);
+        }
+
+        public bool Mandatory
+        {
+            get => _mandatory;
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatory, Ps.Value.MandatorySelector);
+        }
     }
 }
