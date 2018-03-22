@@ -120,7 +120,12 @@ namespace Umbraco.Core.Manifest
 
         // gets all manifest files (recursively)
         private IEnumerable<string> GetManifestFiles()
-            => Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+        {
+            if (Directory.Exists(_path) == false)
+                return new string[0];
+            return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
+        }
+            
 
         private static string TrimPreamble(string text)
         {
