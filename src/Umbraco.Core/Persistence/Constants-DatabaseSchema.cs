@@ -5,7 +5,7 @@ namespace Umbraco.Core
     {
         public static class DatabaseSchema
         {
-            public const string TableNamePrefix = "u";
+            public const string TableNamePrefix = "umbraco";
 
             public static class Tables
             {
