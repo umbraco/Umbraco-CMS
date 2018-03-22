@@ -155,8 +155,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         }
     };
     
-    $scope.test = function() {
-        $scope.open = !$scope.open;
+    $scope.toggleTreeLanguageSelector = function() {
+        $scope.treeLanguageSelectorIsOpen = !$scope.treeLanguageSelectorIsOpen;
     };
 
     //ensure to unregister from all events!

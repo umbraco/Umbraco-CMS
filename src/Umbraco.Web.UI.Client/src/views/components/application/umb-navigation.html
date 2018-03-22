@@ -6,14 +6,14 @@
         <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container">
 
             <!--
-            <div ng-if="currentSection === 'content'" class="umb-language-picker" on-outside-click="open = false;" bind-click-on="{{open === true}}">
+            <div ng-if="currentSection === 'content'" class="umb-language-picker">
                 
-                <div class="umb-language-picker__toggle" ng-click="test()">
+                <div class="umb-language-picker__toggle" ng-click="toggleTreeLanguageSelector()">
                     <div>English (United States)</div>
-                    <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !open, 'icon-navigation-up': open}" class="icon-navigation-right">&nbsp;</ins>                
+                    <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !treeLanguageSelectorIsOpen, 'icon-navigation-up': treeLanguageSelectorIsOpen}" class="icon-navigation-right">&nbsp;</ins>                
                 </div>
 
-                <div class="umb-language-picker__dropdown" ng-if="open">
+                <div class="umb-language-picker__dropdown" ng-if="treeLanguageSelectorIsOpen">
                     <a href="">Spanish (Spain)</a>
                     <a href="">French (France)</a>
                     <a href="">Danish</a>
