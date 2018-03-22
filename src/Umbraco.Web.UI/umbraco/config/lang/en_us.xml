@@ -620,6 +620,7 @@
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
+        <key alias="settings">Settings</key>
         <key alias="show">Show</key>
         <key alias="showPageOnSend">Show page on Send</key>
         <key alias="size">Size</key>
@@ -1630,6 +1631,15 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
         
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
+    </area>
+
+    <area alias="languages">
+        <key alias="addLanguage">Add language</key>
+        <key alias="mandatoryLanguage">Mandatory</key>
+        <key alias="mandatoryLanguageHelp">Properties on this language has to be filled out before the node can be published.</key>
+        <key alias="defaultLanguage">Default language</key>
+        <key alias="defaultLanguageHelp">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non velit eu nunc dignissim rhoncus eget nec sem.</key>
+        <key alias="changingDefaultLanguageWarning">Some warning here about the consequences of changing the default language.</key>
     </area>
 
     <area alias="modelsBuilder">

@@ -2,7 +2,7 @@
     
     <div class="flex items-center" style="height: 100%;">
 
-        <div ng-if="showBackButton && splitViewOpen !== true" style="margin-right: 15px;">
+        <div ng-if="showBackButton === 'true' && splitViewOpen !== true" style="margin-right: 15px;">
             <a class="umb-editor-header__back" href="#" ng-click="goBack()" prevent-default>
                 <i class="fa fa-arrow-left" aria-hidden="true"></i>
             </a>
