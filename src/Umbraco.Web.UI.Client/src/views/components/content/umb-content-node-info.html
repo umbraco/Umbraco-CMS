@@ -171,27 +171,25 @@
                         {{publishStatus.label}}
                     </umb-badge>
                 </umb-control-group>
-                
+
                 <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
                     {{node.createDateFormatted}} <localize key="general_by">by</localize> {{ node.owner.name }}
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
-                    <umb-node-preview
-                        style="max-width: 100%; margin-bottom: 0;"
-                        icon="documentType.icon"
-                        name="documentType.name"
-                        allow-open="allowOpen"
-                        on-open="openDocumentType(documentType)">
+                    <umb-node-preview style="max-width: 100%; margin-bottom: 0;"
+                                      icon="documentType.icon"
+                                      name="documentType.name"
+                                      allow-open="allowOpen"
+                                      on-open="openDocumentType(documentType)">
                     </umb-node-preview>
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-template" label="@template_template">
-                    <select
-                        class="input-block-level"
-                        ng-model="node.template"
-                        ng-options="key as value for (key, value) in availableTemplates"
-                        ng-change="updateTemplate(node.template)">
+                    <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
+                    <select class="input-block-level"
+                            ng-model="node.template"
+                            ng-options="key as value for (key, value) in availableTemplates"
+                            ng-change="updateTemplate(node.template)">
                         <option value=""><localize key="general_choose">Choose</localize>...</option>
                     </select>
                 </umb-control-group>
@@ -200,7 +198,7 @@
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>
-                
+
             </umb-box-content>    
         </umb-box>
     </div>

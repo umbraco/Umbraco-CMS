@@ -72,6 +72,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return GetUmbracoMedia(nodeId);
         }
 
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, Guid nodeKey)
+        {
+            // TODO optimize with Examine?
+            var mapAttempt = ApplicationContext.Current.Services.IdkMap.GetIdForKey(nodeKey, UmbracoObjectTypes.Media);
+            return mapAttempt ? GetById(umbracoContext, preview, mapAttempt.Result) : null;
+        }
+
         public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
         {
             var searchProvider = GetSearchProviderSafe();

@@ -185,6 +185,12 @@ angular.module("umbraco")
                                     //cannot parse, we'll just leave it
                                 }
                             }
+                            if (val === "true") {
+                                tinyMceConfig.customConfig[i] = true;
+                            }
+                            if (val === "false") {
+                                tinyMceConfig.customConfig[i] = false;
+                            }
                         }
                     }
 
