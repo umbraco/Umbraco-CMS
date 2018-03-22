@@ -1,6 +1,5 @@
 ﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
-
     public class SuperZero : MigrationBase
     {
         public SuperZero(IMigrationContext context)

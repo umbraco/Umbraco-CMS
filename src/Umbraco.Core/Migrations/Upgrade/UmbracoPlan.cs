@@ -64,7 +64,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             //
             // when installing, the source state is empty, and the target state should be the final state.
 
-            Add(string.Empty, "{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
+            Add(string.Empty, "{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
 
             // UPGRADE FROM 7
             //
@@ -84,7 +84,8 @@ namespace Umbraco.Core.Migrations.Upgrade
                 .Chain<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}")
                 .Chain<TagsMigration>("{DD1B99AF-8106-4E00-BAC7-A43003EA07F8}")
                 .Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}")
-                .Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");;
+                .Chain<PropertyEditorsMigration>("{9E98CF10-3AE9-437B-AF54-8697D251A541}")
+                .Chain<LanguageColumns>("{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
 
             // 7.8.1 = same as 7.8.0
             From("{init-7.8.1}")
@@ -156,6 +157,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<TagsMigration>("{139F26D7-7E08-48E3-81D9-E50A21A72F67}");
             Chain<SuperZero>("{CC1B1201-1328-443C-954A-E0BBB8CCC1B5}");
             Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
+            Chain<LanguageColumns>("{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
         }
     }
 }

@@ -110,7 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.IsDefaultVariantLanguage)
             {
                 //if this entity is flagged as the default, we need to set all others to false
-                Database.Execute($"UPDATE {SqlSyntax.GetQuotedColumnName(Constants.DatabaseSchema.Tables.Language)} SET {SqlSyntax.GetQuotedColumnName("isDefaultVariantLang")} = 0");
+                Database.Execute(Sql().Update<LanguageDto>(u => u.Set(x => x.IsDefaultVariantLanguage, false)));
                 //We need to clear the whole cache since all languages will be updated
                 IsolatedCache.ClearAllCache();
             }
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.IsDefaultVariantLanguage)
             {
                 //if this entity is flagged as the default, we need to set all others to false
-                Database.Execute($"UPDATE {SqlSyntax.GetQuotedColumnName(Constants.DatabaseSchema.Tables.Language)} SET {SqlSyntax.GetQuotedColumnName("isDefaultVariantLang")} = 0");
+                Database.Execute(Sql().Update<LanguageDto>(u => u.Set(x => x.IsDefaultVariantLanguage, false)));
                 //We need to clear the whole cache since all languages will be updated
                 IsolatedCache.ClearAllCache();
             }
