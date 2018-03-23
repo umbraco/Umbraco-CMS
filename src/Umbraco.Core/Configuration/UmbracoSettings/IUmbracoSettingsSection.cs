@@ -25,8 +25,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IDistributedCallSection DistributedCall { get; }
 
-        IRepositoriesSection PackageRepositories { get; }
-
         IProvidersSection Providers { get; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
