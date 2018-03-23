@@ -124,6 +124,7 @@ namespace Umbraco.Web.Editors
                     PluginName = pluginName,
                     Tours = tours
                         .Where(x => aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false)
+                        .Where(x => x.Culture == null || string.IsNullOrEmpty(x.Culture) || x.Culture.Equals(Security.CurrentUser.Language, StringComparison.InvariantCultureIgnoreCase))
                         .ToArray()
                 };
 
