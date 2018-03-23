@@ -425,13 +425,32 @@
 
     };
 
-    $scope.selectVariant = function(variant, variants) {
-      $scope.content.name = "You changed to a variant";
+    $scope.selectVariant = function(variant, variants, form) {
+      // show the discard changes dialog it there are unsaved changes
+      if(form.$dirty) {
+        var notification = { 
+          view: "confirmroutechange", 
+          args: {
+            onDiscard: function() {
+              setSelectedVariant(variant, variants);
+              notificationsService.remove(notification);
+              form.$setPristine();
+            }
+          }
+        };
+        notificationsService.add(notification);
+        return;
+      }
+      // switch variant if all changes are saved
+      setSelectedVariant(variant, variants);
+    };
+
+    function setSelectedVariant(selectedVariant, variants) {
       angular.forEach(variants, function(variant) {
         variant.current = false;
       });
-      variant.current = true;
-    };
+      selectedVariant.current = true;
+    }
 
     $scope.closeSplitView = function(index, editor) {
       // hacky animation stuff - it will be much better when angular is upgraded
