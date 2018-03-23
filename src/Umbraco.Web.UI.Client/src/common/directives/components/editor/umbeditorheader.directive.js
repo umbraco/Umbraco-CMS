@@ -247,7 +247,6 @@ Use this directive to construct a header inside the main editor window.
             };
 
             scope.selectVariant = function(event, variant) {
-                console.log("selec variant called");
                 if(scope.onSelectVariant) {
                     scope.onSelectVariant({"variant": variant});
                     scope.vm.dropdownOpen = false;
