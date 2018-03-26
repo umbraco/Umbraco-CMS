@@ -136,6 +136,7 @@
     <Compile Include="Editors\EditorValidatorOfT.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
+    <Compile Include="Editors\LanguageController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
@@ -221,6 +222,8 @@
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\ContentEditing\UserProfile.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
+    <Compile Include="Models\Culture.cs" />
+    <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
