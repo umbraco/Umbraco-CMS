@@ -41,6 +41,8 @@ namespace Umbraco.Tests.Web
             Current.Container = container.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            
+            Udi.ResetUdiTypes();
         }
 
         [TearDown]

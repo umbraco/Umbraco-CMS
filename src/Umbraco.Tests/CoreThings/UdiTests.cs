@@ -25,6 +25,8 @@ namespace Umbraco.Tests.CoreThings
             var container = new Mock<IServiceContainer>();
             container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(new TypeLoader(NullCacheProvider.Instance, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             Current.Container = container.Object;
+
+            Udi.ResetUdiTypes();
         }
 
         [TearDown]

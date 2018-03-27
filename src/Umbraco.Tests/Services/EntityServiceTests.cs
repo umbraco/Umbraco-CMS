@@ -530,6 +530,16 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Key_For_Id_With_Unknown_Type()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetKey(1060, UmbracoObjectTypes.Unknown);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
+        }
+
+        [Test]
         public void EntityService_Can_Get_Key_For_Id()
         {
             var service = ServiceContext.EntityService;
@@ -551,6 +561,16 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Id_For_Key_With_Unknown_Type()
+        {
+            var service = ServiceContext.EntityService;
+            var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1060, result.Result);
+        }
+
+        [Test]
         public void EntityService_Can_Get_Id_For_Key()
         {
             var service = ServiceContext.EntityService;
@@ -569,6 +589,30 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(result1.Success);
             Assert.IsFalse(result2.Success);
+        }
+
+        [Test]
+        public void ReserveId()
+        {
+            var service = ServiceContext.EntityService;
+            var guid = Guid.NewGuid();
+
+            // can reserve
+            var reservedId = service.ReserveId(guid);
+            Assert.IsTrue(reservedId > 0);
+
+            // can get it back
+            var id = service.GetId(guid, UmbracoObjectTypes.DocumentType);
+            Assert.IsTrue(id.Success);
+            Assert.AreEqual(reservedId, id.Result);
+
+            // anything goes
+            id = service.GetId(guid, UmbracoObjectTypes.Media);
+            Assert.IsTrue(id.Success);
+            Assert.AreEqual(reservedId, id.Result);
+
+            // a random guid won't work
+            Assert.IsFalse(service.GetId(Guid.NewGuid(), UmbracoObjectTypes.DocumentType).Success);
         }
 
         private static bool _isSetup = false;

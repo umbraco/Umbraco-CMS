@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
+using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks
 {

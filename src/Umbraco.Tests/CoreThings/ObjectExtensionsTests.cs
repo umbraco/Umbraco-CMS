@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -165,13 +166,148 @@ namespace Umbraco.Tests.CoreThings
             Assert.AreEqual("Hello world", result.Result);
         }
 
-                [Test]
+        [Test]
         public virtual void CanConvertObjectToSameObject()
         {
             var obj = new MyTestObject();
             var result = obj.TryConvertTo<object>();
 
             Assert.AreEqual(obj, result.Result);
+        }
+
+        [Test]
+        public void ConvertToIntegerTest()
+        {
+            var conv = "100".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = "100.000".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = "100,000".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            // oops
+            conv = "100.001".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = 100m.TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = 100.000m.TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            // oops
+            conv = 100.001m.TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+        }
+
+        [Test]
+        public void ConvertToDecimalTest()
+        {
+            var conv = "100".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.000".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100,000".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.001".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100m.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.000m.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.001m.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+        }
+
+        [Test]
+        public void ConvertToNullableDecimalTest()
+        {
+            var conv = "100".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.000".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100,000".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.001".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.000m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.001m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+        }
+
+        [Test]
+        public void ConvertToDateTimeTest()
+        {
+            var conv = "2016-06-07".TryConvertTo<DateTime>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        }
+
+        [Test]
+        public void ConvertToNullableDateTimeTest()
+        {
+            var conv = "2016-06-07".TryConvertTo<DateTime?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        }
+
+        [Test]
+        public void Value_Editor_Can_Convert_Decimal_To_Decimal_Clr_Type()
+        {
+            var valueEditor = new DataValueEditor
+            {
+                ValueType = ValueTypes.Decimal
+            };
+
+            var result = valueEditor.TryConvertValueToCrlType(12.34d);
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(12.34d, result.Result);
         }
 
         private class MyTestObject

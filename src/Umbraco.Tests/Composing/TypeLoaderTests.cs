@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Detect_Legacy_Plugin_File_List()
         {
-            var filePath = _typeLoader.GeTypesListFilePath();
+            var filePath = TypeLoader.GetTypesListFilePath();
             var fileDir = Path.GetDirectoryName(filePath);
             Directory.CreateDirectory(fileDir);
 

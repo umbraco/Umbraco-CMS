@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence
 {

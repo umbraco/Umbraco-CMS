@@ -95,8 +95,14 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(assert, result);
         }
 
-
-
+        [Test]
+        public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
+        {
+            //This url is invalid. Default to false when the extension cannot be determined
+            var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
+            var result = uri.IsClientSideRequest();
+            Assert.AreEqual(false, result);
+        }
 
         //NOTE: This test shows how we can test most of the HttpModule, it however is testing a method that no longer exists and is testing too much,
         // we need to write unit tests for each of the components: NiceUrlProvider, all of the Lookup classes, etc...

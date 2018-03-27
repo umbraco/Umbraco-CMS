@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Returns_Binder_For_IPublishedContent_And_IRenderModel()
         {
-            var binder = new ContentModelBinder();
+            var binder = ContentModelBinder.Instance;
             var found = binder.GetBinder(typeof (IPublishedContent));
             Assert.IsNotNull(found);
             found = binder.GetBinder(typeof(ContentModel));
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void No_DataToken_Returns_Null()
         {
-            var binder = new ContentModelBinder();
+            var binder = ContentModelBinder.Instance;
             var routeData = new RouteData();
             var result = binder.BindModel(new ControllerContext(Mock.Of<HttpContextBase>(), routeData, Mock.Of<ControllerBase>()),
                 new ModelBindingContext());
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Invalid_DataToken_Model_Type_Returns_Null()
         {
-            var binder = new ContentModelBinder();
+            var binder = ContentModelBinder.Instance;
             var routeData = new RouteData();
             routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = "hello";
 
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Web.Mvc
         public void IPublishedContent_DataToken_Model_Type_Uses_DefaultImplementation()
         {
             var content = new MyContent(Mock.Of<IPublishedContent>());
-            var binder = new ContentModelBinder();
+            var binder = ContentModelBinder.Instance;
             var routeData = new RouteData();
             routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = content;
 

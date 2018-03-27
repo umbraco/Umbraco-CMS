@@ -119,7 +119,7 @@ namespace Umbraco.Tests.TestHelpers
             var publicAccessService = GetLazyService<IPublicAccessService>(container, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));
             var taskService = GetLazyService<ITaskService>(container, c => new TaskService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITaskTypeRepository>(c), GetRepo<ITaskRepository>(c)));
             var domainService = GetLazyService<IDomainService>(container, c => new DomainService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDomainRepository>(c)));
-            var auditService = GetLazyService<IAuditService>(container, c => new AuditService(scopeProvider, logger, eventMessagesFactory, GetRepo<IAuditRepository>(c)));
+            var auditService = GetLazyService<IAuditService>(container, c => new AuditService(scopeProvider, logger, eventMessagesFactory, GetRepo<IAuditRepository>(c), GetRepo<IAuditEntryRepository>(c)));
 
             var localizedTextService = GetLazyService<ILocalizedTextService>(container, c => new LocalizedTextService(
                     new Lazy<LocalizedTextServiceFileSources>(() =>
@@ -183,6 +183,7 @@ namespace Umbraco.Tests.TestHelpers
             var tagService = GetLazyService<ITagService>(container, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var sectionService = GetLazyService<ISectionService>(container, c => new SectionService(userService.Value, treeService.Value, scopeProvider, cache));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(container, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
+            var consentService = GetLazyService<IConsentService>(container, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
 
             return new ServiceContext(
                 publicAccessService,
@@ -211,7 +212,8 @@ namespace Umbraco.Tests.TestHelpers
                 memberGroupService,
                 notificationService,
                 externalLoginService,
-                redirectUrlService);
+                redirectUrlService,
+                consentService);
         }
 
         private Lazy<T> GetLazyService<T>(IServiceFactory container, Func<IServiceFactory, T> ctor)

@@ -51,12 +51,20 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             var mockedContentService = Mock.Of<IContentService>();
             var mockedMediaService = Mock.Of<IMediaService>();
             var mockedEntityService = Mock.Of<IEntityService>();
+            var mockedMemberService = Mock.Of<IMemberService>();
+            var mockedMemberTypeService = Mock.Of<IMemberTypeService>();
+            var mockedDataTypeService = Mock.Of<IDataTypeService>();
+            var mockedContentTypeService = Mock.Of<IContentTypeService>();
 
             var serviceContext = new ServiceContext(
                 userService: mockedUserService,
                 contentService: mockedContentService,
                 mediaService: mockedMediaService,
                 entityService: mockedEntityService,
+                memberService: mockedMemberService,
+                memberTypeService: mockedMemberTypeService,
+                dataTypeService: mockedDataTypeService,
+                contentTypeService: mockedContentTypeService,
                 localizedTextService:Mock.Of<ILocalizedTextService>(),
                 sectionService:Mock.Of<ISectionService>());
 

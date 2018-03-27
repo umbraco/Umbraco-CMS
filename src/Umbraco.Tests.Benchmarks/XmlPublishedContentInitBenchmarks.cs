@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -14,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Benchmarks
