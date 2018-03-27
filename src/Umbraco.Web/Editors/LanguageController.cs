@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Models;
@@ -56,6 +59,13 @@ namespace Umbraco.Web.Editors
             {
                 throw new EntityNotFoundException(id, $"Could not find language by id: '{id}'.");
             }
+
+            if (language.IsDefaultVariantLanguage)
+            {
+                var message = $"Language with id '{id}' is currently set to 'default' and can not be deleted.";
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, message));
+            }
+
             Services.LocalizationService.Delete(language);
         }
 
