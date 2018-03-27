@@ -17,31 +17,15 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Tests.TestHelpers;
 using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class BulkInsertBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-                //Add(ExecutionValidator.FailOnError);
-
-                //The 'quick and dirty' settings, so it runs a little quicker
-                // see benchmarkdotnet FAQ
-                Add(Job.Default
-                    .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(TimeInterval.FromMilliseconds(100)) // 100ms per iteration
-                    .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration
-            }
-        }
-
         private static byte[] _initDbBytes;
 
         // fixme - should run on LocalDb same as NPoco tests!
@@ -71,7 +55,7 @@ namespace Umbraco.Tests.Benchmarks
             return f.CreateDatabase();
         }
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             var logger = new DebugDiagnosticsLogger();
@@ -158,7 +142,7 @@ namespace Umbraco.Tests.Benchmarks
             return data;
         }
 
-        [Cleanup]
+        [GlobalCleanup]
         public void Cleanup()
         {
             _dbSqlCe.Dispose();
