@@ -31,6 +31,7 @@ namespace Umbraco.Tests.UmbracoExamine
         public static UmbracoContentIndexer GetUmbracoIndexer(
             ProfilingLogger profilingLogger,
             Directory luceneDir,
+            ISqlContext sqlContext,
             Analyzer analyzer = null,
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -38,7 +39,6 @@ namespace Umbraco.Tests.UmbracoExamine
             IUserService userService = null,
             IContentTypeService contentTypeService = null,
             IMediaTypeService mediaTypeService = null,
-            ISqlContext sqlContext = null,
             UmbracoContentIndexerOptions options = null)
         {
             if (contentService == null)
@@ -81,12 +81,6 @@ namespace Umbraco.Tests.UmbracoExamine
             if (userService == null)
             {
                 userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == 0 && p.Name == "admin"));
-            }
-
-            if (sqlContext == null)
-            {
-                //TODO: What do we need here?
-                sqlContext = Mock.Of<ISqlContext>();
             }
 
             if (mediaService == null)
@@ -178,13 +172,13 @@ namespace Umbraco.Tests.UmbracoExamine
             //query
             //    .Setup(x => x.GetWhereClauses())
             //    .Returns(new List<Tuple<string, object[]>> { new Tuple<string, object[]>($"{Constants.DatabaseSchema.Tables.Document}.published", new object[] { 1 }) });
-            var scopeProvider = new Mock<IScopeProvider>();
+            
             //scopeProvider
             //    .Setup(x => x.Query<IContent>())
             //    .Returns(query.Object);
 
             var i = new UmbracoContentIndexer(
-                new[] { new FieldDefinition("", FieldDefinitionTypes.FullText) },
+                Enumerable.Empty<FieldDefinition>(),
                 luceneDir,
                 analyzer,
                 profilingLogger,

@@ -53,8 +53,8 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, contentService: contentService))
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, contentService: contentService))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.UmbracoExamine
         //[Test]
         //public void Test_Index_Type_With_German_Analyzer()
         //{
-        //    using (var luceneDir = new RAMDirectory())
+        //    using (var luceneDir = new RandomIdRamDirectory())
         //    {
         //        var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
         //            new GermanAnalyzer());

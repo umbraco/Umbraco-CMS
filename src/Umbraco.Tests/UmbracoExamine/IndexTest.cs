@@ -10,7 +10,6 @@ using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
-
     /// <summary>
     /// Tests the standard indexing capabilities
     /// </summary>
@@ -23,8 +22,8 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Rebuild_Index()
         {
 
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
@@ -46,8 +45,8 @@ namespace Umbraco.Tests.UmbracoExamine
         public void Index_Protected_Content_Not_Indexed()
         {
 
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext))
             using (indexer.ProcessNonAsync())
             using (var searcher = ((LuceneSearcher)indexer.GetSearcher()).GetLuceneSearcher())
             {
@@ -77,8 +76,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
                 //make parent id 1116
                 options: new UmbracoContentIndexerOptions(false, false, 1116)))
             using (indexer.ProcessNonAsync())
@@ -119,8 +118,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Move_Media_To_Non_Indexable_ParentID()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer1 = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
                 //make parent id 2222
                 options: new UmbracoContentIndexerOptions(false, false, 2222)))
             using (indexer1.ProcessNonAsync())
@@ -169,8 +168,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Reindex_Content()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
@@ -212,8 +211,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir))
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext))
             using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();

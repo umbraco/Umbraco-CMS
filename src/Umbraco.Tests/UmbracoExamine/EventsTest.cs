@@ -15,8 +15,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Events_Ignoring_Node()
         {
-            using (var luceneDir = new RAMDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
+            using (var luceneDir = new RandomIdRamDirectory())
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
                 //make parent id 999 so all are ignored
                 options: new UmbracoContentIndexerOptions(false, false, 999)))
             using (indexer.ProcessNonAsync())
