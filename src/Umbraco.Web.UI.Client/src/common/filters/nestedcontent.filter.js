@@ -9,11 +9,15 @@ var ncNodeNameCache = {
 
 angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource) {
 
-    return function (input) {
+    return function (input, entityType) {
 
         // Check we have a value at all
         if (input === "" || input.toString() === "0") {
             return "";
+        }
+
+        if (entityType === "") {
+            entityType = "Document";
         }
 
         var currentNode = editorState.getCurrent();
@@ -35,7 +39,7 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         // make a load of requests while we wait for a response
         ncNodeNameCache.keys[input] = "Loading...";
 
-        entityResource.getById(input, "Document")
+        entityResource.getById(input, entityType)
             .then(function (ent) {
                 ncNodeNameCache.keys[input] = ent.name;
             });
