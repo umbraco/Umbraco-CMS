@@ -10,6 +10,7 @@ using Moq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
@@ -37,6 +38,7 @@ namespace Umbraco.Tests.UmbracoExamine
             IUserService userService = null,
             IContentTypeService contentTypeService = null,
             IMediaTypeService mediaTypeService = null,
+            ISqlContext sqlContext = null,
             UmbracoContentIndexerOptions options = null)
         {
             if (contentService == null)
@@ -80,6 +82,13 @@ namespace Umbraco.Tests.UmbracoExamine
             {
                 userService = Mock.Of<IUserService>(x => x.GetProfileById(It.IsAny<int>()) == Mock.Of<IProfile>(p => p.Id == 0 && p.Name == "admin"));
             }
+
+            if (sqlContext == null)
+            {
+                //TODO: What do we need here?
+                sqlContext = Mock.Of<ISqlContext>();
+            }
+
             if (mediaService == null)
             {
                 long totalRecs;
@@ -182,10 +191,10 @@ namespace Umbraco.Tests.UmbracoExamine
                 contentService,
                 mediaService,
                 userService,
+                sqlContext,
                 new[] {new DefaultUrlSegmentProvider()},
                 new UmbracoContentValueSetValidator(options, Mock.Of<IPublicAccessService>()),
-                options,
-                scopeProvider.Object);
+                options);
 
             i.IndexingError += IndexingError;
 
@@ -206,7 +215,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
         internal static void IndexingError(object sender, IndexingErrorEventArgs e)
         {
-            throw new ApplicationException(e.Message, e.Exception);
+            throw new ApplicationException(e.Message, e.InnerException);
         }
 
 

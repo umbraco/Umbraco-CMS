@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Composing
                     //typeof(TabPage).Assembly,
                     typeof(System.Web.Mvc.ActionResult).Assembly,
                     typeof(TypeFinder).Assembly,
-                    typeof(global::Umbraco.Examine.BaseUmbracoIndexer).Assembly
+                    typeof(global::Umbraco.Examine.UmbracoExamineIndexer).Assembly
                 };
 
         }

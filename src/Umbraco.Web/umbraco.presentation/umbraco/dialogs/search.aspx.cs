@@ -16,6 +16,7 @@ using Umbraco.Core.Xml;
 
 namespace umbraco.presentation.dialogs
 {
+    //fixme - is this even used anymore?
     public partial class search : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
@@ -63,7 +64,7 @@ namespace umbraco.presentation.dialogs
                 : ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
 
             //create some search criteria, make everything combined to be 'And' and only search the current app
-            var criteria = internalSearcher.CreateSearchCriteria(CurrentApp, Examine.SearchCriteria.BooleanOperation.And);
+            var criteria = internalSearcher.CreateCriteria(CurrentApp, Examine.SearchCriteria.BooleanOperation.And);
 
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))

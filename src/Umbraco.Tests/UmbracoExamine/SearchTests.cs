@@ -5,13 +5,12 @@ using Examine;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
-using Examine.Session;
 using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Examine;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -56,19 +55,19 @@ namespace Umbraco.Tests.UmbracoExamine
 
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, contentService: contentService))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var searcher = indexer.GetSearcher();
 
-                var numberSortedCriteria = searcher.CreateSearchCriteria()
+                var numberSortedCriteria = searcher.CreateCriteria()
                     .ParentId(1148).And()
                     .OrderBy(new SortableField("sortOrder", SortType.Int));
                 var numberSortedResult = searcher.Search(numberSortedCriteria.Compile());
 
-                var stringSortedCriteria = searcher.CreateSearchCriteria()
+                var stringSortedCriteria = searcher.CreateCriteria()
                     .ParentId(1148).And()
                     .OrderBy("sortOrder"); //will default to string
                 var stringSortedResult = searcher.Search(stringSortedCriteria.Compile());

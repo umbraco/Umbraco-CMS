@@ -12,7 +12,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using System.Linq;
 using System.Xml;
-using Examine.Session;
+using Examine;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
@@ -111,11 +111,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
             {
-                indexer.RebuildIndex();
-                session.WaitForChanges();
 
+                indexer.RebuildIndex();
+             
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
@@ -138,10 +137,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -159,11 +158,11 @@ namespace Umbraco.Tests.PublishedContent
                     <data alias='umbracoBytes'>10726</data>
                     <data alias='umbracoExtension'>jpg</data>
                 </node>");
-                indexer.ReIndexNode(newXml, "media");
-                session.WaitForChanges();
+                indexer.IndexItems(new[]{ newXml.ConvertToValueSet("media") });
+                
 
                 //ensure it still exists in the index (raw examine search)
-                var criteria = searcher.CreateSearchCriteria();
+                var criteria = searcher.CreateCriteria();
                 var filter = criteria.Id(3113);
                 var found = searcher.Search(filter.Compile());
                 Assert.IsNotNull(found);
@@ -182,10 +181,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -207,10 +206,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -232,10 +231,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -257,10 +256,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
@@ -279,10 +278,10 @@ namespace Umbraco.Tests.PublishedContent
         {
             using (var luceneDir = new RAMDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, options: new UmbracoContentIndexerOptions(true, false, null)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                session.WaitForChanges();
+                
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();

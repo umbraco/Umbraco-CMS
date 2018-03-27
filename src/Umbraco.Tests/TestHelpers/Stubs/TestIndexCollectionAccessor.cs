@@ -6,6 +6,6 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     public class TestIndexCollectionAccessor : IExamineIndexCollectionAccessor
     {
-        public IReadOnlyDictionary<string, IExamineIndexer> Indexes => new Dictionary<string, IExamineIndexer>();
+        public IReadOnlyDictionary<string, IIndexer> Indexes => new Dictionary<string, IIndexer>();
     }
 }

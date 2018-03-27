@@ -4,10 +4,10 @@ using Examine;
 namespace Umbraco.Examine
 {
     /// <summary>
-    /// Returns a collection of IExamineIndexer
+    /// Returns a collection of <see cref="IIndexer"/>
     /// </summary>
     public interface IExamineIndexCollectionAccessor
     {
-        IReadOnlyDictionary<string, IExamineIndexer> Indexes { get; }
+        IReadOnlyDictionary<string, IIndexer> Indexes { get; }
     }
 }

@@ -8,6 +8,6 @@ namespace Umbraco.Examine
     /// </summary>
     public class ExamineIndexCollectionAccessor : IExamineIndexCollectionAccessor
     {
-        public IReadOnlyDictionary<string, IExamineIndexer> Indexes => ExamineManager.Instance.IndexProviders;
+        public IReadOnlyDictionary<string, IIndexer> Indexes => ExamineManager.Instance.IndexProviders;
     }
 }

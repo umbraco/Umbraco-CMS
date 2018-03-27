@@ -91,30 +91,6 @@ function ExamineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
         }
     }
 
-    $scope.optimizeIndex = function(indexer) {
-        if (confirm("This will cause the index to be optimized which will improve its performance. " +
-            "It is not recommended to optimize an index during times of high website traffic " +
-            "or when editors are editing content.")) {
-            indexer.isProcessing = true;
-
-            umbRequestHelper.resourcePromise(
-                    $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl",
-                        "PostOptimizeIndex",
-                        { indexerName: indexer.name })),
-                    'Failed to optimize index')
-                .then(function() {
-
-                    //optimizing has started, nothing is returned accept a 200 status code.
-                    //lets poll to see if it is done.
-                    $timeout(function() {
-                            checkProcessing(indexer, "PostCheckOptimizeIndex");
-                        },
-                        1000);
-
-                });
-        }
-    }
-
     $scope.closeSearch = function(searcher) {
         searcher.isSearching = true;
     }

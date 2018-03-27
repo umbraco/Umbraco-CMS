@@ -180,7 +180,7 @@ namespace Umbraco.Web.Search
             sb.Append("+__IndexType:");
             sb.Append(type);
 
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString());
 
             var result = internalSearcher
                 //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
@@ -273,10 +273,10 @@ namespace Umbraco.Web.Search
                     m.Icon = "icon-user";
                 }
 
-                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
+                var searchResult = results.First(x => x.Id == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];
+                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Fields["email"];
                 }
                 if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
                 {

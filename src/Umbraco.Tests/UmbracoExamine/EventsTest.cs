@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Examine;
-using Examine.Session;
 using Lucene.Net.Store;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Examine;
 
@@ -21,19 +19,10 @@ namespace Umbraco.Tests.UmbracoExamine
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir,
                 //make parent id 999 so all are ignored
                 options: new UmbracoContentIndexerOptions(false, false, 999)))
-            using (var session = new ThreadScopedIndexSession(indexer.SearcherContext))
+            using (indexer.ProcessNonAsync())
             {
                 var searcher = indexer.GetSearcher();
-
-                var isIgnored = false;
-
-                EventHandler<IndexingNodeDataEventArgs> ignoringNode = (s, e) =>
-                {
-                    isIgnored = true;
-                };
-
-                indexer.IgnoringNode += ignoringNode;
-
+                
                 var contentService = new ExamineDemoDataContentService();
                 //get a node from the data repo
                 var node = contentService.GetPublishedContentByXPath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -41,10 +30,12 @@ namespace Umbraco.Tests.UmbracoExamine
                                           .Elements()
                                           .First();
 
-                indexer.ReIndexNode(node, IndexTypes.Content);
+                var valueSet = node.ConvertToValueSet(IndexTypes.Content);
+                indexer.IndexItems(new[] {valueSet});
 
+                var found = searcher.Search(searcher.CreateCriteria().Id((string) node.Attribute("id")).Compile());
 
-                Assert.IsTrue(isIgnored);
+                Assert.IsNull(found);
             }
 
 

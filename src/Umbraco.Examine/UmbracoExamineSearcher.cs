@@ -2,23 +2,11 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Security;
-using System.Web;
-using System.Web.Compilation;
-using Examine;
-using Examine.LuceneEngine.Config;
-using Examine.Providers;
-using Examine.SearchCriteria;
-using Lucene.Net.Index;
-using Lucene.Net.Store;
 using Umbraco.Core;
-using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
-using Examine.LuceneEngine.SearchCriteria;
 using Lucene.Net.Analysis;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Examine.LocalStorage;
+using Umbraco.Examine.Config;
 using Directory = Lucene.Net.Store.Directory;
 
 
@@ -30,8 +18,6 @@ namespace Umbraco.Examine
     public class UmbracoExamineSearcher : LuceneSearcher
     {
 
-        private Lazy<Directory> _localTempDirectory;
-        private LocalStorageType _localStorageType = LocalStorageType.Sync;
         private string _name;
         private readonly bool _configBased = false;
 
@@ -67,14 +53,18 @@ namespace Umbraco.Examine
             _configBased = false;
         }
 
+        //TODO: What about the NRT ctor?
+
         /// <summary>
         /// we override name because we need to manually set it if !CanInitialize()
         /// since we cannot call base.Initialize in that case.
         /// </summary>
-        public override string Name
-        {
-            get { return _name; }
-        }
+        public override string Name => _name;
+
+        /// <summary>
+        /// Name of the Lucene.NET index set
+        /// </summary>
+        public string IndexSetName { get; private set; }
 
         /// <summary>
         /// Method used for initializing based on a configuration based searcher
@@ -83,10 +73,8 @@ namespace Umbraco.Examine
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            if (name == null) throw new ArgumentNullException("name");
-
             //ensure name is set
-            _name = name;
+            _name = name ?? throw new ArgumentNullException(nameof(name));
 
             //We need to check if we actually can initialize, if not then don't continue
             if (CanInitialize() == false)
@@ -94,66 +82,53 @@ namespace Umbraco.Examine
                 return;
             }
 
+            //need to check if the index set is specified, if it's not, we'll see if we can find one by convension
+            //if the folder is not null and the index set is null, we'll assume that this has been created at runtime.
+            //NOTE: Don't proceed if the _luceneDirectory is set since we already know where to look.
+            var luceneDirectory = GetLuceneDirectory();
+            if (config["indexSet"] == null && (LuceneIndexFolder == null && luceneDirectory == null))
+            {
+                //if we don't have either, then we'll try to set the index set by naming convensions
+                var found = false;
+                if (name.EndsWith("Searcher"))
+                {
+                    var setNameByConvension = name.Remove(name.LastIndexOf("Searcher")) + "IndexSet";
+                    //check if we can assign the index set by naming convension
+                    var set = IndexSets.Instance.Sets.Cast<IndexSet>().SingleOrDefault(x => x.SetName == setNameByConvension);
+
+                    if (set != null)
+                    {
+                        set.ReplaceTokensInIndexPath();
+
+                        //we've found an index set by naming convensions :)
+                        IndexSetName = set.SetName;
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                    throw new ArgumentNullException("indexSet on LuceneExamineIndexer provider has not been set in configuration");
+
+                //get the folder to index
+                LuceneIndexFolder = new DirectoryInfo(Path.Combine(IndexSets.Instance.Sets[IndexSetName].IndexDirectory.FullName, "Index"));
+            }
+            else if (config["indexSet"] != null && luceneDirectory == null)
+            {
+                if (IndexSets.Instance.Sets[config["indexSet"]] == null)
+                    throw new ArgumentException("The indexSet specified for the LuceneExamineIndexer provider does not exist");
+
+                IndexSetName = config["indexSet"];
+
+                var indexSet = IndexSets.Instance.Sets[IndexSetName];
+
+                indexSet.ReplaceTokensInIndexPath();
+
+                //get the folder to index
+                LuceneIndexFolder = new DirectoryInfo(Path.Combine(indexSet.IndexDirectory.FullName, "Index"));
+            }
+
             base.Initialize(name, config);
 
-            if (config != null && config["useTempStorage"] != null)
-            {
-                throw new NotImplementedException("Fix how local temp storage works and is synced with Examine v2.0 - since a writer is always open we cannot snapshot it, we need to use the same logic in AzureDirectory");
-
-                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
-                // for websites that are running from a remove file server and file IO latency becomes an issue
-                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
-                if (attemptUseTempStorage)
-                {
-                    //this is the default
-                    ILocalStorageDirectory localStorageDir = new CodeGenLocalStorageDirectory();
-                    if (config["tempStorageDirectory"] != null)
-                    {
-                        //try to get the type
-                        var dirType = BuildManager.GetType(config["tempStorageDirectory"], false);
-                        if (dirType != null)
-                        {
-                            try
-                            {
-                                localStorageDir = (ILocalStorageDirectory)Activator.CreateInstance(dirType);
-                            }
-                            catch (Exception ex)
-                            {
-                                Current.Logger.Error<UmbracoExamineSearcher>(
-                                    string.Format("Could not create a temp storage location of type {0}, reverting to use the " + typeof(CodeGenLocalStorageDirectory).FullName, dirType),
-                                    ex);
-                            }
-                        }
-                    }
-                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
-                    var configuredPath = indexSet.IndexPath;
-                    var tempPath = localStorageDir.GetLocalStorageDirectory(config, configuredPath);
-                    if (tempPath == null) throw new InvalidOperationException("Could not resolve a temp location from the " + localStorageDir.GetType() + " specified");
-                    var localTempPath = tempPath.FullName;
-                    _localStorageType = attemptUseTempStorage.Result;
-
-                    //initialize the lazy callback
-                    _localTempDirectory = new Lazy<Directory>(() =>
-                    {
-                        switch (_localStorageType)
-                        {
-                            case LocalStorageType.Sync:
-                                var fsDir = base.GetLuceneDirectory() as FSDirectory;
-                                if (fsDir != null)
-                                {
-                                    return LocalTempStorageDirectoryTracker.Current.GetDirectory(
-                                        new DirectoryInfo(localTempPath),
-                                        fsDir);
-                                }
-                                return base.GetLuceneDirectory();
-                            case LocalStorageType.LocalOnly:
-                                return DirectoryTracker.Current.GetDirectory(new DirectoryInfo(localTempPath));
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    });
-                }
-            }
         }
 
         /// <summary>
@@ -175,17 +150,10 @@ namespace Umbraco.Examine
         {
             var fields = base.GetSearchFields();
             return fields
-                .Where(x => x != BaseUmbracoIndexer.IndexPathFieldName)
-                .Where(x => x != LuceneIndexer.NodeTypeAliasFieldName)
+                .Where(x => x != UmbracoExamineIndexer.IndexPathFieldName)
+                .Where(x => x != LuceneIndexer.ItemTypeFieldName)
                 .ToArray();
         }
 
-        protected override Directory GetLuceneDirectory()
-        {
-            //local temp storage is not enabled, just return the default
-            return _localTempDirectory.IsValueCreated == false
-                ? base.GetLuceneDirectory()
-                : _localTempDirectory.Value;
-        }
     }
 }

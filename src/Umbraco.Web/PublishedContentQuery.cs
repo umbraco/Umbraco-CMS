@@ -222,16 +222,19 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="term"></param>
         /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
+        /// <param name="indexName">The index to search</param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
         {
-            if (_query != null) return _query.Search(term, useWildCards, searchProvider);
+            if (_query != null) return _query.Search(term, useWildCards, indexName);
 
-            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (string.IsNullOrEmpty(searchProvider) == false)
-                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+            var searcher = string.IsNullOrEmpty(indexName)
+                ? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetIndexSearcher(indexName);
 
+            if (searcher == null)
+                throw new InvalidOperationException("No searcher found for index " + indexName);
+            
             var results = searcher.Search(term, useWildCards);
             return results.ToPublishedSearchResults(_contentCache);
         }
@@ -242,13 +245,11 @@ namespace Umbraco.Web
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
         /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
         {
             if (_query != null) return _query.Search(criteria, searchProvider);
 
-            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (searchProvider != null)
-                s = searchProvider;
+            var s = searchProvider ?? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer);
 
             var results = s.Search(criteria);
             return results.ToPublishedSearchResults(_contentCache);

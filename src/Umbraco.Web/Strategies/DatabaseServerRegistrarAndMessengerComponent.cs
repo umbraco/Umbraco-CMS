@@ -95,7 +95,7 @@ namespace Umbraco.Web.Strategies
         // fixme - this should move to something else, we should not depend on Examine here!
         private static void RebuildIndexes(bool onlyEmptyIndexes)
         {
-            var indexers = (IEnumerable<KeyValuePair<string, IExamineIndexer>>) ExamineManager.Instance.IndexProviders;
+            var indexers = (IEnumerable<KeyValuePair<string, IIndexer>>) ExamineManager.Instance.IndexProviders;
             if (onlyEmptyIndexes)
                 indexers = indexers.Where(x => x.Value.IsIndexNew());
             foreach (var indexer in indexers)

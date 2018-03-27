@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Examine.LuceneEngine.Config;
-using Examine.LuceneEngine.Faceting;
 using Examine.LuceneEngine.Indexing;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
@@ -19,6 +18,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Examine.Config;
 using IContentService = Umbraco.Core.Services.IContentService;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
@@ -28,20 +28,21 @@ namespace Umbraco.Examine
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndexer : BaseUmbracoIndexer
+    public class UmbracoContentIndexer : UmbracoExamineIndexer
     {
         protected IContentService ContentService { get; }
         protected IMediaService MediaService { get; }
         protected IUserService UserService { get; }
 
         private readonly IEnumerable<IUrlSegmentProvider> _urlSegmentProviders;
-        private readonly IScopeProvider _scopeProvider;
         private int? _parentId;
 
         #region Constructors
 
-        // default - bad, should inject instead
-        // usage: none
+        /// <summary>
+        /// Constructor for configuration providers
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoContentIndexer()
         {
             ContentService = Current.Services.ContentService;
@@ -49,12 +50,25 @@ namespace Umbraco.Examine
             UserService = Current.Services.UserService;
 
             _urlSegmentProviders = Current.UrlSegmentProviders;
-            _scopeProvider = Current.ScopeProvider;
 
-            InitializeQueries();
+            InitializeQueries(Current.SqlContext);
         }
 
-        // usage: IndexInitializer (tests)
+        /// <summary>
+        /// Create an index at runtime
+        /// </summary>
+        /// <param name="fieldDefinitions"></param>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="defaultAnalyzer"></param>
+        /// <param name="profilingLogger"></param>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="userService"></param>
+        /// <param name="sqlContext"></param>
+        /// <param name="urlSegmentProviders"></param>
+        /// <param name="validator"></param>
+        /// <param name="options"></param>
+        /// <param name="indexValueTypes"></param>
         public UmbracoContentIndexer(
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
@@ -63,13 +77,12 @@ namespace Umbraco.Examine
             IContentService contentService,
             IMediaService mediaService,
             IUserService userService,
+            ISqlContext sqlContext,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
-            IScopeProvider scopeProvider,
-            FacetConfiguration facetConfiguration = null,
-            IDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
-            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, facetConfiguration, indexValueTypes)
+            IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
+            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             if (options == null) throw new ArgumentNullException(nameof(options));
@@ -77,24 +90,20 @@ namespace Umbraco.Examine
             SupportProtectedContent = options.SupportProtectedContent;
             SupportUnpublishedContent = options.SupportUnpublishedContent;
             ParentId = options.ParentId;
-            //backward compat hack:
-            IndexerData = new IndexCriteria(Enumerable.Empty<IIndexField>(), Enumerable.Empty<IIndexField>(), Enumerable.Empty<string>(), Enumerable.Empty<string>(),
-                //hack to set the parent Id for backwards compat, when using this ctor the IndexerData will (should) always be null
-                options.ParentId);
 
             ContentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             MediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             UserService = userService ?? throw new ArgumentNullException(nameof(userService));
             _urlSegmentProviders = urlSegmentProviders ?? throw new ArgumentNullException(nameof(urlSegmentProviders));
-            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
 
-            InitializeQueries();
+            InitializeQueries(sqlContext);
         }
 
-        private void InitializeQueries()
+        private void InitializeQueries(ISqlContext sqlContext)
         {
+            if (sqlContext == null) throw new ArgumentNullException(nameof(sqlContext));
             if (_publishedQuery == null)
-                _publishedQuery = Current.SqlContext.Query<IContent>().Where(x => x.Published);
+                _publishedQuery = sqlContext.Query<IContent>().Where(x => x.Published);
         }
 
         #endregion
@@ -121,11 +130,9 @@ namespace Umbraco.Examine
 
         public override void Initialize(string name, NameValueCollection config)
         {
-
             //check if there's a flag specifying to support unpublished content,
             //if not, set to false;
-            bool supportUnpublished;
-            if (config["supportUnpublished"] != null && bool.TryParse(config["supportUnpublished"], out supportUnpublished))
+            if (config["supportUnpublished"] != null && bool.TryParse(config["supportUnpublished"], out var supportUnpublished))
                 SupportUnpublishedContent = supportUnpublished;
             else
                 SupportUnpublishedContent = false;
@@ -133,13 +140,25 @@ namespace Umbraco.Examine
 
             //check if there's a flag specifying to support protected content,
             //if not, set to false;
-            bool supportProtected;
-            if (config["supportProtected"] != null && bool.TryParse(config["supportProtected"], out supportProtected))
+            if (config["supportProtected"] != null && bool.TryParse(config["supportProtected"], out var supportProtected))
                 SupportProtectedContent = supportProtected;
             else
                 SupportProtectedContent = false;
 
             base.Initialize(name, config);
+
+            //now we need to build up the indexer options so we can create our validator
+            int? parentId = null;
+            if (IndexSetName.IsNullOrWhiteSpace() == false)
+            {
+                var indexSet = IndexSets.Instance.Sets[IndexSetName];
+                parentId = indexSet.IndexParentId;
+            }
+            ValueSetValidator = new UmbracoContentValueSetValidator(
+                new UmbracoContentIndexerOptions(SupportUnpublishedContent, SupportProtectedContent, parentId),
+                //Using a singleton here, we can't inject this when using config based providers and we don't use this
+                //anywhere else in this class
+                Current.Services.PublicAccessService);
         }
 
         #endregion
@@ -163,12 +182,8 @@ namespace Umbraco.Examine
         /// </summary>
         public int? ParentId
         {
-            get
-            {
-                //fallback to the legacy data
-                return _parentId ?? (IndexerData == null ? (int?)null : IndexerData.ParentNodeId);
-            }
-            protected set { _parentId = value; }
+            get => _parentId ?? ConfigIndexCriteria?.ParentNodeId;
+            protected set => _parentId = value;
         }
 
         protected override IEnumerable<string> SupportedTypes => new[] {IndexTypes.Content, IndexTypes.Media};
@@ -193,18 +208,14 @@ namespace Umbraco.Examine
             var searcher = GetSearcher();
             var c = searcher.CreateCriteria();
             var filtered = c.RawQuery(rawQuery);
-            var results = searcher.Find(filtered);
+            var results = searcher.Search(filtered);
 
             ProfilingLogger.Logger.Debug(GetType(), $"DeleteFromIndex with query: {rawQuery} (found {results.TotalItemCount} results)");
 
-            //need to create a delete queue item for each one found
+            //need to queue a delete item for each one found
             foreach (var r in results)
             {
-                ProcessIndexOperation(new IndexOperation()
-                {
-                    Operation = IndexOperationType.Delete,
-                    Item = new IndexItem(new ValueSet(r.LongId, string.Empty))
-                });
+                QueueIndexOperation(new IndexOperation(IndexItem.ForId(r.Id),  IndexOperationType.Delete));
             }
 
             base.DeleteFromIndex(nodeId);
@@ -250,16 +261,16 @@ namespace Umbraco.Examine
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
+                        if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
                         {
-                            content = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                            content = descendants.Where(x => ConfigIndexCriteria.IncludeItemTypes.Contains(x.ContentType.Alias)).ToArray();
                         }
                         else
                         {
                             content = descendants.ToArray();
                         }
 
-                        IndexItems(GetValueSets(content));
+                        IndexItems(GetValueSets(_urlSegmentProviders, UserService, content));
 
                         pageIndex++;
                     } while (content.Length == pageSize);
@@ -286,16 +297,16 @@ namespace Umbraco.Examine
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too
-                        if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
+                        if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
                         {
-                            media = descendants.Where(x => IndexerData.IncludeNodeTypes.Contains(x.ContentType.Alias)).ToArray();
+                            media = descendants.Where(x => ConfigIndexCriteria.IncludeItemTypes.Contains(x.ContentType.Alias)).ToArray();
                         }
                         else
                         {
                             media = descendants.ToArray();
                         }
 
-                        IndexItems(GetValueSets(media));
+                        IndexItems(GetValueSets(_urlSegmentProviders, UserService, media));
 
                         pageIndex++;
                     } while (media.Length == pageSize);
@@ -304,11 +315,11 @@ namespace Umbraco.Examine
             }
         }
 
-        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IContent> content)
+        public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IUserService userService, params IContent[] content)
         {
             foreach (var c in content)
             {
-                var urlValue = c.GetUrlSegment(_urlSegmentProviders);
+                var urlValue = c.GetUrlSegment(urlSegmentProviders);
                 var values = new Dictionary<string, object[]>
                 {
                     {"icon", new object[] {c.ContentType.Icon}},
@@ -325,8 +336,8 @@ namespace Umbraco.Examine
                     {"urlName", new object[] {urlValue}},
                     {"path", new object[] {c.Path}},
                     {"nodeType", new object[] {c.ContentType.Id}},
-                    {"creatorName", new object[] {c.GetCreatorProfile(UserService)?.Name ?? "??"}},
-                    {"writerName", new object[] {c.GetWriterProfile(UserService)?.Name ?? "??"}},
+                    {"creatorName", new object[] {c.GetCreatorProfile(userService)?.Name ?? "??"}},
+                    {"writerName", new object[] {c.GetWriterProfile(userService)?.Name ?? "??"}},
                     {"writerID", new object[] {c.WriterId}},
                     {"template", new object[] {c.Template?.Id ?? 0}}
                 };
@@ -336,17 +347,17 @@ namespace Umbraco.Examine
                     values.Add(property.Alias, new[] {property.GetValue() });
                 }
 
-                var vs = new ValueSet(c.Id, IndexTypes.Content, c.ContentType.Alias, values);
+                var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values);
 
                 yield return vs;
             }
         }
 
-        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IMedia> media)
+        public static IEnumerable<ValueSet> GetValueSets(IEnumerable<IUrlSegmentProvider> urlSegmentProviders, IUserService userService, params IMedia[] media)
         {
             foreach (var m in media)
             {
-                var urlValue = m.GetUrlSegment(_urlSegmentProviders);
+                var urlValue = m.GetUrlSegment(urlSegmentProviders);
                 var values = new Dictionary<string, object[]>
                 {
                     {"icon", new object[] {m.ContentType.Icon}},
@@ -362,7 +373,7 @@ namespace Umbraco.Examine
                     {"urlName", new object[] {urlValue}},
                     {"path", new object[] {m.Path}},
                     {"nodeType", new object[] {m.ContentType.Id}},
-                    {"creatorName", new object[] {m.GetCreatorProfile(UserService).Name}}
+                    {"creatorName", new object[] {m.GetCreatorProfile(userService).Name}}
                 };
 
                 foreach (var property in m.Properties.Where(p => p?.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
@@ -370,32 +381,12 @@ namespace Umbraco.Examine
                     values.Add(property.Alias, new[] { property.GetValue() });
                 }
 
-                var vs = new ValueSet(m.Id, IndexTypes.Media, m.ContentType.Alias, values);
+                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);
 
                 yield return vs;
             }
         }
 
-        /// <summary>
-        /// Creates an IIndexCriteria object based on the indexSet passed in and our DataService
-        /// </summary>
-        /// <param name="indexSet"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If we cannot initialize we will pass back empty indexer data since we cannot read from the database
-        /// </remarks>
-        [Obsolete("IIndexCriteria is obsolete, this method is used only for configuration based indexes it is recommended to configure indexes on startup with code instead of config")]
-        protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
-        {
-            if (CanInitialize())
-            {
-                //NOTE: We are using a singleton here because: This is only ever used for configuration based scenarios, this is never
-                // used when the index is configured via code (the default), in which case IIndexCriteria is never used. When this is used
-                // the DI ctor is not used.
-                return indexSet.ToIndexCriteria(Current.Services.ContentTypeService);
-            }
-            return base.GetIndexerData(indexSet);
-        }
 
         #endregion
     }
