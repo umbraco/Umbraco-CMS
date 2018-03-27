@@ -149,6 +149,9 @@
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="Editors\UsersController.cs" />
     <Compile Include="ExamineStartup.cs" />
+    <Compile Include="Features\DisabledFeatures.cs" />
+    <Compile Include="Features\EnabledFeatures.cs" />
+    <Compile Include="Features\UmbracoFeatures.cs" />
     <Compile Include="HealthCheck\HealthCheckCollection.cs" />
     <Compile Include="HealthCheck\HealthCheckNotificationMethodAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckNotificationMethodCollection.cs" />
@@ -204,7 +207,6 @@
     <Compile Include="Media\ImageUrlProviderCollection.cs" />
     <Compile Include="Models\BackOfficeTour.cs" />
     <Compile Include="Models\BackOfficeTourFile.cs" />
-    <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="Models\BackOfficeTourStep.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
@@ -269,6 +271,9 @@
     <Compile Include="PropertyEditors\DateValueEditor.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="PropertyEditors\DecimalConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownFlexibleConfiguration.cs" />
+    <Compile Include="PropertyEditors\DropDownFlexiblePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\DropDownFlexibleConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressConfiguration.cs" />
@@ -394,7 +399,6 @@
     <Compile Include="Tour\TourFilterCollection.cs" />
     <Compile Include="Tour\TourFilterCollectionBuilder.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
-    <Compile Include="Trees\MacroTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />
@@ -414,6 +418,7 @@
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
+    <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />

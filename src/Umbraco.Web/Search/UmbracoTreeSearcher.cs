@@ -210,7 +210,7 @@ namespace Umbraco.Web.Search
 
             Udi udi;
             Udi.TryParse(searchFrom, true, out udi);
-            searchFrom = udi == null ? searchFrom : entityService.GetIdForUdi(udi).Result.ToString();
+            searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
 
             int searchFromId;
             var entityPath = int.TryParse(searchFrom, out searchFromId) && searchFromId > 0

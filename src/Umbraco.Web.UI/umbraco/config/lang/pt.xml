@@ -15,8 +15,6 @@
     <key alias="disable">Desabilitar</key>
     <key alias="emptyTrashcan">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
-    <key alias="exportDocumentTypeAsCode">Exportar para .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Exportar para .NET</key>
     <key alias="importDocumentType">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>
     <key alias="liveEdit">Editar na Tela</key>
@@ -649,7 +647,7 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Classificação concluída.</key>
     <key alias="sortHelp">Arraste os diferentes itens para cima ou para baixo para definir como os mesmos serão arranjados. Ou clique no título da coluna para classificar a coleção completa de itens</key>
-    <key alias="sortPleaseWait"><![CDATA[Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo. <br /><br /> Não feche esta janela durante a classificação]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Publicação foi cancelada por add-in de terceiros</key>
@@ -718,6 +716,12 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="template">Modelo</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>

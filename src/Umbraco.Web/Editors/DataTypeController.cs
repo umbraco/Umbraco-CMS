@@ -346,8 +346,8 @@ namespace Umbraco.Web.Editors
             var datatypes = new List<DataTypeBasic>();
             var showDeprecatedPropertyEditors = UmbracoConfig.For.UmbracoSettings().Content.ShowDeprecatedPropertyEditors;
 
-            var propertyEditors = Current.PropertyEditors;
-            #error .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors); ???
+            var propertyEditors = Current.PropertyEditors
+                .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();

@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -28,19 +27,13 @@ namespace Umbraco.Web.PropertyEditors
 
         public override Dictionary<string, object> ToConfigurationEditor(ColorPickerConfiguration configuration)
         {
-            if (configuration == null)
-                return new Dictionary<string, object>
-                {
-                    { "items", new object() },
-                    { "useLabel", false }
-                };
-
-            var items = configuration.Items.ToDictionary(x => x.Id.ToString(), x => GetItemValue(x, configuration.UseLabel));
+            var items = configuration?.Items.ToDictionary(x => x.Id.ToString(), x => GetItemValue(x, configuration.UseLabel)) ?? new object();
+            var useLabel = configuration?.UseLabel ?? false;
 
             return new Dictionary<string, object>
             {
                 { "items", items },
-                { "useLabel", configuration.UseLabel }
+                { "useLabel", useLabel }
             };
         }
 

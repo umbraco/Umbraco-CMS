@@ -869,6 +869,7 @@ namespace Umbraco.Web.Editors
             {
                 content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
                 return content;
+            }
         }
 
         /// <summary>

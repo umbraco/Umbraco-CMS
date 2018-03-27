@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
     /// as INT and we have logic in here to ensure it is formatted correctly including ensuring that the string value is published
     /// in cache and not the int ID.
     /// </remarks>
-    [DataEditor(Constants.PropertyEditors.Aliases.DropDownList, "Dropdown list", "dropdown", ValueType = ValueTypes.String, Group = "lists", Icon = "icon-indent")]
+    [DataEditor(Constants.PropertyEditors.Aliases.DropDownList, "Dropdown list", "dropdown", ValueType = ValueTypes.String, Group = "lists", Icon = "icon-indent", IsDeprecated = true)]
     public class DropDownPropertyEditor : DropDownWithKeysPropertyEditor
     {
         /// <summary>

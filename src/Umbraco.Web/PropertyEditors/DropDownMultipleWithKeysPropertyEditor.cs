@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Due to backwards compatibility, this editor stores the value as a CSV string listing
     /// the ids of individual items.
     /// </remarks>
-    [DataEditor(Constants.PropertyEditors.Aliases.DropdownlistMultiplePublishKeys, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list")]
+    [DataEditor(Constants.PropertyEditors.Aliases.DropdownlistMultiplePublishKeys, "Dropdown list multiple, publish keys", "dropdown", Group = "lists", Icon = "icon-bulleted-list", IsDeprecated = true)]
     public class DropDownMultipleWithKeysPropertyEditor : DropDownPropertyEditor
     {
         private readonly ILocalizedTextService _textService;

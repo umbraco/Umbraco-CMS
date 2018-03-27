@@ -15,8 +15,6 @@
     <key alias="disable">비활성</key>
     <key alias="emptyTrashcan">휴지통 비우기</key>
     <key alias="exportDocumentType">추출 문서 유형</key>
-    <key alias="exportDocumentTypeAsCode">.NET으로 추출</key>
-    <key alias="exportDocumentTypeAsCode-Full">.NET으로 추출</key>
     <key alias="importDocumentType">등록 문서 유형</key>
     <key alias="importPackage">패키지 등록</key>
     <key alias="liveEdit">캔버스 내용 편집</key>
@@ -661,7 +659,7 @@
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">정렬 완료</key>
     <key alias="sortHelp">다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다</key>
-    <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다<br/><br/>정렬하는 동안 이 창을 닫지 마십시오]]></key>
+    <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">3rd party add-in 때문에 발행이 취소되었습니다.</key>
@@ -730,6 +728,12 @@
     <key alias="template">템플릿</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>

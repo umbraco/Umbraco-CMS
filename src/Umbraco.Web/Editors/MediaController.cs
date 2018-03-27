@@ -495,7 +495,7 @@ namespace Umbraco.Web.Editors
             var saveStatus = Services.MediaService.WithResult().Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
-            var display = AutoMapperExtensions.MapWithUmbracoContext<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
+            var display = ContextMapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -640,7 +640,7 @@ namespace Umbraco.Web.Editors
             int parentId = GetParentIdAsInt(currentFolderId, validatePermissions: true);
            
             var tempFiles = new PostedFiles();
-            var mediaService = ApplicationContext.Services.MediaService;
+            var mediaService = Services.MediaService;
             
             //in case we pass a path with a folder in it, we will create it and upload media to it.
             if (result.FormData.ContainsKey("path"))

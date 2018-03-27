@@ -89,54 +89,72 @@ namespace Umbraco.Web.Trees
 
             OnBeforeRenderMenu(menu, id, queryStrings);
 
-            //if root node no need to visit the filesystem so lets just create the menu and return it
+            // if root node no need to visit the filesystem so lets just create the menu and return it
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //default create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    //Since we haven't implemented anything for file systems in angular, this needs to be converted to
-                    //use the legacy format
-                    .ConvertLegacyFileSystemMenuItem("", "init" + TreeAlias, queryStrings.GetValue<string>("application"));
-
-                //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
-
-                return menu;
+                GetMenuForRootNode(menu, queryStrings);
             }
-
-            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
-                ? HttpUtility.UrlDecode(id).TrimStart("/")
-                : "";
-            var isFile = FileSystem.FileExists(path);
-            var isDirectory = FileSystem.DirectoryExists(path);
-
-            if (isDirectory)
+            else
             {
-                if (EnableCreateOnFolder)
-                {
-                    //default create
-                    menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-                    menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                        //Since we haven't implemented anything for file systems in angular, this needs to be converted to
-                        //use the legacy format
-                        .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder", queryStrings.GetValue<string>("application"));
-                }
+                var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
+                    ? HttpUtility.UrlDecode(id).TrimStart("/")
+                    : "";
+                var isFile = FileSystem.FileExists(path);
+                var isDirectory = FileSystem.DirectoryExists(path);
 
-                //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
-            }
-            else if (isFile)
-            {
-                //add delete option for all languages
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
-                    .ConvertLegacyFileSystemMenuItem(
-                        id, TreeAlias, queryStrings.GetValue<string>("application"));
+                if (isDirectory)
+                    GetMenuForFolder(menu, path, id, queryStrings);
+                else if (isFile)
+                    GetMenuForFile(menu, path, id, queryStrings);
             }
 
             OnAfterRenderMenu(menu, id, queryStrings);
 
             return menu;
+        }
+
+        protected virtual void GetMenuForRootNode(MenuItemCollection menu, FormDataCollection queryStrings)
+        {
+            // default create
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
+            // create action
+            //Since we haven't implemented anything for file systems in angular, this needs to be converted to
+            //use the legacy format
+            menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
+                .ConvertLegacyFileSystemMenuItem("", "init" + TreeAlias, queryStrings.GetValue<string>("application"));
+
+            // refresh action
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+        }
+
+        protected virtual void GetMenuForFolder(MenuItemCollection menu, string path, string id, FormDataCollection queryStrings)
+        {
+            if (EnableCreateOnFolder)
+            {
+                // default create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
+                // create action
+                //Since we haven't implemented anything for file systems in angular, this needs to be converted to
+                //use the legacy format
+                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
+                    .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder", queryStrings.GetValue<string>("application"));
+            }
+
+            // delete action
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
+                .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder", queryStrings.GetValue<string>("application"));
+
+            // refresh action
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+        }
+
+        protected virtual void GetMenuForFile(MenuItemCollection menu, string path, string id, FormDataCollection queryStrings)
+        {
+            // delete action
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
+                .ConvertLegacyFileSystemMenuItem(id, TreeAlias, queryStrings.GetValue<string>("application"));
         }
 
         protected virtual void OnBeforeRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)

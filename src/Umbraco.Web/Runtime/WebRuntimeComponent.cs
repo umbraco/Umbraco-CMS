@@ -32,6 +32,7 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
@@ -122,7 +123,7 @@ namespace Umbraco.Web.Runtime
 
             composition.Container.RegisterCollectionBuilder<TourFilterCollectionBuilder>();
 
-            composition.Container.RegisterCollectionBuilder<FeatureCollectionBuilder>(); // fixme FeaturesResolver?
+            composition.Container.RegisterSingleton<UmbracoFeatures>();
 
             // set the default RenderMvcController
             Current.DefaultRenderMvcControllerType = typeof(RenderMvcController); // fixme WRONG!

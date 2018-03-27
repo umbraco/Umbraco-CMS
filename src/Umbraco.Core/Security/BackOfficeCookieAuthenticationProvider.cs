@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 
@@ -14,14 +15,9 @@ namespace Umbraco.Core.Security
 {
     public class BackOfficeCookieAuthenticationProvider : CookieAuthenticationProvider
     {
-        private readonly IUserService _userService;
-        private readonly IRuntimeState _runtimeState;
-
-        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState)
-        {
-            _userService = userService;
-            _runtimeState = runtimeState;
-        }
+        // fixme inject
+        private IUserService UserService => Current.Services.UserService;
+        private IRuntimeState RuntimeState => Current.RuntimeState;
 
         public override void ResponseSignIn(CookieResponseSignInContext context)
         {
@@ -30,8 +26,8 @@ namespace Umbraco.Core.Security
                 //generate a session id and assign it
                 //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
 
-                var session = _runtimeState.Level == RuntimeLevel.Run
-                    ? _userService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
+                var session = RuntimeState.Level == RuntimeLevel.Run
+                    ? UserService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
                     : Guid.NewGuid();
 
                 backOfficeIdentity.UserData.SessionId = session.ToString();
@@ -49,7 +45,7 @@ namespace Umbraco.Core.Security
                 var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
                 if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out var guidSession))
                 {
-                    _userService.ClearLoginSession(guidSession);
+                    UserService.ClearLoginSession(guidSession);
                 }
             }
 
@@ -100,7 +96,7 @@ namespace Umbraco.Core.Security
         /// </remarks>
         protected  virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
         {
-            if (_runtimeState.Level == RuntimeLevel.Run)
+            if (RuntimeState.Level == RuntimeLevel.Run)
                 await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
         }
 

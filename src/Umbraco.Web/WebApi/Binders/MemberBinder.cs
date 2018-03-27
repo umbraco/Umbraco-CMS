@@ -18,6 +18,7 @@ using System.Net.Http;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Binders
 {
@@ -242,13 +243,8 @@ namespace Umbraco.Web.WebApi.Binders
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);
                 }
 
-                var httpCtx = actionContext.Request.TryGetHttpContext();
-                if (httpCtx.Success == false)
-                {
-                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, "No http context");
-                    return false;
-                }
-                var umbCtx = httpCtx.Result.GetUmbracoContext();
+
+                var umbCtx = Current.UmbracoContext; // fixme inject?
 
                 //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
                 //if a sensitive value is being submitted.

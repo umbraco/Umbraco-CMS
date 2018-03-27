@@ -949,7 +949,6 @@
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
-    <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>

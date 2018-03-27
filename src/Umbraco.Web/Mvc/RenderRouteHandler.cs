@@ -13,6 +13,7 @@ using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using Current = Umbraco.Web.Composing.Current;
 using LightInject;
+using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Mvc
 {
@@ -48,6 +49,8 @@ namespace Umbraco.Web.Mvc
         }
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
+
+        private UmbracoFeatures Features => Current.Container.GetInstance<UmbracoFeatures>(); // fixme inject
 
         #region IRouteHandler Members
 
@@ -390,7 +393,7 @@ namespace Umbraco.Web.Mvc
 
             //here we need to check if there is no hijacked route and no template assigned, if this is the case
             //we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            if (!request.HasTemplate && !routeDef.HasHijackedRoute && !_features.Enabled.RenderNoTemplate)
+            if (!request.HasTemplate && !routeDef.HasHijackedRoute && !Features.Enabled.RenderNoTemplate)
             {
                 // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
                 var engine = Core.Composing.Current.Container.GetInstance<PublishedRouter>();

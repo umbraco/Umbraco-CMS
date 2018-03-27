@@ -26,6 +26,7 @@
     <header>Macro</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
+      <create assembly="Umbraco.Web" type="macroTasks" />
       <delete assembly="Umbraco.Web" type="macroTasks" />
     </tasks>
   </nodeType>

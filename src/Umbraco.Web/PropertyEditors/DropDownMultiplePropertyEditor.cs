@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
     /// Due to maintaining backwards compatibility this data type stores the value as a string which is a comma separated value of the
     /// ids of the individual items so we have logic in here to deal with that.
     /// </remarks>
-    [DataEditor(Constants.PropertyEditors.Aliases.DropDownListMultiple, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list")]
+    [DataEditor(Constants.PropertyEditors.Aliases.DropDownListMultiple, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list", IsDeprecated = true)]
     public class DropDownMultiplePropertyEditor : DropDownMultipleWithKeysPropertyEditor
     {
         /// <summary>
