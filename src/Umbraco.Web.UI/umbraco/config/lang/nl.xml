@@ -1155,7 +1155,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="memberCanEdit">Lid kan bewerken</key>
     <key alias="memberCanEditDescription">Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel pagina.</key>
     <key alias="isSensitiveData">Omvat gevoelige gegevens</key>
-    <key alias="isSensitiveDataDescription">Verberg deze eigenschap voor de content editor dat geen toegang heeft tot het bekijken van gevoelige informatie.</key>
+    <key alias="isSensitiveDataDescription">Verberg deze eigenschap voor de content editor die geen toegang heeft tot het bekijken van gevoelige informatie.</key>
     <key alias="showOnMemberProfile">Toon in het profiel van leden</key>
     <key alias="showOnMemberProfileDescription">Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het lid.</key>
     
