@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>
-    class XmlStore : IDisposable
+    internal class XmlStore : IDisposable
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -328,6 +328,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return _xml;
             }
         }
+
+        // Gets the temp. Xml managed by SafeXmlReaderWrite, if any
+        public XmlDocument TempXml => SafeXmlReaderWriter.Get(_scopeProvider)?.Xml;
 
         // assumes xml lock
         private void SetXmlLocked(XmlDocument xml, bool registerXmlChange)

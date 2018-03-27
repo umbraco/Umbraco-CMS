@@ -3,7 +3,6 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Xml;
-using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.IO;
 using System.Collections.Generic;

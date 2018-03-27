@@ -5,6 +5,7 @@
 //using System.ComponentModel;
 //using System.Data;
 //using System.Drawing;
+//using System.Linq;
 //using System.Web;
 //using System.Web.SessionState;
 //using System.Web.UI;
@@ -119,36 +120,22 @@
 
 //            if (!IsPostBack) {
 //                allVersions.Items.Add(new ListItem(Services.TextService.Localize("rollback/selectVersion")+ "...", ""));
-//                foreach (DocumentVersionList dl in currentDoc.GetVersions()) {
+                
+//                foreach (DocumentVersionList dl in currentDoc.GetVersions())
+//                {
+//                    //we don't need to show the current version
+//                    if (dl.Version == currentDoc.Version)
+//                        continue;
+//
 //                    allVersions.Items.Add(new ListItem(dl.Text + " (" + Services.TextService.Localize("content/createDate") + ": " + dl.Date.ToShortDateString() + " " + dl.Date.ToShortTimeString() + ")", dl.Version.ToString()));
 //                }
 //                Button1.Text = Services.TextService.Localize("actions/rollback");
 //            }
 //        }
-
-//        #region Web Form Designer generated code
-//        override protected void OnInit(EventArgs e)
-//        {
-//            //
-//            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-//            //
-//            InitializeComponent();
-//            base.OnInit(e);
-//        }
-
-//        /// <summary>
-//        /// Required method for Designer support - do not modify
-//        /// the contents of this method with the code editor.
-//        /// </summary>
-//        private void InitializeComponent()
-//        {
-
-//        }
-//        #endregion
-
 //        protected void doRollback_Click(object sender, System.EventArgs e)
 //        {
-//            if (allVersions.SelectedValue.Trim() != "") {
+//            if (allVersions.SelectedValue.Trim() != "")
+//            {
 //                Document d = new Document(int.Parse(helper.Request("nodeId")));
 //                d.RollBack(new Guid(allVersions.SelectedValue), Security.CurrentUser);
 
@@ -161,6 +148,8 @@
 //                feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 //                diffPanel.Visible = false;
 //                pl_buttons.Visible = false;
+//
+//                ClientTools.ReloadLocationIfMatched(string.Format("/content/content/edit/{0}", d.Id));
 //            }
 //        }
 //    }

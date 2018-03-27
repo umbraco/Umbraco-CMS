@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Core;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Umbraco.Core.Security;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Infrastructure;

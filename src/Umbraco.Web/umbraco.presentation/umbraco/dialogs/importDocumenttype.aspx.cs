@@ -73,6 +73,7 @@ namespace umbraco.presentation.umbraco.dialogs
         private void import_Click(object sender, EventArgs e)
         {
             var xd = new XmlDocument();
+		    xd.XmlResolver = null;
             xd.Load(tempFile.Value);
 
             var userId = Security.GetUserId();
@@ -107,6 +108,7 @@ namespace umbraco.presentation.umbraco.dialogs
             documentTypeFile.PostedFile.SaveAs(fileName);
 
             var xd = new XmlDocument();
+		    xd.XmlResolver = null;
             xd.Load(fileName);
             dtName.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Name").FirstChild.Value;
             dtAlias.Text = xd.DocumentElement.SelectSingleNode("//DocumentType/Info/Alias").FirstChild.Value;

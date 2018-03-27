@@ -23,7 +23,7 @@ namespace Umbraco.Web.Security
     /// <summary>
     /// A utility class used for dealing with USER security in Umbraco
     /// </summary>
-    public class WebSecurity : DisposableObject
+    public class WebSecurity : DisposableObjectSlim
     {
         private HttpContextBase _httpContext;
         private readonly IUserService _userService;
@@ -112,34 +112,14 @@ namespace Umbraco.Web.Security
             owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
 
             var user = UserManager.FindByIdAsync(userId).Result;
-            var userData = Mapper.Map<UserData>(user);
-            _httpContext.SetPrincipalForRequest(userData);
 
             SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
+            
+            _httpContext.SetPrincipalForRequest(owinCtx.Request.User);
+            
             return TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
         }
-
-        [Obsolete("This method should not be used, login is performed by the OWIN pipeline, use the overload that returns double and accepts a UserId instead")]
-        public virtual FormsAuthenticationTicket PerformLogin(IUser user)
-        {
-            //clear the external cookie - we do this first without owin context because we're writing cookies directly to httpcontext
-            // and cookie handling is different with httpcontext vs webapi and owin, normally we'd just do:
-            //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-
-            var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalCookieName);
-            if (externalLoginCookie != null)
-            {
-                externalLoginCookie.Expires = DateTime.Now.AddYears(-1);
-                _httpContext.Response.Cookies.Set(externalLoginCookie);
-            }
-
-            //ensure it's done for owin too
-            _httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-
-            var ticket = _httpContext.CreateUmbracoAuthTicket(Mapper.Map<UserData>(user));
-            return ticket;
-        }
-
+        
         /// <summary>
         /// Clears the current login for the currently logged in user
         /// </summary>

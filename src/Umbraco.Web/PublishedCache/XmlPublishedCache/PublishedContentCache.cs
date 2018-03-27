@@ -486,7 +486,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // not trying to be thread-safe here, that's not the point
 
             if (preview == false)
+            {
+                // if there's a current enlisted reader/writer, use its xml
+                var tempXml = _xmlStore.TempXml;
+                if (tempXml != null) return tempXml;
                 return _xml;
+            }
 
             // Xml cache does not support retrieving preview content when not previewing
             if (_previewContent == null)

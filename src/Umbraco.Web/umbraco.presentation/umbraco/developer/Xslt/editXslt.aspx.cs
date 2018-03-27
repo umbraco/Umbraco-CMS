@@ -28,7 +28,7 @@ namespace umbraco.cms.presentation.developer
             if (!IsPostBack)
             {
                 string file = Request.QueryString["file"];
-                string path = BaseTree.GetTreePathFromFilePath(file);
+                string path = BaseTree.GetTreePathFromFilePath(file, false, tree);
                 ClientTools
                     .SetActiveTreeType(Constants.Trees.Xslt)
                     .SyncTree(path, false);

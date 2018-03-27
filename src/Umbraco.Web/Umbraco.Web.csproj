@@ -131,14 +131,17 @@
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />
+    <Compile Include="Editors\EditorModelEventArgs.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\EditorValidatorOfT.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
+    <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\TemplateController.cs" />
+    <Compile Include="Editors\TourController.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
@@ -199,6 +202,10 @@
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
     <Compile Include="Media\ImageUrlProviderCollection.cs" />
+    <Compile Include="Models\BackOfficeTour.cs" />
+    <Compile Include="Models\BackOfficeTourFile.cs" />
+    <Compile Include="Models\BackOfficeTourFilter.cs" />
+    <Compile Include="Models\BackOfficeTourStep.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
@@ -251,6 +258,7 @@
     <Compile Include="Models\RelatedLinkType.cs" />
     <Compile Include="Models\SendCodeViewModel.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
+    <Compile Include="Models\UserTourStatus.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
@@ -386,6 +394,7 @@
     <Compile Include="Tour\TourFilterCollection.cs" />
     <Compile Include="Tour\TourFilterCollectionBuilder.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
+    <Compile Include="Trees\MacroTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
     <Compile Include="Models\ContentEditing\MemberGroupDisplay.cs" />

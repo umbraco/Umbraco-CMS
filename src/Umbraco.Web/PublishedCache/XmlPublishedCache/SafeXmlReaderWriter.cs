@@ -17,6 +17,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private bool _using;
         private bool _registerXmlChange;
 
+        // the default enlist priority is 100
+        // enlist with a lower priority to ensure that anything "default" has a clean xml
+        private const int EnlistPriority = 60;
+        private const string EnlistKey = "safeXmlReaderWriter";
+
         private SafeXmlReaderWriter(IDisposable releaser, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool isWriter, bool scoped)
         {
             _releaser = releaser;
@@ -27,6 +32,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IsWriter = isWriter;
 
             _xml = IsWriter ? Clone(xml) : xml;
+        }
+
+        public static SafeXmlReaderWriter Get(IScopeProvider scopeProvider)
+        {
+            var scopeContext = scopeProvider.Context;
+            return scopeContext?.GetEnlisted<SafeXmlReaderWriter>(EnlistKey);
         }
 
         public static SafeXmlReaderWriter Get(IScopeProvider scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool writer)
@@ -42,7 +53,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             // get or create an enlisted reader/writer
-            var rw = scopeContext.Enlist("safeXmlReaderWriter",
+            var rw = scopeContext.Enlist(EnlistKey,
                 () => // creator
                 {
                     // obtain exclusive access to xml and create reader/writer
@@ -52,7 +63,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 (completed, item) => // action
                 {
                     item.DisposeForReal(completed);
-                });
+                }, EnlistPriority);
 
             // ensure it's not already in-use - should never happen, just being super safe
             if (rw._using)
