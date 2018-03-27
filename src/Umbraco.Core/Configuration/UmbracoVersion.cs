@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Reflection;
 using Semver;
 
@@ -34,11 +35,37 @@ namespace Umbraco.Core.Configuration
         /// <summary>
         /// Gets the semantic version of the executing code.
         /// </summary>
-        public static SemVersion SemanticVersion => new SemVersion(
-                Current.Major,
-                Current.Minor,
-                Current.Build,
-                CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
-                Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
+        public static SemVersion SemanticVersion { get; } = new SemVersion(
+            Current.Major,
+            Current.Minor,
+            Current.Build,
+            CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
+            Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
+
+        /// <summary>
+        /// Gets the "local" version of the site.
+        /// </summary>
+        /// <remarks>
+        /// <para>Three things have a version, really: the executing code, the database model,
+        /// and the site/files. The database model version is entirely managed via migrations,
+        /// and changes during an upgrade. The executing code version changes when new code is
+        /// deployed. The site/files version changes during an upgrade.</para>
+        /// </remarks>
+        public static SemVersion Local
+        {
+            get
+            {
+                try
+                {
+                    // fixme - this should live in its own independent file! NOT web.config!
+                    var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
+                    return SemVersion.TryParse(value, out var semver) ? semver : null;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
     }
 }

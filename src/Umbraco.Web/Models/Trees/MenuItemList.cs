@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="name">The text to display for the menu item, will default to the IAction alias if not specified</param>
         internal MenuItem Add(IAction action, string name)
         {
-            var item = new MenuItem(action);
+            var item = new MenuItem(action, name);
 
             DetectLegacyActionMenu(action.GetType(), item);
 

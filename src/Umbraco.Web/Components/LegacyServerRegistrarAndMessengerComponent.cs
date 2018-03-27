@@ -1,15 +1,19 @@
 ﻿using System;
+using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using LightInject;
 using Umbraco.Web.Runtime;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Components
 {
+    // the legacy LB is not enabled by default, because LB is implemented by
+    // DatabaseServerRegistrarAndMessengerComponent instead
+
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+    [DisableComponent] // is not enabled by default
     public sealed class LegacyServerRegistrarAndMessengerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public override void Compose(Composition composition)

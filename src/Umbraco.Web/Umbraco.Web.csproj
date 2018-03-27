@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.1.1" />
-    <PackageReference Include="ClientDependency" Version="1.9.2" />
+    <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="dotless" Version="1.5.2" />
     <PackageReference Include="Examine" Version="2.0.0-beta2" />
@@ -145,6 +145,7 @@
     <Compile Include="Editors\UserGroupsController.cs" />
     <Compile Include="Editors\UserGroupValidateAttribute.cs" />
     <Compile Include="Editors\UsersController.cs" />
+    <Compile Include="ExamineStartup.cs" />
     <Compile Include="HealthCheck\HealthCheckCollection.cs" />
     <Compile Include="HealthCheck\HealthCheckNotificationMethodAttribute.cs" />
     <Compile Include="HealthCheck\HealthCheckNotificationMethodCollection.cs" />
@@ -205,11 +206,13 @@
     <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollectionBuilder.cs" />
+    <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\ContentEditing\Permission.cs" />
+    <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\ContentEditing\TreeSearchResult.cs" />
@@ -222,13 +225,24 @@
     <Compile Include="Models\ContentEditing\UserProfile.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
+    <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
+    <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
+    <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
+    <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
     <Compile Include="Models\Mapping\EntityProfileExtensions.cs" />
+    <Compile Include="Models\Mapping\ContentTypeBasicResolver.cs" />
+    <Compile Include="Models\Mapping\MemberBasicPropertiesResolver.cs" />
     <Compile Include="Models\Mapping\MemberDtoPropertiesResolver.cs" />
     <Compile Include="Models\Mapping\MemberProviderFieldResolver.cs" />
     <Compile Include="Models\Mapping\MembershipScenarioResolver.cs" />
+    <Compile Include="Models\Mapping\MembershipUserTypeConverter.cs" />
     <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
+    <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
+    <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\RelatedLink.cs" />
@@ -236,6 +250,7 @@
     <Compile Include="Models\RelatedLinks.cs" />
     <Compile Include="Models\RelatedLinkType.cs" />
     <Compile Include="Models\SendCodeViewModel.cs" />
+    <Compile Include="Models\Trees\ExportMember.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollection.cs" />
     <Compile Include="Mvc\FilteredControllerFactoryCollectionBuilder.cs" />
     <Compile Include="Mvc\SurfaceControllerTypeCollection.cs" />
@@ -365,8 +380,11 @@
     <Compile Include="SignalR\IPreviewHub.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="SignalR\PreviewHubComponent.cs" />
-    <Compile Include="Strategies\LegacyServerRegistrarAndMessengerComponent.cs" />
+    <Compile Include="Components\LegacyServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Suspendable.cs" />
+    <Compile Include="Tour\BackOfficeTourFilter.cs" />
+    <Compile Include="Tour\TourFilterCollection.cs" />
+    <Compile Include="Tour\TourFilterCollectionBuilder.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\RelationTypeTreeController.cs" />
     <Compile Include="Trees\MacrosTreeController.cs" />
@@ -649,7 +667,6 @@
     <Compile Include="Models\ContentEditing\RichTextEditorPlugin.cs" />
     <Compile Include="Models\ContentEditing\StylesheetRule.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
-    <Compile Include="Models\Mapping\DashboardMapperProfile.cs" />
     <Compile Include="Models\Mapping\MacroMapperProfile.cs" />
     <Compile Include="Models\Mapping\MemberMapperProfile.cs" />
     <Compile Include="Models\Mapping\TagMapperProfile.cs" />
@@ -731,7 +748,7 @@
     <Compile Include="Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Migrations\EnsureListViewDataTypeIsCreated.cs" />
     <Compile Include="Migrations\OverwriteStylesheetFilesFromTempFiles.cs" />
-    <Compile Include="Strategies\NotificationsComponent.cs" />
+    <Compile Include="Components\NotificationsComponent.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -921,7 +938,7 @@
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="Migrations\RebuildXmlCachesAfterUpgrade.cs" />
-    <Compile Include="Strategies\PublicAccessComponent.cs" />
+    <Compile Include="Components\PublicAccessComponent.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
@@ -1045,7 +1062,7 @@
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineComponent.cs" />
-    <Compile Include="Strategies\DatabaseServerRegistrarAndMessengerComponent.cs" />
+    <Compile Include="Components\DatabaseServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />

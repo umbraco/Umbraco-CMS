@@ -375,6 +375,19 @@ namespace Umbraco.Web.Editors
             if (loginInfo == null) throw new ArgumentNullException("loginInfo");
             if (response == null) throw new ArgumentNullException("response");
 
+
+            //Here we can check if the provider associated with the request has been configured to allow
+            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
+            // .... not likely! 
+            var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
+            if (authType == null)
+            {
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
+            }
+
+            var autoLinkOptions = authType.GetExternalAuthenticationOptions();
+
             // Sign in the user with this external login provider if the user already has a login
             var user = await UserManager.FindAsync(loginInfo.Login);
             if (user != null)
@@ -385,12 +398,25 @@ namespace Umbraco.Web.Editors
                 // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure
                 // that the ticket is created and stored and that the user is logged in.
 
-                //sign in
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                var shouldSignIn = true;
+                if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
+                {
+                    shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
+                    if (shouldSignIn == false)
+                    {
+                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '" + loginInfo.Login.LoginProvider + "' have refused the login based on the OnExternalLogin method. Affected user id: '" + user.Id + "'");
+                    }
+                }
+
+                if (shouldSignIn)
+                {
+                    //sign in
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                }
             }
             else
             {
-                if (await AutoLinkAndSignInExternalAccount(loginInfo) == false)
+                if (await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions) == false)
                 {
                     ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
                 }
@@ -405,97 +431,81 @@ namespace Umbraco.Web.Editors
             return response();
         }
 
-        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo)
+        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo, ExternalSignInAutoLinkOptions autoLinkOptions)
         {
-            //Here we can check if the provider associated with the request has been configured to allow
-            // new users (auto-linked external accounts). This would never be used with public providers such as
-            // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
-            // .... not likely!
-
-            var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
-            if (authType == null)
-            {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
+            if (autoLinkOptions == null)
                 return false;
-            }
 
-            var autoLinkOptions = authType.GetExternalAuthenticationOptions();
-            if (autoLinkOptions != null)
+            if (autoLinkOptions.ShouldAutoLinkExternalAccount(UmbracoContext, loginInfo) == false)
+                return true;
+
+            //we are allowing auto-linking/creating of local accounts
+            if (loginInfo.Email.IsNullOrWhiteSpace())
             {
-                if (autoLinkOptions.ShouldAutoLinkExternalAccount(UmbracoContext, loginInfo))
+                ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+            }
+            else
+            {
+                //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
+                var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
+                if (foundByEmail != null)
                 {
-                    //we are allowing auto-linking/creating of local accounts
-                    if (loginInfo.Email.IsNullOrWhiteSpace())
+                    ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                }
+                else
+                {
+                    if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
+                    if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
+
+                    var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
+
+                    var autoLinkUser = BackOfficeIdentityUser.CreateNew(
+                        loginInfo.Email,
+                        loginInfo.Email,
+                        autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));
+                    autoLinkUser.Name = loginInfo.ExternalIdentity.Name;
+                    foreach (var userGroup in groups)
                     {
-                        ViewData[TokenExternalSignInError] = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                        autoLinkUser.AddRole(userGroup.Alias);
+                    }
+                            
+                    //call the callback if one is assigned
+                    if (autoLinkOptions.OnAutoLinking != null)
+                    {
+                        autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
+                    }
+
+                    var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
+
+                    if (userCreationResult.Succeeded == false)
+                    {
+                        ViewData[TokenExternalSignInError] = userCreationResult.Errors;
                     }
                     else
                     {
-
-                        //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                        var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
-                        if (foundByEmail != null)
+                        var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+                        if (linkResult.Succeeded == false)
                         {
-                            ViewData[TokenExternalSignInError] = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                            ViewData[TokenExternalSignInError] = linkResult.Errors;
+
+                            //If this fails, we should really delete the user since it will be in an inconsistent state!
+                            var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
+                            if (deleteResult.Succeeded == false)
+                            {
+                                //DOH! ... this isn't good, combine all errors to be shown
+                                ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
+                            }
                         }
                         else
                         {
-                            if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
-                            if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
-
-                            var groups = Services.UserService.GetUserGroupsByAlias(autoLinkOptions.GetDefaultUserGroups(UmbracoContext, loginInfo));
-
-                            var autoLinkUser = BackOfficeIdentityUser.CreateNew(
-                                loginInfo.Email,
-                                loginInfo.Email,
-                                autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo));
-                            autoLinkUser.Name = loginInfo.ExternalIdentity.Name;
-                            foreach (var userGroup in groups)
-                            {
-                                autoLinkUser.AddRole(userGroup.Alias);
-                            }
-
-                            //call the callback if one is assigned
-                            if (autoLinkOptions.OnAutoLinking != null)
-                            {
-                                autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
-                            }
-
-                            var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
-
-                            if (userCreationResult.Succeeded == false)
-                            {
-                                ViewData[TokenExternalSignInError] = userCreationResult.Errors;
-                            }
-                            else
-                            {
-                                var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
-                                if (linkResult.Succeeded == false)
-                                {
-                                    ViewData[TokenExternalSignInError] = linkResult.Errors;
-
-                                    //If this fails, we should really delete the user since it will be in an inconsistent state!
-                                    var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
-                                    if (deleteResult.Succeeded == false)
-                                    {
-                                        //DOH! ... this isn't good, combine all errors to be shown
-                                        ViewData[TokenExternalSignInError] = linkResult.Errors.Concat(deleteResult.Errors);
-                                    }
-                                }
-                                else
-                                {
-                                    //sign in
-                                    await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
-                                }
-                            }
+                            //sign in
+                            await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
                         }
-
                     }
                 }
-                return true;
-            }
 
-            return false;
+            }
+            return true;
         }
 
         /// <summary>

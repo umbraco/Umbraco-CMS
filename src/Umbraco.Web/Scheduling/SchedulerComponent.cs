@@ -66,15 +66,16 @@ namespace Umbraco.Web.Scheduling
             _healthCheckRunner = new BackgroundTaskRunner<IBackgroundTask>("HealthCheckNotifier", logger);
 
             // we will start the whole process when a successful request is made
-            UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
+            UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
         }
 
-        private void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
+        private void RegisterBackgroundTasksOnce(object sender, RoutableAttemptEventArgs e)
         {
             switch (e.Outcome)
             {
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
+                    UmbracoModule.RouteAttempt -= RegisterBackgroundTasksOnce;
                     RegisterBackgroundTasks();
                     break;
             }
@@ -82,9 +83,6 @@ namespace Umbraco.Web.Scheduling
 
         private void RegisterBackgroundTasks()
         {
-            // remove handler, we're done
-            UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
-
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
                 _logger.Debug<SchedulerComponent>(() => "Initializing the scheduler");

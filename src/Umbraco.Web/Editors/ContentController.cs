@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
-            return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
+            return foundContent.Select(x => ContextMapper.Map<IContent, ContentItemDisplay>(x, UmbracoContext));
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
 
             SetupBlueprint(content, foundContent);
 
@@ -261,7 +261,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
             return content;
         }
 
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
             return content;
         }
 
@@ -297,7 +297,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
-            var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+            var mapped = ContextMapper.Map<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -433,9 +433,17 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
         {
-            return Services.UserService
-                    .GetPermissions(Security.CurrentUser, nodeIds)
-                    .ToDictionary(x => x.EntityId, x => x.AssignedPermissions);
+            var permissions = Services.UserService
+                    .GetPermissions(Security.CurrentUser, nodeIds);
+            
+            var permissionsDictionary = new Dictionary<int, string[]>();
+            foreach (var nodeId in nodeIds)
+            {
+                var aggregatePerms = permissions.GetAllPermissions(nodeId).ToArray();
+                permissionsDictionary.Add(nodeId, aggregatePerms);
+            }
+
+            return permissionsDictionary;
         }
 
         /// <summary>
@@ -525,6 +533,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             return PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
@@ -552,7 +561,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
+                    var forDisplay = ContextMapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -595,7 +604,7 @@ namespace Umbraco.Web.Editors
             }
 
             //return the updated model
-            var display = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
+            var display = ContextMapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -634,8 +643,6 @@ namespace Umbraco.Web.Editors
                     ShowMessageForPublishStatus(publishStatus, display);
                     break;
             }
-
-            UpdatePreviewContext(contentItem.PersistedContent.Id);
 
             //If the item is new and the operation was cancelled, we need to return a different
             // status code so the UI can handle it since it won't be able to redirect since there
@@ -786,11 +793,8 @@ namespace Umbraco.Web.Editors
             {
                 var contentService = Services.ContentService;
 
-                // content service GetByIds does order the content items based on the order of Ids passed in
-                var content = contentService.GetByIds(sorted.IdSortOrder);
-
                 // Save content with new sort order and update content xml in db accordingly
-                if (contentService.Sort(content) == false)
+                if (contentService.Sort(sorted.IdSortOrder) == false)
                 {
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
@@ -844,6 +848,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'U')]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay PostUnPublish(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
@@ -853,7 +858,7 @@ namespace Umbraco.Web.Editors
 
             var unpublishResult = Services.ContentService.Unpublish(foundContent, Security.CurrentUser.Id);
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
 
             if (unpublishResult.Success == false)
             {
@@ -864,16 +869,6 @@ namespace Umbraco.Web.Editors
             {
                 content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
                 return content;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the user is currently in preview mode and if so will update the preview content for this item
-        /// </summary>
-        /// <param name="contentId"></param>
-        private void UpdatePreviewContext(int contentId)
-        {
-            _publishedSnapshotService.RefreshPreview(Request.GetPreviewCookieValue(), contentId);
         }
 
         /// <summary>

@@ -32,12 +32,18 @@ namespace Umbraco.Web.Trees
         public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
         {
             int asInt;
+            Guid asGuid = Guid.Empty;
             if (int.TryParse(id, out asInt) == false)
             {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                if (Guid.TryParse(id, out asGuid) == false)
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
             }
 
-            var entity = Services.EntityService.Get(asInt, UmbracoObjectType);
+            var entity = asGuid == Guid.Empty
+                    ? Services.EntityService.Get(asInt, UmbracoObjectType)
+                    : Services.EntityService.Get(asGuid, UmbracoObjectType);
             if (entity == null)
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -112,73 +118,63 @@ namespace Umbraco.Web.Trees
         {
             var nodes = new TreeNodeCollection();
 
-            var altStartId = string.Empty;
-            if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
-                altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
             var rootIdString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var hasAccessToRoot = UserStartNodes.Contains(Constants.System.Root);
 
-            //check if a request has been made to render from a specific start node
-            if (string.IsNullOrEmpty(altStartId) == false && altStartId != "undefined" && altStartId != rootIdString)
+            var startNodeId = queryStrings.HasKey(TreeQueryStringParameters.StartNodeId)
+                ? queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId)
+                : string.Empty;
+
+            if (string.IsNullOrEmpty(startNodeId) == false && startNodeId != "undefined" && startNodeId != rootIdString)
             {
-                id = altStartId;
+                // request has been made to render from a specific, non-root, start node
+                id = startNodeId;
 
-                //we need to verify that the user has access to view this node, otherwise we'll render an empty tree collection
+                // ensure that the user has access to that node, otherwise return the empty tree nodes collection
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (HasPathAccess(id, queryStrings) == false)
                 {
-                    Logger.Warn<ContentTreeControllerBase>("The user " + Security.CurrentUser.Username + " does not have access to the tree node " + id);
-                    return new TreeNodeCollection();
+                    Logger.Warn<ContentTreeControllerBase>("User " + Security.CurrentUser.Username + " does not have access to node with id " + id);
+                    return nodes;
                 }
 
-                // So there's an alt id specified, it's not the root node and the user has access to it, great! But there's one thing we
-                // need to consider:
-                // If the tree is being rendered in a dialog view we want to render only the children of the specified id, but
-                // when the tree is being rendered normally in a section and the current user's start node is not -1, then
-                // we want to include their start node in the tree as well.
-                // Therefore, in the latter case, we want to change the id to -1 since we want to render the current user's root node
-                // and the GetChildEntities method will take care of rendering the correct root node.
-                // If it is in dialog mode, then we don't need to change anything and the children will just render as per normal.
-                if (IsDialog(queryStrings) == false && UserStartNodes.Contains(Constants.System.Root) == false)
-                {
-                    id = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
-                }
+                // if the tree is rendered...
+                // - in a dialog: render only the children of the specific start node, nothing to do
+                // - in a section: if the current user's start nodes do not contain the root node, we need
+                //   to include these start nodes in the tree too, to provide some context - i.e. change
+                //   start node back to root node, and then GetChildEntities method will take care of the rest.
+                if (IsDialog(queryStrings) == false && hasAccessToRoot == false)
+                    id = rootIdString;
             }
 
+            // get child entities - if id is root, but user's start nodes do not contain the
+            // root node, this returns the start nodes instead of root's children
             var entities = GetChildEntities(id).ToList();
+            nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
 
-            //If we are looking up the root and there is more than one node ...
-            //then we want to lookup those nodes' 'site' nodes and render those so that the
-            //user has some context of where they are in the tree, this is generally for pickers in a dialog.
-            //for any node they don't have access too, we need to add some metadata
-            if (id == rootIdString && entities.Count > 1)
+            // if the user does not have access to the root node, what we have is the start nodes,
+            // but to provide some context we also need to add their topmost nodes when they are not
+            // topmost nodes themselves (level > 1).
+            if (id == rootIdString && hasAccessToRoot == false)
             {
-                var siteNodeIds = new List<int>();
-                //put into array since we might modify the list
-                foreach (var e in entities.ToArray())
+                var topNodeIds = entities.Where(x => x.Level > 1).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
+                if (topNodeIds.Length > 0)
                 {
-                    var pathParts = e.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-                    if (pathParts.Length < 2)
-                        continue; // this should never happen but better to check
-
-                    int siteNodeId;
-                    if (int.TryParse(pathParts[1], out siteNodeId) == false)
-                        continue;
-
-                    //we'll look up this
-                    siteNodeIds.Add(siteNodeId);
+                    var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
+                    nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
                 }
-                var siteNodes = Services.EntityService.GetAll(UmbracoObjectType, siteNodeIds.ToArray())
-                    .DistinctBy(e => e.Id)
-                    .ToArray();
-
-                //add site nodes
-                nodes.AddRange(siteNodes.Select(e => GetSingleTreeNodeWithAccessCheck(e, id, queryStrings)).Where(node => node != null));
-
-                return nodes;
             }
 
-            nodes.AddRange(entities.Select(e => GetSingleTreeNodeWithAccessCheck(e, id, queryStrings)).Where(node => node != null));
             return nodes;
+        }
+
+        private static readonly char[] Comma = { ',' };
+
+        private int GetTopNodeId(IUmbracoEntity entity)
+        {
+            int id;
+            var parts = entity.Path.Split(Comma, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length >= 2 && int.TryParse(parts[1], out id) ? id : 0;
         }
 
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
@@ -187,27 +183,27 @@ namespace Umbraco.Web.Trees
 
         protected IEnumerable<IEntitySlim> GetChildEntities(string id)
         {
-            // use helper method to ensure we support both integer and guid lookups
-
-            if (int.TryParse(id, out int iid) == false)
+            // try to parse id as an integer else use GetEntityFromId
+            // which will grok Guids, Udis, etc and let use obtain the id
+            if (int.TryParse(id, out var entityId) == false)
             {
-                var idEntity = GetEntityFromId(id);
-                if (idEntity == null)
+                var entity = GetEntityFromId(id);
+                if (entity == null)
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                iid = idEntity.Id;
+                entityId = entity.Id;
             }
 
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
-            if (iid == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
+            if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 return UserStartNodes.Length > 0
                     ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
                     : Enumerable.Empty<IEntitySlim>();
             }
 
-            return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
+            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
         }
 
         /// <summary>

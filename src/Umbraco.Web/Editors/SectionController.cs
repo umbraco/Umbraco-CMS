@@ -50,7 +50,7 @@ namespace Umbraco.Web.Editors
                 {
                     //get the first tree in the section and get it's root node route path
                     var sectionTrees = appTreeController.GetApplicationTrees(section.Alias, null, null).Result;
-                    section.RoutePath = sectionTrees.IsContainer == false
+                    section.RoutePath = sectionTrees.IsContainer == false || sectionTrees.Children.Count == 0
                         ? sectionTrees.RoutePath
                         : sectionTrees.Children[0].RoutePath;
                 }

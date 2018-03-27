@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -24,6 +25,17 @@ namespace Umbraco.Web.Scheduling
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
+            // not on slaves nor unknown role servers
+            switch (_runtime.ServerRole)
+            {
+                case ServerRole.Slave:
+                    _logger.Debug<KeepAlive>("Does not run on slave servers.");
+                    return true; // role may change!
+                case ServerRole.Unknown:
+                    _logger.Debug<KeepAlive>("Does not run on servers with unknown role.");
+                    return true; // role may change!
+            }
+
             // ensure we do not run if not main domain, but do NOT lock it
             if (_runtime.IsMainDom == false)
             {

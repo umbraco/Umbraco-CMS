@@ -141,7 +141,7 @@ namespace Umbraco.Web.Trees
                     else
                     {
                         // if that doesn't work, try to get the legacy confirm view
-                        var attempt2 = GetLegacyConfirmView(currentAction, currentSection);
+                        var attempt2 = GetLegacyConfirmView(currentAction);
                         if (attempt2)
                         {
                             var view = attempt2.Result;
@@ -177,9 +177,8 @@ namespace Umbraco.Web.Trees
         /// This will look at the legacy IAction's JsFunctionName and convert it to a confirmation dialog view if possible
         /// </summary>
         /// <param name="action"></param>
-        /// <param name="currentSection"></param>
         /// <returns></returns>
-        internal static Attempt<string> GetLegacyConfirmView(IAction action, string currentSection)
+        internal static Attempt<string> GetLegacyConfirmView(IAction action)
         {
             if (action.JsFunctionName.IsNullOrWhiteSpace())
             {

@@ -33,10 +33,8 @@ namespace Umbraco.Web.Mvc
         // fixme - that one could / should accept a PublishedRouter (engine) to work on the PublishedRequest (published content request)
         public RenderRouteHandler(IUmbracoContextAccessor umbracoContextAccessor, IControllerFactory controllerFactory)
         {
-            if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            if (controllerFactory == null) throw new ArgumentNullException(nameof(controllerFactory));
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _controllerFactory = controllerFactory;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
         }
 
         // fixme - what about that one?
@@ -45,10 +43,8 @@ namespace Umbraco.Web.Mvc
         //   UmbracoComponentRenderer - ?? that one is not so obvious
         public RenderRouteHandler(UmbracoContext umbracoContext, IControllerFactory controllerFactory)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (controllerFactory == null) throw new ArgumentNullException(nameof(controllerFactory));
-            _umbracoContext = umbracoContext;
-            _controllerFactory = controllerFactory;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _controllerFactory = controllerFactory ?? throw new ArgumentNullException(nameof(controllerFactory));
         }
 
         private UmbracoContext UmbracoContext => _umbracoContext ?? _umbracoContextAccessor.UmbracoContext;
@@ -65,12 +61,12 @@ namespace Umbraco.Web.Mvc
         {
             if (UmbracoContext == null)
             {
-                throw new NullReferenceException("There is not current UmbracoContext, it must be initialized before the RenderRouteHandler executes");
+                throw new NullReferenceException("There is no current UmbracoContext, it must be initialized before the RenderRouteHandler executes");
             }
             var request = UmbracoContext.PublishedRequest;
             if (request == null)
             {
-                throw new NullReferenceException("There is not current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
+                throw new NullReferenceException("There is no current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
             }
 
             SetupRouteDataForRequest(
@@ -394,7 +390,7 @@ namespace Umbraco.Web.Mvc
 
             //here we need to check if there is no hijacked route and no template assigned, if this is the case
             //we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            if (request.HasTemplate == false && routeDef.HasHijackedRoute == false)
+            if (!request.HasTemplate && !routeDef.HasHijackedRoute && !_features.Enabled.RenderNoTemplate)
             {
                 // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
                 var engine = Core.Composing.Current.Container.GetInstance<PublishedRouter>();
@@ -455,7 +451,5 @@ namespace Umbraco.Web.Mvc
         {
             return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
         }
-
-
     }
 }

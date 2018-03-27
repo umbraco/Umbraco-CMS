@@ -19,8 +19,9 @@ namespace Umbraco.Web.Composing.CompositionRoots
             container.Register<SectionMapperProfile>();
             container.Register<TagMapperProfile>();
             container.Register<UserMapperProfile>();
-            container.Register<DashboardMapperProfile>();
             container.Register<TemplateMapperProfile>();
+            container.Register<RedirectUrlMapperProfile>();
+            container.Register<AuditMapperProfile>();
         }
     }
 }

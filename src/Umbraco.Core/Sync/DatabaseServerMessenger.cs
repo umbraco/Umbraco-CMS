@@ -43,7 +43,7 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
 
-        protected DatabaseServerMessengerOptions Options { get; }
+        public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
             IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, ILogger logger, ProfilingLogger proflog,
@@ -86,8 +86,7 @@ namespace Umbraco.Core.Sync
         {
             var idsA = ids?.ToArray();
 
-            Type idType;
-            if (GetArrayType(idsA, out idType) == false)
+            if (GetArrayType(idsA, out var idType) == false)
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
             var instructions = RefreshInstruction.GetInstructions(refresher, messageType, idsA, idType, json);

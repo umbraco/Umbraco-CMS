@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -214,6 +215,7 @@ namespace Umbraco.Web.Editors
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
             var http = EnsureHttpContext();
+            var owinContext = TryGetOwinContext().Result;
 
             //Sign the user in with username/password, this also gives a chance for developers to
             //custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
@@ -228,7 +230,7 @@ namespace Umbraco.Web.Editors
                     var user = Services.UserService.GetByUsername(loginModel.Username);
                     UserManager.RaiseLoginSuccessEvent(user.Id);
 
-                    return SetPrincipalAndReturnUserDetail(user);
+                    return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
                 case SignInStatus.RequiresVerification:
 
                     var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
@@ -241,7 +243,7 @@ namespace Umbraco.Web.Editors
                     }
 
                     var twofactorView = twofactorOptions.GetTwoFactorView(
-                        TryGetOwinContext().Result,
+                        owinContext,
                         UmbracoContext,
                         loginModel.Username);
 
@@ -372,13 +374,14 @@ namespace Umbraco.Web.Editors
             }
 
             var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: true, rememberBrowser: false);
+            var owinContext = TryGetOwinContext().Result;
 
             var user = Services.UserService.GetByUsername(userName);
             switch (result)
             {
                 case SignInStatus.Success:
                     UserManager.RaiseLoginSuccessEvent(user.Id);
-                    return SetPrincipalAndReturnUserDetail(user);
+                    return SetPrincipalAndReturnUserDetail(user, owinContext.Request.User);
                 case SignInStatus.LockedOut:
                     UserManager.RaiseAccountLockedEvent(user.Id);
                     return Request.CreateValidationErrorResponse("User is locked out");
@@ -437,13 +440,15 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
         {
-            Request.TryGetOwinContext().Result.Authentication.SignOut(
+            var owinContext = Request.TryGetOwinContext().Result;
+
+            owinContext.Authentication.SignOut(
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
             Logger.Info<AuthenticationController>("User {0} from IP address {1} has logged out",
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
-                            () => TryGetOwinContext().Result.Request.RemoteIpAddress);
+                            () => owinContext.Request.RemoteIpAddress);
 
             if (UserManager != null)
             {
@@ -459,10 +464,12 @@ namespace Umbraco.Web.Editors
         /// This is used when the user is auth'd successfully and we need to return an OK with user details along with setting the current Principal in the request
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="principal"></param>
         /// <returns></returns>
-        private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user)
+        private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user, IPrincipal principal)
         {
             if (user == null) throw new ArgumentNullException("user");
+            if (principal == null) throw new ArgumentNullException(nameof(principal));
 
             var userDetail = Mapper.Map<UserDetail>(user);
             //update the userDetail and set their remaining seconds
@@ -472,7 +479,7 @@ namespace Umbraco.Web.Editors
             var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
 
             //ensure the user is set for the current request
-            Request.SetPrincipalForRequest(user);
+            Request.SetPrincipalForRequest(principal);
 
             return response;
         }

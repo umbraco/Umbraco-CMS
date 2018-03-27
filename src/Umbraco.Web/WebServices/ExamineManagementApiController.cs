@@ -8,7 +8,9 @@ using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.Providers;
+using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Lucene.Net.Store;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -195,18 +197,39 @@ namespace Umbraco.Web.WebServices
                 {
                     indexer.RebuildIndex();
                 }
+                // fixme - Examine issues
+                // cannot enable that piece of code from v7 as Index.Write.Unlock does not seem to exist anymore?
+                //catch (LockObtainFailedException)
+                //{
+                //    //this will occur if the index is locked (which it should defo not be!) so in this case we'll forcibly unlock it and try again
+
+                //    try
+                //    {
+                //        IndexWriter.Unlock(indexer.GetLuceneDirectory());
+                //        indexer.RebuildIndex();
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        return HandleException(e, indexer);
+                //    }
+                //}
                 catch (Exception ex)
                 {
-                    //ensure it's not listening
-                    indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                    Logger.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
-                    var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                    response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
-                    response.ReasonPhrase = "Could Not Rebuild";
-                    return response;
+                    return HandleException(ex, indexer);
                 }
             }
             return msg;
+        }
+
+        private HttpResponseMessage HandleException(Exception ex, LuceneIndexer indexer)
+        {
+            //ensure it's not listening
+            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+            Logger.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
+            var response = Request.CreateResponse(HttpStatusCode.Conflict);
+            response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
+            response.ReasonPhrase = "Could Not Rebuild";
+            return response;
         }
 
         //static listener so it's not GC'd

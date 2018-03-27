@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Linq;
 using Newtonsoft.Json;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class MemberGroupCacheRefresher : JsonCacheRefresherBase<MemberGroupCacheRefresher>
     {
-        private readonly IMemberGroupService _memberGroupService;
-
-        public MemberGroupCacheRefresher(CacheHelper cacheHelper, IMemberGroupService memberGroupService)
+        public MemberGroupCacheRefresher(CacheHelper cacheHelper)
             : base(cacheHelper)
-        {
-            _memberGroupService = memberGroupService;
-        }
+        { }
 
         #region Define
 
@@ -36,39 +28,28 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(string json)
         {
-            var payload = Deserialize(json);
-            ClearCache(payload);
+            ClearCache();
             base.Refresh(json);
         }
 
         public override void Refresh(int id)
         {
-            var group = _memberGroupService.GetById(id);
-            if (group != null)
-                ClearCache(new JsonPayload(group.Id, group.Name));
+            ClearCache();
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            var group = _memberGroupService.GetById(id);
-            if (group != null)
-                ClearCache(new JsonPayload(group.Id, group.Name));
+            ClearCache();
             base.Remove(id);
         }
 
-        private void ClearCache(params JsonPayload[] payloads)
+        private void ClearCache()
         {
-            if (payloads == null) return;
-
-            var memberGroupCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMemberGroup>();
-            if (memberGroupCache == false) return;
-
-            foreach (var payload in payloads.WhereNotNull())
-            {
-                memberGroupCache.Result.ClearCacheByKeySearch($"{typeof(IMemberGroup).FullName}.{payload.Name}");
-                memberGroupCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMemberGroup>(payload.Id));
-            }
+            // Since we cache by group name, it could be problematic when renaming to
+            // previously existing names - see http://issues.umbraco.org/issue/U4-10846.
+            // To work around this, just clear all the cache items
+            CacheHelper.IsolatedRuntimeCache.ClearCache<IMemberGroup>();
         }
 
         #endregion

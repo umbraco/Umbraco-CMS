@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
@@ -24,7 +22,7 @@ namespace Umbraco.Web.Scheduling
             _logger = logger;
         }
 
-        public override async Task<bool> PerformRunAsync(CancellationToken token)
+        public override bool PerformRun()
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
                 return true; // repeat, later
@@ -46,15 +44,21 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
+            // do NOT run publishing if not properly running
+            if (_runtime.Level != RuntimeLevel.Run)
+            {
+                _logger.Debug<ScheduledPublishing>("Does not run if run level is not Run.");
+                return true; // repeat/wait
+            }
+
             try
             {
-                // DO not run publishing if content is re-loading
-                if (_runtime.Level != RuntimeLevel.Run)
-                {
-                    var publisher = new ScheduledPublisher(_contentService, _logger);
-                    var count = publisher.CheckPendingAndProcess();
-                    _logger.Warn<ScheduledPublishing>("No url for service (yet), skip.");
-                }
+                // run
+                // fixme context & events during scheduled publishing?
+                // in v7 we create an UmbracoContext and an HttpContext, and cache instructions
+                // are batched, and we have to explicitely flush them, how is it going to work here?
+                var publisher = new ScheduledPublisher(_contentService, _logger);
+                var count = publisher.CheckPendingAndProcess();
             }
             catch (Exception e)
             {
@@ -64,6 +68,6 @@ namespace Umbraco.Web.Scheduling
             return true; // repeat
         }
 
-        public override bool IsAsync => true;
+        public override bool IsAsync => false;
     }
 }

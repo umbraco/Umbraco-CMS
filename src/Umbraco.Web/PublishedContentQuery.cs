@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Xml.XPath;
+using Examine.LuceneEngine.Providers;
+using Examine.LuceneEngine.SearchCriteria;
+using Examine.SearchCriteria;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
@@ -27,10 +31,8 @@ namespace Umbraco.Web
         /// <param name="mediaCache"></param>
         public PublishedContentQuery(IPublishedContentCache contentCache, IPublishedMediaCache mediaCache)
         {
-            if (contentCache == null) throw new ArgumentNullException(nameof(contentCache));
-            if (mediaCache == null) throw new ArgumentNullException(nameof(mediaCache));
-            _contentCache = contentCache;
-            _mediaCache = mediaCache;
+            _contentCache = contentCache ?? throw new ArgumentNullException(nameof(contentCache));
+            _mediaCache = mediaCache ?? throw new ArgumentNullException(nameof(mediaCache));
         }
 
         /// <summary>
@@ -39,8 +41,7 @@ namespace Umbraco.Web
         /// <param name="query"></param>
         public PublishedContentQuery(IPublishedContentQuery query)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
-            _query = query;
+            _query = query ?? throw new ArgumentNullException(nameof(query));
         }
 
         #region Content
@@ -217,41 +218,102 @@ namespace Umbraco.Web
 
         #region Search
 
-        /// <summary>
-        /// Searches content
-        /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null)
         {
-            if (_query != null) return _query.Search(term, useWildCards, searchProvider);
+            return Search(0, 0, out _, term, useWildCards, searchProvider);
+        }
 
-            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (string.IsNullOrEmpty(searchProvider) == false)
-                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        {
+            if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, searchProvider);
 
-            var results = searcher.Search(term, useWildCards);
+            var searcher = string.IsNullOrWhiteSpace(searchProvider)
+                ? Examine.ExamineManager.Instance.DefaultSearchProvider
+                : Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+            if (skip == 0 && take == 0)
+            {
+                var results = searcher.Search(term, useWildCards);
+                totalRecords = results.TotalItemCount;
+                return results.ToPublishedSearchResults(_contentCache);
+            }
+
+            if (!(searcher is BaseLuceneSearcher luceneSearcher))
+            {
+                var results = searcher.Search(term, useWildCards);
+                totalRecords = results.TotalItemCount;
+                // Examine skip, Linq take
+                return results.Skip(skip).ToPublishedSearchResults(_contentCache).Take(take);
+            }
+
+            var criteria = SearchAllFields(term, useWildCards, luceneSearcher);
+            return Search(skip, take, out totalRecords, criteria, searcher);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            return Search(0, 0, out _, criteria, searchProvider);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            if (_query != null) return _query.Search(skip, take, out totalRecords, criteria, searchProvider);
+
+            var searcher = searchProvider ?? Examine.ExamineManager.Instance.DefaultSearchProvider;
+
+            var results = skip == 0 && take == 0
+                ? searcher.Search(criteria)
+                : searcher.Search(criteria, maxResults: skip + take);
+
+            totalRecords = results.TotalItemCount;
             return results.ToPublishedSearchResults(_contentCache);
         }
 
         /// <summary>
-        /// Searhes content
+        /// Creates an ISearchCriteria for searching all fields in a <see cref="BaseLuceneSearcher"/>.
         /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
-        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        /// <remarks>
+        /// This is here because some of this stuff is internal in Examine.
+        /// </remarks>
+        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, BaseLuceneSearcher searcher)
         {
-            if (_query != null) return _query.Search(criteria, searchProvider);
+            var sc = searcher.CreateSearchCriteria();
 
-            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (searchProvider != null)
-                s = searchProvider;
+            if (_examineGetSearchFields == null)
+            {
+                //get the GetSearchFields method from BaseLuceneSearcher
+                _examineGetSearchFields = typeof(BaseLuceneSearcher).GetMethod("GetSearchFields", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            }
 
-            var results = s.Search(criteria);
-            return results.ToPublishedSearchResults(_contentCache);
+            //get the results of searcher.BaseLuceneSearcher() using ugly reflection since it's not public
+            var searchFields = (IEnumerable<string>) _examineGetSearchFields.Invoke(searcher, null);
+
+            //this is what Examine does internally to create ISearchCriteria for searching all fields
+            var strArray = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            sc = useWildcards == false
+                ? sc.GroupedOr(searchFields, strArray).Compile()
+                : sc.GroupedOr(searchFields, strArray.Select(x => new CustomExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray<IExamineValue>()).Compile();
+            return sc;
+        }
+
+        private static MethodInfo _examineGetSearchFields;
+
+        //support class since Examine doesn't expose it's own ExamineValue class publicly
+        private class CustomExamineValue : IExamineValue
+        {
+            public CustomExamineValue(Examineness vagueness, string value)
+            {
+                this.Examineness = vagueness;
+                this.Value = value;
+                this.Level = 1f;
+            }
+            public Examineness Examineness { get; private set; }
+            public string Value { get; private set; }
+            public float Level { get; private set; }
         }
 
         #endregion

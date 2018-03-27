@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Examine;
+using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
@@ -14,13 +14,11 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
-using LightInject;
-using Umbraco.Core.Exceptions;
-using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Components
 {
     /// <summary>
     /// Ensures that servers are automatically registered in the database, when using the database server registrar.
@@ -38,13 +36,14 @@ namespace Umbraco.Web.Strategies
     {
         private object _locker = new object();
         private DatabaseServerRegistrar _registrar;
+        private BatchedDatabaseServerMessenger _messenger;
         private IRuntimeState _runtime;
         private ILogger _logger;
         private IServerRegistrationService _registrationService;
-        private BackgroundTaskRunner<IBackgroundTask> _backgroundTaskRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _touchTaskRunner;
+        private BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
         private bool _started;
-        private TouchServerTask _task;
-        private IUmbracoDatabaseFactory _databaseFactory;
+        private IBackgroundTask[] _tasks;
 
         public override void Compose(Composition composition)
         {
@@ -102,24 +101,27 @@ namespace Umbraco.Web.Strategies
                 indexer.Value.RebuildIndex();
         }
 
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger)
         {
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
             _registrar = serverRegistrar as DatabaseServerRegistrar;
             if (_registrar == null) throw new Exception("panic: registar.");
 
+            _messenger = serverMessenger as BatchedDatabaseServerMessenger;
+            if (_messenger == null) throw new Exception("panic: messenger");
+
             _runtime = runtime;
-            _databaseFactory = databaseFactory;
             _logger = logger;
             _registrationService = registrationService;
 
-            _backgroundTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(
-                new BackgroundTaskRunnerOptions { AutoStart = true },
-                logger);
+            _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
+                new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
+            _processTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerInstProcess",
+                new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
 
             //We will start the whole process when a successful request is made
-            UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
+            UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
         }
 
         /// <summary>
@@ -133,39 +135,76 @@ namespace Umbraco.Web.Strategies
         /// - RegisterServer is called on UmbracoModule.RouteAttempt which is triggered in ProcessRequest
         ///      we are safe, UmbracoApplicationUrl has been initialized
         /// </remarks>
-        private void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
+        private void RegisterBackgroundTasksOnce(object sender, RoutableAttemptEventArgs e)
         {
             switch (e.Outcome)
             {
                 case EnsureRoutableOutcome.IsRoutable:
                 case EnsureRoutableOutcome.NotDocumentRequest:
-                    RegisterBackgroundTasks(e);
+                    UmbracoModule.RouteAttempt -= RegisterBackgroundTasksOnce;
+                    RegisterBackgroundTasks();
                     break;
             }
         }
 
-        private void RegisterBackgroundTasks(UmbracoRequestEventArgs e)
+        private void RegisterBackgroundTasks()
         {
-            // remove handler, we're done
-            UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
-
             // only perform this one time ever
-            LazyInitializer.EnsureInitialized(ref _task, ref _started, ref _locker, () =>
+            LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
                 var serverAddress = _runtime.ApplicationUrl.ToString();
-                var svc = _registrationService;
 
-                var task = new TouchServerTask(_backgroundTaskRunner,
-                    15000, //delay before first execution
-                    _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
-                    svc, _registrar, serverAddress, _databaseFactory, _logger);
-
-                // perform the rest async, we don't want to block the startup sequence
-                // this will just reoccur on a background thread
-                _backgroundTaskRunner.TryAdd(task);
-
-                return task;
+                return new[]
+                {
+                    RegisterInstructionProcess(),
+                    RegisterTouchServer(_registrationService, serverAddress)
+                };
             });
+        }
+
+        private IBackgroundTask RegisterInstructionProcess()
+        {
+            var task = new InstructionProcessTask(_processTaskRunner,
+                60000, //delay before first execution
+                _messenger.Options.ThrottleSeconds*1000, //amount of ms between executions
+                _messenger);
+            _processTaskRunner.TryAdd(task);
+            return task;
+        }
+
+        private IBackgroundTask RegisterTouchServer(IServerRegistrationService registrationService, string serverAddress)
+        {
+            var task = new TouchServerTask(_touchTaskRunner,
+                15000, //delay before first execution
+                _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
+                registrationService, _registrar, serverAddress, _logger);
+            _touchTaskRunner.TryAdd(task);
+            return task;
+        }
+
+        private class InstructionProcessTask : RecurringTaskBase
+        {
+            private readonly DatabaseServerMessenger _messenger;
+
+            public InstructionProcessTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
+                DatabaseServerMessenger messenger)
+                : base(runner, delayMilliseconds, periodMilliseconds)
+            {
+                _messenger = messenger;
+            }
+
+            public override bool IsAsync => false;
+
+            /// <summary>
+            /// Runs the background task.
+            /// </summary>
+            /// <returns>A value indicating whether to repeat the task.</returns>
+            public override bool PerformRun()
+            {
+                // TODO what happens in case of an exception?
+                _messenger.Sync();
+                return true; // repeat
+            }
         }
 
         private class TouchServerTask : RecurringTaskBase
@@ -173,30 +212,18 @@ namespace Umbraco.Web.Strategies
             private readonly IServerRegistrationService _svc;
             private readonly DatabaseServerRegistrar _registrar;
             private readonly string _serverAddress;
-            private readonly IUmbracoDatabaseFactory _databaseFactory;
             private readonly ILogger _logger;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
+            /// Initializes a new instance of the <see cref="TouchServerTask"/> class.
             /// </summary>
-            /// <param name="runner">The task runner.</param>
-            /// <param name="delayMilliseconds">The delay.</param>
-            /// <param name="periodMilliseconds">The period.</param>
-            /// <param name="svc"></param>
-            /// <param name="registrar"></param>
-            /// <param name="serverAddress"></param>
-            /// <param name="databaseContext"></param>
-            /// <param name="logger"></param>
-            /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
             public TouchServerTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
-                if (svc == null) throw new ArgumentNullException(nameof(svc));
-                _svc = svc;
+                _svc = svc ?? throw new ArgumentNullException(nameof(svc));
                 _registrar = registrar;
                 _serverAddress = serverAddress;
-                _databaseFactory = databaseFactory;
                 _logger = logger;
             }
 

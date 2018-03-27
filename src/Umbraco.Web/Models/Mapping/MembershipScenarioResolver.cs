@@ -9,9 +9,9 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class MembershipScenarioResolver
     {
-        private readonly Lazy<IMemberTypeService> _memberTypeService;
+        private readonly IMemberTypeService _memberTypeService;
 
-        public MembershipScenarioResolver(Lazy<IMemberTypeService> memberTypeService)
+        public MembershipScenarioResolver(IMemberTypeService memberTypeService)
         {
             _memberTypeService = memberTypeService;
         }
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 return MembershipScenario.NativeUmbraco;
             }
-            var memberType = _memberTypeService.Value.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+            var memberType = _memberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
             return memberType != null
                 ? MembershipScenario.CustomProviderWithUmbracoLink
                 : MembershipScenario.StandaloneCustomProvider;

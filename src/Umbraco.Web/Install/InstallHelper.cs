@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -45,7 +46,7 @@ namespace Umbraco.Web.Install
             {
                 // fixme - should NOT use current everywhere here - inject!
                 new NewInstallStep(_httpContext, Current.Services.UserService, _databaseBuilder),
-                new UpgradeStep(_databaseBuilder),
+                new UpgradeStep(),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState, Current.SqlContext, Current.ScopeProvider),
                 new Version73FileCleanup(_httpContext, _logger),

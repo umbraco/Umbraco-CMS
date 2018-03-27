@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Services;
 using Umbraco.Core.Components;
-using Umbraco.Web._Legacy.Actions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Web._Legacy.Actions;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Components
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class NotificationsComponent : UmbracoComponentBase, IUmbracoCoreComponent

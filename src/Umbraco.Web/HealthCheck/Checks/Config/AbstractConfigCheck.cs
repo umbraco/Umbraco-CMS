@@ -128,7 +128,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
-            var successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
+            var successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values);
 
             var configValue = _configurationService.GetConfigurationValue();
             if (configValue.Success == false)
@@ -143,6 +143,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             }
 
             CurrentValue = configValue.Result;
+
+            // need to update the successMessage with the CurrentValue
+            successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
 
             var valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
             if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)

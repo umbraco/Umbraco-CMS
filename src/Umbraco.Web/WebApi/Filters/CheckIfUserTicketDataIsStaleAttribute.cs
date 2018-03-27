@@ -20,6 +20,9 @@ namespace Umbraco.Web.WebApi.Filters
     /// to what is persisted for the current user and will update the current auth ticket with the correct data if required and output
     /// a custom response header for the UI to be notified of it.
     /// </summary>
+    /// <remarks>
+    /// This could/should be created as a filter on the BackOfficeCookieAuthenticationProvider just like the SecurityStampValidator does
+    /// </remarks>
     public sealed class CheckIfUserTicketDataIsStaleAttribute : ActionFilterAttribute
     {
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
@@ -107,12 +110,12 @@ namespace Umbraco.Web.WebApi.Filters
             if (owinCtx)
             {
                 var signInManager = owinCtx.Result.GetBackOfficeSignInManager();
-
-                //ensure the remainder of the request has the correct principal set
-                actionContext.Request.SetPrincipalForRequest(user);
-
+                
                 var backOfficeIdentityUser = Mapper.Map<BackOfficeIdentityUser>(user);
                 await signInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true, rememberBrowser: false);
+                
+                //ensure the remainder of the request has the correct principal set
+                actionContext.Request.SetPrincipalForRequest(owinCtx.Result.Request.User);
 
                 //flag that we've made changes
                 actionContext.Request.Properties[typeof(CheckIfUserTicketDataIsStaleAttribute).Name] = true;

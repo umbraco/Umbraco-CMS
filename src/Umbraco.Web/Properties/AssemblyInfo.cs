@@ -33,6 +33,9 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Umbraco.Forms.Core.Providers")]
 [assembly: InternalsVisibleTo("Umbraco.Forms.Web")]
 
+// Umbraco Headless
+[assembly: InternalsVisibleTo("Umbraco.Headless")]
+
 // v8
 [assembly: InternalsVisibleTo("Umbraco.Compat7")]
 

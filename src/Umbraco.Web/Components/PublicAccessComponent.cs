@@ -4,7 +4,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Components
 {
     /// <summary>
     /// Used to ensure that the public access data file is kept up to date properly

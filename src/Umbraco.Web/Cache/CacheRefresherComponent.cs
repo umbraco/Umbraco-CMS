@@ -32,7 +32,7 @@ namespace Umbraco.Web.Cache
     [RequiredComponent(typeof(IUmbracoCoreComponent))] // runs before every other IUmbracoCoreComponent!
     public class CacheRefresherComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        private static readonly ConcurrentDictionary<IEventDefinition, MethodInfo> FoundHandlers = new ConcurrentDictionary<IEventDefinition, MethodInfo>();
+        private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();
         private DistributedCache _distributedCache;
         private List<Action> _unbinders;
 
@@ -195,7 +195,7 @@ namespace Umbraco.Web.Cache
         {
             var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
 
-            return FoundHandlers.GetOrAdd(eventDefinition, _ => CandidateHandlers.Value.FirstOrDefault(x => x.Name == name));
+            return FoundHandlers.GetOrAdd(name, n => CandidateHandlers.Value.FirstOrDefault(x => x.Name == n));
         }
 
         private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
@@ -480,10 +480,10 @@ namespace Umbraco.Web.Cache
                 _distributedCache.RemoveUserCache(entity.Id);
         }
 
-        private void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
+        private void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<UserGroupWithUsers> e)
         {
             foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshUserGroupCache(entity.Id);
+                _distributedCache.RefreshUserGroupCache(entity.UserGroup.Id);
         }
 
         private void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)

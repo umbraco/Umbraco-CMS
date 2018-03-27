@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebApi
 {
@@ -16,6 +17,7 @@ namespace Umbraco.Web.WebApi
     /// Provides a base class for Umbraco API controllers.
     /// </summary>
     /// <remarks>These controllers are NOT auto-routed.</remarks>
+    [FeatureAuthorize]
     public abstract class UmbracoApiControllerBase : ApiController
     {
         private UmbracoHelper _umbracoHelper;

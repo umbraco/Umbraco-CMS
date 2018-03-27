@@ -16,6 +16,11 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     public class ContentModelBinder : DefaultModelBinder, IModelBinderProvider
     {
+        // use Instance
+        private ContentModelBinder() { }
+
+        public static ContentModelBinder Instance = new ContentModelBinder();
+
         /// <summary>
         /// Binds the model to a value by using the specified controller context and binding context.
         /// </summary>
@@ -119,6 +124,7 @@ namespace Umbraco.Web.Mvc
         {
             var msg = new StringBuilder();
 
+            // prepare message
             msg.Append("Cannot bind source");
             if (sourceContent) msg.Append(" content");
             msg.Append(" type ");
@@ -129,22 +135,17 @@ namespace Umbraco.Web.Mvc
             msg.Append(modelType.FullName);
             msg.Append(".");
 
-            // compare FullName for the time being because when upgrading ModelsBuilder,
-            // Umbraco does not know about the new attribute type - later on, can compare
-            // on type directly (ie after v7.4.2).
-            var sourceAttr = sourceType.Assembly.CustomAttributes.FirstOrDefault(x =>
-                x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
-            var modelAttr = modelType.Assembly.CustomAttributes.FirstOrDefault(x =>
-                x.AttributeType.FullName == "Umbraco.ModelsBuilder.PureLiveAssemblyAttribute");
+// raise event, to give model factories a chance at reporting
+            // the error with more details, and optionally request that
+            // the application restarts.
 
-            // bah.. names are App_Web_all.generated.cs.8f9494c4.jjuvxz55 so they ARE different, fuck!
-            // we cannot compare purely on type.FullName 'cos we might be trying to map Sub to Main = fails!
-            if (sourceAttr != null && modelAttr != null
-                && sourceType.Assembly.GetName().Version.Revision != modelType.Assembly.GetName().Version.Revision)
+            var args = new ModelBindingArgs(sourceType, modelType, msg);
+            ModelBindingException?.Invoke(Instance, args);
+
+            if (args.Restart)
             {
-                msg.Append(" Types come from two PureLive assemblies with different versions,");
-                msg.Append(" this usually indicates that the application is in an unstable state.");
-                msg.Append(" The application is restarting now, reload the page and it should work.");
+                msg.Append(" The application is restarting now.");
+
                 var context = HttpContext.Current;
                 if (context == null)
                     AppDomain.Unload(AppDomain.CurrentDomain);
@@ -167,5 +168,47 @@ namespace Umbraco.Web.Mvc
             if (typeof(IPublishedContent).IsAssignableFrom(modelType)) return this;
             return null;
         }
+
+        /// <summary>
+        /// Contains event data for the <see cref="ModelBindingException"/> event.
+        /// </summary>
+        public class ModelBindingArgs : EventArgs
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ModelBindingArgs"/> class.
+            /// </summary>
+            public ModelBindingArgs(Type sourceType, Type modelType, StringBuilder message)
+            {
+                SourceType = sourceType;
+                ModelType = modelType;
+                Message = message;
+            }
+
+            /// <summary>
+            /// Gets the type of the source object.
+            /// </summary>
+            public Type SourceType { get; set; }
+
+            /// <summary>
+            /// Gets the type of the view model.
+            /// </summary>
+            public Type ModelType { get; set; }
+
+            /// <summary>
+            /// Gets the message string builder.
+            /// </summary>
+            /// <remarks>Handlers of the event can append text to the message.</remarks>
+            public StringBuilder Message { get; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the application should restart.
+            /// </summary>
+            public bool Restart { get; set; }
+        }
+
+        /// <summary>
+        /// Occurs on model binding exceptions.
+        /// </summary>
+        public static event EventHandler<ModelBindingArgs> ModelBindingException;
     }
 }

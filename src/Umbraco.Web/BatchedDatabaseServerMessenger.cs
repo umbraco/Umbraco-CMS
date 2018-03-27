@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
-using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Sync;
@@ -39,7 +38,6 @@ namespace Umbraco.Web
         internal void Startup()
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
-            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
 
             if (_databaseFactory.CanConnect == false)
             {
@@ -49,23 +47,6 @@ namespace Umbraco.Web
             else
             {
                 Boot();
-            }
-        }
-
-        private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
-        {
-            // as long as umbraco is ready & configured, sync
-            switch (e.Outcome)
-            {
-                case EnsureRoutableOutcome.IsRoutable:
-                case EnsureRoutableOutcome.NotDocumentRequest:
-                case EnsureRoutableOutcome.NoContent:
-                    Sync();
-                    break;
-                //case EnsureRoutableOutcome.NotReady:
-                //case EnsureRoutableOutcome.NotConfigured:
-                //default:
-                //    break;
             }
         }
 
@@ -108,7 +89,8 @@ namespace Umbraco.Web
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
             using (var scope = ScopeProvider.CreateScope())

@@ -11,33 +11,34 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ActionButtonsResolver
     {
-        private readonly Lazy<IUserService> _userService;
-
-        public ActionButtonsResolver(Lazy<IUserService> userService)
+        public ActionButtonsResolver(IUserService userService, IContentService contentService)
         {
-            _userService = userService;
+            UserService = userService;
+            ContentService = contentService;
         }
+
+        private IUserService UserService { get; }
+        private IContentService ContentService { get; }
 
         public IEnumerable<string> Resolve(IContent source)
         {
+            //cannot check permissions without a context
             if (UmbracoContext.Current == null)
-            {
-                //cannot check permissions without a context
                 return Enumerable.Empty<string>();
+
+            string path;
+            if (source.HasIdentity)
+                path = source.Path;
+            else
+            {
+                var parent = ContentService.GetById(source.ParentId);
+                path = parent == null ? "-1" : parent.Path;
             }
-            var svc = _userService.Value;
 
-            var permissions = svc.GetPermissions(
-                    //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
-                    // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
-                    // refrence exception :(
-                    UmbracoContext.Current.Security.CurrentUser,
-                    // Here we need to do a special check since this could be new content, in which case we need to get the permissions
-                    // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
-                    source.HasIdentity ? source.Id : source.ParentId)
-                .GetAllPermissions();
-
-            return permissions;
+            //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
+            // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
+            // refrence exception :(
+            return UserService.GetPermissionsForPath(UmbracoContext.Current.Security.CurrentUser, path).GetAllPermissions();
         }
     }
 }
