@@ -254,6 +254,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             this.removeChildNodes(args.node);
             args.node.loading = true;
 
+            var self = this;
             return this.getChildren(args)
                 .then(function(data) {
 
@@ -263,6 +264,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     if (args.node.children && args.node.children.length > 0) {
                         args.node.expanded = true;
                         args.node.hasChildren = true;
+                    }
+
+                    if (angular.isFunction(args.node.updateNodeData)) {
+                        args.node.updateNodeData();
                     }
                     return data;
 
