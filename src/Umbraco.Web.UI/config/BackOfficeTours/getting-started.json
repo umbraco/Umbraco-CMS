@@ -128,7 +128,7 @@
             {
                 "element": "#dialog [data-element='action-documentType']",
                 "title": "Create Document Type",
-                "content": "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type</p><p>You will use the template in a later tour render content.</p>",
+                "content": "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type.</p><p>You will use the template in a later tour render content.</p>",
                 "event": "click"
             },
             {
@@ -151,13 +151,13 @@
             {
                 "element": "[data-element='group-name-field']",
                 "title": "Name the tab",
-                "content": "<p>Enter <code>Home</code> in the tab name.</p><p><em>You can name a tab anything you want and if you have a lot of properties it can be useful to add multiple tabs.</em></p>",
+                "content": "<p>Enter <code>Home</code> in the tab name.</p><p><em>You can name a tab anything you want. Also, if you have a lot of properties it can be useful to add multiple tabs.</em></p>",
                 "view": "tabName"
             },
             {
                 "element": "[data-element='property-add']",
                 "title": "Add a property",
-                "content": "<p>Properties are the different input fields on a content page.</p><p>On our Home Page we wan't to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
+                "content": "<p>Properties are the different input fields on a content page.</p><p>On our Home Page we want to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
                 "event": "click"
             },
             {
@@ -169,7 +169,7 @@
             {
                 "element": "[data-element~='overlay-property-settings'] [data-element='property-description']",
                 "title": "Enter a description",
-                "content": "<p>A description will help to fill in the right content.</p><p>Enter a description for the property editor. It could be:<br/> <pre>Write a nice introduction text so the visitors feel welcome</pre></p>"
+                "content": "<p>A good description will help ensure it gets filled with the right content.</p><p>Enter a description for the property editor. It could be:<br/> <pre>Write a nice introduction text so the visitors feel welcome</pre></p>"
             },
             {
                 "element": "[data-element~='overlay-property-settings'] [data-element='editor-add']",
@@ -181,7 +181,7 @@
                 "element": "[data-element~='overlay-editor-picker']",
                 "elementPreventClick": true,
                 "title": "Editor picker",
-                "content": "<p>In the editor picker dialog we can pick one of the many build in editor.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em></p>"
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p><p><em>You can choose from preconfigured data types (Reuse tab) or create a new configuration (Available editors tab).</em></p>"
             },
             {
                 "element": "[data-element~='overlay-editor-picker'] [data-element='editor-Textarea']",
@@ -193,7 +193,7 @@
                 "element": "[data-element~='overlay-editor-settings']",
                 "elementPreventClick": true,
                 "title": "Editor settings",
-                "content": "Each property editor can have individual settings. For the textarea editor you can set a charachter limit but in this case it is not needed"
+                "content": "Each property editor can have individual settings. For example: the textarea editor can take a character limit, but in this case it is not needed."
             },
             {
                 "element": "[data-element~='overlay-editor-settings'] [data-element='button-overlaySubmit']",
