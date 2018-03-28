@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Web.Http;
 using Examine;
 using Examine.LuceneEngine;
@@ -115,6 +117,7 @@ namespace Umbraco.Web.WebServices
                     var props = TypeHelper.CachedDiscoverableProperties(searcher.GetType(), mustWrite: false)
                         //ignore these properties
                         .Where(x => new[] {"Description"}.InvariantContains(x.Name) == false)
+                        .Where(x => x.GetCustomAttribute<EditorBrowsableAttribute>()?.State != EditorBrowsableState.Never)
                         .OrderBy(x => x.Name);
                     foreach (var p in props)
                     {
