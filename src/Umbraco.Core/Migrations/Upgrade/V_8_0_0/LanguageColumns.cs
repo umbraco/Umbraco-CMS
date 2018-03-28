@@ -4,7 +4,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
     public class LanguageColumns : MigrationBase
     {
-        protected LanguageColumns(IMigrationContext context)
+        public LanguageColumns(IMigrationContext context)
             : base(context)
         { }
 
