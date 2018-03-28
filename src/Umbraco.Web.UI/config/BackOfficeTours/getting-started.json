@@ -291,13 +291,13 @@
         "steps": [
             {
                 "title": "Render your content in a template",
-                "content": "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from asp.net MVC. - This tour is a sneak peak on how to write templates in Umbraco.</p><p>In this tour you will learn how to render content from the <b>Home Page</b> document type so you can see the content added to our <b>Home</b> content page.</p>",
+                "content": "<p>Templating in Umbraco builds on the concept of <b>Razor Views</b> from asp.net MVC.</p><p>In this tour you will learn how to render content from the <b>Home Page</b> document type so you can see the content added to our <b>Home</b> content page.</p>",
                 "type": "intro"
             },
             {
                 "element": "#applications [data-element='section-settings']",
                 "title": "Navigate to the Settings section",
-                "content": "<p>In the <b>Settings</b> section you will find all the templates</p><p>It is of course also possible to edit all your code files in your favorite code editor.</p>",
+                "content": "<p>In the <b>Settings</b> section you will find all the templates.</p><p>It is of course also possible to edit all your code files in your favorite code editor.</p>",
                 "event": "click",
                 "backdropOpacity": 0.6
             },
@@ -319,7 +319,7 @@
             {
                 "element": "[data-element='editor-templates'] [data-element='code-editor']",
                 "title": "Edit template",
-                "content": "<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>&#60;h1&#62;@Model.Content.Name&#60;/h1&#62;<br>&#60;p&#62;@Model.Content.WelcomeText&#60;/p&#62;</pre></p>"
+                "content": "<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>&#60;h1&#62;@Model.Content.Name&#60;/h1&#62;<br>&#60;p&#62;@Model.Content.WelcomeText&#60;/p&#62;</pre>.</p>"
             },
             {
                 "element": "[data-element='editor-templates'] [data-element='button-save']",
