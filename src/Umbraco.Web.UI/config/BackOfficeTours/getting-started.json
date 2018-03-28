@@ -238,14 +238,14 @@
             {
                 "element": "#applications [data-element='section-content']",
                 "title": "Navigate to the Content section",
-                "content": "<p>In the <b>Content section</b> you can create and manage the content of the website.</p><p>The <b>Content section</b> contains the content of your website. Content is displayed as <b>nodes</b> in the content tree.</p>",
+                "content": "<p>Click on the <b>Content section</b> to create and manage the content of the website.</p><p>The <b>Content section</b> contains the content of your website. Content is displayed as <b>nodes</b> in the content tree.</p>",
                 "event": "click",
                 "backdropOpacity": 0.6
             },
             {
                 "element": "[data-element='tree-root']",
                 "title": "Open context menu",
-                "content": "<p>Open the context menu by hovering the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
+                "content": "<p>Open the context menu by hovering over the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
                 "event": "click",
                 "eventElement": "[data-element='tree-root'] [data-element='tree-item-options']"
             },
@@ -264,7 +264,7 @@
             {
                 "element": "[data-element='editor-content'] [data-element='property-welcomeText']",
                 "title": "Add a welcome text",
-                "content": "<p>Add content to the <b>Welcome Text</b> field</p><p>If you don't have any ideas here is a start:<br/> <pre>I am learning Umbraco. High Five I Rock #H5IR</pre>.</p>"
+                "content": "<p>Add content to the <b>Welcome Text</b> field.</p><p>If you don't have any ideas here is a start:<br/> <pre>I am learning Umbraco. High Five I Rock #H5IR</pre>.</p>"
             },
             {
                 "element": "[data-element='editor-content'] [data-element='button-saveAndPublish']",
