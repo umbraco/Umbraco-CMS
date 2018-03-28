@@ -264,11 +264,13 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     if (args.node.children && args.node.children.length > 0) {
                         args.node.expanded = true;
                         args.node.hasChildren = true;
+
+                        //make sure to update the UI with the new values
+                        if (angular.isFunction(args.node.updateNodeData)) {
+                            args.node.updateNodeData();
+                        }
                     }
 
-                    if (angular.isFunction(args.node.updateNodeData)) {
-                        args.node.updateNodeData();
-                    }
                     return data;
 
                 }, function(reason) {
