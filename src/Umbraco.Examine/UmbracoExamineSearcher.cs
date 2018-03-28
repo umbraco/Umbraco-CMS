@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Lucene.Net.Index;
 using Umbraco.Core.Composing;
 using Umbraco.Examine.Config;
 using Directory = Lucene.Net.Store.Directory;
@@ -17,8 +18,6 @@ namespace Umbraco.Examine
     /// </summary>
     public class UmbracoExamineSearcher : LuceneSearcher
     {
-
-        private string _name;
         private readonly bool _configBased = false;
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace Umbraco.Examine
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoExamineSearcher()
-            : base()
         {
             _configBased = true;
         }
@@ -34,10 +32,11 @@ namespace Umbraco.Examine
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="indexPath"></param>
         /// <param name="analyzer"></param>
-        public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
-            : base(indexPath, analyzer)
+        public UmbracoExamineSearcher(string name, DirectoryInfo indexPath, Analyzer analyzer)
+            : base(name, indexPath, analyzer)
         {
             _configBased = false;
         }
@@ -45,21 +44,20 @@ namespace Umbraco.Examine
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="luceneDirectory"></param>
         /// <param name="analyzer"></param>
-        public UmbracoExamineSearcher(Directory luceneDirectory, Analyzer analyzer)
-            : base(luceneDirectory, analyzer)
+        public UmbracoExamineSearcher(string name, Directory luceneDirectory, Analyzer analyzer)
+            : base(name, luceneDirectory, analyzer)
         {
             _configBased = false;
         }
 
-        //TODO: What about the NRT ctor?
-
-        /// <summary>
-        /// we override name because we need to manually set it if !CanInitialize()
-        /// since we cannot call base.Initialize in that case.
-        /// </summary>
-        public override string Name => _name;
+        /// <inheritdoc />
+        public UmbracoExamineSearcher(string name, IndexWriter writer, Analyzer analyzer) : base(name, writer, analyzer)
+        {
+            _configBased = false;
+        }
 
         /// <summary>
         /// Name of the Lucene.NET index set
@@ -73,9 +71,8 @@ namespace Umbraco.Examine
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            //ensure name is set
-            _name = name ?? throw new ArgumentNullException(nameof(name));
-
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            
             //We need to check if we actually can initialize, if not then don't continue
             if (CanInitialize() == false)
             {

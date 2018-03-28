@@ -57,6 +57,7 @@ namespace Umbraco.Examine
         /// <summary>
         /// Create an index at runtime
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="fieldDefinitions"></param>
         /// <param name="luceneDirectory"></param>
         /// <param name="defaultAnalyzer"></param>
@@ -70,6 +71,7 @@ namespace Umbraco.Examine
         /// <param name="options"></param>
         /// <param name="indexValueTypes"></param>
         public UmbracoContentIndexer(
+            string name,
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
@@ -82,7 +84,7 @@ namespace Umbraco.Examine
             IValueSetValidator validator,
             UmbracoContentIndexerOptions options,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
-            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
+            : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, profilingLogger, validator, indexValueTypes)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             if (options == null) throw new ArgumentNullException(nameof(options));
@@ -342,9 +344,21 @@ namespace Umbraco.Examine
                     {"template", new object[] {c.Template?.Id ?? 0}}
                 };
 
-                foreach (var property in c.Properties.Where(p => p?.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in c.Properties)
                 {
-                    values.Add(property.Alias, new[] {property.GetValue() });
+                    //only add the value if its not null or empty (we'll check for string explicitly here too)
+                    var val = property.GetValue();
+                    switch (val)
+                    {
+                        case null:
+                            continue;
+                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                        default:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                    }
                 }
 
                 var vs = new ValueSet(c.Id.ToInvariantString(), IndexTypes.Content, c.ContentType.Alias, values);
@@ -376,9 +390,21 @@ namespace Umbraco.Examine
                     {"creatorName", new object[] {m.GetCreatorProfile(userService).Name}}
                 };
 
-                foreach (var property in m.Properties.Where(p => p?.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in m.Properties)
                 {
-                    values.Add(property.Alias, new[] { property.GetValue() });
+                    //only add the value if its not null or empty (we'll check for string explicitly here too)
+                    var val = property.GetValue();
+                    switch (val)
+                    {
+                        case null:
+                            continue;
+                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                        default:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                    }
                 }
 
                 var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Media, m.ContentType.Alias, values);

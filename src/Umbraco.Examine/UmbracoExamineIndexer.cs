@@ -72,13 +72,14 @@ namespace Umbraco.Examine
         }
 
         protected UmbracoExamineIndexer(
+            string name, 
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
             ProfilingLogger profilingLogger,
             IValueSetValidator validator = null,
             IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypes = null)
-            : base(fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
+            : base(name, fieldDefinitions, luceneDirectory, defaultAnalyzer, validator, indexValueTypes)
         {
             ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
         }
@@ -131,10 +132,10 @@ namespace Umbraco.Examine
             return base.CreateFieldValueTypes(x, indexValueTypesFactory);
         }
 
-        //TODO: Remove this?
-        [Obsolete("This should not be used, it is used by the configuration based indexes but instead to disable Examine event handlers use the ExamineEvents class instead.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool EnableDefaultEventHandler { get; protected set; }
+        /// <summary>
+        /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
+        /// </summary>
+        public bool EnableDefaultEventHandler { get; set; } = true;
         
         /// <summary>
         /// the supported indexable types
@@ -163,9 +164,7 @@ namespace Umbraco.Examine
         {
             ProfilingLogger.Logger.Debug(GetType(), "{0} indexer initializing", () => name);
 
-            EnableDefaultEventHandler = true; //set to true by default
-            bool enabled;
-            if (bool.TryParse(config["enableDefaultEventHandler"], out enabled))
+            if (config["enableDefaultEventHandler"] != null && bool.TryParse(config["enableDefaultEventHandler"], out var enabled))
             {
                 EnableDefaultEventHandler = enabled;
             }

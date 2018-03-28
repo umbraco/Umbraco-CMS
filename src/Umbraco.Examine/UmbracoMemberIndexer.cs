@@ -28,7 +28,6 @@ namespace Umbraco.Examine
         /// <summary>
         /// Constructor for config/provider based indexes
         /// </summary>
-        /// 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoMemberIndexer()
         {
@@ -38,6 +37,7 @@ namespace Umbraco.Examine
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="fieldDefinitions"></param>
         /// <param name="luceneDirectory"></param>
         /// <param name="profilingLogger"></param>
@@ -45,13 +45,14 @@ namespace Umbraco.Examine
         /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
         public UmbracoMemberIndexer(
+            string name, 
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
             IValueSetValidator validator,
             IMemberService memberService) :
-            base(fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
+            base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         }
@@ -140,9 +141,21 @@ namespace Umbraco.Examine
                     {"email", new object[] {m.Email}},
                 };
 
-                foreach (var property in m.Properties.Where(p => p?.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in m.Properties)
                 {
-                    values.Add(property.Alias, new[] { property.GetValue() });
+                    //only add the value if its not null or empty (we'll check for string explicitly here too)
+                    var val = property.GetValue();
+                    switch (val)
+                    {
+                        case null:
+                            continue;
+                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                        default:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                    }
                 }
 
                 var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Content, m.ContentType.Alias, values);

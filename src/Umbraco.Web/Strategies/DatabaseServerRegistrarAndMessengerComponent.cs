@@ -18,7 +18,9 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using LightInject;
 using Umbraco.Core.Exceptions;
+using Umbraco.Examine;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Strategies
 {
@@ -45,6 +47,7 @@ namespace Umbraco.Web.Strategies
         private bool _started;
         private TouchServerTask _task;
         private IUmbracoDatabaseFactory _databaseFactory;
+        private IExamineIndexCollectionAccessor _indexCollection;
 
         public override void Compose(Composition composition)
         {
@@ -77,38 +80,28 @@ namespace Umbraco.Web.Strategies
                                 // (we really should have a way to reuse RefreshAll... locally)
                                 // note: refresh all content & media caches does refresh content types too
                                 var svc = Current.PublishedSnapshotService;
-                                bool ignored1, ignored2;
                                 svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
-                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1, out ignored2);
-                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out ignored1);
+                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _, out _);
+                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _);
                             },
 
                             //rebuild indexes if the server is not synced
                             // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                             // indexes then they can adjust this logic themselves.
-                            () => RebuildIndexes(false)
+                            () => ExamineComponent.RebuildIndexes(false, _indexCollection, _logger)
                         }
                     });
             });
         }
 
-        // fixme - this should move to something else, we should not depend on Examine here!
-        private static void RebuildIndexes(bool onlyEmptyIndexes)
-        {
-            var indexers = (IEnumerable<KeyValuePair<string, IIndexer>>) ExamineManager.Instance.IndexProviders;
-            if (onlyEmptyIndexes)
-                indexers = indexers.Where(x => x.Value.IsIndexNew());
-            foreach (var indexer in indexers)
-                indexer.Value.RebuildIndex();
-        }
-
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, IUmbracoDatabaseFactory databaseFactory, ILogger logger, IExamineIndexCollectionAccessor indexCollection)
         {
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
             _registrar = serverRegistrar as DatabaseServerRegistrar;
             if (_registrar == null) throw new Exception("panic: registar.");
 
+            _indexCollection = indexCollection;
             _runtime = runtime;
             _databaseFactory = databaseFactory;
             _logger = logger;

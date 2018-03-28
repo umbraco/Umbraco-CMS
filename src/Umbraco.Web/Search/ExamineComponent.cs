@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,7 +7,9 @@ using System.Threading;
 using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine;
+using Examine.LuceneEngine.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
@@ -29,50 +32,67 @@ namespace Umbraco.Web.Search
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ILogger logger)
+        //fixme - we are injecting this which is nice, but we still use ExamineManager everywhere, we could instead interface IExamineManager?
+        private IExamineIndexCollectionAccessor _indexCollection;
+        private static bool _disableExamineIndexing = false;
+        private static volatile bool __isConfigured = false;
+        private static readonly object IsConfiguredLocker = new object();
+
+        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ProfilingLogger profilingLogger)
         {
-            logger.Info<ExamineComponent>("Starting initialize async background thread.");
+            _indexCollection = indexCollection;
 
-            // make it async in order not to slow down the boot
-            // fixme - should be a proper background task else we cannot stop it!
-            var bg = new Thread(() =>
+            //fixme we cannot inject MainDom since it's internal, so thsi is the only way we can get it, alternatively we can add the container to the container and resolve
+            //directly from the container but that's not nice either
+            if (!(runtime is RuntimeState coreRuntime))
+                throw new NotSupportedException($"Unsupported IRuntimeState implementation {runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
+
+            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
+            //and then we'll use MainDom to control Examine's shutdown
+            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
+
+            //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
+            //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
+            //which simply checks the existence of the lock file
+            DirectoryTracker.DefaultLockFactory = d =>
             {
-                try
+                var simpleFsLockFactory = new NoPrefixSimpleFsLockFactory(d);
+                return simpleFsLockFactory;
+            };
+            
+            //let's deal with shutting down Examine with MainDom
+            var examineShutdownRegistered = coreRuntime.MainDom.Register(() =>
+            {
+                using (profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
-                    // from WebRuntimeComponent
-                    // rebuilds any empty indexes
-                    RebuildIndexes(true);
-                }
-                catch (Exception e)
-                {
-                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
-                }
-
-                try
-                {
-                    // from PropertyEditorsComponent
-                    var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
-                    if (grid != null) BindGridToExamine(grid, indexCollection);
-                }
-                catch (Exception e)
-                {
-                    logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+                    //Due to the way Examine's own IRegisteredObject works, we'll first run it with immediate=false and then true so that
+                    //it's correct subroutines are executed (otherwise we'd have to run this logic manually ourselves)
+                    ExamineManager.Instance.Stop(false);
+                    ExamineManager.Instance.Stop(true);
                 }
             });
-            bg.Start();
 
-            // the rest is the original Examine event handler
+            if (!examineShutdownRegistered)
+            {
+                profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
-            logger.Info<ExamineComponent>("Initialize and bind to business logic events.");
-            
-            var registeredProviders = ExamineManager.Instance.IndexProviders
-                .OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
+                //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
+                Suspendable.ExamineEvents.SuspendIndexers();
+                _disableExamineIndexing = true;
+                return; //exit, do not continue
+            }
 
-            logger.Info<ExamineComponent>($"Adding examine event handlers for {registeredProviders} index providers.");
+            profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
+
+            var registeredIndexers = indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
+
+            profilingLogger.Logger.Info<ExamineComponent>($"Adding examine event handlers for {registeredIndexers} index providers.");
 
             // don't bind event handlers if we're not suppose to listen
-            if (registeredProviders == 0)
+            if (registeredIndexers == 0)
                 return;
+
+            BindGridToExamine(profilingLogger.Logger, indexCollection, propertyEditors);
 
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
@@ -83,26 +103,124 @@ namespace Umbraco.Web.Search
             // fixme - content type?
             // events handling removed in ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
             // because, could not make sense of it?
+
+            EnsureUnlocked(profilingLogger.Logger, indexCollection);
+
+            RebuildIndexesOnStartup(profilingLogger.Logger);
         }
 
-        private static void RebuildIndexes(bool onlyEmptyIndexes)
+        /// <summary>
+        /// Called to rebuild empty indexes on startup
+        /// </summary>
+        /// <param name="logger"></param>
+        private void RebuildIndexesOnStartup(ILogger logger)
         {
-            var indexers = ExamineManager.Instance.IndexProviders;
+            //TODO: need a way to disable rebuilding on startup
+
+            logger.Info<ExamineComponent>("Starting initialize async background thread.");
+
+            // make it async in order not to slow down the boot
+            // fixme - should be a proper background task else we cannot stop it!
+            var bg = new Thread(() =>
+            {
+                try
+                {
+                    // rebuilds any empty indexes
+                    RebuildIndexes(true, _indexCollection, logger);
+                }
+                catch (Exception e)
+                {
+                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
+                }
+            });
+            bg.Start();
+        }
+
+        /// <summary>
+        /// Used to rebuild indexes on startup or cold boot
+        /// </summary>
+        /// <param name="onlyEmptyIndexes"></param>
+        /// <param name="indexCollection"></param>
+        /// <param name="logger"></param>
+        internal static void RebuildIndexes(bool onlyEmptyIndexes, IExamineIndexCollectionAccessor indexCollection, ILogger logger)
+        {
+            //do not attempt to do this if this has been disabled since we are not the main dom.
+            //this can be called during a cold boot
+            if (_disableExamineIndexing) return;
+
+            EnsureUnlocked(logger, indexCollection);
+
             if (onlyEmptyIndexes)
-                indexers = indexers.Where(x => x.Value.IsIndexNew()).ToDictionary(x => x.Key, x => x.Value);
-            foreach (var indexer in indexers)
-                indexer.Value.RebuildIndex();
+            {
+                foreach (var indexer in indexCollection.Indexes.Values.Where(x => x.IsIndexNew()))
+                {
+                    indexer.RebuildIndex();
+                }
+            }
+            else
+            {
+                //do all of them
+                ExamineManager.Instance.RebuildIndexes();
+            }
         }
 
-        private static void BindGridToExamine(GridPropertyEditor grid, IExamineIndexCollectionAccessor indexCollection)
+        /// <summary>
+        /// Must be called to each index is unlocked before any indexing occurs
+        /// </summary>
+        /// <remarks>
+        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
+        /// either of these happens, we need to configure the indexes.
+        /// </remarks>
+        private static void EnsureUnlocked(ILogger logger, IExamineIndexCollectionAccessor indexCollection)
         {
-            var indexes = indexCollection.Indexes;
-            if (indexes == null) return;
-            foreach (var i in indexes.Values.OfType<UmbracoExamineIndexer>())
-                i.DocumentWriting += grid.DocumentWriting;
+            if (_disableExamineIndexing) return;
+            if (__isConfigured) return;
+
+            lock (IsConfiguredLocker)
+            {
+                //double chekc
+                if (__isConfigured) return;
+
+                __isConfigured = true;
+
+                foreach (var luceneIndexer in indexCollection.Indexes.Values.OfType<LuceneIndexer>())
+                {
+                    //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
+                    //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
+                    //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
+                    luceneIndexer.WaitForIndexQueueOnShutdown = false;
+
+                    //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
+                    //the indexes are not operational unless MainDom is true
+                    var dir = luceneIndexer.GetLuceneDirectory();
+                    if (IndexWriter.IsLocked(dir))
+                    {
+                        logger.Info<ExamineComponent>("Forcing index " + luceneIndexer.Name + " to be unlocked since it was left in a locked state");
+                        IndexWriter.Unlock(dir);
+                    }
+                }
+            }
         }
 
-        static void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
+        private static void BindGridToExamine(ILogger logger, IExamineIndexCollectionAccessor indexCollection, IEnumerable propertyEditors)
+        {
+            //bind the grid property editors - this is a hack until http://issues.umbraco.org/issue/U4-8437
+            try
+            {
+                var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
+                if (grid != null)
+                {
+                    foreach (var i in indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>())
+                        i.DocumentWriting += grid.DocumentWriting;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+            }
+        }
+
+        private void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
@@ -145,7 +263,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        static void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
+        private void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
@@ -194,7 +312,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        static void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
+        private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
@@ -270,7 +388,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        private static void ReIndexForContent(IContent content, IContent published)
+        private void ReIndexForContent(IContent content, IContent published)
         {
             if (published != null && content.VersionId == published.VersionId)
             {
@@ -292,36 +410,36 @@ namespace Umbraco.Web.Search
             }
         }
 
-        private static void ReIndexForContent(IContent sender, bool? supportUnpublished = null)
+        private void ReIndexForContent(IContent sender, bool? supportUnpublished = null)
         {
             var valueSet = UmbracoContentIndexer.GetValueSets(Current.UrlSegmentProviders, Current.Services.UserService, sender);
 
             ExamineManager.Instance.IndexItems(
-                valueSet.ToArray(), 
-                ExamineManager.Instance.IndexProviders.OfType<UmbracoContentIndexer>()
+                valueSet.ToArray(),
+                _indexCollection.Indexes.Values.OfType<UmbracoContentIndexer>()
                     // only for the specified indexers
                     .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
                     .Where(x => x.EnableDefaultEventHandler));
         }
 
-        private static void ReIndexForMember(IMember member)
+        private void ReIndexForMember(IMember member)
         {
             var valueSet = UmbracoMemberIndexer.GetValueSets(member);
 
             ExamineManager.Instance.IndexItems(
                 valueSet.ToArray(),
-                ExamineManager.Instance.IndexProviders.OfType<UmbracoExamineIndexer>()
+                _indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>()
                     //ensure that only the providers are flagged to listen execute
                     .Where(x => x.EnableDefaultEventHandler));
         }
 
-        private static void ReIndexForMedia(IMedia sender, bool isMediaPublished)
+        private void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
             var valueSet = UmbracoContentIndexer.GetValueSets(Current.UrlSegmentProviders, Current.Services.UserService, sender);
 
             ExamineManager.Instance.IndexItems(
                 valueSet.ToArray(),
-                ExamineManager.Instance.IndexProviders.OfType<UmbracoContentIndexer>()
+                _indexCollection.Indexes.Values.OfType<UmbracoContentIndexer>()
                     // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
                     // then only index this for indexers supporting unpublished media
                     .Where(x => isMediaPublished || (x.SupportUnpublishedContent))
@@ -336,11 +454,11 @@ namespace Umbraco.Web.Search
         /// If true, indicates that we will only delete this item from indexes that don't support unpublished content.
         /// If false it will delete this from all indexes regardless.
         /// </param>
-        private static void DeleteIndexForEntity(int entityId, bool keepIfUnpublished)
+        private void DeleteIndexForEntity(int entityId, bool keepIfUnpublished)
         {
-            ExamineManager.Instance.DeleteFromIndex(
+            ExamineManager.Instance.DeleteFromIndexes(
                 entityId.ToString(CultureInfo.InvariantCulture),
-                ExamineManager.Instance.IndexProviders.OfType<UmbracoExamineIndexer>()
+                _indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>()
                     // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
                     // otherwise if keepIfUnpublished == false then remove from all indexes
                     .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))

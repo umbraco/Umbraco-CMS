@@ -178,6 +178,7 @@ namespace Umbraco.Tests.UmbracoExamine
             //    .Returns(query.Object);
 
             var i = new UmbracoContentIndexer(
+                "testIndexer",
                 Enumerable.Empty<FieldDefinition>(),
                 luceneDir,
                 analyzer,
@@ -197,12 +198,12 @@ namespace Umbraco.Tests.UmbracoExamine
 
         public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
         {
-            return new LuceneSearcher(luceneDir, new StandardAnalyzer(Version.LUCENE_29));
+            return new LuceneSearcher("testSearcher", luceneDir, new StandardAnalyzer(Version.LUCENE_29));
         }
 
         public static MultiIndexSearcher GetMultiSearcher(Directory pdfDir, Directory simpleDir, Directory conventionDir, Directory cwsDir)
         {
-            var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
+            var i = new MultiIndexSearcher("testSearcher", new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
             return i;
         }
 

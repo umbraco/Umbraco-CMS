@@ -23,9 +23,10 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
-        public ExamineManagementApiController(ExamineManager examineManager, ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
+        public ExamineManagementApiController(ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
         {
-            _examineManager = examineManager;
+            //fixme can we inject this? we'll need an IExamineManager
+            _examineManager = ExamineManager.Instance;
             _logger = logger;
             _runtimeCacheProvider = runtimeCacheProvider;
         }
@@ -114,7 +115,7 @@ namespace Umbraco.Web.WebServices
                         .OrderBy(x => x.Name);
                     foreach (var p in props)
                     {
-                        indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null).ToString());
+                        indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null)?.ToString());
                     }
                     return indexerModel;
                 }).OrderBy(x =>
