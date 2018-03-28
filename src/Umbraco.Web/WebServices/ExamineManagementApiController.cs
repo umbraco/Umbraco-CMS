@@ -241,7 +241,7 @@ namespace Umbraco.Web.WebServices
                 Name = indexer.Key
             };
 
-            var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
+            var props = TypeHelper.CachedDiscoverableProperties(indexer.Value.GetType(), mustWrite: false)
                 //ignore these properties
                 .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                 .OrderBy(x => x.Name);

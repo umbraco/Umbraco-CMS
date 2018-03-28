@@ -70,7 +70,6 @@
     <Compile Include="UmbracoContentIndexerOptions.cs" />
     <Compile Include="UmbracoContentValueSetValidator.cs" />
     <Compile Include="UmbracoExamineIndexer.cs" />
-    <Compile Include="UmbracoExamineMultiIndexSearcher.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
     <Compile Include="..\SolutionInfo.cs">
