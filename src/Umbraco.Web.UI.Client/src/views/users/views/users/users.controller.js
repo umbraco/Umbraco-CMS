@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -124,6 +124,13 @@
             vm.usersOptions.orderBy = "Name";
             vm.usersOptions.orderDirection = "Ascending";
 
+            if ($routeParams.create) {
+                setUsersViewState("createUser");
+            }
+            else if ($routeParams.invite) {
+                setUsersViewState("inviteUser");
+            }
+
             // Get users
             getUsers();
 
@@ -168,6 +175,17 @@
 
             if (state === "createUser") {
                 clearAddUserForm();
+
+                $location.search("create", "true");
+                $location.search("invite", null);
+            }
+            else if (state === "inviteUser") {
+                $location.search("create", null);
+                $location.search("invite", "true");
+            }
+            else if (state === "overview") {
+                $location.search("create", null);
+                $location.search("invite", null);
             }
 
             vm.usersViewState = state;

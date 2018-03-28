@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.Mapping
     /// <summary>
     /// A model mapper used to map models for the various dashboards
     /// </summary>
-    internal class DashboardModelsMapper : MapperConfiguration
+    internal class MiscModelsMapper : MapperConfiguration
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
@@ -24,7 +24,16 @@ namespace Umbraco.Web.Models.Mapping
 
             //for the logging controller (and assuming dashboard that is used in uaas? otherwise not sure what that controller is used for)
             config.CreateMap<LogItem, AuditLog>()
-                  .ForMember(log => log.LogType, expression => expression.MapFrom(item => Enum<AuditLogType>.Parse(item.LogType.ToString())));
+                .ForMember(log => log.UserAvatars, expression => expression.Ignore())
+                .ForMember(log => log.UserName, expression => expression.Ignore())
+                .ForMember(log => log.LogType, expression => expression.MapFrom(item => Enum<AuditType>.Parse(item.LogType.ToString())));
+
+            config.CreateMap<IAuditItem, AuditLog>()
+                .ForMember(log => log.UserAvatars, expression => expression.Ignore())
+                .ForMember(log => log.UserName, expression => expression.Ignore())
+                .ForMember(log => log.NodeId, expression => expression.MapFrom(item => item.Id))
+                .ForMember(log => log.Timestamp, expression => expression.MapFrom(item => item.CreateDate))
+                .ForMember(log => log.LogType, expression => expression.MapFrom(item => item.AuditType));
         }
     }
 }

@@ -102,6 +102,8 @@ namespace Umbraco.Core.Services
         void SaveBlueprint(IContent content, int userId = 0);
         void DeleteBlueprint(IContent content, int userId = 0);
         IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
+        void DeleteBlueprintsOfType(int contentTypeId, int userId = 0);
+        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         /// <summary>
         /// Gets all XML entries found in the cmsContentXml table based on the given path

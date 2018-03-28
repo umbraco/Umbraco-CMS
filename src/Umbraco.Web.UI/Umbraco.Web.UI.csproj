@@ -116,9 +116,8 @@
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.2\lib\net45\ClientDependency.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ClientDependency.Core, Version=1.9.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.6\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="ClientDependency.Core.Mvc, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ClientDependency-Mvc5.1.8.0.0\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
@@ -127,11 +126,10 @@
     <Reference Include="dotless.Core, Version=1.5.2.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
       <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.88.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.88\lib\net45\Examine.dll</HintPath>
+    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="ImageProcessor, Version=2.5.6.0, Culture=neutral, processorArchitecture=MSIL">
@@ -144,7 +142,6 @@
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core">
@@ -335,8 +332,8 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.7.99, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.7\lib\Umbraco.ModelsBuilder.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.10.102, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.10\lib\Umbraco.ModelsBuilder.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -518,6 +515,7 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
+    <Content Include="Config\BackOfficeTours\getting-started.json" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -976,7 +974,6 @@
     <Content Include="Umbraco\Masterpages\default.Master" />
     <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
     <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
@@ -1026,9 +1023,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7760</DevelopmentServerPort>
+          <DevelopmentServerPort>7910</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7760</IISUrl>
+          <IISUrl>http://localhost:7910</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

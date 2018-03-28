@@ -489,7 +489,7 @@
 
       scope.editPropertyTypeSettings = function(property, group) {
 
-        if (!property.inherited && !property.locked) {
+        if (!property.inherited) {
 
           scope.propertySettingsDialogModel = {};
           scope.propertySettingsDialogModel.title = "Property settings";
@@ -547,6 +547,7 @@
             property.validation.pattern = oldModel.property.validation.pattern;
             property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
             property.memberCanEdit = oldModel.property.memberCanEdit;
+            property.isSensitiveValue = oldModel.property.isSensitiveValue;
 
             // because we set state to active, to show a preview, we have to check if has been filled out
             // label is required so if it is not filled we know it is a placeholder

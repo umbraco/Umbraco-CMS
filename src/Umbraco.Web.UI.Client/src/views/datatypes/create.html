@@ -4,7 +4,7 @@
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">           
-            <li>
+            <li data-element="action-data-type">
                 <a href="" ng-click="createDataType()" umb-auto-focus>
                     <i class="large icon-autofill"></i>
                     <span class="menu-label">
@@ -12,7 +12,7 @@
                     </span>
                 </a>
             </li>
-            <li>
+            <li data-element="action-folder">
                 <a href="" ng-click="showCreateFolder()">
                     <i class="large icon-folder"></i>
                     <span class="menu-label">

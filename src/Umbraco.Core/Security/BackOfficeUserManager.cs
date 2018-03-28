@@ -152,7 +152,6 @@ namespace Umbraco.Core.Security
             //NOTE: This method is mostly here for backwards compat
             base.InitUserManager(manager, membershipProvider, options.DataProtectionProvider, contentSectionConfig);
         }
-       
     }
 
     /// <summary>
@@ -169,7 +168,7 @@ namespace Umbraco.Core.Security
 
         #region What we support do not currently
 
-        //NOTE: Not sure if we really want/need to ever support this 
+        //TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
         public override bool SupportsUserClaim
         {
             get { return false; }
@@ -269,6 +268,22 @@ namespace Umbraco.Core.Security
             //});
 
             //manager.SmsService = new SmsService();            
+        }
+
+        /// <summary>
+        /// Used to validate a user's session
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> ValidateSessionIdAsync(int userId, string sessionId)
+        {
+            var userSessionStore = Store as IUserSessionStore<BackOfficeIdentityUser, int>;
+            //if this is not set, for backwards compat (which would be super rare), we'll just approve it
+            if (userSessionStore == null)
+                return true;
+
+            return await userSessionStore.ValidateSessionIdAsync(userId, sessionId);
         }
 
         /// <summary>
@@ -405,6 +420,33 @@ namespace Umbraco.Core.Security
             return await base.CheckPasswordAsync(user, password);
         }
 
+        public override Task<IdentityResult> ResetPasswordAsync(int userId, string token, string newPassword)
+        {
+            var result = base.ResetPasswordAsync(userId, token, newPassword);
+            if (result.Result.Succeeded)
+                RaisePasswordResetEvent(userId);
+            return result;
+        }
+
+        /// <summary>
+        /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
+        /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
+        /// </remarks>
+        public Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
+        {
+            var result = base.ResetPasswordAsync(userId, token, newPassword);
+            if (result.Result.Succeeded)
+                RaisePasswordChangedEvent(userId);
+            return result;
+        }
+
         public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
             var result = base.ChangePasswordAsync(userId, currentPassword, newPassword);
@@ -539,27 +581,27 @@ namespace Umbraco.Core.Security
 
         internal void RaiseAccountLockedEvent(int userId)
         {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), userId));
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseAccountUnlockedEvent(int userId)
         {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), userId));
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordRequestedEvent(int userId)
         {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), userId));
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
         {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), userId));
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginFailedEvent(int userId)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), userId));
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseInvalidLoginAttemptEvent(string username)
@@ -569,31 +611,33 @@ namespace Umbraco.Core.Security
 
         internal void RaiseLoginRequiresVerificationEvent(int userId)
         {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), userId));
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginSuccessEvent(int userId)
         {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), userId));
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), userId));
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaisePasswordChangedEvent(int userId)
         {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), userId));
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
+        //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
         internal void RaisePasswordResetEvent(int userId)
         {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), userId));
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
+
         internal void RaiseResetAccessFailedCountEvent(int userId)
         {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), userId));
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         public static event EventHandler AccountLocked;
@@ -674,4 +718,5 @@ namespace Umbraco.Core.Security
             return httpContext.GetCurrentRequestIpAddress();
         }
     }
+
 }

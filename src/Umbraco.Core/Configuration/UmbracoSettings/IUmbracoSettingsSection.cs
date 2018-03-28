@@ -5,6 +5,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface IUmbracoSettingsSection : IUmbracoConfigurationSection
     {
+        IBackOfficeSection BackOffice { get; }
+
         IContentSection Content { get; }
 
         ISecuritySection Security { get; }

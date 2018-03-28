@@ -618,6 +618,10 @@ namespace umbraco
         {
             get
             {
+                // if there's a current enlisted reader/writer, use its xml
+                var safeXml = SafeXmlReaderWriter.Get(_scopeProvider);
+                if (safeXml != null) return safeXml.Xml;
+
                 var items = HttpContextItems;
                 if (items == null)
                     return XmlContentInternal;

@@ -70,5 +70,10 @@ namespace Umbraco.Core.Models.Membership
         /// Will hold the media file system relative path of the users custom avatar if they uploaded one
         /// </summary>
         string Avatar { get; set; }
+
+        /// <summary>
+        /// A Json blob stored for recording tour data for a user
+        /// </summary>
+        string TourData { get; set; }
     }
 }

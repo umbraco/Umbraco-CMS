@@ -544,6 +544,28 @@ namespace Umbraco.Core.Models
             return false;
         }
 
+        /// <summary>
+        /// Returns both instance dirty properties and property type properties
+        /// </summary>
+        /// <returns></returns>
+        public override IEnumerable<string> GetDirtyProperties()
+        {
+            var instanceProperties = base.GetDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
+        }
+
+        /// <summary>
+        /// Returns both instance dirty properties and property type properties
+        /// </summary>
+        /// <returns></returns>
+        internal override IEnumerable<string> GetPreviouslyDirtyProperties()
+        {
+            var instanceProperties = base.GetPreviouslyDirtyProperties();
+            var propertyTypes = Properties.Where(x => x.WasDirty()).Select(x => x.Alias);
+            return instanceProperties.Concat(propertyTypes);
+        }
+
         #endregion
     }
 }

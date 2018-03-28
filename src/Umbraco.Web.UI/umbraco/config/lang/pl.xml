@@ -12,9 +12,11 @@
     <key alias="copy">Kopiuj</key>
     <key alias="create">Utwórz</key>
     <key alias="createPackage">Stwórz zbiór</key>
+    <key alias="createGroup">Stwórz grupę</key>
     <key alias="delete">Usuń</key>
     <key alias="disable">Deaktywuj</key>
     <key alias="emptyTrashcan">Opróżnij kosz</key>
+    <key alias="enable">Aktywuj</key>
     <key alias="exportDocumentType">Eksportuj typ dokumentu</key>
     <key alias="importDocumentType">Importuj typ dokumentu</key>
     <key alias="importPackage">Importuj zbiór</key>
@@ -27,16 +29,49 @@
     <key alias="unpublish">Cofnij publikację</key>
     <key alias="refreshNode">Odśwież węzeł</key>
     <key alias="republish">Opublikuj ponownie całą stronę</key>
+    <key alias="rename" version="7.3.0">Zmień nazwę</key>
     <key alias="restore" version="7.3.0">Przywróć</key>
     <key alias="SetPermissionsForThePage">Ustaw  uprawnienia dla strony %0%</key>
+    <key alias="chooseWhereToMove">Wybierz dokąd przenieść</key>
+    <key alias="toInTheTreeStructureBelow">W strukturze drzewa poniżej</key>
     <key alias="rights">Uprawnienia</key>
     <key alias="rollback">Cofnij</key>
     <key alias="sendtopublish">Wyślij do publikacji</key>
     <key alias="sendToTranslate">Wyślij do tłumaczenia</key>
+    <key alias="setGroup">Ustaw grupę</key>
     <key alias="sort">Sortuj</key>
     <key alias="translate">Przetłumacz</key>
     <key alias="update">Aktualizuj</key>
+    <key alias="setPermissions">Ustaw uprawnienia</key>
+    <key alias="unlock">Odblokuj</key>
+    <key alias="createblueprint">Stwórz Szablon Zawartości</key>
   </area>
+  <area alias="actionCategories">
+    <key alias="content">Zawartość</key>
+    <key alias="administration">Administracja</key>
+    <key alias="structure">Struktura</key>
+    <key alias="other">Inne</key>
+   </area>
+   <area alias="actionDescriptions">
+    <key alias="assignDomain">Zezwól na dostęp do przydzielenia języka i hostów</key>
+    <key alias="auditTrail">Zezwól na dostęp do wglądu w historię logów węzła</key>
+    <key alias="browse">Zezwól na dostęp do widoku węzła</key>
+    <key alias="changeDocType">Zezwól na dostęp do zmiany typu dokumentu dla węzła</key>
+    <key alias="copy">Zezwól na dostęp do skopiowania węzła</key>
+    <key alias="create">Zezwól na dostęp do stworzenia węzłów</key>
+    <key alias="delete">Zezwól na dostęp do usunięcia węzłóws</key>
+    <key alias="move">Zezwól na dostęp do przeniesienia węzła</key>
+    <key alias="protect">Zezwól na dostęp do ustawienia i zmiany publicznego dostępu węzła</key>
+    <key alias="publish">Zezwól na dostęp do publikacji węzła</key>
+    <key alias="rights">Zezwól na dostęp do zmiany uprawnień węzła</key>
+    <key alias="rollback">Zezwól na dostęp do cofnięcia węzła do poprzedniego stanu</key>
+    <key alias="sendtopublish">Zezwól na dostęp do wysłania węzła do akceptacji przed publikacją</key>
+    <key alias="sendToTranslate">Zezwól na dostęp do wysłania węzła do tłumaczenia</key>
+    <key alias="sort">Zezwól na dostęp do zmiany kolejności sortowania węzłów</key>
+    <key alias="translate">Zezwól na dostęp do tłumaczenia węzła</key>
+    <key alias="update">Zezwól na dostęp do zapisania węzła</key>
+    <key alias="createblueprint">Zezwól na dostęp do utworzenia Szablonu Zawartości</key>
+  </area>  
   <area alias="assignDomain">
     <key alias="permissionDenied">Brak odpowiednich uprawnień</key>
     <key alias="addNew">Dodaj nową domenę</key>
@@ -50,14 +85,18 @@
     <key alias="domainDeleted">Domena '%0%' została skasowana</key>
     <key alias="domainExists">Domena '%0%' jest aktualnie przypisana</key>
     <key alias="domainUpdated">Domena '%0%' została zaktualizowana</key>
-    <key alias="domainHelp"><![CDATA[Poprawne domeny to: "example.com", "www.example.com", "example.com:8080" lub
-        "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać. 
-Preferowane jest użycie powyższych ustawień języka.]]></key>
-    <key alias="orEdit">Edycja aktualnych domen</key>
+    <key alias="orEdit">Edytuj Aktualne Domeny</key>
+    <key alias="domainHelp">
+        <![CDATA[Poprawne domeny to: "example.com", "www.example.com", "example.com:8080" lub
+    "https://www.example.com/". Wspierane są jednopoziomowe ścieżki domen, np. "example.com/en" jednakże powinno się ich unikać. 
+    Preferowane jest użycie powyższych ustawień języka.]]>
+    </key>
     <key alias="inherit">Odziedziczona</key>
     <key alias="setLanguage">Język</key>
-    <key alias="setLanguageHelp"><![CDATA[Wybierz język dla węzła,<br /> lub wybierz dziedziczenie języka z węzła rodzica. Zostanie to zastosowane<br />
-także do obecnego węzła, o ile poniższa domena również do niego należy.]]></key>
+    <key alias="setLanguageHelp">
+        <![CDATA[Wybierz język dla węzła,<br /> lub wybierz dziedziczenie języka z węzła rodzica. Zostanie to zastosowane<br />
+    także do obecnego węzła, o ile poniższa domena również do niego należy.]]>
+    </key>
     <key alias="setDomains">Domeny</key>
   </area>
   <area alias="auditTrails">
@@ -96,6 +135,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="styleShow">Pokaż style</key>
     <key alias="tableInsert">Wstaw tabelę</key>
     <key alias="generateModels">Wygeneruj modele</key>
+    <key alias="saveAndGenerateModels">Zapisz i wygeneruj modele</key>
     <key alias="undo">Cofnij</key>
     <key alias="redo">Powtórz</key>
   </area>
@@ -139,6 +179,8 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="lastPublished">Opublikowane</key>
     <key alias="noItemsToShow">Nie ma żadnych elementów do wyświetlenia</key>
     <key alias="listViewNoItems" version="7.1.5">Nie ma żadnych elementów do wyświetlenia w liście.</key>
+    <key alias="listViewNoContent">Nie dodano żadnej zawartości</key>
+    <key alias="listViewNoMembers">Nie dodano żadnych członków</key>
     <key alias="mediatype">Typ mediów</key>
     <key alias="mediaLinks">Link do elementu(ów) mediów</key>
     <key alias="membergroup">Członek grupy</key>
@@ -173,16 +215,30 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="target" version="7.0">Cel</key>
     <key alias="scheduledPublishServerTime">Oznacza to następującą godzinę na serwerze:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Co to oznacza?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Czy na pewno chcesz usunąć ten element?</key>
+    <key alias="nestedContentEditorNotSupported">Właściwość %0% używa edytora %1%, który nie jest wspierany przez Nested Content.</key>
     <key alias="addTextBox">Dodaj kolejne pole tekstowe</key>
     <key alias="removeTextBox">Usuń te pole tekstowe</key> 
+    <key alias="contentRoot">Korzeń zawartości</key>
   </area>
+  <area alias="blueprints">
+        <key alias="createBlueprintFrom">Stwórz nowy Szablon Zawartości z '%0%'</key>
+        <key alias="blankBlueprint">Pusty</key>
+        <key alias="selectBlueprint">Wybierz Szablon Zawartości</key>
+        <key alias="createdBlueprintHeading">Szablon Zawartości został stworzony</key>
+        <key alias="createdBlueprintMessage">Szablon Zawartości został stworzony z '%0%'</key>
+        <key alias="duplicateBlueprintMessage">Szablon Zawartości o tej samej nazwie już istnieje</key>
+        <key alias="blueprintDescription">Szablon Zawartości to predefiniowana zawartość, którą edytor może wybrać, aby użyć jej jako podstawę do stworzenia nowej zawartości</key>
+    </area>
   <area alias="media">
     <key alias="clickToUpload">Kliknij, aby załadować plik</key>
     <key alias="dropFilesHere">Przerzuć swoje pliki tutaj...</key>
-	  <key alias="urls">Link do mediów</key>
+	<key alias="urls">Link do mediów</key>
     <key alias="orClickHereToUpload">lub kliknij tutaj, aby wybrać pliki</key>
     <key alias="onlyAllowedFiles">Jedyne dozwolone typy plików to</key>
+    <key alias="disallowedFileType">Nie można załadować pliku, typ pliku nie jest akceptowany</key>
     <key alias="maxFileSize">Maksymalny rozmiar pliku to</key>
+    <key alias="mediaRoot">Korzeń mediów</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Stwórz nowego członka</key>
@@ -191,6 +247,7 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
   <area alias="create">
     <key alias="chooseNode">Gdzie chcesz stworzyć nowy %0%?</key>
     <key alias="createUnder">Utwórz w</key>
+    <key alias="createContentBlueprint">Wybierz typ dokumentu, dla którego chcesz stworzyć szablon zawartości</key>
     <key alias="updateData">Wybierz rodzaj oraz tytuł</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Brak dostępnych dozwolonych typów dokumentów. Należy włączyć je w ustawieniach sekcji pod <strong>"typy dokumentów"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Brak dostępnych dozwolonych typów mediów. Należy włączyć je w ustawieniach sekcji pod <strong>"typy mediów"</strong>.]]></key>
@@ -249,6 +306,8 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="copiedItemOfItems">Skopiowano %0% z %1% elementów</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Tytuł linku</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Nazwa</key>
     <key alias="assignDomain">Zarządzaj nazwami hostów</key>
     <key alias="closeThisWindow">Zamknij to okno</key>
@@ -276,6 +335,9 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="macroDoesNotHaveProperties">To makro nie posiada żadnych właściwości, które można edytować</key>
     <key alias="paste">Wklej</key>
     <key alias="permissionsEdit">Edytuj Uprawnienia dla</key>
+    <key alias="permissionsSet">Ustaw uprawnienia dla</key>
+    <key alias="permissionsSetForGroup">Ustaw uprawnienia dla %0% dla grupy użytkownika %1%</key>
+    <key alias="permissionsHelp">Wybierz grupy użytkowników, dla których chcesz ustawić uprawnienia</key>
     <key alias="recycleBinDeleting">Zawartość kosza jest teraz usuwana. Proszę nie zamykać tego okna do momentu zakończenia procesu.</key>
     <key alias="recycleBinIsEmpty">Zawartość kosza została usunięta</key>
     <key alias="recycleBinWarning">Usunięcie elementów z kosza powoduje ich trwałe i nieodwracalne skasowanie</key>
@@ -288,10 +350,14 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="siterepublishHelp">Cache strony zostanie odświeżone. Cała zawartość opublikowana będzie aktualna, lecz nieopublikowana zawartość pozostanie niewidoczna</key>
     <key alias="tableColumns">Liczba kolumn</key>
     <key alias="tableRows">Liczba wierszy</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Ustaw zastępczy ID</strong> Ustawiając ID na tym elemencie możesz później łączyć treść z podrzędnych szablonów, 
-      ustawiając dowiązanie do tego ID na elemencie <code>&lt;asp:treści /&gt;</code>]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Wybierz zastępczy ID</strong> z poniższej listy. Możesz wybierać tylko 
-      spośród ID na szablonie nadrzędnym tego formularza.]]></key>
+    <key alias="templateContentAreaHelp">
+        <![CDATA[<strong>Ustaw zastępczy ID</strong> Ustawiając ID na tym elemencie możesz później łączyć treść z podrzędnych szablonów, 
+      ustawiając dowiązanie do tego ID na elemencie <code>&lt;asp:treści /&gt;</code>]]>
+    </key>
+    <key alias="templateContentPlaceHolderHelp">
+        <![CDATA[<strong>Wybierz zastępczy ID</strong> z poniższej listy. Możesz wybierać tylko 
+      spośród ID na szablonie nadrzędnym tego formularza.]]>
+    </key>
     <key alias="thumbnailimageclickfororiginal">Kliknij na obrazie, aby zobaczyć go w pełnym rozmiarze</key>
     <key alias="treepicker">Wybierz element</key>
     <key alias="viewCacheItem">Podgląd elementów Cache</key>
@@ -303,14 +369,19 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="openInNewWindow">Otwórz zlinkowany dokument w nowym oknie lub zakładce</key>
     <key alias="linkToMedia">Link do mediów</key>
     <key alias="linkToFile">Link do plików</key>
+    <key alias="selectContentStartNode">Wybierz węzeł początkowy zawartości</key>
     <key alias="selectMedia">Wybierz media</key>
     <key alias="selectIcon">Wybierz ikonę</key>
     <key alias="selectItem">Wybierz element</key>
     <key alias="selectLink">Wybierz link</key>
     <key alias="selectMacro">Wybierz makro</key>
     <key alias="selectContent">Wybierz zawartość</key>
+    <key alias="selectMediaStartNode">Wybierz węzeł początkowy mediów</key>
     <key alias="selectMember">Wybierz członka</key>
     <key alias="selectMemberGroup">Wybierz członka grupy</key>
+    <key alias="selectNode">Wybierz węzeł</key>
+    <key alias="selectSections">Wybierz sekcje</key>
+    <key alias="selectUsers">Wybierz użytkowników</key>
     <key alias="noIconsFound">Nie znaleziono ikon</key>
     <key alias="noMacroParams">Te makro nie ma żadnych właściwości</key>
     <key alias="noMacros">Brak dostępnych makro do wstawienia</key>
@@ -325,9 +396,11 @@ także do obecnego węzła, o ile poniższa domena również do niego należy.]]
     <key alias="selectSnippet">Wybierz snippet</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[
-Edytuj różne wersje językowe dla elementu słownika '<em>%0%</em>' poniżej.<br/>
-Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
+    <key alias="description">
+        <![CDATA[
+    Edytuj różne wersje językowe dla elementu słownika '<em>%0%</em>' poniżej.<br/>
+    Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]>
+    </key>
     <key alias="displayName">Nazwa języka</key>
     <key alias="changeKey">Edytuj klucz elementu słownika.</key>
     <key alias="changeKeyError">
@@ -342,12 +415,15 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="confirmPassword">Potwierdź hasło</key>
     <key alias="nameentity">Nazwij %0%...</key>
     <key alias="entername">Wpisz nazwę...</key>
+    <key alias="enteremail">Wpisz adres e-mail...</key>
+    <key alias="enterusername">Wpisz nazwę użytkownika...</key>
     <key alias="label">Etykieta...</key>
     <key alias="enterDescription">Wpisz opis...</key>
     <key alias="search">Wpisz, aby wyszukać...</key>
     <key alias="filter">Wpisz, aby filtrować...</key>
     <key alias="enterTags">Wpisz, aby dodać tagi (naciśnij enter po każdym tagu)...</key>
     <key alias="email">Wpisz adres e-mail</key>
+    <key alias="enterMessage">Wpisz wiadomość...</key>
     <key alias="usernameHint">Twoja nazwa użytkownika to przeważnie Twój adres e-mail</key>
   </area>
   <area alias="editcontenttype">
@@ -1198,6 +1274,12 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   </area>
       
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Wybierz typ treści</key>
     <key alias="chooseLayout">Wybierz układ</key>
     <key alias="addRows">Dodaj wiersz</key>

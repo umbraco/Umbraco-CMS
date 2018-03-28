@@ -832,21 +832,21 @@ namespace Umbraco.Core.Services
             foreach (var element in structureElement.Elements("DocumentType"))
             {
                 var alias = element.Value;
-                if (_importedContentTypes.ContainsKey(alias))
-                {
-                    var allowedChild = _importedContentTypes[alias];
-                    if (allowedChild == null || allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
 
-                    allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
-                    sortOrder++;
-                }
-                else
+                var allowedChild = _importedContentTypes.ContainsKey(alias) ? _importedContentTypes[alias] : _contentTypeService.GetContentType(alias);
+                if (allowedChild == null)
                 {
                     _logger.Warn<PackagingService>(
                     string.Format(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
                         alias, contentType.Alias));
+
+                    continue;
                 }
+                if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
+
+                allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
+                sortOrder++;
             }
 
             contentType.AllowedContentTypes = allowedChildren;
@@ -1748,9 +1748,10 @@ namespace Umbraco.Core.Services
 
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
+            var metaData = GetPackageMetaData(packageFilePath);
+
             if (raiseEvents)
-            {
-                var metaData = GetPackageMetaData(packageFilePath);
+            {                
                 if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFilePath, metaData), this))
                 {
                     var initEmpty = new InstallationSummary().InitEmpty();
@@ -1762,7 +1763,7 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
             {
-                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, false), this);
+                ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(installationSummary, metaData, false), this);
             }
 
             return installationSummary;

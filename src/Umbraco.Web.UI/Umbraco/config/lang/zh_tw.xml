@@ -995,6 +995,12 @@
     <key alias="template">範本</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">選擇內容類別</key>
     <key alias="chooseLayout">選擇排列方式</key>
     <key alias="addRows">新增一行</key>

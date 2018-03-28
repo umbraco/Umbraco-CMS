@@ -3,12 +3,12 @@
 		<umb-pane>
 
 			<p class="abstract" ng-hide="error != null || success == true">
-				Restore <strong>{{currentNode.name}}</strong> to under <strong>{{target.name}}</strong>?
+				Restore <strong>{{currentNode.name}}</strong> under <strong>{{target.name}}</strong>?
 			</p>
 
 			<div class="alert alert-error" ng-show="error != null">
-				<h4>{{error.errorMsg}}</h4>
-				<p>{{error.data.Message}}</p>
+				<div><strong>{{error.errorMsg}}</strong></div>
+				<div>{{error.data.Message}}</div>
 			</div>
 
 			<div class="alert alert-success" ng-show="success == true">

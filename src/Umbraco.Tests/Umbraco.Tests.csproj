@@ -31,6 +31,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
     <NugetPackages Condition="$(NugetPackages) == '' Or $(NugetPackages) == '*Undefined*'">$(SolutionDir)\packages</NugetPackages>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +42,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,8 +62,8 @@
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.0.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.88.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.88\lib\net45\Examine.dll</HintPath>
+    <Reference Include="Examine, Version=0.1.89.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.89\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -188,7 +188,10 @@
     <Compile Include="DateTimeExtensionsTests.cs" />
     <Compile Include="Cache\CacheRefresherEventHandlerTests.cs" />
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
+    <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
+    <Compile Include="Services\AuditServiceTests.cs" />
+    <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingMiddleware.cs" />
     <Compile Include="TestHelpers\ControllerTesting\SpecificAssemblyResolver.cs" />
@@ -231,7 +234,6 @@
     <Compile Include="Services\CachedDataTypeServiceTests.cs" />
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
-    <Compile Include="TryConvertToTests.cs" />
     <Compile Include="UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRAMDirectory.cs" />
     <Compile Include="UmbracoExamine\UmbracoContentIndexerTests.cs" />
