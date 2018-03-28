@@ -32,12 +32,25 @@ namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions
             {
                 foreach (var item in Rows)
                 {
-                    var cols = string.Join(",", item.Select(x => x.Key));
-                    var vals = string.Join(",", item.Select(x => x.Value));
+                    var cols = new StringBuilder();
+                    var vals = new StringBuilder();
+                    var first = true;
+                    foreach (var keyVal in item)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            cols.Append(",");
+                            vals.Append(",");
+                        }
+                        cols.Append(SqlSyntax.GetQuotedColumnName(keyVal.Key));
+                        vals.Append(GetQuotedValue(keyVal.Value));
+                    }
 
-                    var sql = string.Format(SqlSyntax.InsertData,
-                        SqlSyntax.GetQuotedTableName(TableName),
-                        cols, vals);
+                    var sql = string.Format(SqlSyntax.InsertData, SqlSyntax.GetQuotedTableName(TableName), cols, vals);
 
                     stmts.Append(sql);
                     AppendStatementSeparator(stmts);

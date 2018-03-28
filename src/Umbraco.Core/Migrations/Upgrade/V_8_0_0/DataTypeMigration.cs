@@ -29,18 +29,17 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Rename.Table("cmsDataType").To(Constants.DatabaseSchema.Tables.DataType).Do();
 
             // create column
-            // fixme it is annoying that these are NOT written out to the log?!
             AddColumn<DataTypeDto>(Constants.DatabaseSchema.Tables.DataType, "config");
-            Database.Execute(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty)));
+            Execute.Sql(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty)).SQL).Do();
 
             // re-create *all* keys and indexes
             foreach (var x in DatabaseSchemaCreator.OrderedTables)
                 Create.KeysAndIndexes(x).Do();
 
             // renames
-            Database.Execute(Sql()
+            Execute.Sql(Sql()
                 .Update<DataTypeDto>(u => u.Set(x => x.EditorAlias, "Umbraco.ColorPicker"))
-                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias"));
+                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias").SQL).Do();
 
             // from preValues to configuration...
             var sql = Sql()

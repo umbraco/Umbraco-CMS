@@ -355,12 +355,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
 
             // troubleshooting
-            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE published=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
             //}
-            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
@@ -500,12 +500,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
 
             // troubleshooting
-            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE published=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");
             //}
-            //if (Database.ExecuteScalar<int>("SELECT COUNT(*) FROM uDocumentVersion JOIN uContentVersion ON uDocumentVersion.id=uContentVersion.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
             //{
             //    Debugger.Break();
             //    throw new Exception("oops");

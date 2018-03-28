@@ -19,9 +19,9 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var expected = new Sql();
             expected.Select("*")
-                .From("[uContentVersion]")
-                .InnerJoin("[uContent]").On("[uContentVersion].[nodeId] = [uContent].[nodeId]")
-                .InnerJoin("[umbracoNode]").On("[uContent].[nodeId] = [umbracoNode].[id]")
+                .From($"[{Constants.DatabaseSchema.Tables.ContentVersion}]")
+                .InnerJoin($"[{Constants.DatabaseSchema.Tables.Content}]").On($"[{Constants.DatabaseSchema.Tables.ContentVersion}].[nodeId] = [{Constants.DatabaseSchema.Tables.Content}].[nodeId]")
+                .InnerJoin("[umbracoNode]").On($"[{Constants.DatabaseSchema.Tables.Content}].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("b796f64c-1f99-4ffb-b886-4bf4bc011a9c"));
 
             var sql = Sql();

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations
 {
@@ -14,31 +15,48 @@ namespace Umbraco.Core.Migrations
         protected void AddColumn<T>(string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            var column = table.Columns.First(x => x.Name == columnName);
-            var createSql = SqlSyntax.Format(column);
-            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(table.Name), createSql));
+            AddColumn(table, table.Name, columnName);
         }
 
         protected void AddColumn<T>(string tableName, string columnName)
         {
-            //if (ColumnExists(tableName, columnName))
-            //    throw new InvalidOperationException($"Column {tableName}.{columnName} already exists.");
-
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, tableName, columnName);
+        }
+
+        private void AddColumn(TableDefinition table, string tableName, string columnName)
+        {
+            if (ColumnExists(tableName, columnName)) return;
+
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column);
-            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
+            
+            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
+        }
+
+        protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, table.Name, columnName, out sqls);
         }
 
         protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
         {
-            //if (ColumnExists(tableName, columnName))
-            //    throw new InvalidOperationException($"Column {tableName}.{columnName} already exists.");
-
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, tableName, columnName, out sqls);
+        }
+
+        private void AddColumn(TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
+        {
+            if (ColumnExists(tableName, columnName))
+            {
+                sqls = Enumerable.Empty<string>();
+                return;
+            }
+
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out sqls);
-            Database.Execute(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql));
+            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
         }
 
         protected void AlterColumn<T>(string tableName, string columnName)
@@ -47,14 +65,14 @@ namespace Umbraco.Core.Migrations
             var column = table.Columns.First(x => x.Name == columnName);
             SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out var sqls);
             foreach (var sql in sqls)
-                Database.Execute(sql);
+                Execute.Sql(sql).Do();
         }
 
         protected void ReplaceColumn<T>(string tableName, string currentName, string newName)
         {
             AddColumn<T>(tableName, newName, out var sqls);
-            Database.Execute($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}");
-            foreach (var sql in sqls) Database.Execute(sql);
+            Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
+            foreach (var sql in sqls) Execute.Sql(sql).Do();
             Delete.Column(currentName).FromTable(tableName).Do();
         }
 

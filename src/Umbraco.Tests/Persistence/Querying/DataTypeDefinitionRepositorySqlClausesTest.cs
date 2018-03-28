@@ -19,8 +19,8 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var expected = new Sql();
             expected.Select("*")
-                .From("[uDataType]")
-                .InnerJoin("[umbracoNode]").On("[uDataType].[nodeId] = [umbracoNode].[id]")
+                .From($"[{Constants.DatabaseSchema.Tables.DataType}]")
+                .InnerJoin("[umbracoNode]").On($"[{Constants.DatabaseSchema.Tables.DataType}].[nodeId] = [umbracoNode].[id]")
                 .Where("([umbracoNode].[nodeObjectType] = @0)", new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"));
 
             var sql = Sql();

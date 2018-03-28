@@ -159,9 +159,8 @@ namespace Umbraco.Core.Migrations
 
                 var nextState = transition.TargetState;
                 origState = nextState;
-
-                // ReSharper disable once AccessToModifiedClosure
-                _logger.Info<MigrationPlan>("At \"{0}\".", () => origState);
+                
+                _logger.Info<MigrationPlan>("At \"{0}\".", origState);
 
                 if (!_transitions.TryGetValue(origState, out transition))
                     throw new Exception($"Unknown state \"{origState}\".");

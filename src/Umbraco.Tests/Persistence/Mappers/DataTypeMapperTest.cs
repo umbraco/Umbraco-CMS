@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "DatabaseType");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[uDataType].[dbType]"));
+            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[dbType]"));
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "EditorAlias");
 
             // Assert
-            Assert.That(column, Is.EqualTo("[uDataType].[propertyEditorAlias]"));
+            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[propertyEditorAlias]"));
         }
     }
 }

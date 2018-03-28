@@ -143,6 +143,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<TagsMigration>("{139F26D7-7E08-48E3-81D9-E50A21A72F67}");
             Chain<SuperZero>("{CC1B1201-1328-443C-954A-E0BBB8CCC1B5}");
             Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
+            Chain<LanguageColumns>("{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
 
             // at this point of the chain, people started to work on v8, so whenever we
             // merge stuff from v7, we have to chain the migrations here so they also
@@ -159,15 +160,10 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<AddIsSensitiveMemberTypeColumn>("{89A728D1-FF4C-4155-A269-62CC09AD2131}");
             Chain<AddUmbracoAuditTable>("{FD8631BC-0388-425C-A451-5F58574F6F05}");
             Chain<AddUmbracoConsentTable>("{2821F53E-C58B-4812-B184-9CD240F990D7}");
-            Chain<CreateSensitiveDataUserGroup>("{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}"); // final state
+            Chain<CreateSensitiveDataUserGroup>("{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
+            Chain<LanguageColumns>("FIXGUID NEW FINAL");
 
-            // BEWARE! whenever changing the final state, update below!
-
-
-            // INSTALL
-            //
-            // when installing, the source state is empty, and the target state should be the final state.
-            // BEWARE! this MUST match the final state above!
+            // FINAL STATE - MUST MATCH LAST ONE ABOVE !
 
             Add(string.Empty, "{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
         }

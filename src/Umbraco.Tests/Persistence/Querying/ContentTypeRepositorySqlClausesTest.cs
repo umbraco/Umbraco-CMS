@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.SelectAll()
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
-                .InnerJoin("[uDataType]").On("[cmsPropertyType].[dataTypeId] = [uDataType].[nodeId]");
+                .InnerJoin($"[{Constants.DatabaseSchema.Tables.DataType}]").On($"[cmsPropertyType].[dataTypeId] = [{Constants.DatabaseSchema.Tables.DataType}].[nodeId]");
 
             var sql = Sql();
             sql.SelectAll()
@@ -140,7 +140,7 @@ namespace Umbraco.Tests.Persistence.Querying
             expected.SelectAll()
                 .From("[cmsPropertyTypeGroup]")
                 .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
-                .InnerJoin("[uDataType]").On("[cmsPropertyType].[dataTypeId] = [uDataType].[nodeId]")
+                .InnerJoin($"[{Constants.DatabaseSchema.Tables.DataType}]").On($"[cmsPropertyType].[dataTypeId] = [{Constants.DatabaseSchema.Tables.DataType}].[nodeId]")
                 .Where("([cmsPropertyType].[contentTypeId] = @0)", 1050);
 
             var sql = Sql();

@@ -22,5 +22,19 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(100)]
         public string CultureName { get; set; }
+
+        /// <summary>
+        /// Defines if this language is the default variant language when language variants are in use
+        /// </summary>
+        [Column("isDefaultVariantLang")]
+        [Constraint(Default = "0")]
+        public bool IsDefaultVariantLanguage { get; set; }
+
+        /// <summary>
+        /// If true, a variant node cannot be published unless this language variant is created
+        /// </summary>
+        [Column("mandatory")]
+        [Constraint(Default = "0")]
+        public bool Mandatory { get; set; }
     }
 }

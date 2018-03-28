@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
@@ -34,8 +35,9 @@ namespace Umbraco.Core.Services.Implement
 
         private void Initialize()
         {
-            // all this cannot be achieved via migrations since it needs to run
-            // before any migration, in order to figure out migrations
+            // all this cannot be achieved via an UmbracoPlan migration since it needs to
+            // run before any migration, in order to figure out the current plan's state.
+            // (does not prevent us from using a migration to do it, though)
 
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -46,35 +48,45 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-                // drop the 'identity' on umbracoLock primary key
-                foreach (var sql in new[]
-                {
-                    // create a temp. id column and copy values
-                    "alter table umbracoLock add column nid int null;",
-                    "update umbracoLock set nid = id;",
-                    // drop the id column entirely (cannot just drop identity)
-                    "alter table umbracoLock drop constraint PK_umbracoLock;",
-                    "alter table umbracoLock drop column id;",
-                    // recreate the id column without identity and copy values
-                    "alter table umbracoLock add column id int null;",
-                    "update umbracoLock set id = nid;",
-                    // drop the temp. id column
-                    "alter table umbracoLock drop column nid;",
-                    // complete the primary key
-                    "alter table umbracoLock alter column id int not null;",
-                    "alter table umbracoLock add constraint PK_umbracoLock primary key (id);"
-                })
-                    scope.Database.Execute(sql);
-
-                // insert the key-value lock
-                scope.Database.Execute($@"INSERT {scope.SqlContext.SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Lock)} (id, name, value)
-VALUES ({Constants.Locks.KeyValues}, 'KeyValues', 1);");
-
-                // create the key-value table
                 var context = new MigrationContext(scope.Database, _logger);
-                new CreateBuilder(context).Table<KeyValueDto>().Do();
+                var initMigration = new InitializeMigration(context);
+                initMigration.Migrate();
 
                 scope.Complete();
+            }
+        }
+
+        /// <summary>
+        /// A custom migration that executes standalone during the Initialize phase of this service.
+        /// </summary>
+        private class InitializeMigration : MigrationBase
+        {
+            public InitializeMigration(IMigrationContext context)
+                : base(context)
+            { }
+
+            public override void Migrate()
+            {
+                // create a temp. id column and copy values
+                Alter.Table(Constants.DatabaseSchema.Tables.Lock).AddColumn("nid").AsInt32().Nullable().Do();
+                Execute.Sql("update umbracoLock set nid = id").Do();
+                // drop the id column entirely (cannot just drop identity)
+                Delete.PrimaryKey("PK_umbracoLock").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
+                Delete.Column("id").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
+                // recreate the id column without identity and copy values
+                Alter.Table(Constants.DatabaseSchema.Tables.Lock).AddColumn("id").AsInt32().Nullable().Do();
+                Execute.Sql("update umbracoLock set id = nid").Do();
+                // drop the temp. id column
+                Delete.Column("nid").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
+                // complete the primary key
+                Alter.Table(Constants.DatabaseSchema.Tables.Lock).AlterColumn("id").AsInt32().NotNullable().PrimaryKey("PK_umbracoLock").Do();
+
+                // insert the key-value lock
+                Insert.IntoTable(Constants.DatabaseSchema.Tables.Lock).Row(new {id = Constants.Locks.KeyValues, name = "KeyValues", value = 1}).Do();
+
+                // create the key-value table if it's not there
+                if (TableExists(Constants.DatabaseSchema.Tables.KeyValue) == false)
+                    Create.Table<KeyValueDto>().Do();
             }
         }
 

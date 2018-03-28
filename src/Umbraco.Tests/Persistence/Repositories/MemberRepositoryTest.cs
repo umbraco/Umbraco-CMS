@@ -323,8 +323,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             var sql = provider.SqlContext.Sql();
-            sql.Select("umbracoNode.*", "uContent.contentTypeId", "cmsContentType.alias AS ContentTypeAlias", "uContentVersion.versionId",
-                "uContentVersion.versionDate", "cmsMember.Email",
+            sql.Select("umbracoNode.*", $"{Constants.DatabaseSchema.Tables.Content}.contentTypeId", "cmsContentType.alias AS ContentTypeAlias", $"{Constants.DatabaseSchema.Tables.ContentVersion}.versionId",
+                $"{Constants.DatabaseSchema.Tables.ContentVersion}.versionDate", "cmsMember.Email",
                 "cmsMember.LoginName", "cmsMember.Password",
                 Constants.DatabaseSchema.Tables.PropertyData + ".id AS PropertyDataId", Constants.DatabaseSchema.Tables.PropertyData + ".propertytypeid",
                 Constants.DatabaseSchema.Tables.PropertyData + ".dateValue", Constants.DatabaseSchema.Tables.PropertyData + ".intValue",
@@ -341,7 +341,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
                 .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.NodeId, right => right.DataTypeId)
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = uContentVersion.id")
+                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + $".versionId = {Constants.DatabaseSchema.Tables.ContentVersion}.id")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -359,7 +359,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
                 .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.NodeId, right => right.DataTypeId)
                 .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + ".versionId = uContentVersion.id")
+                .Append("AND " + Constants.DatabaseSchema.Tables.PropertyData + $".versionId = {Constants.DatabaseSchema.Tables.ContentVersion}.id")
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }

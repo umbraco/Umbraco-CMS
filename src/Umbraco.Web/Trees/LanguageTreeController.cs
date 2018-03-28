@@ -35,6 +35,8 @@ namespace Umbraco.Web.Trees
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.Languages, "overview");
             root.Icon = "icon-flag-alt";
+            root.HasChildren = false;
+            root.MenuUrl = null;
 
             return root;
         }

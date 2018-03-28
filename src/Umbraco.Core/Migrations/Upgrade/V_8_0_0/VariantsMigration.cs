@@ -29,20 +29,20 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             MigrateContent();
             MigrateVersions();
 
-            if (Database.Fetch<dynamic>(@"SELECT uContentVersion.nodeId, COUNT(uContentVersion.id)
-FROM uContentVersion
-JOIN uDocumentVersion ON uContentVersion.id=uDocumentVersion.id
-WHERE uDocumentVersion.published=1
-GROUP BY uContentVersion.nodeId
-HAVING COUNT(uContentVersion.id) > 1").Any())
+            if (Database.Fetch<dynamic>($@"SELECT {Constants.DatabaseSchema.Tables.ContentVersion}.nodeId, COUNT({Constants.DatabaseSchema.Tables.ContentVersion}.id)
+FROM {Constants.DatabaseSchema.Tables.ContentVersion}
+JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} ON {Constants.DatabaseSchema.Tables.ContentVersion}.id={Constants.DatabaseSchema.Tables.DocumentVersion}.id
+WHERE {Constants.DatabaseSchema.Tables.DocumentVersion}.published=1
+GROUP BY {Constants.DatabaseSchema.Tables.ContentVersion}.nodeId
+HAVING COUNT({Constants.DatabaseSchema.Tables.ContentVersion}.id) > 1").Any())
             {
                 Debugger.Break();
                 throw new Exception("Migration failed: duplicate 'published' document versions.");
             }
 
-            if (Database.Fetch<dynamic>(@"SELECT v1.nodeId, v1.id, COUNT(v2.id)
-FROM uContentVersion v1
-LEFT JOIN uContentVersion v2 ON v1.nodeId=v2.nodeId AND v2.[current]=1
+            if (Database.Fetch<dynamic>($@"SELECT v1.nodeId, v1.id, COUNT(v2.id)
+FROM {Constants.DatabaseSchema.Tables.ContentVersion} v1
+LEFT JOIN {Constants.DatabaseSchema.Tables.ContentVersion} v2 ON v1.nodeId=v2.nodeId AND v2.[current]=1
 GROUP BY v1.nodeId, v1.id
 HAVING COUNT(v2.id) <> 1").Any())
             {

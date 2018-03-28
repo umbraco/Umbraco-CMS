@@ -23,6 +23,9 @@ namespace Umbraco.Core.Configuration
     // http://issues.umbraco.org/issue/U4-58
     // http://issues.umbraco.org/issue/U4-115
 
+    // TODO: There's a current task and branch to refactor this into interfaces and proper config: http://issues.umbraco.org/issue/U4-8861
+    // PR https://github.com/umbraco/Umbraco-CMS/compare/dev-v8...temp-U4-8861?expand=1 
+
     //TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
 
     /// <summary>

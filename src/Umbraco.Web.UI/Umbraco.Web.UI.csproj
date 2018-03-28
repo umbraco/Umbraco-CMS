@@ -673,7 +673,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </Content>
-    <Content Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Umbraco\Config\Create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>

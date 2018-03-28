@@ -502,13 +502,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 case "VERSIONDATE":
                 case "UPDATEDATE":
-                    return GetDatabaseFieldNameForOrderBy("uContentVersion", "versionDate");
+                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.ContentVersion, "versionDate");
                 case "CREATEDATE":
                     return GetDatabaseFieldNameForOrderBy("umbracoNode", "createDate");
                 case "NAME":
                     return GetDatabaseFieldNameForOrderBy("umbracoNode", "text");
                 case "PUBLISHED":
-                    return GetDatabaseFieldNameForOrderBy("uDocument", "published");
+                    return GetDatabaseFieldNameForOrderBy(Constants.DatabaseSchema.Tables.Document, "published");
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return GetDatabaseFieldNameForOrderBy("umbracoNode", "nodeUser");

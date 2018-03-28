@@ -2,14 +2,10 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -32,8 +28,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             return new LanguageRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
         }
-
-
 
         [Test]
         public void Can_Perform_Get_On_LanguageRepository()
@@ -109,7 +103,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Get_WhenIdDoesntExist_ReturnsNull()
+        public void Get_When_Id_Doesnt_Exist_Returns_Null()
         {
             // Arrange
             var provider = TestObjects.GetScopeProvider(Logger);
@@ -219,6 +213,59 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
                 Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
+                Assert.IsFalse(languageBR.IsDefaultVariantLanguage);
+                Assert.IsFalse(languageBR.Mandatory);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_LanguageRepository_With_Boolean_Properties()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+
+                // Act
+                var languageBR = new Language("pt-BR") { CultureName = "pt-BR", IsDefaultVariantLanguage = true, Mandatory = true };
+                repository.Save(languageBR);
+
+                // Assert
+                Assert.That(languageBR.HasIdentity, Is.True);
+                Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
+                Assert.IsTrue(languageBR.IsDefaultVariantLanguage);
+                Assert.IsTrue(languageBR.Mandatory);
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_LanguageRepository_With_New_Default()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository(provider);
+                                
+                var languageBR = (ILanguage)new Language("pt-BR") { CultureName = "pt-BR", IsDefaultVariantLanguage = true, Mandatory = true };
+                repository.Save(languageBR);
+                var languageEN = new Language("en-AU") { CultureName = "en-AU" };
+                repository.Save(languageEN);
+
+                Assert.IsTrue(languageBR.IsDefaultVariantLanguage);
+                Assert.IsTrue(languageBR.Mandatory);
+
+                // Act
+
+                var languageNZ = new Language("en-NZ") { CultureName = "en-NZ", IsDefaultVariantLanguage = true, Mandatory = true };
+                repository.Save(languageNZ);
+                languageBR = repository.Get(languageBR.Id);
+
+                // Assert
+
+                Assert.IsFalse(languageBR.IsDefaultVariantLanguage);
+                Assert.IsTrue(languageNZ.IsDefaultVariantLanguage);
             }
         }
 

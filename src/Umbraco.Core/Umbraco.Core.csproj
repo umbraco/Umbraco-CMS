@@ -336,6 +336,7 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />

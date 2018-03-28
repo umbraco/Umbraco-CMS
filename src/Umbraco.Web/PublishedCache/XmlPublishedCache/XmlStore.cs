@@ -497,15 +497,17 @@ AND (umbracoNode.id=@id)";
             return xml;
         }
 
-        public XmlNode GetPreviewXmlNode(int contentId)
-        {
-            const string sql = @"SELECT umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.Level,
-cmsPreviewXml.xml, uDocument.published
+        private static readonly string PreviewXmlNodeSql = $@"SELECT umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.Level,
+cmsPreviewXml.xml, {Constants.DatabaseSchema.Tables.Document}.published
 FROM umbracoNode
 JOIN cmsPreviewXml ON (cmsPreviewXml.nodeId=umbracoNode.id)
-JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
+JOIN {Constants.DatabaseSchema.Tables.Document} ON ({Constants.DatabaseSchema.Tables.Document}.nodeId=umbracoNode.id)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType
 AND (umbracoNode.id=@id)";
+
+        public XmlNode GetPreviewXmlNode(int contentId)
+        {
+            var sql = PreviewXmlNodeSql;
 
             XmlDto xmlDto;
             using (var scope = _scopeProvider.CreateScope())
@@ -840,32 +842,32 @@ AND (umbracoNode.id=@id)";
 
         #region Database
 
-        private const string ReadTreeCmsContentXmlSql = @"SELECT
+        private static readonly string ReadTreeCmsContentXmlSql = $@"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsContentXml.xml, cmsContentXml.rv, uDocument.published
+    cmsContentXml.xml, cmsContentXml.rv, {Constants.DatabaseSchema.Tables.Document}.published
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
-JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1
+JOIN {Constants.DatabaseSchema.Tables.Document} ON ({Constants.DatabaseSchema.Tables.Document}.nodeId=umbracoNode.id)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND {Constants.DatabaseSchema.Tables.Document}.published=1
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-        private const string ReadBranchCmsContentXmlSql = @"SELECT
+        private static readonly string ReadBranchCmsContentXmlSql = $@"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsContentXml.xml, cmsContentXml.rv, uDocument.published
+    cmsContentXml.xml, cmsContentXml.rv, {Constants.DatabaseSchema.Tables.Document}.published
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
-JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1 AND (umbracoNode.id = @id OR umbracoNode.path LIKE @path)
+JOIN {Constants.DatabaseSchema.Tables.Document} ON ({Constants.DatabaseSchema.Tables.Document}.nodeId=umbracoNode.id)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND {Constants.DatabaseSchema.Tables.Document}.published=1 AND (umbracoNode.id = @id OR umbracoNode.path LIKE @path)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-        private const string ReadCmsContentXmlForContentTypesSql = @"SELECT
+        private static readonly string ReadCmsContentXmlForContentTypesSql = $@"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsContentXml.xml, cmsContentXml.rv, uDocument.published
+    cmsContentXml.xml, cmsContentXml.rv, {Constants.DatabaseSchema.Tables.Document}.published
 FROM umbracoNode
 JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
-JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
-JOIN uContent ON (uDocument.nodeId=uContent.nodeId)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1 AND uContent.contentTypeId IN (@ids)
+JOIN {Constants.DatabaseSchema.Tables.Document} ON ({Constants.DatabaseSchema.Tables.Document}.nodeId=umbracoNode.id)
+JOIN {Constants.DatabaseSchema.Tables.Content} ON ({Constants.DatabaseSchema.Tables.Document}.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND {Constants.DatabaseSchema.Tables.Document}.published=1 AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ids)
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private const string ReadMoreCmsContentXmlSql = @"SELECT
@@ -876,13 +878,13 @@ JOIN cmsContentXml ON (cmsContentXml.nodeId=umbracoNode.id)
 WHERE umbracoNode.nodeObjectType = @nodeObjectType
 ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
-        private const string ReadCmsPreviewXmlSql1 = @"SELECT
+        private static readonly string ReadCmsPreviewXmlSql1 = $@"SELECT
     umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, umbracoNode.level, umbracoNode.path,
-    cmsPreviewXml.xml, cmsPreviewXml.rv, uDocument.published
+    cmsPreviewXml.xml, cmsPreviewXml.rv, {Constants.DatabaseSchema.Tables.Document}.published
 FROM umbracoNode
 JOIN cmsPreviewXml ON (cmsPreviewXml.nodeId=umbracoNode.id)
-JOIN uDocument ON (uDocument.nodeId=umbracoNode.id)
-WHERE umbracoNode.nodeObjectType = @nodeObjectType AND uDocument.published=1
+JOIN {Constants.DatabaseSchema.Tables.Document} ON ({Constants.DatabaseSchema.Tables.Document}.nodeId=umbracoNode.id)
+WHERE umbracoNode.nodeObjectType = @nodeObjectType AND {Constants.DatabaseSchema.Tables.Document}.published=1
 AND (umbracoNode.path=@path OR"; // @path LIKE concat(umbracoNode.path, ',%')";
 
         private const string ReadCmsPreviewXmlSql2 = @")
@@ -1714,15 +1716,15 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN uContent ON (cmsContentXml.nodeId=uContent.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND uContent.contentTypeId IN (@ctypes)",
-                db.Execute(@"DELETE FROM cmsContentXml
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                db.Execute($@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = contentObjectType, ctypes = contentTypeIdsA });
             }
@@ -1785,15 +1787,15 @@ WHERE cmsPreviewXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsPreviewXml
                 //FROM cmsPreviewXml
                 //JOIN umbracoNode ON (cmsPreviewXml.nodeId=umbracoNode.Id)
-                //JOIN uContent ON (cmsPreviewXml.nodeId=uContent.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsPreviewXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND uContent.contentTypeId IN (@ctypes)",
-                db.Execute(@"DELETE FROM cmsPreviewXml
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                db.Execute($@"DELETE FROM cmsPreviewXml
 WHERE cmsPreviewXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = contentObjectType, ctypes = contentTypeIdsA });
             }
@@ -1808,7 +1810,7 @@ WHERE cmsPreviewXml.nodeId IN (
             long total;
             do
             {
-                // .GetPagedResultsByQuery implicitely adds (uDocument.newest = 1) which
+                // .GetPagedResultsByQuery implicitely adds ({Constants.DatabaseSchema.Tables.Document}.newest = 1) which
                 // is what we want for preview (ie latest version of a content, published or not)
                 var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, "Path", Direction.Ascending, true);
                 const bool published = true; // previewXml contains edit content!
@@ -1860,15 +1862,15 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN uContent ON (cmsContentXml.nodeId=uContent.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND uContent.contentTypeId IN (@ctypes)",
-                db.Execute(@"DELETE FROM cmsContentXml
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                db.Execute($@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = mediaObjectType, ctypes = contentTypeIdsA });
             }
@@ -1929,15 +1931,15 @@ WHERE cmsContentXml.nodeId IN (
                 //                    db.Execute(@"DELETE cmsContentXml
                 //FROM cmsContentXml
                 //JOIN umbracoNode ON (cmsContentXml.nodeId=umbracoNode.Id)
-                //JOIN uContent ON (cmsContentXml.nodeId=uContent.nodeId)
+                //JOIN {Constants.DatabaseSchema.Tables.Content} ON (cmsContentXml.nodeId={Constants.DatabaseSchema.Tables.Content}.nodeId)
                 //WHERE umbracoNode.nodeObjectType=@objType
-                //AND uContent.contentTypeId IN (@ctypes)",
-                db.Execute(@"DELETE FROM cmsContentXml
+                //AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)",
+                db.Execute($@"DELETE FROM cmsContentXml
 WHERE cmsContentXml.nodeId IN (
     SELECT id FROM umbracoNode
-    JOIN uContent ON uContent.nodeId=umbracoNode.id
+    JOIN {Constants.DatabaseSchema.Tables.Content} ON {Constants.DatabaseSchema.Tables.Content}.nodeId=umbracoNode.id
     WHERE umbracoNode.nodeObjectType=@objType
-    AND uContent.contentTypeId IN (@ctypes)
+    AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
                     new { objType = memberObjectType, ctypes = contentTypeIdsA });
             }
@@ -1980,9 +1982,9 @@ WHERE cmsContentXml.nodeId IN (
             var contentObjectType = Constants.ObjectTypes.Document;
             var db = scope.Database;
 
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
+            var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN uDocument ON (umbracoNode.id=uDocument.nodeId and uDocument.published=1)
+JOIN {Constants.DatabaseSchema.Tables.Document} ON (umbracoNode.id={Constants.DatabaseSchema.Tables.Document}.nodeId and {Constants.DatabaseSchema.Tables.Document}.published=1)
 LEFT JOIN cmsContentXml ON (umbracoNode.id=cmsContentXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
@@ -2021,9 +2023,9 @@ AND cmsPreviewXml.nodeId IS NULL OR cmsPreviewXml.xml NOT LIKE '% key=""'
             var mediaObjectType = Constants.ObjectTypes.Media;
             var db = scope.Database;
 
-            var count = db.ExecuteScalar<int>(@"SELECT COUNT(*)
+            var count = db.ExecuteScalar<int>($@"SELECT COUNT(*)
 FROM umbracoNode
-JOIN uDocument ON (umbracoNode.id=uDocument.nodeId and uDocument.published=1)
+JOIN {Constants.DatabaseSchema.Tables.Document} ON (umbracoNode.id={Constants.DatabaseSchema.Tables.Document}.nodeId and {Constants.DatabaseSchema.Tables.Document}.published=1)
 LEFT JOIN cmsContentXml ON (umbracoNode.id=cmsContentXml.nodeId)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentXml.nodeId IS NULL OR cmsContentXml.xml NOT LIKE '% key=""'
