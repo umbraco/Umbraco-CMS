@@ -36,8 +36,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public static SafeXmlReaderWriter Get(IScopeProvider scopeProvider)
         {
-            var scopeContext = scopeProvider.Context;
-            return scopeContext?.GetEnlisted<SafeXmlReaderWriter>(EnlistKey);
+            return scopeProvider?.Context?.GetEnlisted<SafeXmlReaderWriter>(EnlistKey);
         }
 
         public static SafeXmlReaderWriter Get(IScopeProvider scopeProvider, AsyncLock xmlLock, XmlDocument xml, Action<XmlDocument> refresh, Action<XmlDocument, bool> apply, bool writer)

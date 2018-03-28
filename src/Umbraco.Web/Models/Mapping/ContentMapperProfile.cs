@@ -4,25 +4,10 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class ContentUrlResolver : IValueResolver<IContent, ContentItemDisplay, string[]>
-    {
-        public string[] Resolve(IContent source, ContentItemDisplay destination, string[] destMember, ResolutionContext context)
-        {
-            var umbracoContext = context.GetUmbracoContext();
-
-            var urls = umbracoContext == null
-                ? new[] {"Cannot generate urls without a current Umbraco Context"}
-                : source.GetContentUrls(umbracoContext).ToArray();
-
-            return urls;
-        }
-    }
-
     /// <summary>
     /// Declares how model mappings for content
     /// </summary>

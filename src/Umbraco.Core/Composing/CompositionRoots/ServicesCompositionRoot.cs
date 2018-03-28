@@ -51,6 +51,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<INotificationService, NotificationService>();
             container.RegisterSingleton<IExternalLoginService, ExternalLoginService>();
             container.RegisterSingleton<IRedirectUrlService, RedirectUrlService>();
+            container.RegisterSingleton<IConsentService, ConsentService>();
             container.Register<LocalizedTextServiceFileSources>(factory =>
             {
                 var mainLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));

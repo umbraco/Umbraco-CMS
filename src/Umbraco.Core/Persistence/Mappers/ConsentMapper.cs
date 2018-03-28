@@ -15,15 +15,6 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConsentMapper"/> class.
-        /// </summary>
-        public ConsentMapper()
-        {
-            // note: why the base ctor does not invoke BuildMap is a mystery to me
-            BuildMap();
-        }
-
         protected override void BuildMap()
         {
             CacheMap<Consent, ConsentDto>(entity => entity.Id, dto => dto.Id);

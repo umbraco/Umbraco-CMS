@@ -371,7 +371,7 @@
     <Compile Include="Persistence\Factories\AuditEntryFactory.cs" />
     <Compile Include="Persistence\Factories\ConsentFactory.cs" />
     <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
-    <Compile Include="Persistence\Mappers\AuditMapper.cs" />
+    <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
@@ -936,7 +936,6 @@
     <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
-    <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />

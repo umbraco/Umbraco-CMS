@@ -533,7 +533,7 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Key_For_Id_With_Unknown_Type()
         {
             var service = ServiceContext.EntityService;
-            var result = service.GetKey(1060, UmbracoObjectTypes.Unknown);
+            var result = service.GetKey(1061, UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), result.Result);
@@ -567,7 +567,7 @@ namespace Umbraco.Tests.Services
             var result = service.GetId(Guid.Parse("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522"), UmbracoObjectTypes.Unknown);
 
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(1060, result.Result);
+            Assert.AreEqual(1061, result.Result);
         }
 
         [Test]

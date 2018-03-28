@@ -54,6 +54,8 @@ namespace Umbraco.Core.Persistence.Mappers
             Add<UserMapper>();
             Add<ExternalLoginMapper>();
             Add<UserGroupMapper>();
+            Add<AuditEntryMapper>();
+            Add<ConsentMapper>();
             return this;
         }
     }

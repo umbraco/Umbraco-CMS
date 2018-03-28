@@ -3,11 +3,21 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
     internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
     {
+        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService)
+        {
+            var items = Fields.First(x => x.Key == "items");
+
+            // customize the items field
+            items.Name = textService.Localize("editdatatype/addPrevalue");
+            items.Validators.Add(new ValueListUniqueValueValidator());
+        }
+
         public override DropDownFlexibleConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, DropDownFlexibleConfiguration configuration)
         {
             var output = new DropDownFlexibleConfiguration();

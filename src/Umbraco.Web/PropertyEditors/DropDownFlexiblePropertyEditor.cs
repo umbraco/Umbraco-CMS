@@ -8,15 +8,19 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(Constants.PropertyEditors.Aliases.DropDownListFlexible, "Dropdown", "dropdownFlexible", Group = "lists", Icon = "icon-indent")]
     public class DropDownFlexiblePropertyEditor : DataEditor
     {
-        public DropDownFlexiblePropertyEditor(ILogger logger)
+        private readonly ILocalizedTextService _textService;
+
+        public DropDownFlexiblePropertyEditor(ILocalizedTextService textService, ILogger logger)
             : base(logger)
-        { }
+        {
+            _textService = textService;
+        }
 
         protected override IDataValueEditor CreateValueEditor()
         {
             return new PublishValuesMultipleValueEditor(false, Attribute);
         }
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new DropDownFlexibleConfigurationEditor();
+        protected override IConfigurationEditor CreateConfigurationEditor() => new DropDownFlexibleConfigurationEditor(_textService);
     }
 }

@@ -13,16 +13,13 @@ namespace Umbraco.Web.PropertyEditors
     {
         public ColorPickerConfigurationEditor()
         {
-            var field = Fields.First(x => x.Key == "items");
+            var items = Fields.First(x => x.Key == "items");
 
-            //use a custom editor too
-            field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
-            //change the description
-            field.Description = "Add and remove colors";
-            //change the label
-            field.Name = "Add color";
-            //need to have some custom validation happening here
-            field.Validators.Add(new ColorListValidator());
+            // customize the items field
+            items.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
+            items.Description = "Add and remove colors";
+            items.Name = "Add color";
+            items.Validators.Add(new ColorListValidator());
         }
 
         public override Dictionary<string, object> ToConfigurationEditor(ColorPickerConfiguration configuration)

@@ -169,6 +169,9 @@ namespace Umbraco.Tests.Scoping
         [Test]
         public void SupersededEvents2()
         {
+            Test_UnPublished += OnDoThingFail;
+            Test_Deleted += OnDoThingFail;
+
             var contentService = Mock.Of<IContentService>();
             var content = Mock.Of<IContent>();
 

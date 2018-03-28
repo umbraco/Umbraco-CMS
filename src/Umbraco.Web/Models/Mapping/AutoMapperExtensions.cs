@@ -18,8 +18,10 @@ namespace Umbraco.Web.Models.Mapping
             if (resolutionContext.Options.Items.TryGetValue(UmbracoContextKey, out var obj) && obj is UmbracoContext umbracoContext)
                 return umbracoContext;
 
-            // not sure this is a good idea at all
-            //return Current.UmbracoContext;
+            // fixme - not a good idea at all
+            // because this falls back to magic singletons
+            // so really we should remove this line, but then some tests+app breaks ;(
+            return Umbraco.Web.Composing.Current.UmbracoContext;
 
             // better fail fast
             if (throwIfMissing)

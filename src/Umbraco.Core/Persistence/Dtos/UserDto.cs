@@ -107,7 +107,7 @@ namespace Umbraco.Core.Persistence.Dtos
         /// <summary>
         /// A Json blob stored for recording tour data for a user
         /// </summary>
-        [Column("tourData")]
+        [Column("tourData")] // FIXME CANNOT UPGRADE???
         [NullSetting(NullSetting = NullSettings.Null)]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string TourData { get; set; }
