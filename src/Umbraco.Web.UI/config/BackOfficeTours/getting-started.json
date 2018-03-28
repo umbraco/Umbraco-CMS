@@ -395,7 +395,7 @@
         "steps": [
             {
                 "title": "How to use the media library",
-                "content": "<p>A website would be boring without media content. In Umbraco you can manage all your images, documents, videos etc. in the <b>Media section</b>. Here you can upload and organise your media items and see details about each item.</p><p>In this tour you will learn how to upload and organise your Media library in Umbraco. It will also show you how to view details about a specific media item.</p>",
+                "content": "<p>A website would be boring without media content. In Umbraco you can manage all your images, documents, videos, and other media in the <b>Media section</b>. Here you can upload and organise your media items and see details about each item.</p><p>In this tour you will learn how to upload and organise your Media library in Umbraco. It will also show you how to view details about specific media items.</p>",
                 "type": "intro"
             },
             {
@@ -408,14 +408,14 @@
             {
                 "element": "#tree [data-element='tree-root']",
                 "title": "Create a new folder",
-                "content": "<p>First create a folder for your images. Hover the media root node and click the <b>three small dots</b> on the right side of the item.</p>",
+                "content": "<p>First create a folder for your images. Hover over the media root node and click the <b>three small dots</b> on the right side of the item.</p>",
                 "event": "click",
                 "eventElement": "#tree [data-element='tree-root'] [data-element='tree-item-options']"
             },
             {
                 "element": "#dialog [data-element='action-Folder']",
                 "title": "Create a new folder",
-                "content": "<p>Select the <b>Folder</b> option to select the type folder.</p>",
+                "content": "<p>Select the <b>Folder</b> option to select an empty folder.</p>",
                 "event": "click"
             },
             {
@@ -427,19 +427,19 @@
             {
                 "element": "[data-element='editor-media'] [data-element='button-save']",
                 "title": "Save the folder",
-                "content": "<p>Click the <b>Save</b> button to create the new folder</p>",
+                "content": "<p>Click the <b>Save</b> button to create the new folder.</p>",
                 "event": "click"
             },
             {
                 "element": "[data-element='editor-media'] [data-element='dropzone']",
                 "title": "Upload images",
-                "content": "<p>In the upload area you can upload your media items.</p><p>Click the <b>Click here to choose files</b>-button and select a couple of images on your computer and upload them.</p>",
+                "content": "<p>In the upload area you can upload your media items.</p><p>Click the <b>Click here to choose files</b> button and select a few example images from your computer to upload.</p>",
                 "view": "uploadimages"
             },
             {
                 "element": "[data-element='editor-media'] [data-element='media-grid-item-0']",
                 "title": "View media item details",
-                "content": "Hover the media item and <b>Click the purple bar</b> to view details about the media item",
+                "content": "Hover over the thumbnail and click the <b>purple bar</b>, or select the item directly in the <b>media tree</b> to view details about the media item.",
                 "event": "click",
                 "eventElement": "[data-element='editor-media'] [data-element='media-grid-item-0'] [data-element='media-grid-item-edit']"
             },
@@ -452,7 +452,7 @@
             {
                 "element": "[data-element='editor-media'] [data-element='property-umbracoBytes']",
                 "title": "Image size",
-                "content": "<p>You will also find other details about the image, like the size.</p><p>Media items work in much the same way as content. So you can add extra properties to an image by creating or editing the <b>Media types</b> in the Settings section.</p>"
+                "content": "<p>You will also find other details about the image, like the size.</p><p>Media items work in much the same way as content, so you can add extra properties to an image by creating or editing the <b>Media types</b> in the Settings section.</p>"
             },
             {
                 "element": "[data-element='editor-media'] [data-element='tab-_umb_infoTab']",
