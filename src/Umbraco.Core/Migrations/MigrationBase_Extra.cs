@@ -12,19 +12,41 @@ namespace Umbraco.Core.Migrations
     {
         // provides extra methods for migrations
 
-        //fixme - why do we have tableName and provide a table type which we can just extract the table name from?
+        protected void AddColumn<T>(string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, table.Name, columnName);
+        }
+
         protected void AddColumn<T>(string tableName, string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, tableName, columnName);
+        }
+
+        private void AddColumn(TableDefinition table, string tableName, string columnName)
         {
             if (ColumnExists(tableName, columnName)) return;
 
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column);
             
-            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(table.Name), createSql)).Do();
+            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
+        }
+
+        protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, table.Name, columnName, out sqls);
         }
 
         protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(table, tableName, columnName, out sqls);
+        }
+
+        private void AddColumn(TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
         {
             if (ColumnExists(tableName, columnName))
             {
@@ -32,7 +54,6 @@ namespace Umbraco.Core.Migrations
                 return;
             }
 
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out sqls);
             Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();

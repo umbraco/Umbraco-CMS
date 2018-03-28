@@ -35,8 +35,9 @@ namespace Umbraco.Core.Services.Implement
 
         private void Initialize()
         {
-            // all this cannot be achieved via default migrations since it needs to run
-            // before any migration, in order to figure out migrations, ironically we are using a custom migration to do this
+            // all this cannot be achieved via an UmbracoPlan migration since it needs to
+            // run before any migration, in order to figure out the current plan's state.
+            // (does not prevent us from using a migration to do it, though)
 
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -56,13 +57,13 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// A custom migration that executes standalone during the Initialize phase of this service
+        /// A custom migration that executes standalone during the Initialize phase of this service.
         /// </summary>
         private class InitializeMigration : MigrationBase
         {
-            public InitializeMigration(IMigrationContext context) : base(context)
-            {
-            }
+            public InitializeMigration(IMigrationContext context)
+                : base(context)
+            { }
 
             public override void Migrate()
             {
@@ -79,9 +80,9 @@ namespace Umbraco.Core.Services.Implement
                 Delete.Column("nid").FromTable(Constants.DatabaseSchema.Tables.Lock).Do();
                 // complete the primary key
                 Alter.Table(Constants.DatabaseSchema.Tables.Lock).AlterColumn("id").AsInt32().NotNullable().PrimaryKey("PK_umbracoLock").Do();
-                
+
                 // insert the key-value lock
-                Insert.IntoTable(Constants.DatabaseSchema.Tables.Lock).Row(new {id = Constants.Locks.KeyValues, name = "KeyValues", value = 1}).Do();                
+                Insert.IntoTable(Constants.DatabaseSchema.Tables.Lock).Row(new {id = Constants.Locks.KeyValues, name = "KeyValues", value = 1}).Do();
 
                 // create the key-value table if it's not there
                 if (TableExists(Constants.DatabaseSchema.Tables.KeyValue) == false)
