@@ -143,9 +143,9 @@ namespace Umbraco.Examine
         /// Returns a list of fields to search on, this will also exclude the IndexPathFieldName and node type alias
         /// </summary>
         /// <returns></returns>
-        protected override string[] GetSearchFields()
+        public override string[] GetAllIndexedFields()
         {
-            var fields = base.GetSearchFields();
+            var fields = base.GetAllIndexedFields();
             return fields
                 .Where(x => x != UmbracoExamineIndexer.IndexPathFieldName)
                 .Where(x => x != LuceneIndexer.ItemTypeFieldName)

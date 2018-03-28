@@ -14,6 +14,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -23,15 +24,17 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
-        public ExamineManagementApiController(ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
+        public ExamineManagementApiController(IExamineIndexCollectionAccessor examineIndexes, ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
         {
             //fixme can we inject this? we'll need an IExamineManager
             _examineManager = ExamineManager.Instance;
+            _examineIndexes = examineIndexes;
             _logger = logger;
             _runtimeCacheProvider = runtimeCacheProvider;
         }
 
         private readonly ExamineManager _examineManager;
+        private readonly IExamineIndexCollectionAccessor _examineIndexes;
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCacheProvider;
 
@@ -86,7 +89,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<ExamineIndexerModel> GetIndexerDetails()
         {
-            return ExamineManager.Instance.IndexProviders.Select(CreateModel).OrderBy(x =>
+            return _examineIndexes.Indexes.Select(CreateModel).OrderBy(x =>
             {
                 //order by name , but strip the "Indexer" from the end if it exists
                 return x.Name.TrimEnd("Indexer");
@@ -100,7 +103,7 @@ namespace Umbraco.Web.WebServices
         public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
         {
             var model = new List<ExamineSearcherModel>(
-                ExamineManager.Instance.IndexProviders.Select(indexer =>
+                _examineIndexes.Indexes.Select(indexer =>
                 {
                     var searcher = indexer.Value.GetSearcher();
                     var searcherName = (searcher as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
@@ -286,7 +289,7 @@ namespace Umbraco.Web.WebServices
 
         private HttpResponseMessage ValidateLuceneSearcher(string searcherName, out LuceneSearcher searcher)
         {
-            foreach (var indexer in ExamineManager.Instance.IndexProviders)
+            foreach (var indexer in _examineIndexes.Indexes)
             {
                 var s = indexer.Value.GetSearcher();
                 var sName = (s as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
@@ -316,14 +319,16 @@ namespace Umbraco.Web.WebServices
         {
             indexer = null;
 
-            if (ExamineManager.Instance.IndexProviders.ContainsKey(indexerName))
+            if (_examineIndexes.Indexes.ContainsKey(indexerName)
+                && _examineIndexes.Indexes[indexerName] is T casted)
             {
                 //return Ok!
+                indexer = casted;
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
             var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response.Content = new StringContent($"No indexer found with name = {indexerName}");
+            response.Content = new StringContent($"No indexer found with name = {indexerName} of type {typeof(T)}");
             response.ReasonPhrase = "Indexer Not Found";
             return response;
         }

@@ -66,7 +66,7 @@
     <PackageReference Include="ClientDependency" Version="1.9.2" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="dotless" Version="1.5.2" />
-    <PackageReference Include="Examine" Version="1.0.0-beta017" />
+    <PackageReference Include="Examine" Version="1.0.0-beta020" />
     <PackageReference Include="HtmlAgilityPack" Version="1.5.1" />
     <PackageReference Include="LightInject" Version="5.0.3" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />

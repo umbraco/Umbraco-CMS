@@ -39,7 +39,7 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var searcher = Constants.Examine.InternalSearcher;
+            var indexer = Constants.Examine.InternalIndexer;
             var fields = new[] { "id", "__NodeId" };
 
             var umbracoContext = umbracoHelper.UmbracoContext;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Search
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
+                    indexer = Constants.Examine.InternalMemberIndexer;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Search
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = ExamineManager.Instance.GetIndexSearcher(indexer);
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
