@@ -35,7 +35,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 var found = searcher.Search(searcher.CreateCriteria().Id((string) node.Attribute("id")).Compile());
 
-                Assert.IsNull(found);
+                Assert.AreEqual(0, found.TotalItemCount);
             }
 
 
