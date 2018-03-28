@@ -24,21 +24,21 @@
                 "element": "#applications",
                 "elementPreventClick": true,
                 "title": "Main Menu",
-                "content": "This is the main menu in Umbraco backoffice. Here you can navigate betweeen the different sections, see your user profile and open the help drawer",
+                "content": "This is the main menu in Umbraco backoffice. Here you can navigate betweeen the different sections, see your user profile, and open the help drawer.",
                 "backdropOpacity": 0.6
             },
             {
                 "element": "[data-element='section-content']",
                 "elementPreventClick": true,
                 "title": "Sections",
-                "content": "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the appropriate icon in the main menu and you'll be there in no time.",
+                "content": "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section. When you want to go to another section simply click on the appropriate icon in the main menu and you'll be there in no time.",
                 "backdropOpacity": 0.6
             },
             {
                 "element": "#tree",
                 "elementPreventClick": true,
                 "title": "The Tree",
-                "content": "<p>This is the <b>Tree</b> and is the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b> and here you can navigate the content of your website.</p>"
+                "content": "<p>This is the <b>Tree</b>. It acts as the main navigation inside a section.</p><p>In the Content section the tree is called the <b>Content tree</b>, allowing you to navigate the content of your website.</p>"
             },
             {
                 "element": "[data-element='editor-container']",
@@ -62,18 +62,18 @@
                 "element": "[data-element~='overlay-user']",
                 "elementPreventClick": true,
                 "title": "User profile",
-                "content": "<p>Here you can see details about your user, what Umbraco version the site is running, change your password and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advanced user management.</p>"
+                "content": "<p>Here you can see details about your user, what Umbraco version the site is running, change your password, and log out of Umbraco.</p><p>In the <b>User section</b> you will be able to do more advanced user management.</p>"
             },
             {
                 "element": "[data-element~='overlay-user'] [data-element='button-overlayClose']",
                 "title": "User profile",
-                "content": "Let's close the user profile again",
+                "content": "Click here to close the user profile",
                 "event": "click"
             },
             {
                 "element": "#applications [data-element='section-help']",
                 "title": "Help",
-                "content": "If you ever find yourself in trouble click here to open the help drawer.",
+                "content": "If you ever find yourself in trouble, click here to open the help drawer.",
                 "event": "click",
                 "backdropOpacity": 0.6
             },
@@ -87,7 +87,7 @@
             {
                 "element": "[data-element='drawer'] [data-element='help-tours']",
                 "title": "Tours",
-                "content": "To continue your journey on getting started with Umbraco, you can find more tours right here."
+                "content": "Click here to start the next tour and continue your journey on getting started with Umbraco."
             }
         ]
     },
