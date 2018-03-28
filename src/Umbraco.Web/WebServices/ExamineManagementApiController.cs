@@ -233,15 +233,17 @@ namespace Umbraco.Web.WebServices
             throw new HttpResponseException(msg);
         }
 
-        private ExamineIndexerModel CreateModel(KeyValuePair<string, IIndexer> indexer)
+        private ExamineIndexerModel CreateModel(KeyValuePair<string, IIndexer> indexerKeyVal)
         {
+            var indexer = indexerKeyVal.Value;
+            var indexName = indexerKeyVal.Key;
             var indexerModel = new ExamineIndexerModel()
             {
-                FieldDefinitions = indexer.Value.FieldDefinitionCollection,
-                Name = indexer.Key
+                FieldDefinitions = indexer.FieldDefinitionCollection,
+                Name = indexName
             };
 
-            var props = TypeHelper.CachedDiscoverableProperties(indexer.Value.GetType(), mustWrite: false)
+            var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                 //ignore these properties
                 .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                 .OrderBy(x => x.Name);
@@ -253,14 +255,14 @@ namespace Umbraco.Web.WebServices
                 {
                     // Do not warn for new new attribute that is optional
                     if(string.Equals(p.Name, "DirectoryFactory", StringComparison.InvariantCultureIgnoreCase) == false)
-                    Logger.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Key + " property: " + p.Name);
+                    Logger.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexName + " property: " + p.Name);
 
                     val = string.Empty;
                 }
                 indexerModel.ProviderProperties.Add(p.Name, val.ToString());
             }
 
-            if (indexer.Value is LuceneIndexer luceneIndexer)
+            if (indexer is LuceneIndexer luceneIndexer)
             {
                 indexerModel.IsLuceneIndex = true;
 
