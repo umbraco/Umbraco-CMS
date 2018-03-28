@@ -44,17 +44,19 @@ namespace Umbraco.Core.Migrations.Upgrade
 
                 // cannot go back in time
                 if (currentVersion > UmbracoVersion.SemanticVersion)
-                    throw new InvalidOperationException($"Version {currentVersion} cannot be upgraded to {UmbracoVersion.SemanticVersion}.");
+                    throw new InvalidOperationException($"Version {currentVersion} cannot be downgraded to {UmbracoVersion.SemanticVersion}.");
 
                 switch (currentVersion.Major)
                 {
                     case 7:
+                        // upgrading from version 7
                         return "{orig-" + currentVersion + "}";
                     case 8: // fixme remove when releasing
-                        // this is very temp and for my own website - zpqrtbnk
+                        // upgrading from version 8
+                        // should never happen, this is very temp and for my own website - zpqrtbnk
                         return "{04F54303-3055-4700-8F76-35A37F232FF5}"; // right before the variants migration
                     default:
-                        throw new InvalidOperationException($"Version {currentVersion} should have an upgrade state in the key-value table.");
+                        throw new InvalidOperationException($"Version {currentVersion} is not supported by the migration plan.");
                 }
 
             }

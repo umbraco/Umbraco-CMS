@@ -24,9 +24,9 @@ namespace Umbraco.Web.Models.Mapping
             {
                 ContentTypeBasic contentTypeBasic;
                 if (source is IContent content)
-                    contentTypeBasic = Mapper.Map<ContentTypeBasic>(content.ContentType);
+                    contentTypeBasic = Mapper.Map<IContentType, ContentTypeBasic>(content.ContentType);
                 else if (source is IMedia media)
-                    contentTypeBasic = Mapper.Map<ContentTypeBasic>(media.ContentType);
+                    contentTypeBasic = Mapper.Map<IMediaType, ContentTypeBasic>(media.ContentType);
                 else
                     throw new NotSupportedException($"Expected TSource to be IContent or IMedia, got {typeof(TSource).Name}.");
 

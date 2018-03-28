@@ -33,12 +33,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserTourStatus> PostSetUserTour(UserTourStatus status)
         {
-            if (status == null) throw new ArgumentNullException("status");
+            if (status == null) throw new ArgumentNullException(nameof(status));
 
             List<UserTourStatus> userTours;
             if (Security.CurrentUser.TourData.IsNullOrWhiteSpace())
             {
-                userTours = new List<UserTourStatus> {status};
+                userTours = new List<UserTourStatus> { status };
                 Security.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
                 Services.UserService.Save(Security.CurrentUser);
                 return userTours;

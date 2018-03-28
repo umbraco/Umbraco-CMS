@@ -366,7 +366,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             var group = MockedUserGroup.CreateUserGroup();
             userGroupRepository.AddOrUpdateGroupWithUsers(@group, new[] { user.Id });
-            
+
+            user.AddGroup(group);
 
             return user;
         }

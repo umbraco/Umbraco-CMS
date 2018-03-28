@@ -7,6 +7,8 @@ namespace Umbraco.Web.Composing.CompositionRoots
     {
         public void Compose(IServiceRegistry container)
         {
+            container.Register<AuditMapperProfile>();
+            container.Register<CodeFileMapperProfile>();
             container.Register<ContentMapperProfile>();
             container.Register<ContentPropertyMapperProfile>();
             container.Register<ContentTypeMapperProfile>();
@@ -15,13 +17,12 @@ namespace Umbraco.Web.Composing.CompositionRoots
             container.Register<MacroMapperProfile>();
             container.Register<MediaMapperProfile>();
             container.Register<MemberMapperProfile>();
+            container.Register<RedirectUrlMapperProfile>();
             container.Register<RelationMapperProfile>();
             container.Register<SectionMapperProfile>();
             container.Register<TagMapperProfile>();
-            container.Register<UserMapperProfile>();
             container.Register<TemplateMapperProfile>();
-            container.Register<RedirectUrlMapperProfile>();
-            container.Register<AuditMapperProfile>();
+            container.Register<UserMapperProfile>();
         }
     }
 }

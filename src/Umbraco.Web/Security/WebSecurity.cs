@@ -71,7 +71,7 @@ namespace Umbraco.Web.Security
                 if (_currentUser == null)
                 {
                     var id = GetUserId();
-                    return id ? _userService.GetUserById(id.Result) : null;
+                    _currentUser = id ? _userService.GetUserById(id.Result) : null;
                 }
 
                 return _currentUser;
