@@ -40,8 +40,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // when they are null the cache derives them from the ExamineManager, see
         // method GetExamineManagerSafe().
         //
-        private readonly ILuceneSearcher _searchProvider;
-        private readonly BaseIndexProvider _indexProvider;
+        private readonly ISearcher _searchProvider;
+        private readonly IIndexer _indexProvider;
         private readonly XmlStore _xmlStore;
         private readonly PublishedContentTypeCache _contentTypeCache;
 
@@ -51,10 +51,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
             : base(false)
         {
-            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            _mediaService = mediaService;
-            _userService = userService;
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
             _cacheProvider = cacheProvider;
             _xmlStore = xmlStore;
@@ -70,18 +68,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="indexProvider"></param>
         /// <param name="cacheProvider"></param>
         /// <param name="contentTypeCache"></param>
-        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ILuceneSearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
+        internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
             : base(false)
         {
-            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (searchProvider == null) throw new ArgumentNullException(nameof(searchProvider));
-            if (indexProvider == null) throw new ArgumentNullException(nameof(indexProvider));
-
-            _mediaService = mediaService;
-            _userService = userService;
-            _searchProvider = searchProvider;
-            _indexProvider = indexProvider;
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _searchProvider = searchProvider ?? throw new ArgumentNullException(nameof(searchProvider));
+            _indexProvider = indexProvider ?? throw new ArgumentNullException(nameof(indexProvider));
             _cacheProvider = cacheProvider;
             _contentTypeCache = contentTypeCache;
         }
@@ -117,8 +110,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // first check in Examine for the cache values
                     // +(+parentID:-1) +__IndexType:media
 
-                    var criteria = searchProvider.CreateSearchCriteria("media");
-                    var filter = criteria.ParentId(-1).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var criteria = searchProvider.CreateCriteria("media");
+                    var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = searchProvider.Search(filter.Compile());
                     if (result != null)
@@ -228,7 +221,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override bool HasContent(bool preview) { throw new NotImplementedException(); }
 
-        private static ExamineManager GetExamineManagerSafe()
+        private static IExamineManager GetExamineManagerSafe()
         {
             try
             {
@@ -239,34 +232,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return null;
             }
         }
-
-        private BaseIndexProvider GetIndexProviderSafe()
-        {
-            if (_indexProvider != null)
-                return _indexProvider;
-
-            var eMgr = GetExamineManagerSafe();
-            if (eMgr == null) return null;
-
-            try
-            {
-                //by default use the InternalSearcher
-                var indexer = eMgr.IndexProviderCollection[Constants.Examine.InternalIndexer];
-                if (indexer.IndexerData.IncludeNodeTypes.Any() || indexer.IndexerData.ExcludeNodeTypes.Any())
-                {
-                    Current.Logger.Warn<PublishedMediaCache>("The InternalIndexer for examine is configured incorrectly, it should not list any include/exclude node types or field names, it should simply be configured as: " + "<IndexSet SetName=\"InternalIndexSet\" IndexPath=\"~/App_Data/TEMP/ExamineIndexes/Internal/\" />");
-                }
-                return indexer;
-            }
-            catch (Exception ex)
-            {
-                Current.Logger.Error<PublishedMediaCache>("Could not retrieve the InternalIndexer", ex);
-                //something didn't work, continue returning null.
-            }
-            return null;
-        }
-
-        private ILuceneSearcher GetSearchProviderSafe()
+        
+        private ISearcher GetSearchProviderSafe()
         {
             if (_searchProvider != null)
                 return _searchProvider;
@@ -276,7 +243,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                //by default use the InternalSearcher
+                //by default use the internal index
                 return eMgr.GetSearcher(Constants.Examine.InternalIndexer);
             }
             catch (FileNotFoundException)
@@ -328,8 +295,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     //
                     // note that since the use of the wildcard, it automatically escapes it in Lucene.
 
-                    var criteria = searchProvider.CreateSearchCriteria("media");
-                    var filter = criteria.Id(id).Not().Field(BaseUmbracoIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var criteria = searchProvider.CreateCriteria("media");
+                    var filter = criteria.Id(id.ToInvariantString()).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = searchProvider.Search(filter.Compile()).FirstOrDefault();
                     if (result != null) return ConvertFromSearchResult(result);
@@ -395,11 +362,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
         {
             // note: fixing fields in 7.x, removed by Shan for 8.0
-            var values = new Dictionary<string, string>(searchResult.Fields);
-
+            
             return new CacheValues
             {
-                Values = values,
+                Values = searchResult.Fields,
                 FromExamine = true
             };
         }
@@ -515,7 +481,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             {
                 //We are going to check for a special field however, that is because in some cases we store a 'Raw'
                 //value in the index such as for xml/html.
-                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(BaseUmbracoIndexer.RawFieldPrefix + alias));
+                var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoExamineIndexer.RawFieldPrefix + alias));
                 return rawValue
                        ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
@@ -545,12 +511,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                         //first check in Examine as this is WAY faster
                         var criteria = searchProvider.CreateCriteria("media");
 
-                        var filter = criteria.ParentId(parentId).Not().Field(BaseUmbracoIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                        var filter = criteria.ParentId(parentId).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
                         //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
                         //+(+parentId:3113 -__Path:-1,-21,*) +__IndexType:media
 
                         // sort with the Sort field (updated for 8.0)
-                        var results = searchProvider.Find(
+                        var results = searchProvider.Search(
                             filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
 
                         if (results.Any())
@@ -661,7 +627,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             private static readonly string[] IgnoredKeys = { "version", "isDoc" };
 
             public DictionaryPublishedContent(
-                IDictionary<string, string> valueDictionary,
+                IReadOnlyDictionary<string, string> valueDictionary,
                 Func<int, IPublishedContent> getParent,
                 Func<int, XPathNavigator, IEnumerable<IPublishedContent>> getChildren,
                 Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
@@ -687,7 +653,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 ValidateAndSetProperty(valueDictionary, val => _sortOrder = int.Parse(val), "sortOrder");
                 ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName", "__nodeName");
                 ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
-                ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndexer.NodeTypeAliasFieldName);
+                ValidateAndSetProperty(valueDictionary, val => _documentTypeAlias = val, "nodeTypeAlias", LuceneIndexer.ItemTypeFieldName);
                 ValidateAndSetProperty(valueDictionary, val => _documentTypeId = int.Parse(val), "nodeType");
                 //ValidateAndSetProperty(valueDictionary, val => _writerName = val, "writerName");
                 ValidateAndSetProperty(valueDictionary, val => _creatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
@@ -852,7 +818,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             private readonly ICollection<IPublishedProperty> _properties;
             private readonly PublishedContentType _contentType;
 
-            private void ValidateAndSetProperty(IDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)
+            private void ValidateAndSetProperty(IReadOnlyDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)
             {
                 var key = potentialKeys.FirstOrDefault(x => valueDictionary.ContainsKey(x) && valueDictionary[x] != null);
                 if (key == null)
@@ -901,7 +867,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         internal class CacheValues
         {
-            public IDictionary<string, string> Values { get; set; }
+            public IReadOnlyDictionary<string, string> Values { get; set; }
             public XPathNavigator XPath { get; set; }
             public bool FromExamine { get; set; }
         }
@@ -976,7 +942,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 GetValuesValue(v.Values, "path", "__Path").Contains(fid));
         }
 
-        private static string GetValuesValue(IDictionary<string, string> d, params string[] keys)
+        private static string GetValuesValue(IReadOnlyDictionary<string, string> d, params string[] keys)
         {
             string value = null;
             var ignored = keys.Any(x => d.TryGetValue(x, out value));

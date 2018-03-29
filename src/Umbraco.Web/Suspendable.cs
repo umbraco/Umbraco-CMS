@@ -2,7 +2,9 @@
 using Examine;
 using Examine.Providers;
 using Umbraco.Core.Composing;
+using Umbraco.Examine;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web
 {
@@ -77,10 +79,9 @@ namespace Umbraco.Web
                 _tried = false;
 
                 // fixme - could we fork this on a background thread?
-                foreach (BaseIndexProvider indexer in ExamineManager.Instance.IndexProviderCollection)
-                {
-                    indexer.RebuildIndex();
-                }
+                //TODO: when resuming do we always want a full rebuild of all indexes?
+                // fixme - can we inject IExamineManager somehow?
+                ExamineComponent.RebuildIndexes(false, ExamineManager.Instance, Current.Logger);
             }
         }
 

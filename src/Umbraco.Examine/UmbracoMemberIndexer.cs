@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
-using System.Xml.Linq;
-using Examine.LuceneEngine.Config;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Examine;
-using System.IO;
+using Examine.LuceneEngine;
+using Examine.LuceneEngine.Indexing;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Examine
@@ -25,24 +21,23 @@ namespace Umbraco.Examine
     /// <summary>
     /// Custom indexer for members
     /// </summary>
-    public class UmbracoMemberIndexer : BaseUmbracoIndexer
+    public class UmbracoMemberIndexer : UmbracoExamineIndexer
     {
         private readonly IMemberService _memberService;
-        private readonly IScopeProvider _scopeProvider;
 
         /// <summary>
-        /// Default constructor
+        /// Constructor for config/provider based indexes
         /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public UmbracoMemberIndexer()
-            : base()
         {
             _memberService = Current.Services.MemberService;
-            _scopeProvider = Current.ScopeProvider;
         }
 
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="fieldDefinitions"></param>
         /// <param name="luceneDirectory"></param>
         /// <param name="profilingLogger"></param>
@@ -50,76 +45,35 @@ namespace Umbraco.Examine
         /// <param name="memberService"></param>
         /// <param name="analyzer"></param>
         public UmbracoMemberIndexer(
+            string name, 
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer analyzer,
             ProfilingLogger profilingLogger,
             IValueSetValidator validator,
             IMemberService memberService) :
-            base(fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
+            base(name, fieldDefinitions, luceneDirectory, analyzer, profilingLogger, validator)
         {
-            if (memberService == null) throw new ArgumentNullException("memberService");
-            _memberService = memberService;
+            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
         }
 
-        /// <summary>
-        /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
-        /// </summary>
-        /// <param name="indexSet"></param>
-        /// <returns></returns>
-        [Obsolete("IIndexCriteria is obsolete, this method is used only for configuration based indexes it is recommended to configure indexes on startup with code instead of config")]
-        protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
-        {
-            //TODO: This is only required for config based index delcaration - We need to change this!
-
-            var indexerData = base.GetIndexerData(indexSet);
-
-            if (CanInitialize())
-            {
-                //If the fields are missing a custom _searchEmail, then add it
-
-                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
-                {
-                    var field = new IndexField { Name = "_searchEmail" };
-                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
-                    if (policy != null)
-                    {
-                        field.Type = policy.Type;
-                        field.EnableSorting = policy.EnableSorting;
-                    }
-
-                    return new IndexCriteria(
-                        indexerData.StandardFields,
-                        indexerData.UserFields.Concat(new[] { field }),
-                        indexerData.IncludeNodeTypes,
-                        indexerData.ExcludeNodeTypes,
-                        indexerData.ParentNodeId
-                        );
-                }
-            }
-
-            return indexerData;
-        }
 
         /// <summary>
         /// Overridden to ensure that the umbraco system field definitions are in place
         /// </summary>
-        /// <param name="originalDefinitions"></param>
+        /// <param name="x"></param>
+        /// <param name="indexValueTypesFactory"></param>
         /// <returns></returns>
-        protected override IEnumerable<FieldDefinition> InitializeFieldDefinitions(IEnumerable<FieldDefinition> originalDefinitions)
+        protected override FieldValueTypeCollection CreateFieldValueTypes(Directory x, IReadOnlyDictionary<string, Func<string, IIndexValueType>> indexValueTypesFactory = null)
         {
-            var result = base.InitializeFieldDefinitions(originalDefinitions).ToList();
-            result.Add(new FieldDefinition("__key", FieldDefinitionTypes.Raw));
-            return result;
+            var keyDef = new FieldDefinition("__key", FieldDefinitionTypes.Raw);
+            FieldDefinitionCollection.TryAdd(keyDef.Name, keyDef);
+
+            return base.CreateFieldValueTypes(x, indexValueTypesFactory);
         }
 
-        /// <summary>
-        /// The supported types for this indexer
-        /// </summary>
-        protected override IEnumerable<string> SupportedTypes
-        {
-            get { return new[] {IndexTypes.Member}; }
-        }
+        /// <inheritdoc />
+        protected override IEnumerable<string> SupportedTypes => new[] {IndexTypes.Member};
 
         /// <summary>
         /// Reindex all members
@@ -136,44 +90,38 @@ namespace Umbraco.Examine
 
             IMember[] members;
 
-            using (var scope = _scopeProvider.CreateScope())
+            if (ConfigIndexCriteria != null && ConfigIndexCriteria.IncludeItemTypes.Any())
             {
-                if (IndexerData != null && IndexerData.IncludeNodeTypes.Any())
+                //if there are specific node types then just index those
+                foreach (var nodeType in ConfigIndexCriteria.IncludeItemTypes)
                 {
-                    //if there are specific node types then just index those
-                    foreach (var nodeType in IndexerData.IncludeNodeTypes)
-                    {
-                        do
-                        {
-                            long total;
-                            members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
-
-                            IndexItems(GetValueSets(members));
-
-                            pageIndex++;
-                        } while (members.Length == pageSize);
-                    }
-                }
-                else
-                {
-                    //no node types specified, do all members
                     do
                     {
-                        long total;
-                        members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+                        members = _memberService.GetAll(pageIndex, pageSize, out _, "LoginName", Direction.Ascending, true, null, nodeType).ToArray();
 
                         IndexItems(GetValueSets(members));
 
                         pageIndex++;
                     } while (members.Length == pageSize);
                 }
-                scope.Complete();
+            }
+            else
+            {
+                //no node types specified, do all members
+                do
+                {
+                    members = _memberService.GetAll(pageIndex, pageSize, out _).ToArray();
+
+                    IndexItems(GetValueSets(members));
+
+                    pageIndex++;
+                } while (members.Length == pageSize);
             }
         }
 
-        private IEnumerable<ValueSet> GetValueSets(IEnumerable<IMember> member)
+        public static IEnumerable<ValueSet> GetValueSets(params IMember[] members)
         {
-            foreach (var m in member)
+            foreach (var m in members)
             {
                 var values = new Dictionary<string, object[]>
                 {
@@ -193,30 +141,48 @@ namespace Umbraco.Examine
                     {"email", new object[] {m.Email}},
                 };
 
-                foreach (var property in m.Properties.Where(p => p != null && p.GetValue() != null && p.GetValue().ToString().IsNullOrWhiteSpace() == false))
+                foreach (var property in m.Properties)
                 {
-                    values.Add(property.Alias, new[] { property.GetValue() });
+                    //only add the value if its not null or empty (we'll check for string explicitly here too)
+                    var val = property.GetValue();
+                    switch (val)
+                    {
+                        case null:
+                            continue;
+                        case string strVal when strVal.IsNullOrWhiteSpace() == false:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                        default:
+                            values.Add(property.Alias, new[] { val });
+                            break;
+                    }
                 }
 
-                var vs = new ValueSet(m.Id, IndexTypes.Content, m.ContentType.Alias, values);
+                var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Content, m.ContentType.Alias, values);
 
                 yield return vs;
             }
         }
 
-        protected override void OnTransformingIndexValues(TransformingIndexDataEventArgs e)
+        /// <summary>
+        /// Ensure some custom values are added to the index
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
         {
             base.OnTransformingIndexValues(e);
 
-            if (e.OriginalValues.ContainsKey("key") && e.IndexItem.ValueSet.Values.ContainsKey("__key") == false)
+            if (e.IndexItem.ValueSet.Values.TryGetValue("key", out var key) && e.IndexItem.ValueSet.Values.ContainsKey("__key") == false)
             {
-                e.IndexItem.ValueSet.Values["__key"] = new List<object> {e.OriginalValues["key"]};
-            }
-            if (e.OriginalValues.ContainsKey("email") && e.IndexItem.ValueSet.Values.ContainsKey("_searchEmail") == false)
-            {
-                e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { e.OriginalValues["email"].ToString().Replace(".", " ").Replace("@", " ") };
+                //double __ prefix means it will be indexed as culture invariant
+                e.IndexItem.ValueSet.Values["__key"] = new List<object> { key };
             }
 
+            if (e.IndexItem.ValueSet.Values.TryGetValue("email", out var email) && e.IndexItem.ValueSet.Values.ContainsKey("_searchEmail") == false)
+            {
+                //will be indexed as full text (the default anaylyzer)
+                e.IndexItem.ValueSet.Values["_searchEmail"] = new List<object> { email?.ToString().Replace(".", " ").Replace("@", " ") };
+            }
         }
 
     }

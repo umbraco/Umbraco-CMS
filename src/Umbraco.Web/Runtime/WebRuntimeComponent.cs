@@ -12,6 +12,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
+using Examine;
 using LightInject;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
@@ -99,7 +100,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             composition.Container.RegisterSingleton<ISectionService, SectionService>();
 
-            composition.Container.RegisterSingleton<IExamineIndexCollectionAccessor, ExamineIndexCollectionAccessor>();
+            composition.Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
             // IoC setup for LightInject for MVC/WebApi
             // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here

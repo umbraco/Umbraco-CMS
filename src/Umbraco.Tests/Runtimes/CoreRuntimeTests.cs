@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Hosting;
+using Examine;
 using LightInject;
 using Moq;
 using NUnit.Framework;
@@ -163,7 +164,7 @@ namespace Umbraco.Tests.Runtimes
                 base.Compose(composition);
 
                 composition.Container.Register(factory => SettingsForTests.GetDefault());
-                composition.Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
+                composition.Container.RegisterSingleton<IExamineManager, TestExamineManager>();
 
                 Composed = true;
             }

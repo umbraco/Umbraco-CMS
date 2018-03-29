@@ -48,8 +48,9 @@ namespace Umbraco.Web.Search
         {
             try
             {
-                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-                if (searcher == null) return 0;
+                if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
+                    return 0;
+
                 using (searcher)
                 using (var reader = searcher.IndexReader)
                 {
@@ -70,12 +71,11 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexFieldCount(this LuceneIndexer indexer)
         {
-            //TODO: check for closing! and AlreadyClosedException
-
             try
             {
-                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-                if (searcher == null) return 0;
+                if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
+                    return 0;
+
                 using (searcher)
                 using (var reader = searcher.IndexReader)
                 {
@@ -86,30 +86,6 @@ namespace Umbraco.Web.Search
             {
                 Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get GetIndexFieldCount, the writer is already closed");
                 return 0;
-            }
-        }
-
-        /// <summary>
-        /// Returns true if the index is optimized or not
-        /// </summary>
-        /// <param name="indexer"></param>
-        /// <returns></returns>
-        public static bool IsIndexOptimized(this LuceneIndexer indexer)
-        {
-            try
-            {
-                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-                if (searcher == null) return true;
-                using (searcher)
-                using (var reader = searcher.IndexReader)
-                {
-                    return reader.IsOptimized();
-                }
-            }
-            catch (AlreadyClosedException)
-            {
-                Current.Logger.Warn(typeof(ExamineExtensions), "Cannot get IsIndexOptimized, the writer is already closed");
-                return false;
             }
         }
 
@@ -136,8 +112,9 @@ namespace Umbraco.Web.Search
         {
             try
             {
-                var searcher = indexer.GetSearcher().GetSearcher() as IndexSearcher;
-                if (searcher == null) return 0;
+                if (!((indexer.GetSearcher() as LuceneSearcher)?.GetLuceneSearcher() is IndexSearcher searcher))
+                    return 0;
+
                 using (searcher)
                 using (var reader = searcher.IndexReader)
                 {

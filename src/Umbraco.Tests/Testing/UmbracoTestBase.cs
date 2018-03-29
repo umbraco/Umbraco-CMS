@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AutoMapper;
+using Examine;
 using LightInject;
 using Moq;
 using NUnit.Framework;
@@ -258,7 +259,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => settings.Content);
             Container.RegisterSingleton(factory => settings.Templates);
             Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
-            Container.RegisterSingleton<IExamineIndexCollectionAccessor, TestIndexCollectionAccessor>();
+            Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
             // replace some stuff
             Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");

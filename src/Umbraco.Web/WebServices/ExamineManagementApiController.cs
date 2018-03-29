@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Web.Http;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Examine.Providers;
-using Lucene.Net.Index;
 using Lucene.Net.Search;
-using Lucene.Net.Store;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
+using Umbraco.Examine;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -25,10 +26,16 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
-        //TODO: Fix all of this for searchers/indexers that are not configured via code (i.e. the core ones once we do that)
-        // We will need to be able to search an index directly without having to go through all of the searchers
+        public ExamineManagementApiController(IExamineManager examineManager, ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
+        {
+            _examineManager = examineManager;
+            _logger = logger;
+            _runtimeCacheProvider = runtimeCacheProvider;
+        }
 
-        private ExamineManager _examineManager;
+        private readonly IExamineManager _examineManager;
+        private readonly ILogger _logger;
+        private readonly IRuntimeCacheProvider _runtimeCacheProvider;
 
         /// <summary>
         /// Checks if the member internal index is consistent with the data stored in the database
@@ -40,7 +47,7 @@ namespace Umbraco.Web.WebServices
             var total = Services.MemberService.Count();
 
             var searcher = _examineManager.GetSearcher(Constants.Examine.InternalMemberIndexer);
-            var criteria = searcher.CreateSearchCriteria().RawQuery("__IndexType:member");
+            var criteria = searcher.CreateCriteria().RawQuery("__IndexType:member");
             var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
         }
@@ -55,7 +62,7 @@ namespace Umbraco.Web.WebServices
             var total = Services.MediaService.Count();
 
             var searcher = _examineManager.GetSearcher(Constants.Examine.InternalIndexer);
-            var criteria = searcher.CreateSearchCriteria().RawQuery("__IndexType:media");
+            var criteria = searcher.CreateCriteria().RawQuery("__IndexType:media");
             var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
         }
@@ -70,7 +77,7 @@ namespace Umbraco.Web.WebServices
             var total = Services.ContentService.Count();
 
             var searcher = _examineManager.GetSearcher(Constants.Examine.InternalIndexer);
-            var criteria = searcher.CreateSearchCriteria().RawQuery("__IndexType:content");
+            var criteria = searcher.CreateCriteria().RawQuery("__IndexType:content");
             var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
         }
@@ -81,7 +88,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<ExamineIndexerModel> GetIndexerDetails()
         {
-            return ExamineManager.Instance.IndexProviders.Select(CreateModel).OrderBy(x =>
+            return _examineManager.IndexProviders.Select(CreateModel).OrderBy(x =>
             {
                 //order by name , but strip the "Indexer" from the end if it exists
                 return x.Name.TrimEnd("Indexer");
@@ -95,19 +102,23 @@ namespace Umbraco.Web.WebServices
         public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
         {
             var model = new List<ExamineSearcherModel>(
-                ExamineManager.Instance.SearchProviderCollection.Cast<BaseSearchProvider>().Select(searcher =>
+                _examineManager.IndexProviders.Select(indexer =>
                 {
+                    var searcher = indexer.Value.GetSearcher();
+                    var searcherName = (searcher as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
+
                     var indexerModel = new ExamineSearcherModel()
                     {
-                        Name = searcher.Name
+                        Name = searcherName
                     };
                     var props = TypeHelper.CachedDiscoverableProperties(searcher.GetType(), mustWrite: false)
                         //ignore these properties
-                                          .Where(x => new[] {"Description"}.InvariantContains(x.Name) == false)
-                                          .OrderBy(x => x.Name);
+                        .Where(x => new[] {"Description"}.InvariantContains(x.Name) == false)
+                        .Where(x => x.GetCustomAttribute<EditorBrowsableAttribute>()?.State != EditorBrowsableState.Never)
+                        .OrderBy(x => x.Name);
                     foreach (var p in props)
                     {
-                        indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null).ToString());
+                        indexerModel.ProviderProperties.Add(p.Name, p.GetValue(searcher, null)?.ToString());
                     }
                     return indexerModel;
                 }).OrderBy(x =>
@@ -118,7 +129,7 @@ namespace Umbraco.Web.WebServices
             return model;
         }
 
-        public ILuceneSearchResults GetSearchResults(string searcherName, string query, string queryType)
+        public ISearchResults GetSearchResults(string searcherName, string query, string queryType)
         {
             if (queryType == null)
             {
@@ -129,46 +140,20 @@ namespace Umbraco.Web.WebServices
             if (query.IsNullOrWhiteSpace())
                 return LuceneSearchResults.Empty();
 
-            LuceneSearcher searcher;
-            var msg = ValidateLuceneSearcher(searcherName, out searcher);
+            var msg = ValidateLuceneSearcher(searcherName, out var searcher);
             if (msg.IsSuccessStatusCode)
             {
                 if (queryType.InvariantEquals("text"))
                 {
-                    return searcher.Find(query, false);
+                    return searcher.Search(query, false);
                 }
                 if (queryType.InvariantEquals("lucene"))
                 {
-                    return searcher.Find(searcher.CreateCriteria().RawQuery(query));
+                    return searcher.Search(searcher.CreateCriteria().RawQuery(query));
                 }
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
             throw new HttpResponseException(msg);
-        }
-
-        /// <summary>
-        /// Optimizes an index
-        /// </summary>
-        public HttpResponseMessage PostOptimizeIndex(string indexerName)
-        {
-            IExamineIndexer indexer;
-            var msg = ValidateLuceneIndexer(indexerName, out indexer);
-            var luceneIndexer = indexer as LuceneIndexer;
-            if (luceneIndexer != null && msg.IsSuccessStatusCode)
-            {
-                try
-                {
-                    luceneIndexer.OptimizeIndex();
-                }
-                catch (Exception ex)
-                {
-                    var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                    response.Content = new StringContent(string.Format("The index could not be optimized, most likely there is another thread currently writing to the index. Error: {0}", ex));
-                    response.ReasonPhrase = "Could Not Optimize";
-                    return response;
-                }
-            }
-            return msg;
         }
 
         /// <summary>
@@ -178,11 +163,10 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public HttpResponseMessage PostRebuildIndex(string indexerName)
         {
-            LuceneIndexer indexer;
-            var msg = ValidateLuceneIndexer(indexerName, out indexer);
+            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
             if (msg.IsSuccessStatusCode)
             {
-                Current.Logger.Info<ExamineManagementApiController>(string.Format("Rebuilding index '{0}'", indexerName));
+                _logger.Info<ExamineManagementApiController>($"Rebuilding index '{indexerName}'");
 
                 //remove it in case there's a handler there alraedy
                 indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -197,53 +181,32 @@ namespace Umbraco.Web.WebServices
                 {
                     indexer.RebuildIndex();
                 }
-                // fixme - Examine issues
-                // cannot enable that piece of code from v7 as Index.Write.Unlock does not seem to exist anymore?
-                //catch (LockObtainFailedException)
-                //{
-                //    //this will occur if the index is locked (which it should defo not be!) so in this case we'll forcibly unlock it and try again
-
-                //    try
-                //    {
-                //        IndexWriter.Unlock(indexer.GetLuceneDirectory());
-                //        indexer.RebuildIndex();
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        return HandleException(e, indexer);
-                //    }
-                //}
                 catch (Exception ex)
                 {
-                    return HandleException(ex, indexer);
+                    //ensure it's not listening
+                    indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+                    Logger.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
+                    var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                    response.Content = new StringContent($"The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {ex}");
+                    response.ReasonPhrase = "Could Not Rebuild";
+                    return response;
                 }
             }
             return msg;
         }
 
-        private HttpResponseMessage HandleException(Exception ex, LuceneIndexer indexer)
-        {
-            //ensure it's not listening
-            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-            Logger.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
-            var response = Request.CreateResponse(HttpStatusCode.Conflict);
-            response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
-            response.ReasonPhrase = "Could Not Rebuild";
-            return response;
-        }
-
         //static listener so it's not GC'd
-        private static void Indexer_IndexOperationComplete(object sender, EventArgs e)
+        private void Indexer_IndexOperationComplete(object sender, EventArgs e)
         {
             var indexer = (LuceneIndexer) sender;
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
-            Current.Logger.Info<ExamineManagementApiController>($"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
+            _logger.Info<ExamineManagementApiController>($"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
-            Current.ApplicationCache.RuntimeCache.ClearCacheItem(cacheKey);
+            _runtimeCacheProvider.ClearCacheItem(cacheKey);
         }
 
         /// <summary>
@@ -257,8 +220,7 @@ namespace Umbraco.Web.WebServices
         /// </remarks>
         public ExamineIndexerModel PostCheckRebuildIndex(string indexerName)
         {
-            LuceneIndexer indexer;
-            var msg = ValidateLuceneIndexer(indexerName, out indexer);
+            var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
             if (msg.IsSuccessStatusCode)
             {
                 var cacheKey = "temp_indexing_op_" + indexerName;
@@ -266,42 +228,25 @@ namespace Umbraco.Web.WebServices
                 //if its still there then it's not done
                 return found != null
                     ? null
-                    : CreateModel(new KeyValuePair<string, IExamineIndexer>(indexerName, indexer));
+                    : CreateModel(new KeyValuePair<string, IIndexer>(indexerName, indexer));
             }
             throw new HttpResponseException(msg);
         }
 
-        /// <summary>
-        /// Checks if the index is optimized
-        /// </summary>
-        /// <param name="indexerName"></param>
-        /// <returns></returns>
-        public ExamineIndexerModel PostCheckOptimizeIndex(string indexerName)
+        private ExamineIndexerModel CreateModel(KeyValuePair<string, IIndexer> indexerKeyVal)
         {
-            LuceneIndexer indexer;
-            var msg = ValidateLuceneIndexer(indexerName, out indexer);
-            if (msg.IsSuccessStatusCode)
-            {
-                var isOptimized = indexer.IsIndexOptimized();
-                return isOptimized == false
-                    ? null
-                    : CreateModel(new KeyValuePair<string, IExamineIndexer>(indexerName, indexer));
-            }
-            throw new HttpResponseException(msg);
-        }
-
-        private ExamineIndexerModel CreateModel(KeyValuePair<string, IExamineIndexer> indexer)
-        {
+            var indexer = indexerKeyVal.Value;
+            var indexName = indexerKeyVal.Key;
             var indexerModel = new ExamineIndexerModel()
             {
-                FieldDefinitions = indexer.Value.FieldDefinitions,
-                Name = indexer.Key
+                FieldDefinitions = indexer.FieldDefinitionCollection,
+                Name = indexName
             };
 
             var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                 //ignore these properties
-                                  .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
-                                  .OrderBy(x => x.Name);
+                .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
+                .OrderBy(x => x.Name);
 
             foreach (var p in props)
             {
@@ -310,22 +255,20 @@ namespace Umbraco.Web.WebServices
                 {
                     // Do not warn for new new attribute that is optional
                     if(string.Equals(p.Name, "DirectoryFactory", StringComparison.InvariantCultureIgnoreCase) == false)
-                    Logger.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Key + " property: " + p.Name);
+                    Logger.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexName + " property: " + p.Name);
 
                     val = string.Empty;
                 }
                 indexerModel.ProviderProperties.Add(p.Name, val.ToString());
             }
 
-            var luceneIndexer = indexer.Value as LuceneIndexer;
-            if (luceneIndexer != null)
+            if (indexer is LuceneIndexer luceneIndexer)
             {
                 indexerModel.IsLuceneIndex = true;
 
                 if (luceneIndexer.IndexExists())
                 {
-                    Exception indexError;
-                    indexerModel.IsHealthy = luceneIndexer.IsHealthy(out indexError);
+                    indexerModel.IsHealthy = luceneIndexer.IsHealthy(out var indexError);
 
                     if (indexerModel.IsHealthy == false)
                     {
@@ -336,15 +279,11 @@ namespace Umbraco.Web.WebServices
 
                     indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
                     indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
-                    indexerModel.IsOptimized = luceneIndexer.IsIndexOptimized();
-                    indexerModel.DeletionCount = luceneIndexer.GetDeletedDocumentsCount();
                 }
                 else
                 {
                     indexerModel.DocumentCount = 0;
                     indexerModel.FieldCount = 0;
-                    indexerModel.IsOptimized = true;
-                    indexerModel.DeletionCount = 0;
                 }
             }
             return indexerModel;
@@ -352,41 +291,46 @@ namespace Umbraco.Web.WebServices
 
         private HttpResponseMessage ValidateLuceneSearcher(string searcherName, out LuceneSearcher searcher)
         {
-            if (ExamineManager.Instance.SearchProviderCollection.Cast<BaseSearchProvider>().Any(x => x.Name == searcherName))
+            foreach (var indexer in _examineManager.IndexProviders)
             {
-                searcher = ExamineManager.Instance.SearchProviderCollection[searcherName] as LuceneSearcher;
-                if (searcher == null)
-                {
-                    var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-                    response.Content = new StringContent(string.Format("The searcher {0} is not of type {1}", searcherName, typeof(LuceneSearcher)));
-                    response.ReasonPhrase = "Wrong Searcher Type";
-                    return response;
-                }
-                //return Ok!
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var s = indexer.Value.GetSearcher();
+                var sName = (s as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
+                if (sName != searcherName) continue;
+                searcher = s as LuceneSearcher;
+
+                //Found it, return OK
+                if (searcher != null) return Request.CreateResponse(HttpStatusCode.OK);
+
+                //Return an error since it's not the right type
+                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                response.Content = new StringContent($"The searcher {searcherName} is not of type {typeof(LuceneSearcher)}");
+                response.ReasonPhrase = "Wrong Searcher Type";
+                return response;
             }
 
             searcher = null;
 
             var response1 = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response1.Content = new StringContent(string.Format("No searcher found with name = {0}", searcherName));
+            response1.Content = new StringContent($"No searcher found with name = {searcherName}");
             response1.ReasonPhrase = "Searcher Not Found";
             return response1;
         }
 
         private HttpResponseMessage ValidateLuceneIndexer<T>(string indexerName, out T indexer)
-            where T : class, IExamineIndexer
+            where T : class, IIndexer
         {
             indexer = null;
 
-            if (ExamineManager.Instance.IndexProviders.ContainsKey(indexerName))
+            if (_examineManager.IndexProviders.ContainsKey(indexerName)
+                && _examineManager.IndexProviders[indexerName] is T casted)
             {
                 //return Ok!
+                indexer = casted;
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
             var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-            response.Content = new StringContent(string.Format("No indexer found with name = {0}", indexerName));
+            response.Content = new StringContent($"No indexer found with name = {indexerName} of type {typeof(T)}");
             response.ReasonPhrase = "Indexer Not Found";
             return response;
         }

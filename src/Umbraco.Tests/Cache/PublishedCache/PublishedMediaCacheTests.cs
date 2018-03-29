@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -161,31 +162,31 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var ctx = GetUmbracoContext("/test");
             var key = Guid.NewGuid();
 
-            var result = new SearchResult()
-                {
-                    LongId = 1234,
-                    Score = 1
-                };
-            result.Fields.Add("__IndexType", "media");
-            result.Fields.Add("__NodeId", "1234");
-            result.Fields.Add("__NodeTypeAlias", Constants.Conventions.MediaTypes.Image);
-            result.Fields.Add("__Path", "-1,1234");
-            result.Fields.Add("__nodeName", "Test");
-            result.Fields.Add("id", "1234");
-            result.Fields.Add("key", key.ToString());
-            result.Fields.Add("urlName", "/media/test.jpg");
-            result.Fields.Add("nodeType", "0");
-            result.Fields.Add("sortOrder", "0");
-            result.Fields.Add("level", "2");
-            result.Fields.Add("nodeName", "Test");
-            result.Fields.Add("nodeTypeAlias", Constants.Conventions.MediaTypes.Image);
-            result.Fields.Add("parentID", "-1");
-            result.Fields.Add("path", "-1,1234");
-            result.Fields.Add("updateDate", DateTime.Parse("2012-07-16T10:34:09").Ticks.ToString());
-            result.Fields.Add("createDate", DateTime.Parse("2012-07-17T10:34:09").Ticks.ToString());
-            result.Fields.Add("creatorID", "0");
-            result.Fields.Add("creatorName", "Shannon");
+            var fields = new Dictionary<string, string>
+            {
+                {"__IndexType", "media"},
+                {"__NodeId", "1234"},
+                {"__NodeTypeAlias", Constants.Conventions.MediaTypes.Image},
+                {"__Path", "-1,1234"},
+                {"__nodeName", "Test"},
+                {"id", "1234"},
+                {"key", key.ToString()},
+                {"urlName", "/media/test.jpg"},
+                {"nodeType", "0"},
+                {"sortOrder", "0"},
+                {"level", "2"},
+                {"nodeName", "Test"},
+                {"nodeTypeAlias", Constants.Conventions.MediaTypes.Image},
+                {"parentID", "-1"},
+                {"path", "-1,1234"},
+                {"updateDate", DateTime.Parse("2012-07-16T10:34:09").Ticks.ToString()},
+                {"createDate", DateTime.Parse("2012-07-17T10:34:09").Ticks.ToString()},
+                {"creatorID", "0"},
+                {"creatorName", "Shannon"}
+            };
 
+            var result = new SearchResult("1234", 1, 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
+            
             var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 

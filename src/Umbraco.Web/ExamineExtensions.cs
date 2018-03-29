@@ -18,10 +18,12 @@ namespace Umbraco.Web
 
             foreach (var result in results.OrderByDescending(x => x.Score))
             {
-                var content = cache.GetById(result.Id);
+                if (!int.TryParse(result.Id, out var intId)) continue; //invalid
+                var content = cache.GetById(intId);
                 if (content == null) continue; // skip if this doesn't exist in the cache
 
                 list.Add(new PublishedSearchResult(content, result.Score));
+
             }
 
             return list;

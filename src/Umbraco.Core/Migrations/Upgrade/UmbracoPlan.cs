@@ -112,7 +112,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}");
             Chain<TagsMigration>("{DD1B99AF-8106-4E00-BAC7-A43003EA07F8}");
             Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
-            Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
+            Chain<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
             Chain<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
 
             // must chain to v8 final state (see at end of file)

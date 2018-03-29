@@ -1,7 +1,8 @@
 ﻿using System;
 
 namespace Umbraco.Examine
-{
+{   
+
     /// <summary>
     /// Options used to configure the umbraco content indexer
     /// </summary>

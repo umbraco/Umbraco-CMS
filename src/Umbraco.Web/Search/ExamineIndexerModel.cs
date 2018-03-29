@@ -22,19 +22,7 @@ namespace Umbraco.Web.Search
         /// </summary>
         [DataMember(Name = "fieldCount")]
         public int FieldCount { get; set; }
-
-        /// <summary>
-        /// The number of documents flagged for deletion in the index
-        /// </summary>
-        [DataMember(Name = "deletionCount")]
-        public int DeletionCount { get; set; }
-
-        /// <summary>
-        /// Whether or not the indexed is optimized
-        /// </summary>
-        [DataMember(Name = "isOptimized")]
-        public bool IsOptimized{ get; set; }
-
+        
         /// <summary>
         /// Generally will always be true unless someone has created a new non-lucene index
         /// </summary>
