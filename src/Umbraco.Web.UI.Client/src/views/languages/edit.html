@@ -27,7 +27,7 @@
                                     ng-model="vm.language.culture"
                                     ng-options="key as value for (key, value) in vm.availableCultures"
                                     val-server-field="IsoCode"
-                                    ></select>
+                                    required></select>
                             <span class="help-inline" val-msg-for="newLang" val-toggle-msg="required">Required</span>
                             <span class="help-inline" val-msg-for="newLang" val-toggle-msg="valServerField"></span>
                         </umb-control-group>
