@@ -5,9 +5,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using AutoMapper;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
@@ -24,8 +27,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<Culture> GetAllCultures()
         {
-            return CultureInfo.GetCultures(CultureTypes.AllCultures)
-                .Select(x => new Culture {IsoCode = x.Name, Name = x.DisplayName});
+            return Mapper.Map<IEnumerable<Culture>>(CultureInfo.GetCultures(CultureTypes.AllCultures));
         }
 
         /// <summary>
@@ -33,18 +35,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<Language> GetAllLanguages()
+        public IEnumerable<LanguageDisplay> GetAllLanguages()
         {
             var allLanguages = Services.LocalizationService.GetAllLanguages();
-
-            return allLanguages.Select(x => new Language
-            {
-                Id = x.Id,
-                IsoCode = x.IsoCode,
-                Name = x.CultureInfo.DisplayName,
-                IsDefaultVariantLanguage = x.IsDefaultVariantLanguage,
-                Mandatory = x.Mandatory
-            });
+            return Mapper.Map<IEnumerable<LanguageDisplay>>(allLanguages);
         }
         
         /// <summary>
@@ -52,28 +46,29 @@ namespace Umbraco.Web.Editors
         /// </summary>
         [HttpDelete]
         [HttpPost]
-        public void DeleteLanguage(int id)
+        public IHttpActionResult DeleteLanguage(int id)
         {
             var language = Services.LocalizationService.GetLanguageById(id);
-            if (language == null)
-            {
-                throw new EntityNotFoundException(id, $"Could not find language by id: '{id}'.");
-            }
+            if (language == null) return NotFound();
 
-            if (language.IsDefaultVariantLanguage)
+            var totalLangs = Services.LocalizationService.GetAllLanguages().Count();
+
+            if (language.IsDefaultVariantLanguage || totalLangs == 1)
             {
-                var message = $"Language with id '{id}' is currently set to 'default' and can not be deleted.";
-                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, message));
+                var message = $"Language '{language.IsoCode}' is currently set to 'default' or it is the only installed language and can not be deleted.";
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
 
             Services.LocalizationService.Delete(language);
+
+            return Ok();
         }
 
         /// <summary>
         /// Saves a bulk set of languages with default/mandatory settings and returns the full set of languages configured.
         /// </summary>
         [HttpPost]
-        public IEnumerable<Language> SaveLanguages(IEnumerable<Language> languages)
+        public IEnumerable<LanguageDisplay> SaveLanguages(IEnumerable<LanguageDisplay> languages)
         {
             foreach (var l in languages)
             {

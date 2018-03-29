@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesEditController($timeout, $location, $routeParams, notificationsService, localizationService) {
+    function LanguagesEditController($timeout, $location, $routeParams, notificationsService, localizationService, languageResource) {
 
         var vm = this;
 

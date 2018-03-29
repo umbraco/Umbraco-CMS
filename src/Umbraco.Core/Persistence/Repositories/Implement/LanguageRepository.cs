@@ -151,6 +151,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(ILanguage entity)
         {
+            //we need to validate that we can delete this language
+            if (entity.IsDefaultVariantLanguage)
+                throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
+
+            var count = Database.ExecuteScalar<int>(Sql().SelectCount().From<LanguageDto>());
+            if (count == 1)
+                throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
+
             base.PersistDeletedItem(entity);
 
             //Clear the cache entries that exist by key/iso
