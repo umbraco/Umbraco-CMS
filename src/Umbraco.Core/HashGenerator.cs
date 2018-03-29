@@ -14,7 +14,7 @@ namespace Umbraco.Core
     /// This will use the crypto libs to generate the hash and will try to ensure that
     /// strings, etc... are not re-allocated so it's not consuming much memory.
     /// </remarks>
-    internal class HashGenerator : DisposableObject
+    internal class HashGenerator : DisposableObjectSlim
     {
         public HashGenerator()
         {

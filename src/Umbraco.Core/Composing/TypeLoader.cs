@@ -5,8 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Web;
 using System.Web.Compilation;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using File = System.IO.File;
@@ -28,7 +30,6 @@ namespace Umbraco.Core.Composing
 
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly ProfilingLogger _logger;
-        private readonly string _tempFolder;
 
         private readonly object _typesLock = new object();
         private readonly Dictionary<TypeListKey, TypeList> _types = new Dictionary<TypeListKey, TypeList>();
@@ -37,6 +38,8 @@ namespace Umbraco.Core.Composing
         private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
+        private static LocalTempStorage _localTempStorage = LocalTempStorage.Unknown;
+        private static string _fileBasePath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
@@ -49,13 +52,6 @@ namespace Umbraco.Core.Composing
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            // the temp folder where the cache file lives
-            _tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
-            if (Directory.Exists(_tempFolder) == false)
-                Directory.CreateDirectory(_tempFolder);
-
-            var typesListFile = GeTypesListFilePath();
-
             if (detectChanges)
             {
                 //first check if the cached hash is string.Empty, if it is then we need
@@ -67,7 +63,9 @@ namespace Umbraco.Core.Composing
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
-                    File.Delete(typesListFile);
+                    var typesListFilePath = GetTypesListFilePath();
+                    if (File.Exists(typesListFilePath))
+                        File.Delete(typesListFilePath);
 
                     WriteCacheTypesHash();
                 }
@@ -77,7 +75,9 @@ namespace Umbraco.Core.Composing
                 // if the hash has changed, clear out the persisted list no matter what, this will force
                 // rescanning of all types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
-                File.Delete(typesListFile);
+                var typesListFilePath = GetTypesListFilePath();
+                if (File.Exists(typesListFilePath))
+                    File.Delete(typesListFilePath);
 
                 // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
@@ -135,10 +135,10 @@ namespace Umbraco.Core.Composing
                 if (_cachedAssembliesHash != null)
                     return _cachedAssembliesHash;
 
-                var filePath = GetTypesHashFilePath();
-                if (File.Exists(filePath) == false) return string.Empty;
+                var typesHashFilePath = GetTypesHashFilePath();
+                if (!File.Exists(typesHashFilePath)) return string.Empty;
 
-                var hash = File.ReadAllText(filePath, Encoding.UTF8);
+                var hash = File.ReadAllText(typesHashFilePath, Encoding.UTF8);
 
                 _cachedAssembliesHash = hash;
                 return _cachedAssembliesHash;
@@ -177,8 +177,8 @@ namespace Umbraco.Core.Composing
         /// </summary>
         private void WriteCacheTypesHash()
         {
-            var filePath = GetTypesHashFilePath();
-            File.WriteAllText(filePath, CurrentAssembliesHash, Encoding.UTF8);
+            var typesHashFilePath = GetTypesHashFilePath();
+            File.WriteAllText(typesHashFilePath, CurrentAssembliesHash, Encoding.UTF8);
         }
 
         /// <summary>
@@ -295,8 +295,8 @@ namespace Umbraco.Core.Composing
             {
                 try
                 {
-                    var filePath = GeTypesListFilePath();
-                    File.Delete(filePath);
+                    var typesListFilePath = GetTypesListFilePath();
+                    File.Delete(typesListFilePath);
                 }
                 catch
                 {
@@ -312,11 +312,11 @@ namespace Umbraco.Core.Composing
         {
             var cache = new Dictionary<Tuple<string, string>, IEnumerable<string>>();
 
-            var filePath = GeTypesListFilePath();
-            if (File.Exists(filePath) == false)
+            var typesListFilePath = GetTypesListFilePath();
+            if (File.Exists(typesListFilePath) == false)
                 return cache;
 
-            using (var stream = GetFileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
+            using (var stream = GetFileStream(typesListFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
             using (var reader = new StreamReader(stream))
             {
                 while (true)
@@ -354,28 +354,88 @@ namespace Umbraco.Core.Composing
         }
 
         // internal for tests
-        internal string GeTypesListFilePath()
+        internal static string GetTypesListFilePath() => GetFileBasePath() + ".list";
+
+        private static string GetTypesHashFilePath() => GetFileBasePath() + ".hash";
+
+        private static string GetFileBasePath()
         {
-            var filename = "umbraco-types." + NetworkHelper.FileSafeMachineName + ".list";
-            return Path.Combine(_tempFolder, filename);
+            var localTempStorage = GlobalSettings.LocalTempStorageLocation;
+            if (_localTempStorage != localTempStorage)
+            {
+                string path;
+                switch (GlobalSettings.LocalTempStorageLocation)
+                {
+                    case LocalTempStorage.AspNetTemp:
+                        path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "umbraco-types");
+                        break;
+                    case LocalTempStorage.EnvironmentTemp:
+                        // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                        var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                        var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
+                        path = Path.Combine(cachePath, "umbraco-types");
+                        break;
+                    case LocalTempStorage.Default:
+                    default:
+                        var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
+                        path =  Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName);
+                        break;
+                }
+
+                _fileBasePath = path;
+                _localTempStorage = localTempStorage;
+            }
+
+            // ensure that the folder exists
+            var directory = Path.GetDirectoryName(_fileBasePath);
+            if (directory == null)
+                throw new InvalidOperationException($"Could not determine folder for path \"{_fileBasePath}\".");
+            if (Directory.Exists(directory) == false)
+                Directory.CreateDirectory(directory);
+
+            return _fileBasePath;
         }
 
-        private string GetTypesHashFilePath()
+        private static string GetFilePath(string extension)
         {
-            var filename = "umbraco-types." + NetworkHelper.FileSafeMachineName + ".hash";
-            return Path.Combine(_tempFolder, filename);
+            string path;
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {
+                case LocalTempStorage.AspNetTemp:
+                    path = Path.Combine(HttpRuntime.CodegenDir, "UmbracoData", "umbraco-types." + extension);
+                    break;
+                case LocalTempStorage.EnvironmentTemp:
+                    // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                    // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                    // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
+                    path = Path.Combine(cachePath, "umbraco-types." + extension);
+                    break;
+                case LocalTempStorage.Default:
+                default:
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/TypesCache");
+                    path =  Path.Combine(tempFolder, "umbraco-types." + NetworkHelper.FileSafeMachineName + "." + extension);
+                    break;
+            }
+
+            // ensure that the folder exists
+            var directory = Path.GetDirectoryName(path);
+            if (directory == null)
+                throw new InvalidOperationException($"Could not determine folder for file \"{path}\".");
+            if (Directory.Exists(directory) == false)
+                Directory.CreateDirectory(directory);
+
+            return path;
         }
 
         // internal for tests
         internal void WriteCache()
         {
-            // be absolutely sure
-            if (Directory.Exists(_tempFolder) == false)
-                Directory.CreateDirectory(_tempFolder);
-
-            var filePath = GeTypesListFilePath();
-
-            using (var stream = GetFileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
+            var typesListFilePath = GetTypesListFilePath();
+            using (var stream = GetFileStream(typesListFilePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
                 foreach (var typeList in _types.Values)
@@ -405,13 +465,13 @@ namespace Umbraco.Core.Composing
         /// <remarks>Generally only used for resetting cache, for example during the install process.</remarks>
         public void ClearTypesCache()
         {
-            var path = GeTypesListFilePath();
-            if (File.Exists(path))
-                File.Delete(path);
+            var typesListFilePath = GetTypesListFilePath();
+            if (File.Exists(typesListFilePath))
+                File.Delete(typesListFilePath);
 
-            path = GetTypesHashFilePath();
-            if (File.Exists(path))
-                File.Delete(path);
+            var typesHashFilePath = GetTypesHashFilePath();
+            if (File.Exists(typesHashFilePath))
+                File.Delete(typesHashFilePath);
 
             _runtimeCache.ClearCacheItem(CacheKey);
         }
@@ -589,7 +649,8 @@ namespace Umbraco.Core.Composing
             // else proceed,
             typeList = new TypeList(baseType, attributeType);
 
-            var scan = RequiresRescanning || File.Exists(GeTypesListFilePath()) == false;
+            var typesListFilePath = GetTypesListFilePath();
+            var scan = RequiresRescanning || File.Exists(typesListFilePath) == false;
 
             if (scan)
             {

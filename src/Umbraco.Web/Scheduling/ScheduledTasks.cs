@@ -67,6 +67,9 @@ namespace Umbraco.Web.Scheduling
         {
             using (var wc = new HttpClient())
             {
+                // url could be relative, so better set a base url for the http client
+                wc.BaseAddress = _runtime.ApplicationUrl;
+
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 //TODO: pass custom the authorization header, currently these aren't really secured!

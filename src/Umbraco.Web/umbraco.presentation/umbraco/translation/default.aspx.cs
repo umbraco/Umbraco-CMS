@@ -3,9 +3,9 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Xml;
-using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.IO;
+using Umbraco.Core;
 using System.Collections.Generic;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.BusinessLogic;
@@ -16,7 +16,7 @@ namespace umbraco.presentation.translation
     {
         public _default()
         {
-            CurrentApp = Constants.Applications.Translation.ToString();
+            CurrentApp = Constants.Applications.Translation;
 
         }
         protected void Page_Load(object sender, EventArgs e)

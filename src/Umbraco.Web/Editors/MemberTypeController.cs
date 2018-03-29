@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -108,9 +109,47 @@ namespace Umbraco.Web.Editors
 
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
+            //get the persisted member type
+            var ctId = Convert.ToInt32(contentTypeSave.Id);
+            var ct = ctId > 0 ? Services.MemberTypeService.Get(ctId) : null;
+
+            if (UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+            {
+                //We need to validate if any properties on the contentTypeSave have had their IsSensitiveValue changed,
+                //and if so, we need to check if the current user has access to sensitive values. If not, we have to return an error
+                var props = contentTypeSave.Groups.SelectMany(x => x.Properties);
+                if (ct != null)
+                {
+                    foreach (var prop in props)
+                    {
+                        // Id 0 means the property was just added, no need to look it up
+                        if (prop.Id == 0)
+                            continue;
+                        
+                        var foundOnContentType = ct.PropertyTypes.FirstOrDefault(x => x.Id == prop.Id);
+                        if (foundOnContentType == null)
+                            throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "No property type with id " + prop.Id + " found on the content type"));
+                        if (ct.IsSensitiveProperty(foundOnContentType.Alias) && prop.IsSensitiveData == false)
+                        {
+                            //if these don't match, then we cannot continue, this user is not allowed to change this value
+                            throw new HttpResponseException(HttpStatusCode.Forbidden);
+                        }
+                    }
+                }
+                else
+                {
+                    //if it is new, then we can just verify if any property has sensitive data turned on which is not allowed
+                    if (props.Any(prop => prop.IsSensitiveData))
+                    {
+                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                    }
+                }
+            }
+           
+
             var savedCt = PerformPostSave<MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
-                getContentType:             i => Services.MemberTypeService.Get(i),
+                getContentType:             i => ct,
                 saveContentType:            type => Services.MemberTypeService.Save(type));
 
             var display = Mapper.Map<MemberTypeDisplay>(savedCt);

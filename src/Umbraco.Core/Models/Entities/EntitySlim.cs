@@ -215,6 +215,11 @@ namespace Umbraco.Core.Models.Entities
             throw new WontImplementException();
         }
 
+        public IEnumerable<string> GetWereDirtyProperties()
+        {
+            throw new WontImplementException();
+        }
+
         #endregion
     }
 }

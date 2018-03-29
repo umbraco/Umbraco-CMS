@@ -85,6 +85,7 @@
     <key alias="returnToList">Zurück zur Liste</key>
     <key alias="save">Speichern</key>
     <key alias="saveAndPublish">Speichern und veröffentlichen</key>
+    <key alias="saveAndSchedule">Speichern und planen</key>
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="showPage">Vorschau</key>
     <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
@@ -766,7 +767,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="sortCreationDate">Erstellungsdatum</key>
     <key alias="sortDone">Sortierung abgeschlossen.</key>
     <key alias="sortHelp">Ziehen Sie die Elemente an ihre gewünschte neue Position.</key>
-    <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern. Bitte schließen Sie dieses Fenster nicht, bis der Sortiervorgang abgeschlossen ist.</key>
+    <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern.</key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationFailedHeader">Fehlgeschlagen</key>
@@ -852,6 +853,12 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="template">Vorlage</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Element hinzufügen</key>
     <key alias="addRows">Zeilenlayout auswählen</key>
     <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>

@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Cache
 
                 new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, serviceContext.UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, serviceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),
-                new EventDefinition<IUserService, SaveEventArgs<IUserGroup>>(null, serviceContext.UserService, new SaveEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
+                new EventDefinition<IUserService, SaveEventArgs<UserGroupWithUsers>>(null, serviceContext.UserService, new SaveEventArgs<UserGroupWithUsers>(Enumerable.Empty<UserGroupWithUsers>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, serviceContext.UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
 
                 new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, serviceContext.LocalizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -6,6 +7,8 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
+        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
+
         /// <summary>
         /// Builds an IContent item from a dto and content type.
         /// </summary>
@@ -177,11 +180,18 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Buils a dto from an IMedia item.
         /// </summary>
-        public static ContentDto BuildDto(IMedia entity)
+        public static MediaDto BuildDto(IMedia entity)
         {
             var contentBase = (Models.Media) entity;
-            var dto = BuildContentDto(contentBase, Constants.ObjectTypes.Media);
-            dto.ContentVersionDto = BuildContentVersionDto(contentBase, dto);
+            var contentDto = BuildContentDto(contentBase, Constants.ObjectTypes.Media);
+
+            var dto = new MediaDto
+            {
+                NodeId = entity.Id,
+                ContentDto = contentDto,
+                MediaVersionDto = BuildMediaVersionDto(contentBase, contentDto)
+            };
+
             return dto;
         }
 
@@ -272,6 +282,38 @@ namespace Umbraco.Core.Persistence.Factories
             };
 
             return dto;
+        }
+
+        private static MediaVersionDto BuildMediaVersionDto(Models.Media entity, ContentDto contentDto)
+        {
+            // try to get a path from the string being stored for media
+            // fixme - only considering umbracoFile ?!
+
+            TryMatch(entity.GetValue<string>("umbracoFile"), out var path);
+
+            var dto = new MediaVersionDto
+            {
+                Id = entity.VersionId,
+                Path = path,
+
+                ContentVersionDto = BuildContentVersionDto(entity, contentDto)
+            };
+
+            return dto;
+        }
+
+        // fixme - this should NOT be here?!
+        // more dark magic ;-(
+        internal static bool TryMatch(string text, out string path)
+        {
+            path = null;
+            if (string.IsNullOrWhiteSpace(text)) return false;
+
+            var m = MediaPathPattern.Match(text);
+            if (!m.Success || m.Groups.Count != 2) return false;
+
+            path = m.Groups[1].Value;
+            return true;
         }
     }
 }

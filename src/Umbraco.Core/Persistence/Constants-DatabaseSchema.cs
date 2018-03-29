@@ -28,6 +28,7 @@ namespace Umbraco.Core
                 public const string ContentVersion = TableNamePrefix + "ContentVersion";
                 public const string Document = TableNamePrefix + "Document";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
+                public const string MediaVersion = TableNamePrefix + "MediaVersion";
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";
@@ -71,6 +72,10 @@ namespace Umbraco.Core
                 public const string TaskType = /*TableNamePrefix*/ "cms" + "TaskType";
 
                 public const string KeyValue = TableNamePrefix + "KeyValue";
+
+                public const string AuditEntry = /*TableNamePrefix*/ "umbraco" + "Audit";
+                public const string Consent = /*TableNamePrefix*/ "umbraco" + "Consent";
+                public const string UserLogin = /*TableNamePrefix*/ "umbraco" + "UserLogin";
             }
         }
     }

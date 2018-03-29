@@ -14,39 +14,8 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentTypeMapperProfile : Profile
     {
-        private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IFileService _fileService;
-        private readonly IContentTypeService _contentTypeService;
-        private readonly IMediaTypeService _mediaTypeService;
-
         public ContentTypeMapperProfile(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService, IContentTypeService contentTypeService, IMediaTypeService mediaTypeService)
         {
-            _propertyEditors = propertyEditors;
-            _dataTypeService = dataTypeService;
-            _fileService = fileService;
-            _contentTypeService = contentTypeService;
-            _mediaTypeService = mediaTypeService;
-
-            // v7 creates this map twice which makes no sense, and AutoMapper 6 detects it
-            // assuming the second map took over, and removing the first one for now
-            /*
-            CreateMap<PropertyTypeBasic, PropertyType>()
-                .ConstructUsing(basic => new PropertyType(_dataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
-                .ForMember(type => type.ValidationRegExp, opt => opt.ResolveUsing(basic => basic.Validation.Pattern))
-                .ForMember(type => type.Mandatory, opt => opt.ResolveUsing(basic => basic.Validation.Mandatory))
-                .ForMember(type => type.Name, opt => opt.ResolveUsing(basic => basic.Label))
-                .ForMember(type => type.DataTypeDefinitionId, opt => opt.ResolveUsing(basic => basic.DataTypeId))
-                .ForMember(type => type.DataTypeId, opt => opt.Ignore())
-                .ForMember(type => type.PropertyEditorAlias, opt => opt.Ignore())
-                .ForMember(type => type.HelpText, opt => opt.Ignore())
-                .ForMember(type => type.Key, opt => opt.Ignore())
-                .ForMember(type => type.CreateDate, opt => opt.Ignore())
-                .ForMember(type => type.UpdateDate, opt => opt.Ignore())
-                .ForMember(type => type.DeletedDate, opt => opt.Ignore())
-                .ForMember(type => type.HasIdentity, opt => opt.Ignore());
-            */
-
             CreateMap<DocumentTypeSave, IContentType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity<DocumentTypeSave, PropertyTypeBasic, IContentType>()
@@ -57,13 +26,15 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     dest.AllowedTemplates = source.AllowedTemplates
                         .Where(x => x != null)
-                        .Select(s => _fileService.GetTemplate(s))
+                        .Select(s => fileService.GetTemplate(s))
                         .ToArray();
 
                     if (source.DefaultTemplate != null)
-                        dest.SetDefaultTemplate(_fileService.GetTemplate(source.DefaultTemplate));
+                        dest.SetDefaultTemplate(fileService.GetTemplate(source.DefaultTemplate));
+                    else
+                        dest.SetDefaultTemplate(null);
 
-                    ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
+                    ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, contentTypeService);
                 });
 
             CreateMap<MediaTypeSave, IMediaType>()
@@ -72,7 +43,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((source) => new MediaType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
-                    ContentTypeProfileExtensions.AfterMapMediaTypeSaveToEntity(source, dest, _mediaTypeService);
+                    ContentTypeProfileExtensions.AfterMapMediaTypeSaveToEntity(source, dest, mediaTypeService);
                 });
 
             CreateMap<MemberTypeSave, IMemberType>()
@@ -81,9 +52,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing(source => new MemberType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
-                    ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, _contentTypeService);
+                    ContentTypeProfileExtensions.AfterMapContentTypeSaveToEntity(source, dest, contentTypeService);
 
-                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    //map the MemberCanEditProperty,MemberCanViewProperty,IsSensitiveData
                     foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
                     {
                         var localCopy = propertyType;
@@ -92,6 +63,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             dest.SetMemberCanEditProperty(localCopy.Alias, localCopy.MemberCanEditProperty);
                             dest.SetMemberCanViewProperty(localCopy.Alias, localCopy.MemberCanViewProperty);
+                            dest.SetIsSensitiveProperty(localCopy.Alias, localCopy.IsSensitiveData);
                         }
                     }
                 });
@@ -100,10 +72,10 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(_propertyEditors, _dataTypeService, _contentTypeService)
+                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService)
                 .AfterMap((memberType, display) =>
                 {
-                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    //map the MemberCanEditProperty,MemberCanViewProperty,IsSensitiveData
                     foreach (var propertyType in memberType.PropertyTypes)
                     {
                         var localCopy = propertyType;
@@ -112,13 +84,14 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             displayProp.MemberCanEditProperty = memberType.MemberCanEditProperty(localCopy.Alias);
                             displayProp.MemberCanViewProperty = memberType.MemberCanViewProperty(localCopy.Alias);
+                            displayProp.IsSensitiveData = memberType.IsSensitiveProperty(localCopy.Alias);
                         }
                     }
                 });
 
             CreateMap<IMediaType, MediaTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(_propertyEditors, _dataTypeService, _contentTypeService)
+                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService)
                 .AfterMap((source, dest) =>
                  {
                      //default listview
@@ -127,14 +100,14 @@ namespace Umbraco.Web.Models.Mapping
                      if (string.IsNullOrEmpty(source.Name) == false)
                      {
                          var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
-                         if (_dataTypeService.GetDataType(name) != null)
+                         if (dataTypeService.GetDataType(name) != null)
                              dest.ListViewEditorName = name;
                      }
                  });
 
             CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(_propertyEditors, _dataTypeService, _contentTypeService)
+                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(propertyEditors, dataTypeService, contentTypeService)
                 .ForMember(dto => dto.AllowedTemplates, opt => opt.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
                 .ForMember(display => display.Notifications, opt => opt.Ignore())
@@ -152,7 +125,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (string.IsNullOrEmpty(source.Alias) == false)
                     {
                         var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Alias;
-                        if (_dataTypeService.GetDataType(name) != null)
+                        if (dataTypeService.GetDataType(name) != null)
                             dest.ListViewEditorName = name;
                     }
 
@@ -175,7 +148,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ConstructUsing(propertyTypeBasic =>
                 {
-                    var dataType = _dataTypeService.GetDataType(propertyTypeBasic.DataTypeId);
+                    var dataType = dataTypeService.GetDataType(propertyTypeBasic.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
                     return new PropertyType(dataType, propertyTypeBasic.Alias);
                 })
@@ -226,7 +199,7 @@ namespace Umbraco.Web.Models.Mapping
                     //if the dest is set and it's the same as the source, then don't change
                     if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
                     {
-                        var templates = _fileService.GetTemplates(source.AllowedTemplates.ToArray());
+                        var templates = fileService.GetTemplates(source.AllowedTemplates.ToArray());
                         dest.AllowedTemplates = source.AllowedTemplates
                             .Select(x => Mapper.Map<EntityBasic>(templates.SingleOrDefault(t => t.Alias == x)))
                             .WhereNotNull()
@@ -238,7 +211,7 @@ namespace Umbraco.Web.Models.Mapping
                         //if the dest is set and it's the same as the source, then don't change
                         if (dest.DefaultTemplate == null || source.DefaultTemplate != dest.DefaultTemplate.Alias)
                         {
-                            var template = _fileService.GetTemplate(source.DefaultTemplate);
+                            var template = fileService.GetTemplate(source.DefaultTemplate);
                             dest.DefaultTemplate = template == null ? null : Mapper.Map<EntityBasic>(template);
                         }
                     }

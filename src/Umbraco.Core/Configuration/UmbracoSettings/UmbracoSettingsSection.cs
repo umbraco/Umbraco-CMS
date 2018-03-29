@@ -8,6 +8,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
     public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
+        [ConfigurationProperty("backOffice")]
+        internal BackOfficeElement BackOffice
+        {
+            get { return (BackOfficeElement)this["backOffice"]; }
+        }
+
         [ConfigurationProperty("content")]
         internal ContentElement Content
         {
@@ -130,6 +136,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         ITemplatesSection IUmbracoSettingsSection.Templates
         {
             get { return Templates; }
+        }
+
+        IBackOfficeSection IUmbracoSettingsSection.BackOffice
+        {
+            get { return BackOffice; }
         }
 
         IDeveloperSection IUmbracoSettingsSection.Developer

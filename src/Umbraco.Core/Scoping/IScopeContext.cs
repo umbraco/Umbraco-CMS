@@ -38,5 +38,13 @@ namespace Umbraco.Core.Scoping
         /// <para>The action boolean parameter indicates whether the scope completed or not.</para>
         /// </remarks>
         T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100);
+
+        /// <summary>
+        /// Gets an enlisted object.
+        /// </summary>
+        /// <typeparam name="T">The type of the object.</typeparam>
+        /// <param name="key">The object unique identifier.</param>
+        /// <returns>The enlisted object, if any, else the default value.</returns>
+        T GetEnlisted<T>(string key);
     }
 }

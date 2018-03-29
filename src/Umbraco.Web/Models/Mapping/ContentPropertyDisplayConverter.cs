@@ -15,10 +15,13 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
     {
-        public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService)
-            : base(dataTypeService)
-        { }
+        private readonly ILocalizedTextService _textService;
 
+        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService)
+            : base(dataTypeService)
+        {
+            _textService = textService;
+        }
         public override ContentPropertyDisplay Convert(Property originalProp, ContentPropertyDisplay dest, ResolutionContext context)
         {
             var display = base.Convert(originalProp, dest, context);
@@ -57,6 +60,10 @@ namespace Umbraco.Web.Models.Mapping
                 display.Config = display.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
                 display.View = valEditor.View;
             }
+
+            //Translate
+            display.Label = _textService.UmbracoDictionaryTranslate(display.Label);
+            display.Description = _textService.UmbracoDictionaryTranslate(display.Description);
 
             return display;
         }

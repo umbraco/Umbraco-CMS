@@ -17,13 +17,11 @@ namespace Umbraco.Web.PropertyEditors
     {
         public ValueListConfigurationEditor(ILocalizedTextService textService)
         {
-            Fields.Add(new ConfigurationField(new ValueListUniqueValueValidator())
-            {
-                Description = "Add and remove values for the list",
-                Key = "items",
-                Name = textService.Localize("editdatatype/addPrevalue"),
-                View = "multivalues"
-            });
+            var items = Fields.First(x => x.Key == "items");
+
+            // customize the items field
+            items.Name = textService.Localize("editdatatype/addPrevalue");
+            items.Validators.Add(new ValueListUniqueValueValidator());
         }
 
         // editor...

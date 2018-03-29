@@ -224,7 +224,7 @@
                                                       <!-- Controls repeat end -->
 
                                                       <!-- if area is empty tools -->
-                                                      <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode">
+                                                      <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0 && !sortMode && (area.maxItems == undefined || area.maxItems == '' || area.maxItems == 0 || area.maxItems > area.controls.length)">
                                                           <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);"><localize key="grid_addElement" /></div>
                                                       </div>
 

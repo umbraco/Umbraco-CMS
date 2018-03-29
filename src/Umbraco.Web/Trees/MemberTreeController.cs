@@ -17,6 +17,7 @@ using Umbraco.Web._Legacy.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -176,6 +177,17 @@ namespace Umbraco.Web.Trees
 
             //add delete option for all members
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+
+            if (Security.CurrentUser.HasAccessToSensitiveData())
+            {
+                menu.Items.Add(new ExportMember
+                {
+                    Name = Services.TextService.Localize("actions/export"),
+                    Icon = "download-alt",
+                    Alias = "export"
+                });
+            }
+
 
             return menu;
         }

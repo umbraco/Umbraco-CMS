@@ -27,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<EntitySlim, EntityBasic>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(ObjectTypes.GetUdiType(src.NodeObjectType), src.Key)))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => GetContentTypeIcon(src)))
-                .ForMember(dest => dest.Trashed, opt => opt.Ignore())
+                .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .AfterMap((src, dest) =>
                 {

@@ -59,7 +59,7 @@
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="AutoMapper" Version="6.1.1" />
     <PackageReference Include="ClientDependency">
-      <Version>1.9.2</Version>
+      <Version>1.9.6</Version>
     </PackageReference>
     <!-- do not update -->
     <PackageReference Include="HtmlAgilityPack" Version="1.5.1" />
@@ -98,6 +98,7 @@
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
+    <Compile Include="Auditing\AuditEventsComponent.cs" />
     <Compile Include="Auditing\IdentityAuditEventArgs.cs" />
     <Compile Include="BindingRedirects.cs" />
     <Compile Include="ByteArrayExtensions.cs" />
@@ -140,10 +141,12 @@
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="Collections\CompositeIntStringKey.cs" />
+    <Compile Include="Collections\CompositeTypeTypeKey.cs" />
     <Compile Include="Collections\ConcurrentHashSet.cs" />
     <Compile Include="Collections\DeepCloneableList.cs" />
     <Compile Include="Collections\ListCloneBehavior.cs" />
     <Compile Include="Collections\ObservableDictionary.cs" />
+    <Compile Include="Collections\TypeList.cs" />
     <Compile Include="Components\BootLoader.cs" />
     <Compile Include="Components\Composition.cs" />
     <Compile Include="Components\CompositionExtensions.cs" />
@@ -182,7 +185,6 @@
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
-    <Compile Include="Configuration\ContentXmlStorage.cs" />
     <Compile Include="Configuration\CoreDebug.cs" />
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessItem.cs" />
@@ -230,6 +232,7 @@
     <Compile Include="Configuration\IFileSystemProviderElement.cs" />
     <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
+    <Compile Include="Configuration\LocalTempStorage.cs" />
     <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\RawXmlConfigurationElement.cs" />
@@ -237,6 +240,7 @@
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\BackOfficeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentElement.cs" />
@@ -251,6 +255,7 @@
     <Compile Include="Configuration\UmbracoSettings\DistributedCallElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
@@ -272,6 +277,7 @@
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IServer.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
@@ -290,6 +296,7 @@
     <Compile Include="Configuration\UmbracoSettings\ServerCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ServerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
@@ -312,13 +319,31 @@
     <Compile Include="Constants-System.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="DisposableObjectSlim.cs" />
+    <Compile Include="Events\ExportedMemberEventArgs.cs" />
+    <Compile Include="Events\RolesEventArgs.cs" />
+    <Compile Include="Events\UserGroupWithUsers.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\RollingFileCleanupAppender.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_8_0\AddInstructionCountColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_8_0\AddMediaVersionTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_8_0\AddTourDataUserColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_8_0\AddUserLoginTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_9_0\AddIsSensitiveMemberTypeColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
+    <Compile Include="Models\AuditEntry.cs" />
+    <Compile Include="Models\Consent.cs" />
+    <Compile Include="Models\ConsentExtensions.cs" />
+    <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
@@ -331,9 +356,29 @@
     <Compile Include="Models\Entities\IDocumentEntitySlim.cs" />
     <Compile Include="Models\Entities\ContentEntitySlim.cs" />
     <Compile Include="Models\Entities\DocumentEntitySlim.cs" />
+    <Compile Include="Models\IAuditEntry.cs" />
+    <Compile Include="Models\IAuditItem.cs" />
+    <Compile Include="Models\IConsent.cs" />
+    <Compile Include="Models\Membership\MemberExportModel.cs" />
+    <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
+    <Compile Include="Persistence\Dtos\ConsentDto.cs" />
+    <Compile Include="Persistence\Dtos\MediaDto.cs" />
+    <Compile Include="Persistence\Dtos\MediaVersionDto.cs" />
+    <Compile Include="Persistence\Dtos\UserLoginDto.cs" />
+    <Compile Include="Persistence\Factories\AuditEntryFactory.cs" />
+    <Compile Include="Persistence\Factories\ConsentFactory.cs" />
+    <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
+    <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
+    <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
+    <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
+    <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
+    <Compile Include="Persistence\Repositories\Implement\AuditEntryRepository.cs" />
+    <Compile Include="Persistence\Repositories\Implement\ConsentRepository.cs" />
+    <Compile Include="PropertyEditors\ColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditorOfTConfiguration.cs" />
     <Compile Include="PropertyEditors\DataEditorAttribute.cs" />
     <Compile Include="PropertyEditors\ConfigurationEditor.cs" />
@@ -352,6 +397,7 @@
     <Compile Include="PropertyEditors\TagConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
+    <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
@@ -891,7 +937,6 @@
     <Compile Include="Persistence\IUmbracoDatabaseFactory.cs" />
     <Compile Include="Persistence\LocalDb.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
-    <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
@@ -1272,6 +1317,7 @@
     <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUmbracoMemberTypeMembershipProvider.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
+    <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\IUsersMembershipProvider.cs" />
     <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
@@ -1279,6 +1325,7 @@
     <Compile Include="Security\MembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
+    <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
@@ -1304,6 +1351,7 @@
     <Compile Include="Serialization\UdiJsonConverter.cs" />
     <Compile Include="Serialization\UdiRangeJsonConverter.cs" />
     <Compile Include="ServiceContextExtensions.cs" />
+    <Compile Include="Services\IConsentService.cs" />
     <Compile Include="Services\Implement\AuditService.cs" />
     <Compile Include="Services\Changes\ContentTypeChange.cs" />
     <Compile Include="Services\Changes\ContentTypeChangeExtensions.cs" />
@@ -1312,6 +1360,7 @@
     <Compile Include="Services\Changes\TreeChange.cs" />
     <Compile Include="Services\Changes\TreeChangeExtensions.cs" />
     <Compile Include="Services\Changes\TreeChangeTypes.cs" />
+    <Compile Include="Services\Implement\ConsentService.cs" />
     <Compile Include="Services\Implement\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
     <Compile Include="Services\Implement\ContentTypeService.cs" />

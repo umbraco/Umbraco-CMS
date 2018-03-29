@@ -45,6 +45,9 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("viewOnProfile")]
         public bool ViewOnProfile { get; set; }
 
+        [Column("isSensitive")]
+        public bool IsSensitive { get; set; }
+
         /* DataType */
         [Column("propertyEditorAlias")]
         public string PropertyEditorAlias { get; set; }

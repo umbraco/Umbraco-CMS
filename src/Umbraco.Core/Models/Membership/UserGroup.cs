@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
+    public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         private int? _startContentId;
         private int? _startMediaId;

@@ -20,6 +20,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
@@ -40,6 +41,8 @@ namespace Umbraco.Tests.Web.Controllers
 
             // kill the true IEntityService too
             Container.RegisterSingleton(f => Mock.Of<IEntityService>());
+            
+            Container.RegisterSingleton<UmbracoFeatures>();
         }
 
         [Test]

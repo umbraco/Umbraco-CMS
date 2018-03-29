@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, usersResource, userGroupsResource, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -20,6 +20,19 @@
             { label: "Oldest", key: "CreateDate", direction: "Ascending" },
             { label: "Last login", key: "LastLoginDate", direction: "Descending" }
         ];
+
+        angular.forEach(vm.userSortData, function (userSortData) {
+            var key = "user_sort" + userSortData.key + userSortData.direction;
+            localizationService.localize(key).then(function (value) {
+                var reg = /^\[[\S\s]*]$/g;
+                var result = reg.test(value);
+                if (result === false) {
+                    // Only translate if key exists
+                    userSortData.label = value;
+                }
+            });
+        });
+
         vm.userStatesFilter = [];
         vm.newUser.userGroups = [];
         vm.usersViewState = 'overview';
@@ -111,6 +124,13 @@
             vm.usersOptions.orderBy = "Name";
             vm.usersOptions.orderDirection = "Ascending";
 
+            if ($routeParams.create) {
+                setUsersViewState("createUser");
+            }
+            else if ($routeParams.invite) {
+                setUsersViewState("inviteUser");
+            }
+
             // Get users
             getUsers();
 
@@ -155,6 +175,17 @@
 
             if (state === "createUser") {
                 clearAddUserForm();
+
+                $location.search("create", "true");
+                $location.search("invite", null);
+            }
+            else if (state === "inviteUser") {
+                $location.search("create", null);
+                $location.search("invite", "true");
+            }
+            else if (state === "overview") {
+                $location.search("create", null);
+                $location.search("invite", null);
             }
 
             vm.usersViewState = state;
@@ -284,10 +315,10 @@
             vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
 
             vm.userGroupPicker = {
-                title: "Select user groups",
+                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.selectedBulkUserGroups,
-                closeButtonLabel: "Cancel",
+                closeButtonLabel: localizationService.localize("general_cancel"),
                 show: true,
                 submit: function (model) {
                     usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
@@ -320,10 +351,10 @@
 
         function openUserGroupPicker(event) {
             vm.userGroupPicker = {
-                title: "Select user groups",
+                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.newUser.userGroups,
-                closeButtonLabel: "Cancel",
+                closeButtonLabel: localizationService.localize("general_cancel"),
                 show: true,
                 submit: function (model) {
                     // apply changes
@@ -583,7 +614,10 @@
                         dateVal = moment(user.lastLoginDate, "YYYY-MM-DD HH:mm:ss");
                     }
 
-                    user.formattedLastLogin = dateVal.format("MMMM Do YYYY, HH:mm");
+                    // get current backoffice user and format date
+                    userService.getCurrentUser().then(function (currentUser) {
+                        user.formattedLastLogin = dateVal.locale(currentUser.locale).format("LLL");
+                    });
                 }
             });
         }

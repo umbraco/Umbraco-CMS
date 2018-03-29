@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
@@ -37,8 +39,16 @@ namespace Umbraco.Core.Services
             int? val;
             using (var scope = _scopeProvider.CreateScope())
             {
-                val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND nodeObjectType=@nodeObjectType",
-                    new { id = key, nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType) });
+                var sql = scope.Database.SqlContext.Sql()
+                    .Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
+
+                if (umbracoObjectType != UmbracoObjectTypes.Unknown) // if unknow, don't include in query
+                {
+                    var objectType = GetNodeObjectTypeGuid(umbracoObjectType);
+                    sql = sql.Where<NodeDto>(x => x.NodeObjectType == objectType || x.NodeObjectType == Constants.ObjectTypes.IdReservation); // fixme TEST the OR here!
+                }
+                    
+                val = scope.Database.ExecuteScalar<int?>(sql);
                 scope.Complete();
             }
 
@@ -89,8 +99,16 @@ namespace Umbraco.Core.Services
             Guid? val;
             using (var scope = _scopeProvider.CreateScope())
             {
-                val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND nodeObjectType=@nodeObjectType",
-                    new { id, nodeObjectType = GetNodeObjectTypeGuid(umbracoObjectType) });
+                var sql = scope.Database.SqlContext.Sql()
+                    .Select<NodeDto>(x => x.UniqueId).From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
+
+                if (umbracoObjectType != UmbracoObjectTypes.Unknown) // if unknow, don't include in query
+                {
+                    var objectType = GetNodeObjectTypeGuid(umbracoObjectType);
+                    sql = sql.Where<NodeDto>(x => x.NodeObjectType == objectType || x.NodeObjectType == Constants.ObjectTypes.IdReservation); // fixme TEST the OR here!
+                }
+                    
+                val = scope.Database.ExecuteScalar<Guid?>(sql);
                 scope.Complete();
             }
 
@@ -104,7 +122,7 @@ namespace Umbraco.Core.Services
             {
                 _locker.EnterWriteLock();
                 _id2Key[id] = new TypedId<Guid>(val.Value, umbracoObjectType);
-                _key2Id[val.Value] = new TypedId<int>();
+                _key2Id[val.Value] = new TypedId<int>(id, umbracoObjectType);
             }
             finally
             {

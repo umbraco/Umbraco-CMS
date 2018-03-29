@@ -100,6 +100,7 @@ namespace Umbraco.Core.Models.Membership
         private string _name;
         private string _securityStamp;
         private string _avatar;
+        private string _tourData;
         private int _sessionTimeout;
         private int[] _startContentIds;
         private int[] _startMediaIds;
@@ -133,6 +134,7 @@ namespace Umbraco.Core.Models.Membership
 
             public readonly PropertyInfo SecurityStampSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.SecurityStamp);
             public readonly PropertyInfo AvatarSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Avatar);
+            public readonly PropertyInfo TourDataSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.TourData);
             public readonly PropertyInfo SessionTimeoutSelector = ExpressionHelper.GetPropertyInfo<User, int>(x => x.SessionTimeout);
             public readonly PropertyInfo StartContentIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartContentIds);
             public readonly PropertyInfo StartMediaIdSelector = ExpressionHelper.GetPropertyInfo<User, int[]>(x => x.StartMediaIds);
@@ -468,6 +470,16 @@ namespace Umbraco.Core.Models.Membership
         }
 
         /// <summary>
+        /// A Json blob stored for recording tour data for a user
+        /// </summary>
+        [DataMember]
+        public string TourData
+        {
+            get { return _tourData; }
+            set { SetPropertyValueAndDetectChanges(value, ref _tourData, Ps.Value.TourDataSelector); }
+        }
+
+        /// <summary>
         /// Gets or sets the session timeout.
         /// </summary>
         /// <value>
@@ -671,5 +683,6 @@ namespace Umbraco.Core.Models.Membership
                 return _user.GetHashCode();
             }
         }
+
     }
 }

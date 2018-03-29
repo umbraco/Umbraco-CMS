@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoConverter : ContentPropertyBasicConverter<ContentPropertyDto>
     {
-        public ContentPropertyDtoConverter(Lazy<IDataTypeService> dataTypeService)
+        public ContentPropertyDtoConverter(IDataTypeService dataTypeService)
             : base(dataTypeService)
         { }
 

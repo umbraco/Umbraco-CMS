@@ -905,7 +905,7 @@
     <key alias="sortCreationDate">增添時間</key>
     <key alias="sortDone">排序完成。</key>
     <key alias="sortHelp">上下拖拽項目或按一下列頭進行排序</key>
-    <key alias="sortPleaseWait"><![CDATA[ 請稍後。項目正在排序，這需要一點時間。<br/> <br/>排序中請不要關閉視窗。]]></key>
+    <key alias="sortPleaseWait"><![CDATA[ 請稍後。項目正在排序，這需要一點時間。]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="validationFailedHeader">驗證</key>
@@ -995,6 +995,12 @@
     <key alias="template">範本</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">選擇內容類別</key>
     <key alias="chooseLayout">選擇排列方式</key>
     <key alias="addRows">新增一行</key>

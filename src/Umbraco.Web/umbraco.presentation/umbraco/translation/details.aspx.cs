@@ -5,7 +5,6 @@ using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.BusinessLogic;
-
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
 

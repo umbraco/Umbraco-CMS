@@ -74,6 +74,11 @@
             public const string Media = "media";
 
             /// <summary>
+            /// alias for the macro tree.
+            /// </summary>
+            public const string Macros = "macros";
+            
+            /// <summary>
             /// alias for the datatype tree.
             /// </summary>
             public const string DataTypes = "dataTypes";
@@ -120,8 +125,6 @@
             public const string Xslt = "xslt";
 
             public const string Languages = "languages";
-
-            public const string Macros = "macros";
 
             /// <summary>
             /// alias for the user types tree.

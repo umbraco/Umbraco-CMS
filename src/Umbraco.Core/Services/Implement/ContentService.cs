@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
 
-        private readonly MediaFileSystem _mediaFileSystem;        
+        private readonly MediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
         #region Constructors
@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                return _documentRepository.CountPublished();
+                return _documentRepository.CountPublished(contentTypeAlias);
             }
         }
 
@@ -651,7 +651,7 @@ namespace Umbraco.Core.Services.Implement
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith($"{contentPath[0]},", TextColumnType.NVarchar));
+                    query.Where(x => x.Path.SqlStartsWith($"{contentPath[0].Path},", TextColumnType.NVarchar));
                 }
                 return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
             }
@@ -800,8 +800,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var bin = $"{Constants.System.Root},{Constants.System.RecycleBinContent},";
-                var query = Query<IContent>().Where(x => x.Path.StartsWith(bin));
+                var query = Query<IContent>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
                 return _documentRepository.Get(query);
             }
         }
@@ -1709,7 +1708,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <summary>
         /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
-        /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
+        /// to the ordering of items in the passed in <paramref name="items"/>.
         /// </summary>
         /// <remarks>
         /// Using this method will ensure that the Published-state is maintained upon sorting
@@ -1726,56 +1725,88 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
-                    return false;
-
-                var published = new List<IContent>();
-                var saved = new List<IContent>();
-
                 scope.WriteLock(Constants.Locks.ContentTree);
-                var sortOrder = 0;
 
-                foreach (var content in itemsA)
-                {
-                    // if the current sort order equals that of the content we don't
-                    // need to update it, so just increment the sort order and continue.
-                    if (content.SortOrder == sortOrder)
-                    {
-                        sortOrder++;
-                        continue;
-                    }
-
-                    // else update
-                    content.SortOrder = sortOrder++;
-                    content.WriterId = userId;
-
-                    // if it's published, register it, no point running StrategyPublish
-                    // since we're not really publishing it and it cannot be cancelled etc
-                    if (content.Published)
-                        published.Add(content);
-
-                    // save
-                    saved.Add(content);
-                    _documentRepository.Save(content);
-                }
-
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                }
-
-                scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
-
-                if (raiseEvents && published.Any())
-                    scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
-
-                Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
-
+                var ret = Sort(scope, itemsA, userId, raiseEvents);
                 scope.Complete();
+                return ret;
+            }
+        }
+
+        /// <summary>
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of items identified by the <paramref name="ids"/>.
+        /// </summary>
+        /// <remarks>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
+        /// </remarks>
+        /// <param name="ids"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        public bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
+        {
+            var idsA = ids.ToArray();
+            if (idsA.Length == 0) return true;
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+                var itemsA = GetByIds(idsA).ToArray();
+
+                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                scope.Complete();
+                return ret;
+            }
+        }
+
+        private bool Sort(IScope scope, IContent[] itemsA, int userId, bool raiseEvents)
+        {
+            var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
+            if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                return false;
+
+            var published = new List<IContent>();
+            var saved = new List<IContent>();
+            var sortOrder = 0;
+
+            foreach (var content in itemsA)
+            {
+                // if the current sort order equals that of the content we don't
+                // need to update it, so just increment the sort order and continue.
+                if (content.SortOrder == sortOrder)
+                {
+                    sortOrder++;
+                    continue;
+                }
+
+                // else update
+                content.SortOrder = sortOrder++;
+                content.WriterId = userId;
+
+                // if it's published, register it, no point running StrategyPublish
+                // since we're not really publishing it and it cannot be cancelled etc
+                if (content.Published)
+                    published.Add(content);
+
+                // save
+                saved.Add(content);
+                _documentRepository.Save(content);
             }
 
+            if (raiseEvents)
+            {
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+            }
+
+            scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
+
+            if (raiseEvents && published.Any())
+                scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
+
+            Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
             return true;
         }
 
@@ -2300,6 +2331,38 @@ namespace Umbraco.Core.Services.Implement
                     return x;
                 });
             }
+        }
+
+        public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.ContentTree);
+
+                var contentTypeIdsA = contentTypeIds.ToArray();
+                var query = Query<IContent>();
+                if (contentTypeIdsA.Length > 0)
+                    query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
+
+                var blueprints = _documentBlueprintRepository.Get(query).Select(x =>
+                {
+                    ((Content) x).Blueprint = true;
+                    return x;
+                }).ToArray();
+
+                foreach (var blueprint in blueprints)
+                {
+                    _documentBlueprintRepository.Delete(blueprint);
+                }
+
+                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(blueprints), "DeletedBlueprint");
+                scope.Complete();
+            }
+        }
+
+        public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
+        {
+            DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
         }
 
         #endregion

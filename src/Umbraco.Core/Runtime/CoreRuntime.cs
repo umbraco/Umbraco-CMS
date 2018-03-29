@@ -235,14 +235,14 @@ namespace Umbraco.Core.Runtime
 
         private void SetRuntimeStateLevel(RuntimeState runtimeState, IUmbracoDatabaseFactory databaseFactory, ILogger logger)
         {
-            var localVersion = LocalVersion; // the local, files, version
+            var localVersion = UmbracoVersion.Local; // the local, files, version
             var codeVersion = runtimeState.SemanticVersion; // the executing code version
             var connect = false;
 
             // we don't know yet
             runtimeState.Level = RuntimeLevel.Unknown;
 
-            if (string.IsNullOrWhiteSpace(localVersion))
+            if (localVersion == null)
             {
                 // there is no local version, we are not installed
                 logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
@@ -348,22 +348,6 @@ namespace Umbraco.Core.Runtime
             logger.Debug<CoreRuntime>($"Final upgrade state is \"{finalState}\", database contains \"{state ?? "<null>"}\".");
 
             return state == finalState;
-        }
-
-        private static string LocalVersion
-        {
-            get
-            {
-                try
-                {
-                    // fixme - this should live in its own independent file! NOT web.config!
-                    return ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
         }
 
         #region Locals

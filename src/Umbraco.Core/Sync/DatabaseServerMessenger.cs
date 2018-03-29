@@ -15,6 +15,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Sync
@@ -34,6 +35,7 @@ namespace Umbraco.Core.Sync
         private readonly object _locko = new object();
         private readonly ProfilingLogger _profilingLogger;
         private readonly ISqlContext _sqlContext;
+        private readonly Lazy<string> _distCacheFilePath = new Lazy<string>(GetDistCacheFilePath);
         private int _lastId = -1;
         private DateTime _lastSync;
         private DateTime _lastPruned;
@@ -41,7 +43,7 @@ namespace Umbraco.Core.Sync
         private bool _syncing;
         private bool _released;
 
-        protected DatabaseServerMessengerOptions Options { get; }
+        public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
             IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, ILogger logger, ProfilingLogger proflog,
@@ -63,6 +65,8 @@ namespace Umbraco.Core.Sync
         protected IScopeProvider ScopeProvider { get; }
 
         protected Sql<ISqlContext> Sql() => _sqlContext.Sql();
+        
+        private string DistCacheFilePath => _distCacheFilePath.Value;
 
         #region Messenger
 
@@ -82,8 +86,7 @@ namespace Umbraco.Core.Sync
         {
             var idsA = ids?.ToArray();
 
-            Type idType;
-            if (GetArrayType(idsA, out idType) == false)
+            if (GetArrayType(idsA, out var idType) == false)
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
             var instructions = RefreshInstruction.GetInstructions(refresher, messageType, idsA, idType, json);
@@ -92,7 +95,8 @@ namespace Umbraco.Core.Sync
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = LocalIdentity
+                OriginIdentity = LocalIdentity,
+                InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
             using (var scope = ScopeProvider.CreateScope())
@@ -182,10 +186,9 @@ namespace Umbraco.Core.Sync
                 }
                 else
                 {
-                    //check for how many instructions there are to process
-                    //TODO: In 7.6 we need to store the count of instructions per row since this is not affective because there can be far more than one (if not thousands)
-                    // of instructions in a single row.
-                    var count = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    //row so we will sum these numbers to get the actual count.
+                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
@@ -222,7 +225,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Synchronize the server (throttled).
         /// </summary>
-        protected void Sync()
+        protected internal void Sync()
         {
             lock (_locko)
             {
@@ -484,11 +487,10 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void ReadLastSynced()
         {
-            var path = SyncFilePath;
-            if (File.Exists(path) == false) return;
+            if (File.Exists(DistCacheFilePath) == false) return;
 
-            var content = File.ReadAllText(path);
-            if (int.TryParse(content, out int last))
+            var content = File.ReadAllText(DistCacheFilePath);
+            if (int.TryParse(content, out var last))
                 _lastId = last;
         }
 
@@ -501,7 +503,7 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void SaveLastSynced(int id)
         {
-            File.WriteAllText(SyncFilePath, id.ToString(CultureInfo.InvariantCulture));
+            File.WriteAllText(DistCacheFilePath, id.ToString(CultureInfo.InvariantCulture));
             _lastId = id;
         }
 
@@ -521,20 +523,40 @@ namespace Umbraco.Core.Sync
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-        /// <summary>
-        /// Gets the sync file path for the local server.
-        /// </summary>
-        /// <returns>The sync file path for the local server.</returns>
-        private static string SyncFilePath
+        private static string GetDistCacheFilePath()
         {
-            get
-            {
-                var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/DistCache/" + NetworkHelper.FileSafeMachineName);
-                if (Directory.Exists(tempFolder) == false)
-                    Directory.CreateDirectory(tempFolder);
+            var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
-                return Path.Combine(tempFolder, HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt");
+            string distCacheFilePath;
+            switch (GlobalSettings.LocalTempStorageLocation)
+            {
+                case LocalTempStorage.AspNetTemp:
+                    distCacheFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData", fileName);
+                    break;
+                case LocalTempStorage.EnvironmentTemp:
+                    var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
+                    var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",
+                        //include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
+                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
+                        // utilizing an old path
+                        appDomainHash);
+                    distCacheFilePath = Path.Combine(cachePath, fileName);
+                    break;
+                case LocalTempStorage.Default:
+                default:
+                    var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/DistCache");
+                    distCacheFilePath = Path.Combine(tempFolder, fileName);
+                    break;
             }
+
+            //ensure the folder exists
+            var folder = Path.GetDirectoryName(distCacheFilePath);
+            if (folder == null)
+                throw new InvalidOperationException("The folder could not be determined for the file " + distCacheFilePath);
+            if (Directory.Exists(folder) == false)
+                Directory.CreateDirectory(folder);
+
+            return distCacheFilePath;
         }
 
         #endregion

@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
 using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -14,29 +10,14 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class XmlPublishedContentInitBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-
-                //The 'quick and dirty' settings, so it runs a little quicker
-                // see benchmarkdotnet FAQ
-                Add(Job.Default
-                    .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(TimeInterval.FromMilliseconds(100)) // 100ms per iteration
-                    .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration
-            }
-        }
-
         public XmlPublishedContentInitBenchmarks()
         {
             _xml10 = Build(10);

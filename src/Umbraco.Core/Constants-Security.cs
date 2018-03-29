@@ -13,6 +13,7 @@ namespace Umbraco.Core
             public const int SuperId = -1;
 
             public const string AdminGroupAlias = "admin";
+            public const string SensitiveDataGroupAlias = "sensitiveData";
             public const string TranslatorGroupAlias = "translator";
 
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";

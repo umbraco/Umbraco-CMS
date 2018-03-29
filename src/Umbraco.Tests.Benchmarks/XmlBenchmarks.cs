@@ -1,34 +1,14 @@
 ﻿using System;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
-using BenchmarkDotNet.Horology;
-using BenchmarkDotNet.Jobs;
+using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class XmlBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-                //Add(ExecutionValidator.FailOnError);
-
-                //The 'quick and dirty' settings, so it runs a little quicker
-                // see benchmarkdotnet FAQ
-                Add(Job.Default
-                    .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(TimeInterval.FromMilliseconds(100)) // 100ms per iteration
-                    .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration
-            }
-        }
-
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             var templateId = 0;
@@ -67,7 +47,7 @@ namespace Umbraco.Tests.Benchmarks
             _xml.LoadXml(xmlText);
         }
 
-        [Cleanup]
+        [GlobalCleanup]
         public void Cleanup()
         {
             _xml = null;
@@ -87,7 +67,7 @@ namespace Umbraco.Tests.Benchmarks
         public void XmlWithNavigation()
         {
             var elt = _xml.DocumentElement;
-            var id = NavigateElementRoute(elt, new[] {"home", "sub1", "sub2"});
+            var id = NavigateElementRoute(elt, new[] { "home", "sub1", "sub2" });
             if (id <= 0) Console.WriteLine("ERR");
         }
 

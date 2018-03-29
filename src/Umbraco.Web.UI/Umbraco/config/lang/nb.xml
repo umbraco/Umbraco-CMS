@@ -83,6 +83,7 @@
     <key alias="returnToList">Tilbake til listen</key>
     <key alias="save">Lagre</key>
     <key alias="saveAndPublish">Lagre og publiser</key>
+    <key alias="saveAndSchedule">Lagre og planlegge</key>
     <key alias="saveToPublish">Lagre og send til publisering</key>
     <key alias="showPage">Forhåndsvis</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktivert siden det ikke er angitt noen mal</key>
@@ -422,7 +423,7 @@
     <key alias="showPageOnSend">Hvilken side skal vises etter at skjemaet er sendt</key>
     <key alias="size">Størrelse</key>
     <key alias="sort">Sorter</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Send</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Søk...</key>
     <key alias="up">Opp</key>
@@ -439,6 +440,17 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søkeresultater</key>
+    <key alias="reorder">Sorter</key>
+    <key alias="reorderDone">Avslutt sortering</key>
+    <key alias="preview">Eksempel</key>
+    <key alias="changePassword">Bytt passord</key>
+    <key alias="to">til</key>
+    <key alias="listView">Listevisning</key>
+    <key alias="saving">Lagrer...</key>
+    <key alias="current">nåværende</key>
+    <key alias="embed">Innbygging</key>
+    <key alias="retrieve">Hent</key>
+    <key alias="selected">valgt</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrunnsfarge</key>
@@ -733,7 +745,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortering ferdig.</key>
     <key alias="sortHelp">Dra elementene opp eller ned for å arrangere dem. Du kan også klikke kolonneoverskriftene for å sortere alt på en gang.</key>
-    <key alias="sortPleaseWait"><![CDATA[Vennligst vent. Elementene blir sortert, dette kan ta litt tid.<br/> <br/> Ikke lukk dette vinduet under sortering]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Vennligst vent. Elementene blir sortert, dette kan ta litt tid.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="operationFailedHeader">En feil oppsto</key>
@@ -819,6 +831,12 @@ Vennlig hilsen Umbraco roboten
     <key alias="template">Mal</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Sett inn element</key>
     <key alias="chooseLayout">Velg layout</key>
     <key alias="addRows">Legg til rad</key>

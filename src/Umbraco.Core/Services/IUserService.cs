@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -12,6 +13,34 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IUserService : IMembershipUserService
     {
+        /// <summary>
+        /// Creates a database entry for starting a new login session for a user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="requestingIpAddress"></param>
+        /// <returns></returns>
+        Guid CreateLoginSession(int userId, string requestingIpAddress);
+
+        /// <summary>
+        /// Validates that a user login session is valid/current and hasn't been closed
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
+        bool ValidateLoginSession(int userId, Guid sessionId);
+
+        /// <summary>
+        /// Removes the session's validity
+        /// </summary>
+        /// <param name="sessionId"></param>
+        void ClearLoginSession(Guid sessionId);
+
+        /// <summary>
+        /// Removes all valid sessions for the user
+        /// </summary>
+        /// <param name="userId"></param>
+        int ClearLoginSessions(int userId);
+
         /// <summary>
         /// This is basically facets of UserStates key = state, value = count
         /// </summary>

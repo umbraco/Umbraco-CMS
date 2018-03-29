@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -14,26 +15,29 @@ namespace umbraco.cms.presentation.Trees
     /// </summary>
     public abstract class BaseTree : ITreeService //, IApplicationEventHandler
     {
-
-        public BaseTree(string application)
+        protected BaseTree(string application)
         {
-            this.app = application;
+            app = application;
         }
 
         protected const string FolderIcon = "icon-folder";
         protected const string FolderIconOpen = "icon-folder";
 
-
         internal static string GetTreePathFromFilePath(string filePath)
+            => GetTreePathFromFilePath(filePath, true, false);
+
+        internal static string GetTreePathFromFilePath(string filePath, bool includeInit, bool urlEncode)
         {
             List<string> treePath = new List<string>();
             treePath.Add("-1");
-            treePath.Add("init");
+            if (includeInit) treePath.Add("init");
             string[] pathPaths = filePath.Split('/');
             pathPaths.Reverse();
             for (int p = 0; p < pathPaths.Length; p++)
             {
-                treePath.Add(string.Join("/", pathPaths.Take(p + 1).ToArray()));
+                var s = string.Join("/", pathPaths.Take(p + 1).ToArray());
+                if (urlEncode) s = WebUtility.UrlEncode(s);
+                treePath.Add(s);
             }
             string sPath = string.Join(",", treePath.ToArray());
             return sPath;

@@ -32,20 +32,23 @@ namespace Umbraco.Web
         IEnumerable<IPublishedContent> MediaAtRoot();
 
         /// <summary>
-        /// Searches content
+        /// Searches content.
         /// </summary>
-        /// <param name="term"></param>
-        /// <param name="useWildCards"></param>
-        /// <param name="indexName">The index to search</param>
-        /// <returns></returns>
         IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null);
 
         /// <summary>
-        /// Searhes content
+        /// Searches content.
         /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="searchProvider"></param>
-        /// <returns></returns>
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null);
+
+        /// <summary>
+        /// Searches content.
+        /// </summary>
         IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null);
+
+        /// <summary>
+        /// Searches content.
+        /// </summary>
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalrecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
     }
 }

@@ -17,7 +17,30 @@ namespace Umbraco.Core.Models.Membership
         }
 
         /// <summary>
-        /// Returns the aggregate permissions in the permission set
+        /// Returns the aggregate permissions in the permission set for a single node
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This value is only calculated once per node
+        /// </remarks>
+        public IEnumerable<string> GetAllPermissions(int entityId)
+        {
+            if (_aggregateNodePermissions == null)
+                _aggregateNodePermissions = new Dictionary<int, string[]>();
+
+            string[] entityPermissions;
+            if (_aggregateNodePermissions.TryGetValue(entityId, out entityPermissions) == false)
+            {
+                entityPermissions = this.Where(x => x.EntityId == entityId).SelectMany(x => x.AssignedPermissions).Distinct().ToArray();
+                _aggregateNodePermissions[entityId] = entityPermissions;
+            }
+            return entityPermissions;
+        }
+
+        private Dictionary<int, string[]> _aggregateNodePermissions;
+
+        /// <summary>
+        /// Returns the aggregate permissions in the permission set for all nodes
         /// </summary>
         /// <returns></returns>
         /// <remarks>

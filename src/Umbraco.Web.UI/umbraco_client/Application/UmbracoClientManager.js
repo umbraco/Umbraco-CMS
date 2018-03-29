@@ -170,9 +170,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
             },
 
-            reloadLocation: function () {
+            reloadLocation: function (pathToMatch) {
                 if (this.mainWindow().UmbClientMgr) {
-                    this.mainWindow().UmbClientMgr.reloadLocation();
+                    this.mainWindow().UmbClientMgr.reloadLocation(pathToMatch);
                 }
             },
 

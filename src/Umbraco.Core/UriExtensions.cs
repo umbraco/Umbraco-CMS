@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -142,10 +144,18 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static bool IsClientSideRequest(this Uri url)
         {
-            var ext = Path.GetExtension(url.LocalPath);
-            if (ext.IsNullOrWhiteSpace()) return false;
-            var toInclude = new[] { ".aspx", ".ashx", ".asmx", ".axd", ".svc" };
-            return toInclude.Any(ext.InvariantEquals) == false;
+            try
+            {
+                var ext = Path.GetExtension(url.LocalPath);
+                if (ext.IsNullOrWhiteSpace()) return false;
+                var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
+                return toInclude.Any(ext.InvariantEquals) == false;
+            }
+            catch (ArgumentException ex)
+            {
+                Current.Logger.Error(typeof(UriExtensions), "Failed to determine if request was client side", ex);
+                return false;
+            }
         }
 
         /// <summary>

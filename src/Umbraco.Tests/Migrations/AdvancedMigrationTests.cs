@@ -240,9 +240,9 @@ namespace Umbraco.Tests.Migrations
                 foreach (var x in DatabaseSchemaCreator.OrderedTables)
                 {
                     // ok - for tests, restrict to Node
-                    if (x.Value != typeof(NodeDto)) continue;
+                    if (x != typeof(NodeDto)) continue;
 
-                    Create.KeysAndIndexes(x.Value).Do();
+                    Create.KeysAndIndexes(x).Do();
                 }
             }
         }

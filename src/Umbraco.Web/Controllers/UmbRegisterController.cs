@@ -17,6 +17,13 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
+            // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
+            // If name field is empty, add the email address instead
+            if (string.IsNullOrEmpty(model.Name) && string.IsNullOrEmpty(model.Email) == false)
+            {
+                model.Name = model.Email;
+            }
+
             MembershipCreateStatus status;
             var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
 

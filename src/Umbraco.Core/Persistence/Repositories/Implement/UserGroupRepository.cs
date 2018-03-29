@@ -298,6 +298,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Id = id;
 
             PersistAllowedSections(entity);
+
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IUserGroup entity)
@@ -309,6 +311,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Update(userGroupDto);
 
             PersistAllowedSections(entity);
+
+            entity.ResetDirtyProperties();
         }
 
         private void PersistAllowedSections(IUserGroup entity)

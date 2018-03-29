@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -12,13 +11,11 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyMapperProfile : Profile
     {
-        private readonly IDataTypeService _dataTypeService;
-
-        public ContentPropertyMapperProfile(IDataTypeService dataTypeService)
+        public ContentPropertyMapperProfile(IDataTypeService dataTypeService, ILocalizedTextService textService)
         {
-            _dataTypeService = dataTypeService;
-
-            var lazyDataTypeService = new Lazy<IDataTypeService>(() => _dataTypeService);
+            var contentPropertyBasicConverter = new ContentPropertyBasicConverter<ContentPropertyBasic>(dataTypeService);
+            var contentPropertyDtoConverter = new ContentPropertyDtoConverter(dataTypeService);
+            var contentPropertyDisplayConverter = new ContentPropertyDisplayConverter(dataTypeService, textService);
 
             //FROM Property TO ContentPropertyBasic
             CreateMap<PropertyGroup, Tab<ContentPropertyDisplay>>()
@@ -28,16 +25,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(tab => tab.Alias, expression => expression.Ignore());
 
             //FROM Property TO ContentPropertyBasic
-            CreateMap<Property, ContentPropertyBasic>()
-                  .ConvertUsing(new ContentPropertyBasicConverter<ContentPropertyBasic>(lazyDataTypeService));
+            CreateMap<Property, ContentPropertyBasic>().ConvertUsing(contentPropertyBasicConverter);
 
             //FROM Property TO ContentPropertyDto
-            CreateMap<Property, ContentPropertyDto>()
-                  .ConvertUsing(new ContentPropertyDtoConverter(lazyDataTypeService));
+            CreateMap<Property, ContentPropertyDto>().ConvertUsing(contentPropertyDtoConverter);
 
             //FROM Property TO ContentPropertyDisplay
-            CreateMap<Property, ContentPropertyDisplay>()
-                  .ConvertUsing(new ContentPropertyDisplayConverter(lazyDataTypeService));
+            CreateMap<Property, ContentPropertyDisplay>().ConvertUsing(contentPropertyDisplayConverter);
         }
     }
 }

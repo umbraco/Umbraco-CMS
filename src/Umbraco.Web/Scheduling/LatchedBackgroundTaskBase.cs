@@ -5,7 +5,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {
-    public abstract class LatchedBackgroundTaskBase : DisposableObject, ILatchedBackgroundTask
+    public abstract class LatchedBackgroundTaskBase : DisposableObjectSlim, ILatchedBackgroundTask
     {
         private TaskCompletionSource<bool> _latch;
 

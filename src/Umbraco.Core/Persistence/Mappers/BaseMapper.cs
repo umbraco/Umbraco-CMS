@@ -26,9 +26,7 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal string Map(ISqlSyntaxProvider sqlSyntax, string propertyName, bool throws = false)
         {
-            DtoMapModel dtoTypeProperty;
-
-            if (PropertyInfoCache.TryGetValue(propertyName, out dtoTypeProperty))
+            if (PropertyInfoCache.TryGetValue(propertyName, out var dtoTypeProperty))
                 return GetColumnName(sqlSyntax, dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
 
             if (throws)

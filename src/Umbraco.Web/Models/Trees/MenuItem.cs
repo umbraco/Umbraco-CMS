@@ -192,7 +192,7 @@ namespace Umbraco.Web.Models.Trees
             else
             {
                 // if that doesn't work, try to get the legacy confirm view
-                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action, currentSection);
+                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action);
                 if (attempt2)
                 {
                     var view = attempt2.Result;
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Models.Trees
             else
             {
                 // if that doesn't work, try to get the legacy confirm view
-                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action, currentSection);
+                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action);
                 if (attempt2)
                 {
                     var view = attempt2.Result;

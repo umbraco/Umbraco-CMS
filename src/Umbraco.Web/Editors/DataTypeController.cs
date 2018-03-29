@@ -17,6 +17,7 @@ using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
 using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Editors
 {
@@ -343,8 +344,10 @@ namespace Umbraco.Web.Editors
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
+            var showDeprecatedPropertyEditors = UmbracoConfig.For.UmbracoSettings().Content.ShowDeprecatedPropertyEditors;
 
-            var propertyEditors = Current.PropertyEditors;
+            var propertyEditors = Current.PropertyEditors
+                .Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.GetConfigurationEditor().Fields.Any();

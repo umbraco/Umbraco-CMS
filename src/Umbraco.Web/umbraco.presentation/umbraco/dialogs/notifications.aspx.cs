@@ -30,7 +30,7 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = Services.TextService.Localize("update");
-            pane_form.Text = Services.TextService.Localize("notifications/editNotifications", new[] { node.Name});
+            pane_form.Text = Services.TextService.Localize("notifications/editNotifications", new[] { Server.HtmlEncode(node.Name) });
         }
 
         #region Web Form Designer generated code

@@ -21,9 +21,9 @@ namespace Umbraco.Core
         public static DateTime TruncateTo(this DateTime dt, DateTruncate truncateTo)
         {
             if (truncateTo == DateTruncate.Year)
-                return new DateTime(dt.Year, 0, 0);
+                return new DateTime(dt.Year, 1, 1);
             if (truncateTo == DateTruncate.Month)
-                return new DateTime(dt.Year, dt.Month, 0);
+                return new DateTime(dt.Year, dt.Month, 1);
             if (truncateTo == DateTruncate.Day)
                 return new DateTime(dt.Year, dt.Month, dt.Day);
             if (truncateTo == DateTruncate.Hour)

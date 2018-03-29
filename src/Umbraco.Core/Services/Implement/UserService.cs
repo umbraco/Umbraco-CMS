@@ -224,9 +224,9 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Deletes an <see cref="IUser"/>
+        /// Disables an <see cref="IUser"/>
         /// </summary>
-        /// <param name="membershipUser"><see cref="IUser"/> to Delete</param>
+        /// <param name="membershipUser"><see cref="IUser"/> to disable</param>
         public void Delete(IUser membershipUser)
         {
             //disable
@@ -542,6 +542,42 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public Guid CreateLoginSession(int userId, string requestingIpAddress)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var session = _userRepository.CreateLoginSession(userId, requestingIpAddress);
+                scope.Complete();
+                return session;
+            }
+        }
+
+        public int ClearLoginSessions(int userId)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var count = _userRepository.ClearLoginSessions(userId);
+                scope.Complete();
+                return count;
+            }
+        }
+
+        public void ClearLoginSession(Guid sessionId)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                _userRepository.ClearLoginSession(sessionId);
+                scope.Complete();
+            }
+        }
+
+        public bool ValidateLoginSession(int userId, Guid sessionId)
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _userRepository.ValidateLoginSession(userId, sessionId);
+            }
+        }
         public IDictionary<UserState, int> GetUserStates()
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -747,8 +783,9 @@ namespace Umbraco.Core.Services.Implement
                 _userGroupRepository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 scope.Complete();
 
-                scope.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray()))
-                    .ToArray(), false));
+                var assigned = permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
+                scope.Events.Dispatch(UserGroupPermissionsAssigned, this,
+                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
             }
         }
 
@@ -768,8 +805,9 @@ namespace Umbraco.Core.Services.Implement
                 _userGroupRepository.AssignGroupPermission(groupId, permission, entityIds);
                 scope.Complete();
 
-                scope.Events.Dispatch(UserGroupPermissionsAssigned, this, new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, new[] { permission.ToString(CultureInfo.InvariantCulture) }))
-                    .ToArray(), false));
+                var assigned = new[] { permission.ToString(CultureInfo.InvariantCulture) };
+                scope.Events.Dispatch(UserGroupPermissionsAssigned, this,
+                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
             }
         }
 
@@ -842,7 +880,23 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IUserGroup>(userGroup);
+                // we need to figure out which users have been added / removed, for audit purposes
+                var empty = new IUser[0];
+                var addedUsers = empty;
+                var removedUsers = empty;
+
+                if (userIds != null)
+                {
+                    var groupUsers = userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : empty;
+                    var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
+                    var groupIds = groupUsers.Select(x => x.Id).ToArray();
+
+                    addedUsers = _userRepository.GetMany(userIds.Except(groupIds).ToArray()).Where(x => x.Id != 0).ToArray();
+                    removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
+                }
+
+                var saveEventArgs = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers));
+
                 if (raiseEvents && scope.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
                 {
                     scope.Complete();
@@ -1183,12 +1237,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavingUserGroup;
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserGroup>> SavedUserGroup;
+        internal static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
 
         /// <summary>
         /// Occurs before Delete

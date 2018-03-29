@@ -4,11 +4,11 @@
            val-server="value"
            ng-required="model.validation.mandatory"
            ng-trim="false"
-		   ng-keyup="model.change()" />
+           ng-keyup="model.change()" />
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-	<div class="help" ng-if="model.maxlength">
-		<strong>{{model.count}}</strong> 
-		<localize key="textbox_characters_left">characters left</localize>
-	</div>
+    <div class="help" ng-if="model.maxlength">
+        <strong>{{model.count}}</strong>
+        <localize key="textbox_characters_left">characters left</localize>
+    </div>
 </div>

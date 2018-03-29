@@ -14,6 +14,43 @@ By default, this builds the current version. It is possible to specify a differe
 
 Valid version strings are defined in the `Set-UmbracoVersion` documentation below.
 
+## PowerShell Quirks
+
+There is a good chance that running `build.ps1` ends up in error, with messages such as
+
+>The file ...\build\build.ps1 is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies.
+
+PowerShell has *Execution Policies* that may prevent the script from running. You can check the current policies with:
+
+    PS> Get-ExecutionPolicy -List
+    
+            Scope ExecutionPolicy
+            ----- ---------------
+    MachinePolicy       Undefined
+       UserPolicy       Undefined
+          Process       Undefined
+      CurrentUser       Undefined
+     LocalMachine    RemoteSigned
+
+Policies can be `Restricted`, `AllSigned`, `RemoteSigned`, `Unrestricted` and `Bypass`. Scopes can be `MachinePolicy`, `UserPolicy`, `Process`, `CurrentUser`, `LocalMachine`. You need the current policy to be `RemoteSigned`&mdash;as long as it is `Undefined`, the script cannot run. You can change the current user policy with:
+
+    PS> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+Alternatively, you can do it at machine level, from within an elevated PowerShell session:
+
+    PS> Set-ExecutionPolicy -Scope LocalMachine -ExecutionPolicy RemoteSigned
+
+And *then* the script should run. It *might* however still complain about executing scripts, with messages such as:
+
+>Security warning - Run only scripts that you trust. While scripts from the internet can be useful, this script can potentially harm your computer. If you trust this script, use the Unblock-File cmdlet to allow the script to run without this warning message. Do you want to run ...\build\build.ps1?
+[D] Do not run  [R] Run once  [S] Suspend  [?] Help (default is "D"):
+
+This is usually caused by the scripts being *blocked*. And that usually happens when the source code has been downloaded as a Zip file. When Windows downloads Zip files, they are marked as *blocked* (technically, they have a Zone.Identifier alternate data stream, with a value of "3" to indicate that they were downloaded from the Internet). And when such a Zip file is un-zipped, each and every single file is also marked as blocked.
+
+The best solution is to unblock the Zip file before un-zipping: right-click the files, open *Properties*, and there should be a *Unblock* checkbox at the bottom of the dialog. If, however, the Zip file has already been un-zipped, it is possible to recursively unblock all files from PowerShell with:
+
+    PS> Get-ChildItem -Recurse *.* | Unblock-File
+
 ## Notes
 
 Git might have issues dealing with long file paths during build. You may want/need to enable `core.longpaths` support (see [this page](https://github.com/msysgit/msysgit/wiki/Git-cannot-create-a-file-or-directory-with-a-long-path) for details).

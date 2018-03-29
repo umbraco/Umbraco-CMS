@@ -46,7 +46,7 @@ namespace umbraco.cms.presentation.developer
             {
                 ClientTools
                     .SetActiveTreeType(Constants.Trees.Macros)
-                    .SyncTree("-1,init," + _macro.Id, false);
+                    .SyncTree("-1," + _macro.Id, false);
 
                 string tempMacroAssembly = _macro.ControlAssembly ?? "";
                 string tempMacroType = _macro.ControlType ?? "";
@@ -291,7 +291,7 @@ namespace umbraco.cms.presentation.developer
 
             ClientTools
                 .SetActiveTreeType(Constants.Trees.Macros)
-                .SyncTree("-1,init," + _macro.Id.ToInvariantString(), true); //true forces the reload
+                .SyncTree("-1," + _macro.Id.ToInvariantString(), true); //true forces the reload
 
             var tempMacroAssembly = macroAssembly.Text;
             var tempMacroType = macroType.Text;

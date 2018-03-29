@@ -156,7 +156,7 @@ angular.module('umbraco.directives')
                 if(els.indexOf(el) >= 0){return;}
 
                 // ignore clicks on new overlay
-                var parents = $(event.target).parents("a,button,.umb-overlay");
+                var parents = $(event.target).parents("a,button,.umb-overlay,.umb-tour");
                 if(parents.length > 0){
                     return;
                 }

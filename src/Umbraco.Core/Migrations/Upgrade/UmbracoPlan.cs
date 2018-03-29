@@ -7,6 +7,8 @@ using Umbraco.Core.Migrations.Upgrade.V_7_5_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_5;
 using Umbraco.Core.Migrations.Upgrade.V_7_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_7_0;
+using Umbraco.Core.Migrations.Upgrade.V_7_8_0;
+using Umbraco.Core.Migrations.Upgrade.V_7_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
@@ -36,23 +38,25 @@ namespace Umbraco.Core.Migrations.Upgrade
                 if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
                     throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
 
-                // must be at least 7.8.0 - fixme adjust when releasing
-                if (currentVersion < new SemVersion(7, 8))
+                // must be at least 7.?.? - fixme adjust when releasing
+                if (currentVersion < new SemVersion(7, 999))
                     throw new InvalidOperationException($"Version {currentVersion} cannot be upgraded to {UmbracoVersion.SemanticVersion}.");
 
                 // cannot go back in time
                 if (currentVersion > UmbracoVersion.SemanticVersion)
-                    throw new InvalidOperationException($"Version {currentVersion} cannot be upgraded to {UmbracoVersion.SemanticVersion}.");
+                    throw new InvalidOperationException($"Version {currentVersion} cannot be downgraded to {UmbracoVersion.SemanticVersion}.");
 
                 switch (currentVersion.Major)
                 {
                     case 7:
+                        // upgrading from version 7
                         return "{orig-" + currentVersion + "}";
                     case 8: // fixme remove when releasing
-                        // this is very temp and for my own website - zpqrtbnk
+                        // upgrading from version 8
+                        // should never happen, this is very temp and for my own website - zpqrtbnk
                         return "{04F54303-3055-4700-8F76-35A37F232FF5}"; // right before the variants migration
                     default:
-                        throw new InvalidOperationException($"Version {currentVersion} should have an upgrade state in the key-value table.");
+                        throw new InvalidOperationException($"Version {currentVersion} is not supported by the migration plan.");
                 }
 
             }
@@ -60,12 +64,6 @@ namespace Umbraco.Core.Migrations.Upgrade
 
         private void DefinePlan()
         {
-            // INSTALL
-            //
-            // when installing, the source state is empty, and the target state should be the final state.
-
-            Add(string.Empty, "{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
-
             // UPGRADE FROM 7
             //
             // when 8.0.0 is released, on the first upgrade, the state is automatically
@@ -74,45 +72,37 @@ namespace Umbraco.Core.Migrations.Upgrade
             // then, as more v7 and v8 versions are released, new chains needs to be defined to
             // support the upgrades (new v7 may backport some migrations and require their own
             // upgrade paths, etc).
+            // fixme adjust when releasing
 
-            From("{init-7.8.0}")
-                .Chain<V_8_0_0.AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}") // add more lock objects
-                .Chain<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}")
-                .Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}")
-                .Chain<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}")
-                .Chain<DropMigrationsTable>("{F0C42457-6A3B-4912-A7EA-F27ED85A2092}")
-                .Chain<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}")
-                .Chain<TagsMigration>("{DD1B99AF-8106-4E00-BAC7-A43003EA07F8}")
-                .Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}")
-                .Chain<PropertyEditorsMigration>("{9E98CF10-3AE9-437B-AF54-8697D251A541}")
-                .Chain<LanguageColumns>("{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
+            From("{init-7.8.0}");
+            Chain<V_8_0_0.AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}"); // add more lock objects
+            Chain<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}");
+            Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}");
+            Chain<VariantsMigration>("{FB0A5429-587E-4BD0-8A67-20F0E7E62FF7}");
+            Chain<DropMigrationsTable>("{F0C42457-6A3B-4912-A7EA-F27ED85A2092}");
+            Chain<DataTypeMigration>("{8640C9E4-A1C0-4C59-99BB-609B4E604981}");
+            Chain<TagsMigration>("{DD1B99AF-8106-4E00-BAC7-A43003EA07F8}");
+            Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
+            Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
 
             // 7.8.1 = same as 7.8.0
-            From("{init-7.8.1}")
-                .Chain("{init-7.8.0}");
+            From("{init-7.8.1}");
+            Chain("{init-7.8.0}");
 
             // 7.9.0 = requires its own chain
-            From("{init-7.9.0}")
-                // chain...
-                .Chain("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
+            From("{init-7.9.0}");
+            // chain...
+            Chain("{82C4BA1D-7720-46B1-BBD7-07F3F73800E6}");
+
 
             // UPGRADE 8
             //
             // starting from the original 8.0.0 final state, chain migrations to upgrade version 8,
             // defining new final states as more migrations are added to the chain.
-
-            //From("")
-            //    .Chain("")
-            //    .Chain("");
-
-            // WIP 8
             //
             // before v8 is released, some sites may exist, and these "pre-8" versions require their
-            // own upgrade plan. in other words, this is the plan for sites that were on v8 before
+            // own upgrade plan. in other words, this is also the plan for sites that were on v8 before
             // v8 was released
-
-            // fixme - this is essentially for ZpqrtBnk website
-            // need to determine which version it is and where it should resume running migrations
 
             // 8.0.0
             From("{init-origin}");
@@ -130,8 +120,6 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<UpdateAllowedMediaTypesAtRoot>("{44484C32-EEB3-4A12-B1CB-11E02CE22AB2}");
 
             // 7.6.0
-            //Chain<AddLockTable>("{858B4039-070C-4928-BBEC-DDE8303352DA}");
-            //Chain<AddLockObjects>("{64F587C1-0B28-4D78-B4CC-26B7D87F69C1}");
             Chain<AddIndexesToUmbracoRelationTables>("{3586E4E9-2922-49EB-8E2A-A530CE6DBDE0}");
             Chain<AddIndexToCmsMemberLoginName>("{D4A5674F-654D-4CC7-85E5-CFDBC533A318}");
             Chain<AddIndexToUmbracoNodePath>("{7F828EDD-6622-4A8D-AD80-EEAF46C11680}");
@@ -158,6 +146,28 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<SuperZero>("{CC1B1201-1328-443C-954A-E0BBB8CCC1B5}");
             Chain<PropertyEditorsMigration>("{CA7DB949-3EF4-403D-8464-F9BA36A52E87}");
             Chain<LanguageColumns>("{7F0BF916-F64E-4B25-864A-170D6E6B68E5}");
+
+            // at this point of the chain, people started to work on v8, so whenever we
+            // merge stuff from v7, we have to chain the migrations here so they also
+            // run for v8.
+
+            // mergin from 7.8.0
+            Chain<AddUserLoginTable>("{FDCB727A-EFB6-49F3-89E4-A346503AB849}");
+            Chain<AddTourDataUserColumn>("{2A796A08-4FE4-4783-A1A5-B8A6C8AA4A92}");
+            Chain<AddMediaVersionTable>("{1A46A98B-2AAB-4C8E-870F-A2D55A97FD1F}");
+            Chain<AddInstructionCountColumn>("{0AE053F6-2683-4234-87B2-E963F8CE9498}");
+            Chain<AddIndexToPropertyTypeAliasColumn>("{D454541C-15C5-41CF-8109-937F26A78E71}");
+
+            // merging from 7.9.0
+            Chain<AddIsSensitiveMemberTypeColumn>("{89A728D1-FF4C-4155-A269-62CC09AD2131}");
+            Chain<AddUmbracoAuditTable>("{FD8631BC-0388-425C-A451-5F58574F6F05}");
+            Chain<AddUmbracoConsentTable>("{2821F53E-C58B-4812-B184-9CD240F990D7}");
+            Chain<CreateSensitiveDataUserGroup>("{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
+            Chain<LanguageColumns>("FIXGUID NEW FINAL");
+
+            // FINAL STATE - MUST MATCH LAST ONE ABOVE !
+
+            Add(string.Empty, "{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
         }
     }
 }

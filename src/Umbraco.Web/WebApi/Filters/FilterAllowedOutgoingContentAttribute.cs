@@ -97,30 +97,19 @@ namespace Umbraco.Web.WebApi.Filters
                     ids.Add(((dynamic)items[i]).Id);
                 }
                 //get all the permissions for these nodes in one call
-                var permissions = _userService.GetPermissions(user, ids.ToArray()).ToArray();
+                var permissions = _userService.GetPermissions(user, ids.ToArray());
                 var toRemove = new List<dynamic>();
                 foreach (dynamic item in items)
                 {
-                    var nodePermission = permissions.Where(x => x.EntityId == Convert.ToInt32(item.Id)).ToArray();
-                    //if there are no permissions for this id then we need to check what the user's default
-                    // permissions are.
-                    if (nodePermission.Length == 0)
-                    {
-                        //var defaultP = user.DefaultPermissions
+                    //get the combined permission set across all user groups for this node
+                    //we're in the world of dynamics here so we need to cast
+                    var nodePermission = ((IEnumerable<string>)permissions.GetAllPermissions(item.Id)).ToArray();
 
-                        toRemove.Add(item);
-                    }
-                    else
+                    //if the permission being checked doesn't exist then remove the item
+                    if (nodePermission.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
                     {
-                        foreach (var n in nodePermission)
-                        {
-                            //if the permission being checked doesn't exist then remove the item
-                            if (n.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
-                            {
-                                toRemove.Add(item);
-                            }
-                        }
-                    }
+                        toRemove.Add(item);
+                    }                    
                 }
                 foreach (var item in toRemove)
                 {

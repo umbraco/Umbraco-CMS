@@ -15,13 +15,11 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicConverter<TDestination> : ITypeConverter<Property, TDestination>
         where TDestination : ContentPropertyBasic, new()
     {
-        private readonly Lazy<IDataTypeService> _dataTypeService;
+        protected IDataTypeService DataTypeService { get; }
 
-        protected IDataTypeService DataTypeService => _dataTypeService.Value;
-
-        public ContentPropertyBasicConverter(Lazy<IDataTypeService> dataTypeService)
+        public ContentPropertyBasicConverter(IDataTypeService dataTypeService)
         {
-            _dataTypeService = dataTypeService;
+            DataTypeService = dataTypeService;
         }
 
         /// <summary>

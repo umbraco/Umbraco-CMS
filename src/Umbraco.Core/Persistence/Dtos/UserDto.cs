@@ -104,6 +104,14 @@ namespace Umbraco.Core.Persistence.Dtos
         [Length(500)]
         public string Avatar { get; set; }
 
+        /// <summary>
+        /// A Json blob stored for recording tour data for a user
+        /// </summary>
+        [Column("tourData")] // FIXME CANNOT UPGRADE???
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
+        public string TourData { get; set; }
+
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserId")]
         public List<UserGroupDto> UserGroupDtos { get; set; }

@@ -37,6 +37,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
 
             // repositories
             container.RegisterSingleton<IAuditRepository, AuditRepository>();
+            container.RegisterSingleton<IAuditEntryRepository, AuditEntryRepository>();
             container.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
             container.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
             container.RegisterSingleton<IDataTypeRepository, DataTypeRepository>();
@@ -67,6 +68,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<ITemplateRepository, TemplateRepository>();
             container.RegisterSingleton<IUserGroupRepository, UserGroupRepository>();
             container.RegisterSingleton<IUserRepository, UserRepository>();
+            container.RegisterSingleton<IConsentRepository, ConsentRepository>();
 
             // repositories that depend on a filesystem
             // these have an annotated ctor parameter to pick the right file system

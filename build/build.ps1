@@ -328,15 +328,7 @@
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\js", "*", "$tmp\WebApp\umbraco\js")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\lib", "*", "$tmp\WebApp\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\views", "*", "$tmp\WebApp\umbraco\views")
-    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\preview", "*", "$tmp\WebApp\umbraco\preview")
-  
-    # prepare WebPI
-    Write-Host "Prepare WebPI"
-    $this.RemoveDirectory("$tmp\WebPi")
-    mkdir "$tmp\WebPi" > $null
-    mkdir "$tmp\WebPi\umbraco" > $null
-    $this.CopyFiles("$tmp\WebApp", "*", "$tmp\WebPi\umbraco")
-    $this.CopyFiles("$src\WebPi", "*",  "$tmp\WebPi")
+    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\preview", "*", "$tmp\WebApp\umbraco\preview")  
   })
 
   $ubuild.DefineMethod("PackageZip",
@@ -359,19 +351,7 @@
       "$tmp\WebApp\*" `
       "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" "-x!Umbraco.Compat7.*" `
       > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms." }   
-      
-    Write-Host "Zip WebPI"  
-    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.WebPI.$($this.Version.Semver).zip" "-x!*.pdb" `
-      "$tmp\WebPi\*" `
-      "-x!dotless.Core.*" "-x!Umbraco.Compat7.*" `
-      > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms.WebPI." }   
-      
-      # hash the webpi file
-    Write-Host "Hash WebPI"
-    $hash = $this.GetFileHash("$out\UmbracoCms.WebPI.$($this.Version.Semver).zip")
-    Write-Output $hash | out-file "$out\webpihash.txt" -encoding ascii  
+    if (-not $?) { throw "Failed to zip UmbracoCms." }     
   })
 
   $ubuild.DefineMethod("PrepareBuild",
@@ -450,6 +430,12 @@
     if ($this.OnError()) { return }
   })
 
+  $ubuild.DefineMethod("PrepareAzureGallery",
+  {
+    Write-Host "Prepare Azure Gallery"
+    $this.CopyFile("$($this.SolutionRoot)\build\Azure\azuregalleryrelease.ps1", $this.BuildOutput)
+  })
+
   $ubuild.DefineMethod("Build",
   {
     $this.PrepareBuild()
@@ -474,6 +460,8 @@
     $this.PrepareNuGet()
     if ($this.OnError()) { return }
     $this.PackageNuGet()
+    if ($this.OnError()) { return }
+    $this.PrepareAzureGallery()
     if ($this.OnError()) { return }
   })
 

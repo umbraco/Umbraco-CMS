@@ -46,7 +46,8 @@ namespace Umbraco.Web.UI.Pages
             {
                 return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
             }
-            public static string ReloadLocation { get { return string.Format(ClientMgrScript + ".reloadLocation();"); } }
+            public static string ReloadLocation { get { return ClientMgrScript + ".reloadLocation();"; } }
+            public static string ReloadLocationIfMatched { get { return ClientMgrScript + ".reloadLocation('{0}');"; } }
             public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
             public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
             public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
@@ -168,15 +169,18 @@ namespace Umbraco.Web.UI.Pages
             return this;
         }
 
-        /// <summary>
-        /// Reloads location, refreshing what is in the content frame
-        /// </summary>
+        public ClientTools ReloadLocationIfMatched(string routePath)
+        {
+            RegisterClientScript(string.Format(Scripts.ReloadLocationIfMatched, routePath));
+            return this;
+        }
+
         public ClientTools ReloadLocation()
         {
             RegisterClientScript(Scripts.ReloadLocation);
-
             return this;
         }
+
 
         private string EnsureUmbracoUrl(string url)
         {

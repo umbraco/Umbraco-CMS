@@ -158,7 +158,7 @@ namespace Umbraco.Core.Models
 
         public bool TryGetValue(string propertyTypeAlias, out Property property)
         {
-            property = this[propertyTypeAlias];
+            property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             return property != null;
         }
 

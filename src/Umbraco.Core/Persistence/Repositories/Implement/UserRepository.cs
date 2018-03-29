@@ -7,6 +7,7 @@ using System.Web.Security;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -151,12 +152,89 @@ ORDER BY colName";
 
             return new Dictionary<UserState, int>
             {
-                {UserState.All, result[0].num},
-                {UserState.Active, result[1].num},
-                {UserState.Disabled, result[2].num},
-                {UserState.LockedOut, result[3].num},
-                {UserState.Invited, result[4].num}
+                {UserState.All, (int) result[0].num},
+                {UserState.Active, (int) result[1].num},
+                {UserState.Disabled, (int) result[2].num},
+                {UserState.LockedOut, (int) result[3].num},
+                {UserState.Invited, (int) result[4].num}
             };
+        }
+
+        public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
+        {
+            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            //and also business logic models for these objects but that's just so overkill for what we are doing
+            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+            var now = DateTime.UtcNow;
+            var dto = new UserLoginDto
+            {
+                UserId = userId,
+                IpAddress = requestingIpAddress,
+                LoggedInUtc = now,
+                LastValidatedUtc = now,
+                LoggedOutUtc = null,
+                SessionId = Guid.NewGuid()
+            };
+            Database.Insert(dto);
+
+            if (cleanStaleSessions)
+            {
+                ClearLoginSessions(TimeSpan.FromDays(15));
+            }
+
+            return dto.SessionId;
+        }
+
+        public bool ValidateLoginSession(int userId, Guid sessionId)
+        {
+            var found = Database.FirstOrDefault<UserLoginDto>("WHERE sessionId=@sessionId", new {sessionId = sessionId});
+            if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
+                return false;
+
+            //now detect if there's been a timeout
+            if (DateTime.UtcNow - found.LastValidatedUtc > TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes))
+            {
+                //timeout detected, update the record
+                ClearLoginSession(sessionId);
+                return false;
+            }
+
+            //update the validate date
+            found.LastValidatedUtc = DateTime.UtcNow;
+            Database.Update(found);
+            return true;
+        }
+
+        public int ClearLoginSessions(int userId)
+        {
+            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            //and also business logic models for these objects but that's just so overkill for what we are doing
+            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE userId=@userId", new { userId = userId });
+            Database.Execute("DELETE FROM umbracoUserLogin WHERE userId=@userId", new {userId = userId});
+            return count;
+        }
+
+        public int ClearLoginSessions(TimeSpan timespan)
+        {
+            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            //and also business logic models for these objects but that's just so overkill for what we are doing
+            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+
+            var fromDate = DateTime.UtcNow - timespan;
+
+            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
+            Database.Execute("DELETE FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
+            return count;
+        }
+
+        public void ClearLoginSession(Guid sessionId)
+        {
+            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
+            //and also business logic models for these objects but that's just so overkill for what we are doing
+            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
+            Database.Execute("UPDATE umbracoUserLogin SET loggedOutUtc=@now WHERE sessionId=@sessionId",
+                new { now = DateTime.UtcNow, sessionId = sessionId });
         }
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
@@ -429,7 +507,8 @@ ORDER BY colName";
                 {"updateDate", "UpdateDate"},
                 {"avatar", "Avatar"},
                 {"emailConfirmedDate", "EmailConfirmedDate"},
-                {"invitedDate", "InvitedDate"}
+                {"invitedDate", "InvitedDate"},
+                {"tourData", "TourData"}
             };
 
             // create list of properties that have changed

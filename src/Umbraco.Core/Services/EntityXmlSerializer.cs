@@ -54,6 +54,8 @@ namespace Umbraco.Core.Services
 
             xml.Add(new XAttribute("template", content.Template?.Id.ToString(CultureInfo.InvariantCulture) ?? "0"));
 
+            xml.Add(new XAttribute("isPublished", content.Published));
+
             if (withDescendants)
             {
                 var descendants = contentService.GetDescendants(content).ToArray();

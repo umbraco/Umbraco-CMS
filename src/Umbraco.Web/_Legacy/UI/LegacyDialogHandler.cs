@@ -120,8 +120,11 @@ namespace Umbraco.Web._Legacy.UI
         internal static bool UserHasCreateAccess(HttpContextBase httpContext, IUser umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+
+            //if no task was found it will use the default task and we cannot validate the application assigned so return true
             if (task == null)
-                throw new InvalidOperationException($"Could not task for operation {Operation.Create} for node type {nodeType}.");
+                return true;
+
             return task is LegacyDialogTask ltask ? ltask.ValidateUserForApplication() : true;
         }
 
@@ -141,8 +144,11 @@ namespace Umbraco.Web._Legacy.UI
         internal static bool UserHasDeleteAccess(HttpContextBase httpContext, User umbracoUser, string nodeType)
         {
             var task = GetTaskForOperation(httpContext, umbracoUser, Operation.Delete, nodeType);
+
+            //if no task was found it will use the default task and we cannot validate the application assigned so return true
             if (task == null)
-                throw new InvalidOperationException($"Could not task for operation {Operation.Delete} for node type {nodeType}");
+                return true;
+
             return task is LegacyDialogTask ltask ? ltask.ValidateUserForApplication() : true;
         }
 

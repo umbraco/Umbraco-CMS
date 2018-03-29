@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Web;
 using Semver;
@@ -18,6 +19,7 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
         private readonly Lazy<MainDom> _mainDom;
+        private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private RuntimeLevel _level;
 
         /// <summary>
@@ -99,7 +101,18 @@ namespace Umbraco.Core
         /// <param name="settings"></param>
         internal void EnsureApplicationUrl(HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
         {
-            if (ApplicationUrl != null) return;
+            // see U4-10626 - in some cases we want to reset the application url
+            // (this is a simplified version of what was in 7.x)
+            // note: should this be optional? is it expensive?
+            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request);
+            var change = url != null && !_applicationUrls.Contains(url);
+            if (change)
+            {
+                _logger.Info(typeof(ApplicationUrlHelper), $"New url \"{url}\" detected, re-discovering application url.");
+                _applicationUrls.Add(url);
+            }
+
+            if (ApplicationUrl != null && !change) return;
             ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, request, settings));
         }
 

@@ -119,6 +119,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetEnableState())
                         },
                         {
+                            "tourApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TourController>(
+                                controller => controller.GetTours())
+                        },
+                        {
                             "embedApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
                                 controller => controller.GetEmbed("", 0, 0))
                         },
@@ -269,6 +273,10 @@ namespace Umbraco.Web.Editors
                         {
                             "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
                                 controller => controller.GetStatus())
+                        },
+                        {
+                            "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
+                                controller => controller.GetContextHelpForPage("","",""))
                         }
                     }
                 },
@@ -378,9 +386,6 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private Dictionary<string, object> GetApplicationState()
         {
-            if (_runtimeState.Level != RuntimeLevel.Run)
-                return null;
-
             var app = new Dictionary<string, object>
             {
                 {"assemblyVersion", UmbracoVersion.AssemblyVersion}
@@ -388,7 +393,9 @@ namespace Umbraco.Web.Editors
 
             var version = _runtimeState.SemanticVersion.ToSemanticString();
 
-            app.Add("cacheBuster", $"{version}.{ClientDependencySettings.Instance.Version}".GenerateHash());
+            //the value is the hash of the version, cdf version and the configured state
+            app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{ClientDependencySettings.Instance.Version}".GenerateHash());
+
             app.Add("version", version);
 
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially

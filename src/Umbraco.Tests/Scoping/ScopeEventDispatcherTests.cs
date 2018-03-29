@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LightInject;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.IO;
@@ -12,6 +14,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -139,7 +142,7 @@ namespace Umbraco.Tests.Scoping
 
                 //content1 will be filtered from the args
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(new[]{ content1 , content3}));
-                scope.Events.Dispatch(DoDeleteForContent, this, new DeleteEventArgs<IContent>(content1));
+                scope.Events.Dispatch(DoDeleteForContent, this, new DeleteEventArgs<IContent>(content1), "DoDeleteForContent");
                 scope.Events.Dispatch(DoSaveForContent, this, new SaveEventArgs<IContent>(content2));
                 //this entire event will be filtered
                 scope.Events.Dispatch(DoForTestArgs, this, new TestEventArgs(content1));
@@ -160,6 +163,27 @@ namespace Umbraco.Tests.Scoping
                 Assert.AreEqual(content2.Id, ((SaveEventArgs<IContent>)events[2].Args).SavedEntities.First().Id);
 
                 Assert.AreEqual(typeof(TestEventArgs2), events[3].Args.GetType());
+            }
+        }
+
+        [Test]
+        public void SupersededEvents2()
+        {
+            Test_UnPublished += OnDoThingFail;
+            Test_Deleted += OnDoThingFail;
+
+            var contentService = Mock.Of<IContentService>();
+            var content = Mock.Of<IContent>();
+
+            var scopeProvider = _testObjects.GetScopeProvider(Mock.Of<ILogger>());
+            using (var scope = scopeProvider.CreateScope(eventDispatcher: new PassiveEventDispatcher()))
+            {
+                scope.Events.Dispatch(Test_UnPublished, contentService, new PublishEventArgs<IContent>(new [] { content }), "UnPublished");
+                scope.Events.Dispatch(Test_Deleted, contentService, new DeleteEventArgs<IContent>(new [] { content }), "Deleted");
+
+                // see U4-10764
+                var events = scope.Events.GetEvents(EventDefinitionFilter.All).ToArray();
+                Assert.AreEqual(2, events.Length);
             }
         }
 
@@ -370,6 +394,9 @@ namespace Umbraco.Tests.Scoping
         public static event EventHandler<SaveEventArgs<int>> DoThing2;
 
         public static event TypedEventHandler<ScopeEventDispatcherTests, SaveEventArgs<decimal>> DoThing3;
+
+        public static event TypedEventHandler<IContentService, PublishEventArgs<IContent>> Test_UnPublished;
+        public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Test_Deleted;
 
         public class TestEventArgs : CancellableObjectEventArgs
         {

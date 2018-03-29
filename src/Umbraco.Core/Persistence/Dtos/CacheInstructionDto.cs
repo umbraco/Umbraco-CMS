@@ -27,5 +27,10 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Length(500)]
         public string OriginIdentity { get; set; }
+
+        [Column("instructionCount")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = 1)]
+        public int InstructionCount { get; set; }
     }
 }

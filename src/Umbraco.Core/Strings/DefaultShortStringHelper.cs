@@ -680,19 +680,14 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public virtual string ReplaceMany(string text, IDictionary<string, string> replacements)
         {
-            // be safe
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (replacements == null) throw new ArgumentNullException(nameof(replacements));
 
-            // Have done various tests, implementing my own "super fast" state machine to handle
-            // replacement of many items, or via regexes, but on short strings and not too
-            // many replacements (which prob. is going to be our case) nothing can beat this...
-            // (at least with safe and checked code -- we don't want unsafe/unchecked here)
 
-            // Note that it will do chained-replacements ie replaced items can be replaced
-            // in turn by another replacement (ie the order of replacements is important)
+            foreach (KeyValuePair<string, string> item in replacements)
+                text = text.Replace(item.Key, item.Value);
 
-            return replacements.Aggregate(text, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
+            return text;
         }
 
         /// <summary>
@@ -704,13 +699,14 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public virtual string ReplaceMany(string text, char[] chars, char replacement)
         {
-            // be safe
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (chars == null) throw new ArgumentNullException(nameof(chars));
 
-            // see note above
 
-            return chars.Aggregate(text, (current, c) => current.Replace(c, replacement));
+            for (int i = 0; i < chars.Length; i++)
+                text = text.Replace(chars[i], replacement);
+
+            return text;
         }
 
         #endregion

@@ -56,6 +56,8 @@
     </Reference>
     <Reference Include="Examine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Examine.1.0.0-beta020\lib\net45\Examine.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.9.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.6\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="ImageProcessor.Web, Version=4.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImageProcessor.Web.4.8.4\lib\net45\ImageProcessor.Web.dll</HintPath>
@@ -257,10 +259,6 @@
     <!--
         Which means we also have to have explicit references here ;(
     -->
-    <Reference Include="ClientDependency.Core">
-      <HintPath>..\packages\ClientDependency.1.9.2\lib\net45\ClientDependency.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>../packages/log4net.2.0.8/lib/net45-full/log4net.dll</HintPath>
       <Private>True</Private>
@@ -951,7 +949,6 @@
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
-    <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>

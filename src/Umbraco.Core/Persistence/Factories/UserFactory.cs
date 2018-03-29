@@ -36,6 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
                 user.Avatar = dto.Avatar;
                 user.EmailConfirmedDate = dto.EmailConfirmedDate;
                 user.InvitedDate = dto.InvitedDate;
+                user.TourData = dto.TourData;
 
                 // reset dirty initial properties (U4-1946)
                 user.ResetDirtyProperties(false);
@@ -68,7 +69,8 @@ namespace Umbraco.Core.Persistence.Factories
                 UpdateDate = entity.UpdateDate,
                 Avatar = entity.Avatar,
                 EmailConfirmedDate = entity.EmailConfirmedDate,
-                InvitedDate = entity.InvitedDate
+                InvitedDate = entity.InvitedDate,
+                TourData = entity.TourData
             };
 
             foreach (var startNodeId in entity.StartContentIds)

@@ -436,8 +436,13 @@ namespace Umbraco.Web
 
         public IPublishedContent Member(object id)
         {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
+            if (ConvertIdObjectToInt(id, out var intId))
+                return Member(intId);
+            if (ConvertIdObjectToGuid(id, out var guidId))
+                return Member(guidId);
+            if (ConvertIdObjectToUdi(id, out var udiId))
+                return Member(udiId);
+            return null;
         }
 
         public IPublishedContent Member(int id)
@@ -699,7 +704,7 @@ namespace Umbraco.Web
 
         #region Media
 
-        public IPublishedContent TypedMedia(Udi id)
+        public IPublishedContent Media(Udi id)
         {
             var guidUdi = id as GuidUdi;
             return guidUdi == null ? null : Media(guidUdi.Guid);
@@ -839,7 +844,7 @@ namespace Umbraco.Web
         #region Search
 
         /// <summary>
-        /// Searches content
+        /// Searches content.
         /// </summary>
         /// <param name="term"></param>
         /// <param name="useWildCards"></param>
@@ -851,7 +856,36 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Searhes content
+        /// Searches content.
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="term"></param>
+        /// <param name="useWildCards"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return ContentQuery.Search(skip, take, out totalRecords, term, useWildCards, searchProvider);
+        }
+
+        /// <summary>
+        /// Searhes content.
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="criteria"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        public IEnumerable<PublishedSearchResult> TypedSearch(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            return ContentQuery.Search(skip, take, out totalRecords, criteria, searchProvider);
+        }
+
+        /// <summary>
+        /// Searhes content.
         /// </summary>
         /// <param name="criteria"></param>
         /// <param name="searchProvider"></param>
