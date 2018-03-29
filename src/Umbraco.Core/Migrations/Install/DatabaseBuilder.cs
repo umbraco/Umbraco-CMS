@@ -302,6 +302,22 @@ namespace Umbraco.Core.Migrations.Install
             var connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
             if (connectionStrings == null) throw new Exception("Invalid web.config file.");
 
+            // honour configSource, if its set, change the xml file we are saving the configuration
+            // to the one set in the configSource attribute
+            if (connectionStrings.Attribute("configSource") != null)
+            {
+                var source = connectionStrings.Attribute("configSource").Value;
+                var configFile = IOHelper.MapPath($"{SystemDirectories.Root}/{source}");
+                logger.Info<DatabaseBuilder>("storing ConnectionString in {0}", () => configFile);
+                if (File.Exists(configFile))
+                {
+                    xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+                    fileName = configFile;
+                }
+                connectionStrings = xml.Root.DescendantsAndSelf("connectionStrings").FirstOrDefault();
+                if (connectionStrings == null) throw new Exception("Invalid web.config file.");
+            }
+
             // update connectionString if it exists, or else create a new connectionString
             var setting = connectionStrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == Constants.System.UmbracoConnectionName);
             if (setting == null)

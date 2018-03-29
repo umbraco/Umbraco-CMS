@@ -145,6 +145,12 @@ angular.module("umbraco.directives")
                                             }
                                         }
                                     }
+                                    if (val === "true") {
+                                        tinyMceConfig.customConfig[i] = true;
+                                    }
+                                    if (val === "false") {
+                                        tinyMceConfig.customConfig[i] = false;
+                                    }
                                 }
 
                                 angular.extend(baseLineConfigObj, tinyMceConfig.customConfig);

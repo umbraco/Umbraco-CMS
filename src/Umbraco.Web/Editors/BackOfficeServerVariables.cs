@@ -14,6 +14,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -53,7 +54,8 @@ namespace Umbraco.Web.Editors
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl"}},
                 {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
-                {"isDebuggingEnabled", new string[] { }}
+                {"isDebuggingEnabled", new string[] { }},
+                {"features", new [] {"disabledFeatures"}}
             };
             //now do the filtering...
             var defaults = GetServerVariables();
@@ -82,7 +84,7 @@ namespace Umbraco.Web.Editors
 
             //TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
             // so based on compat and how things are currently working we need to replace the serverVarsJs one
-            ((Dictionary<string, object>) defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
+            ((Dictionary<string, object>)defaults["umbracoUrls"])["serverVarsJs"] = _urlHelper.Action("ServerVariables", "BackOffice");
 
             return defaults;
         }
@@ -277,6 +279,10 @@ namespace Umbraco.Web.Editors
                         {
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
+                        },
+                        {
+                            "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
+                                controller => controller.GetSupportedMomentLocales())
                         }
                     }
                 },
@@ -337,6 +343,18 @@ namespace Umbraco.Web.Editors
                                 .ToArray()
                         }
                     }
+                },
+                {
+                    "features", new Dictionary<string,object>
+                    {
+                        {
+                            "disabledFeatures", new Dictionary<string,object>
+                            {
+                                { "disableTemplates", FeaturesResolver.Current.Features.Disabled.DisableTemplates}
+                            }
+                        }
+
+                    }
                 }
             };
             return defaultVals;
@@ -361,9 +379,9 @@ namespace Umbraco.Web.Editors
                 .ToArray();
 
             return (from p in pluginTreesWithAttributes
-                let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
-                let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
-                select new Dictionary<string, string>
+                    let treeAttr = p.attributes.OfType<TreeAttribute>().Single()
+                    let pluginAttr = p.attributes.OfType<PluginControllerAttribute>().Single()
+                    select new Dictionary<string, string>
                 {
                     {"alias", treeAttr.Alias}, {"packageFolder", pluginAttr.AreaName}
                 }).ToArray();

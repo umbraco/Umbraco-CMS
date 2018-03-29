@@ -181,7 +181,6 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                //by default the packages folder should exist in the data folder
                 return IOHelper.ReturnPath("umbracoPreviewPath", Data + IOHelper.DirSepChar + "preview");
             }
         }

@@ -41,6 +41,8 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(JsonPayload[] payloads)
         {
+            if (payloads == null) return;
+            
             bool anythingChanged;
             _publishedSnapshotService.Notify(payloads, out anythingChanged);
 
@@ -52,7 +54,11 @@ namespace Umbraco.Web.Cache
 
                 foreach (var payload in payloads)
                 {
-                    _idkMap.ClearCache(payload.Id);
+                    if (payload.Operation == OperationType.Deleted)
+                       _idkMap.ClearCache(payload.Id);
+
+                    
+                    
 
                     // note: ClearCacheByKeySearch - does StartsWith(...)
 

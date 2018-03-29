@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using NPoco;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
+using ColumnInfo = Umbraco.Core.Persistence.SqlSyntax.ColumnInfo;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
 {
@@ -339,14 +342,24 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
 
             if (tables.InvariantContains("umbracoUserType") && tables.InvariantContains("umbracoUser"))
             {
-                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
+                if (DatabaseType.IsMySql())
                 {
-                    Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser").Do();
+                    //In MySql, this will drop the FK according to it's special naming rules
+                    Delete.ForeignKey().FromTable("umbracoUser").ForeignColumn("userType").ToTable("umbracoUserType").PrimaryColumn("id");
                 }
-                //This is the super old constraint name of the FK for user type so check this one too
-                if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_user_userType")))
+                else
                 {
-                    Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser").Do();
+                    //Delete the FK if it exists before dropping the column
+                    if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_umbracoUser_umbracoUserType_id")))
+                    {
+                        Delete.ForeignKey("FK_umbracoUser_umbracoUserType_id").OnTable("umbracoUser").Do();
+                    }
+
+                    //This is the super old constraint name of the FK for user type so check this one too
+                    if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser") && x.Item3.InvariantEquals("FK_user_userType")))
+                    {
+                        Delete.ForeignKey("FK_user_userType").OnTable("umbracoUser").Do();
+                    }
                 }
 
                 Delete.Column("userType").FromTable("umbracoUser").Do();

@@ -119,6 +119,7 @@ build/ApiDocs/*
 build/ApiDocs/Output/*
 src/Umbraco.Web.UI.Client/bower_components/*
 /src/Umbraco.Web.UI/Umbraco/preview
+/src/Umbraco.Web.UI/Umbraco/preview.old
 
 #Ignore Rule for output of generated documentation files from Grunt docserve
 src/Umbraco.Web.UI.Client/docs/api

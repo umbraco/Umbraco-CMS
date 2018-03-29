@@ -6,9 +6,11 @@ namespace Umbraco.Web.Features
     internal class EnabledFeatures
     {
         /// <summary>
-        /// Specifies if rendering pipeline should ignore HasTemplate check when handling a request.
-        /// <remarks>This is to allow JSON preview of content with no template set.</remarks>
+        /// This allows us to inject a razor view into the Umbraco preview view to extend it
         /// </summary>
-        public bool RenderNoTemplate { get; set; }
+        /// <remarks>
+        /// This is set to a virtual path of a razor view file
+        /// </remarks>
+        public string PreviewExtendedView { get; set; }
     }
 }

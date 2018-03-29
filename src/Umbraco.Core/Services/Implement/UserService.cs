@@ -196,28 +196,26 @@ namespace Umbraco.Core.Services.Implement
                 {
                     return _userRepository.GetByUsername(username, includeSecurityData: true);
                 }
-                catch (Exception ex)
+                catch (DbException ex)
                 {
-                    if (ex is SqlException || ex is SqlCeException)
+                    // fixme kill in v8
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    // fixme kill in v8
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    if (_isUpgrading)
                     {
-                        // fixme kill in v8
-                        //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                        //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                        //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                        //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                        //that method would not be cached.
-                        // fixme kill in v8
-                        //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                        //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                        //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                        //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                        //that method would not be cached.
-                        if (_isUpgrading)
-                        {
-                            //NOTE: this will not be cached
-                            return _userRepository.GetByUsername(username, includeSecurityData: false);
-                        }
+                        //NOTE: this will not be cached
+                        return _userRepository.GetByUsername(username, includeSecurityData: false);
                     }
+                    
                     throw;
                 }
             }
@@ -735,22 +733,20 @@ namespace Umbraco.Core.Services.Implement
                 {
                     return _userRepository.Get(id);
                 }
-                catch (Exception ex)
+                catch (DbException ex)
                 {
-                    if (ex is SqlException || ex is SqlCeException)
+                    // fixme kill in v8
+                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
+                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
+                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
+                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
+                    //that method would not be cached.
+                    if (_isUpgrading)
                     {
-                        // fixme kill in v8
-                        //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                        //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                        //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                        //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                        //that method would not be cached.
-                        if (_isUpgrading)
-                        {
-                            //NOTE: this will not be cached
-                            return _userRepository.Get(id, includeSecurityData: false);
-                        }
+                        //NOTE: this will not be cached
+                        return _userRepository.Get(id, includeSecurityData: false);
                     }
+                    
                     throw;
                 }
             }

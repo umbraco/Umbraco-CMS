@@ -4,6 +4,7 @@ using Umbraco.Core;
 using umbraco;
 using Umbraco.Core.Composing;
 using Umbraco.Web._Legacy.UI;
+using Umbraco.Web.umbraco.presentation.umbraco.create;
 
 namespace Umbraco.Tests.UI
 {

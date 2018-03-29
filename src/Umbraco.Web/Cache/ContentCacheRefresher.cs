@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
@@ -15,11 +16,13 @@ namespace Umbraco.Web.Cache
     public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresher, ContentCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly IdkMap _idkMap;
 
-        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService)
+        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
             : base(cacheHelper)
         {
             _publishedSnapshotService = publishedSnapshotService;
+            _idkMap = idkMap;
         }
 
         #region Define
@@ -50,6 +53,8 @@ namespace Umbraco.Web.Cache
             {
                 // remove that one
                 runtimeCache.ClearCacheItem(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+
+                _idkMap.ClearCache(payload.Id);
 
                 // remove those that are in the branch
                 if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))

@@ -391,9 +391,12 @@ namespace Umbraco.Web.Mvc
                 return GetWebFormsHandler();
             }
 
-            //here we need to check if there is no hijacked route and no template assigned, if this is the case
-            //we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            if (!request.HasTemplate && !routeDef.HasHijackedRoute && !Features.Enabled.RenderNoTemplate)
+            //Here we need to check if there is no hijacked route and no template assigned,
+            //if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
+            //We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
+            //for example for json rendering in headless.
+            if ((request.HasTemplate == false && Features.Disabled.DisableTemplates == false)
+                && routeDef.HasHijackedRoute == false)
             {
                 // fixme - better find a way to inject that engine? or at least Current.Engine of some sort!
                 var engine = Core.Composing.Current.Container.GetInstance<PublishedRouter>();

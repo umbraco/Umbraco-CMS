@@ -23,7 +23,7 @@ namespace Umbraco.Web.WebApi.Filters
             if (features == null) return true;
 
             var controllerType = actionContext.ControllerContext.ControllerDescriptor.ControllerType;
-            return features.IsEnabled(controllerType);
+            return features.IsControllerEnabled(controllerType);
         }
     }
 }

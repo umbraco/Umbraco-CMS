@@ -8,6 +8,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
 
@@ -171,7 +172,6 @@ namespace Umbraco.Web
         private static IPublishedContent ItemById(Guid id, IPublishedCache cache)
         {
             var doc = cache.GetById(id);
-            return doc;
         }
 
         private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)

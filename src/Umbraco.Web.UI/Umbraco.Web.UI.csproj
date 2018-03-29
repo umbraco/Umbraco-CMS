@@ -864,6 +864,19 @@
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap2-Fluid.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Background.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Border.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Color.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Googlefontpicker.cshtml" />
+    <Content Include="Umbraco\Views\Preview\GridRow.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Index.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Layout.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Margin.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Padding.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
+    <Content Include="Umbraco\Views\Preview\web.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -973,6 +986,12 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+    <Folder Include="App_Data\" />
+    <Folder Include="Views\MacroPartials\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
@@ -999,6 +1018,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
           <DevelopmentServerPort>8000</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:8000</IISUrl>
+          <DevelopmentServerPort>7110</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:7110</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

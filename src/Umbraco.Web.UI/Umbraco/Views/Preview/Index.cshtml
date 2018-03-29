@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using System.Web.Mvc.Html
+@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Models.ContentEditing.BackOfficePreview>
+@{
+    var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Umbraco Canvas Designer</title>
@@ -6,27 +11,25 @@
     <link href="../lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
     <link href="../lib/jquery-ui/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
 </head>
-
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-class="{ leftOpen: (showStyleEditor || showPalettePicker) && !showDevicesPreview }" ng-controller="Umbraco.canvasdesignerController">
-
     <div class="wait" ng-show="!frameLoaded"></div>
+
+    @if (string.IsNullOrWhiteSpace(Model.PreviewExtendedHeaderView) == false)
+    {
+        @Html.Partial(Model.PreviewExtendedHeaderView)
+    }
 
     <div id="demo-iframe-wrapper" ng-show="frameLoaded" class="{{previewDevice.css}}">
         <iframe id="resultFrame" ng-src="{{pageUrl}}" frameborder="0" iframe-is-loaded></iframe>
     </div>
-
-    <div class="canvasdesigner" ng-init="showDevicesPreview = true; showPalettePicker = true" ng-mouseenter="positionSelectedHide()">
-
+    <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview); showPalettePicker = true" ng-mouseenter="positionSelectedHide()">
         <div class="fix-left-menu selected">
-
             <div class="avatar">
-                <img
-                    ng-src="../assets/img/application/logo.png"
-                    ng-srcset="../assets/img/application/logo@2x.png 2x, 
+                <img ng-src="../assets/img/application/logo.png"
+                     ng-srcset="../assets/img/application/logo@2x.png 2x,
                     ../assets/img/application/logo@3x.png 3x" />
             </div>
-
-            <ul class="sections" ng-class="{selected: showDevicesPreview}">
+            <ul class="sections" ng-class="{selected: showDevicesPreview && showDevices}">
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
                     <a href="#"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
@@ -39,9 +42,8 @@
                 </li>
                 <li ng-click="exitPreview()">
                     <a href="#" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
-                </li>                
+                </li>
             </ul>
-
             <ul class="sections" ng-class="{selected: !showDevicesPreview}" ng-if="enableCanvasdesigner > 0">
                 <li ng-click="openPreviewDevice()">
                     <a href="#"><i class="icon {{previewDevice.icon}}"></i><span>Preview</span></a>
@@ -53,15 +55,11 @@
                     <a href="#"><i class="icon icon-paint-roller"></i><span>UI Designer</span></a>
                 </li>
             </ul>
-
         </div>
-
         <div class="main-panel" ng-class="{selected: !showDevicesPreview && ( showPalettePicker || showStyleEditor )}">
-
             <div class="header">
                 <h3>Palette Style</h3>
             </div>
-
             <div class="content">
                 <ul class="samples">
                     <li ng-repeat="palette in canvasdesignerPalette">
@@ -78,7 +76,6 @@
                     </li>
                 </ul>
             </div>
-
             <div class="btn-group">
                 <a class="btn btn-success" ng-click="saveStyle()">Save Style</a>
                 <a class="btn btn-success dropdown-toggle" ng-click="opendropdown = !opendropdown">
@@ -90,11 +87,8 @@
                     <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
                 </ul>
             </div>
-
         </div>
-
         <div class="main-panel" ng-class="{selected: !showDevicesPreview && showStyleEditor}">
-
             <div ng-show="!currentSelected">
                 <div class="header">
                     <h3>Select</h3>
@@ -112,7 +106,6 @@
                     </ul>
                 </div>
             </div>
-
             <div ng-repeat="configItem in canvasdesignerModel.configs" ng-show="currentSelected && currentSelected.name.toLowerCase() == configItem.name.toLowerCase()
                  && currentSelected.schema.toLowerCase() == configItem.schema.toLowerCase()" on-finish-render-filters>
                 <div class="header">
@@ -134,7 +127,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="btn-group">
                 <a class="btn btn-success" ng-click="saveStyle()">Save Style</a>
                 <a class="btn btn-success dropdown-toggle" ng-click="opendropdown = !opendropdown">
@@ -146,20 +138,13 @@
                     <li><a ng-click="makePreset();opendropdown = false">Make preset</a></li>
                 </ul>
             </div>
-
         </div>
-
         <div class="float-panel"></div>
-
     </div>
-
     <div id="speechbubble">
         <p>Styles saved and published</p>
     </div>
-
     <script src="../lib/rgrove-lazyload/lazyload.js"></script>
     <script src="../js/canvasdesigner.loader.js"></script>
-
 </body>
-
 </html>

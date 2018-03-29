@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Mvc
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Web.Mvc
         // see note in HttpInstallAuthorizeAttribute
         private readonly UmbracoContext _umbracoContext;
         private readonly IRuntimeState _runtimeState;
+        private readonly string _redirectUrl;
 
         private IRuntimeState RuntimeState => _runtimeState ?? Current.RuntimeState;
 
@@ -32,8 +34,32 @@ namespace Umbraco.Web.Mvc
             _runtimeState = runtimeState;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public UmbracoAuthorizeAttribute()
         { }
+
+        /// <summary>
+        /// Constructor specifying to redirect to the specified location if not authorized
+        /// </summary>
+        /// <param name="redirectUrl"></param>
+        public UmbracoAuthorizeAttribute(string redirectUrl)
+        {
+            _redirectUrl = redirectUrl ?? throw new ArgumentNullException(nameof(redirectUrl));
+        }
+
+        /// <summary>
+        /// Constructor specifying to redirect to the umbraco login page if not authorized
+        /// </summary>
+        /// <param name="redirectToUmbracoLogin"></param>
+        public UmbracoAuthorizeAttribute(bool redirectToUmbracoLogin)
+        {
+            if (redirectToUmbracoLogin)
+            {
+                _redirectUrl = GlobalSettings.Path.EnsureStartsWith("~");
+            }
+        }
 
         /// <summary>
         /// Ensures that the user must be in the Administrator or the Install role
@@ -64,7 +90,16 @@ namespace Umbraco.Web.Mvc
         /// <param name="filterContext"></param>
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            filterContext.Result = new HttpUnauthorizedResult("You must login to view this resource.");
+            if (_redirectUrl.IsNullOrWhiteSpace())
+            {
+                filterContext.Result = (ActionResult)new HttpUnauthorizedResult("You must login to view this resource.");
+
+                
+            }
+            else
+            {
+                filterContext.Result = new RedirectResult(_redirectUrl);
+            }
 
             // DON'T do a FormsAuth redirect... argh!! thankfully we're running .Net 4.5 :)
             filterContext.RequestContext.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
