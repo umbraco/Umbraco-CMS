@@ -40,7 +40,7 @@ angular.module('umbraco.directives')
             
                 $timeout(function(){
                     // get list of all links in the list
-                    listItems = element.find("li a");
+                    listItems = element.find("li :tabbable");
                 });
 
                 // Handle keydown events

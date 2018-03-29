@@ -11,13 +11,7 @@
 function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService) {
 
     //the null is important because we do an explicit bool check on this in the view
-    //the avatar is by default the umbraco logo    
     $scope.authenticated = null;
-    $scope.avatar = [
-        { value: "assets/img/application/logo.png" },
-        { value: "assets/img/application/logo@2x.png" },
-        { value: "assets/img/application/logo@3x.png" }
-    ];
     $scope.touchDevice = appState.getGlobalState("touchDevice");
 
 
@@ -61,15 +55,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             //Load locale file
             if ($scope.user.locale) {
                 tmhDynamicLocale.set($scope.user.locale);
-            }
-
-            if ($scope.user.avatars) {
-                $scope.avatar = [];
-                if (angular.isArray($scope.user.avatars)) {
-                    for (var i = 0; i < $scope.user.avatars.length; i++) {
-                        $scope.avatar.push({ value: $scope.user.avatars[i] });
-                    }
-                }
             }
         });
     }));
@@ -116,16 +101,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             tmhDynamicLocale.set($scope.user.locale);
         }
 
-        if ($scope.user.avatars) {
-
-            $scope.avatar = [];
-            if (angular.isArray($scope.user.avatars)) {
-                for (var i = 0; i < $scope.user.avatars.length; i++) {
-                    $scope.avatar.push({ value: $scope.user.avatars[i] });
-                }
-            }
-
-        }
     }));
 
     evts.push(eventsService.on("app.ysod", function (name, error) {

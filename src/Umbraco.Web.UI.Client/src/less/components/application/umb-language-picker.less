@@ -1,0 +1,43 @@
+.umb-language-picker {
+    position: relative;
+    z-index: 1;
+}
+
+.umb-language-picker__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid @gray-9;
+}
+
+.umb-language-picker__toggle:hover {
+    background: @gray-10;
+}
+
+.umb-language-picker__expand {
+    color: @gray-6;
+    font-size: 14px;
+}
+
+.umb-language-picker__dropdown {
+    width: 100%;
+    background: @white;
+    box-shadow: 0 5px 5px rgba(0,0,0,.2);
+    box-sizing: border-box;
+    position: absolute;
+}
+
+.umb-language-picker__dropdown a {
+    padding: 8px 20px;
+    display: block;
+    font-size: 14px;
+}
+
+
+.umb-language-picker__dropdown a:hover, 
+.umb-language-picker__dropdown a:focus {
+    background: @gray-10;
+    text-decoration: none;
+}

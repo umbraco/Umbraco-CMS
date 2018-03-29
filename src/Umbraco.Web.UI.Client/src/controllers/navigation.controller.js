@@ -154,6 +154,10 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
             }, 300);
         }
     };
+    
+    $scope.toggleTreeLanguageSelector = function() {
+        $scope.treeLanguageSelectorIsOpen = !$scope.treeLanguageSelectorIsOpen;
+    };
 
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {

@@ -10,50 +10,59 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
         templateUrl: 'views/components/application/umb-sections.html',
         link: function (scope, element, attr, ctrl) {
 
+			var sectionItemsWidth = [];
+			var evts = [];
+			var maxSections = 7;
+
             //setup scope vars
-			scope.maxSections = 7;
+			scope.maxSections = maxSections;
 			scope.overflowingSections = 0;
             scope.sections = [];
             scope.currentSection = appState.getSectionState("currentSection");
             scope.showTray = false; //appState.getGlobalState("showTray");
             scope.stickyNavigation = appState.getGlobalState("stickyNavigation");
             scope.needTray = false;
-            scope.trayAnimation = function() {
-                if (scope.showTray) {
-                    return 'slide';
-                }
-                else if (scope.showTray === false) {
-                    return 'slide';
-                }
-                else {
-                    return '';
-                }
-            };
 
 			function loadSections(){
 			    sectionService.getSectionsForUser()
 					.then(function (result) {
 						scope.sections = result;
-						calculateHeight();
+						// store the width of each section so we can hide/show them based on browser width 
+						// we store them because the sections get removed from the dom and then we 
+						// can't tell when to show them gain
+						$timeout(function(){
+							$("#applications .sections li").each(function(index) {
+								sectionItemsWidth.push($(this).outerWidth());
+							});
+						});
+						calculateWidth();
 					});
 			}
 
-			function calculateHeight(){
+			function calculateWidth(){
 				$timeout(function(){
-					//total height minus room for avatar and help icon
-					var height = $(window).height()-200;
+					//total width minus room for avatar, search, and help icon
+					var windowWidth = $(window).width()-200;
+					var sectionsWidth = 0;
 					scope.totalSections = scope.sections.length;
-					scope.maxSections = Math.floor(height / 70);
+					scope.maxSections = maxSections;
+					scope.overflowingSections = 0;
 					scope.needTray = false;
+					
+					// detect how many sections we can show on the screen
+					for (var i = 0; i < sectionItemsWidth.length; i++) {
+						var sectionItemWidth = sectionItemsWidth[i];
+						sectionsWidth += sectionItemWidth;
 
-					if(scope.totalSections > scope.maxSections){
-						scope.needTray = true;
-						scope.overflowingSections = scope.maxSections - scope.totalSections;
+						if(sectionsWidth > windowWidth) {
+							scope.needTray = true;
+							scope.maxSections = i - 1;
+							scope.overflowingSections = scope.maxSections - scope.totalSections;
+							break;
+						}
 					}
 				});
 			}
-
-			var evts = [];
 
             //Listen for global state changes
             evts.push(eventsService.on("appState.globalState.changed", function(e, args) {
@@ -84,40 +93,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			});
 
 			//on page resize
-			window.onresize = calculateHeight;
-
-			scope.avatarClick = function(){
-
-                if(scope.helpDialog) {
-                    closeHelpDialog();
-                }
-
-                if(!scope.userDialog) {
-                    scope.userDialog = {
-                        view: "user",
-                        show: true,
-                        close: function(oldModel) {
-                            closeUserDialog();
-                        }
-                    };
-                } else {
-                    closeUserDialog();
-                }
-
-			};
-
-            function closeUserDialog() {
-                scope.userDialog.show = false;
-                scope.userDialog = null;
-            }
-
-            //toggle the help dialog by raising the global app state to toggle the help drawer
-            scope.helpClick = function () {
-                var showDrawer = appState.getDrawerState("showDrawer");
-                var drawer = { view: "help", show: !showDrawer };
-                appState.setDrawerState("view", drawer.view);
-                appState.setDrawerState("showDrawer", drawer.show);
-            };
+			window.onresize = calculateWidth;
 
 			scope.sectionClick = function (event, section) {
 
@@ -154,14 +130,6 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			};
 
 			scope.trayClick = function () {
-                // close dialogs
-			    if (scope.userDialog) {
-                    closeUserDialog();
-			    }
-			    if (scope.helpDialog) {
-                    closeHelpDialog();
-			    }
-
 			    if (appState.getGlobalState("showTray") === true) {
 			        navigationService.hideTray();
 			    } else {

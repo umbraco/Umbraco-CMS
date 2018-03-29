@@ -47,13 +47,12 @@ describe('edit media controller tests', function () {
             expect(scope.content.id).toBe(1234);
         });
 
-        it('it should have a tabs collection', function () {
-            expect(scope.content.tabs.length).toBe(2);
+        it('it should have an apps collection', function () {
+            expect(scope.content.apps.length).toBe(2);
         });
 
-        it('it should have added an info tab', function () {
-            expect(scope.content.tabs[1].id).toBe(-1);
-            expect(scope.content.tabs[1].alias).toBe("_umb_infoTab");
+        it('it should have added an info app', function () {
+            expect(scope.content.apps[1].alias).toBe("info");
         });
 
         it('all other tabs than the info tab should have a properties collection', function () {

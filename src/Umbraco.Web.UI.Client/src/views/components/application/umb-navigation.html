@@ -1,88 +1,33 @@
-<div id="leftcolumn" ng-controller="Umbraco.NavigationController"
-     ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
-
-    <umb-sections sections="sections" ng-if="authenticated">
-    </umb-sections>
+<div id="leftcolumn" ng-controller="Umbraco.NavigationController" ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
 
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize>
 
-        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6">
+        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container">
 
-            <!-- the search -->
-            <div ng-controller="Umbraco.SearchController" ng-if="authenticated">
-
-                <!-- Search form -->
-        <div data-element="global-search" id="search-form">
-                    <div class="umb-modalcolumn-header">
-
-                        <form class="form-search" novalidate>
-                            <i class="icon-search"></i>
-              <input data-element="global-search-field"
-                     type="text"
-                                   hotkey="ctrl+space"
-                                   id="search-field"
-                                   ng-model="searchTerm"
-                                   class="umb-search-field search-query search-input"
-                                   localize="placeholder"
-                                   placeholder="@placeholders_search"
-                                   ng-keydown="navigateResults($event)"
-                                   no-dirty-check />
-                        </form>
-                    </div>
+            <!--
+            <div ng-if="currentSection === 'content'" class="umb-language-picker">
+                
+                <div class="umb-language-picker__toggle" ng-click="toggleTreeLanguageSelector()">
+                    <div>English (United States)</div>
+                    <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !treeLanguageSelectorIsOpen, 'icon-navigation-up': treeLanguageSelectorIsOpen}" class="icon-navigation-right">&nbsp;</ins>                
                 </div>
 
-                <!-- Search results -->
-                <div id="search-results" class="umb-modalcolumn-body" ng-show="showSearchResults">
-
-                    <umb-load-indicator ng-if="isSearching"></umb-load-indicator>
-
-                    <umb-empty-state ng-if="!hasResults && !isSearching"
-                                     position="center">
-                        <localize key="general_searchNoResult"></localize>
-                    </umb-empty-state>
-
-                    <ul class="umb-tree" ng-if="!isSearching && hasResults">
-                        <li class="root">
-                            <div>
-                                <h5 class="umb-tree-header"><localize key="general_searchResults">Search results</localize></h5>
-                            </div>
-
-                            <div class="umb-search-group" ng-repeat="(key, group) in groups">
-                                <h6 class="umb-tree-header">{{key}}</h6>
-                                <ul>
-                                    <li ng-repeat="result in group.results" ng-class="{'current':selectedItem == result}">
-                                        <div class="umb-search-group-item">
-                                            <a class="umb-search-group-item-link" ng-class="{'first':$first}" ng-click="searchHide()" ng-href="#/{{result.editorPath}}">
-
-                                                <div class="umb-search-group-item-name">
-                                                    <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
-                                                    {{result.name}}
-                                                </div>
-
-                                                <small class="search-subtitle" ng-show="result.subTitle">
-                                                    {{result.subTitle}}
-                                                </small>
-                                            </a>
-
-                                            <a href ng-hide="!result.menuUrl" ng-click="searchShowMenu($event, {node: result})" class="umb-options"><i></i><i></i><i></i></a>
-                                        </div>
-                                    </li>
-                                </ul>
-
-                            </div>
-
-                        </li>
-                    </ul>
+                <div class="umb-language-picker__dropdown" ng-if="treeLanguageSelectorIsOpen">
+                    <a href="">Spanish (Spain)</a>
+                    <a href="">French (France)</a>
+                    <a href="">Danish</a>
+                    <a href="">German (Germany)</a>
                 </div>
-
             </div>
+            -->
 
             <!-- the tree -->
-            <div id="tree" class="umb-modalcolumn-body" ng-if="authenticated">
-                <umb-tree cachekey="_"
-                          eventhandler="treeEventHandler"
-                          section="{{currentSection}}">
+            <div id="tree" ng-if="authenticated">
+                <umb-tree
+                    cachekey="_"
+                    eventhandler="treeEventHandler"
+                    section="{{currentSection}}">
                 </umb-tree>
             </div>
         </div>
@@ -91,18 +36,17 @@
 
             <!-- The context menu -->
             <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-swipe-left="nav.hideMenu()" ng-show="showContextMenu" ng-animate="'slide'">
-                <umb-context-menu menu-dialog-title="{{menuDialogTitle}}"
-                                  current-section="{{currentSection}}"
-                                  current-node="menuNode"
-                                  menu-actions="menuActions">
+                <umb-context-menu
+                    menu-dialog-title="{{menuDialogTitle}}"
+                    current-section="{{currentSection}}"
+                    current-node="menuNode"
+                    menu-actions="menuActions">
                 </umb-context-menu>
             </div>
 
 
             <!-- Tree dialogs -->
-            <div id="dialog" class='umb-modalcolumn fill shadow'
-                 ng-swipe-left="nav.hideDialog()"
-                 ng-show="showContextMenuDialog" ng-animate="'slide'">
+            <div id="dialog" class='umb-modalcolumn fill shadow' ng-swipe-left="nav.hideDialog()" ng-show="showContextMenuDialog" ng-animate="'slide'">
                 <div class='umb-modalcolumn-header'>
                     <h1>{{menuDialogTitle}}</h1>
                 </div>

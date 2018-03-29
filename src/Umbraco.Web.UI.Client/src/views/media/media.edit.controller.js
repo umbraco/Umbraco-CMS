@@ -54,7 +54,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 editorState.set($scope.content);
 
                 // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                contentEditingHelper.addInfoTab($scope.content.tabs);
+                //contentEditingHelper.addInfoTab($scope.content.tabs);
+
+                init($scope.content);
 
                 $scope.page.loading = false;
 
@@ -94,11 +96,61 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 }
 
                 // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                contentEditingHelper.addInfoTab($scope.content.tabs);
+                //contentEditingHelper.addInfoTab($scope.content.tabs);
+
+                init($scope.content);
 
                 $scope.page.loading = false;
 
             });
+    }
+
+    function init(content) {
+
+        // prototype content and info apps
+        var contentApp = {
+            "name": "Content",
+            "alias": "content",
+            "icon": "icon-document",
+            "view": "views/media/apps/content/content.html"
+        };
+
+        var infoApp = {
+            "name": "Info",
+            "alias": "info",
+            "icon": "icon-info",
+            "view": "views/media/apps/info/info.html"
+        };
+
+        var listview = {
+            "name": "Child items",
+            "alias": "childItems",
+            "icon": "icon-list",
+            "view": "views/media/apps/listview/listview.html"
+        };
+
+        $scope.content.apps = [];
+
+        if($scope.content.contentTypeAlias === "Folder") {
+          // add list view app
+          $scope.content.apps.push(listview);
+            
+          // remove the list view tab
+          angular.forEach($scope.content.tabs, function(tab, index){
+            if(tab.alias === "Contents") {
+              tab.hide = true;
+            }
+          });
+
+        } else {
+            $scope.content.apps.push(contentApp);
+        }
+        
+        $scope.content.apps.push(infoApp);
+        
+        // set first app to active
+        $scope.content.apps[0].active = true;
+
     }
     
     $scope.save = function () {
@@ -150,6 +202,10 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             $scope.busy = false;
         }
         
+    };
+
+    $scope.backToListView = function() {
+        $location.path($scope.page.listViewPath);
     };
 
 }

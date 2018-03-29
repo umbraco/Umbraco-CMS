@@ -1,0 +1,7 @@
+<div ng-controller="Umbraco.Editors.Content.Apps.ListViewController as vm">
+
+    <umb-property ng-repeat="property in vm.listViewGroup.properties" property="property">
+        <umb-editor model="property"></umb-editor>
+    </umb-property>
+
+</div>

@@ -1,90 +1,109 @@
-﻿<div data-element="editor-header" class="umb-editor-header umb-panel-header">
+﻿<div data-element="editor-header" class="umb-editor-header">
+    
+    <div class="flex items-center" style="height: 100%;">
 
-    <div class="umb-panel-header-content-wrapper">
+        <div ng-if="showBackButton === 'true' && splitViewOpen !== true" style="margin-right: 15px;">
+            <a class="umb-editor-header__back" href="#" ng-click="goBack()" prevent-default>
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </a>
+        </div>
 
-        <div class="umb-panel-header-content">
+        <div class="flex items-center" style="flex: 1;">
 
-            <div class="umb-panel-header-left-side" ng-class="{'-top-position': tabs || !icon && hideDescription}">
-              
-              <ng-form data-element="editor-icon" name="iconForm">
-                 <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}" title="{{$parent.icon}}">
-                     <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
-                     <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
-                         <localize key="settings_addIcon"></localize>
-                     </div>
-                 </div>
-              </ng-form>
-
-               <div class="umb-panel-header-title-wrapper">
-
-                   <ng-form name="headerNameForm">
-                       <input
-                        data-element="editor-name-field"
-                        title="{{key}}"
-                        type="text"
-                        class="umb-panel-header-name-input"
-                        localize="placeholder"
-                        placeholder="@placeholders_entername"
-                        name="headerName"
-                        ng-show="!nameLocked"
-                        ng-model="name"
-                        ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
-                        umb-auto-focus
-                        val-server-field="Name"
-                        required />
-                   </ng-form>
-
-                  <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
-
-                  <umb-generate-alias
-                    data-element="editor-alias"
-                    class="umb-panel-header-alias"
-                    ng-if="!hideAlias"
-                    alias="$parent.alias"
-                    alias-from="$parent.name"
-                    enable-lock="true"
-                    server-validation-field="Alias">
-                    </umb-generate-alias>
-                
-
-                        <input
-                            data-element="editor-description"
-                            type="text"
-                            class="umb-panel-header-description"
-                            localize="placeholder"
-                            placeholder="@placeholders_enterDescription"
-                            ng-if="!hideDescription && !descriptionLocked"
-                            ng-model="$parent.description" />
-
-                        <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
-
-
-               </div>
-
-               <div class="umb-editor-header__actions-menu">
-                    <umb-editor-menu
-                        data-element="editor-actions"
-                        ng-if="menu.currentNode"
-                        current-node="menu.currentNode"
-                        current-section="{{menu.currentSection}}">
-                    </umb-editor-menu>
+            <ng-form data-element="editor-icon" name="iconForm">
+                <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
+                    title="{{$parent.icon}}">
+                    <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                    <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                        <localize key="settings_addIcon"></localize>
+                    </div>
                 </div>
+            </ng-form>
+
+            <div style="flex: 1 1 auto;">
+
+                <div class="umb-editor-header__name-wrapper">
+                    <ng-form name="headerNameForm">
+                        <input
+                            data-element="editor-name-field"
+                            title="{{key}}"
+                            type="text"
+                            class="umb-editor-header__name-input"
+                            localize="placeholder"
+                            placeholder="@placeholders_entername"
+                            name="headerName"
+                            ng-show="!nameLocked"
+                            ng-model="name"
+                            ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                            umb-auto-focus
+                            val-server-field="Name"
+                            required />
+                    </ng-form>
+
+                    <umb-generate-alias
+                        data-element="editor-alias"
+                        class="umb-panel-header-alias"
+                        ng-if="!hideAlias"
+                        alias="$parent.alias"
+                        alias-from="$parent.name"
+                        enable-lock="true"
+                        server-validation-field="Alias">
+                    </umb-generate-alias>
+                    
+                    <a ng-if="variants.length > 0" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                        <span>{{vm.currentVariant.cultureDisplayName}}</span>
+                        <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
+                    </a>
+
+                    <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
+                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.current}" ng-repeat="variant in variants">
+                            <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
+                                <span class="umb-variant-switcher__name">{{variant.cultureDisplayName}}</span>
+                                <span class="umb-variant-switcher__state">{{variant.state}}</span>
+                            </a>
+                            <div ng-if="splitViewOpen !== true" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
+                        </umb-dropdown-item>
+                    </umb-dropdown>
+
+                </div>
+
+                <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
+
+                <input
+                    data-element="editor-description"
+                    type="text"
+                    class="umb-panel-header-description"
+                    localize="placeholder"
+                    placeholder="@placeholders_enterDescription"
+                    ng-if="!hideDescription && !descriptionLocked"
+                    ng-model="$parent.description" />
+        
+                <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
 
             </div>
 
-            <umb-editor-navigation
-                data-element="editor-sub-views"
-                ng-if="navigation"
-                navigation="navigation">
-            </umb-editor-navigation>
-
         </div>
 
-        <umb-tabs-nav
-            data-element="editor-tabs"
-            ng-if="tabs"
-            model="tabs">
-        </umb-tabs-nav>
+        <div ng-if="splitViewOpen" style="margin-left: 20px;">
+            <a class="umb-editor-header__close-split-view" href="" ng-click="closeSplitView()">
+                <i class="icon-delete"></i>
+            </a>
+        </div>
+
+        <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
+            <umb-editor-navigation
+                data-element="editor-sub-views"
+                navigation="navigation">
+            </umb-editor-navigation>
+        </div>
+
+        <div ng-if="menu.currentNode && splitViewOpen !== true" style="margin-left: 20px;">
+            <umb-editor-menu
+                data-element="editor-actions"
+                current-node="menu.currentNode"
+                current-section="{{menu.currentSection}}">
+            </umb-editor-menu>
+        </div>
 
     </div>
 

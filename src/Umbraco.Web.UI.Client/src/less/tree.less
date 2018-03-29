@@ -119,8 +119,10 @@
 
 .umb-tree div > a.umb-options {
 	visibility: hidden;
-    flex: 1 0 auto;
+	flex: 0 0 auto;
+	margin-left: auto;
 }
+
 .umb-tree div:hover > a.umb-options {
 	visibility: visible;
 }
@@ -157,8 +159,9 @@
 
 .umb-tree li > div a:not(.umb-options) {
 	padding: 6px 0;
-	display: flex;
-    flex: 1 1 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .umb-tree li > div:hover a:not(.umb-options) {

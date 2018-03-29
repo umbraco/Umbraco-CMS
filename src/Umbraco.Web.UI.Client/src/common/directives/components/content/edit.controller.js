@@ -18,7 +18,13 @@
     $scope.page.isNew = $scope.isNew ? true : false;
     $scope.page.buttonGroupState = "init";    
     $scope.allowOpen = true;
-
+    
+    // add all editors to an editors array to support split view 
+    $scope.editors = [];
+    $scope.splitView = {
+      "leftIsOpen": true,
+      "rightIsOpen": false
+    };
 
     function init(content) {
 
@@ -45,7 +51,112 @@
       }));
 
       // We don't get the info tab from the server from version 7.8 so we need to manually add it
-      contentEditingHelper.addInfoTab($scope.content.tabs);
+      //contentEditingHelper.addInfoTab($scope.content.tabs);
+
+      // prototype variants
+      $scope.content.variants = [
+        {
+          "cultureDisplayName": "English (United States)",
+          "culture": "en-US",
+          "current": true,
+          "segments" : [
+            {
+              "name": "Mobile"
+            },
+            {
+              "name": "Job campign"
+            }
+          ],
+          "state": "Published"
+        },
+        {
+          "cultureDisplayName": "Danish",
+          "culture": "da-DK",
+          "current": false,
+          "segments" : [
+            {
+              "name": "Mobile"
+            }
+          ],
+          "state": "Published"
+        },
+        {
+            "cultureDisplayName": "Spanish (Spain)",
+            "culture": "es-ES",
+            "current": false,
+            "state": "Published (pending changes)"
+        },
+        {
+            "cultureDisplayName": "French (France)",
+            "culture": "fr-FR",
+            "current": false,
+            "segments" : [
+              {
+                "name": "Mobile"
+              },
+              {
+                "name": "Job campign"
+              }
+            ],
+            "state": "Draft"
+        },
+        {
+            "cultureDisplayName": "German (Germany)",
+            "culture": "de-DE",
+            "current": false,
+            "state": "Draft"
+        }
+      ];
+
+      // prototype content and info apps
+      var contentApp = {
+        "name": "Content",
+        "alias": "content",
+        "icon": "icon-document",
+        "view": "views/content/apps/content/content.html"
+      };
+
+      var infoApp = {
+        "name": "Info",
+        "alias": "info",
+        "icon": "icon-info",
+        "view": "views/content/apps/info/info.html"
+      };
+
+      var listview = {
+        "name": "Child items",
+        "alias": "childItems",
+        "icon": "icon-list",
+        "view": "views/content/apps/listview/listview.html"
+      };
+
+      $scope.content.apps = [];
+
+      if($scope.content.isContainer) {
+        // add list view app
+        $scope.content.apps.push(listview);
+
+        // remove the list view tab
+        angular.forEach($scope.content.tabs, function(tab, index){
+          if(tab.alias === "umbContainerView") {
+            tab.hide = true;
+          }
+        });
+
+      }
+      
+      $scope.content.apps.push(contentApp);
+      $scope.content.apps.push(infoApp);
+      
+      // set first app to active
+      $scope.content.apps[0].active = true;
+
+      // create new editor for split view
+      if($scope.editors.length === 0) {
+        var editor = {};
+        editor.content = $scope.content;
+        $scope.editors.push(editor);
+      }
 
     }
 
@@ -260,6 +371,10 @@
       }
     };
 
+    $scope.backToListView = function() {
+      $location.path($scope.page.listViewPath);
+    };
+
     $scope.restore = function (content) {
 
       $scope.page.buttonRestore = "busy";
@@ -306,6 +421,73 @@
       });
 
 
+    };
+
+    $scope.selectVariant = function(variant, variants, form) {
+      // show the discard changes dialog it there are unsaved changes
+      if(form.$dirty) {
+        var notification = { 
+          view: "confirmroutechange", 
+          args: {
+            onDiscard: function() {
+              setSelectedVariant(variant, variants);
+              notificationsService.remove(notification);
+              form.$setPristine();
+            }
+          }
+        };
+        notificationsService.add(notification);
+        return;
+      }
+      // switch variant if all changes are saved
+      setSelectedVariant(variant, variants);
+    };
+
+    function setSelectedVariant(selectedVariant, variants) {
+      angular.forEach(variants, function(variant) {
+        variant.current = false;
+      });
+      selectedVariant.current = true;
+    }
+
+    $scope.closeSplitView = function(index, editor) {
+      // hacky animation stuff - it will be much better when angular is upgraded
+      editor.loading = true;
+      editor.collapsed = true;
+      $timeout(function(){
+        $scope.editors.splice(index, 1);
+      }, 400);
+    };
+
+    $scope.openInSplitView = function(selectedVariant) {
+
+      console.log(selectedVariant);
+
+      var editor = {};
+      // hacking animation states - these should hopefully be easier to do when we upgrade angular
+      editor.collapsed = true;
+      editor.loading = true;
+      $scope.editors.push(editor);
+      var editorIndex = $scope.editors.length - 1;
+      $timeout(function(){ 
+        $scope.editors[editorIndex].collapsed = false;
+      }, 100);
+    
+      // fake loading of content
+      $timeout(function(){
+        $scope.editors[editorIndex].content = angular.copy($scope.content);
+        $scope.editors[editorIndex].content.name = "What a variant";
+        // set selected variant on split view content
+        console.log($scope.editors[editorIndex].content.variants);
+        angular.forEach($scope.editors[editorIndex].content.variants, function(variant) {
+          if(variant.culture === selectedVariant.culture) {
+            variant.current = true;
+          } else {
+            variant.current = false;
+          }
+        });
+        $scope.editors[editorIndex].loading = false;
+      }, 500);
     };
 
     function moveNode(node, target) {

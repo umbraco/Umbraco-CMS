@@ -546,6 +546,7 @@
         <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
         <key alias="server">Server</key>
+        <key alias="settings">Settings</key>
         <key alias="show">Show</key>
         <key alias="showPageOnSend">Show page on Send</key>
         <key alias="size">Size</key>

@@ -208,6 +208,51 @@ Use this directive to construct a header inside the main editor window.
 
         function link(scope, el, attr, ctrl) {
 
+            scope.vm = {};
+            scope.vm.dropdownOpen = false;
+            scope.vm.currentVariant = "";
+
+            function onInit() {
+                setCurrentVariant(scope.variants);
+                setVariantStatusColor(scope.variants);
+            }
+
+            function setCurrentVariant(variants) {
+                angular.forEach(variants, function (variant) {
+                    if(variant.current) {
+                        scope.vm.currentVariant = variant;
+                    }
+                });
+            }
+
+            function setVariantStatusColor(variants) {
+                angular.forEach(variants, function (variant) {
+                    angular.forEach(variant.states, function(state){
+                        switch (state.name) {
+                            case "Published":
+                            case "Published +":
+                                state.stateColor = "success";
+                                break;
+                            default:
+                                state.stateColor = "gray";
+                        }
+                    });
+                });
+            }
+
+            scope.goBack = function() {
+                if(scope.onBack) {
+                    scope.onBack();
+                }
+            };
+
+            scope.selectVariant = function(event, variant) {
+                if(scope.onSelectVariant) {
+                    scope.onSelectVariant({"variant": variant});
+                    scope.vm.dropdownOpen = false;
+                }
+            };
+
             scope.openIconPicker = function() {
                 scope.dialogModel = {
                     view: "iconpicker",
@@ -234,6 +279,29 @@ Use this directive to construct a header inside the main editor window.
                     }
                 };
             };
+
+            scope.closeSplitView = function() {
+                if(scope.onCloseSplitView) {
+                    scope.onCloseSplitView();
+                }
+            };
+
+            scope.openInSplitView = function(event, variant) {
+                if(scope.onOpenInSplitView) {
+                    scope.vm.dropdownOpen = false;
+                    scope.onOpenInSplitView({"variant": variant});
+                }
+            };
+
+            scope.$watch('variants', function(newValue, oldValue){
+                if(!newValue) return;
+                if(newValue === oldValue) return;
+                setCurrentVariant(newValue);
+                setVariantStatusColor(newValue);
+            }, true);
+
+            onInit();
+
         }
 
         var directive = {
@@ -254,8 +322,15 @@ Use this directive to construct a header inside the main editor window.
                 description: "=",
                 hideDescription: "@",
                 descriptionLocked: "@",
+                variants: "=",
+                onSelectVariant: "&",
                 navigation: "=",
-                key: "="
+                key: "=",
+                onBack: "&?",
+                showBackButton: "@?",
+                splitViewOpen: "=?",
+                onOpenInSplitView: "&?",
+                onCloseSplitView: "&?"
             },
             link: link
         };

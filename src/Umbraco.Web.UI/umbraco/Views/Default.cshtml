@@ -54,11 +54,10 @@
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <div ng-hide="!authenticated" ng-cloak>
-    
-        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
-        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
         
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+
+            <umb-app-header></umb-app-header>
 
             <umb-navigation></umb-navigation>
 
@@ -74,6 +73,9 @@
             <umb-notifications></umb-notifications>
 
         </div>
+
+        <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
+        <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
         
     </div>
 

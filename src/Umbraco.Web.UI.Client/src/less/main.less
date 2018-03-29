@@ -11,7 +11,7 @@
 	min-height: 100%;
 }
 .shadow {
-	box-shadow: 3px 0px 7px @gray-8;
+	box-shadow: 3px 0px 7px rgba(0,0,0,0.16);
 }
 
 .umb-scrollable, .umb-auto-overflow {
@@ -126,6 +126,12 @@ h5.-black {
 
 .umb-control-group.-no-border {
   border: none;
+}
+
+.umb-property:last-of-type .umb-control-group {
+  border: none;
+  margin-bottom: 0 !important;
+  padding-bottom: 0;
 }
 
 /* BLOCK MODE */
@@ -439,15 +445,6 @@ table thead a {
 
 .umb-search-group li > div a > i {
     height: 100%;
-}
-
-#search-form .form-search div {
-    margin-top:3px;
-}
-#search-form .form-search div .btn {
-    position:relative;
-    top:0;
-    left:0;
 }
 
 /* DICTIONARY */

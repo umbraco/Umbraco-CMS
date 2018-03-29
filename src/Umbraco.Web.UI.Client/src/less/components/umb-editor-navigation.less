@@ -2,14 +2,22 @@
   list-style: none;
   display: flex;
   margin: 0;
+  border-left: 1px solid @gray-9;
 }
 
 .umb-sub-views-nav-item {
   text-align: center;
-  //margin-left: 20px;
   cursor: pointer;
   display: block;
-  padding: 5px 10px;
+  padding: 12px 10px 8px 10px;
+  min-width: 70px;
+  border-right: 1px solid @gray-9;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .umb-sub-views-nav-item:focus {
@@ -33,8 +41,10 @@
   font-size: 24px;
   display: block;
   text-align: center;
+  margin-bottom: 5px;
 }
 
 .umb-sub-views-nav-item-text {
   font-size: 12px;
+  line-height: 1em;
 }
