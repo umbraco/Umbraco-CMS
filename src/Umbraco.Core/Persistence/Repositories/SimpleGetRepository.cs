@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<TDto>(sql).Select(ConvertToEntity);
         }
 
-        protected override sealed IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query)
+        protected sealed override IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query)
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
@@ -76,22 +76,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Not implemented and not required
 
-        protected override sealed IEnumerable<string> GetDeleteClauses()
+        protected sealed override IEnumerable<string> GetDeleteClauses()
         {
             throw new NotImplementedException();
         }
 
-        protected override sealed Guid NodeObjectTypeId
+        protected sealed override Guid NodeObjectTypeId
         {
             get { throw new NotImplementedException(); }
         }
 
-        protected override sealed void PersistNewItem(TEntity entity)
+        protected sealed override void PersistNewItem(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        protected override sealed void PersistUpdatedItem(TEntity entity)
+        protected sealed override void PersistUpdatedItem(TEntity entity)
         {
             throw new NotImplementedException();
         }

@@ -280,7 +280,6 @@
 .umb-grid .umb-control {
     position: relative;
     display: block;
-    overflow: hidden;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
@@ -535,7 +534,7 @@
     color: @gray-3;
 }
 
-.umb-grid .umb-cell-rte textarea {
+.umb-grid .umb-cell-rte textarea.mceNoEditor {
     display: none !important;
 }
 
@@ -636,9 +635,19 @@
     clear: both;
 }
 
-.umb-grid .mce-btn button {
-    padding: 8px 6px;
-    line-height: inherit;
+.umb-grid .mce-btn {
+    button {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 6px;
+        line-height: inherit;
+    }
+
+    &:not(.mce-menubtn) {
+        button {
+            padding-right: 6px;
+        }
+    }
 }
 
 .umb-grid .mce-toolbar {

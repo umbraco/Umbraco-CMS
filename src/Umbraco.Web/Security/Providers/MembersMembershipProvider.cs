@@ -74,7 +74,7 @@ namespace Umbraco.Web.Security.Providers
                 _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
                 if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                 {
-                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                    throw new ProviderException("No default member type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
                 _hasDefaultMember = true;
             }
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Security.Providers
                             _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
                             if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                             {
-                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                                throw new ProviderException("No default member type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                             }
                             _hasDefaultMember = true;
                         }

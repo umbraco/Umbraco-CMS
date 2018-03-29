@@ -208,7 +208,7 @@ AND umbracoNode.id <> @id",
                 throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
             }
 
-            //Updates Modified date and Version Guid
+            //Updates Modified date 
             ((DataTypeDefinition)entity).UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
@@ -248,7 +248,7 @@ AND umbracoNode.id <> @id",
             Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { Id = entity.Id });
 
             //Remove Permissions
-            Database.Delete<User2NodePermissionDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            Database.Delete<UserGroup2NodePermissionDto>("WHERE nodeId = @Id", new { Id = entity.Id });
 
             //Remove associated tags
             Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = entity.Id });

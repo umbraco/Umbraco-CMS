@@ -29,7 +29,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <remarks>
         /// This property cannot be set
         /// </remarks>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public override IEnumerable<T> Properties
         {
             get { return Tabs.SelectMany(x => x.Properties); }

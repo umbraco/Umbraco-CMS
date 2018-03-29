@@ -63,29 +63,28 @@ namespace Umbraco.Web.Security.Identity
                 return null;
             }
 
+            UmbracoBackOfficeIdentity identity;
+
             try
             {
-                var identity = new UmbracoBackOfficeIdentity(decrypt);
-
-                var ticket = new AuthenticationTicket(identity, new AuthenticationProperties
-                {
-                    ExpiresUtc = decrypt.Expiration.ToUniversalTime(),
-                    IssuedUtc = decrypt.IssueDate.ToUniversalTime(),
-                    IsPersistent = decrypt.IsPersistent,
-                    AllowRefresh = true
-                });
-
-                return ticket;
+                identity = new UmbracoBackOfficeIdentity(decrypt);
             }
-            catch (JsonReaderException)
+            catch (Exception)
             {
-                //catch this and return null if the json is invalid
-                //NOTE: This will happen when running on local host and developing on 7.6 and 7.7+ because 7.7 has a different
-                // auth ticket format.
+                //if it cannot be created return null, will be due to serialization errors in user data most likely due to corrupt cookies or cookies
+                //for previous versions of Umbraco
                 return null;
             }
 
-            
+            var ticket = new AuthenticationTicket(identity, new AuthenticationProperties
+            {
+                ExpiresUtc = decrypt.Expiration.ToUniversalTime(),
+                IssuedUtc = decrypt.IssueDate.ToUniversalTime(),
+                IsPersistent = decrypt.IsPersistent,
+                AllowRefresh = true
+            });
+
+            return ticket;
         }
     }
 }

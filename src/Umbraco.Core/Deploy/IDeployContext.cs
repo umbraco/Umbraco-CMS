@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Umbraco.Core.Deploy
 {
@@ -38,5 +39,10 @@ namespace Umbraco.Core.Deploy
         /// <param name="key">The key of the item.</param>
         /// <returns>The item with the specified key and type, if any, else null.</returns>
         T Item<T>(string key) where T : class;
+
+        ///// <summary>
+        ///// Gets the global deployment cancellation token.
+        ///// </summary>
+        //CancellationToken CancellationToken { get; }
     }
 }

@@ -1,3 +1,4 @@
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -6,9 +7,9 @@
     It also highlights the current active page/section in the navigation with the CSS class "current".
 *@
 
-@{ var selection = Model.Content.Site().Children.Where(x => x.IsVisible()); }
+@{ var selection = Model.Content.Site().Children.Where(x => x.IsVisible()).ToArray(); }
 
-@if (selection.Any())
+@if (selection.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

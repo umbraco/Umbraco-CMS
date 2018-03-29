@@ -13,11 +13,28 @@ using Umbraco.Core.Configuration;
 namespace Umbraco.Core.IO
 {
 	public static class IOHelper
-    {
+	{
+        /// <summary>
+        /// Gets or sets a value forcing Umbraco to consider it is non-hosted.
+        /// </summary>
+        /// <remarks>This should always be false, unless unit testing.</remarks>
+	    public static bool ForceNotHosted { get; set; }
+
         private static string _rootDir = "";
 
         // static compiled regex for faster performance
         private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+        /// <summary>
+        /// Gets a value indicating whether Umbraco is hosted.
+        /// </summary>
+	    public static bool IsHosted
+	    {
+	        get
+	        {
+	            return ForceNotHosted == false && (HttpContext.Current != null || HostingEnvironment.IsHosted);
+            }
+	    }
 
         public static char DirSepChar
         {
@@ -72,14 +89,14 @@ namespace Umbraco.Core.IO
         internal static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
-            {				
+            {
 				using (DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
 				{
 					// find all relative urls (ie. urls that contain ~)
 					var tags = ResolveUrlPattern.Matches(text);
-					
+
 					foreach (Match tag in tags)
-					{						
+					{
 						string url = "";
 						if (tag.Groups[1].Success)
 							url = tag.Groups[1].Value;
@@ -98,6 +115,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
+            useHttpContext = useHttpContext && IsHosted;
 
             // Check if the path is already mapped
             if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
@@ -303,7 +321,7 @@ namespace Umbraco.Core.IO
             var debugFolder = Path.Combine(binFolder, "debug");
             if (Directory.Exists(debugFolder))
                 return debugFolder;
-#endif   
+#endif
             var releaseFolder = Path.Combine(binFolder, "release");
             if (Directory.Exists(releaseFolder))
                 return releaseFolder;

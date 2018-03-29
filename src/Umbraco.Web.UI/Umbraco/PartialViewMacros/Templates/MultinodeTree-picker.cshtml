@@ -1,3 +1,5 @@
+@using Umbraco.Core.Models
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -8,9 +10,9 @@
     multinode treepicker (so: replace "PropertyWithPicker" with the alias of your property).
 *@
 
-@{ var selection = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("PropertyWithPicker");  }
+@{ var selection = Model.Content.GetPropertyValue<IEnumerable<IPublishedContent>>("PropertyWithPicker").ToArray();  }
 
-@if (selection.Any())
+@if (selection.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

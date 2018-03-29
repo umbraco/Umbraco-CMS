@@ -61,22 +61,23 @@
 
 
     <div class="umb-panel umb-dialogs-mediapicker browser"
-          on-drag-leave="dragLeave()"
-          on-drag-end="dragLeave()"
-          on-drag-enter="dragEnter()" 
-          ng-hide="target">
+         on-drag-leave="dragLeave()"
+         on-drag-end="dragLeave()"
+         on-drag-enter="dragEnter()"
+         ng-hide="target">
 
-          
+
         <div class="umb-panel-header">
 
             <div class="umb-el-wrap umb-panel-buttons umb-mediapicker-upload">
-	            <div class="form-search">
-	                <i class="icon-search"></i>
-	                <input type="text"
-	                       ng-model="searchTerm"
-	                       class="umb-search-field search-query"
-                          localize="placeholder"
-	                       placeholder="@placeholders_filter">
+                <div class="form-search">
+                    <i class="icon-search"></i>
+                    <input type="text"
+                           ng-model="searchTerm"
+                           class="umb-search-field search-query"
+                           localize="placeholder"
+                           placeholder="@placeholders_filter"
+                           no-dirty-check />
                 </div>
 
                 <div class="upload-button">
@@ -97,7 +98,7 @@
                     <li ng-repeat="item in path">
                         <a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a> /
                     </li>
- 
+
                     <li>
                         <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
                             <i class="icon icon-add small"></i>
@@ -114,28 +115,26 @@
                 </ul>
             </div>
         </div>
-  
+
 
         <div class="umb-panel-body with-footer">
-                       
-            <umb-file-dropzone 
-                ng-if="acceptedMediatypes.length > 0"
-                accepted-mediatypes="acceptedMediatypes"
-                hide-dropzone="{{!activeDrag && images.length > 0}}" 
-                parent-id="{{currentFolder.id}}"
-                files-uploaded="onUploadComplete"
-                files-queued="onFilesQueue">
+
+            <umb-file-dropzone ng-if="acceptedMediatypes.length > 0"
+                               accepted-mediatypes="acceptedMediatypes"
+                               hide-dropzone="{{!activeDrag && images.length > 0}}"
+                               parent-id="{{currentFolder.id}}"
+                               files-uploaded="onUploadComplete"
+                               files-queued="onFilesQueue">
             </umb-file-dropzone>
 
-            <umb-photo-folder 
-                min-height="105"
-                min-width="150"
-                max-height="250"
-                ideal-items-per-row="3"
-                on-click="clickHandler"
-                ng-model="images"
-                images-only="{{onlyImages}}"
-                filter-by="searchTerm" />
+            <umb-photo-folder min-height="105"
+                              min-width="150"
+                              max-height="250"
+                              ideal-items-per-row="3"
+                              on-click="clickHandler"
+                              ng-model="images"
+                              images-only="{{onlyImages}}"
+                              filter-by="searchTerm" />
         </div>
 
 

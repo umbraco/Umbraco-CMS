@@ -29,17 +29,13 @@
     <key alias="republish">重新发布整站</key>
     <key alias="restore" version="7.3.0">恢复</key>
     <key alias="SetPermissionsForThePage">为 %0%设置权限</key>
-    <key alias="chooseWhereToMove">选择移动目的地</key>
-    <key alias="toInTheTreeStructureBelow">到下列的树结构中</key>
     <key alias="rights">权限</key>
     <key alias="rollback">回滚</key>
     <key alias="sendtopublish">提交至发布者</key>
     <key alias="sendToTranslate">发送给翻译</key>
     <key alias="sort">排序</key>
-    <key alias="toPublish">提交至发布者</key>
     <key alias="translate">翻译</key>
     <key alias="update">更新</key>
-    <key alias="defaultValue">默认值</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">禁止访问</key>
@@ -350,7 +346,7 @@
     <key alias="password">输入您的密码</key>
     <key alias="confirmPassword">确认密码</key>
     <key alias="nameentity">命名 %0%...</key>
-    <key alias="entername">输入用户名...</key>
+    <key alias="entername">输入名称...</key>
     <key alias="label">标签...</key>
     <key alias="enterDescription">输入说明...</key>
     <key alias="search">输入搜索关键字...</key>
@@ -642,17 +638,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>默认账户已禁用或无权访问系统！</strong></p><p>点击<b>下一步</b>继续。]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>安装过程中默认用户密码已更改</strong></p><p>点击<strong>下一步</strong>继续。]]></key>
     <key alias="defaultUserPasswordChanged">密码已更改</key>
-    <key alias="defaultUserText">
-      <![CDATA[
-        <p>
-          系统创建了一个默认用户<strong>(‘admin’)</strong>和默认密码<strong>(‘default’)</strong>。
-          现在密码是随机的。
-        </p>
-        <p>
-        该步骤建议您修改默认密码。
-        </p>
-    ]]>
-    </key>
     <key alias="greatStart">作为入门者，从视频教程开始吧！</key>
     <key alias="licenseText">点击下一步 (或在Web.config中自行修改UmbracoConfigurationStatus)，意味着您接受上述许可协议。</key>
     <key alias="None">安装失败。</key>
@@ -1080,7 +1065,7 @@
     <key alias="sortCreationDate">创建日期</key>
     <key alias="sortDone">排序完成。</key>
     <key alias="sortHelp">上下拖拽项目或单击列头进行排序</key>
-    <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…<br/><br/>请不要关闭窗口]]></key>
+    <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="validationFailedHeader">验证</key>
@@ -1245,6 +1230,12 @@
   </area>
 
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">选择内容类别</key>
     <key alias="chooseLayout">选择一项布局</key>
     <key alias="addRows">添加一行</key>
@@ -1495,8 +1486,6 @@
     <key alias="startnode">默认打开内容项</key>
     <key alias="username">用户名</key>
     <key alias="userPermissions">用户权限</key>
-    <key alias="usertype">用户类型</key>
-    <key alias="userTypes">用户类型</key>
     <key alias="writer">撰稿人</key>
     <key alias="translator">翻译人</key>
     <key alias="change">更改</key>

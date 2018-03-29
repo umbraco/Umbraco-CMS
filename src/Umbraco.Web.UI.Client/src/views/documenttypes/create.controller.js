@@ -14,18 +14,21 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         creatingFolder: false,
     };
 
+    var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+    $scope.model.disableTemplates = disableTemplates;
+
     var node = $scope.dialogOptions.currentNode,
         localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
-    $scope.showCreateFolder = function() {
+    $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
     };
 
-    $scope.createContainer = function() {
+    $scope.createContainer = function () {
 
-        if (formHelper.submitForm({scope: $scope, formCtrl: this.createFolderForm, statusMessage: localizeCreateFolder})) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: localizeCreateFolder })) {
 
-            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function(folderId) {
+            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
 
@@ -44,7 +47,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                 var section = appState.getSectionState("currentSection");
 
-            }, function(err) {
+            }, function (err) {
 
                 $scope.error = err;
 
@@ -58,14 +61,17 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         }
     };
 
-    $scope.createDocType = function() {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
-        navigationService.hideMenu();
-    };
+    // Disabling logic for creating document type with template if disableTemplates is set to true
+    if (!disableTemplates) {
+        $scope.createDocType = function () {
+            $location.search('create', null);
+            $location.search('notemplate', null);
+            $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
+            navigationService.hideMenu();
+        };
+    }
 
-    $scope.createComponent = function() {
+    $scope.createComponent = function () {
         $location.search('create', null);
         $location.search('notemplate', null);
         $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");

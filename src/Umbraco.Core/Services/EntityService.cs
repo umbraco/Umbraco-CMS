@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
 using Umbraco.Core.Cache;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
@@ -345,11 +348,77 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly:true))
             {
                 var repository = RepositoryFactory.CreateEntityRepository(uow);
-
+                
                 var query = Query<IUmbracoEntity>.Builder;
                 //if the id is System Root, then just get all
                 if (id != Constants.System.Root)
-                    query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
+                {
+                    //lookup the path so we can use it in the prefix query below
+                    var itemPaths = repository.GetAllPaths(objectTypeId, id).ToArray();
+                    if (itemPaths.Length == 0)
+                    {
+                        totalRecords = 0;
+                        return Enumerable.Empty<IUmbracoEntity>();
+                    }
+                    var itemPath = itemPaths[0].Path;
+
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", itemPath), TextColumnType.NVarchar));
+                }
+
+                IQuery<IUmbracoEntity> filterQuery = null;
+                if (filter.IsNullOrWhiteSpace() == false)
+                {
+                    filterQuery = Query<IUmbracoEntity>.Builder.Where(x => x.Name.Contains(filter));
+                }
+
+                var contents = repository.GetPagedResultsByQuery(query, objectTypeId, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filterQuery);
+                return contents;
+            }
+        }
+        /// <summary>
+        /// Returns a paged collection of descendants.
+        /// </summary>
+        public IEnumerable<IUmbracoEntity> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes umbracoObjectType, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "")
+        {
+            totalRecords = 0;
+
+            var idsA = ids.ToArray();
+            if (idsA.Length == 0)
+                return Enumerable.Empty<IUmbracoEntity>();
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                
+                var query = Query<IUmbracoEntity>.Builder;
+                if (idsA.All(x => x != Constants.System.Root))
+                {
+                    //lookup the paths so we can use it in the prefix query below
+                    var itemPaths = repository.GetAllPaths(objectTypeId, idsA).ToArray();
+                    if (itemPaths.Length == 0)
+                    {
+                        totalRecords = 0;
+                        return Enumerable.Empty<IUmbracoEntity>();
+                    }
+
+                    var clauses = new List<Expression<Func<IUmbracoEntity, bool>>>();
+                    foreach (var id in idsA)
+                    {
+                        //if the id is root then don't add any clauses
+                        if (id != Constants.System.Root)
+                        {
+                            var itemPath = itemPaths.FirstOrDefault(x => x.Id == id);
+                            if (itemPath == null) continue;
+                            var path = itemPath.Path;
+                            var qid = id;
+                            clauses.Add(x => x.Path.SqlStartsWith(string.Format("{0},", path), TextColumnType.NVarchar) || x.Path.SqlEndsWith(string.Format(",{0}", qid), TextColumnType.NVarchar));
+                        }                        
+                    }
+                    query.WhereAny(clauses);
+                }
 
                 IQuery<IUmbracoEntity> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
@@ -399,7 +468,7 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
-
+        
         /// <summary>
         /// Gets a collection of descendents by the parents Id
         /// </summary>
@@ -523,12 +592,48 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params int[] ids)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                return repository.GetAllPaths(objectTypeId, ids);
+            }
+        }
+
+        public virtual IEnumerable<EntityPath> GetAllPaths(UmbracoObjectTypes umbracoObjectType, params Guid[] keys)
+        {
+            var entityType = GetEntityType(umbracoObjectType);
+            var typeFullName = entityType.FullName;
+            Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
+
+            var objectTypeId = umbracoObjectType.GetGuid();
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateEntityRepository(uow);
+                return repository.GetAllPaths(objectTypeId, keys);
+            }
+        }
+        
         /// <summary>
-        /// Gets a collection of <see cref="IUmbracoEntity"/>
+        /// Gets a collection of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" />
         /// </summary>
         /// <param name="objectTypeId">Guid id of the UmbracoObjectType</param>
         /// <param name="ids"></param>
-        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
+        /// <returns>An enumerable list of <see cref="T:Umbraco.Core.Models.EntityBase.IUmbracoEntity" /> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId, params int[] ids)
         {
             var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
@@ -645,6 +750,35 @@ namespace Umbraco.Core.Services
                 var exists = repository.Exists(id);
                 return exists;
             }
+        }
+
+        /// <inheritdoc />
+        public int ReserveId(Guid key)
+        {
+            NodeDto node;
+            using (var scope = UowProvider.ScopeProvider.CreateScope())
+            {
+                var sql = new Sql("SELECT * FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", key, Constants.ObjectTypes.IdReservationGuid);
+                node = scope.Database.SingleOrDefault<NodeDto>(sql);
+                if (node != null) throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
+                node = new NodeDto
+                {
+                    UniqueId = key,
+                    Text = "RESERVED.ID",
+                    NodeObjectType = Constants.ObjectTypes.IdReservationGuid,
+
+                    CreateDate = DateTime.Now,
+                    UserId = 0,
+                    ParentId = -1,
+                    Level = 1,
+                    Path = "-1",
+                    SortOrder = 0,
+                    Trashed = false
+                };
+                scope.Database.Insert(node);
+                scope.Complete();
+            }
+            return node.NodeId;
         }
     }
 }

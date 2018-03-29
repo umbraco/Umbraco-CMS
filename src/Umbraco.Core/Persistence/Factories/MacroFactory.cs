@@ -5,6 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
+    
     internal class MacroFactory 
     {
         public IMacro BuildEntity(MacroDto dto)

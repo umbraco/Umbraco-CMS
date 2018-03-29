@@ -53,22 +53,21 @@
 	border-color: @turquoise-d1;
 }
 
-.umb-tree li.root > div {
-	padding: 0;
+.umb-tree li.root > div:first-child {
+  padding: 0;
 }
 
-.umb-tree li.root > div h5 {
-	margin: 0;
-	width: 100%;
-
-	display: flex;
-	align-items: center;
+.umb-tree li.root > div h5, .umb-tree li.root > div h6 {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.umb-tree li.root > div h5 > a, .umb-tree-header {
-	display: flex;
-	padding: 20px 0 20px 20px;
-	box-sizing: border-box;
+.umb-tree li.root > div:first-child h5 > a, .umb-tree-header {
+  display: flex;
+  padding: 20px 0 20px 20px;
+  box-sizing: border-box;
 }
 
 .umb-tree * {
@@ -96,14 +95,22 @@
 	text-decoration: none
 }
 
-.umb-tree div {
+/*.umb-tree div.tree-node {
 	padding: 5px 0 5px 0;
 	position: relative;
 	overflow: hidden;
 	display: flex;
 	flex-wrap: nowrap;
 	align-items: center;
+}*/
 
+.umb-tree div {
+  padding: 5px 0 5px 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .umb-tree a.noSpr {
@@ -112,6 +119,7 @@
 
 .umb-tree div > a.umb-options {
 	visibility: hidden;
+    flex: 1 0 auto;
 }
 .umb-tree div:hover > a.umb-options {
 	visibility: visible;
@@ -149,8 +157,8 @@
 
 .umb-tree li > div a:not(.umb-options) {
 	padding: 6px 0;
-	width: 100%;
 	display: flex;
+    flex: 1 1 100%;
 }
 
 .umb-tree li > div:hover a:not(.umb-options) {
@@ -192,6 +200,23 @@
     /*color:@turquoise;*/
 }
 
+.umb-tree div.umb-search-group {
+  position: inherit;
+  display: inherit;  
+}
+
+.umb-tree div.umb-search-group:hover {
+  background: inherit;
+}
+.umb-tree div.umb-search-group h6 {
+  /*color: @gray-5;*/
+  padding: 10px 0 10px 20px;
+  font-weight: inherit;
+  background: @gray-10;
+  font-size: 14px;
+  font-weight: bold;
+}
+
 .umb-tree .umb-search-group-item {
 	padding-left: 20px;
 }
@@ -200,6 +225,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	flex-direction: column;
+	font-weight: normal !important;
 }
 
 .icon-check:before {
@@ -214,6 +240,7 @@
 .umb-tree .umb-tree-node-checked i:before {
 	/*check box*/
     content: "\e165" !important;
+	font-family: inherit;
 }
 
 a.umb-options {
@@ -350,6 +377,13 @@ div.locked:before{
 	padding-left: 7px;
 	padding-top: 7px;
 	bottom: 0;
+}
+
+.umb-tree li div.no-access .umb-tree-icon,
+.umb-tree li div.no-access .root-link,
+.umb-tree li div.no-access .umb-tree-item__label {
+	color: @gray-7;
+	cursor: not-allowed;
 }
 
 // Tree context menu

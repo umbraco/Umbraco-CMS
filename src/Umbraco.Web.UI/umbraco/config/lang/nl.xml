@@ -28,21 +28,17 @@
     <key alias="refreshNode">Nodes opnieuw inladen</key>
     <key alias="republish">Herpubliceer de site</key>
     <key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
-    <key alias="chooseWhereToMove">Waarheen verplaatsen/</key>
-    <key alias="toInTheTreeStructureBelow">Naar de onderstaande boomstructuur</key>
     <key alias="restore" version="7.3.0">Herstellen</key>
     <key alias="rights">Rechten</key>
     <key alias="rollback">Vorige versies</key>
     <key alias="sendtopublish">Klaar voor publicatie</key>
     <key alias="sendToTranslate">Klaar voor vertalen</key>
     <key alias="sort">Sorteren</key>
-    <key alias="toPublish">Klaar voor publicatie</key>
     <key alias="translate">Vertalen</key>
     <key alias="update">Bijwerken</key>
-    <key alias="defaultValue">Standaardwaarde</key>
   </area>
   <area alias="assignDomain">
-    <key alias="permissionDenied">Permission denied.</key>
+    <key alias="permissionDenied">Toegang geweigerd.</key>
     <key alias="addNew">Nieuw domein toevoegen</key>
     <key alias="remove">verwijderen</key>
     <key alias="invalidNode">Ongeldige node.</key>
@@ -456,7 +452,7 @@
     <key alias="email">Email</key>
     <key alias="error">Fout</key>
     <key alias="findDocument">Vind</key>
-    <key alias="height">Hogte</key>
+    <key alias="height">Hoogte</key>
     <key alias="help">Help</key>
     <key alias="icon">Icoon</key>
     <key alias="import">Import</key>
@@ -587,7 +583,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <b>Volgende</b> om verder te gaan.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
     <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco maakt een default gebruiker aan met login <strong>('admin')</strong> and wachtwoord <strong>('default')</strong>. Het is <strong>belangrijk</strong> dat dit wachtwoord wordt veranderd in iets unieks. </p> <p> Deze stap controleert het password van de default gebruiker en adviseert of het veranderd dient te worden. </p>]]></key>
     <key alias="greatStart">Neem een jumpstart en bekijk onze introductie videos</key>
     <key alias="licenseText"><![CDATA[Door op de 'Volgende' knop te klikken (of door de UmbracoConfigurationStatus in web.config te veranderen), accepteer je de licentie voor deze software zoals in het onderstaande kader is te lezen. Deze Umbraco distributie bevat twee verschillende licensies: de open-source MIT licensie voor het framework en de Umbraco freeware licensie die de gebruikersinterface behelst.
 
@@ -954,7 +949,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sorteren gereed.</key>
     <key alias="sortHelp">Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolom-header om alle pagina's daarop te sorteren.</key>
-    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.<br/> <br/> Sluit dit venster niet tijdens het sorteren]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.]]></key>
   </area>
   <area alias="speechBubbles">
 	<key alias="validationFailedHeader">Validatie</key>
@@ -1044,6 +1039,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="template">Sjabloon</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Item toevoegen</key>
     <key alias="chooseLayout">Kies de indeling</key>
     <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>
@@ -1082,7 +1083,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 
     <key alias="allowAllEditors">Alle editors toelaten</key>
     <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
-	<key alias="setAsDefault">Instellen als standaard</key>
+    <key alias="maxItems">Maximale artikelen</key>
+    <key alias="maxItemsDescription">Laat dit leeg of is ingesteld op -1 voor onbeperkt</key>
+	  <key alias="setAsDefault">Instellen als standaard</key>
     <key alias="chooseExtra">Kies extra</key>
     <key alias="chooseDefault">Kies standaard</key>
     <key alias="areAdded">zijn toegevoegd</key>
@@ -1306,8 +1309,6 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="startnode">Startnode in Content</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="userPermissions">Gebruikersrechten</key>
-    <key alias="usertype">Gebruikerstype</key>
-    <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
 	<key alias="translator">Vertaler</key>
     <key alias="change">Wijzig</key>
@@ -1378,10 +1379,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="httpsCheckEnableHttpsDescription">Zet in de appSettings van de web.config de umbracoSSL instelling op 'true'.</key>
     <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'umbracoUseSSL' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
 
-    <key alias="rectifyButton">Fix</key>
-    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
-    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+    <key alias="rectifyButton">Herstellen</key>
+    <key alias="cannotRectifyShouldNotEqual">Kan een controle met vergelijkingstype 'ShouldNotEqual' niet herstellen.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Kan een controle met vergelijkingstype 'ShouldNotEqual' en gedefinieerde waarde niet herstellen.</key>
+    <key alias="valueToRectifyNotProvided">Waarde om te herstellen niet gedefinieerd.</key>
 
     <key alias="compilationDebugCheckSuccessMessage">Debug compiliate mode staat uit.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compiliate mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>

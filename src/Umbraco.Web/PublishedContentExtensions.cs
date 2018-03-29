@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
@@ -506,16 +507,18 @@ namespace Umbraco.Web
         #endregion
 
         #region Dynamic Linq Extensions
-
-        // todo - we should keep this file clean and remove dynamic linq stuff from it
-
+        
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IQueryable<IPublishedContent> OrderBy(this IEnumerable<IPublishedContent> source, string predicate)
 		{
 			var dList = new DynamicPublishedContentList(source);
 			return dList.OrderBy<DynamicPublishedContent>(predicate);
 		}
 
-		public static IQueryable<IPublishedContent> Where(this IEnumerable<IPublishedContent> list, string predicate)
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IQueryable<IPublishedContent> Where(this IEnumerable<IPublishedContent> list, string predicate)
 		{
             // wrap in DynamicPublishedContentList so that the ContentSet is correct
             // though that code is somewhat ugly.
@@ -526,30 +529,40 @@ namespace Umbraco.Web
 		    return dlist.AsQueryable<IPublishedContent>();
 		}
 
-		public static IEnumerable<IGrouping<object, IPublishedContent>> GroupBy(this IEnumerable<IPublishedContent> list, string predicate)
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IEnumerable<IGrouping<object, IPublishedContent>> GroupBy(this IEnumerable<IPublishedContent> list, string predicate)
 		{
 			var dList = new DynamicPublishedContentList(list);
 			return dList.GroupBy(predicate);
 		}
 
-		public static IQueryable Select(this IEnumerable<IPublishedContent> list, string predicate, params object[] values)
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IQueryable Select(this IEnumerable<IPublishedContent> list, string predicate, params object[] values)
 		{
 			var dList = new DynamicPublishedContentList(list);
 			return dList.Select(predicate);
 		}
 
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static HtmlString Where(this IPublishedContent content, string predicate, string valueIfTrue)
         {
             if (content == null) throw new ArgumentNullException("content");
             return content.Where(predicate, valueIfTrue, string.Empty);
         }
 
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static HtmlString Where(this IPublishedContent content, string predicate, string valueIfTrue, string valueIfFalse)
         {
             if (content == null) throw new ArgumentNullException("content");
             return new HtmlString(content.Where(predicate) ? valueIfTrue : valueIfFalse);
         }
 
+        [Obsolete("This method uses dynamics which will be removed in future versions, use strongly typed syntax instead: Where(x => x.IsVisible())")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static bool Where(this IPublishedContent content, string predicate)
         {
             if (content == null) throw new ArgumentNullException("content");
@@ -562,16 +575,16 @@ namespace Umbraco.Web
 
         #region AsDynamic
 
-        // it is ok to have dynamic here
-
-        // content should NOT be null
-		public static dynamic AsDynamic(this IPublishedContent content)
+        [Obsolete("The use of dynamics has been deprecated, use strongly typed syntax instead, dynamics will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static dynamic AsDynamic(this IPublishedContent content)
 		{
 			if (content == null) throw new ArgumentNullException("content");
 			return new DynamicPublishedContent(content);
 		}
 
-        // content CAN be null
+        [Obsolete("The use of dynamics has been deprecated, use strongly typed syntax instead, dynamics will be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         internal static DynamicPublishedContent AsDynamicOrNull(this IPublishedContent content)
 		{
 		    return content == null ? null : new DynamicPublishedContent(content);

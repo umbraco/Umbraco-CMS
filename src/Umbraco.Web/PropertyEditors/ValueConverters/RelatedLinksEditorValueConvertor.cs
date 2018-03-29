@@ -110,6 +110,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     relatedLink.Id = contentId;
                     relatedLink = CreateLink(relatedLink);
+                    relatedLink.Content = UmbracoContext.Current.ContentCache.GetById(contentId);
                 }
                 else
                 {

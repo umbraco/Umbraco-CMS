@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Globalization;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -304,7 +305,7 @@ namespace umbraco.presentation.templateControls
         protected virtual bool FieldEditableWithUserPermissions()
         {
             BusinessLogic.User u = helper.GetCurrentUmbracoUser();
-            return u != null && u.GetPermissions(PageElements["path"].ToString()).Contains(ActionUpdate.Instance.Letter.ToString());
+            return u != null && u.GetPermissions(PageElements["path"].ToString()).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture));
         } 
 
         #endregion

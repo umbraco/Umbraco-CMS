@@ -12,6 +12,7 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
 {
+    //TODO: In v8 we need to change this to use an int? nullable TKey instead, see notes against overridden TwoFactorSignInAsync
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
     {
         private readonly ILogger _logger;
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Security
         public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
             var result = await PasswordSignInAsyncImpl(userName, password, isPersistent, shouldLockout);
-            
+
             switch (result)
             {
                 case SignInStatus.Success:
@@ -101,31 +102,57 @@ namespace Umbraco.Core.Security
             {
                 return SignInStatus.Failure;
             }
+
             var user = await UserManager.FindByNameAsync(userName);
-            if (user == null)
-            {
-                return SignInStatus.Failure;
-            }
-            if (await UserManager.IsLockedOutAsync(user.Id))
-            {
-                return SignInStatus.LockedOut;
-            }
+            
+            //if the user is null, create an empty one which can be used for auto-linking
+            if (user == null)            
+                user = BackOfficeIdentityUser.CreateNew(userName, null, GlobalSettings.DefaultUILanguage);            
+            
+            //check the password for the user, this will allow a developer to auto-link 
+            //an account if they have specified an IBackOfficeUserPasswordChecker
             if (await UserManager.CheckPasswordAsync(user, password))
             {
+                //the underlying call to this will query the user by Id which IS cached!
+                if (await UserManager.IsLockedOutAsync(user.Id))
+                {
+                    return SignInStatus.LockedOut;
+                }
+
                 await UserManager.ResetAccessFailedCountAsync(user.Id);
                 return await SignInOrTwoFactor(user, isPersistent);
             }
-            if (shouldLockout)
+
+            var requestContext = _request.Context;
+
+            if (user.HasIdentity && shouldLockout)
             {
                 // If lockout is requested, increment access failed count which might lock out the user
                 await UserManager.AccessFailedAsync(user.Id);
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
+                    //at this point we've just locked the user out after too many failed login attempts
+                    
+                    if (requestContext != null)
+                    {
+                        var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                        if (backofficeUserManager != null)
+                            backofficeUserManager.RaiseAccountLockedEvent(user.Id);
+                    }
+
                     return SignInStatus.LockedOut;
                 }
             }
+            
+            if (requestContext != null)
+            {
+                var backofficeUserManager = requestContext.GetBackOfficeUserManager();
+                if (backofficeUserManager != null)
+                    backofficeUserManager.RaiseInvalidLoginAttemptEvent(userName);
+            }
+
             return SignInStatus.Failure;
-        }
+        }        
 
         /// <summary>
         /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
@@ -176,7 +203,7 @@ namespace Umbraco.Core.Security
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                }, userIdentity, rememberBrowserIdentity);                
+                }, userIdentity, rememberBrowserIdentity);
             }
             else
             {
@@ -191,8 +218,13 @@ namespace Umbraco.Core.Security
 
             //track the last login date
             user.LastLoginDateUtc = DateTime.UtcNow;
-            user.AccessFailedCount = 0;
+            if (user.AccessFailedCount > 0)
+                //we have successfully logged in, reset the AccessFailedCount
+                user.AccessFailedCount = 0;
             await UserManager.UpdateAsync(user);
+
+            //set the current request's principal to the identity just signed in!
+            _request.User = new ClaimsPrincipal(userIdentity);
 
             _logger.WriteCore(TraceEventType.Information, 0,
                 string.Format(
@@ -230,6 +262,68 @@ namespace Umbraco.Core.Security
                 return result.Identity.GetUserName();
             }
             return null;
+        }
+
+        /// <summary>
+        /// Two factor verification step
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="code"></param>
+        /// <param name="isPersistent"></param>
+        /// <param name="rememberBrowser"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
+        /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
+        /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
+        /// all of this code to check for -1 instead.
+        /// </remarks>
+        public override async Task<SignInStatus> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
+        {
+            var userId = await GetVerifiedUserIdAsync();
+            if (userId == -1)
+            {
+                return SignInStatus.Failure;
+            }
+            var user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return SignInStatus.Failure;
+            }
+            if (await UserManager.IsLockedOutAsync(user.Id))
+            {
+                return SignInStatus.LockedOut;
+            }
+            if (await UserManager.VerifyTwoFactorTokenAsync(user.Id, provider, code))
+            {
+                // When token is verified correctly, clear the access failed count used for lockout
+                await UserManager.ResetAccessFailedCountAsync(user.Id);
+                await SignInAsync(user, isPersistent, rememberBrowser);
+                return SignInStatus.Success;
+            }
+            // If the token is incorrect, record the failure which also may cause the user to be locked out
+            await UserManager.AccessFailedAsync(user.Id);
+            return SignInStatus.Failure;
+        }
+
+        /// <summary>Send a two factor code to a user</summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
+        /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
+        /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
+        /// all of this code to check for -1 instead.
+        /// </remarks>
+        public override async Task<bool> SendTwoFactorCodeAsync(string provider)
+        {
+            var userId = await GetVerifiedUserIdAsync();
+            if (userId == -1)
+                return false;
+
+            var token = await UserManager.GenerateTwoFactorTokenAsync(userId, provider);
+            var identityResult = await UserManager.NotifyTwoFactorTokenAsync(userId, provider, token);
+            return identityResult.Succeeded;
         }
     }
 }

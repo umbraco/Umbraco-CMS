@@ -16,6 +16,7 @@ angular.module("umbraco")
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = localStorageService.get("umbLastOpenedMediaNodeId");
+            $scope.lockedFolder = true;
 
             var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
             var allowedUploadFiles = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
@@ -53,6 +54,46 @@ angular.module("umbraco")
             $scope.target = undefined;
             if (dialogOptions.currentTarget) {
                 $scope.target = dialogOptions.currentTarget;
+            }
+
+            function onInit() {
+                if ($scope.startNodeId !== -1) {
+                    entityResource.getById($scope.startNodeId, "media")
+                        .then(function (ent) {
+                            $scope.startNodeId = ent.id;
+                            run();
+                        });
+                } else {
+                    run();
+                }
+            }
+
+            function run() {
+                //default root item
+                if (!$scope.target) {
+                    if ($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
+                        entityResource.getById($scope.lastOpenedNode, "media")
+                            .then(ensureWithinStartNode, gotoStartNode);
+                    } else {
+                        gotoStartNode();
+                    }
+                } else {
+                    //if a target is specified, go look it up - generally this target will just contain ids not the actual full
+                    //media object so we need to look it up
+                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
+                    var altText = $scope.target.altText;
+                    mediaResource.getById(id)
+                        .then(function (node) {
+                            $scope.target = node;
+                            if (ensureWithinStartNode(node)) {
+                                selectImage(node);
+                                $scope.target.url = mediaHelper.resolveFile(node);
+                                $scope.target.altText = altText;
+                                $scope.openDetailsDialog();
+                            }
+                        },
+                        gotoStartNode);
+                }
             }
 
             $scope.upload = function(v) {
@@ -106,7 +147,7 @@ angular.module("umbraco")
 
                 if (folder.id > 0) {
                     entityResource.getAncestors(folder.id, "media")
-                        .then(function(anc) {
+                        .then(function(anc) {              
                             $scope.path = _.filter(anc,
                                 function(f) {
                                     return f.path.indexOf($scope.startNodeId) !== -1;
@@ -120,6 +161,8 @@ angular.module("umbraco")
                 } else {
                     $scope.path = [];
                 }
+
+                $scope.lockedFolder = folder.id === -1 && $scope.model.startNodeIsVirtual;
 
                 $scope.currentFolder = folder;
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
@@ -213,32 +256,6 @@ angular.module("umbraco")
 
             function gotoStartNode(err) {
                 $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
-            }
-
-            //default root item
-            if (!$scope.target) {
-                if ($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
-                    entityResource.getById($scope.lastOpenedNode, "media")
-                        .then(ensureWithinStartNode, gotoStartNode);
-                } else {
-                    gotoStartNode();
-                }
-            } else {
-                //if a target is specified, go look it up - generally this target will just contain ids not the actual full
-                //media object so we need to look it up
-                var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
-                var altText = $scope.target.altText;
-                mediaResource.getById(id)
-                    .then(function(node) {
-                            $scope.target = node;
-                            if (ensureWithinStartNode(node)) {
-                                selectImage(node);
-                                $scope.target.url = mediaHelper.resolveFile(node);
-                                $scope.target.altText = altText;
-                                $scope.openDetailsDialog();
-                            }
-                        },
-                        gotoStartNode);
             }
 
             $scope.openDetailsDialog = function() {
@@ -365,4 +382,7 @@ angular.module("umbraco")
                     }
                 }
             }
+
+            onInit();
+
         });

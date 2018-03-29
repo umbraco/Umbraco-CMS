@@ -1,10 +1,17 @@
-﻿using Umbraco.Core;
+﻿using umbraco;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [Tree(Constants.Applications.Settings, "scripts", null, sortOrder: 4)]
+    [UmbracoTreeAuthorize(Constants.Trees.Scripts)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Scripts, null, sortOrder: 4)]
+    [LegacyBaseTree(typeof(loadScripts))]
+    [PluginController("UmbracoTrees")]
+    [CoreTree]
     public class ScriptTreeController : FileSystemTreeController
     {
         protected override IFileSystem2 FileSystem

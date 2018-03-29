@@ -14,6 +14,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Cache;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
 using Umbraco.Core.Services;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Security
         [EditorBrowsable(EditorBrowsableState.Never)]
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
             : this(applicationContext, httpContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(applicationContext.Services.MemberService))
-        {            
+        {
         }
 
         [Obsolete("Use the constructor specifying an UmbracoContext")]
@@ -53,11 +54,11 @@ namespace Umbraco.Web.Security
             _httpContext = httpContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-        }   
+        }
 
         public MembershipHelper(UmbracoContext umbracoContext)
-            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider: new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
-        {            
+            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(umbracoContext.Application.Services.MemberService))
+        {
         }
 
         public MembershipHelper(UmbracoContext umbracoContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
@@ -116,11 +117,11 @@ namespace Umbraco.Web.Security
         /// </remarks>
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
-            return _umbracoContext.PublishedContentRequest == null 
-                ? _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser) 
+            return _umbracoContext.PublishedContentRequest == null
+                ? _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser)
                 : _applicationContext.Services.PublicAccessService.HasAccess(path, CurrentUserName, _umbracoContext.PublishedContentRequest.GetRolesForLogin);
         }
-        
+
         /// <summary>
         /// Returns true if the current membership provider is the Umbraco built-in one.
         /// </summary>
@@ -252,7 +253,7 @@ namespace Umbraco.Web.Security
             {
                 //Set member online
                 provider.GetUser(model.Username, true);
-    
+
                 //Log them in
                 FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
             }
@@ -279,7 +280,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);                
+                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
                 return false;
             }
             //Log them in
@@ -388,7 +389,7 @@ namespace Umbraco.Web.Security
             var result = GetCurrentMember();
             return result == null ? -1 : result.Id;
         }
-        
+
         #endregion
 
         #region Model Creation methods for member data editing on the front-end
@@ -407,7 +408,7 @@ namespace Umbraco.Web.Security
             var provider = _membershipProvider;
 
             if (provider.IsUmbracoMembershipProvider())
-            {                
+            {
                 var membershipUser = provider.GetCurrentUserOnline();
                 var member = GetCurrentPersistedMember();
                 //this shouldn't happen but will if the member is deleted in the back office while the member is trying
@@ -495,7 +496,7 @@ namespace Umbraco.Web.Security
                     if (propValue != null && propValue.Value != null)
                     {
                         value = propValue.Value.ToString();
-                    }    
+                    }
                 }
 
                 var viewProperty = new UmbracoProperty
@@ -635,7 +636,7 @@ namespace Umbraco.Web.Security
 
             // Allow by default
             var allowAction = true;
-            
+
             if (IsLoggedIn() == false)
             {
                 // If not logged on, not allowed
@@ -670,7 +671,7 @@ namespace Umbraco.Web.Security
                     var member = provider.GetCurrentUser();
                     username = member.UserName;
                 }
-                
+
                 // If groups defined, check member is of one of those groups
                 var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
                 if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
@@ -680,7 +681,7 @@ namespace Umbraco.Web.Security
                     allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
                 }
 
-                
+
             }
 
             return allowAction;
@@ -700,6 +701,7 @@ namespace Umbraco.Web.Security
             {
                 throw new InvalidOperationException("Could not find provider with name " + membershipProviderName);
             }
+            
             return ChangePassword(username, passwordModel, provider);
         }
 
@@ -712,130 +714,10 @@ namespace Umbraco.Web.Security
         /// <returns></returns>        
         public virtual Attempt<PasswordChangedModel> ChangePassword(string username, ChangingPasswordModel passwordModel, MembershipProvider membershipProvider)
         {
-            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!        
-
-            if (passwordModel == null) throw new ArgumentNullException("passwordModel");
-            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-
-            //Are we resetting the password??
-            if (passwordModel.Reset.HasValue && passwordModel.Reset.Value)
-            {
-                var canReset = membershipProvider.CanResetPassword(_applicationContext.Services.UserService);
-                if (canReset == false)
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }) });
-                }
-                if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset requires a password answer", new[] { "resetPassword" }) });
-                }
-                //ok, we should be able to reset it
-                try
-                {
-                    var newPass = membershipProvider.ResetPassword(
-                        username,
-                        membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
-
-                    //return the generated pword
-                    return Attempt.Succeed(new PasswordChangedModel { ResetPassword = newPass });
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.WarnWithException<WebSecurity>("Could not reset member password", ex);
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] { "resetPassword" }) });
-                }
-            }
-
-            //we're not resetting it so we need to try to change it.
-
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
-            {
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
-            }
-
-            //This is an edge case and is only necessary for backwards compatibility:
-            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
-            if (umbracoBaseProvider != null && umbracoBaseProvider.AllowManuallyChangingPassword)
-            {
-                //this provider allows manually changing the password without the old password, so we can just do it
-                try
-                {
-                    var result = umbracoBaseProvider.ChangePassword(username, "", passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-                }
-            }
-
-            //The provider does not support manually chaning the password but no old password supplied - need to return an error
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
-            {
-                //if password retrieval is not enabled but there is no old password we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
-            }
-
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
-            {
-                //if an old password is suplied try to change it
-
-                try
-                {
-                    var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-                }
-            }
-
-            if (membershipProvider.EnablePasswordRetrieval == false)
-            {
-                //we cannot continue if we cannot get the current password
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
-            }
-            if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
-            {
-                //if the question answer is required but there isn't one, we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the password answer", new[] { "value" }) });
-            }
-
-            //lets try to get the old one so we can change it
-            try
-            {
-                var oldPassword = membershipProvider.GetPassword(
-                    username,
-                    membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
-
-                try
-                {
-                    var result = membershipProvider.ChangePassword(username, oldPassword, passwordModel.NewPassword);
-                    return result == false
-                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password", new[] { "value" }) })
-                        : Attempt.Succeed(new PasswordChangedModel());
-                }
-                catch (Exception ex1)
-                {
-                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex1);
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });
-                }
-
-            }
-            catch (Exception ex2)
-            {
-                LogHelper.WarnWithException<WebSecurity>("Could not retrieve member password", ex2);
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
-            }
+            var passwordChanger = new PasswordChanger(_applicationContext.ProfilingLogger.Logger, _applicationContext.Services.UserService, UmbracoContext.Current.HttpContext);
+            return passwordChanger.ChangePasswordWithMembershipProvider(username, passwordModel, membershipProvider);
         }
-        
+
         /// <summary>
         /// Updates a membership user with all of it's writable properties
         /// </summary>
@@ -894,7 +776,7 @@ namespace Umbraco.Web.Security
 
             return Attempt<MembershipUser>.Fail(member);
         }
-        
+
         /// <summary>
         /// Returns the currently logged in IMember object - this should never be exposed to the front-end since it's returning a business logic entity!
         /// </summary>
@@ -918,7 +800,7 @@ namespace Umbraco.Web.Security
 
         private string GetCacheKey(string key, params object[] additional)
         {
-            var sb = new StringBuilder(string.Format("{0}-{1}", typeof (MembershipHelper).Name, key));
+            var sb = new StringBuilder(string.Format("{0}-{1}", typeof(MembershipHelper).Name, key));
             foreach (var s in additional)
             {
                 sb.Append("-");

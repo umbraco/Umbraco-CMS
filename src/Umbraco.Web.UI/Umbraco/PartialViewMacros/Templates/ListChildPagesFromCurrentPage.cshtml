@@ -1,3 +1,4 @@
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -8,9 +9,9 @@
     - It then generates links so the visitor can go to each page
 *@
 
-@{ var selection = Model.Content.Children.Where(x => x.IsVisible()); }
+@{ var selection = Model.Content.Children.Where(x => x.IsVisible()).ToArray(); }
 
-@if (selection.Any())
+@if (selection.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

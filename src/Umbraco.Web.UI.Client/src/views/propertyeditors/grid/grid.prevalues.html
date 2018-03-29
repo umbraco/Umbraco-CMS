@@ -65,7 +65,9 @@
                                     ng-repeat="area in layout.areas | filter:zeroWidthFilter"
                                     ng-style="{width: percentage(area.grid) + '%', 'max-width': '100%'}">
 
-                                    <div class="preview-cell"></div>
+                                    <div class="preview-cell">
+                                        <p style="font-size: 6px; line-height: 8px; text-align: center" ng-show="area.maxItems > 0">{{area.maxItems}}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

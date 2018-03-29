@@ -537,8 +537,16 @@ namespace Umbraco.Web
 
         public IPublishedContent TypedMember(object id)
         {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
+            int intId;
+            if (ConvertIdObjectToInt(id, out intId))
+                return MembershipHelper.GetById(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return TypedMember(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return TypedMember(udiId);
+            return null;
         }
 
         public IPublishedContent TypedMember(int id)
@@ -1253,22 +1261,51 @@ namespace Umbraco.Web
             return ContentQuery.TypedSearch(term, useWildCards, searchProvider);
 		}
 
-		/// <summary>
-		/// Searhes content
+        /// <summary>
+		/// Searches content
 		/// </summary>
-		/// <param name="criteria"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+		/// <param name="term"></param>
+		/// <param name="useWildCards"></param>
 		/// <param name="searchProvider"></param>
 		/// <returns></returns>
-		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return ContentQuery.TypedSearch(skip, take, out totalRecords, term, useWildCards, searchProvider);
+        }
+
+        /// <summary>
+        /// Searhes content
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="criteria"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-            return ContentQuery.TypedSearch(criteria, searchProvider);
+            return ContentQuery.TypedSearch(skip, take, out totalRecords, criteria, searchProvider);
 		}
 
-		#endregion
+        /// <summary>
+        /// Searhes content
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            return ContentQuery.TypedSearch(criteria, searchProvider);
+        }
 
-		#region Xml
+        #endregion
 
-		public dynamic ToDynamicXml(string xml)
+        #region Xml
+
+        public dynamic ToDynamicXml(string xml)
 		{
 			if (string.IsNullOrWhiteSpace(xml)) return null;
 			var xElement = XElement.Parse(xml);
@@ -1440,17 +1477,57 @@ namespace Umbraco.Web
 		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
             return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
-		}
+        }
+        #region Truncate by Words
 
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		#endregion
+            return Truncate(html, length, true, false);
+        }
 
-		#region If
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		/// <summary>
-		/// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
-		/// </summary>
-		public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
+            return Truncate(html, length, addElipsis, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, true, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, addElipsis, false);
+        }
+        #endregion
+        #endregion
+
+        #region If
+
+        /// <summary>
+        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// </summary>
+        public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
 		{
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}

@@ -19,7 +19,6 @@ angular.module("umbraco")
         
         userService.getCurrentUser().then(function(user){
         	
-        	rq.usertype = user.userType;
         	rq.lang = user.locale;
 
     	    if($routeParams.url){

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web;
 using System.Reflection;
 using Umbraco.Core;
@@ -127,30 +128,20 @@ namespace umbraco.BusinessLogic.Actions
         /// </summary>
         /// <param name="actions"></param>
         /// <returns>returns a list of actions that have an associated letter found in the action string list</returns>
+        [Obsolete("Use ActionsResolver.Current.FromActionSymbols instead")]
         public static List<IAction> FromString(string actions)
         {
-            List<IAction> list = new List<IAction>();
-            foreach (char c in actions.ToCharArray())
-            {
-                IAction action = ActionsResolver.Current.Actions.ToList().Find(
-                    delegate(IAction a)
-                    {
-                        return a.Letter == c;
-                    }
-                );
-                if (action != null)
-                    list.Add(action);
-            }
-            return list;
+            return ActionsResolver.Current.FromActionSymbols(actions.ToCharArray().Select(x => x.ToString())).ToList();            
         }
 
         /// <summary>
         /// Returns the string representation of the actions that make up the actions collection
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Use ActionsResolver.Current.ToActionSymbols instead")]
         public static string ToString(List<IAction> actions)
         {
-            string[] strMenu = Array.ConvertAll<IAction, string>(actions.ToArray(), delegate(IAction a) { return (a.Letter.ToString()); });
+            string[] strMenu = Array.ConvertAll(actions.ToArray(), a => (a.Letter.ToString(CultureInfo.InvariantCulture)));
             return string.Join("", strMenu);
         }
 
@@ -160,12 +151,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<IAction> GetPermissionAssignable()
         {
-            return ActionsResolver.Current.Actions.ToList().FindAll(
-                delegate(IAction a)
-                {
-                    return (a.CanBePermissionAssigned);
-                }
-            );
+            return ActionsResolver.Current.Actions.ToList().FindAll(a => (a.CanBePermissionAssigned));
         }
 
         /// <summary>

@@ -15,8 +15,6 @@
     <key alias="disable">נטרל</key>
     <key alias="emptyTrashcan">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
-    <key alias="exportDocumentTypeAsCode">ייצא אל.NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">ייצא אל .NET</key>
     <key alias="importDocumentType">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>
     <key alias="liveEdit">ערוך במצב "קנבס"</key>
@@ -32,14 +30,8 @@
     <key alias="sendtopublish">שלח לפירסום</key>
     <key alias="sendToTranslate">שלח לתירגום</key>
     <key alias="sort">מיין</key>
-    <key alias="toPublish">שלח לפירסום</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
-    <key alias="DeleteCMSImportAction">מחק</key>
-    <key alias="ExecuteCMSImportWizardAction">בצע</key>
-    <key alias="ScheduleCMSImportWizardAction">תזמן</key>
-    <key alias="StartCMSImportWizardAction">ייבא נתונים</key>
-    <key alias="StartCMSImportChildDefinitionAction">צור הגדרות ילדים</key>
     <key alias="LastRunInfoAction">יומן משימות מתוזמנות</key>
   </area>
   <area alias="assignDomain">
@@ -410,15 +402,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">הסיסמה שונתה!</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
-          changed to something unique.
-        </p>
-        <p>
-          This step will check the default user's password and suggest if it needs to be changed.
-        </p>
-      ]]></key>
     <key alias="greatStart">התחל מכאן, צפה בסרטוני ההדרכה עבור אומברקו</key>
     <key alias="licenseText">על ידי לחיצה על 'הבא', הנך מאשר את פרטי התקנון כפי שמפורט בתיבת הטקטס למטה. שים לב, הפצה זו של אומברקו כוללת שני גירסאות שונות של רשיון,קוד פתוח ברשיון MIT עבור ה- framework ורשיון Umbraco freeware המכסה את ה- UI.</key>
     <key alias="None">לא הותקן עדיין.</key>
@@ -693,7 +676,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">המיון הושלם.</key>
     <key alias="sortHelp">יש לגרור את הפריטים מעלה או מטה כדי להגדיר את סדר התוכן. או לחץ על כותרת העמודה כדי למיין את כל פריטי התוכן</key>
-    <key alias="sortPleaseWait"><![CDATA[פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.<br/> <br/> נא לא לסגור את החלון בזמן המיון]]></key>
+    <key alias="sortPleaseWait"><![CDATA[פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.]]></key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">הפירסום בוטל על ידי תוסף צד שלישי</key>
@@ -762,6 +745,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">תבנית</key>
   </area>
   <area alias="grid">
+      <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
     <key alias="insertControl">Choose type of content</key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
@@ -938,8 +927,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="startnode">התחלה בפריט התוכן</key>
     <key alias="username">שם תצוגה</key>
     <key alias="userPermissions">הרשאות משתמש</key>
-    <key alias="usertype">סוג משתמש</key>
-    <key alias="userTypes">סוגי משתמש</key>
     <key alias="writer">כותב</key>
   </area>
 </language>

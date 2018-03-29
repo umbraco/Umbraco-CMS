@@ -77,6 +77,41 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameContentTypeContainer(int id, string name, int userId = 0)
+        {
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.DocumentTypeContainerGuid);
+        }
+
+        private Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameTypeContainer(int id, string name, Guid typeCode)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, typeCode))
+            {
+                try
+                {
+                    var container = repo.Get(id);
+
+                    //throw if null, this will be caught by the catch and a failed returned
+                    if (container == null)
+                        throw new InvalidOperationException("No container found with id " + id);
+
+                    container.Name = name;
+
+                    repo.AddOrUpdate(container);
+                    uow.Commit();
+
+                    uow.Events.Dispatch(SavedContentTypeContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "RenamedContainer");
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
+                }
+                catch (Exception ex)
+                {
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
+                }
+            }
+        }
+
         public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -114,6 +149,16 @@ namespace Umbraco.Core.Services
                     return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
             }
+        }
+
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameMediaTypeContainer(int id, string name, int userId = 0)
+        {
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.MediaTypeContainerGuid);
+        }
+
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> RenameDataTypeContainer(int id, string name, int userId = 0)
+        {
+            return RenameTypeContainer(id, name, Constants.ObjectTypes.DataTypeContainerGuid);
         }
 
         public Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0)
@@ -213,7 +258,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType)
         {
-            var ancestorIds = mediaType.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = mediaType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
@@ -242,7 +287,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<EntityContainer> GetContentTypeContainers(IContentType contentType)
         {
-            var ancestorIds = contentType.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = contentType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
@@ -332,7 +377,7 @@ namespace Umbraco.Core.Services
                 repo.Delete(container);
                 uow.Commit();
                 deleteEventArgs.CanCancel = false;
-                uow.Events.Dispatch(DeletedMediaTypeContainer, this, deleteEventArgs);
+                uow.Events.Dispatch(DeletedMediaTypeContainer, this, deleteEventArgs, "DeletedMediaTypeContainer");
 
                 return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
@@ -368,6 +413,15 @@ namespace Umbraco.Core.Services
             {
                 var repository = RepositoryFactory.CreateContentTypeRepository(uow);
                 return repository.GetAllContentTypeAliases(objectTypes);
+            }
+        }
+
+        public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
+        {
+            using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
+            {
+                var repository = RepositoryFactory.CreateContentTypeRepository(uow);
+                return repository.GetAllContentTypeIds(aliases);
             }
         }
 
@@ -430,7 +484,7 @@ namespace Umbraco.Core.Services
 
             clone.Name = name;
 
-            var compositionAliases = clone.CompositionAliases().Except(new[] {alias}).ToList();
+            var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
             //remove all composition that is not it's current alias
             foreach (var a in compositionAliases)
             {
@@ -853,7 +907,7 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    var deleteEventArgs = new DeleteEventArgs<IContentType>(contentType);                    
+                    var deleteEventArgs = new DeleteEventArgs<IContentType>(contentType);
                     if (uow.Events.DispatchCancelable(DeletingContentType, this, deleteEventArgs))
                     {
                         uow.Commit();
@@ -863,10 +917,12 @@ namespace Umbraco.Core.Services
                     var repository = RepositoryFactory.CreateContentTypeRepository(uow);
 
                     //If we are deleting this content type, we are also deleting it's descendents!
-                    var deletedContentTypes = new List<IContentType> {contentType};
+                    var deletedContentTypes = new List<IContentType> { contentType };
                     deletedContentTypes.AddRange(GetDescendants(contentType));
 
-                    _contentService.DeleteContentOfTypes(deletedContentTypes.Select(x => x.Id), userId);
+                    var ids = deletedContentTypes.Select(x => x.Id).ToArray();
+                    _contentService.DeleteContentOfTypes(ids, userId);
+                    _contentService.DeleteBlueprintsOfTypes(ids);
 
                     repository.Delete(contentType);
                     deleteEventArgs.DeletedEntities = deletedContentTypes.DistinctBy(x => x.Id);

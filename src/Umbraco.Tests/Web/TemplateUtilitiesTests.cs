@@ -20,8 +20,14 @@ using Umbraco.Web.Templates;
 namespace Umbraco.Tests.Web
 {
     [TestFixture]
-    public class TemplateUtilitiesTests
+    public class TemplateUtilitiesTests : BaseUmbracoApplicationTest
     {
+        [SetUp]
+        public void Setup()
+        {
+            Udi.ResetUdiTypes();
+        }
+
         [TestCase("", "")]
         [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ")]
         [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]

@@ -1,3 +1,5 @@
+@using Umbraco.Core.Models
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
@@ -19,13 +21,13 @@
 @helper Traverse(IPublishedContent node)
 {
     @* Update the level to reflect how deep you want the sitemap to go *@
-    var maxLevelForSitemap = 4;
+    const int maxLevelForSitemap = 4;
 
     @* Select visible children *@
-    var selection = node.Children.Where(x => x.IsVisible() && x.Level <= maxLevelForSitemap);
+    var selection = node.Children.Where(x => x.IsVisible() && x.Level <= maxLevelForSitemap).ToArray();
 
     @* If any items are returned, render a list *@
-    if (selection.Any())
+    if (selection.Length > 0)
     {
         <ul>
             @foreach (var item in selection)

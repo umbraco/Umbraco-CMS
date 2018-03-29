@@ -139,6 +139,7 @@ angular.module("umbraco")
 
             //wait for queue to end
             $q.all(await).then(function () {
+                
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
                     mode: "exact",
@@ -149,14 +150,16 @@ angular.module("umbraco")
                     extended_valid_elements: extendedValidElements,
                     menubar: false,
                     statusbar: false,
+                    relative_urls: false,
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets,
-                    relative_urls: false,
                     style_formats: styleFormats,
-                    language: language
+                    language: language,
+                    //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
                 };
 
                 if (tinyMceConfig.customConfig) {
@@ -181,6 +184,12 @@ angular.module("umbraco")
                                 catch (e) {
                                     //cannot parse, we'll just leave it
                                 }
+                            }
+                            if (val === "true") {
+                                tinyMceConfig.customConfig[i] = true;
+                            }
+                            if (val === "false") {
+                                tinyMceConfig.customConfig[i] = false;
                             }
                         }
                     }
@@ -286,7 +295,8 @@ angular.module("umbraco")
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
-                            startNodeId: userData.startMediaId,
+                            startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                            startNodeIsVirtual: userData.startMediaIds.length !== 1,
                             view: "mediapicker",
                             show: true,
                             submit: function(model) {
@@ -355,7 +365,8 @@ angular.module("umbraco")
                 //this is instead of doing a watch on the model.value = faster
                 $scope.model.onValueChanged = function (newVal, oldVal) {
                     //update the display val again if it has changed from the server;
-                    tinyMceEditor.setContent(newVal, { format: 'raw' });
+                    //uses an empty string in the editor when the value is null
+                    tinyMceEditor.setContent(newVal || "", { format: 'raw' });
                     //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
                     // is required for our plugins listening to this event to execute
                     tinyMceEditor.fire('LoadContent', null);
@@ -365,7 +376,7 @@ angular.module("umbraco")
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                     // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                    $scope.model.value = tinyMceEditor.getContent();
+                    $scope.model.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
                 });
 
                 //when the element is disposed we need to unsubscribe!
@@ -373,6 +384,9 @@ angular.module("umbraco")
                 // element might still be there even after the modal has been hidden.
                 $scope.$on('$destroy', function () {
                     unsubscribe();
+					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+						tinyMceEditor.destroy()
+					}
                 });
             });
         });

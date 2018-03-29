@@ -43,7 +43,7 @@
        xdt:Locator="Match(application,alias)"
        xdt:Transform="InsertIfMissing"  />
   
-  <add application="settings" alias="scripts" title="Scripts" type="umbraco.loadScripts, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="4" 
+  <add application="settings" alias="scripts" title="Scripts" type="Umbraco.Web.Trees.ScriptTreeController, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="4" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
   <add application="settings" alias="dictionary" title="Dictionary" type="umbraco.loadDictionary, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="6" 
@@ -79,14 +79,14 @@
   <add sortOrder="1" alias="dataTypes" application="developer"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes(sortOrder)" />
-	   
-  <add application="developer" alias="macros" title="Macros" type="umbraco.loadMacros, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="2" 
+
+  <add initialize="true" sortOrder="2" alias="macros" application="developer" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.MacroTreeController, umbraco"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
   <add application="developer" alias="relationTypes" title="Relation Types" type="umbraco.loadRelationTypes, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="4" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
-  <add application="developer" alias="xslt" title="XSLT Files" type="umbraco.loadXslt, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="5" 
+  <add initialize="true" sortOrder="5" alias="xslt" application="developer" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.XsltTreeController, umbraco"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
   
@@ -102,15 +102,16 @@
        xdt:Transform="Remove" />
 
   <!--Users-->
-  <add application="users" alias="users" title="Users" type="umbraco.loadUsers, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="0" 
+ <add initialize="true" sortOrder="0" alias="users" application="users" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.UserTreeController, umbraco" 
+      xdt:Locator="Match(application,alias)"
+      xdt:Transform="SetAttributes()" />
+
+  <add application="users" alias="userTypes"
        xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
-  <add application="users" alias="userTypes" title="User Types" type="umbraco.cms.presentation.Trees.UserTypes, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="1" 
+       xdt:Transform="Remove" />
+  <add application="users" alias="userPermissions" 
        xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
-  <add application="users" alias="userPermissions" title="User Permissions" type="umbraco.cms.presentation.Trees.UserPermissions, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="2" 
-       xdt:Locator="Match(application,alias)" 
-       xdt:Transform="SetAttributes()" />
+       xdt:Transform="Remove" />
 
   <!--Members-->
   <add initialize="true" sortOrder="0" alias="member" application="member" title="Members" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.MemberTreeController, umbraco" 

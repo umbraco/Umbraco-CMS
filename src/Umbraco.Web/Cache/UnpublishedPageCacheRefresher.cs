@@ -5,7 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using System.Linq;
-
+using Newtonsoft.Json;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Sync;
 
@@ -40,21 +40,19 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
             return jsonObject;
         }
 
       
         internal static string SerializeToJsonPayloadForPermanentDeletion(params int[] contentIds)
         {
-            var serializer = new JavaScriptSerializer();
             var items = contentIds.Select(x => new JsonPayload
             {
                 Id = x,
                 Operation = OperationType.Deleted
             }).ToArray();
-            var json = serializer.Serialize(items);
+            var json = JsonConvert.SerializeObject(items);
             return json;
         }
 
@@ -86,7 +84,6 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
@@ -106,7 +103,6 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(IContent instance)
         {
-            ApplicationContext.Current.Services.IdkMap.ClearCache(instance.Id);
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(instance);

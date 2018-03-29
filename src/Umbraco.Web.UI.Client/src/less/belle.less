@@ -81,6 +81,10 @@
 @import "forms/umb-validation-label.less";
 
 // Umbraco Components
+@import "components/application/umb-tour.less";
+@import "components/application/umb-backdrop.less";
+@import "components/application/umb-drawer.less";
+
 @import "components/editor.less";
 @import "components/overlays.less";
 @import "components/card.less";
@@ -120,17 +124,36 @@
 @import "components/umb-querybuilder.less";
 @import "components/umb-pagination.less";
 @import "components/umb-mini-list-view.less";
+@import "components/umb-badge.less";
+@import "components/umb-nested-content.less";
+@import "components/umb-checkmark.less";
+@import "components/umb-list.less";
+@import "components/umb-box.less";
+@import "components/umb-number-badge.less";
+@import "components/umb-progress-circle.less";
 
 @import "components/buttons/umb-button.less";
 @import "components/buttons/umb-button-group.less";
 @import "components/buttons/umb-era-button.less";
+@import "components/buttons/umb-toggle.less";
 
 @import "components/notifications/umb-notifications.less";
 @import "components/umb-file-dropzone.less";
 @import "components/umb-node-preview.less";
 @import "components/umb-mini-editor.less";
 
+@import "components/users/umb-user-cards.less";
+@import "components/users/umb-user-group-picker-list.less";
+@import "components/users/umb-user-group-preview.less";
+@import "components/users/umb-user-preview.less";
+@import "components/users/umb-user-picker-list.less";
+@import "components/users/umb-permission.less";
+
+
 // Utilities
+@import "utilities/layout/_display.less";
+@import "utilities/typography/_text-decoration.less";
+@import "utilities/typography/_white-space.less";
 @import "utilities/_flexbox.less";
 @import "utilities/_spacing.less";
 @import "utilities/_text-align.less";
@@ -145,8 +168,14 @@
 //used for property editors
 @import "property-editors.less";
 
+//used for prevalue editors
+@import "components/prevalues/multivalues.less";
+
 
 @import "typeahead.less";
 @import "hacks.less";
 
 @import "healthcheck.less";
+
+// cleanup properties.less when it is done
+@import "properties.less";

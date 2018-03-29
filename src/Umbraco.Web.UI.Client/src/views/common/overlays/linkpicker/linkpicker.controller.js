@@ -22,6 +22,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        selectedSearchResults: []
 	    };
 
+            $scope.showTarget = $scope.model.hideTarget !== true;
+
 	    if (dialogOptions.currentTarget) {
 	        $scope.model.target = dialogOptions.currentTarget;
 
@@ -89,23 +91,24 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 	    $scope.switchToMediaPicker = function () {
 	        userService.getCurrentUser().then(function (userData) {
-				$scope.mediaPickerOverlay = {
-					view: "mediapicker",
-					startNodeId: userData.startMediaId,
-					show: true,
-					submit: function(model) {
-						var media = model.selectedImages[0];
+	          $scope.mediaPickerOverlay = {
+	            view: "mediapicker",
+                startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+	            startNodeIsVirtual: userData.startMediaIds.length !== 1,
+	            show: true,
+	            submit: function(model) {
+	              var media = model.selectedImages[0];
 
-                        $scope.model.target.id = media.id;
-                        $scope.model.target.udi = media.udi;
-						$scope.model.target.isMedia = true;
-						$scope.model.target.name = media.name;
-						$scope.model.target.url = mediaHelper.resolveFile(media);
+	              $scope.model.target.id = media.id;
+	              $scope.model.target.udi = media.udi;
+	              $scope.model.target.isMedia = true;
+	              $scope.model.target.name = media.name;
+	              $scope.model.target.url = mediaHelper.resolveFile(media);
 
-						$scope.mediaPickerOverlay.show = false;
-						$scope.mediaPickerOverlay = null;
-					}
-				};
+	              $scope.mediaPickerOverlay.show = false;
+	              $scope.mediaPickerOverlay = null;
+	            }
+	          };
 	        });
 	    };
 

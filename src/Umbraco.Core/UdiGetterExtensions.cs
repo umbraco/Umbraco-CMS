@@ -132,7 +132,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IContent entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
+            return new GuidUdi(entity.IsBlueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -211,8 +211,8 @@ namespace Umbraco.Core
             if (entity == null) throw new ArgumentNullException("entity");
 
             // we should throw on Unknown but for the time being, assume it means PartialView
-            var entityType = entity.ViewType == PartialViewType.PartialViewMacro 
-                ? Constants.UdiEntityType.PartialViewMacro 
+            var entityType = entity.ViewType == PartialViewType.PartialViewMacro
+                ? Constants.UdiEntityType.PartialViewMacro
                 : Constants.UdiEntityType.PartialView;
 
             return new StringUdi(entityType, entity.Path.TrimStart('/')).EnsureClosed();

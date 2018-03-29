@@ -86,6 +86,10 @@
             };
 
             $scope.add = function ($event) {
+				if (!angular.isArray($scope.model.value)) {
+                  $scope.model.value = [];
+				}
+				
                 if ($scope.newCaption == "") {
                     $scope.hasError = true;
                 } else {

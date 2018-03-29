@@ -1,25 +1,25 @@
 <div ng-controller="Umbraco.Overlays.ItemPickerOverlay">
 
     <div class="form-search" ng-hide="model.filter === false" style="margin-bottom: 15px;">
-      <i class="icon-search"></i>
-      <input type="text"
-        ng-model="searchTerm"
-        class="umb-search-field search-query input-block-level -full-width-input"
-        localize="placeholder"
-        placeholder="@placeholders_filter"
-        umb-auto-focus />
+        <i class="icon-search"></i>
+        <input type="text"
+               ng-model="searchTerm"
+               class="umb-search-field search-query input-block-level -full-width-input"
+               localize="placeholder"
+               placeholder="@placeholders_filter"
+               umb-auto-focus
+               no-dirty-check />
     </div>
 
     <ul class="umb-card-grid">
-      <li
-        ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
-        ng-click="selectItem(availableItem)"
-        class="-three-in-row">
-        <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
-            <i class="{{ availableItem.icon }}"></i>
-            {{ availableItem.name }}
-        </a>
-      </li>
+        <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
+            ng-click="selectItem(availableItem)"
+            class="-three-in-row">
+            <a class="umb-card-grid-item" href="" title="{{ availableItem.name }}">
+                <i class="{{ availableItem.icon }}"></i>
+                {{ availableItem.name }}
+            </a>
+        </li>
     </ul>
 
 </div>

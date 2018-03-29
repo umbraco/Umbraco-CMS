@@ -1,6 +1,7 @@
 using Umbraco.Core.Configuration;
 using System;
 using System.ComponentModel;
+using System.Web.Security;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -9,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Persistence
 {
@@ -52,8 +54,8 @@ namespace Umbraco.Core.Persistence
 
                     //if the result is already a DeepCloneRuntimeCacheProvider then return it, otherwise
                     //wrap the result with a DeepCloneRuntimeCacheProvider
-                    return cache is DeepCloneRuntimeCacheProvider 
-                        ? cache 
+                    return cache is DeepCloneRuntimeCacheProvider
+                        ? cache
                         : new DeepCloneRuntimeCacheProvider(cache);
                 };
             }
@@ -142,6 +144,23 @@ namespace Umbraco.Core.Persistence
                 _settings.Content)
             {
                 EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming
+            };
+        }
+
+        public virtual IContentRepository CreateContentBlueprintRepository(IScopeUnitOfWork uow)
+        {
+            return new ContentBlueprintRepository(
+                uow,
+                _cacheHelper,
+                _logger,
+                _sqlSyntax,
+                CreateContentTypeRepository(uow),
+                CreateTemplateRepository(uow),
+                CreateTagRepository(uow),
+                _settings.Content)
+            {
+                //duplicates are allowed
+                EnsureUniqueNaming = false
             };
         }
 
@@ -287,23 +306,28 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax);
         }
 
-        public virtual IUserTypeRepository CreateUserTypeRepository(IScopeUnitOfWork uow)
+        public virtual IUserGroupRepository CreateUserGroupRepository(IScopeUnitOfWork uow)
         {
-            return new UserTypeRepository(
+            return new UserGroupRepository(
                 uow,
-                //There's not many user types but we query on users all the time so the result needs to be cached
                 _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
         public virtual IUserRepository CreateUserRepository(IScopeUnitOfWork uow)
         {
+            var userMembershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var passwordConfig = userMembershipProvider == null || userMembershipProvider.PasswordFormat != MembershipPasswordFormat.Hashed
+                ? null
+                : new System.Collections.Generic.Dictionary<string, string> {{"hashAlgorithm", Membership.HashAlgorithmType}};
+
             return new UserRepository(
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
                 _cacheHelper,
-                _logger, _sqlSyntax,
-                CreateUserTypeRepository(uow));
+                _logger,
+                _sqlSyntax,
+                passwordConfig);
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IScopeUnitOfWork uow)
@@ -372,6 +396,16 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger,
                 _sqlSyntax);
+        }
+
+        public IConsentRepository CreateConsentRepository(IScopeUnitOfWork uow)
+        {
+            return new ConsentRepository(uow, _cacheHelper, _logger, _sqlSyntax);
+        }
+
+        public IAuditEntryRepository CreateAuditEntryRepository(IScopeUnitOfWork uow)
+        {
+            return new AuditEntryRepository(uow, _cacheHelper, _logger, _sqlSyntax);
         }
     }
 }

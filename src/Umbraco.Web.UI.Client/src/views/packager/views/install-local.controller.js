@@ -68,6 +68,7 @@
                     // set done status on file
                     vm.zipFile.uploadStatus = "done";
                     loadPackage();
+                    vm.zipFile.uploadProgress = 100;
                     vm.localPackage = data;
                 }
 
@@ -96,7 +97,7 @@
                         }
 
                     } else if (evt.Message) {
-                        file.serverErrorMessage = evt.Message;
+                        vm.zipFile.serverErrorMessage = evt.Message;
                     }
                 }
             });

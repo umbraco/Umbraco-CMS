@@ -42,10 +42,12 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
-            Mandate.ParameterNotNullOrEmpty(paramName, "paramName");
+            if (string.IsNullOrWhiteSpace(paramName)) throw new ArgumentException("Value cannot be null or whitespace.", "paramName");
+
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
+
         public EnsureUserPermissionForContentAttribute(string paramName, char permissionToCheck)
             : this(paramName)
         {
@@ -100,7 +102,9 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 ApplicationContext.Current.Services.UserService,
-                ApplicationContext.Current.Services.ContentService, nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
+                ApplicationContext.Current.Services.ContentService, 
+                ApplicationContext.Current.Services.EntityService, 
+                nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);
             }
