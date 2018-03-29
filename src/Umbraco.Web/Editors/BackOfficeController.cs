@@ -31,6 +31,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Features;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
@@ -39,7 +40,14 @@ namespace Umbraco.Web.Editors
 {
     public class BackOfficeModel
     {
-        public string Path { get; set; }
+        public BackOfficeModel(string path, UmbracoFeatures features)
+        {
+            Path = path;
+            Features = features;
+        }
+
+        public string Path { get; }
+        public UmbracoFeatures Features { get; }
     }
 
     /// <summary>
@@ -50,6 +58,7 @@ namespace Umbraco.Web.Editors
     public class BackOfficeController : UmbracoController
     {
         private readonly ManifestParser _manifestParser;
+        private readonly UmbracoFeatures _features;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
@@ -57,9 +66,10 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(ManifestParser manifestParser)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features)
         {
             _manifestParser = manifestParser;
+            _features = features;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -75,8 +85,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel { Path = GlobalSettings.Path }),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel { Path = GlobalSettings.Path }));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(GlobalSettings.Path, _features)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(GlobalSettings.Path, _features)));
         }
 
         [HttpGet]
@@ -149,7 +159,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel { Path = GlobalSettings.Path}),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(GlobalSettings.Path, _features)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -251,7 +261,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState);
+            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState, _features);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled

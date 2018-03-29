@@ -172,6 +172,7 @@ namespace Umbraco.Web
         private static IPublishedContent ItemById(Guid id, IPublishedCache cache)
         {
             var doc = cache.GetById(id);
+            return doc;
         }
 
         private static IPublishedContent ItemByXPath(string xpath, XPathVariable[] vars, IPublishedCache cache)

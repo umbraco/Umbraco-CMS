@@ -7,6 +7,7 @@ using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web
@@ -27,14 +28,15 @@ namespace Umbraco.Web
         /// The post url used to sign in with external logins - this can change depending on for what service the external login is service.
         /// Example: normal back office login or authenticating upgrade login
         /// </param>
+        /// <param name="features"></param>
         /// <returns></returns>
         /// <remarks>
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState);
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">

@@ -5,183 +5,150 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Composing;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.IO
 {
-    public class FileSystems
+    public class FileSystemProviderManager
     {
         private readonly IFileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
-        private readonly ILogger _logger;
 
         private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
-        private readonly ConcurrentDictionary<string, IFileSystem> _filesystems = new ConcurrentDictionary<string, IFileSystem>();
+        private readonly ConcurrentDictionary<string, IFileSystem2> _filesystems = new ConcurrentDictionary<string, IFileSystem2>();
 
-        // wrappers for shadow support
         private ShadowWrapper _macroPartialFileSystem;
         private ShadowWrapper _partialViewsFileSystem;
+        private ShadowWrapper _macroScriptsFileSystem;
+        private ShadowWrapper _userControlsFileSystem;
         private ShadowWrapper _stylesheetsFileSystem;
         private ShadowWrapper _scriptsFileSystem;
         private ShadowWrapper _xsltFileSystem;
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
-        
-        // well-known file systems lazy initialization
-        private object _wkfsLock = new object();
-        private bool _wkfsInitialized;
-        private object _wkfsObject;
+        private ShadowWrapper _javaScriptLibraryFileSystem;
 
-        private MediaFileSystem _mediaFileSystem;
+        #region Singleton & Constructor
 
-        
-        //fixme - is this needed to be a managed file system? seems irrelevant since it won't ever be moved and is only used in one place in code
-        private IFileSystem _javascriptLibraryFileSystem;
+        private static volatile FileSystemProviderManager _instance;
+        private static readonly object _instanceLocker = new object();
 
-        #region Constructor
-
-        // DI wants a public ctor
-        // but IScopeProviderInternal is not public
-        public FileSystems(ILogger logger)
+        public static FileSystemProviderManager Current
         {
-            // fixme inject config section => can be used by tests
-            _config = (FileSystemProvidersSection) ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
-            _logger = logger;
+            get
+            {
+                if (_instance != null) return _instance;
+                lock (_instanceLocker)
+                {
+                    return _instance ?? (_instance = new FileSystemProviderManager());
+                }
+            }
+        }
+
+        /// <summary>
+        /// For tests only, allows setting the value of the singleton "Current" property
+        /// </summary>
+        /// <param name="instance"></param>
+        public static void SetCurrent(FileSystemProviderManager instance)
+        {
+            lock (_instanceLocker)
+            {
+                _instance = instance;
+            }
+        }
+
+        internal static void ResetCurrent()
+        {
+            lock (_instanceLocker)
+            {
+                if (_instance != null)
+                _instance.Reset();                
+            }
         }
 
         // for tests only, totally unsafe
-        internal void Reset()
+        private void Reset()
         {
             _wrappers.Clear();
             _providerLookup.Clear();
             _filesystems.Clear();
-            Volatile.Write(ref _wkfsInitialized, false);
+            CreateWellKnownFileSystems();
         }
 
-        internal Func<bool> IsScoped { get; set; } = () => false;
-
-        #endregion
-
-        #region Well-Known FileSystems
-
-        public IFileSystem MacroPartialsFileSystem
+        private IScopeProviderInternal ScopeProvider
         {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _macroPartialFileSystem;
-            }
+            // this is bad, but enough for now, and we'll refactor
+            // in v8 when we'll get rid of this class' singleton
+            // beware: means that we capture the "current" scope provider - take care in tests!
+            get { return ApplicationContext.Current == null ? null : ApplicationContext.Current.ScopeProvider as IScopeProviderInternal; }
         }
 
-        public IFileSystem PartialViewsFileSystem
+        /// <summary>
+        /// Constructor that can be used for tests
+        /// </summary>
+        /// <param name="configSection"></param>
+        public FileSystemProviderManager(IFileSystemProvidersSection configSection)
         {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _partialViewsFileSystem;
-            }
+            if (configSection == null) throw new ArgumentNullException("configSection");
+            _config = configSection;
+            CreateWellKnownFileSystems();
         }
 
-        public IFileSystem StylesheetsFileSystem
+        /// <summary>
+        /// Default constructor that will read the config from the locally found config section
+        /// </summary>
+        public FileSystemProviderManager()
         {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _stylesheetsFileSystem;
-            }
+            _config = (FileSystemProvidersSection)ConfigurationManager.GetSection("umbracoConfiguration/FileSystemProviders");
+            CreateWellKnownFileSystems();
         }
 
-        public IFileSystem ScriptsFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _scriptsFileSystem;
-            }
-        }
-
-        public IFileSystem XsltFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _xsltFileSystem;
-            }
-        }
-
-        public IFileSystem MasterPagesFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _masterPagesFileSystem;// fixme - see 7.6?!
-            }
-        }
-
-        public IFileSystem MvcViewsFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _mvcViewsFileSystem;
-            }
-        }
-
-        public MediaFileSystem MediaFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _mediaFileSystem;
-            }
-        }
-
-        //fixme - is this needed to be a managed file system? seems irrelevant since it won't ever be moved and is only used in one place in code
-        internal IFileSystem JavaScriptLibraryFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _javascriptLibraryFileSystem;
-            }
-        }
-
-        private void EnsureWellKnownFileSystems()
-        {
-            LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
-        }
-
-        // need to return something to LazyInitializer.EnsureInitialized
-        // but it does not really matter what we return - here, null
-        private object CreateWellKnownFileSystems()
+        private void CreateWellKnownFileSystems()
         {
             var macroPartialFileSystem = new PhysicalFileSystem(SystemDirectories.MacroPartials);
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
+            var macroScriptsFileSystem = new PhysicalFileSystem(SystemDirectories.MacroScripts);
+            var userControlsFileSystem = new PhysicalFileSystem(SystemDirectories.UserControls);
             var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
-            
+            var javaScriptLibraryFileSystem = new PhysicalFileSystem(Path.Combine(SystemDirectories.Umbraco, "lib"));
 
-            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", () => IsScoped());
-            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", () => IsScoped());
-            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", () => IsScoped());
-            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", () => IsScoped());
-            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
-            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
-
-            _javascriptLibraryFileSystem = new PhysicalFileSystem(Path.Combine(SystemDirectories.Umbraco, "lib"));
+            _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", ScopeProvider);
+            _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", ScopeProvider);
+            _macroScriptsFileSystem = new ShadowWrapper(macroScriptsFileSystem, "macroScripts", ScopeProvider);
+            _userControlsFileSystem = new ShadowWrapper(userControlsFileSystem, "usercontrols", ScopeProvider);
+            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", ScopeProvider);
+            _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", ScopeProvider);
+            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", ScopeProvider);
+            _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", ScopeProvider);
+            _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", ScopeProvider);
+            _javaScriptLibraryFileSystem = new ShadowWrapper(javaScriptLibraryFileSystem, "Lib", ScopeProvider);
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
-            _mediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
-
-            return null;
+            MediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
         }
+
+        #endregion
+
+        #region Well-Known FileSystems
+
+        public IFileSystem2 MacroPartialsFileSystem { get { return _macroPartialFileSystem; } }
+        public IFileSystem2 PartialViewsFileSystem { get { return _partialViewsFileSystem; } }
+        // Legacy /macroScripts folder
+        public IFileSystem2 MacroScriptsFileSystem { get { return _macroScriptsFileSystem; } }
+        // Legacy /usercontrols folder
+        public IFileSystem2 UserControlsFileSystem { get { return _userControlsFileSystem; } }
+        public IFileSystem2 StylesheetsFileSystem { get { return _stylesheetsFileSystem; } }
+        public IFileSystem2 ScriptsFileSystem { get { return _scriptsFileSystem; } }
+        public IFileSystem2 XsltFileSystem { get { return _xsltFileSystem; } }
+        public IFileSystem2 MasterPagesFileSystem { get { return _mvcViewsFileSystem; } }
+        public IFileSystem2 MvcViewsFileSystem { get { return _mvcViewsFileSystem; } }
+        internal IFileSystem2 JavaScriptLibraryFileSystem { get { return _javaScriptLibraryFileSystem; } }
+        public MediaFileSystem MediaFileSystem { get; private set; }
 
         #endregion
 
@@ -191,11 +158,11 @@ namespace Umbraco.Core.IO
         /// used to cache the lookup of how to construct this object so we don't have to reflect each time.
         /// </summary>
         private class ProviderConstructionInfo
-        {
-            public object[] Parameters { get; set; }
-            public ConstructorInfo Constructor { get; set; }
-            //public string ProviderAlias { get; set; }
-        }
+		{
+			public object[] Parameters { get; set; }
+			public ConstructorInfo Constructor { get; set; }
+			//public string ProviderAlias { get; set; }
+		}
 
         /// <summary>
         /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.
@@ -212,12 +179,12 @@ namespace Umbraco.Core.IO
         /// Gets an underlying (non-typed) filesystem supporting a strongly-typed filesystem.
         /// </summary>
         /// <param name="alias">The alias of the strongly-typed filesystem.</param>
-        /// <param name="fallback">A fallback creator for the filesystem.</param>
+        /// /// <param name="fallback">A fallback creator for the filesystem.</param>
         /// <returns>The non-typed filesystem supporting the strongly-typed filesystem with the specified alias.</returns>
-        /// <remarks>This method should not be used directly, used <see cref="GetFileSystem{TFileSystem}"/> instead.</remarks>
-        internal IFileSystem GetUnderlyingFileSystemProvider(string alias, Func<IFileSystem> fallback)
+        /// <remarks>This method should not be used directly, used <see cref="GetFileSystemProvider{TFileSystem}()"/> instead.</remarks>
+        private IFileSystem GetUnderlyingFileSystemProvider(string alias, Func<IFileSystem> fallback)
         {
-            // either get the constructor info from cache or create it and add to cache
+			// either get the constructor info from cache or create it and add to cache
             var ctorInfo = _providerLookup.GetOrAdd(alias, _ => GetUnderlyingFileSystemCtor(alias, fallback));
             return ctorInfo == null ? fallback() : (IFileSystem) ctorInfo.Constructor.Invoke(ctorInfo.Parameters);
         }
@@ -231,30 +198,33 @@ namespace Umbraco.Core.IO
         private ProviderConstructionInfo GetUnderlyingFileSystemCtor(string alias, Func<IFileSystem> fallback)
         {
             // get config
-            if (_config.Providers.TryGetValue(alias, out var providerConfig) == false)
+            IFileSystemProviderElement providerConfig;
+            
+            if (_config.Providers.TryGetValue(alias, out providerConfig) == false)
             {
                 if (fallback != null) return null;
-                throw new ArgumentException($"No provider found with alias {alias}.");
+                throw new ArgumentException(string.Format("No provider found with alias {0}.", alias));
             }
 
             // get the filesystem type
             var providerType = Type.GetType(providerConfig.Type);
             if (providerType == null)
-                throw new InvalidOperationException($"Could not find type {providerConfig.Type}.");
+                throw new InvalidOperationException(string.Format("Could not find type {0}.", providerConfig.Type));
 
             // ensure it implements IFileSystem
-            if (providerType.IsAssignableFrom(typeof (IFileSystem)))
-                throw new InvalidOperationException($"Type {providerType.FullName} does not implement IFileSystem.");
+            if (providerType.IsAssignableFrom(typeof(IFileSystem)))
+                throw new InvalidOperationException(string.Format("Type {0} does not implement IFileSystem.", providerType.FullName));
 
-            // find a ctor matching the config parameters
-            var paramCount = providerConfig.Parameters?.Count ?? 0;
+            // find a ctor matching the config parameters            
+            var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
             var constructor = providerType.GetConstructors().SingleOrDefault(x
                 => x.GetParameters().Length == paramCount && x.GetParameters().All(y => providerConfig.Parameters.Keys.Contains(y.Name)));
             if (constructor == null)
-                throw new InvalidOperationException($"Type {providerType.FullName} has no ctor matching the {paramCount} configuration parameter(s).");
+                throw new InvalidOperationException(string.Format("Type {0} has no ctor matching the {1} configuration parameter(s).", providerType.FullName, paramCount));
 
             var parameters = new object[paramCount];
-            if (providerConfig.Parameters != null) // keeps ReSharper happy
+
+            if (providerConfig.Parameters != null)
             {
                 var allKeys = providerConfig.Parameters.Keys.ToArray();
                 for (var i = 0; i < paramCount; i++)
@@ -282,7 +252,6 @@ namespace Umbraco.Core.IO
         /// <para>Note that any filesystem created by this method *after* shadowing begins, will *not* be
         /// shadowing (and an exception will be thrown by the ShadowWrapper).</para>
         /// </remarks>
-        // fixme - should it change for v8?
         public TFileSystem GetFileSystemProvider<TFileSystem>()
             where TFileSystem : FileSystemWrapper
         {
@@ -308,14 +277,14 @@ namespace Umbraco.Core.IO
             where TFileSystem : FileSystemWrapper
         {
             var alias = GetFileSystemAlias<TFileSystem>();
-            return (TFileSystem)_filesystems.GetOrAdd(alias, _ =>
+            return (TFileSystem) _filesystems.GetOrAdd(alias, _ =>
             {
                 // gets the inner fs, create the strongly-typed fs wrapping the inner fs, register & return
                 // so we are double-wrapping here
                 // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
                 var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
-                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, () => IsScoped());
-                var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
+                var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, ScopeProvider);
+                var fs = (IFileSystem2) Activator.CreateInstance(typeof (TFileSystem), shadowWrapper);
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
             });
@@ -343,41 +312,23 @@ namespace Umbraco.Core.IO
 
         #region Shadow
 
-        // note
-        // shadowing is thread-safe, but entering and exiting shadow mode is not, and there is only one
-        // global shadow for the entire application, so great care should be taken to ensure that the
-        // application is *not* doing anything else when using a shadow.
-        // shadow applies to well-known filesystems *only* - at the moment, any other filesystem that would
-        // be created directly (via ctor) or via GetFileSystem<T> is *not* shadowed.
-
-        // shadow must be enabled in an app event handler before anything else ie before any filesystem
-        // is actually created and used - after, it is too late - enabling shadow has a neglictible perfs
-        // impact.
-        // NO! by the time an app event handler is instanciated it is already too late, see note in ctor.
-        //internal void EnableShadow()
-        //{
-        //    if (_mvcViewsFileSystem != null) // test one of the fs...
-        //        throw new InvalidOperationException("Cannot enable shadow once filesystems have been created.");
-        //    _shadowEnabled = true;
-        //}
-
         internal ICompletable Shadow(Guid id)
         {
-            if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-
             var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var wrappers = new ShadowWrapper[typed.Length + 9];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;
+            wrappers[i++] = _macroScriptsFileSystem;
             wrappers[i++] = _partialViewsFileSystem;
             wrappers[i++] = _stylesheetsFileSystem;
             wrappers[i++] = _scriptsFileSystem;
+            wrappers[i++] = _userControlsFileSystem;
             wrappers[i++] = _xsltFileSystem;
             wrappers[i++] = _masterPagesFileSystem;
             wrappers[i] = _mvcViewsFileSystem;
 
-            return new ShadowFileSystems(id, wrappers, _logger);
+            return new ShadowFileSystems(id, wrappers);
         }
 
         #endregion

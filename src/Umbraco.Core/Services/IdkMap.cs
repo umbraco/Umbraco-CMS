@@ -94,14 +94,14 @@ namespace Umbraco.Core.Services
             // don't if not empty
             if (_key2Id.Count > 0) return;
 
-            using (var uow = _uowProvider.GetUnitOfWork())
+            using (var scope = _scopeProvider.CreateScope())
             {
                 // populate content and media items
                 var types = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media };
-                var values = uow.Database.Query<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
+                var values = scope.Database.Query<TypedIdDto>("SELECT id, uniqueId, nodeObjectType FROM umbracoNode WHERE nodeObjectType IN @types", new { types });
                 foreach (var value in values)
                 {
-                    var umbracoObjectType = UmbracoObjectTypesExtensions.GetUmbracoObjectType(value.NodeObjectType);
+                    var umbracoObjectType = ObjectTypes.GetUmbracoObjectType(value.NodeObjectType);
                     _id2Key.Add(value.Id, new TypedId<Guid>(value.UniqueId, umbracoObjectType));
                     _key2Id.Add(value.UniqueId, new TypedId<int>(value.Id, umbracoObjectType));
                 }
@@ -175,25 +175,25 @@ namespace Umbraco.Core.Services
             // multiple times, but we don't lock the cache while accessing the database = better
 
             int? val = null;
-
+             
             if (_dictionary.TryGetValue(umbracoObjectType, out var mappers))
                 if ((val = mappers.key2id(key)) == default(int)) val = null;
 
             if (val == null)
             {
-                using (var uow = _uowProvider.GetUnitOfWork())
+                using (var scope = _scopeProvider.CreateScope())
                 {
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
                     {
-                        val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
+                        val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id", new { id = key});
                     }
                     else
                     {
-                        val = uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                        val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
                     }
-                    uow.Commit();
+                    scope.Complete();
                 }
             }
 
@@ -269,19 +269,19 @@ namespace Umbraco.Core.Services
 
             if (val == null)
             {
-                using (var uow = _uowProvider.GetUnitOfWork())
+                using (var scope = _scopeProvider.CreateScope())
                 {
                     //if it's unknown don't include the nodeObjectType in the query
                     if (umbracoObjectType == UmbracoObjectTypes.Unknown)
                     {
-                        val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
+                        val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id", new { id });
                     }
                     else
                     {
-                        val = uow.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservationGuid });
+                        val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
+                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
                     }
-                    uow.Commit();
+                    scope.Complete();
                 }
             }
 

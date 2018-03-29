@@ -1,10 +1,11 @@
 using System.Linq;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
 
-namespace Umbraco.Web.umbraco.presentation.umbraco.create
+namespace umbraco
 {
     public class MemberGroupTasks : LegacyDialogTask
     {
@@ -30,13 +31,13 @@ namespace Umbraco.Web.umbraco.presentation.umbraco.create
             }
 
             // Need to delete the member group from any content item that has it assigned in public access settings
-            var publicAccessService = UmbracoContext.Current.Application.Services.PublicAccessService;
+            var publicAccessService = Current.Services.PublicAccessService;
             var allPublicAccessRules = publicAccessService.GetAll();
 
             // Find only rules which have the current role name (alias) assigned to them
             var rulesWithDeletedRoles = allPublicAccessRules.Where(x => x.Rules.Any(r => r.RuleValue == Alias));
 
-            var contentService = UmbracoContext.Current.Application.Services.ContentService;
+            var contentService = Current.Services.ContentService;
             foreach (var publicAccessEntry in rulesWithDeletedRoles)
             {
                 var contentItem = contentService.GetById(publicAccessEntry.ProtectedNodeId);

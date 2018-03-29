@@ -59,7 +59,7 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

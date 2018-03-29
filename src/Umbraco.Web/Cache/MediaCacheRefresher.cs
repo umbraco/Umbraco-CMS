@@ -54,11 +54,8 @@ namespace Umbraco.Web.Cache
 
                 foreach (var payload in payloads)
                 {
-                    if (payload.Operation == OperationType.Deleted)
+                    if (payload.ChangeTypes == TreeChangeTypes.Remove)
                        _idkMap.ClearCache(payload.Id);
-
-                    
-                    
 
                     // note: ClearCacheByKeySearch - does StartsWith(...)
 

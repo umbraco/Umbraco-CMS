@@ -92,7 +92,7 @@
         view="ysodOverlay.view">
     </umb-overlay>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features)
 
     <script type="text/javascript">
         document.angularReady = function(app) {

@@ -31,13 +31,15 @@ namespace Umbraco.Web.Editors
     {
         private readonly UrlHelper _urlHelper;
         private readonly IRuntimeState _runtimeState;
+        private readonly UmbracoFeatures _features;
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
 
-        public BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState)
+        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
+            _features = features;
             _httpContext = _urlHelper.RequestContext.HttpContext;
             _owinContext = _httpContext.GetOwinContext();
         }
@@ -350,7 +352,7 @@ namespace Umbraco.Web.Editors
                         {
                             "disabledFeatures", new Dictionary<string,object>
                             {
-                                { "disableTemplates", FeaturesResolver.Current.Features.Disabled.DisableTemplates}
+                                { "disableTemplates", _features.Disabled.DisableTemplates}
                             }
                         }
 
