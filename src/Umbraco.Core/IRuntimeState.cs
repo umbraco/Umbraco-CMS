@@ -58,6 +58,16 @@ namespace Umbraco.Core
         RuntimeLevel Level { get; }
 
         /// <summary>
+        /// Gets the current migration state.
+        /// </summary>
+        string CurrentMigrationState { get; }
+
+        /// <summary>
+        /// Gets the final migration state.
+        /// </summary>
+        string FinalMigrationState { get; }
+
+        /// <summary>
         /// Gets the exception that caused the boot to fail.
         /// </summary>
         BootFailedException BootFailedException { get; }

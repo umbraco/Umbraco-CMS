@@ -48,17 +48,12 @@ namespace Umbraco.Web.Search
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
+        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
         {
             _services = services;
             _urlSegmentProviders = urlSegmentProviderCollection;
             _scopeProvider = scopeProvider;
             _examineManager = examineManager;
-
-            //fixme we cannot inject MainDom since it's internal, so thsi is the only way we can get it, alternatively we can add the container to the container and resolve
-            //directly from the container but that's not nice either
-            if (!(runtime is RuntimeState coreRuntime))
-                throw new NotSupportedException($"Unsupported IRuntimeState implementation {runtime.GetType().FullName}, expecting {typeof(RuntimeState).FullName}.");
 
             //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
             //and then we'll use MainDom to control Examine's shutdown
@@ -74,7 +69,7 @@ namespace Umbraco.Web.Search
             };
             
             //let's deal with shutting down Examine with MainDom
-            var examineShutdownRegistered = coreRuntime.MainDom.Register(() =>
+            var examineShutdownRegistered = mainDom.Register(() =>
             {
                 using (profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
