@@ -2,6 +2,7 @@
 using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
+using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -9,12 +10,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public LanguageMapperProfile()
         {
-            CreateMap<ILanguage, LanguageDisplay>()
+            CreateMap<ILanguage, Language>()
                 .ForMember(l => l.Name, expression => expression.MapFrom(x => x.CultureInfo.DisplayName));
-
-            CreateMap<CultureInfo, Culture>()
-                .ForMember(c => c.Name, expression => expression.MapFrom(x => x.DisplayName))
-                .ForMember(c => c.IsoCode, expression => expression.MapFrom(x => x.Name));
         }
     }
 }

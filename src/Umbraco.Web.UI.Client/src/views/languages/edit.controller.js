@@ -1,13 +1,13 @@
 (function () {
     "use strict";
 
-    function LanguagesEditController($timeout, $location, $routeParams, notificationsService, localizationService, languageResource) {
+    function LanguagesEditController($scope, $timeout, $location, $routeParams, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper) {
 
         var vm = this;
 
         vm.page = {};
         vm.language = {};
-        vm.availableLanguages = [];
+        vm.availableCultures = null;
         vm.breadcrumbs = [];
         vm.labels = {};
         vm.initIsDefault = false;
@@ -41,6 +41,9 @@
 
                 if($routeParams.create) {
                     vm.page.name = vm.labels.addLanguage;
+                    languageResource.getCultures().then(function(cultures) {
+                        vm.availableCultures = cultures;
+                    });
                 }
 
             });
@@ -49,14 +52,9 @@
 
                 vm.loading = true;
 
-                // fake loading the language
-                $timeout(function () {
-                    vm.language = {
-                        "name": "English (United States)",
-                        "culture": "en-US",
-                        "isDefault": false,
-                        "isMandatory": false
-                    };
+                languageResource.getById($routeParams.id).then(function(lang) {
+                    vm.language = lang;
+
                     vm.page.name = vm.language.name;
 
                     /* we need to store the initial default state so we can disabel the toggle if it is the default.
@@ -65,18 +63,40 @@
 
                     vm.loading = false;
                     makeBreadcrumbs();
-
-                }, 1000);
+                });
             }
         }
 
         function save() {
-            vm.page.saveButtonState = "busy";
-            // fake saving the language
-            $timeout(function(){
-                vm.page.saveButtonState = "success";
-                notificationsService.success(localizationService.localize("speechBubbles_languageSaved"));
-            }, 1000);
+
+            if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+                vm.page.saveButtonState = "busy";
+
+                languageResource.save(vm.language).then(function (lang) {
+                    vm.language = lang;
+                    vm.page.saveButtonState = "success";
+                    notificationsService.success(localizationService.localize("speechBubbles_languageSaved"));
+
+                    back();
+
+                }, function (err) {
+                    vm.page.saveButtonState = "error";
+
+                    contentEditingHelper.handleSaveError({
+                        redirectOnFailure: false,
+                        err: err
+                    });
+
+                    //show any notifications
+                    if (angular.isArray(err.data.notifications)) {
+                        for (var i = 0; i < err.data.notifications.length; i++) {
+                            notificationsService.showNotification(err.data.notifications[i]);
+                        }
+                    }
+                });
+            }
+
+            
         }
 
         function back() {

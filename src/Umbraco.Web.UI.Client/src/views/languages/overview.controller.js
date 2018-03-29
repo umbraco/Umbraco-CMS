@@ -49,7 +49,7 @@
         }
 
         function deleteLanguage(language, event) {
-            var confirmed = confirm("Are you sure you want to delete " + language.cultureDisplayName + "?");
+            var confirmed = confirm("Are you sure you want to delete " + language.name + "?");
             if(confirmed) {
                 language.deleteButtonState = "busy";
 

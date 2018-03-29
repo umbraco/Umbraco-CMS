@@ -242,8 +242,7 @@
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\ContentEditing\UserProfile.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
-    <Compile Include="Models\ContentEditing\Culture.cs" />
-    <Compile Include="Models\ContentEditing\LanguageDisplay.cs" />
+    <Compile Include="Models\ContentEditing\Language.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />

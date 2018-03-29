@@ -21,12 +21,15 @@
                 <umb-box ng-if="!vm.loading" class="block-form">
                     <umb-box-content>
 
-                        <umb-control-group label="@general_language">
-                            <select 
-                                class="input-block-level"
-                                ng-model="vm.newLanguage.culture"
-                                ng-options="key as value for (key, value) in vm.availableCultures">
-                            </select>
+                        <umb-control-group label="@general_language" ng-if="vm.availableCultures != null">
+                            <select name="newLang"
+                                    class="input-block-level"
+                                    ng-model="vm.language.culture"
+                                    ng-options="key as value for (key, value) in vm.availableCultures"
+                                    val-server-field="IsoCode"
+                                    ></select>
+                            <span class="help-inline" val-msg-for="newLang" val-toggle-msg="required">Required</span>
+                            <span class="help-inline" val-msg-for="newLang" val-toggle-msg="valServerField"></span>
                         </umb-control-group>
 
                         <umb-control-group label="@general_settings">

@@ -5,8 +5,17 @@
   **/
 function languageResource($q, $http, umbRequestHelper) {
     return {
-        
-        getAll: function (id, alias) {
+
+        getCultures: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "languageApiBaseUrl",
+                        "GetAllCultures")),
+                "Failed to get cultures");
+        },
+
+        getAll: function () {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -14,6 +23,29 @@ function languageResource($q, $http, umbRequestHelper) {
                         "languageApiBaseUrl",
                         "GetAllLanguages")),
                 "Failed to get languages");
+        },
+
+        getById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "languageApiBaseUrl",
+                        "GetLanguage",
+                        { id: id })),
+                "Failed to get language with id " + id);
+        },
+
+        save: function (lang) {
+            if (!lang)
+                throw "'lang' parameter cannot be null";
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "languageApiBaseUrl",
+                        "SaveLanguage"), lang),
+                "Failed to save language " + lang.id);
         },
 
         deleteById: function (id) {

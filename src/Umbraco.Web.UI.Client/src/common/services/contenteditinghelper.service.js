@@ -489,6 +489,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          *
          * @description
          * A function to handle what happens when we have validation issues from the server side
+         *
+         * TODO: Move to formHelper, so all this is in one place
          */
         handleSaveError: function (args) {
 

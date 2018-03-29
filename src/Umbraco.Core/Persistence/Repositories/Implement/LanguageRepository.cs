@@ -105,6 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(ILanguage entity)
         {
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureInfo == null || entity.CultureName.IsNullOrWhiteSpace())
+                throw new InvalidOperationException("The required language data is missing");
+
             ((EntityBase)entity).AddingEntity();
 
             if (entity.IsDefaultVariantLanguage)
@@ -127,6 +130,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(ILanguage entity)
         {
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureInfo == null || entity.CultureName.IsNullOrWhiteSpace())
+                throw new InvalidOperationException("The required language data is missing");
+
             ((EntityBase)entity).UpdatingEntity();
 
             if (entity.IsDefaultVariantLanguage)
