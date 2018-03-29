@@ -3,7 +3,7 @@
   * @name umbraco.resources.languageResource
   * @description Handles retrieving and updating language data
   **/
-function languageResource($q, $http, umbRequestHelper) {
+function languageResource($http, umbRequestHelper) {
     return {
 
         getCultures: function() {

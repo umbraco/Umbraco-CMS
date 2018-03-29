@@ -21,7 +21,7 @@
                 <umb-box ng-if="!vm.loading" class="block-form">
                     <umb-box-content>
 
-                        <umb-control-group label="@general_language" ng-if="vm.availableCultures != null">
+                        <umb-control-group label="@general_language" ng-if="vm.availableCultures">
                             <select name="newLang"
                                     class="input-block-level"
                                     ng-model="vm.language.culture"
