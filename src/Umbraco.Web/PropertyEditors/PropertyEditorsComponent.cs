@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Models;
@@ -11,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     internal class PropertyEditorsComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection)
+        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors)
         {
             var fileUpload = propertyEditors.OfType<FileUploadPropertyEditor>().FirstOrDefault();
             if (fileUpload != null) Initialize(fileUpload);

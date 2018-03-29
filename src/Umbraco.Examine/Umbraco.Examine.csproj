@@ -47,7 +47,7 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="Examine">
-      <Version>1.0.0-beta020</Version>
+      <Version>1.0.0-beta024</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NPoco" Version="3.6.1" />
@@ -59,8 +59,6 @@
     <Compile Include="Config\IndexSet.cs" />
     <Compile Include="Config\IndexSetCollection.cs" />
     <Compile Include="Config\IndexSets.cs" />
-    <Compile Include="ExamineIndexCollectionAccessor.cs" />
-    <Compile Include="IExamineIndexCollectionAccessor.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LoggingLevel.cs" />

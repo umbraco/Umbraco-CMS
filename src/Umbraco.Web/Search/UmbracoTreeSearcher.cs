@@ -72,7 +72,7 @@ namespace Umbraco.Web.Search
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
 
-            var internalSearcher = ExamineManager.Instance.GetIndexSearcher(indexer);
+            var internalSearcher = ExamineManager.Instance.GetSearcher(indexer);
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards

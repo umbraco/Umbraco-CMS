@@ -46,7 +46,7 @@ namespace Umbraco.Web.Components
         private BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
         private bool _started;
         private IBackgroundTask[] _tasks;
-        private IExamineIndexCollectionAccessor _indexCollection;
+        private IExamineManager _examineManager;
 
         public override void Compose(Composition composition)
         {
@@ -87,13 +87,13 @@ namespace Umbraco.Web.Components
                             //rebuild indexes if the server is not synced
                             // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                             // indexes then they can adjust this logic themselves.
-                            () => ExamineComponent.RebuildIndexes(false, _indexCollection, _logger)
+                            () => ExamineComponent.RebuildIndexes(false, _examineManager, _logger)
                         }
                     });
             });
         }
 
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IExamineIndexCollectionAccessor indexes)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IExamineManager examineManager)
         {
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
@@ -106,7 +106,7 @@ namespace Umbraco.Web.Components
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
-            _indexCollection = indexes;
+            _examineManager = examineManager;
 
             _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);

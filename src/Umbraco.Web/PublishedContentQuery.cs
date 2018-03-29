@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.XPath;
+using Examine;
 using Examine.LuceneEngine.Providers;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
@@ -227,13 +228,13 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string indexName = null)
         {
-            //TODO: Can we inject/Ioc into this class for ExamineManager or the IExamineIndexAccessor?
+            //TODO: Can we inject IExamineManager?
 
             if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, indexName);
 
             var indexer = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.IndexProviders[Constants.Examine.ExternalIndexer]
-                : Examine.ExamineManager.Instance.IndexProviders[indexName];
+                ? Examine.ExamineManager.Instance.GetIndexer(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetIndexer(indexName);
 
             if (indexer == null) throw new InvalidOperationException("No index found by name " + indexName);
 
@@ -261,7 +262,9 @@ namespace Umbraco.Web
         {
             if (_query != null) return _query.Search(skip, take, out totalRecords, criteria, searchProvider);
 
-            var searcher = searchProvider ?? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer);
+            //TODO: Can we inject IExamineManager?
+
+            var searcher = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
 
             var results = skip == 0 && take == 0
                 ? searcher.Search(criteria)

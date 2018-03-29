@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core;
@@ -222,9 +223,11 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
+            //TODO: we should pass in the IExamineManager?
+
             var searcher = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetIndexSearcher(indexName);
+                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetSearcher(indexName);
 
             if (searcher == null)
                 throw new InvalidOperationException("No searcher found for index " + indexName);
@@ -246,9 +249,11 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
+            //TODO: we should pass in the IExamineManager?
+
             var searcher = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetIndexSearcher(indexName);
+                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetSearcher(indexName);
 
             if (searcher == null)
                 throw new InvalidOperationException("No searcher found for index " + indexName);
@@ -265,7 +270,9 @@ namespace Umbraco.Web
 
         public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
         {
-            var s = searchProvider ?? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer);
+            //TODO: we should pass in the IExamineManager?
+
+            var s = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
             
             var results = s.Search(criteria);
             return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);

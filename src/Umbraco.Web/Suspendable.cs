@@ -80,8 +80,8 @@ namespace Umbraco.Web
 
                 // fixme - could we fork this on a background thread?
                 //TODO: when resuming do we always want a full rebuild of all indexes?
-                //We are calling into the ExamineComponent since this rebuilds only when MainDom is active
-                ExamineComponent.RebuildIndexes(false, new ExamineIndexCollectionAccessor(), Current.Logger);
+                // fixme - can we inject IExamineManager somehow?
+                ExamineComponent.RebuildIndexes(false, ExamineManager.Instance, Current.Logger);
             }
         }
 

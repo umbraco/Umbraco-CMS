@@ -26,17 +26,14 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
-        public ExamineManagementApiController(IExamineIndexCollectionAccessor examineIndexes, ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
+        public ExamineManagementApiController(IExamineManager examineManager, ILogger logger, IRuntimeCacheProvider runtimeCacheProvider)
         {
-            //fixme can we inject this? we'll need an IExamineManager
-            _examineManager = ExamineManager.Instance;
-            _examineIndexes = examineIndexes;
+            _examineManager = examineManager;
             _logger = logger;
             _runtimeCacheProvider = runtimeCacheProvider;
         }
 
-        private readonly ExamineManager _examineManager;
-        private readonly IExamineIndexCollectionAccessor _examineIndexes;
+        private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _runtimeCacheProvider;
 
@@ -49,7 +46,7 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MemberService.Count();
 
-            var searcher = _examineManager.GetIndexSearcher(Constants.Examine.InternalMemberIndexer);
+            var searcher = _examineManager.GetSearcher(Constants.Examine.InternalMemberIndexer);
             var criteria = searcher.CreateCriteria().RawQuery("__IndexType:member");
             var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
@@ -64,7 +61,7 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.MediaService.Count();
 
-            var searcher = _examineManager.GetIndexSearcher(Constants.Examine.InternalIndexer);
+            var searcher = _examineManager.GetSearcher(Constants.Examine.InternalIndexer);
             var criteria = searcher.CreateCriteria().RawQuery("__IndexType:media");
             var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
@@ -79,7 +76,7 @@ namespace Umbraco.Web.WebServices
         {
             var total = Services.ContentService.Count();
 
-            var searcher = _examineManager.GetIndexSearcher(Constants.Examine.InternalIndexer);
+            var searcher = _examineManager.GetSearcher(Constants.Examine.InternalIndexer);
             var criteria = searcher.CreateCriteria().RawQuery("__IndexType:content");
             var totalIndexed = searcher.Search(criteria);
             return total == totalIndexed.TotalItemCount;
@@ -91,7 +88,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<ExamineIndexerModel> GetIndexerDetails()
         {
-            return _examineIndexes.Indexes.Select(CreateModel).OrderBy(x =>
+            return _examineManager.IndexProviders.Select(CreateModel).OrderBy(x =>
             {
                 //order by name , but strip the "Indexer" from the end if it exists
                 return x.Name.TrimEnd("Indexer");
@@ -105,7 +102,7 @@ namespace Umbraco.Web.WebServices
         public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
         {
             var model = new List<ExamineSearcherModel>(
-                _examineIndexes.Indexes.Select(indexer =>
+                _examineManager.IndexProviders.Select(indexer =>
                 {
                     var searcher = indexer.Value.GetSearcher();
                     var searcherName = (searcher as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
@@ -294,7 +291,7 @@ namespace Umbraco.Web.WebServices
 
         private HttpResponseMessage ValidateLuceneSearcher(string searcherName, out LuceneSearcher searcher)
         {
-            foreach (var indexer in _examineIndexes.Indexes)
+            foreach (var indexer in _examineManager.IndexProviders)
             {
                 var s = indexer.Value.GetSearcher();
                 var sName = (s as BaseLuceneSearcher)?.Name ?? string.Concat(indexer.Key, "Searcher");
@@ -324,8 +321,8 @@ namespace Umbraco.Web.WebServices
         {
             indexer = null;
 
-            if (_examineIndexes.Indexes.ContainsKey(indexerName)
-                && _examineIndexes.Indexes[indexerName] is T casted)
+            if (_examineManager.IndexProviders.ContainsKey(indexerName)
+                && _examineManager.IndexProviders[indexerName] is T casted)
             {
                 //return Ok!
                 indexer = casted;

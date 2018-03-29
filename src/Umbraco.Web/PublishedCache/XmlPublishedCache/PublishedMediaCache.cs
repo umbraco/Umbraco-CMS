@@ -221,7 +221,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override bool HasContent(bool preview) { throw new NotImplementedException(); }
 
-        private static ExamineManager GetExamineManagerSafe()
+        private static IExamineManager GetExamineManagerSafe()
         {
             try
             {
@@ -243,8 +243,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             try
             {
-                //by default use the InternalSearcher
-                return eMgr.GetIndexSearcher(Constants.Examine.InternalIndexer);
+                //by default use the internal index
+                return eMgr.GetSearcher(Constants.Examine.InternalIndexer);
             }
             catch (FileNotFoundException)
             {
