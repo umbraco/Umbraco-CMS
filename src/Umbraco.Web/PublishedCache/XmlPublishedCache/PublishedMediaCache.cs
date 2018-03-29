@@ -51,10 +51,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         public PublishedMediaCache(XmlStore xmlStore, IMediaService mediaService, IUserService userService, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
             : base(false)
         {
-            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            _mediaService = mediaService;
-            _userService = userService;
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
             _cacheProvider = cacheProvider;
             _xmlStore = xmlStore;
@@ -73,15 +71,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal PublishedMediaCache(IMediaService mediaService, IUserService userService, ISearcher searchProvider, BaseIndexProvider indexProvider, ICacheProvider cacheProvider, PublishedContentTypeCache contentTypeCache)
             : base(false)
         {
-            if (mediaService == null) throw new ArgumentNullException(nameof(mediaService));
-            if (userService == null) throw new ArgumentNullException(nameof(userService));
-            if (searchProvider == null) throw new ArgumentNullException(nameof(searchProvider));
-            if (indexProvider == null) throw new ArgumentNullException(nameof(indexProvider));
-
-            _mediaService = mediaService;
-            _userService = userService;
-            _searchProvider = searchProvider;
-            _indexProvider = indexProvider;
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _searchProvider = searchProvider ?? throw new ArgumentNullException(nameof(searchProvider));
+            _indexProvider = indexProvider ?? throw new ArgumentNullException(nameof(indexProvider));
             _cacheProvider = cacheProvider;
             _contentTypeCache = contentTypeCache;
         }
@@ -117,8 +110,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     // first check in Examine for the cache values
                     // +(+parentID:-1) +__IndexType:media
 
-                    var criteria = searchProvider.CreateSearchCriteria("media");
-                    var filter = criteria.ParentId(-1).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    var criteria = searchProvider.CreateCriteria("media");
+                    var filter = criteria.ParentId(-1).Not().Field(UmbracoExamineIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
 
                     var result = searchProvider.Search(filter.Compile());
                     if (result != null)

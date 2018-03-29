@@ -16,8 +16,11 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
@@ -35,11 +38,22 @@ namespace Umbraco.Web.Search
         //fixme - we are injecting this which is nice, but we still use ExamineManager everywhere, we could instead interface IExamineManager?
         private IExamineIndexCollectionAccessor _indexCollection;
         private static bool _disableExamineIndexing = false;
-        private static volatile bool __isConfigured = false;
+        private static volatile bool _isConfigured = false;
         private static readonly object IsConfiguredLocker = new object();
+        private IScopeProvider _scopeProvider;
+        private UrlSegmentProviderCollection _urlSegmentProviders;
+        private ServiceContext _services;
 
-        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ProfilingLogger profilingLogger)
+        // the default enlist priority is 100
+        // enlist with a lower priority to ensure that anything "default" runs after us
+        // but greater that SafeXmlReaderWriter priority which is 60
+        private const int EnlistPriority = 80;
+
+        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
         {
+            _services = services;
+            _urlSegmentProviders = urlSegmentProviderCollection;
+            _scopeProvider = scopeProvider;
             _indexCollection = indexCollection;
 
             //fixme we cannot inject MainDom since it's internal, so thsi is the only way we can get it, alternatively we can add the container to the container and resolve
@@ -174,14 +188,14 @@ namespace Umbraco.Web.Search
         private static void EnsureUnlocked(ILogger logger, IExamineIndexCollectionAccessor indexCollection)
         {
             if (_disableExamineIndexing) return;
-            if (__isConfigured) return;
+            if (_isConfigured) return;
 
             lock (IsConfiguredLocker)
             {
                 //double chekc
-                if (__isConfigured) return;
+                if (_isConfigured) return;
 
-                __isConfigured = true;
+                _isConfigured = true;
 
                 foreach (var luceneIndexer in indexCollection.Indexes.Values.OfType<LuceneIndexer>())
                 {
@@ -228,7 +242,7 @@ namespace Umbraco.Web.Search
             switch (args.MessageType)
             {
                 case MessageType.RefreshById:
-                    var c1 = Current.Services.MemberService.GetById((int)args.MessageObject);
+                    var c1 = _services.MemberService.GetById((int)args.MessageObject);
                     if (c1 != null)
                     {
                         ReIndexForMember(c1);
@@ -271,7 +285,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-            var mediaService = Current.Services.MediaService;
+            var mediaService = _services.MediaService;
 
             foreach (var payload in (MediaCacheRefresher.JsonPayload[]) args.MessageObject)
             {
@@ -320,7 +334,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-            var contentService = Current.Services.ContentService;
+            var contentService = _services.ContentService;
 
             foreach (var payload in (ContentCacheRefresher.JsonPayload[]) args.MessageObject)
             {
@@ -385,6 +399,8 @@ namespace Umbraco.Web.Search
                 // ReIndexForContent is NOT taking care of descendants so we have to reload everything
                 //  again in order to process the branch - we COULD improve that by just reloading the
                 //  XML from database instead of reloading content & re-serializing!
+                //
+                // BUT ... pretty sure it is! see test "Index_Delete_Index_Item_Ensure_Heirarchy_Removed"
             }
         }
 
@@ -412,38 +428,29 @@ namespace Umbraco.Web.Search
 
         private void ReIndexForContent(IContent sender, bool? supportUnpublished = null)
         {
-            var valueSet = UmbracoContentIndexer.GetValueSets(Current.UrlSegmentProviders, Current.Services.UserService, sender);
-
-            ExamineManager.Instance.IndexItems(
-                valueSet.ToArray(),
-                _indexCollection.Indexes.Values.OfType<UmbracoContentIndexer>()
-                    // only for the specified indexers
-                    .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
-                    .Where(x => x.EnableDefaultEventHandler));
+            var actions = DeferedActions.Get(_scopeProvider);
+            if (actions != null)
+                actions.Add(new DeferedReIndexForContent(this, sender, supportUnpublished));
+            else
+                DeferedReIndexForContent.Execute(this, sender, supportUnpublished);
         }
 
         private void ReIndexForMember(IMember member)
         {
-            var valueSet = UmbracoMemberIndexer.GetValueSets(member);
-
-            ExamineManager.Instance.IndexItems(
-                valueSet.ToArray(),
-                _indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>()
-                    //ensure that only the providers are flagged to listen execute
-                    .Where(x => x.EnableDefaultEventHandler));
+            var actions = DeferedActions.Get(_scopeProvider);
+            if (actions != null)
+                actions.Add(new DeferedReIndexForMember(this, member));
+            else
+                DeferedReIndexForMember.Execute(this, member);
         }
 
         private void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
-            var valueSet = UmbracoContentIndexer.GetValueSets(Current.UrlSegmentProviders, Current.Services.UserService, sender);
-
-            ExamineManager.Instance.IndexItems(
-                valueSet.ToArray(),
-                _indexCollection.Indexes.Values.OfType<UmbracoContentIndexer>()
-                    // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
-                    // then only index this for indexers supporting unpublished media
-                    .Where(x => isMediaPublished || (x.SupportUnpublishedContent))
-                    .Where(x => x.EnableDefaultEventHandler));
+            var actions = DeferedActions.Get(_scopeProvider);
+            if (actions != null)
+                actions.Add(new DeferedReIndexForMedia(this, sender, isMediaPublished));
+            else
+                DeferedReIndexForMedia.Execute(this, sender, isMediaPublished);
         }
 
         /// <summary>
@@ -456,13 +463,166 @@ namespace Umbraco.Web.Search
         /// </param>
         private void DeleteIndexForEntity(int entityId, bool keepIfUnpublished)
         {
-            ExamineManager.Instance.DeleteFromIndexes(
-                entityId.ToString(CultureInfo.InvariantCulture),
-                _indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>()
-                    // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
-                    // otherwise if keepIfUnpublished == false then remove from all indexes
-                    .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))
-                    .Where(x => x.EnableDefaultEventHandler));
+            var actions = DeferedActions.Get(_scopeProvider);
+            if (actions != null)
+                actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
+            else
+                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);            
+        }
+
+        private class DeferedActions
+        {
+            private readonly List<DeferedAction> _actions = new List<DeferedAction>();
+
+            public static DeferedActions Get(IScopeProvider scopeProvider)
+            {
+                var scopeContext = scopeProvider.Context;
+
+                return scopeContext?.Enlist("examineEvents",
+                    () => new DeferedActions(), // creator
+                    (completed, actions) => // action
+                    {
+                        if (completed) actions.Execute();
+                    }, EnlistPriority);
+            }
+
+            public void Add(DeferedAction action)
+            {
+                _actions.Add(action);
+            }
+
+            private void Execute()
+            {
+                foreach (var action in _actions)
+                    action.Execute();
+            }
+        }
+
+        private abstract class DeferedAction
+        {
+            public virtual void Execute()
+            { }
+        }
+
+        private class DeferedReIndexForContent : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly IContent _content;
+            private readonly bool? _supportUnpublished;
+
+            public DeferedReIndexForContent(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
+            {                
+                _examineComponent = examineComponent;
+                _content = content;
+                _supportUnpublished = supportUnpublished;
+            }
+
+            public override void Execute()
+            {
+                Execute(_examineComponent, _content, _supportUnpublished);
+            }
+
+            public static void Execute(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
+            {
+                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, content);
+
+                ExamineManager.Instance.IndexItems(
+                    valueSet.ToArray(),
+                    examineComponent._indexCollection.Indexes.Values.OfType<UmbracoContentIndexer>()
+                        // only for the specified indexers
+                        .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
+
+        private class DeferedReIndexForMedia : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly IMedia _media;
+            private readonly bool _isPublished;
+
+            public DeferedReIndexForMedia(ExamineComponent examineComponent, IMedia media, bool isPublished)
+            {
+                _examineComponent = examineComponent;
+                _media = media;
+                _isPublished = isPublished;
+            }
+
+            public override void Execute()
+            {
+                Execute(_examineComponent, _media, _isPublished);
+            }
+
+            public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
+            {
+                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, media);
+
+                ExamineManager.Instance.IndexItems(
+                    valueSet.ToArray(),
+                    examineComponent._indexCollection.Indexes.Values.OfType<UmbracoContentIndexer>()
+                        // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
+                        // then only index this for indexers supporting unpublished media
+                        .Where(x => isPublished || (x.SupportUnpublishedContent))
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
+
+        private class DeferedReIndexForMember : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly IMember _member;
+
+            public DeferedReIndexForMember(ExamineComponent examineComponent, IMember member)
+            {
+                _examineComponent = examineComponent;
+                _member = member;
+            }
+
+            public override void Execute()
+            {
+                Execute(_examineComponent, _member);
+            }
+
+            public static void Execute(ExamineComponent examineComponent, IMember member)
+            {
+                var valueSet = UmbracoMemberIndexer.GetValueSets(member);
+
+                ExamineManager.Instance.IndexItems(
+                    valueSet.ToArray(),
+                    examineComponent._indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>()
+                        //ensure that only the providers are flagged to listen execute
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
+
+        private class DeferedDeleteIndex : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly int _id;
+            private readonly bool _keepIfUnpublished;
+
+            public DeferedDeleteIndex(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
+            {
+                _examineComponent = examineComponent;
+                _id = id;
+                _keepIfUnpublished = keepIfUnpublished;
+            }
+
+            public override void Execute()
+            {
+                Execute(_examineComponent, _id, _keepIfUnpublished);
+            }
+
+            public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
+            {
+                ExamineManager.Instance.DeleteFromIndexes(
+                    id.ToString(CultureInfo.InvariantCulture),
+                    examineComponent._indexCollection.Indexes.Values.OfType<UmbracoExamineIndexer>()
+                        // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
+                        // otherwise if keepIfUnpublished == false then remove from all indexes
+                        .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
         }
 
     }

@@ -221,18 +221,24 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null)
         {
-            return Search(0, 0, out _, term, useWildCards, searchProvider);
+            return Search(0, 0, out _, term, useWildCards, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string indexName = null)
         {
-            if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, searchProvider);
+            //TODO: Can we inject/Ioc into this class for ExamineManager or the IExamineIndexAccessor?
 
-            var searcher = string.IsNullOrWhiteSpace(searchProvider)
-                ? Examine.ExamineManager.Instance.DefaultSearchProvider
-                : Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-            
+            if (_query != null) return _query.Search(skip, take, out totalRecords, term, useWildCards, indexName);
+
+            var indexer = string.IsNullOrEmpty(indexName)
+                ? Examine.ExamineManager.Instance.IndexProviders[Constants.Examine.ExternalIndexer]
+                : Examine.ExamineManager.Instance.IndexProviders[indexName];
+
+            if (indexer == null) throw new InvalidOperationException("No index found by name " + indexName);
+
+            var searcher = indexer.GetSearcher();
+
             if (skip == 0 && take == 0)
             {
                 var results = searcher.Search(term, useWildCards);
@@ -240,30 +246,22 @@ namespace Umbraco.Web
                 return results.ToPublishedSearchResults(_contentCache);
             }
 
-            if (!(searcher is BaseLuceneSearcher luceneSearcher))
-            {
-                var results = searcher.Search(term, useWildCards);
-                totalRecords = results.TotalItemCount;
-                // Examine skip, Linq take
-                return results.Skip(skip).ToPublishedSearchResults(_contentCache).Take(take);
-            }
-
-            var criteria = SearchAllFields(term, useWildCards, luceneSearcher);
+            var criteria = SearchAllFields(term, useWildCards, searcher, indexer);
             return Search(skip, take, out totalRecords, criteria, searcher);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
         {
             return Search(0, 0, out _, criteria, searchProvider);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
         {
             if (_query != null) return _query.Search(skip, take, out totalRecords, criteria, searchProvider);
 
-            var searcher = searchProvider ?? Examine.ExamineManager.Instance.DefaultSearchProvider;
+            var searcher = searchProvider ?? Examine.ExamineManager.Instance.GetIndexSearcher(Constants.Examine.ExternalIndexer);
 
             var results = skip == 0 && take == 0
                 ? searcher.Search(criteria)
@@ -276,45 +274,25 @@ namespace Umbraco.Web
         /// <summary>
         /// Creates an ISearchCriteria for searching all fields in a <see cref="BaseLuceneSearcher"/>.
         /// </summary>
-        /// <remarks>
-        /// This is here because some of this stuff is internal in Examine.
-        /// </remarks>
-        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, BaseLuceneSearcher searcher)
+        private ISearchCriteria SearchAllFields(string searchText, bool useWildcards, Examine.ISearcher searcher, Examine.IIndexer indexer)
         {
-            var sc = searcher.CreateSearchCriteria();
+            var sc = searcher.CreateCriteria();
 
-            if (_examineGetSearchFields == null)
-            {
-                //get the GetSearchFields method from BaseLuceneSearcher
-                _examineGetSearchFields = typeof(BaseLuceneSearcher).GetMethod("GetSearchFields", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            }
-
-            //get the results of searcher.BaseLuceneSearcher() using ugly reflection since it's not public
-            var searchFields = (IEnumerable<string>) _examineGetSearchFields.Invoke(searcher, null);
+            //if we're dealing with a lucene searcher, we can get all of it's indexed fields,
+            //else we can get the defined fields for the index. 
+            var searchFields = (searcher is BaseLuceneSearcher luceneSearcher)
+                ? luceneSearcher.GetAllIndexedFields()
+                : indexer.FieldDefinitionCollection.Keys;
 
             //this is what Examine does internally to create ISearchCriteria for searching all fields
             var strArray = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
             sc = useWildcards == false
                 ? sc.GroupedOr(searchFields, strArray).Compile()
-                : sc.GroupedOr(searchFields, strArray.Select(x => new CustomExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray<IExamineValue>()).Compile();
+                : sc.GroupedOr(searchFields, strArray.Select(x => (IExamineValue)new ExamineValue(Examineness.ComplexWildcard, x.MultipleCharacterWildcard().Value)).ToArray()).Compile();
             return sc;
-        }
+        }        
 
-        private static MethodInfo _examineGetSearchFields;
-
-        //support class since Examine doesn't expose it's own ExamineValue class publicly
-        private class CustomExamineValue : IExamineValue
-        {
-            public CustomExamineValue(Examineness vagueness, string value)
-            {
-                this.Examineness = vagueness;
-                this.Value = value;
-                this.Level = 1f;
-            }
-            public Examineness Examineness { get; private set; }
-            public string Value { get; private set; }
-            public float Level { get; private set; }
-        }
 
         #endregion
     }

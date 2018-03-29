@@ -93,20 +93,20 @@ namespace Umbraco.Web.Components
             });
         }
 
-        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerRegistrationService registrationService, IUmbracoDatabaseFactory databaseFactory, ILogger logger, IExamineIndexCollectionAccessor indexCollection)
+        public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IExamineIndexCollectionAccessor indexes)
         {
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
             _registrar = serverRegistrar as DatabaseServerRegistrar;
             if (_registrar == null) throw new Exception("panic: registar.");
 
-            _indexCollection = indexCollection;
             _messenger = serverMessenger as BatchedDatabaseServerMessenger;
             if (_messenger == null) throw new Exception("panic: messenger");
 
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
+            _indexCollection = indexes;
 
             _touchTaskRunner = new BackgroundTaskRunner<IBackgroundTask>("ServerRegistration",
                 new BackgroundTaskRunnerOptions { AutoStart = true }, logger);
