@@ -122,22 +122,22 @@ namespace Umbraco.Web.Models.Mapping
                   .AfterMap((src, dest) =>
                       {
                           //get the icon if there is one
-                          dest.Icon = src.Fields.ContainsKey(BaseUmbracoIndexer.IconFieldName)
-                              ? src.Fields[BaseUmbracoIndexer.IconFieldName]
+                          dest.Icon = src.Fields.ContainsKey(UmbracoExamineIndexer.IconFieldName)
+                              ? src.Fields[UmbracoExamineIndexer.IconFieldName]
                               : "icon-document";
 
                           dest.Name = src.Fields.ContainsKey("nodeName") ? src.Fields["nodeName"] : "[no name]";
-                          if (src.Fields.ContainsKey(UmbracoContentIndexer.NodeKeyFieldName))
+                          if (src.Fields.ContainsKey(UmbracoExamineIndexer.NodeKeyFieldName))
                           {
                               Guid key;
-                              if (Guid.TryParse(src.Fields[UmbracoContentIndexer.NodeKeyFieldName], out key))
+                              if (Guid.TryParse(src.Fields[UmbracoExamineIndexer.NodeKeyFieldName], out key))
                               {
                                   dest.Key = key;
 
                                   //need to set the UDI
-                                  if (src.Fields.ContainsKey(LuceneIndexer.IndexTypeFieldName))
+                                  if (src.Fields.ContainsKey(LuceneIndexer.CategoryFieldName))
                                   {
-                                      switch (src.Fields[LuceneIndexer.IndexTypeFieldName])
+                                      switch (src.Fields[LuceneIndexer.CategoryFieldName])
                                       {
                                           case IndexTypes.Member:
                                               dest.Udi = new GuidUdi(Constants.UdiEntityType.Member, dest.Key);
@@ -165,15 +165,15 @@ namespace Umbraco.Web.Models.Mapping
                                   dest.ParentId = -1;
                               }
                           }
-                          dest.Path = src.Fields.ContainsKey(UmbracoContentIndexer.IndexPathFieldName) ? src.Fields[UmbracoContentIndexer.IndexPathFieldName] : "";
+                          dest.Path = src.Fields.ContainsKey(UmbracoExamineIndexer.IndexPathFieldName) ? src.Fields[UmbracoExamineIndexer.IndexPathFieldName] : "";
 
-                          if (src.Fields.ContainsKey(LuceneIndexer.NodeTypeAliasFieldName))
+                          if (src.Fields.ContainsKey(LuceneIndexer.ItemTypeFieldName))
                           {
-                              dest.AdditionalData.Add("contentType", src.Fields[LuceneIndexer.NodeTypeAliasFieldName]);
+                              dest.AdditionalData.Add("contentType", src.Fields[LuceneIndexer.ItemTypeFieldName]);
                           }
                       });
 
-            CreateMap<ILuceneSearchResults, IEnumerable<SearchResultItem>>()
+            CreateMap<ISearchResults, IEnumerable<SearchResultItem>>()
                   .ConvertUsing(results => results.Select(Mapper.Map<SearchResultItem>).ToList());
 
             CreateMap<IEnumerable<SearchResult>, IEnumerable<SearchResultItem>>()

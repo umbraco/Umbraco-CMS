@@ -85,6 +85,12 @@ namespace Umbraco.Core
         /// <remarks>This is either "/" or eg "/virtual".</remarks>
         public string ApplicationVirtualPath { get; } = HttpRuntime.AppDomainAppVirtualPath;
 
+        /// <inheritdoc />
+        public string CurrentMigrationState { get; internal set; }
+
+        /// <inheritdoc />
+        public string FinalMigrationState { get; internal set; }
+
         /// <summary>
         /// Gets the runtime level of execution.
         /// </summary>

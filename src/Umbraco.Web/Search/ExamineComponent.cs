@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,8 +7,9 @@ using System.Threading;
 using System.Xml.Linq;
 using Examine;
 using Examine.LuceneEngine;
-using Examine.Session;
+using Examine.LuceneEngine.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
@@ -18,6 +20,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
@@ -32,63 +35,69 @@ namespace Umbraco.Web.Search
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ExamineComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
+        private IExamineManager _examineManager;
+        private static bool _disableExamineIndexing = false;
+        private static volatile bool _isConfigured = false;
+        private static readonly object IsConfiguredLocker = new object();
         private IScopeProvider _scopeProvider;
+        private UrlSegmentProviderCollection _urlSegmentProviders;
+        private ServiceContext _services;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        public void Initialize(IRuntimeState runtime, PropertyEditorCollection propertyEditors, IExamineIndexCollectionAccessor indexCollection, IScopeProvider scopeProvider, ILogger logger)
+        internal void Initialize(IRuntimeState runtime, MainDom mainDom, PropertyEditorCollection propertyEditors, IExamineManager examineManager, ProfilingLogger profilingLogger, IScopeProvider scopeProvider, UrlSegmentProviderCollection urlSegmentProviderCollection, ServiceContext services)
         {
+            _services = services;
+            _urlSegmentProviders = urlSegmentProviderCollection;
             _scopeProvider = scopeProvider;
+            _examineManager = examineManager;
 
-            logger.Info<ExamineComponent>("Starting initialize async background thread.");
+            //We want to manage Examine's appdomain shutdown sequence ourselves so first we'll disable Examine's default behavior
+            //and then we'll use MainDom to control Examine's shutdown
+            ExamineManager.DisableDefaultHostingEnvironmentRegistration();
 
-            // make it async in order not to slow down the boot
-            // fixme - should be a proper background task else we cannot stop it!
-            var bg = new Thread(() =>
+            //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the appdomain
+            //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
+            //which simply checks the existence of the lock file
+            DirectoryTracker.DefaultLockFactory = d =>
             {
-                try
+                var simpleFsLockFactory = new NoPrefixSimpleFsLockFactory(d);
+                return simpleFsLockFactory;
+            };
+            
+            //let's deal with shutting down Examine with MainDom
+            var examineShutdownRegistered = mainDom.Register(() =>
+            {
+                using (profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
                 {
-                    // from WebRuntimeComponent
-                    // rebuilds any empty indexes
-                    RebuildIndexes(true);
-                }
-                catch (Exception e)
-                {
-                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
-                }
-
-                try
-                {
-                    // from PropertyEditorsComponent
-                    var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
-                    if (grid != null) BindGridToExamine(grid, indexCollection);
-                }
-                catch (Exception e)
-                {
-                    logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+                    ExamineManager.Instance.Dispose();
                 }
             });
-            bg.Start();
 
-            // the rest is the original Examine event handler
+            if (!examineShutdownRegistered)
+            {
+                profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown not registered, this appdomain is not the MainDom, Examine will be disabled");
 
-            logger.Info<ExamineComponent>("Initialize and bind to business logic events.");
+                //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
+                Suspendable.ExamineEvents.SuspendIndexers();
+                _disableExamineIndexing = true;
+                return; //exit, do not continue
+            }
 
-            //TODO: For now we'll make this true, it means that indexes will be near real time
-            // we'll see about what implications this may have - should be great in most scenarios
-            DefaultExamineSession.RequireImmediateConsistency = true;
+            profilingLogger.Logger.Debug<ExamineComponent>("Examine shutdown registered with MainDom");
 
-            var registeredProviders = ExamineManager.Instance.IndexProviderCollection
-                .OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
+            var registeredIndexers = examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
 
-            logger.Info<ExamineComponent>($"Adding examine event handlers for {registeredProviders} index providers.");
+            profilingLogger.Logger.Info<ExamineComponent>($"Adding examine event handlers for {registeredIndexers} index providers.");
 
             // don't bind event handlers if we're not suppose to listen
-            if (registeredProviders == 0)
+            if (registeredIndexers == 0)
                 return;
+
+            BindGridToExamine(profilingLogger.Logger, examineManager, propertyEditors);
 
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
@@ -100,36 +109,123 @@ namespace Umbraco.Web.Search
             // events handling removed in ef013f9d3b945d0a48a306ff1afbd49c10c3fff8
             // because, could not make sense of it?
 
-            var contentIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalIndexer] as UmbracoContentIndexer;
-            if (contentIndexer != null)
-            {
-                contentIndexer.DocumentWriting += IndexerDocumentWriting;
-            }
-            var memberIndexer = ExamineManager.Instance.IndexProviderCollection[Constants.Examine.InternalMemberIndexer] as UmbracoMemberIndexer;
-            if (memberIndexer != null)
-            {
-                memberIndexer.DocumentWriting += IndexerDocumentWriting;
-            }
+            EnsureUnlocked(profilingLogger.Logger, examineManager);
+
+            RebuildIndexesOnStartup(profilingLogger.Logger);
         }
 
-        private static void RebuildIndexes(bool onlyEmptyIndexes)
+        /// <summary>
+        /// Called to rebuild empty indexes on startup
+        /// </summary>
+        /// <param name="logger"></param>
+        private void RebuildIndexesOnStartup(ILogger logger)
         {
-            var indexers = (IEnumerable<KeyValuePair<string, IExamineIndexer>>)ExamineManager.Instance.IndexProviders;
+            //TODO: need a way to disable rebuilding on startup
+
+            logger.Info<ExamineComponent>("Starting initialize async background thread.");
+
+            // make it async in order not to slow down the boot
+            // fixme - should be a proper background task else we cannot stop it!
+            var bg = new Thread(() =>
+            {
+                try
+                {
+                    // rebuilds any empty indexes
+                    RebuildIndexes(true, _examineManager, logger);
+                }
+                catch (Exception e)
+                {
+                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
+                }
+            });
+            bg.Start();
+        }
+
+        /// <summary>
+        /// Used to rebuild indexes on startup or cold boot
+        /// </summary>
+        /// <param name="onlyEmptyIndexes"></param>
+        /// <param name="examineManager"></param>
+        /// <param name="logger"></param>
+        internal static void RebuildIndexes(bool onlyEmptyIndexes, IExamineManager examineManager, ILogger logger)
+        {
+            //do not attempt to do this if this has been disabled since we are not the main dom.
+            //this can be called during a cold boot
+            if (_disableExamineIndexing) return;
+
+            EnsureUnlocked(logger, examineManager);
+
             if (onlyEmptyIndexes)
-                indexers = indexers.Where(x => x.Value.IsIndexNew());
-            foreach (var indexer in indexers)
-                indexer.Value.RebuildIndex();
+            {
+                foreach (var indexer in examineManager.IndexProviders.Values.Where(x => x.IsIndexNew()))
+                {
+                    indexer.RebuildIndex();
+                }
+            }
+            else
+            {
+                //do all of them
+                ExamineManager.Instance.RebuildIndexes();
+            }
         }
 
-        private static void BindGridToExamine(GridPropertyEditor grid, IExamineIndexCollectionAccessor indexCollection)
+        /// <summary>
+        /// Must be called to each index is unlocked before any indexing occurs
+        /// </summary>
+        /// <remarks>
+        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
+        /// either of these happens, we need to configure the indexes.
+        /// </remarks>
+        private static void EnsureUnlocked(ILogger logger, IExamineManager examineManager)
         {
-            var indexes = indexCollection.Indexes;
-            if (indexes == null) return;
-            foreach (var i in indexes.Values.OfType<BaseUmbracoIndexer>())
-                i.DocumentWriting += grid.DocumentWriting;
+            if (_disableExamineIndexing) return;
+            if (_isConfigured) return;
+
+            lock (IsConfiguredLocker)
+            {
+                //double chekc
+                if (_isConfigured) return;
+
+                _isConfigured = true;
+
+                foreach (var luceneIndexer in examineManager.IndexProviders.Values.OfType<LuceneIndexer>())
+                {
+                    //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
+                    //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
+                    //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
+                    luceneIndexer.WaitForIndexQueueOnShutdown = false;
+
+                    //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
+                    //the indexes are not operational unless MainDom is true
+                    var dir = luceneIndexer.GetLuceneDirectory();
+                    if (IndexWriter.IsLocked(dir))
+                    {
+                        logger.Info<ExamineComponent>("Forcing index " + luceneIndexer.Name + " to be unlocked since it was left in a locked state");
+                        IndexWriter.Unlock(dir);
+                    }
+                }
+            }
         }
 
-        void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
+        private static void BindGridToExamine(ILogger logger, IExamineManager examineManager, IEnumerable propertyEditors)
+        {
+            //bind the grid property editors - this is a hack until http://issues.umbraco.org/issue/U4-8437
+            try
+            {
+                var grid = propertyEditors.OfType<GridPropertyEditor>().FirstOrDefault();
+                if (grid != null)
+                {
+                    foreach (var i in examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>())
+                        i.DocumentWriting += grid.DocumentWriting;
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+            }
+        }
+
+        private void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
@@ -137,7 +233,7 @@ namespace Umbraco.Web.Search
             switch (args.MessageType)
             {
                 case MessageType.RefreshById:
-                    var c1 = Current.Services.MemberService.GetById((int)args.MessageObject);
+                    var c1 = _services.MemberService.GetById((int)args.MessageObject);
                     if (c1 != null)
                     {
                         ReIndexForMember(c1);
@@ -150,8 +246,7 @@ namespace Umbraco.Web.Search
                     DeleteIndexForEntity((int)args.MessageObject, false);
                     break;
                 case MessageType.RefreshByInstance:
-                    var c3 = args.MessageObject as IMember;
-                    if (c3 != null)
+                    if (args.MessageObject is IMember c3)
                     {
                         ReIndexForMember(c3);
                     }
@@ -160,8 +255,7 @@ namespace Umbraco.Web.Search
 
                     // This is triggered when the item is permanently deleted
 
-                    var c4 = args.MessageObject as IMember;
-                    if (c4 != null)
+                    if (args.MessageObject is IMember c4)
                     {
                         DeleteIndexForEntity(c4.Id, false);
                     }
@@ -174,7 +268,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
+        private void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
@@ -182,7 +276,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-            var mediaService = Current.Services.MediaService;
+            var mediaService = _services.MediaService;
 
             foreach (var payload in (MediaCacheRefresher.JsonPayload[]) args.MessageObject)
             {
@@ -223,7 +317,7 @@ namespace Umbraco.Web.Search
             }
         }
 
-        void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
+        private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
                 return;
@@ -231,7 +325,7 @@ namespace Umbraco.Web.Search
             if (args.MessageType != MessageType.RefreshByPayload)
                 throw new NotSupportedException();
 
-            var contentService = Current.Services.ContentService;
+            var contentService = _services.ContentService;
 
             foreach (var payload in (ContentCacheRefresher.JsonPayload[]) args.MessageObject)
             {
@@ -296,6 +390,8 @@ namespace Umbraco.Web.Search
                 // ReIndexForContent is NOT taking care of descendants so we have to reload everything
                 //  again in order to process the branch - we COULD improve that by just reloading the
                 //  XML from database instead of reloading content & re-serializing!
+                //
+                // BUT ... pretty sure it is! see test "Index_Delete_Index_Item_Ensure_Heirarchy_Removed"
             }
         }
 
@@ -325,26 +421,27 @@ namespace Umbraco.Web.Search
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedReIndexForContent(sender, supportUnpublished));
+                actions.Add(new DeferedReIndexForContent(this, sender, supportUnpublished));
             else
-                DeferedReIndexForContent.Execute(sender, supportUnpublished);
+                DeferedReIndexForContent.Execute(this, sender, supportUnpublished);
         }
 
         private void ReIndexForMember(IMember member)
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedReIndexForMember(member));
+                actions.Add(new DeferedReIndexForMember(this, member));
             else
-                DeferedReIndexForMember.Execute(member);        }
+                DeferedReIndexForMember.Execute(this, member);
+        }
 
         private void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedReIndexForMedia(sender, isMediaPublished));
+                actions.Add(new DeferedReIndexForMedia(this, sender, isMediaPublished));
             else
-                DeferedReIndexForMedia.Execute(sender, isMediaPublished);
+                DeferedReIndexForMedia.Execute(this, sender, isMediaPublished);
         }
 
         /// <summary>
@@ -359,189 +456,165 @@ namespace Umbraco.Web.Search
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
-                actions.Add(new DeferedDeleteIndex(entityId, keepIfUnpublished));
+                actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
             else
-                DeferedDeleteIndex.Execute(entityId, keepIfUnpublished);
-        }
-
-        /// <summary>
-        /// Event handler to create a lower cased version of the node name, this is so we can support case-insensitive searching and still
-        /// use the Whitespace Analyzer
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-
-        private static void IndexerDocumentWriting(object sender, DocumentWritingEventArgs e)
-        {
-            if (e.Fields.Keys.Contains("nodeName"))
-            {
-                //TODO: This logic should really be put into the content indexer instead of hidden here!!
-
-                //add the lower cased version
-                e.Document.Add(new Field("__nodeName",
-                                        e.Fields["nodeName"].ToLower(),
-                                        Field.Store.YES,
-                                        Field.Index.ANALYZED,
-                                        Field.TermVector.NO
-                                        ));
-            }
+                DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);            
         }
 
         private class DeferedActions
-	    {
-	        private readonly List<DeferedAction> _actions = new List<DeferedAction>();
+        {
+            private readonly List<DeferedAction> _actions = new List<DeferedAction>();
 
-	        public static DeferedActions Get(IScopeProvider scopeProvider)
-	        {
-	            var scopeContext = scopeProvider.Context;
-	            if (scopeContext == null) return null;
+            public static DeferedActions Get(IScopeProvider scopeProvider)
+            {
+                var scopeContext = scopeProvider.Context;
 
-	            return scopeContext.Enlist("examineEvents",
-	                () => new DeferedActions(), // creator
-	                (completed, actions) => // action
-	                {
-	                    if (completed) actions.Execute();
-	                }, EnlistPriority);
-	        }
+                return scopeContext?.Enlist("examineEvents",
+                    () => new DeferedActions(), // creator
+                    (completed, actions) => // action
+                    {
+                        if (completed) actions.Execute();
+                    }, EnlistPriority);
+            }
 
-	        public void Add(DeferedAction action)
-	        {
+            public void Add(DeferedAction action)
+            {
                 _actions.Add(action);
-	        }
+            }
 
-	        private void Execute()
-	        {
-	            foreach (var action in _actions)
-	                action.Execute();
-	        }
-	    }
+            private void Execute()
+            {
+                foreach (var action in _actions)
+                    action.Execute();
+            }
+        }
 
-	    private abstract class DeferedAction
-	    {
+        private abstract class DeferedAction
+        {
             public virtual void Execute()
             { }
-	    }
+        }
 
-	    private class DeferedReIndexForContent : DeferedAction
-	    {
-	        private readonly IContent _content;
-	        private readonly bool? _supportUnpublished;
+        private class DeferedReIndexForContent : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly IContent _content;
+            private readonly bool? _supportUnpublished;
 
-	        public DeferedReIndexForContent(IContent content, bool? supportUnpublished)
-	        {
-	            _content = content;
-	            _supportUnpublished = supportUnpublished;
-	        }
+            public DeferedReIndexForContent(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
+            {                
+                _examineComponent = examineComponent;
+                _content = content;
+                _supportUnpublished = supportUnpublished;
+            }
 
-	        public override void Execute()
-	        {
-                Execute(_content, _supportUnpublished);
-	        }
+            public override void Execute()
+            {
+                Execute(_examineComponent, _content, _supportUnpublished);
+            }
 
-	        public static void Execute(IContent content, bool? supportUnpublished)
-	        {
-	            var xml = content.ToXml();
-	            //add an icon attribute to get indexed
-	            xml.Add(new XAttribute("icon", content.ContentType.Icon));
+            public static void Execute(ExamineComponent examineComponent, IContent content, bool? supportUnpublished)
+            {
+                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, content);
 
-	            ExamineManager.Instance.ReIndexNode(
-	                xml, IndexTypes.Content,
-	                ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
+                ExamineManager.Instance.IndexItems(
+                    valueSet.ToArray(),
+                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
+                        // only for the specified indexers
+                        .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
 
-	                    //Index this item for all indexers if the content is published, otherwise if the item is not published
-	                    // then only index this for indexers supporting unpublished content
+        private class DeferedReIndexForMedia : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly IMedia _media;
+            private readonly bool _isPublished;
 
-	                    .Where(x => supportUnpublished.HasValue == false || supportUnpublished.Value == x.SupportUnpublishedContent)
-	                    .Where(x => x.EnableDefaultEventHandler));
-	        }
-	    }
+            public DeferedReIndexForMedia(ExamineComponent examineComponent, IMedia media, bool isPublished)
+            {
+                _examineComponent = examineComponent;
+                _media = media;
+                _isPublished = isPublished;
+            }
 
-	    private class DeferedReIndexForMedia : DeferedAction
-	    {
-	        private readonly IMedia _media;
-	        private readonly bool _isPublished;
+            public override void Execute()
+            {
+                Execute(_examineComponent, _media, _isPublished);
+            }
 
-	        public DeferedReIndexForMedia(IMedia media, bool isPublished)
-	        {
-	            _media = media;
-	            _isPublished = isPublished;
-	        }
+            public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
+            {
+                var valueSet = UmbracoContentIndexer.GetValueSets(examineComponent._urlSegmentProviders, examineComponent._services.UserService, media);
 
-	        public override void Execute()
-	        {
-	            Execute(_media, _isPublished);
-	        }
+                ExamineManager.Instance.IndexItems(
+                    valueSet.ToArray(),
+                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoContentIndexer>()
+                        // index this item for all indexers if the media is not trashed, otherwise if the item is trashed
+                        // then only index this for indexers supporting unpublished media
+                        .Where(x => isPublished || (x.SupportUnpublishedContent))
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
 
-	        public static void Execute(IMedia media, bool isPublished)
-	        {
-	            var xml = media.ToXml();
-	            //add an icon attribute to get indexed
-	            xml.Add(new XAttribute("icon", media.ContentType.Icon));
+        private class DeferedReIndexForMember : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly IMember _member;
 
-	            ExamineManager.Instance.ReIndexNode(
-	                xml, IndexTypes.Media,
-	                ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
+            public DeferedReIndexForMember(ExamineComponent examineComponent, IMember member)
+            {
+                _examineComponent = examineComponent;
+                _member = member;
+            }
 
-	                    //Index this item for all indexers if the media is not trashed, otherwise if the item is trashed
-	                    // then only index this for indexers supporting unpublished media
+            public override void Execute()
+            {
+                Execute(_examineComponent, _member);
+            }
 
-	                    .Where(x => isPublished || (x.SupportUnpublishedContent))
-	                    .Where(x => x.EnableDefaultEventHandler));
-	        }
-	    }
+            public static void Execute(ExamineComponent examineComponent, IMember member)
+            {
+                var valueSet = UmbracoMemberIndexer.GetValueSets(member);
 
-	    private class DeferedReIndexForMember : DeferedAction
-	    {
-	        private readonly IMember _member;
+                ExamineManager.Instance.IndexItems(
+                    valueSet.ToArray(),
+                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>()
+                        //ensure that only the providers are flagged to listen execute
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
 
-	        public DeferedReIndexForMember(IMember member)
-	        {
-	            _member = member;
-	        }
+        private class DeferedDeleteIndex : DeferedAction
+        {
+            private readonly ExamineComponent _examineComponent;
+            private readonly int _id;
+            private readonly bool _keepIfUnpublished;
 
-	        public override void Execute()
-	        {
-	            Execute(_member);
-	        }
+            public DeferedDeleteIndex(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
+            {
+                _examineComponent = examineComponent;
+                _id = id;
+                _keepIfUnpublished = keepIfUnpublished;
+            }
 
-	        public static void Execute(IMember member)
-	        {
-	            ExamineManager.Instance.ReIndexNode(
-	                member.ToXml(), IndexTypes.Member,
-	                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-	                    //ensure that only the providers are flagged to listen execute
-	                    .Where(x => x.EnableDefaultEventHandler));
-	        }
-	    }
+            public override void Execute()
+            {
+                Execute(_examineComponent, _id, _keepIfUnpublished);
+            }
 
-	    private class DeferedDeleteIndex : DeferedAction
-	    {
-	        private readonly int _id;
-	        private readonly bool _keepIfUnpublished;
+            public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
+            {
+                ExamineManager.Instance.DeleteFromIndexes(
+                    id.ToString(CultureInfo.InvariantCulture),
+                    examineComponent._examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>()
+                        // if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
+                        // otherwise if keepIfUnpublished == false then remove from all indexes
+                        .Where(x => keepIfUnpublished == false || (x is UmbracoContentIndexer && ((UmbracoContentIndexer)x).SupportUnpublishedContent == false))
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
 
-	        public DeferedDeleteIndex(int id, bool keepIfUnpublished)
-	        {
-	            _id = id;
-	            _keepIfUnpublished = keepIfUnpublished;
-	        }
-
-	        public override void Execute()
-	        {
-	            Execute(_id, _keepIfUnpublished);
-	        }
-
-	        public static void Execute(int id, bool keepIfUnpublished)
-	        {
-	            ExamineManager.Instance.DeleteFromIndex(
-	                id.ToString(CultureInfo.InvariantCulture),
-	                ExamineManager.Instance.IndexProviderCollection.OfType<UmbracoContentIndexer>()
-
-	                    //if keepIfUnpublished == true then only delete this item from indexes not supporting unpublished content,
-	                    // otherwise if keepIfUnpublished == false then remove from all indexes
-
-	                    .Where(x => keepIfUnpublished == false || x.SupportUnpublishedContent == false)
-	                    .Where(x => x.EnableDefaultEventHandler));
-	        }
-	    }
     }
 }

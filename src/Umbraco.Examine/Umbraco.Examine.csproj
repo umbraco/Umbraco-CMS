@@ -46,14 +46,30 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine" Version="2.0.0-beta2" />
-    <PackageReference Include="Lucene.Net" Version="3.0.3" />
-    <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
+    <PackageReference Include="Examine">
+      <Version>1.0.0-beta024</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NPoco" Version="3.6.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" Exclude="obj\**\*.cs" />
+    <Compile Include="Config\ConfigIndexCriteria.cs" />
+    <Compile Include="Config\ConfigIndexField.cs" />
+    <Compile Include="Config\IndexFieldCollectionExtensions.cs" />
+    <Compile Include="Config\IndexSet.cs" />
+    <Compile Include="Config\IndexSetCollection.cs" />
+    <Compile Include="Config\IndexSets.cs" />
+    <Compile Include="UmbracoExamineExtensions.cs" />
+    <Compile Include="IndexTypes.cs" />
+    <Compile Include="LoggingLevel.cs" />
+    <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UmbracoContentIndexer.cs" />
+    <Compile Include="UmbracoContentIndexerOptions.cs" />
+    <Compile Include="UmbracoContentValueSetValidator.cs" />
+    <Compile Include="UmbracoExamineIndexer.cs" />
+    <Compile Include="UmbracoExamineSearcher.cs" />
+    <Compile Include="UmbracoMemberIndexer.cs" />
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>

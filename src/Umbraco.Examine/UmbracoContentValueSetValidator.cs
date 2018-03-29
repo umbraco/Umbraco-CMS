@@ -24,10 +24,10 @@ namespace Umbraco.Examine
         public bool Validate(ValueSet valueSet)
         {
             //check for published content
-            if (valueSet.IndexCategory == IndexTypes.Content
-                && valueSet.Values.ContainsKey(BaseUmbracoIndexer.PublishedFieldName))
+            if (valueSet.Category == IndexTypes.Content
+                && valueSet.Values.ContainsKey(UmbracoExamineIndexer.PublishedFieldName))
             {
-                var published = valueSet.Values[BaseUmbracoIndexer.PublishedFieldName] != null && valueSet.Values[BaseUmbracoIndexer.PublishedFieldName][0].Equals(1);
+                var published = valueSet.Values[UmbracoExamineIndexer.PublishedFieldName] != null && valueSet.Values[UmbracoExamineIndexer.PublishedFieldName][0].Equals(1);
                 //we don't support unpublished and the item is not published return false
                 if (_options.SupportUnpublishedContent == false && published == false)
                 {
@@ -37,11 +37,11 @@ namespace Umbraco.Examine
 
             //must have a 'path'
             if (valueSet.Values.ContainsKey(PathKey) == false) return false;
-            var path = valueSet.Values[PathKey] == null ? string.Empty : valueSet.Values[PathKey][0].ToString();
+            var path = valueSet.Values[PathKey]?[0].ToString() ?? string.Empty;
 
             // Test for access if we're only indexing published content
             // return nothing if we're not supporting protected content and it is protected, and we're not supporting unpublished content
-            if (valueSet.IndexCategory == IndexTypes.Content
+            if (valueSet.Category == IndexTypes.Content
                 && _options.SupportUnpublishedContent == false
                 && _options.SupportProtectedContent == false
                 && _publicAccessService.IsProtected(path))
@@ -61,7 +61,7 @@ namespace Umbraco.Examine
             if (_options.SupportUnpublishedContent == false)
             {
                 if (path.IsNullOrWhiteSpace()) return false;
-                var recycleBinId = valueSet.IndexCategory == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
+                var recycleBinId = valueSet.Category == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
                 if (path.Contains(string.Concat(",", recycleBinId, ",")))
                     return false;
             }

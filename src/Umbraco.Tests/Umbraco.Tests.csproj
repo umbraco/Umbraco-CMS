@@ -59,8 +59,8 @@
     <Reference Include="Castle.Core, Version=4.1.1.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.1.1\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.2.0.0-beta2\lib\net45\Examine.dll</HintPath>
+    <Reference Include="Examine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.1.0.0-beta024\lib\net45\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -272,6 +272,7 @@
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
+    <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
@@ -288,11 +289,11 @@
     <Compile Include="Testing\UmbracoTestOptions.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestPublishedSnapshotAccessor.cs" />
-    <Compile Include="TestHelpers\Stubs\TestIndexCollectionAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="TestHelpers\Stubs\TestUmbracoContextAccessor.cs" />
     <Compile Include="CoreThings\UdiTests.cs" />
+    <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="Web\AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
@@ -577,7 +578,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TestFiles.resx</DependentUpon>
     </Compile>
-    <Compile Include="UmbracoExamine\TestIndexField.cs" />
     <Compile Include="UI\LegacyDialogTests.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
     <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />

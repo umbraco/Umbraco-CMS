@@ -7,6 +7,9 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Migrations
 {
+    /// <summary>
+    /// Represents a migration plan.
+    /// </summary>
     public class MigrationPlan
     {
         private readonly IMigrationBuilder _migrationBuilder;
@@ -16,31 +19,67 @@ namespace Umbraco.Core.Migrations
         private string _prevState;
         private string _finalState;
 
-        // initializes a non-executing plan
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
+        /// </summary>
+        /// <param name="name">The name of the plan.</param>
+        /// <remarks>The plan cannot be executed. Use this constructor e.g. when only validating the plan,
+        /// or trying to get its final state, without actually needing to execute it.</remarks>
         public MigrationPlan(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
+
+            // ReSharper disable once VirtualMemberCallInConstructor
+            // (accepted)
+            DefinePlan();
         }
 
-        // initializes a plan
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
+        /// </summary>
+        /// <param name="name">The name of the plan.</param>
+        /// <param name="migrationBuilder">A migration builder.</param>
+        /// <param name="logger">A logger.</param>
+        /// <remarks>The plan can be executed.</remarks>
         public MigrationPlan(string name, IMigrationBuilder migrationBuilder, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
             _migrationBuilder = migrationBuilder ?? throw new ArgumentNullException(nameof(migrationBuilder));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            // ReSharper disable once VirtualMemberCallInConstructor
+            // (accepted)
+            DefinePlan();
         }
 
+        /// <summary>
+        /// Defines the plan.
+        /// </summary>
+        protected virtual void DefinePlan() { }
+
+        /// <summary>
+        /// Gets the name of the plan.
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Adds an empty migration from source to target state.
+        /// </summary>
         public MigrationPlan Add(string sourceState, string targetState)
             => Add<NoopMigration>(sourceState, targetState);
 
+        /// <summary>
+        /// Adds a migration from source to target state.
+        /// </summary>
         public MigrationPlan Add<TMigration>(string sourceState, string targetState)
             where TMigration : IMigration
             => Add(sourceState, targetState, typeof(TMigration));
 
+        /// <summary>
+        /// Adds a migration from source to target state.
+        /// </summary>
         public MigrationPlan Add(string sourceState, string targetState, Type migration)
         {
             if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
@@ -78,26 +117,50 @@ namespace Umbraco.Core.Migrations
             return this;
         }
 
+        /// <summary>
+        /// Chains an empty migration from chain to target state.
+        /// </summary>
         public MigrationPlan Chain(string targetState)
             => Chain<NoopMigration>(targetState);
 
+        /// <summary>
+        /// Chains a migration from chain to target state.
+        /// </summary>
         public MigrationPlan Chain<TMigration>(string targetState)
             where TMigration : IMigration
             => Chain(targetState, typeof(TMigration));
 
+        /// <summary>
+        /// Chains a migration from chain to target state.
+        /// </summary>
         public MigrationPlan Chain(string targetState, Type migration)
             => Add(_prevState, targetState, migration);
 
+        /// <summary>
+        /// Sets the chain state.
+        /// </summary>
         public MigrationPlan From(string sourceState)
         {
             _prevState = sourceState ?? throw new ArgumentNullException(nameof(sourceState));
             return this;
         }
 
+        /// <summary>
+        /// Gets the initial state.
+        /// </summary>
+        /// <remarks>The initial state is the state when no entry for the plan
+        /// could be found in the database (i.e. the plan has never run).</remarks>
         public virtual string InitialState => string.Empty;
 
+        /// <summary>
+        /// Gets the final state.
+        /// </summary>
         public string FinalState => _finalState ?? (_finalState = Validate());
 
+        /// <summary>
+        /// Validates the plan.
+        /// </summary>
+        /// <returns>The plan's final state.</returns>
         public string Validate()
         {
             // quick check for dead ends - a dead end is a transition that has a target state
@@ -134,6 +197,13 @@ namespace Umbraco.Core.Migrations
             return finalState;
         }
 
+        /// <summary>
+        /// Executes the plan.
+        /// </summary>
+        /// <param name="scope">A scope.</param>
+        /// <param name="fromState">The state to start execution at.</param>
+        /// <returns>The final state.</returns>
+        /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
         public string Execute(IScope scope, string fromState)
         {
             Validate();
@@ -142,7 +212,7 @@ namespace Umbraco.Core.Migrations
                 throw new InvalidOperationException("Cannot execute a non-executing plan.");
 
             _logger.Info<MigrationPlan>("Starting \"{0}\"...", () => Name);
-            var origState = fromState; //GetState();
+            var origState = fromState ?? string.Empty;
             var info = "At " + (string.IsNullOrWhiteSpace(origState) ? "origin" : ("\"" + origState + "\"")) + ".";
             info = info.Replace("{", "{{").Replace("}", "}}"); // stupid log4net
             _logger.Info<MigrationPlan>(info);
@@ -159,7 +229,7 @@ namespace Umbraco.Core.Migrations
 
                 var nextState = transition.TargetState;
                 origState = nextState;
-                
+
                 _logger.Info<MigrationPlan>("At \"{0}\".", origState);
 
                 if (!_transitions.TryGetValue(origState, out transition))

@@ -34,21 +34,21 @@ namespace Umbraco.Web
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(string term, bool useWildCards = true, string indexName = null);
 
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string indexName = null);
 
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null);
 
         /// <summary>
         /// Searches content.
         /// </summary>
-        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalrecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null);
+        IEnumerable<PublishedSearchResult> Search(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null);
     }
 }

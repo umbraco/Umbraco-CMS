@@ -57,6 +57,9 @@
     <Reference Include="ClientDependency.Core, Version=1.9.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ClientDependency.1.9.6\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Examine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.1.0.0-beta024\lib\net45\Examine.dll</HintPath>
+    </Reference>
     <Reference Include="ImageProcessor.Web, Version=4.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImageProcessor.Web.4.8.4\lib\net45\ImageProcessor.Web.dll</HintPath>
     </Reference>
@@ -271,10 +274,6 @@
     </Reference>
     <Reference Include="ClientDependency.Core.Mvc">
       <HintPath>../packages/ClientDependency-Mvc5.1.8.0.0/lib/net45/ClientDependency.Core.Mvc.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Examine">
-      <HintPath>../packages/Examine.2.0.0-beta2/lib/net45/Examine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">

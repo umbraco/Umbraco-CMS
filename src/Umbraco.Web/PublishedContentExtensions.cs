@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core;
@@ -220,49 +221,59 @@ namespace Umbraco.Web
 
         #region Search
 
-        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
-            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (string.IsNullOrEmpty(searchProvider) == false)
-                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+            //TODO: we should pass in the IExamineManager?
+
+            var searcher = string.IsNullOrEmpty(indexName)
+                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetSearcher(indexName);
+
+            if (searcher == null)
+                throw new InvalidOperationException("No searcher found for index " + indexName);
 
             var t = term.Escape().Value;
             if (useWildCards)
                 t = term.MultipleCharacterWildcard().Value;
 
             var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
-            var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
+            var crit = searcher.CreateCriteria().RawQuery(luceneQuery);
 
             return content.Search(crit, searcher);
         }
 
-        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> SearchDescendants(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
-            return content.Search(term, useWildCards, searchProvider);
+            return content.Search(term, useWildCards, indexName);
         }
 
-        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
         {
-            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (string.IsNullOrEmpty(searchProvider) == false)
-                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+            //TODO: we should pass in the IExamineManager?
+
+            var searcher = string.IsNullOrEmpty(indexName)
+                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : Examine.ExamineManager.Instance.GetSearcher(indexName);
+
+            if (searcher == null)
+                throw new InvalidOperationException("No searcher found for index " + indexName);
 
             var t = term.Escape().Value;
             if (useWildCards)
                 t = term.MultipleCharacterWildcard().Value;
 
             var luceneQuery = "+parentID:" + content.Id + " +" + t;
-            var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
+            var crit = searcher.CreateCriteria().RawQuery(luceneQuery);
 
             return content.Search(crit, searcher);
         }
 
-        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, Examine.SearchCriteria.ISearchCriteria criteria, Examine.ISearcher searchProvider = null)
         {
-            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
-            if (searchProvider != null)
-                s = searchProvider;
+            //TODO: we should pass in the IExamineManager?
 
+            var s = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
+            
             var results = s.Search(criteria);
             return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
         }

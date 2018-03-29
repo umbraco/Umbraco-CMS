@@ -39,7 +39,7 @@ namespace Umbraco.Web.Search
             var sb = new StringBuilder();
 
             string type;
-            var searcher = Constants.Examine.InternalSearcher;
+            var indexer = Constants.Examine.InternalIndexer;
             var fields = new[] { "id", "__NodeId" };
 
             var umbracoContext = umbracoHelper.UmbracoContext;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Search
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
-                    searcher = Constants.Examine.InternalMemberSearcher;
+                    indexer = Constants.Examine.InternalMemberIndexer;
                     type = "member";
                     fields = new[] { "id", "__NodeId", "email", "loginName" };
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Search
                     throw new NotSupportedException("The " + typeof(UmbracoTreeSearcher) + " currently does not support searching against object type " + entityType);
             }
 
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = ExamineManager.Instance.GetSearcher(indexer);
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Search
             sb.Append("+__IndexType:");
             sb.Append(type);
 
-            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+            var raw = internalSearcher.CreateCriteria().RawQuery(sb.ToString());
 
             var result = internalSearcher
                 //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
@@ -277,10 +277,10 @@ namespace Umbraco.Web.Search
                     m.Icon = "icon-user";
                 }
 
-                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
+                var searchResult = results.First(x => x.Id == m.Id.ToString());
                 if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
-                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];
+                    m.AdditionalData["Email"] = results.First(x => x.Id == m.Id.ToString()).Fields["email"];
                 }
                 if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
                 {
