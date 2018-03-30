@@ -47,7 +47,10 @@ namespace Umbraco.Web.Editors
 
             //if there's only one language, by default it is the default
             if (langs.Count == 1)
+            {
                 langs[0].IsDefaultVariantLanguage = true;
+                langs[0].Mandatory = true;
+            }   
             else if (allLanguages.All(x => !x.IsDefaultVariantLanguage))
             {
                 //if no language has the default flag, then the defaul language is the one with the lowest id
@@ -72,7 +75,10 @@ namespace Umbraco.Web.Editors
             if (!lang.IsDefaultVariantLanguage)
             {
                 if (allLangs.Count == 1)
+                {
                     model.IsDefaultVariantLanguage = true;
+                    model.Mandatory = true;
+                }   
                 else if (allLangs.All(x => !x.IsDefaultVariantLanguage))
                 {
                     //if no language has the default flag, then the defaul language is the one with the lowest id
