@@ -3,6 +3,7 @@ using System.Configuration;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Upgrade.V_7_10_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_5;
 using Umbraco.Core.Migrations.Upgrade.V_7_6_0;
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Migrations.Upgrade
                     throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
 
                 // must be at least 7.? - fixme adjust when releasing
-                if (currentVersion < new SemVersion(7, 9))
+                if (currentVersion < new SemVersion(7, 10))
                     throw new InvalidOperationException($"Version {currentVersion} cannot be upgraded to {UmbracoVersion.SemanticVersion}.");
 
                 // cannot go back in time
@@ -90,7 +91,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             //     Update all init-7.x.y chains.
 
 
-            // UPGRADE FROM 7
+            // UPGRADE FROM 7, OLDEST
             //
             // When upgrading from version 7, the state is automatically set to {init-7.x.y} where
             // 7.x.y is the version. We need to define a chain starting at that state and taking
@@ -100,9 +101,10 @@ namespace Umbraco.Core.Migrations.Upgrade
             //
             // fixme adjust when releasing the first public (alpha?) version
 
-            // at the moment we don't support upgrading from versions older than 7.9.0
+            // we don't support upgrading from versions older than 7.?
+            // and then we only need to run v8 migrations
             //
-            From("{init-7.9.0}");
+            From("{init-7.10.0}");
             Chain<V_8_0_0.AddLockObjects>("{7C447271-CA3F-4A6A-A913-5D77015655CB}");
             Chain<AddContentNuTable>("{CBFF58A2-7B50-4F75-8E98-249920DB0F37}");
             Chain<RefactorXmlColumns>("{3D18920C-E84D-405C-A06A-B7CEE52FE5DD}");
@@ -116,14 +118,16 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
 
             // must chain to v8 final state (see at end of file)
-            Chain("{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
+            Chain("{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
 
-            // 7.9.1, .2, .3 = same as 7.9.0
-            // 7.10.0 = same as 7.9.0
-            From("{init-7.9.1}").Chain("{init-7.9.0}");
-            From("{init-7.9.2}").Chain("{init-7.9.0}");
-            From("{init-7.9.3}").Chain("{init-7.9.0}");
-            From("{init-7.10.0}").Chain("{init-7.9.0}");
+
+            // UPGRADE FROM 7, MORE RECENT
+            //
+            // handle more recent versions - not yet
+
+            // for more recent versions...
+            // 7.10.x = same as 7.10.0?
+            //From("{init-7.10.1}").Chain("{init-7.10.0}");
 
 
             // VERSION 8 PLAN
@@ -192,10 +196,13 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<AddUmbracoConsentTable>("{2821F53E-C58B-4812-B184-9CD240F990D7}");
             Chain<CreateSensitiveDataUserGroup>("{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
 
+            // mergin from 7.10.0
+            Chain<RenamePreviewFolder>("{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
+
             // FINAL STATE - MUST MATCH LAST ONE ABOVE !
             // whenever this changes, update all references in this file!
 
-            Add(string.Empty, "{8918450B-3DA0-4BB7-886A-6FA8B7E4186E}");
+            Add(string.Empty, "{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
         }
     }
 }

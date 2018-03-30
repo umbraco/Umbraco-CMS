@@ -18,11 +18,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
             return source.TryConvertTo<int>().Result;
-
-            // in json an integer comes back as Int64
-            // ignore overflows ;(
-            if (source is long)
-                return Convert.ToInt32(source);
         }
     }
 }
