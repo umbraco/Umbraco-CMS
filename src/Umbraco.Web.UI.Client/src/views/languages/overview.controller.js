@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($timeout, $location, notificationsService, localizationService) {
+    function LanguagesOverviewController($location, notificationsService, localizationService, languageResource) {
 
         var vm = this;
 
@@ -32,55 +32,10 @@
                 vm.page.name = vm.labels.languages;
             });
 
-            $timeout(function () {
-
-                vm.languages = [
-                    {  
-                        "id": 1,
-                        "cultureDisplayName": "English (United States)",
-                        "culture": "en-US",
-                        "isDefault": true,
-                        "isMandatory": true
-                    },
-                    {
-                        "id": 2,
-                        "cultureDisplayName": "Danish",
-                        "culture": "da-DK",
-                        "isDefault": false,
-                        "isMandatory": true
-                    },
-                    {
-                        "id": 3,
-                        "cultureDisplayName": "Spanish (Spain)",
-                        "culture": "es-ES",
-                        "isDefault": false,
-                        "isMandatory": false
-                    },
-                    {
-                        "id": 4,
-                        "cultureDisplayName": "French (France)",
-                        "culture": "fr-FR",
-                        "isDefault": false,
-                        "isMandatory": false
-                    },
-                    {
-                        "id": 5,
-                        "cultureDisplayName": "German (Germany)",
-                        "culture": "de-DE",
-                        "isDefault": false,
-                        "isMandatory": true
-                    }
-                ];
-
+            languageResource.getAll().then(function(languages) {
+                vm.languages = languages;
                 vm.loading = false;
-
-            }, 1000);
-
-            /*
-            $timeout(function () {
-                navigationService.syncTree({ tree: "languages", path: "-1" });
             });
-            */
         }
 
         function addLanguage() {
@@ -94,13 +49,24 @@
         }
 
         function deleteLanguage(language, event) {
-            var confirmed = confirm("Are you sure you want to delete " + language.cultureDisplayName + "?");
+            var confirmed = confirm("Are you sure you want to delete " + language.name + "?");
             if(confirmed) {
                 language.deleteButtonState = "busy";
-                $timeout(function(){
+
+                languageResource.deleteById(language.id).then(function () {
                     var index = vm.languages.indexOf(language);
                     vm.languages.splice(index, 1);
-                }, 1000);
+                }, function (err) {
+                    language.deleteButtonState = "error";
+
+                    //show any notifications
+                    if (angular.isArray(err.data.notifications)) {
+                        for (var i = 0; i < err.data.notifications.length; i++) {
+                            notificationsService.showNotification(err.data.notifications[i]);
+                        }
+                    }
+                });
+                
             }
             event.preventDefault()
             event.stopPropagation();

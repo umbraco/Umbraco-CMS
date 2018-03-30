@@ -218,6 +218,7 @@
     <Compile Include="Models\BackOfficeTourStep.cs" />
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
+    <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
@@ -241,14 +242,14 @@
     <Compile Include="Models\ContentEditing\UserInvite.cs" />
     <Compile Include="Models\ContentEditing\UserProfile.cs" />
     <Compile Include="Models\ContentEditing\UserSave.cs" />
-    <Compile Include="Models\Culture.cs" />
-    <Compile Include="Models\Language.cs" />
+    <Compile Include="Models\ContentEditing\Language.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
+    <Compile Include="Models\Mapping\LanguageMapperProfile.cs" />
     <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />

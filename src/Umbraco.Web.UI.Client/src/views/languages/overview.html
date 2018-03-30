@@ -32,7 +32,7 @@
                     <tr ng-repeat="language in vm.languages" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
                         <td>
                             <i class="icon-globe" style="color: #BBBABF; margin-right: 5px;"></i>
-                            <span class="bold">{{ language.cultureDisplayName }}</span>
+                            <span class="bold">{{ language.name }}</span>
                             <span ng-if="language.isDefault">- {{vm.labels.general}}</span>
                         </td>
                         <td><span ng-if="language.isMandatory">{{vm.labels.mandatory}}</span></td>
