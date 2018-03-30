@@ -77,7 +77,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         //private static int _singletonCheck;
 
         public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
-            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory,
+            ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
             : base(publishedSnapshotAccessor)
@@ -148,6 +148,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _domainStore = new SnapDictionary<int, Domain>();
 
             LoadCaches();
+
+            if (idkMap != null)
+            {
+                idkMap.SetMapper(UmbracoObjectTypes.Document, id => _contentStore.LiveSnapshot.Get(id).Uid, uid => _contentStore.LiveSnapshot.Get(uid).Id);
+                idkMap.SetMapper(UmbracoObjectTypes.Media, id => _mediaStore.LiveSnapshot.Get(id).Uid, uid => _mediaStore.LiveSnapshot.Get(uid).Id);
+            }
         }
 
         private void LoadCaches()
