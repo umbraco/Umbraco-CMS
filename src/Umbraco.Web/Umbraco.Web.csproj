@@ -102,7 +102,7 @@
     <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.1" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NPoco" Version="3.6.1" />
+    <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.7.0" />

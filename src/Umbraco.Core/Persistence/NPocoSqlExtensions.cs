@@ -888,7 +888,7 @@ namespace Umbraco.Core.Persistence
 
         #region Utilities
 
-        private static object[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true)
+        private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true)
         {
             var pd = sql.SqlContext.PocoDataFactory.ForType(typeof (TDto));
             var tableName = tableAlias ?? pd.TableInfo.TableName;
@@ -923,10 +923,9 @@ namespace Umbraco.Core.Persistence
                 return withAlias ? (string.IsNullOrEmpty(column.ColumnAlias) ? column.MemberInfoKey : column.ColumnAlias) : null;
             }
 
-            return queryColumns.Select(x => (object) GetColumn(sql.SqlContext.DatabaseType,
-                tableName, x.Value.ColumnName,
-                GetAlias(x.Value),
-                referenceName)).ToArray();
+            return queryColumns
+                .Select(x => GetColumn(sql.SqlContext.DatabaseType, tableName, x.Value.ColumnName, GetAlias(x.Value), referenceName))
+                .ToArray();
         }
 
         private static string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string referenceName = null)

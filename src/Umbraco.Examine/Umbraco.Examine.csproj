@@ -50,7 +50,7 @@
       <Version>1.0.0-beta024</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NPoco" Version="3.6.1" />
+    <PackageReference Include="NPoco" Version="3.9.3" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\ConfigIndexCriteria.cs" />

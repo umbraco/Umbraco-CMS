@@ -42,8 +42,10 @@ namespace Umbraco.Core.Persistence
         private ISqlSyntaxProvider _sqlSyntax;
         private RetryPolicy _connectionRetryPolicy;
         private RetryPolicy _commandRetryPolicy;
+        private NPoco.MapperCollection _pocoMappers;
+        private bool _upgrading;
 
-        #region Ctor
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
@@ -112,12 +114,14 @@ namespace Umbraco.Core.Persistence
         /// <inheritdoc />
         public bool CanConnect => Configured && DbConnectionExtensions.IsConnectionAvailable(_connectionString, _providerName);
 
-        #region IDatabaseContext
-
         /// <inheritdoc />
         public ISqlContext SqlContext => _sqlContext;
 
-        #endregion
+        /// <inheritdoc />
+        public void ConfigureForUpgrade()
+        {
+            _upgrading = true;
+        }
 
         /// <inheritdoc />
         public void Configure(string connectionString, string providerName)
@@ -150,13 +154,13 @@ namespace Umbraco.Core.Persistence
 
                 // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
                 // so that everything NPoco is properly cached for the lifetime of the application
-                var mappers = new NPoco.MapperCollection { new PocoMapper() };
-                var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
+                _pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
+                var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
                 _pocoDataFactory = factory;
                 var config = new FluentConfig(xmappers => factory);
 
                 // create the database factory
-                _npocoDatabaseFactory = NPoco.DatabaseFactory.Config(x => x
+                _npocoDatabaseFactory = DatabaseFactory.Config(x => x
                     .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
                     .WithFluentConfig(config)); // with proper configuration
 
@@ -176,6 +180,10 @@ namespace Umbraco.Core.Persistence
         {
             return (IUmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
         }
+
+        // gets initialized poco data builders
+        private InitializedPocoDataBuilder GetPocoDataFactoryResolver(Type type, IPocoDataFactory factory)
+            => new UmbracoPocoDataBuilder(type, _pocoMappers, _upgrading).Init();
 
         // gets the sql syntax provider that corresponds, from attribute
         private ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName)

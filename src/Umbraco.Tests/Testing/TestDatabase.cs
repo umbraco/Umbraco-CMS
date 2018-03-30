@@ -640,12 +640,52 @@ namespace Umbraco.Tests.Testing
             throw new NotImplementedException();
         }
 
+        public Task<T> SingleAsync<T>(string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> SingleAsync<T>(Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> SingleOrDefaultAsync<T>(string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> SingleOrDefaultAsync<T>(Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<T> SingleByIdAsync<T>(object primaryKey)
         {
             throw new NotImplementedException();
         }
 
         public Task<T> SingleOrDefaultByIdAsync<T>(object primaryKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> FirstAsync<T>(string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> FirstAsync<T>(Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> FirstOrDefaultAsync<T>(string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> FirstOrDefaultAsync<T>(Sql sql)
         {
             throw new NotImplementedException();
         }
