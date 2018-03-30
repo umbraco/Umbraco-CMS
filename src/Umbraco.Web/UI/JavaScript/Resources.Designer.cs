@@ -10,8 +10,8 @@
 
 namespace Umbraco.Web.UI.JavaScript {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -19,19 +19,19 @@ namespace Umbraco.Web.UI.JavaScript {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Umbraco.Web.UI.JavaScript {
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,12 +59,14 @@ namespace Umbraco.Web.UI.JavaScript {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/jquery/jquery.min.js&apos;,
         ///    &apos;lib/angular/1.1.5/angular.min.js&apos;,
         ///    &apos;lib/underscore/underscore-min.js&apos;,
+        ///
+        ///    &apos;lib/moment/moment.min.js&apos;,
         ///
         ///    &apos;lib/jquery-ui/jquery-ui.min.js&apos;,
         ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js&apos;,
@@ -76,14 +78,14 @@ namespace Umbraco.Web.UI.JavaScript {
         ///    &apos;lib/angular/angular-ui-sortable.js&apos;,
         ///
         ///    &apos;lib/angular-dynamic-locale/tmhDynamicLocale.min.js&apos;,
-        ///    &apos;lib/ng-file-upload/ng-file-upload.min. [rest of string was truncated]&quot;;.
+        ///    &apos;lib [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string JsInitialize {
             get {
                 return ResourceManager.GetString("JsInitialize", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to LazyLoad.js(&quot;##JsInitialize##&quot;, function () {
         ///    //we need to set the legacy UmbClientMgr path
@@ -101,7 +103,7 @@ namespace Umbraco.Web.UI.JavaScript {
                 return ResourceManager.GetString("Main", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to //TODO: This would be nicer as an angular module so it can be injected into stuff... that&apos;d be heaps nicer, but
         ///// how to do that when this is not a regular JS file, it is a server side JS file and RequireJS seems to only want

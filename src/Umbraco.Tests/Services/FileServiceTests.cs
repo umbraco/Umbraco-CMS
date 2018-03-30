@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
@@ -10,7 +11,8 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class FileServiceTests : TestWithSomeContentBase
     {

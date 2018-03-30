@@ -16,7 +16,7 @@ namespace Umbraco.Tests.UmbracoExamine
     [TestFixture]
     public abstract class ExamineBaseTest : TestWithDatabaseBase
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void InitializeFixture()
         {
             var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));

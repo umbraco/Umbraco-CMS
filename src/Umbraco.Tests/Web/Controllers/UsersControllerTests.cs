@@ -67,10 +67,6 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                     .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                //InitializeMappers(helper.UmbracoContext.Application);
-                InitializeAutoMapper(true);
-
                 var usersController = new UsersController();
                 Container.InjectProperties(usersController);
                 return usersController;
@@ -128,10 +124,6 @@ namespace Umbraco.Tests.Web.Controllers
         {
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                //InitializeMappers(helper.UmbracoContext.Application);
-                InitializeAutoMapper(true);
-
                 var usersController = new UsersController();
                 Container.InjectProperties(usersController);
                 return usersController;
@@ -159,10 +151,6 @@ namespace Umbraco.Tests.Web.Controllers
                         It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(),
                         It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
                     .Returns(() => users);
-
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                //InitializeMappers(helper.UmbracoContext.Application);
-                InitializeAutoMapper(true);
 
                 var usersController = new UsersController();
                 Container.InjectProperties(usersController);

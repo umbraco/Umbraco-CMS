@@ -19,7 +19,7 @@ namespace Umbraco.Tests.CoreThings
             }, o => {});
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUpFixture()
         {
             _first = true;

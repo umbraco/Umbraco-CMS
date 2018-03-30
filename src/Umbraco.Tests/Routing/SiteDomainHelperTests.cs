@@ -15,6 +15,12 @@ namespace Umbraco.Tests.Routing
             SiteDomainHelper.Clear(); // assuming this works!
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            SiteDomainHelper.Clear(); // assuming this works!
+        }
+
         [Test]
         public void AddSites()
         {

@@ -377,6 +377,8 @@ namespace Umbraco.Tests.Testing
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();
             SettingsForTests.Reset(); // fixme - should it be optional?
+
+            Mapper.Reset();
         }
 
         #endregion

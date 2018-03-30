@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
+using System.Threading;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -16,7 +17,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class DatabaseContextTests
     {
         private IUmbracoDatabaseFactory _databaseFactory;

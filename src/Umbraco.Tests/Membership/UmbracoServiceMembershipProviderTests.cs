@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Threading;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;
@@ -12,7 +13,8 @@ using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Membership
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.None, WithApplication = true)]
     public class UmbracoServiceMembershipProviderTests : UmbracoTestBase
     {
