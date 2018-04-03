@@ -211,7 +211,7 @@
         });
 
     //load the separate css for the editor to avoid it blocking our js loading
-    assetsService.loadCss("lib/slider/bootstrap-slider.css");
-    assetsService.loadCss("lib/slider/bootstrap-slider-custom.css");
+    assetsService.loadCss("lib/slider/bootstrap-slider.css", $scope);
+    assetsService.loadCss("lib/slider/bootstrap-slider-custom.css", $scope);
 }
 angular.module("umbraco").controller("Umbraco.PropertyEditors.SliderController", sliderController);

@@ -105,6 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(ILanguage entity)
         {
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureInfo == null || entity.CultureName.IsNullOrWhiteSpace())
+                throw new InvalidOperationException("The required language data is missing");
+
             ((EntityBase)entity).AddingEntity();
 
             if (entity.IsDefaultVariantLanguage)
@@ -127,6 +130,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(ILanguage entity)
         {
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureInfo == null || entity.CultureName.IsNullOrWhiteSpace())
+                throw new InvalidOperationException("The required language data is missing");
+
             ((EntityBase)entity).UpdatingEntity();
 
             if (entity.IsDefaultVariantLanguage)
@@ -151,6 +157,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(ILanguage entity)
         {
+            //we need to validate that we can delete this language
+            if (entity.IsDefaultVariantLanguage)
+                throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
+
+            var count = Database.ExecuteScalar<int>(Sql().SelectCount().From<LanguageDto>());
+            if (count == 1)
+                throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
+
             base.PersistDeletedItem(entity);
 
             //Clear the cache entries that exist by key/iso

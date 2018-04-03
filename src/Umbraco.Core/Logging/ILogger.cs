@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace Umbraco.Core.Logging
 {
@@ -21,8 +22,8 @@ namespace Umbraco.Core.Logging
         /// Logs a warning message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A message.</param>
-        void Warn(Type reporting, string format);
+        /// <param name="message">A message.</param>
+        void Warn(Type reporting, string message);
 
         /// <summary>
         /// Logs a warning message.
@@ -31,20 +32,12 @@ namespace Umbraco.Core.Logging
         /// <param name="messageBuilder">A message builder.</param>
         void Warn(Type reporting, Func<string> messageBuilder);
 
-        /// <summary>
-        /// Logs a formatted warning message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation")]
         void Warn(Type reporting, string format, params object[] args);
 
-        /// <summary>
-        /// Logs a formatted warning message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation, if you want to use lazy generated strings use the overload with messageBuilder")]
         void Warn(Type reporting, string format, params Func<object>[] args);
 
         /// <summary>
@@ -63,22 +56,12 @@ namespace Umbraco.Core.Logging
         /// <param name="messageBuilder">A message builder.</param>
         void Warn(Type reporting, Exception exception, Func<string> messageBuilder);
 
-        /// <summary>
-        /// Logs a formatted warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation")]
         void Warn(Type reporting, Exception exception, string format, params object[] args);
 
-        /// <summary>
-        /// Logs a formatted warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation, if you want to use lazy generated strings use the overload with messageBuilder")]
         void Warn(Type reporting, Exception exception, string format, params Func<object>[] args);
 
         /// <summary>
@@ -95,20 +78,12 @@ namespace Umbraco.Core.Logging
         /// <param name="messageBuilder">A message builder.</param>
         void Info(Type reporting, Func<string> messageBuilder);
 
-        /// <summary>
-        /// Logs a formatted information message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation")]
         void Info(Type reporting, string format, params object[] args);
 
-        /// <summary>
-        /// Logs a formatted information message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation, if you want to use lazy generated strings use the overload with messageBuilder")]
         void Info(Type reporting, string format, params Func<object>[] args);
 
         /// <summary>
@@ -125,20 +100,12 @@ namespace Umbraco.Core.Logging
         /// <param name="messageBuilder">A message builder.</param>
         void Debug(Type reporting, Func<string> messageBuilder);
 
-        /// <summary>
-        /// Logs a formatted debugging message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation")]
         void Debug(Type reporting, string format, params object[] args);
 
-        /// <summary>
-        /// Logs a formatted debugging message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method will be removed, do not use it, if you want to use formatting do it with string interpolation, if you want to use lazy generated strings use the overload with messageBuilder")]
         void Debug(Type reporting, string format, params Func<object>[] args);
     }
 }

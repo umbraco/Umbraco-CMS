@@ -23,6 +23,7 @@ namespace Umbraco.Web.Composing.CompositionRoots
             container.Register<TagMapperProfile>();
             container.Register<TemplateMapperProfile>();
             container.Register<UserMapperProfile>();
+            container.Register<LanguageMapperProfile>();
         }
     }
 }

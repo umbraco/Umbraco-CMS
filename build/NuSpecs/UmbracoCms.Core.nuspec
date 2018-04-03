@@ -64,6 +64,6 @@
     <file src="$BuildTmp$\bin\Umbraco.Web.UI.pdb" target="lib" />
     <file src="$BuildTmp$\..\src\Umbraco.Web.UI\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web.UI" />
     <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
-    <file src="$BuildTmp$\..\src\Umbraco.Examine\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\UmbracoExamine" />
+    <file src="$BuildTmp$\..\src\Umbraco.Examine\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Examine" />
   </files>
 </package>

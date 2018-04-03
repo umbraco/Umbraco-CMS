@@ -79,7 +79,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Examine" Version="1.0.0-beta024" />
+    <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="Log4Net.Async" Version="2.0.4" />
