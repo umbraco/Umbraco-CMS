@@ -194,7 +194,6 @@ namespace Umbraco.Tests.Models
             content.CreatorId = 22;
             content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
-            content.Language = "en";
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
@@ -254,7 +253,6 @@ namespace Umbraco.Tests.Models
             content.CreatorId = 22;
             content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
-            content.Language = "en";
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;
@@ -294,7 +292,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.CreatorId, content.CreatorId);
             Assert.AreEqual(clone.ExpireDate, content.ExpireDate);
             Assert.AreEqual(clone.Key, content.Key);
-            Assert.AreEqual(clone.Language, content.Language);
             Assert.AreEqual(clone.Level, content.Level);
             Assert.AreEqual(clone.Path, content.Path);
             Assert.AreEqual(clone.ReleaseDate, content.ReleaseDate);
@@ -355,7 +352,6 @@ namespace Umbraco.Tests.Models
             content.CreatorId = 22;
             content.ExpireDate = DateTime.Now;
             content.Key = Guid.NewGuid();
-            content.Language = "en";
             content.Level = 3;
             content.Path = "-1,4,10";
             content.ReleaseDate = DateTime.Now;

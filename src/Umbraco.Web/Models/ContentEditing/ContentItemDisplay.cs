@@ -25,6 +25,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "removeDate")]
         public DateTime? ExpireDate { get; set; }
 
+        /// <summary>
+        /// Represents the variant info for a content item
+        /// </summary>
+        [DataMember(Name = "variants")]
+        public IEnumerable<ContentVariation> Variants { get; set; }
+        
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 

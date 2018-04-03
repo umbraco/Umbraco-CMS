@@ -53,61 +53,6 @@
       // We don't get the info tab from the server from version 7.8 so we need to manually add it
       //contentEditingHelper.addInfoTab($scope.content.tabs);
 
-      // prototype variants
-      $scope.content.variants = [
-        {
-          "cultureDisplayName": "English (United States)",
-          "culture": "en-US",
-          "current": true,
-          "segments" : [
-            {
-              "name": "Mobile"
-            },
-            {
-              "name": "Job campign"
-            }
-          ],
-          "state": "Published"
-        },
-        {
-          "cultureDisplayName": "Danish",
-          "culture": "da-DK",
-          "current": false,
-          "segments" : [
-            {
-              "name": "Mobile"
-            }
-          ],
-          "state": "Published"
-        },
-        {
-            "cultureDisplayName": "Spanish (Spain)",
-            "culture": "es-ES",
-            "current": false,
-            "state": "Published (pending changes)"
-        },
-        {
-            "cultureDisplayName": "French (France)",
-            "culture": "fr-FR",
-            "current": false,
-            "segments" : [
-              {
-                "name": "Mobile"
-              },
-              {
-                "name": "Job campign"
-              }
-            ],
-            "state": "Draft"
-        },
-        {
-            "cultureDisplayName": "German (Germany)",
-            "culture": "de-DE",
-            "current": false,
-            "state": "Draft"
-        }
-      ];
-
       // prototype content and info apps
       var contentApp = {
         "name": "Content",

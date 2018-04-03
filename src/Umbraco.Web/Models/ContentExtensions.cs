@@ -11,6 +11,13 @@ namespace Umbraco.Web.Models
 {
     public static class ContentExtensions
     {
+        public static bool HasVariation(this IContent content, int langId, string segment = null)
+        {
+            //TODO: Wire up with new APIs
+            return false;
+            //return content.Languages.FirstOrDefault(x => x == langId);
+        }
+
         /// <summary>
         /// Gets the culture that would be selected to render a specified content,
         /// within the context of a specified current request.

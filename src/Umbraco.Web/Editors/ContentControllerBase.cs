@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
     {
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
         {
-            ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
+            ModelState.AddModelError("id", $"content with id: {id} was not found");
             var errorResponse = Request.CreateErrorResponse(
                 HttpStatusCode.NotFound,
                 ModelState);

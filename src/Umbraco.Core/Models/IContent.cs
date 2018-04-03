@@ -18,6 +18,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         bool Published { get; }
 
+        PublishedState PublishedState { get; }
+
         /// <summary>
         /// Gets a value indicating whether the content has been edited.
         /// </summary>
@@ -54,11 +56,7 @@ namespace Umbraco.Core.Models
         /// Gets the date and time the content was published.
         /// </summary>
         DateTime? PublishDate { get; }
-
-        [Obsolete("This will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        string Language { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the date and time the content item should be published.
         /// </summary>

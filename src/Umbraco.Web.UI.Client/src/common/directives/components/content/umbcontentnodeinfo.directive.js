@@ -136,13 +136,13 @@
                 }
 
                 // published node
-                if(node.hasPublishedVersion === true && node.publishDate && node.published === true) {
+                if(node.publishDate && node.published === true) {
                     scope.publishStatus.label = localizationService.localize("content_published");
                     scope.publishStatus.color = "success";
                 }
 
                 // published node with pending changes
-                if(node.hasPublishedVersion === true && node.publishDate && node.published === false) {
+                if (node.edited === true && node.publishDate) {
                     scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
                     scope.publishStatus.color = "success"
                 }
