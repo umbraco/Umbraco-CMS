@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -11,11 +13,11 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyMapperProfile : Profile
     {
-        public ContentPropertyMapperProfile(IDataTypeService dataTypeService, ILocalizedTextService textService)
+        public ContentPropertyMapperProfile(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
         {
-            var contentPropertyBasicConverter = new ContentPropertyBasicConverter<ContentPropertyBasic>(dataTypeService);
-            var contentPropertyDtoConverter = new ContentPropertyDtoConverter(dataTypeService);
-            var contentPropertyDisplayConverter = new ContentPropertyDisplayConverter(dataTypeService, textService);
+            var contentPropertyBasicConverter = new ContentPropertyBasicConverter<ContentPropertyBasic>(dataTypeService, logger, propertyEditors);
+            var contentPropertyDtoConverter = new ContentPropertyDtoConverter(dataTypeService, logger, propertyEditors);
+            var contentPropertyDisplayConverter = new ContentPropertyDisplayConverter(dataTypeService, textService, logger, propertyEditors);
 
             //FROM Property TO ContentPropertyBasic
             CreateMap<PropertyGroup, Tab<ContentPropertyDisplay>>()
@@ -25,13 +27,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(tab => tab.Alias, expression => expression.Ignore());
 
             //FROM Property TO ContentPropertyBasic
-            CreateMap<Property, ContentPropertyBasic>().ConvertUsing(contentPropertyBasicConverter);
+            CreateMap<Property, ContentPropertyBasic>().ConvertUsing((property, basic, arg3) => contentPropertyBasicConverter.Convert(property, basic, arg3));
 
             //FROM Property TO ContentPropertyDto
             CreateMap<Property, ContentPropertyDto>().ConvertUsing(contentPropertyDtoConverter);
 
             //FROM Property TO ContentPropertyDisplay
-            CreateMap<Property, ContentPropertyDisplay>().ConvertUsing(contentPropertyDisplayConverter);
+            CreateMap<Property, ContentPropertyDisplay>().ConvertUsing((property, basic, arg3) => contentPropertyDisplayConverter.Convert(property, basic, arg3));
         }
     }
 }

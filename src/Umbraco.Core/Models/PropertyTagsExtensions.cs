@@ -167,9 +167,7 @@ namespace Umbraco.Core.Models
         /// <param name="property">The property.</param>
         /// <param name="value">The property value.</param>
         /// <param name="tagConfiguration">The datatype configuration.</param>
-        /// <param name="tagPropertyEditorAttribute">The property editor tags configuration attribute.</param>
-        /// <remarks>
-        /// <para>The tags configuration is specified by the <paramref name="tagPropertyEditorAttribute"/> marking the property editor.</para>
+        /// <remarks>        
         /// <para>The value is either a string (delimited string) or an enumeration of strings (tag list).</para>
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>

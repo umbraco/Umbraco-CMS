@@ -470,7 +470,11 @@ namespace Umbraco.Web.Editors
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
 
-            MapPropertyValues(contentItem);
+            UpdateName(contentItem);
+            MapPropertyValues<IMedia, MediaItemSave>(
+                contentItem,
+                (save, property) => property.GetValue(),        //get prop val
+                (save, property, v) => property.SetValue(v));   //set prop val
 
             //We need to manually check the validation results here because:
             // * We still need to save the entity even if there are validation value errors
@@ -529,19 +533,7 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
-        /// <summary>
-        /// Maps the property values to the persisted entity
-        /// </summary>
-        /// <param name="contentItem"></param>
-        protected override void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
-        {
-            UpdateName(contentItem);
-
-            //use the base method to map the rest of the properties
-            base.MapPropertyValues(contentItem);
-        }
-
+        
         /// <summary>
         /// Empties the recycle bin
         /// </summary>

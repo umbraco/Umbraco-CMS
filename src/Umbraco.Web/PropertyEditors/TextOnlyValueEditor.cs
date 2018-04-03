@@ -19,21 +19,24 @@ namespace Umbraco.Web.PropertyEditors
         /// A method used to format the database value to a value that can be used by the editor
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="propertyType"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="languageId"></param>
+        /// <param name="segment"></param>
         /// <returns></returns>
         /// <remarks>
         /// The object returned will always be a string and if the database type is not a valid string type an exception is thrown
         /// </remarks>
-        public override object ToEditor(Property property, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
         {
-            if (property.GetValue() == null) return string.Empty;
+            var val = property.GetValue(languageId, segment);
+
+            if (val == null) return string.Empty;
 
             switch (ValueTypes.ToStorageType(ValueType))
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:
-                    return property.GetValue().ToString();
+                    return val.ToString();
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
                 case ValueStorageType.Date:

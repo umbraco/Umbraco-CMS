@@ -152,18 +152,19 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="umbracoContext"></param>
         /// <param name="content"></param>
         /// <param name="tabs"></param>
+        /// <param name="context"></param>
         /// <remarks>
         /// The generic properties tab is responsible for 
         /// setting up the properties such as Created date, updated date, template selected, etc...
         /// </remarks>
-        protected virtual void MapGenericProperties(UmbracoContext umbracoContext, IContentBase content, List<Tab<ContentPropertyDisplay>> tabs)
+        protected virtual void MapGenericProperties(UmbracoContext umbracoContext, IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, ResolutionContext context)
         {
             // add the generic properties tab, for properties that don't belong to a tab
             // get the properties, map and translate them, then add the tab
             var noGroupProperties = content.GetNonGroupedProperties()
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
                 .ToList();
-            var genericproperties = MapProperties(umbracoContext, content, noGroupProperties);
+            var genericproperties = MapProperties(umbracoContext, content, noGroupProperties, context);
 
             tabs.Add(new Tab<ContentPropertyDisplay>
             {
@@ -212,12 +213,16 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="umbracoContext"></param>
         /// <param name="content"></param>
         /// <param name="properties"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        protected virtual List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties)
+        protected virtual List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties, ResolutionContext context)
         {
-            var result = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
+            //we need to map this way to pass the context through, I don't like it but we'll see what AutoMapper says: https://github.com/AutoMapper/AutoMapper/issues/2588
+            var result = context.Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
                     // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
-                    properties.OrderBy(prop => prop.PropertyType.SortOrder))
+                    properties.OrderBy(prop => prop.PropertyType.SortOrder),
+                    null,
+                    context)
                 .ToList();
 
             return result;
@@ -265,7 +270,7 @@ namespace Umbraco.Web.Models.Mapping
                     continue;
 
                 //map the properties
-                var mappedProperties = MapProperties(umbracoContext, source, properties);
+                var mappedProperties = MapProperties(umbracoContext, source, properties, context);
 
                 // add the tab
                 // we need to pick an identifier... there is no "right" way...
@@ -283,7 +288,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
             }
 
-            MapGenericProperties(umbracoContext, source, tabs);
+            MapGenericProperties(umbracoContext, source, tabs, context);
 
             // activate the first tab, if any
             if (tabs.Count > 0)

@@ -3,6 +3,7 @@ using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -17,8 +18,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService)
-            : base(dataTypeService)
+        public ContentPropertyDisplayConverter(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, logger, propertyEditors)
         {
             _textService = textService;
         }

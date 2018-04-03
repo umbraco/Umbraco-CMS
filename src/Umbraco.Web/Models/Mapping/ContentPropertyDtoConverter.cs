@@ -1,6 +1,8 @@
 ﻿using System;
 using AutoMapper;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -11,8 +13,8 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoConverter : ContentPropertyBasicConverter<ContentPropertyDto>
     {
-        public ContentPropertyDtoConverter(IDataTypeService dataTypeService)
-            : base(dataTypeService)
+        public ContentPropertyDtoConverter(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, logger, propertyEditors)
         { }
 
         public override ContentPropertyDto Convert(Property originalProperty, ContentPropertyDto dest, ResolutionContext context)

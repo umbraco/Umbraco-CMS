@@ -324,6 +324,16 @@
                 //this is basically the same as for media but we need to explicitly add some extra properties
                 var saveModel = this.formatMediaPostData(displayModel, action);
 
+                //get the selected variant
+                var currVariant = _.find(displayModel.variants,
+                    function(v) {
+                        return v.current === true;
+                    });
+                if (currVariant) {
+                    saveModel.languageId = currVariant.language.id;
+                }
+                
+
                 var propExpireDate = displayModel.removeDate;
                 var propReleaseDate = displayModel.releaseDate;
                 var propTemplate = displayModel.template;

@@ -59,7 +59,8 @@ namespace Umbraco.Web.PropertyEditors
                 return false;
             if (ensureValue == false)
                 return true;
-            return property.GetValue() is string && string.IsNullOrWhiteSpace((string) property.GetValue()) == false;
+            var val = property.GetValue();
+            return val is string s && string.IsNullOrWhiteSpace(s) == false;
         }
 
         /// <summary>

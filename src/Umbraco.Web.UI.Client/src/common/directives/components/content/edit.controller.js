@@ -42,6 +42,11 @@
         }
       }
 
+        //init can be called more than once and we don't want to have multiple bound events
+      for (var e in evts) {
+          eventsService.unsubscribe(evts[e]);
+      }
+
       evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
         createButtons(args.node);
       }));
@@ -97,20 +102,30 @@
       $scope.content.apps[0].active = true;
 
       // create new editor for split view
-      if($scope.editors.length === 0) {
-        var editor = {};
-        editor.content = $scope.content;
-        $scope.editors.push(editor);
-      }
-
+        if ($scope.editors.length === 0) {
+            var editor = {
+                content: $scope.content
+            };
+            $scope.editors.push(editor);
+        }
+        else if ($scope.editors.length === 1) {
+            $scope.editors[0].content = $scope.content
+        }
+        else {
+            //fixme - need to fix something here if we are re-loading a content item that is in a split view
+        }
     }
 
-    function getNode() {
+      /**
+       *  This does the content loading and initializes everything, called on load and changing variants
+       * @param {any} languageId
+       */
+    function getNode(languageId) {
 
       $scope.page.loading = true;
 
       //we are editing so get the content item from the server
-      $scope.getMethod()($scope.contentId)
+      $scope.getMethod()($scope.contentId, languageId)
         .then(function (data) {
 
           $scope.content = data;
@@ -392,7 +407,11 @@
       angular.forEach(variants, function(variant) {
         variant.current = false;
       });
+
       selectedVariant.current = true;
+
+      //go get the variant
+      getNode(selectedVariant.language.id);
     }
 
     $scope.closeSplitView = function(index, editor) {
@@ -419,6 +438,7 @@
       }, 100);
     
       // fake loading of content
+      // TODO: Make this real, but how do we deal with saving since currently we only save one variant at a time?!
       $timeout(function(){
         $scope.editors[editorIndex].content = angular.copy($scope.content);
         $scope.editors[editorIndex].content.name = "What a variant";

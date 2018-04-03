@@ -246,7 +246,7 @@
     <Compile Include="Models\ContentEditing\Language.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
-    <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\ContextMapper.cs" />
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />

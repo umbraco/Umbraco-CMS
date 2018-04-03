@@ -19,8 +19,7 @@ namespace Umbraco.Core.PropertyEditors
     public class DataEditor : IDataEditor
     {
         private IDictionary<string, object> _defaultConfiguration;
-        private IDataValueEditor _valueEditorAssigned;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
@@ -160,10 +159,6 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         protected virtual IDataValueEditor CreateValueEditor()
         {
-            // handle assigned editor, or create a new one
-            if (_valueEditorAssigned != null)
-                return _valueEditorAssigned;
-
             if (Attribute == null)
                 throw new InvalidOperationException("The editor does not specify a view.");
 

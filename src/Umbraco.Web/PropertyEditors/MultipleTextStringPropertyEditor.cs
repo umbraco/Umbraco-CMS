@@ -78,18 +78,18 @@ namespace Umbraco.Web.PropertyEditors
             /// cannot have 2 way binding, so to get around that each item in the array needs to be an object with a string.
             /// </summary>
             /// <param name="property"></param>
-            /// <param name="propertyType"></param>
             /// <param name="dataTypeService"></param>
+            /// <param name="languageId"></param>
+            /// <param name="segment"></param>
             /// <returns></returns>
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
             {
-                return property.GetValue() == null
-                                  ? new JObject[] {}
-                                  : property.GetValue().ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                                           .Select(x => JObject.FromObject(new {value = x}));
+                var val = property.GetValue(languageId, segment);
+                return val?.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+                           .Select(x => JObject.FromObject(new {value = x})) ?? new JObject[] { };
 
 
             }

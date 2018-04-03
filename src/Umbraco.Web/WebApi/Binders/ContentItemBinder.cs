@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -26,7 +27,10 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave model)
         {
-            return Mapper.Map<IContent, ContentItemDto<IContent>>(model.PersistedContent);
+            return ContextMapper.Map<IContent, ContentItemDto<IContent>>(model.PersistedContent, new Dictionary<string, object>
+            {
+                [ContextMapper.LanguageKey] = model.LanguageId
+            });
         }
     }
 }

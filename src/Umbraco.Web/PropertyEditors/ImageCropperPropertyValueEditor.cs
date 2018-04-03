@@ -32,17 +32,17 @@ namespace Umbraco.Web.PropertyEditors
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
 
-        public override object ToEditor(Property property, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
         {
+            var val = property.GetValue(languageId, segment);
             ImageCropperValue value;
             try
             {
-                // fixme - ignoring variants here?!
-                value = JsonConvert.DeserializeObject<ImageCropperValue>(property.GetValue().ToString());
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(val.ToString());
             }
             catch
             {
-                value = new ImageCropperValue { Src = property.GetValue().ToString() };
+                value = new ImageCropperValue { Src = val.ToString() };
             }
 
             var dataType = dataTypeService.GetDataType(property.PropertyType.DataTypeId);

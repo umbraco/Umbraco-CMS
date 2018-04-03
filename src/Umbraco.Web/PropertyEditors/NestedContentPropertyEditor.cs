@@ -139,12 +139,13 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
-            public override object ToEditor(Property property, IDataTypeService dataTypeService)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
             {
-                if (property.GetValue() == null || string.IsNullOrWhiteSpace(property.GetValue().ToString()))
+                var val = property.GetValue(languageId, segment);
+                if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
                     return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(property.GetValue().ToString());
+                var value = JsonConvert.DeserializeObject<List<object>>(val.ToString());
                 if (value == null)
                     return string.Empty;
 

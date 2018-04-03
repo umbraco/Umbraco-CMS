@@ -379,7 +379,10 @@ namespace Umbraco.Web.Editors
             contentItem.PersistedContent.Username = contentItem.Username;
 
             //use the base method to map the rest of the properties
-            base.MapPropertyValues(contentItem);
+            base.MapPropertyValues<IMember, MemberSave>(
+                contentItem,
+                (save, property) => property.GetValue(),        //get prop val
+                (save, property, v) => property.SetValue(v));   //set prop val
         }
 
         /// <summary>

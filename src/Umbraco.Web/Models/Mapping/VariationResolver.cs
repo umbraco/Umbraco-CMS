@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
             var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
             if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariation>(); //there's only 1 language defined so we don't have language variants enabled
 
-            var langs = Mapper.Map<IEnumerable<Language>>(allLanguages).ToList();
+            var langs = context.Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages, null, context);
             var variants = langs.Select(x => new ContentVariation
             {
                 Language = x,
@@ -33,26 +33,14 @@ namespace Umbraco.Web.Models.Mapping
                 ExpireDate = source.ExpireDate,
                 PublishDate = source.PublishDate,
                 ReleaseDate = source.ReleaseDate,
-                Exists = source.HasVariation(x.Id),
+                Exists = source.HasVariation(x.Id), //TODO: This needs to be wired up with new APIs when they are ready
                 PublishedState = source.PublishedState.ToString()
             }).ToList();
 
-            //if there's only one language, by default it is the default
-            if (langs.Count == 1)
-            {
-                langs[0].IsDefaultVariantLanguage = true;
-                langs[0].Mandatory = true;
-            }
-            else if (allLanguages.All(x => !x.IsDefaultVariantLanguage))
-            {
-                //if no language has the default flag, then the defaul language is the one with the lowest id
-                langs[0].IsDefaultVariantLanguage = true;
-                langs[0].Mandatory = true;
-            }
+            var langId = context.GetLanguageId();
 
-            //TODO: Not sure if this is required right now, IsCurrent could purely be a UI thing, we'll see
-            //set the 'current'
-            variants.First(x => x.Language.IsDefaultVariantLanguage).IsCurrent = true;
+            //set the current variant being edited to the one found in the context or the default, whichever matches
+            variants.First(x => (langId.HasValue && langId.Value == x.Language.Id) || x.Language.IsDefaultVariantLanguage).IsCurrent = true;
 
             return variants;
         }

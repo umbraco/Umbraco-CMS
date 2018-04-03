@@ -169,10 +169,11 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="umbracoContext"></param>
         /// <param name="content"></param>
         /// <param name="properties"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        protected override List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties)
+        protected override List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties, ResolutionContext context)
         {
-            var result = base.MapProperties(umbracoContext, content, properties);
+            var result = base.MapProperties(umbracoContext, content, properties, context);
             var member = (IMember)content;
             var memberType = member.ContentType;
 
