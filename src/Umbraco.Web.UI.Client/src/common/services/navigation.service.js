@@ -289,11 +289,17 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
 
             if (mainTreeEventHandler) {                
-                //returns a promise, but wrap it in a time out,
-                // on some occasions the syncTree method is not defined yet in the umb - tree directive(U4 - 11167)
-                $timeout(function () {                   
+               
+                if (mainTreeEventHandler.syncTree) {
+                    //returns a promise,
                     return mainTreeEventHandler.syncTree(args);
-                }, 50, false);                
+                } else {
+                    //returns a promise, but wrap it in a time out,
+                    // on some occasions the syncTree method is not defined yet in the umb - tree directive(U4 - 11167)
+                    $timeout(function () {
+                        return mainTreeEventHandler.syncTree(args);
+                    }, 50, false);       
+                }
             }
 
             //couldn't sync
