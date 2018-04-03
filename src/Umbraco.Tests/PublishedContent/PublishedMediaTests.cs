@@ -136,7 +136,9 @@ namespace Umbraco.Tests.PublishedContent
         public void Do_Not_Find_In_Recycle_Bin()
         {
             using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext,
+                //include unpublished content since this uses the 'internal' indexer, it's up to the media cache to filter
+                options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
@@ -151,7 +153,7 @@ namespace Umbraco.Tests.PublishedContent
                 Assert.IsNotNull(publishedMedia);
 
                 //move item to recycle bin
-                var newXml = XElement.Parse(@"<node id='3113' version='5b3e46ab-3e37-4cfa-ab70-014234b5bd33' parentID='-21' level='1' writerID='0' nodeType='1032' template='0' sortOrder='2' createDate='2010-05-19T17:32:46' updateDate='2010-05-19T17:32:46' nodeName='Another Umbraco Image' urlName='acnestressscrub' writerName='Administrator' nodeTypeAlias='Image' path='-1,-21,3113'>
+                var newXml = XElement.Parse(@"<node id='3113' key='5b3e46ab-3e37-4cfa-ab70-014234b5bd33' parentID='-21' level='1' writerID='0' nodeType='1032' template='0' sortOrder='2' createDate='2010-05-19T17:32:46' updateDate='2010-05-19T17:32:46' nodeName='Another Umbraco Image' urlName='acnestressscrub' writerName='Administrator' nodeTypeAlias='Image' path='-1,-21,3113'>
                     <data alias='umbracoFile'><![CDATA[/media/1234/blah.pdf]]></data>
                     <data alias='umbracoWidth'>115</data>
                     <data alias='umbracoHeight'>268</data>

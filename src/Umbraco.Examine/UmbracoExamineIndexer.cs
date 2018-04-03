@@ -378,9 +378,10 @@ namespace Umbraco.Examine
             base.OnTransformingIndexValues(e);
 
             //ensure special __Path field
-            if (e.IndexItem.ValueSet.Values.TryGetValue("path", out var path) && e.IndexItem.ValueSet.Values.ContainsKey(IndexPathFieldName) == false)
+            var path = e.IndexItem.ValueSet.GetValue("path");
+            if (path != null)
             {
-                e.IndexItem.ValueSet.Values[IndexPathFieldName] = new List<object> { path };
+                e.IndexItem.ValueSet.Set(IndexPathFieldName, path);
             }
 
             //strip html of all users fields if we detect it has HTML in it.
@@ -390,8 +391,7 @@ namespace Umbraco.Examine
             {
                 if (value.Value.Count > 0)
                 {
-                    var str = value.Value.First() as string;
-                    if (str != null)
+                    if (value.Value.First() is string str)
                     {
                         if (XmlHelper.CouldItBeXml(str))
                         {

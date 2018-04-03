@@ -47,7 +47,7 @@
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
     <PackageReference Include="Examine">
-      <Version>1.0.0-beta024</Version>
+      <Version>1.0.0-beta025</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NPoco" Version="3.6.1" />
