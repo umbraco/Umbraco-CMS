@@ -105,7 +105,7 @@
         vm.init = function () {
 
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             //load templates - used in the master template picker
             templateResource.getAll()
