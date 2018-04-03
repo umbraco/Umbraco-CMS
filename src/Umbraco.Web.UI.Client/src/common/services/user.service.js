@@ -294,10 +294,15 @@ angular.module('umbraco.services')
                                 localeUrls.push('lib/moment/' + majorLocale);
                             }
                         }
-                        assetsService.load(localeUrls).then(function () {
-                            
-                        });
-                    } 
+                        return assetsService.load(localeUrls);
+                    }
+                    else {
+                        //return a noop promise
+                        var deferred = $q.defer();
+                        var promise = deferred.promise;
+                        deferred.resolve(true);
+                        return promise;
+                    }
                 }
 
                 var promises = {
