@@ -101,7 +101,7 @@
             var clipboard;
             var target = element[0];
             
-            assetsService.loadJs("lib/clipboard/clipboard.min.js")
+            assetsService.loadJs("lib/clipboard/clipboard.min.js", scope)
                 .then(function () {
 
                     if(scope.umbClipboardTarget) {

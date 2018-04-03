@@ -117,5 +117,5 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         });
 
         // load TinyMCE skin which contains css for font-icons
-        assetsService.loadCss("lib/tinymce/skins/umbraco/skin.min.css");
+        assetsService.loadCss("lib/tinymce/skins/umbraco/skin.min.css", $scope);
     });
