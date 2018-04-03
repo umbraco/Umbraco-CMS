@@ -50,7 +50,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string CultureName
         {
-            get => _cultureName;
+            get => _cultureName ?? CultureInfo.GetCultureInfo(IsoCode).DisplayName;
             set => SetPropertyValueAndDetectChanges(value, ref _cultureName, Ps.Value.CultureNameSelector);
         }
 
