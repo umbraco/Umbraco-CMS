@@ -275,7 +275,7 @@ namespace umbraco
                 Current.Logger.Error<library>("An error occurred looking up media", ex);
             }
 
-            Current.Logger.Debug<library>("No media result for id {0}", () => MediaId);
+            Current.Logger.Debug<library>(() => $"No media result for id {MediaId}");
 
             var errorXml = new XElement("error", string.Format("No media is maching '{0}'", MediaId));
             return errorXml.CreateNavigator().Select("/");
@@ -331,7 +331,7 @@ namespace umbraco
                 Current.Logger.Error<library>("An error occurred looking up member", ex);
             }
 
-            Current.Logger.Debug<library>("No member result for id {0}", () => MemberId);
+            Current.Logger.Debug<library>(() => $"No member result for id {MemberId}");
 
             var xd = new XmlDocument();
             xd.LoadXml(string.Format("<error>No member is maching '{0}'</error>", MemberId));

@@ -405,22 +405,19 @@ namespace Umbraco.Web.Editors
                 if (lockedOut)
                 {
                     Logger.Info<AuthenticationController>(
-                        "User {0} is currently locked out, unlocking and resetting AccessFailedCount",
-                        () => model.UserId);
+                        $"User {model.UserId} is currently locked out, unlocking and resetting AccessFailedCount");
 
                     //var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {0} - error {1}",
-                                        () => model.UserId, () => unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>(() => $"Could not unlock for user {model.UserId} - error {unlockResult.Errors.First()}");
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {0} - error {1}",
-                            () => model.UserId, () => unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>(() => $"Could not reset access failed count {model.UserId} - error {unlockResult.Errors.First()}");
                     }
                 }
 
@@ -446,9 +443,7 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController>("User {0} from IP address {1} has logged out",
-                            () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
-                            () => owinContext.Request.RemoteIpAddress);
+            Logger.Info<AuthenticationController>($"User {(User.Identity == null ? "UNKNOWN" : User.Identity.Name)} from IP address {owinContext.Request.RemoteIpAddress} has logged out");
 
             if (UserManager != null)
             {

@@ -44,13 +44,13 @@ namespace Umbraco.Web.Routing
         /// <returns>The document node, or null.</returns>
         protected IPublishedContent FindContent(PublishedRequest docreq, string route)
         {
-            Logger.Debug<ContentFinderByNiceUrl>("Test route \"{0}\"", () => route);
+            Logger.Debug<ContentFinderByNiceUrl>(() => $"Test route \"{route}\"");
 
             var node = docreq.UmbracoContext.ContentCache.GetByRoute(route);
             if (node != null)
             {
                 docreq.PublishedContent = node;
-                Logger.Debug<ContentFinderByNiceUrl>("Got content, id={0}", () => node.Id);
+                Logger.Debug<ContentFinderByNiceUrl>(() => $"Got content, id={node.Id}");
             }
             else
             {

@@ -194,7 +194,7 @@ namespace Umbraco.Web.Editors
                     var actionsXml = new XmlDocument();
                     actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    Logger.Debug<PackageInstallController>("executing undo actions: {0}", () => actionsXml.OuterXml);
+                    Logger.Debug<PackageInstallController>(() => $"executing undo actions: {actionsXml.OuterXml}");
 
                     foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
                     {

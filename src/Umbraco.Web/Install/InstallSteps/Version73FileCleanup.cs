@@ -45,7 +45,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 var dll = bin[0].GetFiles("Microsoft.Web.Mvc.FixedDisplayModes.dll", SearchOption.TopDirectoryOnly);
                 if (dll.Length == 1)
                 {
-                    _logger.Info<Version73FileCleanup>("Deleting non-compatible and no longer used DLL: {0}", () => dll[0].FullName);
+                    _logger.Info<Version73FileCleanup>($"Deleting non-compatible and no longer used DLL: {dll[0].FullName}");
                     File.Delete(dll[0].FullName);
                 }
             }
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Install.InstallSteps
             foreach (var configFile in found)
             {
                 var fileName = configFile.FullName;
-                _logger.Info<Version73FileCleanup>("Cleaning up web.config file: {0}", () => fileName);
+                _logger.Info<Version73FileCleanup>($"Cleaning up web.config file: {fileName}");
 
                 var contents = File.ReadAllText(fileName);
                 contents = _microsoftWebHelpers.Replace(contents, string.Empty);

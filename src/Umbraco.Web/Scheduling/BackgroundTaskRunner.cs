@@ -233,7 +233,7 @@ namespace Umbraco.Web.Scheduling
                     throw new InvalidOperationException("The task runner has completed.");
 
                 // add task
-                _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Task added {0}", () => task.GetType().FullName);
+                _logger.Debug<BackgroundTaskRunner>(() => _logPrefix + "Task added " + task.GetType().FullName);
                 _tasks.Post(task);
 
                 // start
@@ -253,12 +253,12 @@ namespace Umbraco.Web.Scheduling
             {
                 if (_completed)
                 {
-                    _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Task cannot be added {0}, the task runner has already shutdown", () => task.GetType().FullName);
+                    _logger.Debug<BackgroundTaskRunner>(() => _logPrefix + $"Task cannot be added {task.GetType().FullName}, the task runner has already shutdown");
                     return false;
                 }
 
                 // add task
-                _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Task added {0}", () => task.GetType().FullName);
+                _logger.Debug<BackgroundTaskRunner>(() => _logPrefix + "Task added " + task.GetType().FullName);
                 _tasks.Post(task);
 
                 // start

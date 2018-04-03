@@ -49,9 +49,8 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>(
-                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                    () => id);
+                _logger.Debug<DefaultUrlProvider>(() =>
+                    $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
                 return null;
             }
 
@@ -91,9 +90,8 @@ namespace Umbraco.Web.Routing
 
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>(
-                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                    () => id);
+                _logger.Debug<DefaultUrlProvider>(() =>
+                    $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
                 return null;
             }
 

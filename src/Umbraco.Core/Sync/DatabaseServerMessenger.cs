@@ -65,7 +65,7 @@ namespace Umbraco.Core.Sync
         protected IScopeProvider ScopeProvider { get; }
 
         protected Sql<ISqlContext> Sql() => _sqlContext.Sql();
-        
+
         private string DistCacheFilePath => _distCacheFilePath.Value;
 
         #region Messenger
@@ -192,10 +192,9 @@ namespace Umbraco.Core.Sync
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
-                        Logger.Warn<DatabaseServerMessenger>("The instruction count ({0}) exceeds the specified MaxProcessingInstructionCount ({1})."
+                        Logger.Warn<DatabaseServerMessenger>(() => $"The instruction count ({count}) exceeds the specified MaxProcessingInstructionCount ({Options.MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                            + " to the latest found in the database and maintain cache updates based on that Id.",
-                            () => count, () => Options.MaxProcessingInstructionCount);
+                            + " to the latest found in the database and maintain cache updates based on that Id.");
 
                         coldboot = true;
                     }

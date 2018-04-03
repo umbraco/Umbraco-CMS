@@ -104,7 +104,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (xmlSource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                    _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
                     return result;
                 }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (_dictionarySource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                    _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
                     return result;
                 }
 
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
                 return "[" + key + "]";
             }
 
@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (xmlSource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>("The culture specified {0} was not found in any configured sources for this service", () => culture);
+                _logger.Warn<LocalizedTextService>(() => $"The culture specified {culture} was not found in any configured sources for this service");
                 return "[" + key + "]";
             }
 

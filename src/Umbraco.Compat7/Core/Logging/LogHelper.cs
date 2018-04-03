@@ -33,7 +33,7 @@ namespace Umbraco.Core.Logging
 
         public static void Warn(Type callingType, string message, params Func<object>[] formatItems)
         {
-            Current.Logger.Warn(callingType, message, formatItems);
+            Current.Logger.Warn(callingType, () => string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
         }
 
         [Obsolete("Warnings with http trace should not be used. This method will be removed in future versions")]
@@ -47,8 +47,7 @@ namespace Umbraco.Core.Logging
                 HttpContext.Current.Trace.Warn(callingType.Name, string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
             }
 
-            Current.Logger.Warn(callingType, message, formatItems);
-
+            Current.Logger.Warn(callingType, () => string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
         }
 
         [Obsolete("Warnings with http trace should not be used. This method will be removed in future versions")]
@@ -72,7 +71,7 @@ namespace Umbraco.Core.Logging
                     e);
             }
 
-            Current.Logger.Warn(callingType, e, message, formatItems);
+            Current.Logger.Warn(callingType, e, string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
         }
 
         /// <summary>
@@ -136,7 +135,7 @@ namespace Umbraco.Core.Logging
         /// <param name="formatItems">The format items.</param>
         public static void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
         {
-            Current.Logger.Info(type, generateMessageFormat, formatItems);
+            Current.Logger.Info(type, string.Format(generateMessageFormat, formatItems.Select(x => x.Invoke()).ToArray()));
         }
 
         /// <summary>
@@ -182,7 +181,7 @@ namespace Umbraco.Core.Logging
         /// <param name="formatItems">The format items.</param>
         public static void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
         {
-            Current.Logger.Debug(type, generateMessageFormat, formatItems);
+            Current.Logger.Debug(type, string.Format(generateMessageFormat, formatItems.Select(x => x.Invoke()).ToArray()));
         }
 
         /// <summary>

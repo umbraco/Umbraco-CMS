@@ -34,11 +34,8 @@ namespace umbraco.presentation.webservices
             if (string.IsNullOrEmpty(hash)) return false; // no hash = don't know = not self
             if (hash != WebServiceServerMessenger.GetCurrentServerHash()) return false;
 
-            Current.Logger.Debug<CacheRefresher>(
-                "Ignoring self-message. (server: {0}, appId: {1}, hash: {2})",
-                () => NetworkHelper.MachineName,
-                () => HttpRuntime.AppDomainAppId,
-                () => hash);
+            Current.Logger.Debug<CacheRefresher>(() =>
+                $"Ignoring self-message. (server: {NetworkHelper.MachineName}, appId: {HttpRuntime.AppDomainAppId}, hash: {hash})");
 
             return true;
         }

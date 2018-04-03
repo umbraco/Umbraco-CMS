@@ -43,7 +43,7 @@ namespace Umbraco.Web.Routing
                 var template = Current.Services.FileService.GetTemplate(templateAlias);
                 if (template != null)
                 {
-                    Logger.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
+                    Logger.Debug<ContentFinderByNiceUrlAndTemplate>(() => $"Valid template: \"{templateAlias}\"");
 
                     var route = frequest.HasDomain ? (frequest.Domain.ContentId.ToString() + path) : path;
                     node = FindContent(frequest, route);
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    Logger.Debug<ContentFinderByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
+                    Logger.Debug<ContentFinderByNiceUrlAndTemplate>(() => $"Not a valid template: \"{templateAlias}\"");
                 }
             }
             else

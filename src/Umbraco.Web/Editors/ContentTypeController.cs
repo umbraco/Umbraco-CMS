@@ -185,10 +185,7 @@ namespace Umbraco.Web.Editors
                             var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
                             if (tryCreateTemplate == false)
                             {
-                                Logger.Warn<ContentTypeController>(
-                                    "Could not create a template for the Content Type: {0}, status: {1}",
-                                    () => ctSave.Alias,
-                                    () => tryCreateTemplate.Result.Result);
+                                Logger.Warn<ContentTypeController>(() => $"Could not create a template for the Content Type: {ctSave.Alias}, status: {tryCreateTemplate.Result.Result}");
                             }
                             template = tryCreateTemplate.Result.Entity;
                         }

@@ -53,13 +53,13 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
+                    _logger.Debug<ContentFinderByIdPath>(() => $"Id={nodeId}");
                     node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {
                         frequest.PublishedContent = node;
-                        _logger.Debug<ContentFinderByIdPath>("Found node with id={0}", () => frequest.PublishedContent.Id);
+                        _logger.Debug<ContentFinderByIdPath>(() => $"Found node with id={frequest.PublishedContent.Id}");
                     }
                     else
                     {

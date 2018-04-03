@@ -56,7 +56,7 @@ namespace Umbraco.Examine
             //This is using the config so we'll validate based on that
             ValueSetValidator = new ValueSetValidatorDelegate(set =>
             {
-                
+
                 //check if this document is of a correct type of node type alias
                 if (ConfigIndexCriteria.IncludeItemTypes.Any())
                     if (!ConfigIndexCriteria.IncludeItemTypes.Contains(set.ItemType))
@@ -72,7 +72,7 @@ namespace Umbraco.Examine
         }
 
         protected UmbracoExamineIndexer(
-            string name, 
+            string name,
             IEnumerable<FieldDefinition> fieldDefinitions,
             Directory luceneDirectory,
             Analyzer defaultAnalyzer,
@@ -136,7 +136,7 @@ namespace Umbraco.Examine
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
         /// </summary>
         public bool EnableDefaultEventHandler { get; set; } = true;
-        
+
         /// <summary>
         /// the supported indexable types
         /// </summary>
@@ -162,7 +162,7 @@ namespace Umbraco.Examine
         /// </remarks>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            ProfilingLogger.Logger.Debug(GetType(), "{0} indexer initializing", () => name);
+            ProfilingLogger.Logger.Debug(GetType(), () => $"{name} indexer initializing");
 
             if (config["enableDefaultEventHandler"] != null && bool.TryParse(config["enableDefaultEventHandler"], out var enabled))
             {
@@ -337,7 +337,7 @@ namespace Umbraco.Examine
             ProfilingLogger.Logger.Error(GetType(), e.Message, e.InnerException);
             base.OnIndexingError(e);
         }
-        
+
         /// <summary>
         /// This ensures that the special __Raw_ fields are indexed
         /// </summary>
@@ -359,20 +359,20 @@ namespace Umbraco.Examine
                 }
             }
 
-            ProfilingLogger.Logger.Debug(GetType(), "Write lucene doc id:{0}, category:{1}, type:{2}", docArgs.ValueSet.Id, docArgs.ValueSet.Category, docArgs.ValueSet.ItemType);
-            
+            ProfilingLogger.Logger.Debug(GetType(), () => $"Write lucene doc id:{docArgs.ValueSet.Id}, category:{docArgs.ValueSet.Category}, type:{docArgs.ValueSet.ItemType}");
+
             base.OnDocumentWriting(docArgs);
         }
 
         /// <summary>
         /// Overridden for logging.
-        /// </summary>        
+        /// </summary>
         protected override void AddDocument(Document doc, IndexItem item, IndexWriter writer)
         {
-            ProfilingLogger.Logger.Debug(GetType(), "AddDocument {0} with type {1}", () => item.ValueSet.Id, () => item.ValueSet.ItemType);
+            ProfilingLogger.Logger.Debug(GetType(), () => $"AddDocument {item.ValueSet.Id} with type {item.ValueSet.ItemType}");
             base.AddDocument(doc, item, writer);
         }
-        
+
         protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
         {
             base.OnTransformingIndexValues(e);
