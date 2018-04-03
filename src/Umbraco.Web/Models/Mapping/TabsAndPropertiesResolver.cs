@@ -113,8 +113,13 @@ namespace Umbraco.Web.Models.Mapping
         {
             // Find position of tab from config
             var tabIndexForChildItems = 0;
-            if (listViewConfig["displayAtTabNumber"] != null && int.TryParse((string)listViewConfig["displayAtTabNumber"], out tabIndexForChildItems))
+            if (listViewConfig["displayAtTabNumber"] != null)
             {
+                var o = listViewConfig["displayAtTabNumber"];
+                if (o is string s) tabIndexForChildItems = int.Parse(s);
+                else if (o is int i) tabIndexForChildItems = i;
+                else throw new Exception("panic");
+
                 // Tab position is recorded 1-based but we insert into collection 0-based
                 tabIndexForChildItems--;
 
