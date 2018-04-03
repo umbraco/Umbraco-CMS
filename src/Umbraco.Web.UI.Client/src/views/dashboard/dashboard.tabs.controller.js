@@ -95,7 +95,7 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     }));
     
     //proxy remote css through the local server
-    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
     dashboardResource.getRemoteDashboardContent("content").then(
         function (data) {
 

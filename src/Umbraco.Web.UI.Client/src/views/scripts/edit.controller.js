@@ -92,7 +92,7 @@
         function init() {
 
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             if ($routeParams.create) {
                 codefileResource.getScaffold("scripts", $routeParams.id).then(function (script) {
