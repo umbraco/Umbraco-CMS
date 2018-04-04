@@ -133,7 +133,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             //(if there isn't, eg the number of columns have been changed for this row since the content was published... what is expected behaviour then?)
             if (gridCellConfig != null)
             {
-                gridCellCssClasses = gridCellConfig?["gridclasses"]?.Value<string>();
+                gridCellCssClasses = gridCellConfig?["gridCellCssClasses"]?.Value<string>();
             }
             return gridCellCssClasses;
         }
