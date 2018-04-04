@@ -43,7 +43,7 @@
         @Umbraco.If(singleColumn, "<div class='container-fluid'>")
         <div class="row-fluid clearfix">
             @foreach ( var area in row.areas ) {
-            <div class="@("span" + area.grid) @area.gridClasses column">
+            <div class="@("span" + area.grid) @area.gridCellCssClasses column">
                 <div @RenderElementAttributes(area)>
                     @foreach (var control in area.controls) {
                         if (control !=null && control.editor != null && control.editor.view != null ) {
