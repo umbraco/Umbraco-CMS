@@ -1114,7 +1114,9 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content, int? languageId = null)
         {
-            //a language must be if this content item has any property type that can be varied by language
+            //a languageId must exist in the mapping context if this content item has any property type that can be varied by language
+            //otherwise the property validation will fail since it's expecting to be get/set with a language ID. If a languageId is not explicitly
+            //sent up, then it means that the user is editing the default variant language.
             if (!languageId.HasValue && content.HasLanguageVariantPropertyType())
             {
                 languageId = Services.LocalizationService.GetDefaultVariantLanguage().Id;

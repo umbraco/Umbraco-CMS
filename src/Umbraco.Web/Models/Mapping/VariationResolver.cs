@@ -22,17 +22,14 @@ namespace Umbraco.Web.Models.Mapping
         public IEnumerable<ContentVariation> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariation> destMember, ResolutionContext context)
         {
             var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
-            if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariation>(); //there's only 1 language defined so we don't have language variants enabled
+            if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariation>(); 
 
             var langs = context.Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages, null, context);
             var variants = langs.Select(x => new ContentVariation
             {
                 Language = x,
                 //fixme these all need to the variant values but we need to wait for the db/service changes
-                Name = source.Name ,
-                ExpireDate = source.ExpireDate,
-                PublishDate = source.PublishDate,
-                ReleaseDate = source.ReleaseDate,
+                Name = source.Name ,                
                 Exists = source.HasVariation(x.Id), //TODO: This needs to be wired up with new APIs when they are ready
                 PublishedState = source.PublishedState.ToString()
             }).ToList();

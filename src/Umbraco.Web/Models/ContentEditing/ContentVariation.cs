@@ -22,18 +22,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "segment")]
         public string Segment { get; set; }
 
-        //fixme not sure if we need these dates as metadata for displaying the variant info in the drop down?
-        // when we move to being able to edit all variants and switching then this might be irrelevant
-
-        [DataMember(Name = "publishDate")]
-        public DateTime? PublishDate { get; set; }
-
-        [DataMember(Name = "releaseDate")]
-        public DateTime? ReleaseDate { get; set; }
-
-        [DataMember(Name = "removeDate")]
-        public DateTime? ExpireDate { get; set; }
-
         [DataMember(Name = "state")]
         public string PublishedState { get; set; }
 

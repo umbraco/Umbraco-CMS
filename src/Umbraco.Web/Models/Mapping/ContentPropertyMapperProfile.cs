@@ -27,13 +27,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(tab => tab.Alias, expression => expression.Ignore());
 
             //FROM Property TO ContentPropertyBasic
-            CreateMap<Property, ContentPropertyBasic>().ConvertUsing((property, basic, arg3) => contentPropertyBasicConverter.Convert(property, basic, arg3));
+            CreateMap<Property, ContentPropertyBasic>().ConvertUsing(contentPropertyBasicConverter);
 
             //FROM Property TO ContentPropertyDto
             CreateMap<Property, ContentPropertyDto>().ConvertUsing(contentPropertyDtoConverter);
 
             //FROM Property TO ContentPropertyDisplay
-            CreateMap<Property, ContentPropertyDisplay>().ConvertUsing((property, basic, arg3) => contentPropertyDisplayConverter.Convert(property, basic, arg3));
+            CreateMap<Property, ContentPropertyDisplay>().ConvertUsing(contentPropertyDisplayConverter);
         }
     }
 }
