@@ -7,7 +7,9 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -23,7 +25,17 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.GridAlias);
         }
-
+        private JObject GetGridConfigItems(PublishedPropertyType propertyType)
+        {
+            var preValues = ApplicationContext.Current.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
+            PreValue gridConfigItemsPreValue;
+            JObject gridConfigItems = default(JObject);
+           if(preValues.PreValuesAsDictionary.TryGetValue("items", out gridConfigItemsPreValue))
+           {
+               gridConfigItems = JsonConvert.DeserializeObject<JObject>(gridConfigItemsPreValue.Value);
+            }
+            return gridConfigItems;
+        }
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
@@ -46,7 +58,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
                         HttpContext.Current.IsDebuggingEnabled);
-                    
+
+                    // In order to merge in cell configuration information from prevalues for 'areas' need to pull the config details from prevalues for this particular grid property type 
+                    var gridConfigItems = GetGridConfigItems(propertyType);
+           
+
                     var sections = GetArray(obj, "sections");
                     foreach (var section in sections.Cast<JObject>())
                     {
@@ -54,8 +70,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                         foreach (var row in rows.Cast<JObject>())
                         {
                             var areas = GetArray(row, "areas");
+                            var cellIndex = 0;
                             foreach (var area in areas.Cast<JObject>())
                             {
+                                //get corresponding row config based on name of row
+                                var gridRowConfig = GetGridRowConfig(gridConfigItems, row["name"].Value<string>());
+                                //get any additional CssClasses for the current cell
+                                var gridCellCssClasses = GetGridCellCssClasses(gridRowConfig,cellIndex);
+                                //set the additional grid cell Css Classes from the prevalues config
+                                area["gridCellCssClasses"] = gridCellCssClasses;
+
                                 var controls = GetArray(area, "controls");
                                 foreach (var control in controls.Cast<JObject>())
                                 {
@@ -84,6 +108,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                                         }
                                     }
                                 }
+                                cellIndex++;
                             }
                         }
                     }
@@ -98,6 +123,25 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             //it's not json, just return the string
             return sourceString;
+        }
+
+    private string GetGridCellCssClasses(JToken rowConfig, int cellIndex)
+        {
+            string gridCellCssClasses = String.Empty;
+            var gridCellConfig = rowConfig?["areas"][cellIndex];
+            //is there a corresponding config element in the prevalues for this row name and cell index
+            //(if there isn't, eg the number of columns have been changed for this row since the content was published... what is expected behaviour then?)
+            if (gridCellConfig != null)
+            {
+                gridCellCssClasses = gridCellConfig?["gridclasses"]?.Value<string>();
+            }
+            return gridCellCssClasses;
+        }
+        private JToken GetGridRowConfig(JObject gridConfigItems, string rowName)
+        {
+            //moved this into a seperate method to avoid being called for each cell in a row
+            //is SelectToken the best approach here?
+            return gridConfigItems.SelectToken("$.layouts[?(@.name == '" + rowName + "')]");
         }
 
         private JArray GetArray(JObject obj, string propertyName)
