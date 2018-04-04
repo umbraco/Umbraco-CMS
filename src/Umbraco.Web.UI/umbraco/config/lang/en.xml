@@ -1581,6 +1581,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="allowAllRowConfigurations">Allow all row configurations</key>
         <key alias="maxItems">Maximum items</key>
         <key alias="maxItemsDescription">Leave blank or set to 0 for unlimited</key>
+        <key alias="gridCellCssClasses">Grid Cell Css Classes</key>
+        <key alias="gridCellCssClassesDescription">Optional additional Css Classes to set for this cell, eg col-sm-6</key>
         <key alias="setAsDefault">Set as default</key>
         <key alias="chooseExtra">Choose extra</key>
         <key alias="chooseDefault">Choose default</key>
