@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -14,7 +15,8 @@ using LightInject;
 
 namespace Umbraco.Tests.Services.Importing
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PackageImportTests : TestWithSomeContentBase
     {

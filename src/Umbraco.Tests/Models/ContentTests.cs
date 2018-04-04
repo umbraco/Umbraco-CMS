@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(content.Properties.Any(), Is.True);
             Assert.That(content.Properties["title"], Is.Not.Null);
-            Assert.That(content.Properties["title"].GetValue(), Is.StringContaining("sample.txt"));
+            Assert.IsTrue(content.Properties["title"].GetValue().ToString().Contains("sample.txt"));
         }
 
 

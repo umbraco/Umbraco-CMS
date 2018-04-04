@@ -112,7 +112,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //get the current user to see if we can localize this picker
     userService.getCurrentUser().then(function (user) {
 
-        assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css').then(function() {
+        assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css', $scope).then(function() {
 
         var filesToLoad = ["lib/datetimepicker/bootstrap-datetimepicker.js"];
 

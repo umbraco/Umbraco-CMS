@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Exceptions;
@@ -20,7 +21,8 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the UserService
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class UserServiceTests : TestWithSomeContentBase
     {

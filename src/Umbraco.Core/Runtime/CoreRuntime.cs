@@ -139,7 +139,14 @@ namespace Umbraco.Core.Runtime
                 {
                     var dbfactory = container.GetInstance<IUmbracoDatabaseFactory>();
                     SetRuntimeStateLevel(dbfactory, Logger);
+
                     Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
+
+                    if (_state.Level == RuntimeLevel.Upgrade)
+                    {
+                        Logger.Debug<CoreRuntime>($"Configure database factory for upgrades.");
+                        dbfactory.ConfigureForUpgrade();
+                    }
                 }
                 catch
                 {

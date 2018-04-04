@@ -30,6 +30,8 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
+            Current.Reset();
+
             var sqlSyntax = new SqlCeSyntaxProvider();
 
             var container = new ServiceContainer();

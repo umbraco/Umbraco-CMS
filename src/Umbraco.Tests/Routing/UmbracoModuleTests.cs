@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -12,7 +13,8 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.Routing
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class UmbracoModuleTests : BaseWebTest
     {
         private UmbracoModule _module;

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Threading;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
@@ -9,7 +10,8 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the DataTypeService with cache enabled
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class CachedDataTypeServiceTests : TestWithSomeContentBase
     {

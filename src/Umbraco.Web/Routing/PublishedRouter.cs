@@ -263,7 +263,7 @@ namespace Umbraco.Web.Routing
 
             // note - we are not handling schemes nor ports here.
 
-            _logger.Debug<PublishedRouter>("{0}Uri=\"{1}\"", () => tracePrefix, () => request.Uri);
+            _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Uri=\"{request.Uri}\"");
 
             // try to find a domain matching the current request
             var domainAndUri = DomainHelper.DomainForUri(request.UmbracoContext.PublishedShapshot.Domains.GetAll(false), request.Uri);
@@ -272,11 +272,7 @@ namespace Umbraco.Web.Routing
             if (domainAndUri != null)
             {
                 // matching an existing domain
-                _logger.Debug<PublishedRouter>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
-                    () => tracePrefix,
-                    () => domainAndUri.Name,
-                    () => domainAndUri.ContentId,
-                    () => domainAndUri.Culture);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Matches domain=\"{domainAndUri.Name}\", rootId={domainAndUri.ContentId}, culture=\"{domainAndUri.Culture}\"");
 
                 request.Domain = domainAndUri;
                 request.Culture = domainAndUri.Culture;
@@ -291,13 +287,13 @@ namespace Umbraco.Web.Routing
             else
             {
                 // not matching any existing domain
-                _logger.Debug<PublishedRouter>("{0}Matches no domain", () => tracePrefix);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Matches no domain");
 
                 var defaultLanguage = _services.LocalizationService.GetAllLanguages().FirstOrDefault();
                 request.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
             }
 
-            _logger.Debug<PublishedRouter>("{0}Culture=\"{1}\"", () => tracePrefix, () => request.Culture.Name);
+            _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Culture=\"{request.Culture.Name}\"");
 
             return request.Domain != null;
         }
@@ -313,7 +309,7 @@ namespace Umbraco.Web.Routing
                 return;
 
             var nodePath = request.PublishedContent.Path;
-            _logger.Debug<PublishedRouter>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
+            _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Path=\"{nodePath}\"");
             var rootNodeId = request.HasDomain ? request.Domain.ContentId : (int?)null;
             var domain = DomainHelper.FindWildcardDomainInPath(request.UmbracoContext.PublishedShapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
@@ -321,12 +317,11 @@ namespace Umbraco.Web.Routing
             if (domain != null)
             {
                 request.Culture = domain.Culture;
-                _logger.Debug<PublishedRouter>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
-                    () => domain.ContentId, () => request.Culture.Name);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Got domain on node {domain.ContentId}, set culture to \"{request.Culture.Name}\".");
             }
             else
             {
-                _logger.Debug<PublishedRouter>("{0}No match.", () => tracePrefix);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}No match.");
             }
         }
 
@@ -400,7 +395,7 @@ namespace Umbraco.Web.Routing
         private void FindPublishedContentAndTemplate(PublishedRequest request)
         {
             const string tracePrefix = "FindPublishedContentAndTemplate: ";
-            _logger.Debug<PublishedRouter>("{0}Path=\"{1}\"", () => tracePrefix, () => request.Uri.AbsolutePath);
+            _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Path=\"{request.Uri.AbsolutePath}\"");
 
             // run the document finders
             FindPublishedContent(request);
@@ -469,22 +464,22 @@ namespace Umbraco.Web.Routing
             const int maxLoop = 8;
             do
             {
-                _logger.Debug<PublishedRouter>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}{(i == 0 ? "Begin" : "Loop")}");
 
                 // handle not found
                 if (request.HasPublishedContent == false)
                 {
                     request.Is404 = true;
-                    _logger.Debug<PublishedRouter>("{0}No document, try last chance lookup", () => tracePrefix);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}No document, try last chance lookup");
 
                     // if it fails then give up, there isn't much more that we can do
                     if (_contentLastChanceFinder.TryFindContent(request) == false)
                     {
-                        _logger.Debug<PublishedRouter>("{0}Failed to find a document, give up", () => tracePrefix);
+                        _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Failed to find a document, give up");
                         break;
                     }
 
-                    _logger.Debug<PublishedRouter>("{0}Found a document", () => tracePrefix);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Found a document");
                 }
 
                 // follow internal redirects as long as it's not running out of control ie infinite loop of some sort
@@ -506,11 +501,11 @@ namespace Umbraco.Web.Routing
 
             if (i == maxLoop || j == maxLoop)
             {
-                _logger.Debug<PublishedRouter>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Looks like we're running into an infinite loop, abort");
                 request.PublishedContent = null;
             }
 
-            _logger.Debug<PublishedRouter>("{0}End", () => tracePrefix);
+            _logger.Debug<PublishedRouter>(() => $"{tracePrefix}End");
         }
 
         /// <summary>
@@ -596,13 +591,13 @@ namespace Umbraco.Web.Routing
 
             if (publicAccessAttempt)
             {
-                _logger.Debug<PublishedRouter>("{0}Page is protected, check for access", () => tracePrefix);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Page is protected, check for access");
 
                 var membershipHelper = new MembershipHelper(request.UmbracoContext);
 
                 if (membershipHelper.IsLoggedIn() == false)
                 {
-                    _logger.Debug<PublishedRouter>("{0}Not logged in, redirect to login page", () => tracePrefix);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Not logged in, redirect to login page");
 
                     var loginPageId = publicAccessAttempt.Result.LoginNodeId;
 
@@ -611,19 +606,19 @@ namespace Umbraco.Web.Routing
                 }
                 else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, GetRolesForLogin(membershipHelper.CurrentUserName)) == false)
                 {
-                    _logger.Debug<PublishedRouter>("{0}Current member has not access, redirect to error page", () => tracePrefix);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Current member has not access, redirect to error page");
                     var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
                     if (errorPageId != request.PublishedContent.Id)
                         request.PublishedContent = request.UmbracoContext.PublishedShapshot.Content.GetById(errorPageId);
                 }
                 else
                 {
-                    _logger.Debug<PublishedRouter>("{0}Current member has access", () => tracePrefix);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Current member has access");
                 }
             }
             else
             {
-                _logger.Debug<PublishedRouter>("{0}Page is not protected", () => tracePrefix);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Page is not protected");
             }
         }
 
@@ -663,7 +658,7 @@ namespace Umbraco.Web.Routing
 
                 if (request.HasTemplate)
                 {
-                    _logger.Debug<PublishedRequest>("{0}Has a template already, and no alternate template.", () => tracePrefix);
+                    _logger.Debug<PublishedRequest>("{0}Has a template already, and no alternate template.");
                     return;
                 }
 
@@ -674,16 +669,16 @@ namespace Umbraco.Web.Routing
 
                 if (templateId > 0)
                 {
-                    _logger.Debug<PublishedRouter>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Look for template id={templateId}");
                     var template = _services.FileService.GetTemplate(templateId);
                     if (template == null)
                         throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
                     request.TemplateModel = template;
-                    _logger.Debug<PublishedRouter>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Got template id={template.Id} alias=\"{template.Alias}\"");
                 }
                 else
                 {
-                    _logger.Debug<PublishedRouter>("{0}No specified template.", () => tracePrefix);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}No specified template.");
                 }
             }
             else
@@ -695,24 +690,24 @@ namespace Umbraco.Web.Routing
                 // ignore if the alias does not match - just trace
 
                 if (request.HasTemplate)
-                    _logger.Debug<PublishedRouter>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
-                _logger.Debug<PublishedRouter>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Has a template already, but also an alternate template.");
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Look for alternate template alias=\"{altTemplate}\"");
 
                 var template = _services.FileService.GetTemplate(altTemplate);
                 if (template != null)
                 {
                     request.TemplateModel = template;
-                    _logger.Debug<PublishedRouter>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Got template id={template.Id} alias=\"{template.Alias}\"");
                 }
                 else
                 {
-                    _logger.Debug<PublishedRouter>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
+                    _logger.Debug<PublishedRouter>(() => $"{tracePrefix}The template with alias=\"{altTemplate}\" does not exist, ignoring.");
                 }
             }
 
             if (request.HasTemplate == false)
             {
-                _logger.Debug<PublishedRouter>("{0}No template was found.", () => tracePrefix);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}No template was found.");
 
                 // initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
                 // then reset _pcr.Document to null to force a 404.
@@ -725,7 +720,7 @@ namespace Umbraco.Web.Routing
             }
             else
             {
-                _logger.Debug<PublishedRouter>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => request.TemplateModel.Id, () => request.TemplateModel.Alias);
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Running with template id={request.TemplateModel.Id} alias=\"{request.TemplateModel.Alias}\"");
             }
         }
 

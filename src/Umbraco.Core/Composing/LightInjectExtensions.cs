@@ -59,7 +59,7 @@ namespace Umbraco.Core.Composing
             //    _scanner = scanner;
             //}
 
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister)
+            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
             {
                 // nothing - we *could* scan non-Umbraco assemblies, though
             }

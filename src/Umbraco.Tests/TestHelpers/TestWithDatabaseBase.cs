@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.Linq;
+using System.Threading;
 using System.Web.Routing;
 using System.Xml;
 using Moq;
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.TestHelpers
     /// <para>Provides an Umbraco context and Xml content.</para>
     /// <para>fixme what else?</para>
     /// </remarks>
-    [RequiresSTA] // why?
+    [Apartment(ApartmentState.STA)] // why?
     [UmbracoTest(WithApplication = true)]
     public abstract class TestWithDatabaseBase : UmbracoTestBase
     {
@@ -95,7 +96,7 @@ namespace Umbraco.Tests.TestHelpers
             });
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void FixtureTearDown()
         {
             RemoveDatabaseFile();

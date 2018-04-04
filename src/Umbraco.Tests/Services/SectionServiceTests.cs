@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Linq;
+using System.Threading;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Tests.Testing;
 
@@ -8,7 +9,8 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the SectionService
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class SectionServiceTests : TestWithSomeContentBase
     {

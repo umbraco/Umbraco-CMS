@@ -16,18 +16,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             base.Compose(composition);
 
             // register the NuCache published snapshot service
-            composition.SetPublishedSnapshotService(factory => new PublishedSnapshotService(
-                new PublishedSnapshotService.Options(),
-                factory.GetInstance<MainDom>(),
-                factory.GetInstance<IRuntimeState>(),
-                factory.GetInstance<ServiceContext>(),
-                factory.GetInstance<IPublishedContentTypeFactory>(),
-                factory.GetInstance<IPublishedSnapshotAccessor>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<IScopeProvider>(),
-                factory.GetInstance<IDocumentRepository>(),
-                factory.GetInstance<IMediaRepository>(),
-                factory.GetInstance<IMemberRepository>()));
+            // must register default options, required in the service ctor
+            composition.Container.Register(factory => new PublishedSnapshotService.Options());
+            composition.SetPublishedSnapshotService<PublishedSnapshotService>();
 
             // add the NuCache health check (hidden from type finder)
             // todo - no NuCache health check yet

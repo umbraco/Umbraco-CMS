@@ -101,7 +101,7 @@ namespace Umbraco.Web.Macros
 
             if (macroContent == null) return null;
 
-            Current.Logger.Debug<MacroRenderer>("Macro content loaded from cache \"{0}\".", () => model.CacheIdentifier);
+            Current.Logger.Debug<MacroRenderer>(() => $"Macro content loaded from cache \"{model.CacheIdentifier}\".");
 
             // ensure that the source has not changed
             // note: does not handle dependencies, and never has
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Macros
                 priority: CacheItemPriority.NotRemovable
                 );
 
-            Current.Logger.Debug<MacroRenderer>("Macro content saved to cache \"{0}\".", () => model.CacheIdentifier);
+            Current.Logger.Debug<MacroRenderer>(() => $"Macro content saved to cache \"{model.CacheIdentifier}\".");
         }
 
         // gets the macro source file name

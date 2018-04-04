@@ -308,7 +308,7 @@ namespace Umbraco.Core.Migrations.Install
             {
                 var source = connectionStrings.Attribute("configSource").Value;
                 var configFile = IOHelper.MapPath($"{SystemDirectories.Root}/{source}");
-                logger.Info<DatabaseBuilder>("storing ConnectionString in {0}", () => configFile);
+                logger.Info<DatabaseBuilder>($"Storing ConnectionString in {configFile}");
                 if (File.Exists(configFile))
                 {
                     xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);

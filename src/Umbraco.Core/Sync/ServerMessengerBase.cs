@@ -158,8 +158,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type RefreshByPayload",
-                refresher.GetType);
+            Current.Logger.Debug<ServerMessengerBase>(() => $"Invoking refresher {refresher.GetType()} on local server for message type RefreshByPayload");
 
             var payloadRefresher = refresher as IPayloadCacheRefresher<TPayload>;
             if (payloadRefresher == null)
@@ -181,9 +180,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
-                refresher.GetType,
-                () => messageType);
+            Current.Logger.Debug<ServerMessengerBase>(() => $"Invoking refresher {refresher.GetType()} on local server for message type {messageType}");
 
             switch (messageType)
             {
@@ -244,9 +241,7 @@ namespace Umbraco.Core.Sync
         {
             if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
-                refresher.GetType,
-                () => messageType);
+            Current.Logger.Debug<ServerMessengerBase>(() => $"Invoking refresher {refresher.GetType()} on local server for message type {messageType}");
 
             var typedRefresher = refresher as ICacheRefresher<T>;
 

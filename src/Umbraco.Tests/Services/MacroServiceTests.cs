@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -13,7 +14,8 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MacroServiceTests : TestWithSomeContentBase
     {

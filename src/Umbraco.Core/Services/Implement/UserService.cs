@@ -198,18 +198,10 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException ex)
                 {
-                    // fixme kill in v8
-                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                    //that method would not be cached.
-                    // fixme kill in v8
-                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                    //that method would not be cached.
+                    // fixme - refactor users/upgrade
+                    // currently kinda accepting anything on upgrade, but that won't deal with all cases
+                    // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
+                    // be better BUT requires that the app restarts after the upgrade!
                     if (_isUpgrading)
                     {
                         //NOTE: this will not be cached
@@ -735,12 +727,10 @@ namespace Umbraco.Core.Services.Implement
                 }
                 catch (DbException ex)
                 {
-                    // fixme kill in v8
-                    //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
-                    //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
-                    //version checks in the BackOfficeSignInManager and calling into other special overloads that we'd need
-                    //like "GetUserById(int id, bool includeSecurityData)" which may cause confusion because the result of
-                    //that method would not be cached.
+                    // fixme - refactor users/upgrade
+                    // currently kinda accepting anything on upgrade, but that won't deal with all cases
+                    // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
+                    // be better BUT requires that the app restarts after the upgrade!
                     if (_isUpgrading)
                     {
                         //NOTE: this will not be cached

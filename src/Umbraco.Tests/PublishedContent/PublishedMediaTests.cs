@@ -11,6 +11,7 @@ using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using System.Linq;
+using System.Threading;
 using System.Xml;
 using Examine;
 using Umbraco.Core.Cache;
@@ -27,7 +28,8 @@ namespace Umbraco.Tests.PublishedContent
     /// <summary>
     /// Tests the typed extension methods on IPublishedContent using the DefaultPublishedMediaStore
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class PublishedMediaTests : PublishedContentTestBase
     {
@@ -114,7 +116,7 @@ namespace Umbraco.Tests.PublishedContent
             {
 
                 indexer.RebuildIndex();
-             
+
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
                 var cache = new PublishedMediaCache(ServiceContext.MediaService, ServiceContext.UserService, searcher, indexer, new StaticCacheProvider(), ContentTypesCache);
@@ -142,7 +144,7 @@ namespace Umbraco.Tests.PublishedContent
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -161,7 +163,7 @@ namespace Umbraco.Tests.PublishedContent
                     <data alias='umbracoExtension'>jpg</data>
                 </node>");
                 indexer.IndexItems(new[]{ newXml.ConvertToValueSet("media") });
-                
+
 
                 //ensure it still exists in the index (raw examine search)
                 var criteria = searcher.CreateCriteria();
@@ -186,7 +188,7 @@ namespace Umbraco.Tests.PublishedContent
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -211,7 +213,7 @@ namespace Umbraco.Tests.PublishedContent
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -236,7 +238,7 @@ namespace Umbraco.Tests.PublishedContent
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var searcher = indexer.GetSearcher();
                 var ctx = GetUmbracoContext("/test");
@@ -261,7 +263,7 @@ namespace Umbraco.Tests.PublishedContent
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();
@@ -283,7 +285,7 @@ namespace Umbraco.Tests.PublishedContent
             using (indexer.ProcessNonAsync())
             {
                 indexer.RebuildIndex();
-                
+
 
                 var ctx = GetUmbracoContext("/test");
                 var searcher = indexer.GetSearcher();

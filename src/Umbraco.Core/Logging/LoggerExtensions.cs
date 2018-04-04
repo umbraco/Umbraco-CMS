@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Umbraco.Core.Logging
 {
@@ -42,30 +43,6 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a formatted warning message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
-        public static void Warn<T>(this ILogger logger, string format, params object[] args)
-        {
-            logger.Warn(typeof(T), format, args);
-        }
-
-        /// <summary>
-        /// Logs a formatted warning message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
-        public static void Warn<T>(this ILogger logger, string format, params Func<object>[] args)
-        {
-            logger.Warn(typeof(T), format, args);
-        }
-
-        /// <summary>
         /// Logs a formatted warning message with an exception.
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>
@@ -87,32 +64,6 @@ namespace Umbraco.Core.Logging
         public static void Warn<T>(this ILogger logger, Exception exception, string message)
         {
             logger.Warn(typeof(T), exception, message);
-        }
-
-        /// <summary>
-        /// Logs a formatted warning message with an exception.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
-        public static void Warn<T>(this ILogger logger, Exception exception, string format, params object[] args)
-        {
-            logger.Warn(typeof(T), exception, format, args);
-        }
-
-        /// <summary>
-        /// Logs a formatted warning message with an exception.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
-        public static void Warn<T>(this ILogger logger, Exception exception, string format, params Func<object>[] args)
-        {
-            logger.Warn(typeof(T), exception, format, args);
         }
 
         /// <summary>
@@ -138,30 +89,6 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a formatted information message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
-        public static void Info<T>(this ILogger logger, string format, params object[] args)
-        {
-            logger.Info(typeof(T), format, args);
-        }
-
-        /// <summary>
-        /// Logs a formatted information message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
-        public static void Info<T>(this ILogger logger, string format, params Func<object>[] args)
-        {
-            logger.Info(typeof(T), format, args);
-        }
-
-        /// <summary>
         /// Logs a debugging message.
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>
@@ -181,30 +108,6 @@ namespace Umbraco.Core.Logging
         public static void Debug<T>(this ILogger logger, Func<string> messageBuilder)
         {
             logger.Debug(typeof(T), messageBuilder);
-        }
-
-        /// <summary>
-        /// Logs a formatted debugging message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of objects to format.</param>
-        public static void Debug<T>(this ILogger logger, string format, params object[] args)
-        {
-            logger.Debug(typeof(T), format, args);
-        }
-
-        /// <summary>
-        /// Logs a formatted debugging message.
-        /// </summary>
-        /// <typeparam name="T">The reporting type.</typeparam>
-        /// <param name="logger">The logger.</param>
-        /// <param name="format">A composite format string.</param>
-        /// <param name="args">An array of functions returning objects to format.</param>
-        public static void Debug<T>(this ILogger logger, string format, params Func<object>[] args)
-        {
-            logger.Debug(typeof(T), format, args);
         }
     }
 }

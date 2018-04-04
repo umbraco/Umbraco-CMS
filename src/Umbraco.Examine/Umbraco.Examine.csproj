@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{07FBC26B-2927-4A22-8D96-D644C667FECC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>Umbraco.Examine</AssemblyName>
     <RootNamespace>Umbraco.Examine</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,8 +50,8 @@
     <PackageReference Include="Examine">
       <Version>1.0.0-beta025</Version>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NPoco" Version="3.6.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="NPoco" Version="3.9.3" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\ConfigIndexCriteria.cs" />

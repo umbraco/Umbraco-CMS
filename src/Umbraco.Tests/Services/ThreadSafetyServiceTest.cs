@@ -27,7 +27,8 @@ namespace Umbraco.Tests.Services
     // as I could not figure out _why_ and it does not look like we are
     // causing it, getting into __sysObjects locks, no idea why
 
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ThreadSafetyServiceTest : TestWithDatabaseBase
     {

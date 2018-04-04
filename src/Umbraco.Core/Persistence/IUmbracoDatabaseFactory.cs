@@ -32,5 +32,10 @@ namespace Umbraco.Core.Persistence
         /// Gets the Sql context.
         /// </summary>
         ISqlContext SqlContext { get; }
+
+        /// <summary>
+        /// Configures the database factory for upgrades.
+        /// </summary>
+        void ConfigureForUpgrade();
     }
 }

@@ -23,6 +23,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ConcurrentDictionary<int, LinkedNode<object>> _contentRootNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<PublishedContentType>> _contentTypesById;
         private readonly ConcurrentDictionary<string, LinkedNode<PublishedContentType>> _contentTypesByAlias;
+        private readonly ConcurrentDictionary<Guid, int> _xmap;
 
         private readonly ILogger _logger;
         private BPlusTree<int, ContentNodeKit> _localDb;
@@ -52,6 +53,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentRootNodes = new ConcurrentDictionary<int, LinkedNode<object>>();
             _contentTypesById = new ConcurrentDictionary<int, LinkedNode<PublishedContentType>>();
             _contentTypesByAlias = new ConcurrentDictionary<string, LinkedNode<PublishedContentType>>(StringComparer.InvariantCultureIgnoreCase);
+            _xmap = new ConcurrentDictionary<Guid, int>();
 
             _genRefRefs = new ConcurrentQueue<GenRefRef>();
             _genRefRef = null; // no initial gen exists
@@ -477,6 +479,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     RemoveFromParentLocked(existing);
                     AddToParentLocked(kit.Node);
                 }
+
+                _xmap[kit.Node.Uid] = kit.Node.Id;
             }
             finally
             {
@@ -504,6 +508,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddToParentLocked(kit.Node);
+
+                    _xmap[kit.Node.Uid] = kit.Node.Id;
                 }
             }
             finally
@@ -537,6 +543,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
                     if (_localDb != null) RegisterChange(kit.Node.Id, kit);
                     AddToParentLocked(kit.Node);
+
+                    _xmap[kit.Node.Uid] = kit.Node.Id;
                 }
             }
             finally
@@ -576,8 +584,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void ClearBranchLocked(int id)
         {
-            LinkedNode<ContentNode> link;
-            _contentNodes.TryGetValue(id, out link);
+            _contentNodes.TryGetValue(id, out var link);
             if (link?.Value == null)
                 return;
             ClearBranchLocked(link.Value);
@@ -588,6 +595,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             SetValueLocked(_contentNodes, content.Id, null);
             if (_localDb != null) RegisterChange(content.Id, ContentNodeKit.Null);
 
+            _xmap.TryRemove(content.Uid, out _);
+
             foreach (var childId in content.ChildContentIds)
             {
                 if (_contentNodes.TryGetValue(childId, out LinkedNode<ContentNode> link) == false || link.Value == null) continue;
@@ -597,8 +606,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private LinkedNode<ContentNode> GetParentLink(ContentNode content)
         {
-            LinkedNode<ContentNode> link;
-            _contentNodes.TryGetValue(content.ParentContentId, out link); // else null
+            _contentNodes.TryGetValue(content.ParentContentId, out var link); // else null
             //if (link == null || link.Value == null)
             //    throw new Exception("Panic: parent not found.");
             return link;
@@ -707,6 +715,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public ContentNode Get(int id, long gen)
         {
             return GetValue(_contentNodes, id, gen);
+        }
+
+        public ContentNode Get(Guid uid, long gen)
+        {
+            return _xmap.TryGetValue(uid, out var id)
+                ? GetValue(_contentNodes, id, gen)
+                : null;
         }
 
         public IEnumerable<ContentNode> GetAtRoot(long gen)
@@ -1099,8 +1114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
-                // fixme - optimize with an index - getAll/iterating is expensive
-                return _store.GetAll(_gen).FirstOrDefault(x => x.Uid == id);
+                return _store.Get(id, _gen);
             }
 
             public IEnumerable<ContentNode> GetAtRoot()
@@ -1108,6 +1122,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_gen < 0)
                     throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
                 return _store.GetAtRoot(_gen);
+            }
+
+            public IEnumerable<ContentNode> GetAll()
+            {
+                if (_gen < 0)
+                    throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
+                return _store.GetAll(_gen);
             }
 
             public PublishedContentType GetContentType(int id)

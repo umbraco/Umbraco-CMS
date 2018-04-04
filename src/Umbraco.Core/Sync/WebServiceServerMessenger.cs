@@ -160,13 +160,8 @@ namespace Umbraco.Core.Sync
             Type idArrayType = null,
             string jsonPayload = null)
         {
-            Current.Logger.Debug<WebServiceServerMessenger>(
-                "Performing distributed call for {0}/{1} on servers ({2}), ids: {3}, json: {4}",
-                refresher.GetType,
-                () => messageType,
-                () => string.Join(";", servers.Select(x => x.ToString())),
-                () => ids == null ? "" : string.Join(";", ids.Select(x => x.ToString())),
-                () => jsonPayload ?? "");
+            Current.Logger.Debug<WebServiceServerMessenger>(() =>
+                $"Performing distributed call for {refresher.GetType()}/{messageType} on servers ({string.Join(";", servers.Select(x => x.ToString()))}), ids: {(ids == null ? "" : string.Join(";", ids.Select(x => x.ToString())))}, json: {(jsonPayload ?? "")}");
 
             try
             {

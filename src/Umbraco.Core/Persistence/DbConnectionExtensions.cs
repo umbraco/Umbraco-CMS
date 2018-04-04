@@ -120,8 +120,7 @@ namespace Umbraco.Core.Persistence
             }
             catch (Exception ex)
             {
-                Current.Logger.Warn(typeof(DbConnectionExtensions),
-                    "Could not resolve connection string parameters", ex);
+                Current.Logger.Warn(typeof(DbConnectionExtensions), ex, "Could not resolve connection string parameters");
                 return "(Could not resolve)";
             }
 

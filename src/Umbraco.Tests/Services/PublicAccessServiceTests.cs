@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -9,7 +10,8 @@ using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublicAccessServiceTests : TestWithSomeContentBase
     {

@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services
@@ -30,37 +28,21 @@ namespace Umbraco.Core.Services
         //   to each other, then the id will never map to another guid, and the guid will never map
         //   to another id
         //
-        // - LeeK's solution in 7.7 was to look for the id/guid in the content cache "on demand" via
-        //   XPath, which is probably fast enough but cannot deal with media ids + it maintains a
-        //   separate, duplicate cache
-        //   see https://github.com/umbraco/Umbraco-CMS/pull/2398
-        //
-        // - Andy's solution in a package was to prefetch all by sql; it cannot prefecth reserved ids
-        //   as we don't know the corresponding object type, but that's not a big issue - but then we
-        //   have a full database query on startup
-        //   see https://github.com/AndyButland/UmbracoUdiToIdCache
-        //
-        // - the original IdkMap implementation that was used by services, did a database lookup on
-        //   each cache miss, which is fine enough for services, but would be really slow at content
-        //   cache level
-        //
         // - cache is cleared by MediaCacheRefresher, UnpublishedPageCacheRefresher, and other
         //   refreshers - because id/guid map is unique, we only clear to avoid leaking memory, 'cos
         //   we don't risk caching obsolete values - and only when actually deleting
         //
-        // so...
-        //
-        // - there's a single caching point, and it's idkMap
-        // - there are no "helper methods" - the published content cache itself knows about Guids
-        // - when the published content cache is instanciated, it populates the idkMap with what it knows
-        //   and it registers a way for the idkMap to look for id/keys in the published content cache
         // - we do NOT prefetch anything from database
+        //
+        // - NuCache maintains its own id/guid map for content & media items
+        //   it does *not* populate the idk map, because it directly uses its own map
+        //   still, it provides mappers so that the idk map can benefit from them
+        //   which means there will be some double-caching at some point ??
+        //
         // - when a request comes in:
-        //   the published content cache uses the idkMap to map id/key
         //   if the idkMap already knows about the map, it returns the value
-        //   else it tries the published cache via XPath
+        //   else it tries the published cache via mappers
         //   else it hits the database
-
 
         private readonly ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)> _dictionary
             = new ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)>();

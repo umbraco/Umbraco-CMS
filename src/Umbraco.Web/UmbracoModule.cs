@@ -341,9 +341,7 @@ namespace Umbraco.Web
             var end = false;
             var response = context.Response;
 
-            logger.Debug<UmbracoModule>("Response status: Redirect={0}, Is404={1}, StatusCode={2}",
-                () => pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
-                () => pcr.Is404 ? "true" : "false", () => pcr.ResponseStatusCode);
+            logger.Debug<UmbracoModule>(() => $"Response status: Redirect={(pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none")}, Is404={(pcr.Is404 ? "true" : "false")}, StatusCode={pcr.ResponseStatusCode}");
 
             if(pcr.Cacheability != default(HttpCacheability))
                 response.Cache.SetCacheability(pcr.Cacheability);
@@ -540,7 +538,7 @@ namespace Umbraco.Web
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
-                Logger.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
+                Logger.Debug<UmbracoModule>(() => $"Begin request: {httpContext.Request.Url}.");
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 

@@ -34,28 +34,8 @@ namespace Umbraco.Tests.Models.Mapping
         {
             base.SetUp();
 
-            //var nullCacheHelper = CacheHelper.CreateDisabledCacheHelper();
-            //var logger = Mock.Of<ILogger>();
-
-            //var databaseFactory = TestObjects.GetDatabaseFactoryMock();
-
-            ////Create an app context using mocks
-            //var appContext = new ApplicationContext(
-            //    new DatabaseContext(databaseFactory, logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
-
-            //    //Create service context using mocks
-            //    new ServiceContext(
-
-            //        contentService: _contentService.Object,
-            //        contentTypeService:_contentTypeService.Object,
-            //        dataTypeService:_dataTypeService.Object,
-            //        entityService:_entityService.Object,
-            //        fileService: _fileService.Object),
-
-            //    nullCacheHelper,
-            //    new ProfilingLogger(logger, Mock.Of<IProfiler>()));
-
             // fixme - are we initializing mappers that... have already been?
+            Mapper.Reset();
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper

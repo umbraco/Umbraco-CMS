@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
 
             if (redirectUrl == null)
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: \"{0}\".", () => route);
+                _logger.Debug<ContentFinderByRedirectUrl>(() => $"No match for route: \"{route}\".");
                 return false;
             }
 
@@ -56,13 +56,11 @@ namespace Umbraco.Web.Routing
             var url = content == null ? "#" : content.Url;
             if (url.StartsWith("#"))
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} which has no url.",
-                    () => route, () => redirectUrl.ContentId);
+                _logger.Debug<ContentFinderByRedirectUrl>(() => $"Route \"{route}\" matches content {redirectUrl.ContentId} which has no url.");
                 return false;
             }
 
-            _logger.Debug<ContentFinderByRedirectUrl>("Route \"{0}\" matches content {1} with url \"{2}\", redirecting.",
-                () => route, () => content.Id, () => url);
+            _logger.Debug<ContentFinderByRedirectUrl>(() => $"Route \"{route}\" matches content {content.Id} with url \"{url}\", redirecting.");
             frequest.SetRedirectPermanent(url);
             return true;
         }

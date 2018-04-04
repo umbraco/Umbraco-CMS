@@ -22,13 +22,17 @@ namespace Umbraco.Web.Install.InstallSteps
                 var currentVersion = UmbracoVersion.Local.ToString();
                 var newVersion = UmbracoVersion.SemanticVersion.ToString();
 
+                string FormatGuidState(string value)
+                {
+                    if (string.IsNullOrWhiteSpace(value)) value = "unknown";
+                    else if (Guid.TryParse(value, out var currentStateGuid))
+                        value = currentStateGuid.ToString("N").Substring(0, 8);
+                    return value;
+                }
+
                 var state = Current.RuntimeState; // fixme inject
-                var currentState = state.CurrentMigrationState;
-                if (string.IsNullOrWhiteSpace(currentState)) currentState = "unknown";
-                var newState = state.FinalMigrationState?.Trim('{', '}');
-                if (string.IsNullOrWhiteSpace(newState)) newState = "unknown";
-                else if (Guid.TryParse(newState, out _))
-                    newState = newState.Substring(0, 8);
+                var currentState = FormatGuidState(state.CurrentMigrationState);
+                var newState = FormatGuidState(state.FinalMigrationState);
 
                 var reportUrl = $"https://our.umbraco.org/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
 

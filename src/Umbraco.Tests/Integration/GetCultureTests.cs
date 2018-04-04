@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Services;
@@ -10,7 +11,8 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Integration
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class GetCultureTests : TestWithSomeContentBase
     {

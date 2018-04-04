@@ -232,7 +232,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 return null;
             }
         }
-        
+
         private ISearcher GetSearchProviderSafe()
         {
             if (_searchProvider != null)
@@ -333,9 +333,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var miss = Interlocked.CompareExchange(ref _examineIndexMiss, 0, 0); // volatile read
             if (miss < ExamineIndexMissMax && Interlocked.Increment(ref _examineIndexMiss) == ExamineIndexMissMax)
-                Current.Logger.Warn<PublishedMediaCache>("Failed ({0} times) to retrieve medias from Examine index and had to load"
-                    + " them from DB. This may indicate that the Examine index is corrupted.",
-                    () => ExamineIndexMissMax);
+                Current.Logger.Warn<PublishedMediaCache>(() => $"Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
+                    + " them from DB. This may indicate that the Examine index is corrupted.");
 
             return ConvertFromIMedia(media);
         }
@@ -352,9 +351,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            Current.Logger.Warn<PublishedMediaCache>(
-                "Could not retrieve media {0} from Examine index or from legacy library.GetMedia method",
-                () => id);
+            Current.Logger.Warn<PublishedMediaCache>(() =>
+                $"Could not retrieve media {id} from Examine index or from legacy library.GetMedia method");
 
             return null;
         }
@@ -362,7 +360,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
         {
             // note: fixing fields in 7.x, removed by Shan for 8.0
-            
+
             return new CacheValues
             {
                 Values = searchResult.Fields,

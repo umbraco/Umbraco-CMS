@@ -30,7 +30,7 @@
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
-  Write-Host "Zbu.ModelsBuilder Build"
+  Write-Host "Umbraco Cms Build"
   Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
   # ################################################################

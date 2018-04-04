@@ -126,7 +126,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (fileSourceFolder.Exists == false)
             {
-                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {0}, therefore no sources will be discovered", () => fileSourceFolder.FullName);
+                Current.Logger.Warn<LocalizedTextServiceFileSources>(() => $"The folder does not exist: {fileSourceFolder.FullName}, therefore no sources will be discovered");
             }
             else
             {

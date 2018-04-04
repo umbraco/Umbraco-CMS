@@ -1,7 +1,5 @@
 using System.IO;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.SqlSyntax;
 using File = System.IO.File;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_10_0
@@ -13,9 +11,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_10_0
     /// </summary>
     public class RenamePreviewFolder : MigrationBase
     {
-        public RenamePreviewFolder(IMigrationContext context) : base(context)
-        {
-        }
+        public RenamePreviewFolder(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Migrate()
         {
@@ -31,9 +29,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_10_0
                         $"Instead they have been recreated as MVC views and can now be found in '~/Umbraco/Views/Preview'.\r\n" +
                         $"See issue: http://issues.umbraco.org/issue/U4-11090";
                     File.WriteAllText(Path.Combine(newPath, "readme.txt"), readmeText);
-                }                
+                }
             }
         }
-        
     }
 }

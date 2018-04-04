@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
                 if (path == GlobalSettings.ProfileUrl)
                 {
                     isProfile = true;
-                    Logger.Debug<ContentFinderByProfile>("Path \"{0}\" is the profile path", () => path);
+                    Logger.Debug<ContentFinderByProfile>(() => $"Path \"{path}\" is the profile path");
 
                     var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
                     node = FindContent(frequest, route);

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Index;
@@ -13,7 +14,8 @@ namespace Umbraco.Tests.UmbracoExamine
     /// <summary>
     /// Tests the standard indexing capabilities
     /// </summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class IndexTest : ExamineBaseTest
     {

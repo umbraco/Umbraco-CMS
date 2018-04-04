@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using LightInject;
 using Moq;
 using NUnit.Framework;
@@ -16,7 +17,8 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
 {
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public abstract class BaseWebTest : TestWithDatabaseBase
     {
         protected override void Initialize()

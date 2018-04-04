@@ -4,6 +4,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
+using System.Threading;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 using Current = Umbraco.Web.Composing.Current;
@@ -16,7 +17,8 @@ namespace Umbraco.Tests.TreesAndSections
     ///This is a test class for ApplicationTreeTest and is intended
     ///to contain all ApplicationTreeTest Unit Tests
     ///</summary>
-    [TestFixture, RequiresSTA]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ApplicationTreeTest : TestWithDatabaseBase
     {
