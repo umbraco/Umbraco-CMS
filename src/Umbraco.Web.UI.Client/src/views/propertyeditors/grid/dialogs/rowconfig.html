@@ -54,7 +54,10 @@
                   </a>
               </div>
           </umb-control-group>
-          
+          <umb-control-group label="@grid_gridCellCssClasses" description="@grid_gridCellCssClassesDescription">
+              <input type="text" ng-model="currentCell.gridCellCssClasses" />
+          </umb-control-group>
+   
           <umb-control-group label="@grid_maxItems" description="@grid_maxItemsDescription">
               <input type="number" ng-model="currentCell.maxItems" class="umb-editor-tiny" placeholder="Max" min="0" />
           </umb-control-group>
