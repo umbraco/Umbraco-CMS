@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -47,9 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="Examine">
-      <Version>1.0.0-beta025</Version>
-    </PackageReference>
+    <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
   </ItemGroup>
