@@ -64,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override ValueListConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, ValueListConfiguration configuration)
+        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ValueListConfiguration configuration)
         {
             var output = new ValueListConfiguration();
 

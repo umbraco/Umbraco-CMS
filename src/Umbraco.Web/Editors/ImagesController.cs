@@ -40,6 +40,7 @@ namespace Umbraco.Web.Editors
             if (imageProp == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
+            //fixme doesn't take into account variants
             var imagePath = imageProp.GetValue().ToString();
             return GetBigThumbnail(imagePath);
         }
@@ -78,6 +79,7 @@ namespace Umbraco.Web.Editors
             if (imageProp == null)
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
 
+            //fixme doesn't take into account variants
             var imagePath = imageProp.GetValue().ToString();
             return GetResized(imagePath, width);
         }

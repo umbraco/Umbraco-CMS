@@ -476,6 +476,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (!tagConfigurations.TryGetValue(property.PropertyType.PropertyEditorAlias, out var tagConfiguration))
                         continue;
 
+                    //fixme doesn't take into account variants
                     property.SetTagsValue(property.GetValue(), tagConfiguration);
                 }
 

@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
             return dictionary;
         }
 
-        public override TagConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, TagConfiguration configuration)
+        public override TagConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, TagConfiguration configuration)
         {
             // the front-end editor retuns the string value of the storage type
             // pure Json could do with

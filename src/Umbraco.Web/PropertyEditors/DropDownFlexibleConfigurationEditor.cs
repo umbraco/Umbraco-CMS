@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
             items.Validators.Add(new ValueListUniqueValueValidator());
         }
 
-        public override DropDownFlexibleConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, DropDownFlexibleConfiguration configuration)
+        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, DropDownFlexibleConfiguration configuration)
         {
             var output = new DropDownFlexibleConfiguration();
 

@@ -135,6 +135,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool DetectIsJson(this string input)
         {
+            if (input.IsNullOrWhiteSpace()) return false;
             input = input.Trim();
             return (input.StartsWith("{") && input.EndsWith("}"))
                    || (input.StartsWith("[") && input.EndsWith("]"));

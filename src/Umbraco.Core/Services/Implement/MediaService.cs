@@ -1185,7 +1185,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
-        public void EmptyRecycleBin()
+        public OperationResult EmptyRecycleBin()
         {
             var nodeObjectType = Constants.ObjectTypes.Media;
             var deleted = new List<IMedia>();
@@ -1206,12 +1206,12 @@ namespace Umbraco.Core.Services.Implement
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
                 // are managed by Delete, and not here.
                 // no idea what those events are for, keep a simplified version
-                var args = new RecycleBinEventArgs(nodeObjectType);
+                var args = new RecycleBinEventArgs(nodeObjectType, evtMsgs);
 
                 if (scope.Events.DispatchCancelable(EmptyingRecycleBin, this, args))
                 {
                     scope.Complete();
-                    return;
+                    return OperationResult.Cancel(evtMsgs);
                 }
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
                 var query = Query<IMedia>().Where(x => x.ParentId == Constants.System.RecycleBinMedia);
@@ -1227,6 +1227,8 @@ namespace Umbraco.Core.Services.Implement
                 Audit(AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, Constants.System.RecycleBinMedia);
                 scope.Complete();
             }
+
+            return OperationResult.Succeed(evtMsgs);
         }
 
         #endregion

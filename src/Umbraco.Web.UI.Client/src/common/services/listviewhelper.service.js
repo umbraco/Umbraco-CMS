@@ -181,11 +181,13 @@
 
             var firstAllowedLayout = {};
 
-            for (var i = 0; layouts.length > i; i++) {
-                var layout = layouts[i];
-                if (layout.selected === true) {
-                    firstAllowedLayout = layout;
-                    break;
+            if (layouts != null) {
+                for (var i = 0; layouts.length > i; i++) {
+                    var layout = layouts[i];
+                    if (layout.selected === true) {
+                        firstAllowedLayout = layout;
+                        break;
+                    }
                 }
             }
 

@@ -112,6 +112,7 @@ namespace Umbraco.Core.Models
         private static void RemoveTags(this Property property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter)
         {
             // already empty = nothing to do
+            //fixme doesn't take into account variants
             var value = property.GetValue()?.ToString();
             if (string.IsNullOrWhiteSpace(value)) return;
 
@@ -145,6 +146,7 @@ namespace Umbraco.Core.Models
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
+            //fixme doesn't take into account variants
             var value = property.GetValue()?.ToString();
             if (string.IsNullOrWhiteSpace(value)) return Enumerable.Empty<string>();
 
@@ -154,6 +156,7 @@ namespace Umbraco.Core.Models
                     return value.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
 
                 case TagsStorageType.Json:
+                    //fixme doesn't take into account variants
                     return JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString().Trim());
 
                 default:

@@ -329,7 +329,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the recycle bin.
         /// </summary>
-        void EmptyRecycleBin();
+        OperationResult EmptyRecycleBin();
 
         /// <summary>
         /// Sorts documents.

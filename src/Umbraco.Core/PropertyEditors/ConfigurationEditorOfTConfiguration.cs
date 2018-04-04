@@ -113,7 +113,7 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override object FromConfigurationEditor(Dictionary<string, object> editorValues, object configuration)
+        public sealed override object FromConfigurationEditor(IDictionary<string, object> editorValues, object configuration)
         {
             return FromConfigurationEditor(editorValues, (TConfiguration) configuration);
         }
@@ -123,7 +123,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="editorValues">The configuration object posted by the editor.</param>
         /// <param name="configuration">The current configuration object.</param>
-        public virtual TConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, TConfiguration configuration)
+        public virtual TConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, TConfiguration configuration)
         {
             // note - editorValue contains a mix of Clr types (string, int...) and JToken
             // turning everything back into a JToken... might not be fastest but is simplest
@@ -144,7 +144,7 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public sealed override Dictionary<string, object> ToConfigurationEditor(object configuration)
+        public sealed override IDictionary<string, object> ToConfigurationEditor(object configuration)
         {
             return ToConfigurationEditor((TConfiguration) configuration);
         }
@@ -152,7 +152,6 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts configuration values to values for the editor.
         /// </summary>
-        /// <param name="defaultConfiguration">The default configuration.</param>
         /// <param name="configuration">The configuration.</param>
         public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration configuration)
         {

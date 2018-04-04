@@ -106,14 +106,28 @@ namespace Umbraco.Web.Models.Mapping
             SetChildItemsTabPosition(display, listViewConfig, listViewTab);
         }
 
+        private static int GetTabNumberFromConfig(IDictionary<string, object> listViewConfig)
+        {
+            if (!listViewConfig.TryGetValue("displayAtTabNumber", out var displayTabNum))
+                return -1;
+            switch (displayTabNum)
+            {
+                case int i:
+                    return i;
+                case string s when int.TryParse(s, out var parsed):
+                    return parsed;
+            }
+            return -1;
+        }
+
         private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display,
                 IDictionary<string, object> listViewConfig,
                 Tab<ContentPropertyDisplay> listViewTab)
             where TPersisted : IContentBase
         {
             // Find position of tab from config
-            var tabIndexForChildItems = 0;
-            if (listViewConfig["displayAtTabNumber"] != null && int.TryParse((string)listViewConfig["displayAtTabNumber"], out tabIndexForChildItems))
+            var tabIndexForChildItems = GetTabNumberFromConfig(listViewConfig);
+            if (tabIndexForChildItems != -1)
             {
                 // Tab position is recorded 1-based but we insert into collection 0-based
                 tabIndexForChildItems--;
@@ -129,6 +143,7 @@ namespace Umbraco.Web.Models.Mapping
                     tabIndexForChildItems = display.Tabs.Count();
                 }
             }
+            else tabIndexForChildItems = 0;
 
             // Recreate tab list with child items tab at configured position
             var tabs = new List<Tab<ContentPropertyDisplay>>();

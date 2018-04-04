@@ -368,6 +368,8 @@ namespace Umbraco.Core.Services.Implement
             var props = content.Properties.ToArray();
             foreach (var p in props)
             {
+                //fixme doesn't take into account variants
+
                 var newText = p.GetValue() != null ? p.GetValue().ToString() : "";
                 var oldText = newText;
 

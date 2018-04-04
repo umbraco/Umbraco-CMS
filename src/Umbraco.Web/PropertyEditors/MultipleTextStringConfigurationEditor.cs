@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override MultipleTestStringConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, MultipleTestStringConfiguration configuration)
+        public override MultipleTestStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTestStringConfiguration configuration)
         {
             // fixme this isn't pretty
             //the values from the editor will be min/max fieds and we need to format to json in one field
