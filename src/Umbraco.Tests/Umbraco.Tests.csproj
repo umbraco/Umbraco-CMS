@@ -608,8 +608,8 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\amd64\*.*" "$(TargetDir)amd64\" /Y /F /E /I /C /D
-xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\x86\*.*" "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
+    <PreBuildEvent>REM xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\amd64\*.*" "$(TargetDir)amd64\" /Y /F /E /I /C /D
+REM xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\x86\*.*" "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
