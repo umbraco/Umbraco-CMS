@@ -73,14 +73,10 @@ function NodeEditsController($scope, $rootScope, $routeParams, eventsService, ap
 
     function treeItemApplyStyling(treeItem, edit) {
         treeItem.addClass("being-edited");
-        treeItem.css("border", "dashed 1px orange");
-        treeItem.prop("title", edit.UserName);
     }
 
     function treeItemRemoveStyling(treeItem) {
         treeItem.removeClass("being-edited");
-        treeItem.css("border", "");
-        treeItem.prop("title", "");
     }
 
     evts.push($rootScope.$on("broadcastPublished", function (event, data) {
