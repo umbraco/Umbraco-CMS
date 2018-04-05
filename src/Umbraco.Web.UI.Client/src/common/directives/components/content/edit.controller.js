@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService) {
 
     var evts = [];
 
@@ -338,7 +338,24 @@
     };
 
     $scope.saveAndPublish = function () {
-      return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
+
+      var dialog = {
+        title: "Ready to Publish?",
+        view: "publish",
+        submitButtonLabel: "Publish",
+        submit: function(model) {
+          overlayService.close();
+          // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
+        },
+        close: function(oldModel) {
+          overlayService.close();
+        }
+      };
+
+      overlayService.open(dialog);
+
+      // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
+
     };
 
     $scope.save = function () {
