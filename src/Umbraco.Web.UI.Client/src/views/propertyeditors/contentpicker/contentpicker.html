@@ -28,7 +28,7 @@
             <localize key="general_add">Add</localize>
         </a>
 
-        <div class="umb-contentpicker__min-max-help">
+        <div class="umb-contentpicker__min-max-help" ng-if="model.config.multiPicker === true">
 
             <!-- Both min and max items -->
             <span ng-if="model.config.minNumber && model.config.maxNumber && model.config.minNumber !== model.config.maxNumber">
