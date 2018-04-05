@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using LightInject;
@@ -15,6 +17,7 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
@@ -560,6 +563,13 @@ namespace Umbraco.Web
                 {
                     // can't remove headers this way on IIS6 or cassini.
                 }
+            };
+
+            app.PostAuthenticateRequest += (sender, e) =>
+            {
+                var httpContext = ((HttpApplication) sender).Context;
+                //ensure the thread culture is set
+                httpContext.User?.Identity?.EnsureCulture();
             };
 
             app.PostResolveRequestCache += (sender, e) =>
