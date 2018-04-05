@@ -2,6 +2,7 @@
 using System.Web;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
@@ -67,5 +68,7 @@ namespace Umbraco.Core.Security
             return marker.GetManager(owinContext)
                 ?? throw new NullReferenceException($"Could not resolve an instance of {typeof (BackOfficeUserManager<BackOfficeIdentityUser>)} from the {typeof (IOwinContext)}.");
         }
+
     }
+
 }

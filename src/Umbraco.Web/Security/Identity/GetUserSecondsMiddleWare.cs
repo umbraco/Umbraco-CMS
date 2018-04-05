@@ -35,11 +35,9 @@ namespace Umbraco.Web.Security.Identity
             ILogger logger)
             : base(next)
         {
-            if (authOptions == null) throw new ArgumentNullException("authOptions");
-            if (logger == null) throw new ArgumentNullException("logger");
-            _authOptions = authOptions;
+            _authOptions = authOptions ?? throw new ArgumentNullException(nameof(authOptions));
             _security = security;
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -49,7 +47,7 @@ namespace Umbraco.Web.Security.Identity
 
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
-                    string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)))
+                    $"{GlobalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
             {
                 var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)

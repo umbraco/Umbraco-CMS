@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Security;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.UI.Pages

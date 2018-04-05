@@ -1,6 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Web.Http.Filters;
 using Umbraco.Core.Security;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -17,12 +19,13 @@ namespace Umbraco.Web.WebApi.Filters
 
             //this can occur if an error has already occurred.
             if (actionExecutedContext.Response == null) return;
-
+            
             var httpContextAttempt = actionExecutedContext.Request.TryGetHttpContext();
             if (httpContextAttempt.Success)
             {
+                
                 var ticket = httpContextAttempt.Result.GetUmbracoAuthTicket();
-                if (ticket != null && ticket.Expired == false)
+                if (ticket?.Properties.ExpiresUtc != null && ticket.Properties.ExpiresUtc.Value < DateTimeOffset.UtcNow)
                 {
                     var remainingSeconds = httpContextAttempt.Result.GetRemainingAuthSeconds();
                     actionExecutedContext.Response.Headers.Add("X-Umb-User-Seconds", remainingSeconds.ToString(CultureInfo.InvariantCulture));

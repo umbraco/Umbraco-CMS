@@ -31,16 +31,6 @@ namespace Umbraco.Core.Security
         {
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the constructor specifying all dependencies instead")]
-        public BackOfficeUserManager(
-            IUserStore<BackOfficeIdentityUser, int> store,
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            MembershipProviderBase membershipProvider)
-            : this(store, options, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content)
-        {
-        }
-
         public BackOfficeUserManager(
             IUserStore<BackOfficeIdentityUser, int> store,
             IdentityFactoryOptions<BackOfficeUserManager> options,
@@ -84,17 +74,6 @@ namespace Umbraco.Core.Security
             return manager;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public static BackOfficeUserManager Create(
-           IdentityFactoryOptions<BackOfficeUserManager> options,
-           BackOfficeUserStore customUserStore,
-           MembershipProviderBase membershipProvider)
-        {
-            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
-            return manager;
-        }
-
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and a custom BackOfficeUserManager instance
         /// </summary>
@@ -113,16 +92,6 @@ namespace Umbraco.Core.Security
             return manager;
         }
         #endregion
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        protected void InitUserManager(
-            BackOfficeUserManager manager,
-            MembershipProviderBase membershipProvider,
-            IdentityFactoryOptions<BackOfficeUserManager> options)
-        {
-            InitUserManager(manager, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content, options);
-        }
 
         /// <summary>
         /// Initializes the user manager with the correct options
@@ -154,7 +123,6 @@ namespace Umbraco.Core.Security
         {
         }
 
-
         #region What we support do not currently
 
         //TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
@@ -183,17 +151,7 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
         #endregion
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        protected void InitUserManager(
-            BackOfficeUserManager<T> manager,
-            MembershipProviderBase membershipProvider,
-            IDataProtectionProvider dataProtectionProvider)
-        {
-            InitUserManager(manager, membershipProvider, dataProtectionProvider, UmbracoConfig.For.UmbracoSettings().Content);
-        }
-
+        
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>

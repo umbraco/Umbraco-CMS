@@ -8,6 +8,8 @@ using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.DataHandler;
+using Microsoft.Owin.Security.DataProtection;
 using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -178,16 +180,20 @@ namespace Umbraco.Web.Security.Identity
             //don't apply if app is not ready
             if (runtimeState.Level != RuntimeLevel.Upgrade && runtimeState.Level != RuntimeLevel.Run) return app;
 
-            var getSecondsOptions = app.CreateUmbracoCookieAuthOptions(
+            var cookieAuthOptions = app.CreateUmbracoCookieAuthOptions(
                 //This defines the explicit path read cookies from for this middleware
-                new[] {string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)});
-            getSecondsOptions.Provider = cookieOptions.Provider;
+                new[] {$"{GlobalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"});
+            cookieAuthOptions.Provider = cookieOptions.Provider;
 
             //This is a custom middleware, we need to return the user's remaining logged in seconds
             app.Use<GetUserSecondsMiddleWare>(
-                getSecondsOptions,
+                cookieAuthOptions,
                 UmbracoConfig.For.UmbracoSettings().Security,
                 app.CreateLogger<GetUserSecondsMiddleWare>());
+
+            //This is required so that we can read the auth ticket format outside of this pipeline
+            app.CreatePerOwinContext<UmbracoAuthTicketDataProtector>(
+                (options, context) => new UmbracoAuthTicketDataProtector(cookieOptions.TicketDataFormat));
 
             return app;
         }
@@ -346,11 +352,19 @@ namespace Umbraco.Web.Security.Identity
         /// <returns></returns>
         public static UmbracoBackOfficeCookieAuthOptions CreateUmbracoCookieAuthOptions(this IAppBuilder app, string[] explicitPaths = null)
         {
+            //this is how aspnet wires up the default AuthenticationTicket protector so we'll use the same code
+            var ticketDataFormat = new TicketDataFormat(
+                app.CreateDataProtector(typeof (CookieAuthenticationMiddleware).FullName,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    "v1"));
+
             var authOptions = new UmbracoBackOfficeCookieAuthOptions(
                 explicitPaths,
                 UmbracoConfig.For.UmbracoSettings().Security,
                 GlobalSettings.TimeOutInMinutes,
-                GlobalSettings.UseSSL);
+                GlobalSettings.UseSSL,
+                ticketDataFormat);
+
             return authOptions;
         }
     }

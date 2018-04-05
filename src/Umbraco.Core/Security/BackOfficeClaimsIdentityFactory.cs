@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -25,22 +26,20 @@ namespace Umbraco.Core.Security
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
             
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
+                user.Id,
+                user.UserName,
+                user.Name,
+                user.CalculatedContentStartNodeIds,
+                user.CalculatedMediaStartNodeIds,
+                user.Culture,
                 //NOTE - there is no session id assigned here, this is just creating the identity, a session id will be generated when the cookie is written
-                new UserData
-                {
-                    Id = user.Id,
-                    Username = user.UserName,
-                    RealName = user.Name,
-                    AllowedApplications = user.AllowedSections,
-                    Culture = user.Culture,
-                    Roles = user.Roles.Select(x => x.RoleId).ToArray(),
-                    StartContentNodes = user.CalculatedContentStartNodeIds,
-                    StartMediaNodes = user.CalculatedMediaStartNodeIds,
-                    SecurityStamp = user.SecurityStamp
-                });
+                Guid.NewGuid().ToString(),
+                user.SecurityStamp,
+                user.AllowedSections,
+                user.Roles.Select(x => x.RoleId).ToArray());
 
             return umbracoIdentity;
-        }        
+        }
     }
 
     public class BackOfficeClaimsIdentityFactory : BackOfficeClaimsIdentityFactory<BackOfficeIdentityUser>

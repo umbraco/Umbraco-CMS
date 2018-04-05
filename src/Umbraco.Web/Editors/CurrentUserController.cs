@@ -15,6 +15,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Security;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 
 

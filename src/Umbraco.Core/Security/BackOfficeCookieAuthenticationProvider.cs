@@ -28,11 +28,11 @@ namespace Umbraco.Core.Security
                 //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
 
                 var session = RuntimeState.Level == RuntimeLevel.Run
-                    ? UserService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
+                    ? UserService.CreateLoginSession(backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
                     : Guid.NewGuid();
 
-                backOfficeIdentity.UserData.SessionId = session.ToString();
-            }            
+                backOfficeIdentity.SessionId = session.ToString();
+            }
 
             base.ResponseSignIn(context);
         }

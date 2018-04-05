@@ -1330,7 +1330,6 @@
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
-    <Compile Include="Security\UserData.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />
