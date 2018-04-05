@@ -182,11 +182,8 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                // Update the value on the property
-                property.Value = JsonConvert.SerializeObject(value);
-
-                // Pass the call down
-                return base.ConvertDbToString(property, propertyType, dataTypeService);
+                // Return the serialized value
+                return JsonConvert.SerializeObject(value);
             }
 
             #endregion
@@ -260,11 +257,8 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                // Update the value on the property
-                property.Value = JsonConvert.SerializeObject(value);
-
-                // Pass the call down
-                return base.ConvertDbToEditor(property, propertyType, dataTypeService);
+                // Return the strongly-typed object, Umbraco will handle the JSON serializing/parsing, then Angular can handle it directly
+                return value;
             }
 
             #endregion
