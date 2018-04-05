@@ -27,7 +27,7 @@
     };
 
     function init(content) {
-
+      
       createButtons(content);
 
       editorState.set($scope.content);
@@ -339,13 +339,20 @@
 
     $scope.saveAndPublish = function () {
 
+      // TODO: we only want to open the bulk publish dialog if there are more than one variant to publish
+      // TODO: Add "..." to publish button label if there are more than one variant to publish
+      // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
+
       var dialog = {
         title: "Ready to Publish?",
         view: "publish",
         submitButtonLabel: "Publish",
         submit: function(model) {
-          overlayService.close();
-          // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
+          model.submitButtonState = "busy";
+          // TODO: call bulk publishing method
+          performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
+            overlayService.close();
+          });
         },
         close: function(oldModel) {
           overlayService.close();
@@ -353,8 +360,6 @@
       };
 
       overlayService.open(dialog);
-
-      // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
 
     };
 
