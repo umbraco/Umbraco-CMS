@@ -150,6 +150,7 @@
     <Compile Include="Editors\LanguageController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
+    <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />

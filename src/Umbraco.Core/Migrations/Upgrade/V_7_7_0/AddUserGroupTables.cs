@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using NPoco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -216,8 +215,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_7_0
             var usersWithApps = new Dictionary<int, List<string>>();
             foreach (var userApps in userAppsData)
             {
-                List<string> apps;
-                if (usersWithApps.TryGetValue(userApps.id, out apps) == false)
+                if (usersWithApps.TryGetValue(userApps.id, out List<string> apps) == false)
                 {
                     apps = new List<string> {userApps.app};
                     usersWithApps.Add(userApps.id, apps);

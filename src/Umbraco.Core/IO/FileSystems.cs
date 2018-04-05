@@ -29,6 +29,7 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _xsltFileSystem;
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
+        private ShadowWrapper _javaScriptLibraryFileSystem;
         
         // well-known file systems lazy initialization
         private object _wkfsLock = new object();
@@ -165,7 +166,7 @@ namespace Umbraco.Core.IO
             var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
-            
+            var javaScriptLibraryFileSystem = new PhysicalFileSystem(SystemDirectories.JavaScriptLibrary);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", () => IsScoped());
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
@@ -174,8 +175,7 @@ namespace Umbraco.Core.IO
             _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", () => IsScoped());
             _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
-
-            _javascriptLibraryFileSystem = new PhysicalFileSystem(Path.Combine(SystemDirectories.Umbraco, "lib"));
+            _javascriptLibraryFileSystem = new ShadowWrapper(javaScriptLibraryFileSystem, "Lib", () => IsScoped());
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             _mediaFileSystem = GetFileSystemProvider<MediaFileSystem>();

@@ -25,7 +25,7 @@
   # create and boot the buildsystem
   $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
   if (-not $?) { return }
-  $ubuild.Boot($PSScriptRoot, 
+  $ubuild.Boot($PSScriptRoot,
     @{ Local = $local; },
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
@@ -36,21 +36,21 @@
   # ################################################################
   # TASKS
   # ################################################################
-  
+
   $ubuild.DefineMethod("SetMoreUmbracoVersion",
   {
     param ( $semver )
 
     $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
-    
+
     Write-Host "Update UmbracoVersion.cs"
     $this.ReplaceFileText("$($this.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs", `
       "(\d+)\.(\d+)\.(\d+)(.(\d+))?", `
-      "$release") 
+      "$release")
     $this.ReplaceFileText("$($this.SolutionRoot)\src\Umbraco.Core\Configuration\UmbracoVersion.cs", `
       "CurrentComment => `"(.+)`"", `
       "CurrentComment => `"$($semver.PreRelease)`"")
-  
+
     Write-Host "Update IIS Express port in csproj"
     $updater = New-Object "Umbraco.Build.ExpressPortUpdater"
     $csproj = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
@@ -61,7 +61,7 @@
   {
     $global:node_path = $env:path
     $nodePath = $this.BuildEnv.NodePath
-    $gitExe = (Get-Command git).Source  
+    $gitExe = (Get-Command git).Source
     $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
     $env:path = "$nodePath;$gitPath"
 
@@ -73,7 +73,7 @@
   $ubuild.DefineMethod("RestoreNode",
   {
     $env:path = $node_path
-    
+
     $this.SetEnvVar("NODEPATH", $node_nodepath)
     $this.SetEnvVar("NPM_CONFIG_CACHE", $node_npmcache)
     $this.SetEnvVar("NPM_CONFIG_PREFIX", $node_npmprefix)
@@ -83,9 +83,9 @@
   {
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\belle.log"
-    
+
     Write-Host "Compile Belle"
-    Write-Host "Logging to $log"    
+    Write-Host "Logging to $log"
 
     # get a temp clean node env (will restore)
     $this.SandboxNode()
@@ -96,7 +96,7 @@
 
     Push-Location "$($this.SolutionRoot)\src\Umbraco.Web.UI.Client"
     Write-Output "" > $log
-    
+
     Write-Output "### node version is:" > $log
     &node -v >> $log 2>&1
     if (-not $?) { throw "Failed to report node version." }
@@ -116,7 +116,7 @@
     Write-Output "### install bower" >> $log 2>&1
     &npm install -g bower >> $log 2>&1
     $error.Clear() # that one fails 'cos bower is deprecated - ignore
-    
+
     Write-Output "### install gulp" >> $log 2>&1
     &npm install -g gulp >> $log 2>&1
     $error.Clear() # that one fails 'cos deprecated stuff - ignore
@@ -127,25 +127,16 @@
 
     Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
     &gulp build --buildversion=$this.Version.Release >> $log 2>&1
-    #if (-not $?) { throw "Failed to build" } # that one is expected to work
-    if (-not $?)
-    {
-      # fixme - obviously temp!
-      Write-Output "#################################"
-      Write-Output "FIXME - BELLE BUILD FAILS - FIXME"
-      Write-Output "some phantomJS tests fail, etc..."
-      Write-Output "#################################"
-      $error.Clear()
-    }
+    if (-not $?) { throw "Failed to build" } # that one is expected to work
 
     Pop-Location
-    
+
     # fixme - should we filter the log to find errors?
     #get-content .\build.tmp\belle.log | %{ if ($_ -match "build") { write $_}}
-  
+
     # restore
     $this.RestoreNode()
-    
+
     # setting node_modules folder to hidden
     # used to prevent VS13 from crashing on it while loading the websites project
     # also makes sure aspnet compiler does not try to handle rogue files and chokes
@@ -163,15 +154,15 @@
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\msbuild.umbraco.log"
     $log7 = "$($this.BuildTemp)\msbuild.compat7.log"
-    
+
     if ($this.BuildEnv.VisualStudio -eq $null)
     {
       throw "Build environment does not provide VisualStudio."
     }
-    
+
     Write-Host "Compile Umbraco"
     Write-Host "Logging to $log"
-  
+
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
     &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" `
@@ -189,7 +180,7 @@
       > $log
 
     if (-not $?) { throw "Failed to compile Umbraco.Web.UI." }
-    
+
     Write-Host "Logging to $log7"
 
     &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.Compat7\Umbraco.Compat7.csproj" `
@@ -207,19 +198,19 @@
       > $log7
 
     if (-not $?) { throw "Failed to compile Umbraco.Compat7." }
-  
+
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
   })
 
   $ubuild.DefineMethod("PrepareTests",
   {
     Write-Host "Prepare Tests"
-  
+
     # fixme - idea is to avoid rebuilding everything for tests
     # but because of our weird assembly versioning (with .* stuff)
     # everything gets rebuilt all the time...
     #Copy-Files "$tmp\bin" "." "$tmp\tests"
-    
+
     # data
     Write-Host "Copy data files"
     if (-not (Test-Path -Path "$($this.BuildTemp)\tests\Packaging" ))
@@ -228,8 +219,8 @@
       mkdir "$($this.BuildTemp)\tests\Packaging" > $null
     }
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Tests\Packaging\Packages", "*", "$($this.BuildTemp)\tests\Packaging\Packages")
-    
-    # required for package install tests  
+
+    # required for package install tests
     if (-not (Test-Path -Path "$($this.BuildTemp)\tests\bin" ))
     {
       Write-Host "Create bin directory"
@@ -246,10 +237,10 @@
     {
       throw "Build environment does not provide VisualStudio."
     }
-    
+
     Write-Host "Compile Tests"
     Write-Host "Logging to $log"
-  
+
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
     &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\src\Umbraco.Tests\Umbraco.Tests.csproj" `
@@ -273,26 +264,26 @@
 
   $ubuild.DefineMethod("PreparePackages",
   {
-    Write-Host "Prepare Packages" 
-    
+    Write-Host "Prepare Packages"
+
     $src = "$($this.SolutionRoot)\src"
     $tmp = "$($this.BuildTemp)"
     $out = "$($this.BuildOutput)"
-  
+
     $buildConfiguration = "Release"
-  
+
     # restore web.config
     $this.TempRestoreFile("$src\Umbraco.Web.UI\web.config")
-  
+
     # cleanup build
     Write-Host "Clean build"
     $this.RemoveFile("$tmp\bin\*.dll.config")
     $this.RemoveFile("$tmp\WebApp\bin\*.dll.config")
-  
+
     # cleanup presentation
     Write-Host "Cleanup presentation"
     $this.RemoveDirectory("$tmp\WebApp\umbraco.presentation")
-  
+
     # create directories
     Write-Host "Create directories"
     mkdir "$tmp\Configs" > $null
@@ -300,11 +291,11 @@
     mkdir "$tmp\WebApp\App_Data" > $null
     #mkdir "$tmp\WebApp\Media" > $null
     #mkdir "$tmp\WebApp\Views" > $null
-  
+
     # copy various files
     Write-Host "Copy xml documentation"
     Copy-Item -force "$tmp\bin\*.xml" "$tmp\WebApp\bin"
-  
+
     Write-Host "Copy transformed configs and langs"
     # note: exclude imageprocessor/*.config as imageprocessor pkg installs them
     $this.CopyFiles("$tmp\WebApp\config", "*.config", "$tmp\Configs", `
@@ -312,10 +303,10 @@
     $this.CopyFiles("$tmp\WebApp\config", "*.js", "$tmp\Configs")
     $this.CopyFiles("$tmp\WebApp\config\lang", "*.xml", "$tmp\Configs\Lang")
     $this.CopyFile("$tmp\WebApp\web.config", "$tmp\Configs\web.config.transform")
-  
+
     Write-Host "Copy transformed web.config"
     $this.CopyFile("$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed", "$tmp\WebApp\web.config")
-  
+
     # offset the modified timestamps on all umbraco dlls, as WebResources
     # break if date is in the future, which, due to timezone offsets can happen.
     Write-Host "Offset dlls timestamps"
@@ -323,49 +314,48 @@
       $_.CreationTime = $_.CreationTime.AddHours(-11)
       $_.LastWriteTime = $_.LastWriteTime.AddHours(-11)
     }
-  
+
     # copy libs
     Write-Host "Copy SqlCE libraries"
     $this.CopyFiles("$src\packages\SqlServerCE.4.0.0.1", "*.*", "$tmp\bin", `
       { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") })
     $this.CopyFiles("$src\packages\SqlServerCE.4.0.0.1", "*.*", "$tmp\WebApp\bin", `
       { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") })
-            
+
     # copy Belle
     Write-Host "Copy Belle"
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\assets", "*", "$tmp\WebApp\umbraco\assets")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\js", "*", "$tmp\WebApp\umbraco\js")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\lib", "*", "$tmp\WebApp\umbraco\lib")
     $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\views", "*", "$tmp\WebApp\umbraco\views")
-    $this.CopyFiles("$src\Umbraco.Web.UI\umbraco\preview", "*", "$tmp\WebApp\umbraco\preview")  
   })
 
   $ubuild.DefineMethod("PackageZip",
   {
-    Write-Host "Create Zip packages" 
+    Write-Host "Create Zip packages"
 
     $src = "$($this.SolutionRoot)\src"
     $tmp = $this.BuildTemp
     $out = $this.BuildOutput
-  
-    Write-Host "Zip all binaries"  
+
+    Write-Host "Zip all binaries"
     &$this.BuildEnv.Zip a -r "$out\UmbracoCms.AllBinaries.$($this.Version.Semver).zip" `
       "$tmp\bin\*" `
       "-x!dotless.Core.*" "-x!Umbraco.Compat7.*" `
       > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms.AllBinaries." }   
+    if (-not $?) { throw "Failed to zip UmbracoCms.AllBinaries." }
 
-    Write-Host "Zip cms"  
+    Write-Host "Zip cms"
     &$this.BuildEnv.Zip a -r "$out\UmbracoCms.$($this.Version.Semver).zip" `
       "$tmp\WebApp\*" `
       "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" "-x!Umbraco.Compat7.*" `
       > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms." }     
+    if (-not $?) { throw "Failed to zip UmbracoCms." }
   })
 
   $ubuild.DefineMethod("PrepareBuild",
   {
-    Write-Host "Clear folders and files"    
+    Write-Host "Clear folders and files"
     $this.RemoveDirectory("$($this.SolutionRoot)\src\Umbraco.Web.UI.Client\bower_components")
 
     $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
@@ -390,7 +380,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
     &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" -ConfigFile $this.BuildEnv.NuGetConfig > "$($this.BuildTemp)\nuget.restore.log"
-    if (-not $?) { throw "Failed to restore NuGet packages." }   
+    if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
   $ubuild.DefineMethod("PackageNuGet",
@@ -482,9 +472,9 @@
   $ubuild.ReleaseBranches = @( "master" )
 
   # run
-  if (-not $get) 
+  if (-not $get)
   {
-    $ubuild.Build() 
+    $ubuild.Build()
     if ($ubuild.OnError()) { return }
   }
   Write-Host "Done"
