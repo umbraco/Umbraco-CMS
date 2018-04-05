@@ -131,9 +131,9 @@ namespace Umbraco.Core.IO
         //use a tilde character instead of the complete path
         internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
-            string retval = ConfigurationManager.AppSettings[settingsKey];
+            var retval = ConfigurationManager.AppSettings[settingsKey];
 
-            if (String.IsNullOrEmpty(retval))
+            if (string.IsNullOrEmpty(retval))
                 retval = standardPath;
 
             return retval.TrimEnd('/');
