@@ -88,6 +88,13 @@
     </umb-backdrop>
 
     <umb-overlay
+        ng-if="overlay.show"
+        model="overlay"
+        position="{{overlay.position}}"
+        view="overlay.view">
+    </umb-overlay>
+
+    <umb-overlay
         ng-if="ysodOverlay.show"
         model="ysodOverlay"
         position="right"
