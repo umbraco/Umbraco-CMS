@@ -154,15 +154,7 @@ namespace Umbraco.Web.Security
             var user = UserManager.FindByNameAsync(username).Result;
             return user != null && UserManager.CheckPasswordAsync(user, password).Result;
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Back office users shouldn't be resolved from the membership provider, they should be resolved usign the BackOfficeUserManager or the IUserService")]
-        public virtual MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
-        {
-            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
-        }
-
+        
         /// <summary>
         /// Validates the current user to see if they have access to the specified app
         /// </summary>
@@ -197,18 +189,7 @@ namespace Umbraco.Web.Security
             var identity = _httpContext.GetCurrentIdentity(false);
             return identity?.SessionId;
         }
-
-        /// <summary>
-        /// Validates the user context ID.
-        /// </summary>
-        /// <param name="currentUmbracoUserContextId">This doesn't do anything</param>
-        /// <returns></returns>
-        [Obsolete("This method is no longer used, use the ValidateCurrentUser() method instead")]
-        public bool ValidateUserContextId(string currentUmbracoUserContextId)
-        {
-            return ValidateCurrentUser();
-        }
-
+        
         /// <summary>
         /// Validates the currently logged in user and ensures they are not timed out
         /// </summary>
@@ -290,18 +271,6 @@ namespace Umbraco.Web.Security
                 return false;
             }
             return user.HasSectionAccess(section);
-        }
-
-        [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
-        public string UmbracoUserContextId
-        {
-            get
-            {
-                return _httpContext.GetUmbracoAuthTicket() == null ? "" : GetSessionId();
-            }
-            set
-            {
-            }
         }
 
         /// <summary>
