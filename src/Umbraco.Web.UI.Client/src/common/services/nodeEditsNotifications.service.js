@@ -8,7 +8,9 @@
 (function () {
     'use strict';
 
-    function nodeEditsNotificationsService(notificationsService) {
+    function nodeEditsNotificationsService(notificationsService, localizationService) {
+
+        var localizedLabels = {};
 
         function setCurrentEditNotification(edit) {
             var allOpenNotifications = notificationsService.getCurrent();
@@ -16,41 +18,49 @@
             if (_.where(allOpenNotifications, { contentNotification: true, userId: edit.UserId }).length > 0) {
                 return;
             }
-            notificationsService
-                .add(
-                {
-                    headline: 'Attention',
-                    message: edit.UserName + ' is currently editing this content.',
-                    type: 'warning',
-                    sticky: true,
-                    contentNotification: true,
-                    userId: edit.UserId
-                });
+            
+            localizationService.localize("nodeEdits_userIsEditing", [edit.UserName]).then(function (value) {
+                notificationsService
+                    .add(
+                    {
+                        headline: localizedLabels.attention,
+                        message: value,
+                        type: 'warning',
+                        sticky: true,
+                        contentNotification: true,
+                        userId: edit.UserId
+                    });
+            });
+
         };
 
         function setPublishedNotification(email, time) {
-            notificationsService
-                .add(
-                {
-                    headline: 'This node was just published at ' + time + ' by ',
-                    message: email,
-                    type: 'warning',
-                    sticky: false,
-                    contentNotification: true
-                });
+            localizationService.localize("nodeEdits_userPublished", [email, time]).then(function (value) {
+                notificationsService
+                    .add(
+                    {
+                        headline: localizedLabels.nodePublished,
+                        message: value,
+                        type: 'info',
+                        sticky: false,
+                        contentNotification: true
+                    });
+            });
         };
 
         function setReleasedNotification(edit) {
             this.removeByUserId(edit.UserId);
 
-            notificationsService
-                .add(
-                {
-                    headline: 'Released',
-                    message: edit.UserName + ' stopped working on this item',
-                    type: 'success',
-                    sticky: false
-                });
+            localizationService.localize("nodeEdits_userStoppedEditing", [edit.UserName]).then(function (value) {
+                notificationsService
+                    .add(
+                    {
+                        headline: localizedLabels.released,
+                        message: value,
+                        type: 'info',
+                        sticky: false
+                    });
+            });
         };
 
         function removeByUserId(userId) {
@@ -67,6 +77,15 @@
                 notificationsService.remove(index);
             });
         }
+
+        localizationService.localizeMany([
+            "nodeEdits_attention", "nodeEdits_released", "nodeEdits_nodePublished"
+        ]).then(function (res) {
+            localizedLabels.attention = res[0];
+            localizedLabels.released = res[1];
+            localizedLabels.nodePublished = res[2];
+        });
+
 
         var service = {
             setCurrentEditNotification: setCurrentEditNotification,

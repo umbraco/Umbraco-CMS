@@ -2135,4 +2135,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <area alias="textbox">
         <key alias="characters_left">characters left</key>
     </area>
+    <area alias="nodeEdits">
+        <key alias="attention">Attention</key>
+        <key alias="userIsEditing">%0% is editing this item.</key>
+        <key alias="released">Released</key>
+        <key alias="userStoppedEditing">%0% stopped working on this item.</key>
+        <key alias="nodePublished">Item published</key>
+        <key alias="userPublished">by %0% at %1%.</key>
+    </area>
 </language>

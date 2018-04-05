@@ -1444,4 +1444,12 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="enabledConfirm">URL tracker staat nu aan.</key>
     <key alias="enableError">Fout bij het aanzetten van de URL tracker. Meer informatie kan gevonden worden in de log file.</key>
   </area>
+  <area alias="nodeEdits">
+    <key alias="attention">Attentie</key>
+    <key alias="userIsEditing">%0% is dit item aan het bewerken.</key>
+    <key alias="released">Vrijgegeven</key>
+    <key alias="userStoppedEditing">%0% is gestopt met bewerken van dit item.</key>
+    <key alias="nodePublished">Item gepubliceerd</key>
+    <key alias="userPublished">door %0% om %1%.</key>
+  </area>    
 </language>
