@@ -181,32 +181,7 @@ namespace Umbraco.Web.Security
             http.Items[Constants.Security.ForceReAuthFlag] = true;
             return true;
         }
-
-        ///// <summary>
-        ///// Creates the umbraco authentication ticket
-        ///// </summary>
-        ///// <param name="http"></param>
-        ///// <param name="userdata"></param>
-        //public static AuthenticationTicket CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
-        //{
-        //    //ONLY used by BasePage.doLogin!
-
-        //    if (http == null) throw new ArgumentNullException("http");
-        //    if (userdata == null) throw new ArgumentNullException("userdata");
-            
-        //    var userDataString = JsonConvert.SerializeObject(userdata);
-        //    return CreateAuthTicketAndCookie(
-        //        http,
-        //        userdata.Username,
-        //        userDataString,
-        //        //use the configuration timeout - this is the same timeout that will be used when renewing the ticket.
-        //        GlobalSettings.TimeOutInMinutes,
-        //        //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
-        //        1440,
-        //        UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
-        //        UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
-        //}        
-
+        
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
         /// </summary>
@@ -218,14 +193,7 @@ namespace Umbraco.Web.Security
             var ticket = http.GetUmbracoAuthTicket();
             return ticket.GetRemainingAuthSeconds();
         }
-
-        public static double GetRemainingAuthSeconds(this IOwinContext owinCtx)
-        {
-            if (owinCtx == null) throw new ArgumentNullException(nameof(owinCtx));
-            var ticket = owinCtx.GetUmbracoAuthTicket();
-            return ticket.GetRemainingAuthSeconds();
-        }
-
+        
         /// <summary>
         /// returns the number of seconds the user has until their auth session times out
         /// </summary>
