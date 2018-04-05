@@ -88,6 +88,11 @@
         <td>Set an alternate submit button label key for localized texts</td>
     </tr>
     <tr>
+        <td>model.submitButtonState</td>
+        <td>String</td>
+        <td>Set the state for the submit button</td>
+    </tr>
+    <tr>
         <td>model.hideSubmitButton</td>
         <td>Boolean</td>
         <td>Hides the submit button</td>
