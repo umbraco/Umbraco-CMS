@@ -11,7 +11,12 @@
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
         <div class="umb-list-item" ng-repeat="variant in vm.variants">
             <label class="flex">
-                <input type="checkbox" ng-model="variant.selected" ng-disabled="variant.validationError" style="margin-right: 8px;" />
+                <input 
+                    type="checkbox"
+                    checklist-model="model.selection"
+                    checklist-value="variant.culture"
+                    ng-disabled="variant.validationError"
+                    style="margin-right: 8px;" />
                 <div>
                     <div ng-class="{'bold': variant.selected}" style="margin-bottom: 2px;">{{ variant.cultureDisplayName }}</div>
                     <div class="umb-permission__description" ng-if="!variant.validationError">{{ variant.state }}</div>

@@ -349,6 +349,7 @@
         submitButtonLabel: "Publish",
         submit: function(model) {
           model.submitButtonState = "busy";
+          console.log(model.selection);
           // TODO: call bulk publishing method
           performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
             overlayService.close();
