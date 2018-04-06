@@ -14,21 +14,6 @@ namespace Umbraco.Web.Security.Identity
     /// </summary>
     public class ExternalSignInAutoLinkOptions
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying user groups instead and defaultAllowedSections now serves no purpose")]
-        public ExternalSignInAutoLinkOptions(
-            bool autoLinkExternalAccount = false,
-            string defaultUserType = "editor",
-            string[] defaultAllowedSections = null,
-            string defaultCulture = null)
-        {
-            if (string.IsNullOrEmpty(defaultUserType)) throw new ArgumentNullOrEmptyException(nameof(defaultUserType));
-
-            _defaultUserGroups = new[] {defaultUserType};
-            _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
-        }
-
         /// <summary>
         /// Creates a new <see cref="ExternalSignInAutoLinkOptions"/> instance
         /// </summary>
@@ -42,7 +27,7 @@ namespace Umbraco.Web.Security.Identity
         {
             _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
+            _defaultCulture = defaultCulture ?? UmbracoConfig.For.GlobalSettings().DefaultUILanguage;
         }
 
         private readonly string[] _defaultUserGroups;

@@ -59,7 +59,7 @@ namespace umbraco.presentation.webservices
 
             // Check for current install Id
             Guid installId = Guid.NewGuid();
-            var installCookie = Context.Request.GetCookieValue("umb_installId");
+            var installCookie = Context.Request.GetCookieValue(Constants.Web.InstallerCookieName);
             if (string.IsNullOrEmpty(installCookie) == false)
             {
                 if (Guid.TryParse(installCookie, out installId))
@@ -70,10 +70,10 @@ namespace umbraco.presentation.webservices
 
                 }
             }
-            Context.Response.Cookies.Set(new HttpCookie("umb_installId", installId.ToString()));
+            Context.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, installId.ToString()));
 
             string dbProvider = string.Empty;
-            if (string.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus) == false)
+            if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) == false)
             dbProvider = InstallHelper.GetDbProviderString(Current.SqlContext);
 
             var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();

@@ -126,15 +126,16 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="user"></param>
         /// <param name="textService"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
+        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService, IGlobalSettings globalSettings)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (textService == null) throw new ArgumentNullException(nameof(textService));
-            return GetUserCulture(user.Language, textService);
+            return GetUserCulture(user.Language, textService, globalSettings);
         }
 
-        internal static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService)
+        internal static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService, IGlobalSettings globalSettings)
         {
             try
             {
@@ -148,7 +149,7 @@ namespace Umbraco.Core.Models
             catch (CultureNotFoundException)
             {
                 //return the default one
-                return CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage);
+                return CultureInfo.GetCultureInfo(globalSettings.DefaultUILanguage);
             }
         }
 

@@ -13,7 +13,7 @@ namespace Umbraco.Web.UI.Umbraco
         protected void Page_Load(object sender, EventArgs e)
         {
             Response.Status = "301 Moved Permanently";
-            Response.AddHeader("Location", GlobalSettings.Path);
+            Response.AddHeader("Location", UmbracoConfig.For.GlobalSettings().Path);
         }
     }
 }

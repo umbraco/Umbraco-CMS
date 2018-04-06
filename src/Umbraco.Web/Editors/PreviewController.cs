@@ -11,13 +11,22 @@ namespace Umbraco.Web.Editors
     [DisableBrowserCache]
     public class PreviewController : Controller
     {
+        private readonly UmbracoFeatures _features;
+        private readonly IGlobalSettings _globalSettings;
+
+        public PreviewController(UmbracoFeatures features, IGlobalSettings globalSettings)
+        {
+            _features = features;
+            _globalSettings = globalSettings;
+        }
+
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
         public ActionResult Index()
         {
             var model = new BackOfficePreview
             {
-                DisableDevicePreview = FeaturesResolver.Current.Features.Disabled.DisableDevicePreview,
-                PreviewExtendedHeaderView = FeaturesResolver.Current.Features.Enabled.PreviewExtendedView
+                DisableDevicePreview = _features.Disabled.DisableDevicePreview,
+                PreviewExtendedHeaderView = _features.Enabled.PreviewExtendedView
             };
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
@@ -29,13 +38,13 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         public ActionResult Editors(string editor)
         {
-            if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException("editor");
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
+            if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException(nameof(editor));
+            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
         }
     }
 }

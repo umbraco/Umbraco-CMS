@@ -31,8 +31,8 @@ namespace Umbraco.Tests.Routing
             var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>());
             _module.Runtime = runtime;
             runtime.Level = RuntimeLevel.Run;
+            _module.GlobalSettings = TestObjects.GetGlobalSettings();
 
-            SettingsForTests.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
             //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
             //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";
 

@@ -26,16 +26,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var sessionId = Guid.NewGuid().ToString();
                 var identity = new UmbracoBackOfficeIdentity(
-                    new UserData(sessionId)
-                    {
-                        SecurityStamp = sessionId,
-                        Id = 0,
-                        Roles = new[] { "admin" },
-                        AllowedApplications = new[] { "content", "media", "members" },
-                        Culture = "en-US",
-                        RealName = "Admin",
-                        Username = "admin"
-                    });
+                    -1, "admin", "Admin", null, null, "en-US", sessionId, sessionId, new[] { "content", "media", "members" }, new[] { "admin" });
 
                 return Task.FromResult(new AuthenticationTicket(identity,
                     new AuthenticationProperties()

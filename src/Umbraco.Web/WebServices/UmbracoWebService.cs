@@ -5,6 +5,7 @@ using System.Web.Routing;
 using System.Web.Services;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
@@ -21,18 +22,14 @@ namespace Umbraco.Web.WebServices
         private UrlHelper _url;
 
         protected UmbracoWebService()
-            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
-        { }
-
-        protected UmbracoWebService(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
         {
-            UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
-            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            UmbracoContext = Current.UmbracoContext;
+            Umbraco = new UmbracoHelper(UmbracoContext, Current.Services, Current.ApplicationCache);
 
-            // fixme inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;
+            GlobalSettings = UmbracoConfig.For.GlobalSettings();
         }
 
         /// <summary>
@@ -59,6 +56,11 @@ namespace Umbraco.Web.WebServices
         /// Gets the services context.
         /// </summary>
         public ServiceContext Services { get; }
+
+        /// <summary>
+        /// Gets the global settings.
+        /// </summary>
+        public IGlobalSettings GlobalSettings { get; }
 
         /// <summary>
         /// Gets the web security helper.

@@ -7,6 +7,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -194,6 +195,8 @@ namespace Umbraco.Core.Runtime
             container.RegisterSingleton<ProfilingLogger>();
             container.RegisterSingleton<IRuntimeState, RuntimeState>();
 
+            container.RegisterFrom<ConfigurationCompositionRoot>();
+
             // register caches
             // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
             // are cloned in and cloned out - no request-based cache here since no web-based context,
@@ -206,7 +209,7 @@ namespace Umbraco.Core.Runtime
             container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 
             // register the plugin manager
-            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<ProfilingLogger>()));
+            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
 
             // register syntax providers - required by database factory
             container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");

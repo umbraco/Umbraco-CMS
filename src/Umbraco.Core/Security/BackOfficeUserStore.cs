@@ -8,6 +8,7 @@ using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
@@ -38,14 +39,16 @@ namespace Umbraco.Core.Security
         private readonly IMemberTypeService _memberTypeService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
+        private readonly IGlobalSettings _globalSettings;
         private bool _disposed = false;
 
-        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, MembershipProviderBase usersMembershipProvider)
+        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider)
         {
             _userService = userService;
             _memberTypeService = memberTypeService;
             _entityService = entityService;
             _externalLoginService = externalLoginService;
+            _globalSettings = globalSettings;
             if (userService == null) throw new ArgumentNullException("userService");
             if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
@@ -88,7 +91,7 @@ namespace Umbraco.Core.Security
             var userEntity = new User(user.Name, user.Email, user.UserName, emptyPasswordValue)
             {
                 DefaultToLiveEditing = false,
-                Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
+                Language = user.Culture ?? _globalSettings.DefaultUILanguage,
                 StartContentIds = user.StartContentIds ?? new int[] { },
                 StartMediaIds = user.StartMediaIds ?? new int[] { },
                 IsLockedOut = user.IsLockedOut,

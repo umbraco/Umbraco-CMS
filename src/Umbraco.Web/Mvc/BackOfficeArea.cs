@@ -9,6 +9,12 @@ namespace Umbraco.Web.Mvc
     /// </summary>
     internal class BackOfficeArea : AreaRegistration
     {
+        private readonly IGlobalSettings _globalSettings;
+
+        public BackOfficeArea(IGlobalSettings globalSettings)
+        {
+            _globalSettings = globalSettings;
+        }
 
         /// <summary>
         /// Create the routes for the area
@@ -22,13 +28,13 @@ namespace Umbraco.Web.Mvc
         {
             context.MapRoute(
                 "Umbraco_preview",
-                GlobalSettings.UmbracoMvcArea + "/preview/{action}/{editor}",
+                _globalSettings.GetUmbracoMvcArea() + "/preview/{action}/{editor}",
                 new {controller = "Preview", action = "Index", editor = UrlParameter.Optional},
                 new[] { "Umbraco.Web.Editors" });
 
             context.MapRoute(
                 "Umbraco_back_office",
-                GlobalSettings.UmbracoMvcArea + "/{action}/{id}",
+                _globalSettings.GetUmbracoMvcArea() + "/{action}/{id}",
                 new {controller = "BackOffice", action = "Default", id = UrlParameter.Optional},
                 //limit the action/id to only allow characters - this is so this route doesn't hog all other
                 // routes like: /umbraco/channels/word.aspx, etc...
@@ -42,15 +48,12 @@ namespace Umbraco.Web.Mvc
             //Create the REST/web/script service routes
             context.MapRoute(
                 "Umbraco_web_services",
-                GlobalSettings.UmbracoMvcArea + "/RestServices/{controller}/{action}/{id}",
+                _globalSettings.GetUmbracoMvcArea() + "/RestServices/{controller}/{action}/{id}",
                 new {controller = "SaveFileController", action = "Index", id = UrlParameter.Optional},
                 //look in this namespace for controllers
                 new[] {"Umbraco.Web.WebServices"});
         }
 
-        public override string AreaName
-        {
-            get { return GlobalSettings.UmbracoMvcArea; }
-        }
+        public override string AreaName => _globalSettings.GetUmbracoMvcArea();
     }
 }

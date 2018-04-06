@@ -7,6 +7,7 @@ using System.Web;
 using LightInject;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -112,21 +113,30 @@ namespace Umbraco.Tests.TestHelpers
             publishedSnapshotServiceMock.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
             var publishedSnapshotService = publishedSnapshotServiceMock.Object;
 
-            var webSecurity = new Mock<WebSecurity>(null, null).Object;
-            var settings = GetUmbracoSettings();
+            var umbracoSettings = GetUmbracoSettings();
+            var globalSettings = GetGlobalSettings();
+            var webSecurity = new Mock<WebSecurity>(null, null, globalSettings).Object;
             var urlProviders = Enumerable.Empty<IUrlProvider>();
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
-            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, settings, urlProviders, true);
+            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, true);
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()
         {
+            //fixme Why not use the SettingsForTest.GenerateMock ... ?
+            //fixme Shouldn't we use the default ones so they are the same instance for each test?
+
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
             var webRoutingSectionMock = new Mock<IWebRoutingSection>();
             webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlProviderMode.Auto.ToString());
             umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
             return umbracoSettingsMock.Object;
+        }
+
+        public IGlobalSettings GetGlobalSettings()
+        {
+            return SettingsForTests.GetDefaultGlobalSettings();
         }
 
         #region Inner classes

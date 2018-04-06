@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -207,6 +208,7 @@
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
+    <Compile Include="Configuration\GlobalSettingsExtensions.cs" />
     <Compile Include="Configuration\Grid\GridConfig.cs" />
     <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
     <Compile Include="Configuration\Grid\IGridConfig.cs" />
@@ -228,6 +230,7 @@
     <Compile Include="Configuration\HealthChecks\NotificationMethodSettingsElementCollection.cs" />
     <Compile Include="Configuration\IFileSystemProviderElement.cs" />
     <Compile Include="Configuration\IFileSystemProvidersSection.cs" />
+    <Compile Include="Configuration\IGlobalSettings.cs" />
     <Compile Include="Configuration\InnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\LocalTempStorage.cs" />
     <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
@@ -1329,7 +1332,6 @@
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
-    <Compile Include="Security\UserData.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\ForceInt32Converter.cs" />

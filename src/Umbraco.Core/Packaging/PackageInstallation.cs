@@ -25,7 +25,7 @@ namespace Umbraco.Core.Packaging
 
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,
             IFileService fileService, IPackageExtraction packageExtraction)
-            : this(packagingService, macroService, fileService, packageExtraction, GlobalSettings.FullpathToRoot)
+            : this(packagingService, macroService, fileService, packageExtraction, GlobalSettings.FullPathToRoot)
         {}
 
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,

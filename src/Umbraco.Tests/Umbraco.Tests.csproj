@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -602,20 +603,27 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <!-- get NuGet packages directory -->
+  <PropertyGroup>
+    <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
+  </PropertyGroup>
+  
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>REM xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\amd64\*.*" "$(TargetDir)amd64\" /Y /F /E /I /C /D
-REM xcopy "$(NugetPackages)\SqlServerCE.4.0.0.1\x86\*.*" "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
+  
   <Target Name="BeforeBuild">
+	<Message Text="-BeforeBuild-" Importance="high" />
+    <Message Text="MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="high" />
+    <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
+    <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
+    <Message Text="NuGetPackages:         $(NuGetPackages)" Importance="high" />
+    <!-- copy SqlCe -->
+    <ItemGroup>
+      <SqlCE64 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\amd64\*.*" />
+      <SqlCE86 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\x86\*.*" />
+    </ItemGroup>
+    <Message Text="Copy SqlCe files to $(TargetDir)" Importance="high" />
+    <Copy SourceFiles="@(SqlCe64)" DestinationFolder="$(TargetDir)amd64" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SqlCe86)" DestinationFolder="$(TargetDir)x86" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  
 </Project>

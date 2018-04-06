@@ -439,7 +439,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Convert_From_Standard_Xml()
         {
-            var config = SettingsForTests.GenerateMockSettings();
+            var config = SettingsForTests.GenerateMockUmbracoSettings();
 
             SettingsForTests.ConfigureSettings(config);
 

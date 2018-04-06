@@ -4,6 +4,7 @@ using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Models;
@@ -20,8 +21,7 @@ namespace Umbraco.Web.Models.Mapping
             => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         public UserMapperProfile(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            IRuntimeCacheProvider runtimeCache,
-            ActionCollection actions)
+            IRuntimeCacheProvider runtimeCache, ActionCollection actions, IGlobalSettings globalSettings)
         {
             var userGroupDefaultPermissionsResolver = new UserGroupDefaultPermissionsResolver(textService, actions);
 
@@ -269,7 +269,7 @@ namespace Umbraco.Web.Models.Mapping
                     opt => opt.MapFrom(src => GetStartNodeValues(
                         src.StartMediaIds.ToArray(),
                         textService, entityService, UmbracoObjectTypes.Media, "media/mediaRoot")))
-                .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService)))
+                .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService, globalSettings)))
                 .ForMember(
                     dest => dest.AvailableCultures,
                     opt => opt.MapFrom(user => textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName)))
@@ -298,7 +298,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(dest => dest.UserGroups, opt => opt.MapFrom(user => user.Groups))
                 .ForMember(dest => dest.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?)user.LastLoginDate))
-                .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService)))
+                .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService, globalSettings)))
                 .ForMember(
                     dest => dest.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
@@ -318,7 +318,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                 .ForMember(dest => dest.StartContentIds, opt => opt.MapFrom(user => user.CalculateContentStartNodeIds(entityService)))
                 .ForMember(dest => dest.StartMediaIds, opt => opt.MapFrom(user => user.CalculateMediaStartNodeIds(entityService)))
-                .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService)))
+                .ForMember(dest => dest.Culture, opt => opt.MapFrom(user => user.GetUserCulture(textService, globalSettings)))
                 .ForMember(
                     dest => dest.EmailHash,
                     opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().GenerateHash()))

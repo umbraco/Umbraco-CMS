@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace umbraco.controls.Tree
 {

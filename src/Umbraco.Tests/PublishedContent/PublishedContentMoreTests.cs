@@ -65,13 +65,16 @@ namespace Umbraco.Tests.PublishedContent
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
 
+            var globalSettings = TestObjects.GetGlobalSettings();
+
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 publishedSnapshotService.Object,
-                new WebSecurity(httpContext, Current.Services.UserService),
+                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>());
+                Enumerable.Empty<IUrlProvider>(),
+                globalSettings);
 
             return umbracoContext;
         }

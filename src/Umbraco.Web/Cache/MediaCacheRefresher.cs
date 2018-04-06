@@ -42,9 +42,8 @@ namespace Umbraco.Web.Cache
         public override void Refresh(JsonPayload[] payloads)
         {
             if (payloads == null) return;
-            
-            bool anythingChanged;
-            _publishedSnapshotService.Notify(payloads, out anythingChanged);
+
+            _publishedSnapshotService.Notify(payloads, out var anythingChanged);
 
             if (anythingChanged)
             {

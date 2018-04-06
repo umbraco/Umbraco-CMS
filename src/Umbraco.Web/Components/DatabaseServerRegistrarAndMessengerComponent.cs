@@ -50,19 +50,20 @@ namespace Umbraco.Web.Components
 
         public override void Compose(Composition composition)
         {
+            //fixme inject IUmbracoSettingsSection
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
 
             composition.SetServerMessenger(factory =>
             {
                 var runtime = factory.GetInstance<IRuntimeState>();
                 var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
-                var logger = factory.GetInstance<ILogger>();
+                var globalSettings = factory.GetInstance<IGlobalSettings>();
                 var proflog = factory.GetInstance<ProfilingLogger>();
                 var scopeProvider = factory.GetInstance<IScopeProvider>();
                 var sqlContext = factory.GetInstance<ISqlContext>();
 
                 return new BatchedDatabaseServerMessenger(
-                    runtime, databaseFactory, scopeProvider, sqlContext, logger, proflog,
+                    runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings,
                     true,
                     //Default options for web including the required callbacks to build caches
                     new DatabaseServerMessengerOptions

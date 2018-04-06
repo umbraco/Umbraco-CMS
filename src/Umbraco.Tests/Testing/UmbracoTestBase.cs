@@ -12,6 +12,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionRoots;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.Testing
 
         private static TypeLoader CreateCommonPluginManager(IServiceFactory f)
         {
-            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<ProfilingLogger>(), false)
+            return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>(), false)
             {
                 AssembliesToScan = new[]
                 {
@@ -249,15 +250,20 @@ namespace Umbraco.Tests.Testing
         {
             if (withApplication == false) return;
 
-            var settings = SettingsForTests.GetDefault();
+            var umbracoSettings = SettingsForTests.GetDefaultUmbracoSettings();
+            var globalSettings = SettingsForTests.GetDefaultGlobalSettings();
+            //apply these globally
+            SettingsForTests.ConfigureSettings(umbracoSettings);
+            SettingsForTests.ConfigureSettings(globalSettings);
 
             // default Datalayer/Repositories/SQL/Database/etc...
             Container.RegisterFrom<RepositoryCompositionRoot>();
 
             // register basic stuff that might need to be there for some container resolvers to work
-            Container.RegisterSingleton(factory => SettingsForTests.GetDefault());
-            Container.RegisterSingleton(factory => settings.Content);
-            Container.RegisterSingleton(factory => settings.Templates);
+            Container.RegisterSingleton(factory => umbracoSettings);
+            Container.RegisterSingleton(factory => globalSettings);
+            Container.RegisterSingleton(factory => umbracoSettings.Content);
+            Container.RegisterSingleton(factory => umbracoSettings.Templates);
             Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
             Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 

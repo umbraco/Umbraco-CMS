@@ -24,6 +24,7 @@ namespace Umbraco.Core.Migrations.Install
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IGlobalSettings _globalSettings;
         private readonly IRuntimeState _runtime;
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly IKeyValueService _keyValueService;
@@ -32,9 +33,10 @@ namespace Umbraco.Core.Migrations.Install
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
 
-        public DatabaseBuilder(IScopeProvider scopeProvider, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations)
+        public DatabaseBuilder(IScopeProvider scopeProvider, IGlobalSettings globalSettings, IUmbracoDatabaseFactory databaseFactory, IRuntimeState runtime, ILogger logger, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations)
         {
             _scopeProvider = scopeProvider;
+            _globalSettings = globalSettings;
             _databaseFactory = databaseFactory;
             _runtime = runtime;
             _logger = logger;
@@ -132,7 +134,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, logger);
 
-            var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
+            var path = Path.Combine(GlobalSettings.FullPathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
@@ -488,7 +490,7 @@ namespace Umbraco.Core.Migrations.Install
                 var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
+                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");

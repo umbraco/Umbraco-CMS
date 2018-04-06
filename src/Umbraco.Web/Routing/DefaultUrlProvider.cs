@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 
@@ -13,11 +14,13 @@ namespace Umbraco.Web.Routing
     {
         private readonly IRequestHandlerSection _requestSettings;
         private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
 
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings)
         {
             _requestSettings = requestSettings;
             _logger = logger;
+            _globalSettings = globalSettings;
         }
 
         #region GetUrl
@@ -167,7 +170,7 @@ namespace Umbraco.Web.Routing
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
-            return UriUtility.UriFromUmbraco(uri);
+            return UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
         }
 
         string CombinePaths(string path1, string path2)
@@ -189,7 +192,7 @@ namespace Umbraco.Web.Routing
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
-            return uris.Select(UriUtility.UriFromUmbraco);
+            return uris.Select(x => UriUtility.UriFromUmbraco(x, _globalSettings, _requestSettings));
         }
 
         #endregion

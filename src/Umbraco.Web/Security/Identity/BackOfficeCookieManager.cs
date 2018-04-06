@@ -6,7 +6,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -21,19 +21,21 @@ namespace Umbraco.Web.Security.Identity
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
+        private readonly IGlobalSettings _globalSettings;
         private readonly string[] _explicitPaths;
         private readonly string _getRemainingSecondsPath;
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime)
-            : this(umbracoContextAccessor, runtime, null)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IGlobalSettings globalSettings)
+            : this(umbracoContextAccessor, runtime, globalSettings, null)
         { }
 
-        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IEnumerable<string> explicitPaths)
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IRuntimeState runtime, IGlobalSettings globalSettings, IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
+            _globalSettings = globalSettings;
             _explicitPaths = explicitPaths?.ToArray();
-            _getRemainingSecondsPath = $"{GlobalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
+            _getRemainingSecondsPath = $"{globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds";
         }
 
         /// <summary>
@@ -99,7 +101,7 @@ namespace Umbraco.Web.Security.Identity
                 (checkForceAuthTokens && owinContext.Get<bool?>(Constants.Security.ForceReAuthFlag) != null)
                 || (checkForceAuthTokens && httpContext.Success && httpContext.Result.Items[Constants.Security.ForceReAuthFlag] != null)
                 //check back office
-                || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
+                || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings)
                 //check installer
                 || request.Uri.IsInstallerRequest())
             {

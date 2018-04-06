@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -48,9 +49,9 @@ namespace Umbraco.Tests.CoreThings
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
             SystemDirectories.Root = virtualPath;
-
+            var globalConfig = SettingsForTests.GenerateMockGlobalSettings();
             var source = new Uri(input);
-            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath));
+            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath, globalConfig));
         }
 
         [TestCase("http://www.domain.com/install", true)]

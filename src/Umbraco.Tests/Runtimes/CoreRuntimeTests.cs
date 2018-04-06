@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Runtimes
             {
                 base.Compose(composition);
 
-                composition.Container.Register(factory => SettingsForTests.GetDefault());
+                composition.Container.Register(factory => SettingsForTests.GetDefaultUmbracoSettings());
                 composition.Container.RegisterSingleton<IExamineManager, TestExamineManager>();
 
                 Composed = true;

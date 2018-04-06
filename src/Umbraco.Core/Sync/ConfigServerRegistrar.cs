@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -17,12 +18,12 @@ namespace Umbraco.Core.Sync
         private readonly ServerRole _serverRole;
         private readonly string _umbracoApplicationUrl;
 
-        public ConfigServerRegistrar(IUmbracoSettingsSection settings, ILogger logger)
-            : this(settings.DistributedCall, logger)
+        public ConfigServerRegistrar(IUmbracoSettingsSection settings, ILogger logger, IGlobalSettings globalSettings)
+            : this(settings.DistributedCall, logger, globalSettings)
         { }
 
         // for tests
-        internal ConfigServerRegistrar(IDistributedCallSection settings, ILogger logger)
+        internal ConfigServerRegistrar(IDistributedCallSection settings, ILogger logger, IGlobalSettings globalSettings)
         {
             if (settings.Enabled == false)
             {
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Sync
             var serversA = settings.Servers.ToArray();
 
             _addresses = serversA
-                .Select(x => new ConfigServerAddress(x))
+                .Select(x => new ConfigServerAddress(x, globalSettings))
                 .Cast<IServerAddress>()
                 .ToList();
 

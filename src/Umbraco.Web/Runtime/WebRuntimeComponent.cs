@@ -19,6 +19,7 @@ using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -63,6 +64,11 @@ namespace Umbraco.Web.Runtime
 
             composition.Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
 
+            //register the install components
+            //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
+            //it still needs to use the install controller so we can't do that
+            composition.Container.RegisterFrom<InstallerCompositionRoot>();
+
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
             var proflog = composition.Container.GetInstance<ProfilingLogger>();
@@ -88,8 +94,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, new PerRequestLifeTime());
 
             // register the umbraco helper
-            // fixme - FUCK! how can this even work, it's not a singleton!
-            composition.Container.RegisterSingleton<UmbracoHelper>();
+            composition.Container.Register<UmbracoHelper>(new PerRequestLifeTime());
 
             // register distributed cache
             composition.Container.RegisterSingleton(f => new DistributedCache());
@@ -167,7 +172,6 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByNiceUrl>()
                 .Append<ContentFinderByIdPath>()
                 .Append<ContentFinderByNiceUrlAndTemplate>()
-                .Append<ContentFinderByProfile>()
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
@@ -206,13 +210,15 @@ namespace Umbraco.Web.Runtime
             UmbracoApiControllerTypeCollection apiControllerTypes,
             IPublishedSnapshotService publishedSnapshotService,
             IUserService userService,
+            IUmbracoSettingsSection umbracoSettings,
+            IGlobalSettings globalSettings,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
             SetupMvcAndWebApi();
 
             // client dependency
-            ConfigureClientDependency();
+            ConfigureClientDependency(globalSettings);
 
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
@@ -226,7 +232,7 @@ namespace Umbraco.Web.Runtime
             ConfigureGlobalFilters();
 
             // set routes
-            CreateRoutes(umbracoContextAccessor, surfaceControllerTypes, apiControllerTypes);
+            CreateRoutes(umbracoContextAccessor, globalSettings, surfaceControllerTypes, apiControllerTypes);
 
             // get an http context
             // at that moment, HttpContext.Current != null but its .Request property is null
@@ -239,9 +245,10 @@ namespace Umbraco.Web.Runtime
                 umbracoContextAccessor,
                 new HttpContextWrapper(HttpContext.Current),
                 publishedSnapshotService,
-                new WebSecurity(httpContext, userService),
-                UmbracoConfig.For.UmbracoSettings(),
-                urlProviders);
+                new WebSecurity(httpContext, userService, globalSettings),
+                umbracoSettings,
+                urlProviders,
+                globalSettings);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
@@ -269,10 +276,11 @@ namespace Umbraco.Web.Runtime
         // internal for tests
         internal static void CreateRoutes(
             IUmbracoContextAccessor umbracoContextAccessor,
+            IGlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            var umbracoPath = GlobalSettings.UmbracoMvcArea;
+            var umbracoPath = globalSettings.GetUmbracoMvcArea();
 
             // create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
@@ -286,17 +294,18 @@ namespace Umbraco.Web.Runtime
             RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             // register all back office routes
-            RouteTable.Routes.RegisterArea<BackOfficeArea>();
+            RouteTable.Routes.RegisterArea(new BackOfficeArea(globalSettings));
 
             // plugin controllers must come first because the next route will catch many things
-            RoutePluginControllers(surfaceControllerTypes, apiControllerTypes);
+            RoutePluginControllers(globalSettings, surfaceControllerTypes, apiControllerTypes);
         }
 
         private static void RoutePluginControllers(
+            IGlobalSettings globalSettings,
             SurfaceControllerTypeCollection surfaceControllerTypes,
             UmbracoApiControllerTypeCollection apiControllerTypes)
         {
-            var umbracoPath = GlobalSettings.UmbracoMvcArea;
+            var umbracoPath = globalSettings.GetUmbracoMvcArea();
 
             // need to find the plugin controllers and route them
             var pluginControllers = surfaceControllerTypes.Concat(apiControllerTypes).ToArray();
@@ -318,7 +327,7 @@ namespace Umbraco.Web.Runtime
             foreach (var g in groupedAreas)
             {
                 // create & register an area for the controllers (this will throw an exception if all controllers are not in the same area)
-                var pluginControllerArea = new PluginControllerArea(g.Select(PluginController.GetMetadata));
+                var pluginControllerArea = new PluginControllerArea(globalSettings, g.Select(PluginController.GetMetadata));
                 RouteTable.Routes.RegisterArea(pluginControllerArea);
             }
         }
@@ -375,7 +384,7 @@ namespace Umbraco.Web.Runtime
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
         }
 
-        private static void ConfigureClientDependency()
+        private static void ConfigureClientDependency(IGlobalSettings globalSettings)
         {
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
             XmlFileMapper.FileMapDefaultFolder = "~/App_Data/TEMP/ClientDependency";
@@ -383,7 +392,7 @@ namespace Umbraco.Web.Runtime
 
             // Now we need to detect if we are running umbracoLocalTempStorage as EnvironmentTemp and in that case we want to change the CDF file
             // location to be there
-            if (GlobalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
+            if (globalSettings.LocalTempStorageLocation == LocalTempStorage.EnvironmentTemp)
             {
                 var appDomainHash = HttpRuntime.AppDomainAppId.ToSHA1();
                 var cachePath = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData",

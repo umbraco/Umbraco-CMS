@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
@@ -123,9 +124,11 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains3();
 
-            SettingsForTests.HideTopLevelNodeFromPath = true;
-
-            var umbracoContext = GetUmbracoContext(url);
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
+            
+            var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter(Container);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
@@ -164,9 +167,11 @@ namespace Umbraco.Tests.Routing
             // defaults depend on test environment
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            SettingsForTests.HideTopLevelNodeFromPath = true;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
-            var umbracoContext = GetUmbracoContext(url);
+            var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter(Container);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 

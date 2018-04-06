@@ -8,6 +8,7 @@ using CSharpTest.Net.Collections;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -41,6 +42,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
+        private readonly IGlobalSettings _globalSettings;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -79,7 +81,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IScopeProvider scopeProvider,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
+            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings)
             : base(publishedSnapshotAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -93,6 +95,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
+            _globalSettings = globalSettings;
 
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
@@ -1012,7 +1015,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedShapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache)),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache), _globalSettings),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor),
                 DomainCache = domainCache,

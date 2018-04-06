@@ -65,17 +65,20 @@ namespace Umbraco.Core.Configuration
         /// <param name="umbracoSettings"></param>
         /// <param name="dashboardSettings"></param>
         /// <param name="healthChecks"></param>
-        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IDashboardSection dashboardSettings, IHealthChecks healthChecks)
+        /// <param name="globalSettings"></param>
+        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IDashboardSection dashboardSettings, IHealthChecks healthChecks, IGlobalSettings globalSettings)
         {
             SetHealthCheckSettings(healthChecks);
             SetUmbracoSettings(umbracoSettings);
             SetDashboardSettings(dashboardSettings);
+            SetGlobalConfig(globalSettings);
         }
 
         private IHealthChecks _healthChecks;
         private IDashboardSection _dashboardSection;
         private IUmbracoSettingsSection _umbracoSettings;
         private IGridConfig _gridConfig;
+        private IGlobalSettings _globalSettings;
 
         /// <summary>
         /// Gets the IHealthCheck config
@@ -132,6 +135,23 @@ namespace Umbraco.Core.Configuration
         public void SetUmbracoSettings(IUmbracoSettingsSection value)
         {
             _umbracoSettings = value;
+        }
+
+        /// <summary>
+        /// Only for testing
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetGlobalConfig(IGlobalSettings value)
+        {
+            _globalSettings = value;
+        }
+
+        /// <summary>
+        /// Gets the IGlobalSettings
+        /// </summary>
+        public IGlobalSettings GlobalSettings()
+        {
+            return _globalSettings ?? (_globalSettings = new GlobalSettings());
         }
 
         /// <summary>

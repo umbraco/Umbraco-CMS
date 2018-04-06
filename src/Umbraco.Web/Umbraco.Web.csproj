@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -133,6 +134,7 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
+    <Compile Include="Composing\CompositionRoots\InstallerCompositionRoot.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="Editors\LanguageController.cs" />
     <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
+    <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
@@ -178,6 +181,7 @@
     <Compile Include="Cache\RelationTypeCacheRefresher.cs" />
     <Compile Include="Composing\CompositionRoots\WebMappingProfilesCompositionRoot.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Install\InstallStepCollection.cs" />
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
@@ -405,6 +409,9 @@
     <Compile Include="Search\SearchableTreeCollection.cs" />
     <Compile Include="Search\SearchableTreeCollectionBuilder.cs" />
     <Compile Include="Search\UmbracoTreeSearcher.cs" />
+    <Compile Include="Security\AuthenticationExtensions.cs" />
+    <Compile Include="Security\Identity\UmbracoSecureDataFormat.cs" />
+    <Compile Include="Security\UmbracoAuthTicketDataProtector.cs" />
     <Compile Include="SignalR\IPreviewHub.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="SignalR\PreviewHubComponent.cs" />
@@ -486,7 +493,6 @@
     <Compile Include="Trees\TreeAttribute.cs" />
     <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
-    <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
@@ -630,7 +636,6 @@
     <Compile Include="Install\InstallSteps\DatabaseInstallStep.cs" />
     <Compile Include="Install\InstallSteps\DatabaseUpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\FilePermissionsStep.cs" />
-    <Compile Include="Install\InstallSteps\MajorVersion7UpgradeReport.cs" />
     <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
@@ -770,7 +775,6 @@
     <Compile Include="Security\Identity\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Security\Identity\AuthenticationManagerExtensions.cs" />
     <Compile Include="Security\Identity\BackOfficeCookieManager.cs" />
-    <Compile Include="Security\Identity\FormsAuthenticationSecureDataFormat.cs" />
     <Compile Include="Security\Identity\UmbracoBackOfficeCookieAuthOptions.cs" />
     <Compile Include="Scheduling\TaskAndFactoryExtensions.cs" />
     <Compile Include="Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
@@ -1085,7 +1089,6 @@
     <Compile Include="Routing\IUrlProvider.cs" />
     <Compile Include="Routing\SiteDomainHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
-    <Compile Include="Security\LegacyDefaultAppMapping.cs" />
     <Compile Include="Routing\PublishedRouter.cs" />
     <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
@@ -1233,7 +1236,6 @@
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrl.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlAndTemplate.cs" />
-    <Compile Include="Routing\ContentFinderByProfile.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
     <Compile Include="Routing\PublishedRequest.cs" />

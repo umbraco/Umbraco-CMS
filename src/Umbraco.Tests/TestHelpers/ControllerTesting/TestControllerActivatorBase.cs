@@ -68,8 +68,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 localizedTextService:Mock.Of<ILocalizedTextService>(),
                 sectionService:Mock.Of<ISectionService>());
 
-            //ensure the configuration matches the current version for tests
-            SettingsForTests.ConfigurationStatus = UmbracoVersion.SemanticVersion.ToSemanticString();
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
             // fixme v8?
             ////new app context
@@ -85,19 +84,25 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             //    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),
             //    true);
 
+            var httpContextItems = new Dictionary<string, object>
+            {
+                //add the special owin environment to the httpcontext items, this is how the GetOwinContext works
+                ["owin.Environment"] = new Dictionary<string, object>()
+            };
+
             //httpcontext with an auth'd user
             var httpContext = Mock.Of<HttpContextBase>(
                 http => http.User == owinContext.Authentication.User
                         //ensure the request exists with a cookies collection
                         && http.Request == Mock.Of<HttpRequestBase>(r => r.Cookies == new HttpCookieCollection())
                         //ensure the request exists with an items collection
-                        && http.Items == Mock.Of<IDictionary>());
+                        && http.Items == httpContextItems);
             //chuck it into the props since this is what MS does when hosted and it's needed there
             request.Properties["MS_HttpContext"] = httpContext;
 
             var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
 
-            var webSecurity = new Mock<WebSecurity>(null, null);
+            var webSecurity = new Mock<WebSecurity>(null, null, globalSettings);
 
             //mock CurrentUser
             var groups = new List<ReadOnlyUserGroup>();
@@ -142,6 +147,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 webSecurity.Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
                 true); //replace it
 
             var urlHelper = new Mock<IUrlProvider>();

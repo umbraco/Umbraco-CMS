@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.Scoping
                 publishedSnapshotAccessor,
                 Logger,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository);
+                documentRepository, mediaRepository, memberRepository, Container.GetInstance<IGlobalSettings>());
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
@@ -102,9 +103,10 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService),
-                umbracoSettings ?? SettingsForTests.GetDefault(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>());
+                new WebSecurity(httpContext, Current.Services.UserService, TestObjects.GetGlobalSettings()),
+                umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
+                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                TestObjects.GetGlobalSettings());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

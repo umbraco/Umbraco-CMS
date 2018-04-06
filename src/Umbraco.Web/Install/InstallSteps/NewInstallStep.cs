@@ -27,12 +27,14 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly HttpContextBase _http;
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
+        private readonly IGlobalSettings _globalSettings;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder)
+        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings)
         {
             _http = http;
             _userService = userService;
             _databaseBuilder = databaseBuilder;
+            _globalSettings = globalSettings;
         }
 
         //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
@@ -126,7 +128,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             //if there's already a version then there should def be a user but in some cases someone may have
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
-            if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
+            if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
 
             if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
                 return _databaseBuilder.HasSomeNonDefaultUser() == false;

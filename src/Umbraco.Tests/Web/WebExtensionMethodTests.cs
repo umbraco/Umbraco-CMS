@@ -26,9 +26,10 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>());
+                new List<IUrlProvider>(),
+                TestObjects.GetGlobalSettings());
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -42,9 +43,10 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>());
+                new List<IUrlProvider>(),
+                TestObjects.GetGlobalSettings());
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -68,9 +70,10 @@ namespace Umbraco.Tests.Web
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>());
+                new List<IUrlProvider>(),
+                TestObjects.GetGlobalSettings());
 
             var httpContext = Mock.Of<HttpContextBase>();
 

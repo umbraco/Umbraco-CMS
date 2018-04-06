@@ -17,14 +17,14 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
         private readonly InstallHelper _installHelper;
+        private readonly UmbracoContext _umbracoContext;
         private readonly IContentService _contentService;
-        private readonly WebSecurity _security;
 
-        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper, WebSecurity security)
+        public StarterKitDownloadStep(IContentService contentService, InstallHelper installHelper, UmbracoContext umbracoContext)
         {
             _installHelper = installHelper;
+            _umbracoContext = umbracoContext;
             _contentService = contentService;
-            _security = security;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Install.InstallSteps
             var installer = new Installer();
 
             //Go get the package file from the package repo
-            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _security.GetUserId().ResultOr(0));
+            var packageFile = Current.Services.PackagingService.FetchPackageFile(kitGuid, UmbracoVersion.Current, _umbracoContext.Security.GetUserId().ResultOr(0));
 
             var tempFile = installer.Import(packageFile);
             installer.LoadConfig(tempFile);

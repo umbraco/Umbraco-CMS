@@ -29,9 +29,9 @@ namespace Umbraco.Core.Sync
         // FIXME need another way to do it, eg an interface, injected!
         public static Func<HttpRequestBase, string> ApplicationUrlProvider { get; set; }
 
-        internal static string GetApplicationUrl(ILogger logger, HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
+        internal static string GetApplicationUrl(ILogger logger, IGlobalSettings globalSettings, IUmbracoSettingsSection settings, HttpRequestBase request = null)
         {
-            var umbracoApplicationUrl = TryGetApplicationUrl(settings ?? UmbracoConfig.For.UmbracoSettings(), logger);
+            var umbracoApplicationUrl = TryGetApplicationUrl(settings, logger, globalSettings);
             if (umbracoApplicationUrl != null)
                 return umbracoApplicationUrl;
 
@@ -45,12 +45,12 @@ namespace Umbraco.Core.Sync
 
             if (request == null) return null;
 
-            umbracoApplicationUrl = GetApplicationUrlFromCurrentRequest(request);
+            umbracoApplicationUrl = GetApplicationUrlFromCurrentRequest(request, globalSettings);
             logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (UmbracoModule request)");
             return umbracoApplicationUrl;
         }
 
-        internal static string TryGetApplicationUrl(IUmbracoSettingsSection settings, ILogger logger)
+        internal static string TryGetApplicationUrl(IUmbracoSettingsSection settings, ILogger logger, IGlobalSettings globalSettings)
         {
             // try umbracoSettings:settings/web.routing/@umbracoApplicationUrl
             // which is assumed to:
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Sync
             url = settings.ScheduledTasks.BaseUrl;
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var ssl = GlobalSettings.UseSSL ? "s" : "";
+                var ssl = globalSettings.UseHttps ? "s" : "";
                 url = "http" + ssl + "://" + url;
                 var umbracoApplicationUrl = url.TrimEnd('/');
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (using scheduledTasks/@baseUrl)");
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Sync
             return null;
         }
 
-        public static string GetApplicationUrlFromCurrentRequest(HttpRequestBase request)
+        public static string GetApplicationUrlFromCurrentRequest(HttpRequestBase request, IGlobalSettings globalSettings)
         {
             // if (HTTP and SSL not required) or (HTTPS and SSL required),
             //  use ports from request
@@ -108,12 +108,12 @@ namespace Umbraco.Core.Sync
             //  if non-standard ports used,
             //  user may need to set umbracoApplicationUrl manually per
             //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
-            var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
-                        || (request.IsSecureConnection && GlobalSettings.UseSSL)
+            var port = (request.IsSecureConnection == false && globalSettings.UseHttps == false)
+                        || (request.IsSecureConnection && globalSettings.UseHttps)
                 ? ":" + request.ServerVariables["SERVER_PORT"]
                 : "";
 
-            var useSsl = GlobalSettings.UseSSL || port == "443";
+            var useSsl = globalSettings.UseHttps || port == "443";
             var ssl = useSsl ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 

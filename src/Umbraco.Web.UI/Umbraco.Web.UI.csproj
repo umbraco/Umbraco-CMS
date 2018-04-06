@@ -21,6 +21,16 @@
     </NuGetPackageImportStamp>
     <Use64BitIISExpress />
     <TargetFrameworkProfile />
+    <!-- 
+      for some weird reason, and because Web.config is created only during BeforeBuild,
+      the web.config configuration file would not be picked, and the build system would
+      try to use a traditional app.config, thus missing all the binding redirects.
+      
+      this ensures that the build system things that the config file is web.config.
+      
+      (see FindAppConfigFile target in detailed build output)
+    -->
+    <AppConfig>Web.config</AppConfig>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -109,9 +119,6 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.4" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.4" />
     <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.4" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
-      <Version>2.6.0</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.7.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.7.0" />
     <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="1.0.8" />
@@ -732,8 +739,7 @@
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
+  <!-- determine VSToolsPath -->
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>
@@ -741,15 +747,26 @@
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0</VSToolsPath>
   </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- determine WebPublishingTasks -->
   <PropertyGroup>
-    <PreBuildEvent>REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
-REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
+  <!-- get TransformXml task from WebPublishingtasks -->
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
+  <!-- get NuGet packages directory -->
+  <PropertyGroup>
+    <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
+  </PropertyGroup>
+  
+  <!-- import targets -->
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  
+  <!-- web project -->
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
@@ -768,35 +785,31 @@ REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x8
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <!-- go figure where WebPublishingTasks live -->
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v12.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v11.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(WebPublishingTasks) == '' and Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll')">
-    <WebPublishingTasks>$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-  </PropertyGroup>
-  <!-- load TransformXml task from WebPublishingtasks -->
-  <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
   <Target Name="BeforeBuild">
     <Message Text="-BeforeBuild-" Importance="high" />
     <Message Text="MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="high" />
-    <Message Text="WebPublishingTasks: $(WebPublishingTasks)" Importance="high" />
+    <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
+    <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
+    <Message Text="NuGetPackages:         $(NuGetPackages)" Importance="high" />
+    <!-- copy SqlCe -->
+    <ItemGroup>
+      <SqlCE64 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\amd64\*.*" />
+      <SqlCE86 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\x86\*.*" />
+    </ItemGroup>
+    <Message Text="Copy SqlCe files to $(TargetDir)" Importance="high" />
+    <Copy SourceFiles="@(SqlCe64)" DestinationFolder="$(TargetDir)amd64" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SqlCe86)" DestinationFolder="$(TargetDir)x86" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     <!-- Create web.config file from Template if it doesn't exist -->
+    <Message Text="Copy Web.Template.config to Web.config" Importance="high" Condition="!Exists('$(ProjectDir)Web.config')" />
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
     <!-- Transform the local Web.config file in Visual Studio -->
+    <Message Text="Transform Web.config with web.Template.$(Configuration).config into Web.$(Configuration).config.transformed (this is Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) == true" />
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
+    <Message Text="Transform Web.Template.config with web.Template.$(Configuration).config into Web.$(Configuration).config.transformed (this is not Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) != true" />
     <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
+    <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <!-- Build Belle, if building is Visual Studio and the build folder does not exist yet -->
     <Message Text="Skip Belle because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)." Importance="High" Condition="'$(UmbracoBuild)' != ''" />
@@ -804,7 +817,7 @@ REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x8
     <Message Text="Build Belle because UmbracoBuild is empty (this is Visual Studio), and $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)Umbraco\lib') and '$(UmbracoBuild)' == ''" />
   </Target>
-  <!-- Clean Belle when cleaning and rebuilding, but only in Visual Studio -->
+  <!-- clean Belle when cleaning and rebuilding, but only in Visual Studio -->
   <Target Name="CleanBelle" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
     <Message Text="-CleanBelle-" Importance="high" />
     <Message Text="Nothing to clean, as $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib')" />
@@ -816,20 +829,21 @@ REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x8
   </Target>
   <Target Name="AfterBuild">
     <Message Text="-AfterBuild-" Importance="high" />
+    <Message Text="Copy Web.$(Configuration).config.transformed over to Web.config (this is Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) == true" />
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
     <Copy Condition="'$(BuildingInsideVisualStudio)' == 'true'" SourceFiles="$(ProjectDir)..\Umbraco.Compat7\bin\$(Configuration)\Umbraco.Compat7.dll" DestinationFolder="$(ProjectDir)bin" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
   <Target Name="BelleBuild">
     <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = &amp;&quot;$pwd\build\build.ps1&quot; -get ; $ubuild.CompileBelle() }&quot;" />
   </Target>
-  <ItemGroup>
-    <!-- every *.config (recursive) files xcept web[.*].config -->
-    <!-- beware! includes any rogue git-ignored or temp config file -->
-    <ConfigFiles Include="$(ProjectDir)**\*.config" Exclude="$(ProjectDir)web.config;$(ProjectDir)web.*.config" />
-    <!-- and the UI file -->
-    <ConfigFiles Include="$(ProjectDir)umbraco\config\create\UI.xml" />
-  </ItemGroup>
   <Target Name="ResetConfigFiles" Condition="'$(WebProjectOutputDir)' != ''" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
+    <ItemGroup>
+      <!-- every *.config (recursive) files xcept web[.*].config -->
+      <!-- beware! includes any rogue git-ignored or temp config file -->
+      <ConfigFiles Include="$(ProjectDir)**\*.config" Exclude="$(ProjectDir)web.config;$(ProjectDir)web.*.config" />
+      <!-- and the UI file -->
+      <ConfigFiles Include="$(ProjectDir)umbraco\config\create\UI.xml" />
+    </ItemGroup>
     <PropertyGroup>
       <!-- the original file eg src/.../umbracoSettings.config -->
       <OriginalFileName>@(ConfigFiles)</OriginalFileName>

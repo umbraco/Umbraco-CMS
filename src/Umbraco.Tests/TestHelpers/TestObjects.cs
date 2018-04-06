@@ -9,6 +9,7 @@ using NPoco;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -89,13 +90,14 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// Gets a ServiceContext.
         /// </summary>
-        /// <param name="repositoryFactory">A repository factory.</param>
-        /// <param name="dbUnitOfWorkProvider">A database unit of work provider.</param>
+        /// <param name="scopeAccessor"></param>
         /// <param name="cache">A cache.</param>
         /// <param name="logger">A logger.</param>
+        /// <param name="globalSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
         /// <param name="urlSegmentProviders">Some url segment providers.</param>
         /// <param name="container">A container.</param>
+        /// <param name="scopeProvider"></param>
         /// <returns>A ServiceContext.</returns>
         /// <remarks>Should be used sparingly for integration tests only - for unit tests
         /// just mock the services to be passed to the ctor of the ServiceContext.</remarks>
@@ -103,6 +105,7 @@ namespace Umbraco.Tests.TestHelpers
             IScopeProvider scopeProvider, IScopeAccessor scopeAccessor,
             CacheHelper cache,
             ILogger logger,
+            IGlobalSettings globalSettings,
             IEventMessagesFactory eventMessagesFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
             IServiceFactory container = null)
@@ -156,10 +159,10 @@ namespace Umbraco.Tests.TestHelpers
             var runtimeState = Mock.Of<IRuntimeState>();
             var idkMap = new IdkMap(scopeProvider);
 
-            var userService = GetLazyService<IUserService>(container, c => new UserService(scopeProvider, logger, eventMessagesFactory, runtimeState, GetRepo<IUserRepository>(c), GetRepo<IUserGroupRepository>(c)));
+            var userService = GetLazyService<IUserService>(container, c => new UserService(scopeProvider, logger, eventMessagesFactory, runtimeState, GetRepo<IUserRepository>(c), GetRepo<IUserGroupRepository>(c),globalSettings));
             var dataTypeService = GetLazyService<IDataTypeService>(container, c => new DataTypeService(scopeProvider, logger, eventMessagesFactory, GetRepo<IDataTypeRepository>(c), GetRepo<IDataTypeContainerRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IContentTypeRepository>(c)));
             var contentService = GetLazyService<IContentService>(container, c => new ContentService(scopeProvider, logger, eventMessagesFactory, mediaFileSystem, GetRepo<IDocumentRepository>(c), GetRepo<IEntityRepository>(c), GetRepo<IAuditRepository>(c), GetRepo<IContentTypeRepository>(c), GetRepo<IDocumentBlueprintRepository>(c)));
-            var notificationService = GetLazyService<INotificationService>(container, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, logger, GetRepo<INotificationsRepository>(c)));
+            var notificationService = GetLazyService<INotificationService>(container, c => new NotificationService(scopeProvider, userService.Value, contentService.Value, logger, GetRepo<INotificationsRepository>(c),globalSettings));
             var serverRegistrationService = GetLazyService<IServerRegistrationService>(container, c => new ServerRegistrationService(scopeProvider, logger, eventMessagesFactory, GetRepo<IServerRegistrationRepository>(c)));
             var memberGroupService = GetLazyService<IMemberGroupService>(container, c => new MemberGroupService(scopeProvider, logger, eventMessagesFactory, GetRepo<IMemberGroupRepository>(c)));
             var memberService = GetLazyService<IMemberService>(container, c => new MemberService(scopeProvider, logger, eventMessagesFactory, memberGroupService.Value, mediaFileSystem, GetRepo<IMemberRepository>(c), GetRepo<IMemberTypeRepository>(c), GetRepo<IMemberGroupRepository>(c), GetRepo<IAuditRepository>(c)));

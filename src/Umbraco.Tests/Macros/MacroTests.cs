@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Macros
                 new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
             //Current.ApplicationContext = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
-            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefault());
+            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefaultUmbracoSettings());
         }
 
         [TestCase("123", "IntProp", typeof(int))]

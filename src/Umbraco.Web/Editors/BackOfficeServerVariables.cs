@@ -32,14 +32,16 @@ namespace Umbraco.Web.Editors
         private readonly UrlHelper _urlHelper;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
+        private readonly IGlobalSettings _globalSettings;
         private readonly HttpContextBase _httpContext;
         private readonly IOwinContext _owinContext;
 
-        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features)
+        internal BackOfficeServerVariables(UrlHelper urlHelper, IRuntimeState runtimeState, UmbracoFeatures features, IGlobalSettings globalSettings)
         {
             _urlHelper = urlHelper;
             _runtimeState = runtimeState;
             _features = features;
+            _globalSettings = globalSettings;
             _httpContext = _urlHelper.RequestContext.HttpContext;
             _owinContext = _httpContext.GetOwinContext();
         }
@@ -295,7 +297,7 @@ namespace Umbraco.Web.Editors
                 {
                     "umbracoSettings", new Dictionary<string, object>
                     {
-                        {"umbracoPath", GlobalSettings.Path},
+                        {"umbracoPath", _globalSettings.Path},
                         {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
                         {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                         {

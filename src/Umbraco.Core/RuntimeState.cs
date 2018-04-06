@@ -103,14 +103,15 @@ namespace Umbraco.Core
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
         /// </summary>
+        /// <param name="globalSettings"></param>
         /// <param name="request"></param>
         /// <param name="settings"></param>
-        internal void EnsureApplicationUrl(HttpRequestBase request = null, IUmbracoSettingsSection settings = null)
+        internal void EnsureApplicationUrl(IUmbracoSettingsSection settings, IGlobalSettings globalSettings, HttpRequestBase request = null)
         {
             // see U4-10626 - in some cases we want to reset the application url
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
-            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request);
+            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request, globalSettings);
             var change = url != null && !_applicationUrls.Contains(url);
             if (change)
             {
@@ -119,7 +120,7 @@ namespace Umbraco.Core
             }
 
             if (ApplicationUrl != null && !change) return;
-            ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, request, settings));
+            ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, globalSettings, settings, request));
         }
 
         private readonly ManualResetEventSlim _runLevel = new ManualResetEventSlim(false);

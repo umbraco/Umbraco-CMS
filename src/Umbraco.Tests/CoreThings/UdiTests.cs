@@ -12,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Deploy;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -23,7 +24,9 @@ namespace Umbraco.Tests.CoreThings
         {
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IServiceContainer>();
-            container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(new TypeLoader(NullCacheProvider.Instance, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(
+                new TypeLoader(NullCacheProvider.Instance, globalSettings, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             Current.Container = container.Object;
 
             Udi.ResetUdiTypes();

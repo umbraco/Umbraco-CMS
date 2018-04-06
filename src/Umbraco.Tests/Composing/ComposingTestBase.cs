@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Composing
 {
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Composing
         {
             ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
 
-            TypeLoader = new TypeLoader(NullCacheProvider.Instance, ProfilingLogger, detectChanges: false)
+            TypeLoader = new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), ProfilingLogger, detectChanges: false)
             {
                 AssembliesToScan = AssembliesToScan
             };

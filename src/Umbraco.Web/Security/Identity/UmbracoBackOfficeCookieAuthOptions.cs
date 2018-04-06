@@ -14,50 +14,34 @@ namespace Umbraco.Web.Security.Identity
     /// </summary>
     public sealed class UmbracoBackOfficeCookieAuthOptions : CookieAuthenticationOptions
     {
-        public int LoginTimeoutMinutes { get; private set; }
-
-        public UmbracoBackOfficeCookieAuthOptions()
-            : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
-        {
-        }
-
+        public int LoginTimeoutMinutes { get; }
+        
         public UmbracoBackOfficeCookieAuthOptions(
             string[] explicitPaths,
+            IUmbracoContextAccessor umbracoContextAccessor,
             ISecuritySection securitySection,
-            int loginTimeoutMinutes,
-            bool forceSsl,
-            bool useLegacyFormsAuthDataFormat = true)
+            IGlobalSettings globalSettings,
+            IRuntimeState runtimeState,
+            ISecureDataFormat<AuthenticationTicket> secureDataFormat)
         {
-            LoginTimeoutMinutes = loginTimeoutMinutes;
+            var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
+            LoginTimeoutMinutes = globalSettings.TimeOutInMinutes;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
-
-            if (useLegacyFormsAuthDataFormat)
-            {
-                //If this is not explicitly set it will fall back to the default automatically
-                TicketDataFormat = new FormsAuthenticationSecureDataFormat(LoginTimeoutMinutes);
-            }
-
+            
             SlidingExpiration = true;
             ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);
             CookieDomain = securitySection.AuthCookieDomain;
             CookieName = securitySection.AuthCookieName;
             CookieHttpOnly = true;
-            CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
+            CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
             CookiePath = "/";
 
+            TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
+
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(Current.UmbracoContextAccessor, Current.RuntimeState, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, explicitPaths);
         }
-
-        public UmbracoBackOfficeCookieAuthOptions(
-            ISecuritySection securitySection,
-            int loginTimeoutMinutes,
-            bool forceSsl,
-            bool useLegacyFormsAuthDataFormat = true)
-            : this(null, securitySection, loginTimeoutMinutes, forceSsl, useLegacyFormsAuthDataFormat)
-        {
-        }
-
+        
         /// <summary>
         /// Creates the cookie options for saving the auth cookie
         /// </summary>
@@ -66,8 +50,8 @@ namespace Umbraco.Web.Security.Identity
         /// <returns></returns>
         public CookieOptions CreateRequestCookieOptions(IOwinContext ctx, AuthenticationTicket ticket)
         {
-            if (ctx == null) throw new ArgumentNullException("ctx");
-            if (ticket == null) throw new ArgumentNullException("ticket");
+            if (ctx == null) throw new ArgumentNullException(nameof(ctx));
+            if (ticket == null) throw new ArgumentNullException(nameof(ticket));
 
             var issuedUtc = ticket.Properties.IssuedUtc ?? SystemClock.UtcNow;
             var expiresUtc = ticket.Properties.ExpiresUtc ?? issuedUtc.Add(ExpireTimeSpan);

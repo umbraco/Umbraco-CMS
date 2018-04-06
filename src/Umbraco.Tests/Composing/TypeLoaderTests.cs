@@ -12,6 +12,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PropertyEditors;
 
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Composing
         public void Initialize()
         {
             // this ensures it's reset
-            _typeLoader = new TypeLoader(NullCacheProvider.Instance, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            _typeLoader = new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             foreach (var file in Directory.GetFiles(IOHelper.MapPath("~/App_Data/TEMP/TypesCache")))
                 File.Delete(file);
@@ -146,7 +147,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void Detect_Legacy_Plugin_File_List()
         {
-            var filePath = TypeLoader.GetTypesListFilePath();
+            var filePath = _typeLoader.GetTypesListFilePath();
             var fileDir = Path.GetDirectoryName(filePath);
             Directory.CreateDirectory(fileDir);
 

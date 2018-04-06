@@ -58,9 +58,9 @@ namespace Umbraco.Web.Editors
                 var cookie = new CookieHeaderValue("UMB_UPDCHK", "1")
                     {
                         Path = "/",
-                        Expires = DateTimeOffset.Now.AddDays(GlobalSettings.VersionCheckPeriod),
+                        Expires = DateTimeOffset.Now.AddDays(UmbracoConfig.For.GlobalSettings().VersionCheckPeriod),
                         HttpOnly = true,
-                        Secure = GlobalSettings.UseSSL
+                        Secure = UmbracoConfig.For.GlobalSettings().UseHttps
                     };
                 context.Response.Headers.AddCookies(new[] { cookie });
             }

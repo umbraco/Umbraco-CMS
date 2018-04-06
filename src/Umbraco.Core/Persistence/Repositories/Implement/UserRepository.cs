@@ -27,29 +27,33 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class UserRepository : NPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IMapperCollection _mapperCollection;
+        private readonly IGlobalSettings _globalSettings;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="work"></param>
+        /// <param name="scopeAccessor"></param>
         /// <param name="cacheHelper"></param>
         /// <param name="logger"></param>
-        /// <param name="passwordConfig">
+        /// <param name="mapperCollection">
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
-        public UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection)
+        /// <param name="globalSettings"></param>
+        public UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
             : base(scopeAccessor, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
+            _globalSettings = globalSettings;
         }
 
         // for tests
-        internal UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig)
+        internal UserRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
             : base(scopeAccessor, cacheHelper, logger)
         {
             _mapperCollection = mapperCollection;
+            _globalSettings = globalSettings;
             _passwordConfigJson = JsonConvert.SerializeObject(passwordConfig);
             _passwordConfigInitialized = true;
         }
@@ -192,7 +196,7 @@ ORDER BY colName";
                 return false;
 
             //now detect if there's been a timeout
-            if (DateTime.UtcNow - found.LastValidatedUtc > TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes))
+            if (DateTime.UtcNow - found.LastValidatedUtc > TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes))
             {
                 //timeout detected, update the record
                 ClearLoginSession(sessionId);

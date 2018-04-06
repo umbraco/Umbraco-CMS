@@ -31,10 +31,9 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            SettingsForTests.UmbracoPath = "~/umbraco";
-
             WebRuntimeComponent.CreateRoutes(
                 new TestUmbracoContextAccessor(),
+                TestObjects.GetGlobalSettings(),
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
                 new UmbracoApiControllerTypeCollection(Enumerable.Empty<Type>()));
         }
@@ -71,7 +70,7 @@ namespace Umbraco.Tests.Routing
             var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(Current.TypeLoader.GetUmbracoApiControllers());
             Container.RegisterInstance(umbracoApiControllerTypes);
 
-            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefault()));
+            Container.RegisterSingleton<IShortStringHelper>(_ => new DefaultShortStringHelper(SettingsForTests.GetDefaultUmbracoSettings()));
         }
 
         public override void TearDown()

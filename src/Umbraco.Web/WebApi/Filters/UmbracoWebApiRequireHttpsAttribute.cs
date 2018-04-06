@@ -23,7 +23,7 @@ namespace Umbraco.Web.WebApi.Filters
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             var request = actionContext.Request;
-            if (GlobalSettings.UseSSL && request.RequestUri.Scheme != Uri.UriSchemeHttps)
+            if (UmbracoConfig.For.GlobalSettings().UseHttps && request.RequestUri.Scheme != Uri.UriSchemeHttps)
             {
                 HttpResponseMessage response;
                 var uri = new UriBuilder(request.RequestUri)

@@ -28,12 +28,12 @@ namespace Umbraco.Core.Security
     {
         public const string CookieName = "UMB_UCONTEXT_C";
         
-        public static async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidateIdentityContext context)
+        public static async Task ValidateSessionAsync(TimeSpan validateInterval, CookieValidateIdentityContext context, IGlobalSettings globalSettings)
         {
-            if (context.Request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false)
+            if (context.Request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, globalSettings) == false)
                 return;
             
-            var valid = await ValidateSessionAsync(validateInterval, context.OwinContext, context.Options.CookieManager, context.Options.SystemClock, context.Properties.IssuedUtc, context.Identity);
+            var valid = await ValidateSessionAsync(validateInterval, context.OwinContext, context.Options.CookieManager, context.Options.SystemClock, context.Properties.IssuedUtc, context.Identity, globalSettings);
 
             if (valid == false)
             {
@@ -48,7 +48,8 @@ namespace Umbraco.Core.Security
             ICookieManager cookieManager,
             ISystemClock systemClock,
             DateTimeOffset? authTicketIssueDate,
-            ClaimsIdentity currentIdentity)
+            ClaimsIdentity currentIdentity,
+            IGlobalSettings globalSettings)
         {
             if (owinCtx == null) throw new ArgumentNullException("owinCtx");
             if (cookieManager == null) throw new ArgumentNullException("cookieManager");
@@ -107,7 +108,7 @@ namespace Umbraco.Core.Security
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = GlobalSettings.UseSSL || owinCtx.Request.IsSecure,
+                    Secure = globalSettings.UseHttps || owinCtx.Request.IsSecure,
                     Path = "/"
                 });
 

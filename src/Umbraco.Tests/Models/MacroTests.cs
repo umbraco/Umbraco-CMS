@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public void Init()
         {
-            var config = SettingsForTests.GetDefault();
+            var config = SettingsForTests.GetDefaultUmbracoSettings();
             SettingsForTests.ConfigureSettings(config);
         }
 

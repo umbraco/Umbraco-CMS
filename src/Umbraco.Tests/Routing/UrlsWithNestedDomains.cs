@@ -28,10 +28,12 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void DoNotPolluteCache()
         {
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(true);
 
@@ -40,7 +42,10 @@ namespace Umbraco.Tests.Routing
             const string url = "http://domain1.com/1001-1/1001-1-1";
 
             // get the nice url for 100111
-            var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new [] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new []
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
             Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
 
             // check that the proper route has been cached

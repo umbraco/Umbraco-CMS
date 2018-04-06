@@ -6,11 +6,13 @@ using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Security;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Security;
 using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.UI.Pages
@@ -85,7 +87,7 @@ namespace Umbraco.Web.UI.Pages
             //If this is not a back office request, then the module won't have authenticated it, in this case we
             // need to do the auth manually and since this is an UmbracoEnsuredPage, this is the anticipated behavior
             // TODO: When we implement Identity, this process might not work anymore, will be an interesting challenge
-            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false)
+            if (Context.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, UmbracoConfig.For.GlobalSettings()) == false)
             {
                 var http = new HttpContextWrapper(Context);
                 var ticket = http.GetUmbracoAuthTicket();

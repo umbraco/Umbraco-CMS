@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.HealthCheck.Checks.DataIntegrity;
 using LightInject;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 
@@ -27,8 +28,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetInstance<UrlSegmentProviderCollection>(),
                 factory.GetInstance<IPublishedSnapshotAccessor>(),
-                factory.GetInstance<IDocumentRepository>(), factory.GetInstance<IMediaRepository>(), factory.GetInstance<IMemberRepository>(),
+                factory.GetInstance<IDocumentRepository>(),
+                factory.GetInstance<IMediaRepository>(),
+                factory.GetInstance<IMemberRepository>(),
                 factory.GetInstance<ILogger>(),
+                factory.GetInstance<IGlobalSettings>(),
                 factory.GetInstance<MainDom>()));
 
             // add the Xml cache health check (hidden from type finder)

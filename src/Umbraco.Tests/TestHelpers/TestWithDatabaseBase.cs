@@ -134,7 +134,9 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             // ensure the configuration matches the current version for tests
-            SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.ConfigurationStatus).Returns(UmbracoVersion.Current.ToString(3));
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             using (ProfilingLogger.TraceDuration<TestWithDatabaseBase>("Initialize database."))
             {
@@ -247,22 +249,25 @@ namespace Umbraco.Tests.TestHelpers
             var cache = NullCacheProvider.Instance;
 
             ContentTypesCache = new PublishedContentTypeCache(
-                Current.Services.ContentTypeService,
-                Current.Services.MediaTypeService,
-                Current.Services.MemberTypeService,
+                Container.GetInstance<IContentTypeService>(),
+                Container.GetInstance<IMediaTypeService>(),
+                Container.GetInstance<IMemberTypeService>(),
                 Container.GetInstance<IPublishedContentTypeFactory>(),
-                Current.Logger);
+                Logger);
 
             // testing=true so XmlStore will not use the file nor the database
 
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var service = new PublishedSnapshotService(
-                Current.Services,
+                ServiceContext,
                 Container.GetInstance<IPublishedContentTypeFactory>(),
-                (ScopeProvider) Current.ScopeProvider,
+                ScopeProvider,
                 cache, publishedSnapshotAccessor,
-                Current.Container.GetInstance<IDocumentRepository>(), Current.Container.GetInstance<IMediaRepository>(), Current.Container.GetInstance<IMemberRepository>(),
-                Current.Logger, ContentTypesCache, null, true, Options.PublishedRepositoryEvents);
+                Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
+                Logger,
+                Container.GetInstance<IGlobalSettings>(),
+                ContentTypesCache,
+                null, true, Options.PublishedRepositoryEvents);
 
             // initialize PublishedCacheService content with an Xml source
             service.XmlStore.GetXmlDocument = () =>
@@ -331,14 +336,14 @@ namespace Umbraco.Tests.TestHelpers
             }
             catch (Exception ex)
             {
-                Core.Composing.Current.Logger.Error<TestWithDatabaseBase>("Could not remove the old database file", ex);
+                Logger.Error<TestWithDatabaseBase>("Could not remove the old database file", ex);
 
                 // swallow this exception - that's because a sub class might require further teardown logic
                 onFail?.Invoke(ex);
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
+        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IGlobalSettings globalSettings = null)
         {
             // ensure we have a PublishedCachesService
             var service = PublishedSnapshotService as PublishedSnapshotService;
@@ -358,9 +363,10 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Core.Composing.Current.Services.UserService),
-                umbracoSettings ?? SettingsForTests.GetDefault(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>());
+                new WebSecurity(httpContext, Container.GetInstance<IUserService>(), Container.GetInstance<IGlobalSettings>()),
+                umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
+                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                globalSettings ?? Container.GetInstance<IGlobalSettings>());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

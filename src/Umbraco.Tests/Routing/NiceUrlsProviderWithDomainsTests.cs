@@ -173,15 +173,20 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "/1001-1/")]
         public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
-
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
+            
             SetDomains1();
 
             var currentUri = new Uri(currentUrl);
@@ -204,14 +209,19 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
         public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
 
             SetDomains2();
 
@@ -227,14 +237,19 @@ namespace Umbraco.Tests.Routing
         [TestCase(1002, "http://domain1.com", false, "/1002/")]
         public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
 
             SetDomains3();
 
@@ -256,14 +271,19 @@ namespace Umbraco.Tests.Routing
         [TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
         public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
 
             SetDomains4();
 
@@ -275,14 +295,19 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Nice_Url_DomainsAndCache()
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
             request.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
 
             SetDomains4();
 
@@ -337,14 +362,19 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Nice_Url_Relative_Or_Absolute()
         {
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var requestMock = Mock.Get(settings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
-            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
 
             SetDomains4();
 
@@ -366,11 +396,17 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Nice_Url_Alternate()
         {
-            var settings = SettingsForTests.GenerateMockSettings();
-            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, umbracoSettings: settings, urlProviders: new[] { new DefaultUrlProvider(settings.RequestHandler, Logger) });
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
 
-            SettingsForTests.UseDirectoryUrls = true;
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false); // ignored w/domains
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, umbracoSettings: settings, urlProviders: new[]
+            {
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+            }, globalSettings:globalSettings.Object);
 
             SetDomains5();
 

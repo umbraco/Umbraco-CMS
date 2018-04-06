@@ -35,7 +35,7 @@ namespace Umbraco.Core.Sync
         private readonly object _locko = new object();
         private readonly ProfilingLogger _profilingLogger;
         private readonly ISqlContext _sqlContext;
-        private readonly Lazy<string> _distCacheFilePath = new Lazy<string>(GetDistCacheFilePath);
+        private readonly Lazy<string> _distCacheFilePath;
         private int _lastId = -1;
         private DateTime _lastSync;
         private DateTime _lastPruned;
@@ -46,18 +46,19 @@ namespace Umbraco.Core.Sync
         public DatabaseServerMessengerOptions Options { get; }
 
         public DatabaseServerMessenger(
-            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IScopeProvider scopeProvider, ISqlContext sqlContext, ProfilingLogger proflog, IGlobalSettings globalSettings,
             bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
             ScopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sqlContext = sqlContext;
             _runtime = runtime;
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            Logger = proflog.Logger;
             Options = options ?? throw new ArgumentNullException(nameof(options));
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
+            _distCacheFilePath = new Lazy<string>(() => GetDistCacheFilePath(globalSettings));
         }
 
         protected ILogger Logger { get; }
@@ -522,12 +523,12 @@ namespace Umbraco.Core.Sync
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-        private static string GetDistCacheFilePath()
+        private string GetDistCacheFilePath(IGlobalSettings globalSettings)
         {
             var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
 
             string distCacheFilePath;
-            switch (GlobalSettings.LocalTempStorageLocation)
+            switch (globalSettings.LocalTempStorageLocation)
             {
                 case LocalTempStorage.AspNetTemp:
                     distCacheFilePath = Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData", fileName);

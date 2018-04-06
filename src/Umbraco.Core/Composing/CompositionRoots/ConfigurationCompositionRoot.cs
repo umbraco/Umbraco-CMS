@@ -15,6 +15,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
             container.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
             container.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
+            container.Register(factory => UmbracoConfig.For.GlobalSettings());
 
             // fixme - other sections we need to add?
         }

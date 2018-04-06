@@ -23,7 +23,7 @@ namespace Umbraco.Tests.IO
         public void Setup()
         {
             //init the config singleton
-            var config = SettingsForTests.GetDefault();
+            var config = SettingsForTests.GetDefaultUmbracoSettings();
             SettingsForTests.ConfigureSettings(config);
 
             _container = new ServiceContainer();

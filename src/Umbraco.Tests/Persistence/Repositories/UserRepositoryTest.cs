@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IMapperCollection>());
+            var repository = new UserRepository(accessor, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), Mock.Of<IMapperCollection>(), TestObjects.GetGlobalSettings());
             return repository;
         }
 
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IMapperCollection>());
+                var repository2 = new UserRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
 
                 repository2.Delete(user);
                 

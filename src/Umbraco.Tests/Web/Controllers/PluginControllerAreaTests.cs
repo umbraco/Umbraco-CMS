@@ -14,7 +14,8 @@ namespace Umbraco.Tests.Web.Controllers
         public void Ensure_Same_Area1()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                                                     new PluginControllerArea(new PluginControllerMetadata[]
+                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(),
+                                                         new PluginControllerMetadata[]
                                                          {
                                                             PluginController.GetMetadata(typeof(Plugin1Controller)),
                                                             PluginController.GetMetadata(typeof(Plugin2Controller)),
@@ -26,7 +27,8 @@ namespace Umbraco.Tests.Web.Controllers
         public void Ensure_Same_Area3()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                                                     new PluginControllerArea(new PluginControllerMetadata[]
+                                                     new PluginControllerArea(TestObjects.GetGlobalSettings(),
+                                                         new PluginControllerMetadata[]
                                                          {
                                                             PluginController.GetMetadata(typeof(Plugin1Controller)),
                                                             PluginController.GetMetadata(typeof(Plugin2Controller)),
@@ -37,7 +39,8 @@ namespace Umbraco.Tests.Web.Controllers
         [Test]
         public void Ensure_Same_Area2()
         {
-            var area = new PluginControllerArea(new PluginControllerMetadata[]
+            var area = new PluginControllerArea(TestObjects.GetGlobalSettings(),
+                new PluginControllerMetadata[]
                 {
                     PluginController.GetMetadata(typeof(Plugin1Controller)),
                     PluginController.GetMetadata(typeof(Plugin2Controller))

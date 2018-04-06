@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-
     [DataContract(Name = "auditLog", Namespace = "")]
     public class AuditLog
     {

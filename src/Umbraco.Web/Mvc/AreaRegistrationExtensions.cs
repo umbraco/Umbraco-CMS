@@ -17,6 +17,7 @@ namespace Umbraco.Web.Mvc
         /// Creates a custom individual route for the specified controller plugin. Individual routes
         /// are required by controller plugins to map to a unique URL based on ID.
         /// </summary>
+        /// <param name="globalSettings"></param>
         /// <param name="controllerName"></param>
         /// <param name="controllerType"></param>
         /// <param name="routes">An existing route collection</param>
@@ -38,12 +39,14 @@ namespace Umbraco.Web.Mvc
         /// </param>
         /// <remarks>
         /// </remarks>
-        internal static Route RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
-                                                    string controllerSuffixName, string defaultAction, object defaultId,
-                                                    string umbracoTokenValue = "backoffice",
-                                                    string routeTokens = "{action}/{id}",
-                                                    bool isMvc = true,
-                                                    string areaPathPrefix = "")
+        internal static Route RouteControllerPlugin(this AreaRegistration area,
+            IGlobalSettings globalSettings,
+            string controllerName, Type controllerType, RouteCollection routes,
+            string controllerSuffixName, string defaultAction, object defaultId,
+            string umbracoTokenValue = "backoffice",
+            string routeTokens = "{action}/{id}",
+            bool isMvc = true,
+            string areaPathPrefix = "")
         {
             if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
             if (controllerSuffixName == null) throw new ArgumentNullException(nameof(controllerSuffixName));
@@ -52,12 +55,12 @@ namespace Umbraco.Web.Mvc
             if (routes == null) throw new ArgumentNullException(nameof(routes));
             if (defaultId == null) throw new ArgumentNullException(nameof(defaultId));
 
-            var umbracoArea = GlobalSettings.UmbracoMvcArea;
+            var umbracoArea = globalSettings.GetUmbracoMvcArea();
 
             //routes are explicitly named with controller names and IDs
             var url = umbracoArea + "/" +
-                (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") +
-                area.AreaName + "/" + controllerName + "/" + routeTokens;
+                      (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") +
+                      area.AreaName + "/" + controllerName + "/" + routeTokens;
 
             Route controllerPluginRoute;
             //var meta = PluginController.GetMetadata(controllerType);
@@ -88,12 +91,13 @@ namespace Umbraco.Web.Mvc
                     string.Format("umbraco-{0}-{1}-{2}", "api", area.AreaName, controllerName),
                     //url format
                     url,
-                    new { controller = controllerName, id = defaultId });
+                    new {controller = controllerName, id = defaultId});
                 //web api routes don't set the data tokens object
                 if (controllerPluginRoute.DataTokens == null)
                 {
                     controllerPluginRoute.DataTokens = new RouteValueDictionary();
                 }
+
                 //look in this namespace to create the controller
                 controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
 

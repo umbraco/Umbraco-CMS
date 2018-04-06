@@ -83,7 +83,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         public static string GetSaveFileServicePath(this UrlHelper url)
         {
-            var result = url.Action("SavePartialView", "SaveFile", new {area = GlobalSettings.UmbracoMvcArea});
+            var result = url.Action("SavePartialView", "SaveFile", new {area = UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea()});
             return result.TrimEnd("SavePartialView").EnsureEndsWith('/');
         }
 
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Mvc
         /// <returns></returns>
         public static string GetBulkPublishServicePath(this UrlHelper url)
         {
-            var result = url.Action("PublishDocument", "BulkPublish", new { area = GlobalSettings.UmbracoMvcArea });
+            var result = url.Action("PublishDocument", "BulkPublish", new { area = UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea() });
             return result.TrimEnd("PublishDocument").EnsureEndsWith('/');
         }
 
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Mvc
         /// <returns>The base path of the controller.</returns>
         public static string GetCoreStringsControllerPath(this UrlHelper url)
         {
-            var result = url.Action("ToSafeAlias", "CoreStrings", new { area = GlobalSettings.UmbracoMvcArea });
+            var result = url.Action("ToSafeAlias", "CoreStrings", new { area = UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea() });
             return result.TrimEnd("ToSafeAlias");
         }
     }
