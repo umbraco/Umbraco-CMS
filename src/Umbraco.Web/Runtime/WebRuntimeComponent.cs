@@ -64,9 +64,10 @@ namespace Umbraco.Web.Runtime
 
             composition.Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
 
-            //register the install components if needed
-            if(composition.RuntimeLevel == RuntimeLevel.Install || composition.RuntimeLevel == RuntimeLevel.Upgrade)
-                composition.Container.RegisterFrom<InstallerCompositionRoot>();
+            //register the install components
+            //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
+            //it still needs to use the install controller so we can't do that
+            composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
