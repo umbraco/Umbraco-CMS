@@ -28,14 +28,16 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserGroupRepository _userGroupRepository;
+        private readonly IGlobalSettings _globalSettings;
         private readonly bool _isUpgrading;
 
         public UserService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
-            IUserRepository userRepository, IUserGroupRepository userGroupRepository)
+            IUserRepository userRepository, IUserGroupRepository userGroupRepository, IGlobalSettings globalSettings)
             : base(provider, logger, eventMessagesFactory)
         {
             _userRepository = userRepository;
             _userGroupRepository = userGroupRepository;
+            _globalSettings = globalSettings;
             _isUpgrading = runtimeState.Level == RuntimeLevel.Install || runtimeState.Level == RuntimeLevel.Upgrade;
         }
 
@@ -120,7 +122,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     DefaultToLiveEditing = false,
                     Email = email,
-                    Language = GlobalSettings.DefaultUILanguage,
+                    Language = _globalSettings.DefaultUILanguage,
                     Name = username,
                     RawPasswordValue = passwordValue,
                     Username = username,

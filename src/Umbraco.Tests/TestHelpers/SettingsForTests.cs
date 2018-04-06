@@ -5,11 +5,17 @@ using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.TestHelpers
 {
     public class SettingsForTests
     {
+        public static void ConfigureSettings(IGlobalSettings settings)
+        {
+            UmbracoConfig.For.SetGlobalConfig(settings);
+        }
+
         // umbracoSettings
 
         /// <summary>
@@ -21,11 +27,28 @@ namespace Umbraco.Tests.TestHelpers
             UmbracoConfig.For.SetUmbracoSettings(settings);
         }
 
+        public static IGlobalSettings GenerateMockGlobalSettings()
+        {
+            var config = Mock.Of<IGlobalSettings>(
+                settings =>
+                    settings.ConfigurationStatus == UmbracoVersion.SemanticVersion.ToSemanticString() &&
+                    settings.UseHttps == false &&
+                    settings.HideTopLevelNodeFromPath == false &&
+                    settings.Path == IOHelper.ResolveUrl("~/umbraco") &&
+                    settings.UseDirectoryUrls == true &&
+                    settings.TimeOutInMinutes == 20 &&
+                    settings.DefaultUILanguage == "en" &&
+                    settings.LocalTempStorageLocation == LocalTempStorage.Default &&
+                    settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
+                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls);
+            return config;
+        }
+
         /// <summary>
         /// Returns generated settings which can be stubbed to return whatever values necessary
         /// </summary>
         /// <returns></returns>
-        public static IUmbracoSettingsSection GenerateMockSettings()
+        public static IUmbracoSettingsSection GenerateMockUmbracoSettings()
         {
             var settings = new Mock<IUmbracoSettingsSection>();
 
@@ -68,103 +91,83 @@ namespace Umbraco.Tests.TestHelpers
             return settings.Object;
         }
 
-        // from appSettings
+        //// from appSettings
 
-        private static readonly IDictionary<string, string> SavedAppSettings = new Dictionary<string, string>();
+        //private static readonly IDictionary<string, string> SavedAppSettings = new Dictionary<string, string>();
 
-        static void SaveSetting(string key)
-        {
-            SavedAppSettings[key] = ConfigurationManager.AppSettings[key];
-        }
+        //static void SaveSetting(string key)
+        //{
+        //    SavedAppSettings[key] = ConfigurationManager.AppSettings[key];
+        //}
 
-        static void SaveSettings()
-        {
-            SaveSetting("umbracoHideTopLevelNodeFromPath");
-            SaveSetting("umbracoUseDirectoryUrls");
-            SaveSetting("umbracoPath");
-            SaveSetting("umbracoReservedPaths");
-            SaveSetting("umbracoReservedUrls");
-            SaveSetting("umbracoConfigurationStatus");
-        }
+        //static void SaveSettings()
+        //{
+        //    SaveSetting("umbracoHideTopLevelNodeFromPath");
+        //    SaveSetting("umbracoUseDirectoryUrls");
+        //    SaveSetting("umbracoPath");
+        //    SaveSetting("umbracoReservedPaths");
+        //    SaveSetting("umbracoReservedUrls");
+        //    SaveSetting("umbracoConfigurationStatus");
+        //}
 
-        public static bool HideTopLevelNodeFromPath
-        {
-            get { return GlobalSettings.HideTopLevelNodeFromPath; }
-            set { ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", value ? "true" : "false"); }
-        }
-
-        public static bool UseDirectoryUrls
-        {
-            get { return GlobalSettings.UseDirectoryUrls; }
-            set { ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", value ? "true" : "false"); }
-        }
-
-        public static string UmbracoPath
-        {
-            get { return GlobalSettings.Path; }
-            set { ConfigurationManager.AppSettings.Set("umbracoPath", value); }
-        }
-
-        public static string ReservedPaths
-        {
-            get { return GlobalSettings.ReservedPaths; }
-            set { GlobalSettings.ReservedPaths = value; }
-        }
-
-        public static string ReservedUrls
-        {
-            get { return GlobalSettings.ReservedUrls; }
-            set { GlobalSettings.ReservedUrls = value; }
-        }
-
-        public static string ConfigurationStatus
-        {
-            get { return GlobalSettings.ConfigurationStatus; }
-            set { ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", value); }
-        }
+      
 
         // reset & defaults
 
-        static SettingsForTests()
-        {
-            SaveSettings();
-        }
+        //static SettingsForTests()
+        //{
+        //    //SaveSettings();
+        //}
 
         public static void Reset()
         {
-            ResetUmbracoSettings();
+            ResetSettings();
             GlobalSettings.Reset();
 
-            foreach (var kvp in SavedAppSettings)
-                ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
+            //foreach (var kvp in SavedAppSettings)
+            //    ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
 
-            // set some defaults that are wrong in the config file?!
-            // this is annoying, really
-            HideTopLevelNodeFromPath = false;
+            //// set some defaults that are wrong in the config file?!
+            //// this is annoying, really
+            //HideTopLevelNodeFromPath = false;
         }
 
         /// <summary>
         /// This sets all settings back to default settings
         /// </summary>
-        private static void ResetUmbracoSettings()
+        private static void ResetSettings()
         {
-            ConfigureSettings(GetDefault());
+            _defaultGlobalSettings = null;
+            ConfigureSettings(GetDefaultUmbracoSettings());
+            ConfigureSettings(GetDefaultGlobalSettings());
         }
 
-        private static IUmbracoSettingsSection _defaultSettings;
+        private static IUmbracoSettingsSection _defaultUmbracoSettings;
+        private static IGlobalSettings _defaultGlobalSettings;
 
-        internal static IUmbracoSettingsSection GetDefault()
+        internal static IGlobalSettings GetDefaultGlobalSettings()
         {
-            if (_defaultSettings == null)
+            if (_defaultGlobalSettings == null)
             {
+                _defaultGlobalSettings = GenerateMockGlobalSettings();
+            }
+            return _defaultGlobalSettings;
+        }
+
+        internal static IUmbracoSettingsSection GetDefaultUmbracoSettings()
+        {
+            if (_defaultUmbracoSettings == null)
+            {
+                //TODO: Just make this mocks instead of reading from the config
+
                 var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
 
                 var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = config.FullName };
                 var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-                _defaultSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+                _defaultUmbracoSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
             }
 
-            return _defaultSettings;
+            return _defaultUmbracoSettings;
         }
     }
 }

@@ -13,13 +13,6 @@ namespace Umbraco.Web.WebServices
     /// </summary>
     public abstract class UmbracoAuthorizedWebService : UmbracoWebService
     {
-        protected UmbracoAuthorizedWebService()
-        { }
-
-        protected UmbracoAuthorizedWebService(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
-            : base(umbracoContext, services, appCache)
-        { }
-
         private bool _hasValidated = false;
 
         /// <summary>

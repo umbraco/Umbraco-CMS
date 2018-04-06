@@ -18,13 +18,14 @@ namespace Umbraco.Web.Security.Identity
         
         public UmbracoBackOfficeCookieAuthOptions(
             string[] explicitPaths,
+            IUmbracoContextAccessor umbracoContextAccessor,
             ISecuritySection securitySection,
-            int loginTimeoutMinutes,
-            bool forceSsl,
+            IGlobalSettings globalSettings,
+            IRuntimeState runtimeState,
             ISecureDataFormat<AuthenticationTicket> secureDataFormat)
         {
             var secureDataFormat1 = secureDataFormat ?? throw new ArgumentNullException(nameof(secureDataFormat));
-            LoginTimeoutMinutes = loginTimeoutMinutes;
+            LoginTimeoutMinutes = globalSettings.TimeOutInMinutes;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
             
             SlidingExpiration = true;
@@ -32,13 +33,13 @@ namespace Umbraco.Web.Security.Identity
             CookieDomain = securitySection.AuthCookieDomain;
             CookieName = securitySection.AuthCookieName;
             CookieHttpOnly = true;
-            CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
+            CookieSecure = globalSettings.UseHttps ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
             CookiePath = "/";
 
             TicketDataFormat = new UmbracoSecureDataFormat(LoginTimeoutMinutes, secureDataFormat1);
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(Current.UmbracoContextAccessor, Current.RuntimeState, explicitPaths);
+            CookieManager = new BackOfficeCookieManager(umbracoContextAccessor, runtimeState, globalSettings, explicitPaths);
         }
         
         /// <summary>

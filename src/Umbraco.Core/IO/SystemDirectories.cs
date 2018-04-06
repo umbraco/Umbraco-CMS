@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 
 namespace Umbraco.Core.IO
 {
@@ -66,9 +67,11 @@ namespace Umbraco.Core.IO
                 if (_root != null) return _root;
 
                 var appPath = HttpRuntime.AppDomainAppVirtualPath;
-                if (appPath == "/") appPath = string.Empty;
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (appPath == null || appPath == "/") appPath = string.Empty;
 
                 _root = appPath;
+
                 return _root;
             }
             //Only required for unit tests

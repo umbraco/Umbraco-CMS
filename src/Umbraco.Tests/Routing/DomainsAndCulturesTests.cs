@@ -1,4 +1,5 @@
 ﻿using System;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
@@ -263,7 +264,11 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains1();
 
-            var umbracoContext = GetUmbracoContext(inputUrl);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
             var publishedRouter = CreatePublishedRouter(Container);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
@@ -271,8 +276,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
-
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            
             var finder = new ContentFinderByNiceUrl(Logger);
             var result = finder.TryFindContent(frequest);
 
@@ -310,7 +314,11 @@ namespace Umbraco.Tests.Routing
             // defaults depend on test environment
             expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            var umbracoContext = GetUmbracoContext(inputUrl);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
             var publishedRouter = CreatePublishedRouter(Container);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
@@ -318,7 +326,6 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
 
             // find document
-            SettingsForTests.HideTopLevelNodeFromPath = false;
             var finder = new ContentFinderByNiceUrl(Logger);
             var result = finder.TryFindContent(frequest);
 

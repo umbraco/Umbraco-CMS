@@ -14,6 +14,7 @@ using umbraco;
 
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
@@ -189,7 +190,7 @@ namespace Umbraco.Web.Trees
             {
                 case "UmbClientMgr.appActions().actionDelete()":
                     return Attempt.Succeed(
-                        Core.Configuration.GlobalSettings.Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
+                        UmbracoConfig.For.GlobalSettings().Path.EnsureEndsWith('/') + "views/common/dialogs/legacydelete.html");
             }
 
             return Attempt<string>.Fail();

@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreSame(XmlStore, ((PublishedContentCache) umbracoContext.ContentCache).XmlStore);
 
             // settings
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
@@ -201,7 +201,7 @@ namespace Umbraco.Tests.Scoping
             Assert.AreSame(XmlStore, ((PublishedContentCache)umbracoContext.ContentCache).XmlStore);
 
             // settings
-            var settings = SettingsForTests.GenerateMockSettings();
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.XmlCacheEnabled).Returns(false);
             SettingsForTests.ConfigureSettings(settings);

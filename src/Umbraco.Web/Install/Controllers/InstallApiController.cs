@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.Install.Models;
@@ -18,19 +19,17 @@ namespace Umbraco.Web.Install.Controllers
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ProfilingLogger _proflog;
+        private readonly InstallStepCollection _installSteps;
         private readonly ILogger _logger;
-        private InstallHelper _helper;
 
-        public InstallApiController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, ILogger logger, ProfilingLogger proflog)
+        public InstallApiController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, ProfilingLogger proflog, InstallHelper installHelper, InstallStepCollection installSteps)
         {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (databaseBuilder == null) throw new ArgumentNullException(nameof(databaseBuilder));
-            if (proflog == null) throw new ArgumentNullException(nameof(proflog));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            UmbracoContext = umbracoContext;
-            _databaseBuilder = databaseBuilder;
-            _logger = logger;
-            _proflog = proflog;
+            UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
+            _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
+            _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            _installSteps = installSteps;
+            InstallHelper = installHelper;
+            _logger = _proflog.Logger;
         }
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace Umbraco.Web.Install.Controllers
         /// </summary>
         public UmbracoContext UmbracoContext { get; }
 
-        internal InstallHelper InstallHelper => _helper ?? (_helper = new InstallHelper(UmbracoContext, _databaseBuilder, _logger));
+        internal InstallHelper InstallHelper { get; }
 
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
@@ -57,7 +56,7 @@ namespace Umbraco.Web.Install.Controllers
 
             var steps = new List<InstallSetupStep>();
 
-            var installSteps = InstallHelper.GetStepsForCurrentInstallType().ToArray();
+            var installSteps = _installSteps.GetStepsForCurrentInstallType().ToArray();
 
             //only get the steps that are targetting the current install type
             steps.AddRange(installSteps);
@@ -70,8 +69,7 @@ namespace Umbraco.Web.Install.Controllers
 
         public IEnumerable<Package> GetPackages()
         {
-            var installHelper = new InstallHelper(UmbracoContext, _databaseBuilder, _logger);
-            var starterKits = installHelper.GetStarterKits();
+            var starterKits = InstallHelper.GetStarterKits();
             return starterKits;
         }
 
@@ -94,7 +92,7 @@ namespace Umbraco.Web.Install.Controllers
             while (queue.Count > 0)
             {
                 var item = queue.Dequeue();
-                var step = InstallHelper.GetAllSteps().Single(x => x.Name == item.Name);
+                var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
                 // if this step has any instructions then extract them
                 JToken instruction;
@@ -181,7 +179,7 @@ namespace Umbraco.Web.Install.Controllers
                 if (current.PerformsAppRestart)
                     return item.Name;
 
-                var step = InstallHelper.GetAllSteps().Single(x => x.Name == item.Name);
+                var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
                 // if this step has any instructions then extract them
                 JToken instruction;

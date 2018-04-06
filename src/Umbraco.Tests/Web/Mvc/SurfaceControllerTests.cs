@@ -36,13 +36,15 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Can_Construct_And_Get_Result()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
                 true);
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbracoContext };
@@ -55,13 +57,15 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Umbraco_Context_Not_Null()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
                 true);
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbCtx };
@@ -72,13 +76,15 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Umbraco_Helper_Not_Null()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
                 true);
 
             var controller = new TestSurfaceController { UmbracoContext = umbracoContext };
@@ -95,14 +101,16 @@ namespace Umbraco.Tests.Web.Mvc
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
+            var globalSettings = TestObjects.GetGlobalSettings();
 
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 publishedSnapshotService.Object,
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
                 true);
 
             var helper = new UmbracoHelper(
@@ -130,14 +138,16 @@ namespace Umbraco.Tests.Web.Mvc
         public void Mock_Current_Page()
         {
             var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "AutoLegacy");
+            var globalSettings = TestObjects.GetGlobalSettings();
 
             var umbracoContext = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 new Mock<HttpContextBase>().Object,
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings,
                 true);
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);

@@ -314,6 +314,9 @@ namespace Umbraco.Web.Security
             var owinCtx = http.GetOwinContext();
             var secureFormat = owinCtx.GetUmbracoAuthTicketDataProtector();
 
+            //will only happen in tests
+            if (secureFormat == null) return null;
+
             //get the ticket
             try
             {

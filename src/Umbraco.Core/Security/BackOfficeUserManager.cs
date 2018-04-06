@@ -54,6 +54,7 @@ namespace Umbraco.Core.Security
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
         /// <param name="contentSectionConfig"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
@@ -62,14 +63,16 @@ namespace Umbraco.Core.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig)
+            IContentSection contentSectionConfig,
+            IGlobalSettings globalSettings)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
             if (memberTypeService == null) throw new ArgumentNullException("memberTypeService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
-            var manager = new BackOfficeUserManager(new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, membershipProvider));
+            var manager = new BackOfficeUserManager(
+                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider));
             manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
             return manager;
         }

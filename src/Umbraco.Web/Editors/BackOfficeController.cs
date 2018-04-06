@@ -261,7 +261,7 @@ namespace Umbraco.Web.Editors
         [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
-            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState, _features);
+            var serverVars = new BackOfficeServerVariables(Url, Current.RuntimeState, _features, GlobalSettings);
 
             //cache the result if debugging is disabled
             var result = HttpContext.IsDebuggingEnabled
@@ -355,7 +355,7 @@ namespace Umbraco.Web.Editors
             if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
             if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
 
-            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
+            ViewBag.UmbracoPath = GlobalSettings.GetUmbracoMvcArea();
 
             //check if there is the TempData with the any token name specified, if so, assign to view bag and render the view
             foreach (var tempDataTokenName in TempDataTokenNames)

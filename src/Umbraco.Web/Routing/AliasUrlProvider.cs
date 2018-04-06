@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
@@ -12,6 +14,15 @@ namespace Umbraco.Web.Routing
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
+        private readonly IGlobalSettings _globalSettings;
+        private readonly IRequestHandlerSection _requestConfig;
+
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
+        {
+            _globalSettings = globalSettings;
+            _requestConfig = requestConfig;
+        }
+
         // note - at the moment we seem to accept pretty much anything as an alias
         // without any form of validation ... could even prob. kill the XPath ...
         // ok, this is somewhat experimental and is NOT enabled by default
@@ -79,12 +90,12 @@ namespace Umbraco.Web.Routing
             if (domainUris == null)
             {
                 var uri = new Uri(path, UriKind.Relative);
-                return new[] { UriUtility.UriFromUmbraco(uri).ToString() };
+                return new[] { UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString() };
             }
 
             return domainUris
                 .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
-                .Select(uri => UriUtility.UriFromUmbraco(uri).ToString());
+                .Select(uri => UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
         }
 
         #endregion

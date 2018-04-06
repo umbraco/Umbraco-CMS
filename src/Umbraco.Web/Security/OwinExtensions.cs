@@ -18,7 +18,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal static ISecureDataFormat<AuthenticationTicket> GetUmbracoAuthTicketDataProtector(this IOwinContext owinContext)
         {
-            return owinContext.Get<UmbracoAuthTicketDataProtector>().Protector;
+            var found = owinContext.Get<UmbracoAuthTicketDataProtector>();
+            return found?.Protector;
         }
 
     }

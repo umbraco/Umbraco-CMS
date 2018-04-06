@@ -13,6 +13,8 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Composing;
@@ -27,11 +29,13 @@ namespace Umbraco.Web.Security
     {
         private HttpContextBase _httpContext;
         private readonly IUserService _userService;
+        private readonly IGlobalSettings _globalSettings;
 
-        public WebSecurity(HttpContextBase httpContext, IUserService userService)
+        public WebSecurity(HttpContextBase httpContext, IUserService userService, IGlobalSettings globalSettings)
         {
             _httpContext = httpContext;
             _userService = userService;
+            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -117,7 +121,7 @@ namespace Umbraco.Web.Security
             
             _httpContext.SetPrincipalForRequest(owinCtx.Request.User);
             
-            return TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
+            return TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
         }
         
         /// <summary>
@@ -221,13 +225,18 @@ namespace Umbraco.Web.Security
             var user = CurrentUser;
 
             // Check for console access
-            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
+            if (user == null || (requiresApproval && user.IsApproved == false) || (user.IsLockedOut && RequestIsInUmbracoApplication(_httpContext)))
             {
                 if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                 return ValidateRequestAttempt.FailedNoPrivileges;
             }
             return ValidateRequestAttempt.Success;
 
+        }
+
+        private static bool RequestIsInUmbracoApplication(HttpContextBase context)
+        {
+            return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower(), StringComparison.Ordinal) > -1;
         }
 
         /// <summary>
@@ -238,7 +247,7 @@ namespace Umbraco.Web.Security
         internal ValidateRequestAttempt AuthorizeRequest(bool throwExceptions = false)
         {
             // check for secure connection
-            if (GlobalSettings.UseSSL && _httpContext.Request.IsSecureConnection == false)
+            if (_globalSettings.UseHttps && _httpContext.Request.IsSecureConnection == false)
             {
                 if (throwExceptions) throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;

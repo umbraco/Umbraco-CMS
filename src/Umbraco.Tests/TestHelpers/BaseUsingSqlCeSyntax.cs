@@ -42,6 +42,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var logger = new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>());
             var pluginManager = new TypeLoader(NullCacheProvider.Instance,
+                SettingsForTests.GenerateMockGlobalSettings(),
                 logger,
                 false);
             container.RegisterInstance(pluginManager);

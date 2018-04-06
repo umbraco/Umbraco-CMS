@@ -8,6 +8,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Media;
 using System.IO;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Web.PropertyEditors
 
             //todo cache embed doc
             var xmlConfig = new XmlDocument();
-            xmlConfig.Load(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
+            xmlConfig.Load(IOHelper.GetRootDirectorySafe() + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
 
             foreach (XmlNode node in xmlConfig.SelectNodes("//provider"))
             {

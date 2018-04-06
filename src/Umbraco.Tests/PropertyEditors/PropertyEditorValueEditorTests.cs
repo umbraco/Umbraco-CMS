@@ -25,7 +25,7 @@ namespace Umbraco.Tests.PropertyEditors
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
             container.Register<IShortStringHelper>(_
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefault())));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));
         }
 
         [TearDown]

@@ -53,16 +53,18 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
             _httpContextFactory = new FakeHttpContextFactory("~/Home");
 
-            var settings = SettingsForTests.GenerateMockSettings();
+            var umbracoSettings = SettingsForTests.GenerateMockUmbracoSettings();
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+            SettingsForTests.ConfigureSettings(umbracoSettings);
+            SettingsForTests.ConfigureSettings(globalSettings);
 
-            SettingsForTests.ConfigureSettings(settings);
             _xml = new XmlDocument();
             _xml.LoadXml(GetXml());
             var xmlStore = new XmlStore(() => _xml, null, null, null);
             var cacheProvider = new StaticCacheProvider();
             var domainCache = new DomainCache(ServiceContext.DomainService);
             var publishedShapshot = new Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedShapshot(
-                new PublishedContentCache(xmlStore, domainCache, cacheProvider, ContentTypesCache, null, null),
+                new PublishedContentCache(xmlStore, domainCache, cacheProvider, globalSettings, ContentTypesCache, null, null),
                 new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, cacheProvider, ContentTypesCache),
                 new PublishedMemberCache(null, cacheProvider, Current.Services.MemberService, ContentTypesCache),
                 domainCache);
@@ -72,9 +74,10 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 publishedSnapshotService.Object,
-                new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService),
-                settings,
-                Enumerable.Empty<IUrlProvider>());
+                new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService, globalSettings),
+                umbracoSettings,
+                Enumerable.Empty<IUrlProvider>(),
+                globalSettings);
 
             _cache = _umbracoContext.ContentCache;
         }

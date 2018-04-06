@@ -14,6 +14,7 @@ using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 
 namespace umbraco.presentation.dialogs
@@ -171,9 +172,9 @@ namespace umbraco.presentation.dialogs
                     using (MailMessage mail = new MailMessage(User.Email, Translator.Email))
                     {
                         // populate the message
-                        mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.GetUserCulture(Services.TextService), subjectVars);
+                        mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.GetUserCulture(Services.TextService, UmbracoConfig.For.GlobalSettings()), subjectVars);
                         mail.IsBodyHtml = false;
-                        mail.Body = Services.TextService.Localize("translation/mailBody", Translator.GetUserCulture(Services.TextService), bodyVars);
+                        mail.Body = Services.TextService.Localize("translation/mailBody", Translator.GetUserCulture(Services.TextService, UmbracoConfig.For.GlobalSettings()), bodyVars);
                         try
                         {
                             using (SmtpClient sender = new SmtpClient())

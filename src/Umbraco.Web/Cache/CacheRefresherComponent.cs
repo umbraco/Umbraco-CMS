@@ -233,9 +233,10 @@ namespace Umbraco.Web.Cache
                     Current.UmbracoContextAccessor,
                     httpContext,
                     null,
-                    new WebSecurity(httpContext, Current.Services.UserService),
+                    new WebSecurity(httpContext, Current.Services.UserService, UmbracoConfig.For.GlobalSettings()),
                     UmbracoConfig.For.UmbracoSettings(),
                     Current.UrlProviders,
+                    UmbracoConfig.For.GlobalSettings(),
                     true);
             }
 

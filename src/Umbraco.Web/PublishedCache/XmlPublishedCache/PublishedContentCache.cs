@@ -16,6 +16,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     internal class PublishedContentCache : PublishedCacheBase, IPublishedContentCache
     {
         private readonly ICacheProvider _cacheProvider;
+        private readonly IGlobalSettings _globalSettings;
         private readonly RoutesCache _routesCache;
         private readonly IDomainCache _domainCache;
         private readonly DomainHelper _domainHelper;
@@ -30,12 +31,14 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             XmlStore xmlStore, // an XmlStore containing the master xml
             IDomainCache domainCache, // an IDomainCache implementation
             ICacheProvider cacheProvider, // an ICacheProvider that should be at request-level
+            IGlobalSettings globalSettings,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
             RoutesCache routesCache, // a RoutesCache
             string previewToken) // a preview token string (or null if not previewing)
             : base(previewToken.IsNullOrWhiteSpace() == false)
         {
             _cacheProvider = cacheProvider;
+            _globalSettings = globalSettings;
             _routesCache = routesCache; // may be null for unit-testing
             _contentTypeCache = contentTypeCache;
             _domainCache = domainCache;
@@ -78,7 +81,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             // still have nothing? actually determine the id
-            hideTopLevelNode = hideTopLevelNode ?? GlobalSettings.HideTopLevelNodeFromPath; // default = settings
+            hideTopLevelNode = hideTopLevelNode ?? _globalSettings.HideTopLevelNodeFromPath; // default = settings
             content = content ?? DetermineIdByRoute(preview, route, hideTopLevelNode.Value);
 
             // cache if we have a content and not previewing
@@ -271,7 +274,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-            if (hasDomains == false && GlobalSettings.HideTopLevelNodeFromPath)
+            if (hasDomains == false && _globalSettings.HideTopLevelNodeFromPath)
             {
                 if (node.Parent == null)
                 {

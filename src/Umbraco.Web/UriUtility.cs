@@ -3,6 +3,7 @@ using System.Text;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web
 {
@@ -59,15 +60,15 @@ namespace Umbraco.Web
 
         // maps an internal umbraco uri to a public uri
         // ie with virtual directory, .aspx if required...
-        public static Uri UriFromUmbraco(Uri uri)
+        public static Uri UriFromUmbraco(Uri uri, IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
         {
             var path = uri.GetSafeAbsolutePath();
 
             if (path != "/")
             {
-                if (!GlobalSettings.UseDirectoryUrls)
+                if (!globalSettings.UseDirectoryUrls)
                     path += ".aspx";
-                else if (UmbracoConfig.For.UmbracoSettings().RequestHandler.AddTrailingSlash)
+                else if (requestConfig.AddTrailingSlash)
 				    path = path.EnsureEndsWith("/");
             }
 

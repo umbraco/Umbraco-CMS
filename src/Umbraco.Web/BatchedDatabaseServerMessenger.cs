@@ -5,6 +5,7 @@ using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
@@ -25,9 +26,9 @@ namespace Umbraco.Web
         private readonly IUmbracoDatabaseFactory _databaseFactory;
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, ILogger logger, ProfilingLogger proflog,
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, ProfilingLogger proflog, IGlobalSettings globalSettings,
             bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(runtime, scopeProvider, sqlContext, logger, proflog, enableDistCalls, options)
+            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, enableDistCalls, options)
         {
             _databaseFactory = databaseFactory;
         }

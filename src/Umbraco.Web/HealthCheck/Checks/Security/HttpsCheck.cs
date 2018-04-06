@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck.Checks.Config;
@@ -19,13 +20,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
+        private readonly IGlobalSettings _globalSettings;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime)
+        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings)
         {
             _textService = textService;
             _runtime = runtime;
+            _globalSettings = globalSettings;
         }
 
         /// <summary>
@@ -144,7 +147,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckHttpsConfigurationSetting()
         {
-            var httpsSettingEnabled = Core.Configuration.GlobalSettings.UseSSL;
+            var httpsSettingEnabled = _globalSettings.UseHttps;
             var uri = _runtime.ApplicationUrl;
             var actions = new List<HealthCheckAction>();
 

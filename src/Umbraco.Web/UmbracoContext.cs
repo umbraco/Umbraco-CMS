@@ -16,35 +16,38 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
+        private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedShapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
 
         #region Ensure Context
 
-        /// <summary>
-        /// Ensures that there is a "current" UmbracoContext.
-        /// </summary>
+        ///  <summary>
+        ///  Ensures that there is a "current" UmbracoContext.
+        ///  </summary>
+        /// <param name="umbracoContextAccessor"></param>
         /// <param name="httpContext">An http context.</param>
-        /// <param name="publishedSnapshotService">A published snapshot service.</param>
-        /// <param name="webSecurity">A security helper.</param>
-        /// <param name="umbracoSettings">The umbraco settings.</param>
-        /// <param name="urlProviders">Some url providers.</param>
+        ///  <param name="publishedSnapshotService">A published snapshot service.</param>
+        ///  <param name="webSecurity">A security helper.</param>
+        ///  <param name="umbracoSettings">The umbraco settings.</param>
+        ///  <param name="urlProviders">Some url providers.</param>
+        /// <param name="globalSettings"></param>
         /// <param name="replace">A value indicating whether to replace the existing context.</param>
-        /// <returns>The "current" UmbracoContext.</returns>
-        /// <remarks>
-        /// fixme - this needs to be clarified
-        ///
-        /// If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
-        /// with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
-        /// creating a context at startup and not being able to access httpContext.Request at that time, so
-        /// the OriginalRequestUrl remains unspecified until <see cref="UmbracoModule"/> replaces the context.
-        ///
-        /// This *has* to be done differently!
-        ///
-        /// See http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        ///
-        /// </remarks>
+        ///  <returns>The "current" UmbracoContext.</returns>
+        ///  <remarks>
+        ///  fixme - this needs to be clarified
+        /// 
+        ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
+        ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
+        ///  creating a context at startup and not being able to access httpContext.Request at that time, so
+        ///  the OriginalRequestUrl remains unspecified until <see cref="UmbracoModule"/> replaces the context.
+        /// 
+        ///  This *has* to be done differently!
+        /// 
+        ///  See http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        /// 
+        ///  </remarks>
         // used by
         // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
         //   in BeginRequest so *late* ie *after* the HttpApplication has started (+ init? check!)
@@ -63,6 +66,7 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
+            IGlobalSettings globalSettings,
             bool replace = false)
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -71,6 +75,7 @@ namespace Umbraco.Web
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
+            if (globalSettings == null) throw new ArgumentNullException(nameof(globalSettings));
 
             // if there is already a current context, return if not replacing
             var current = umbracoContextAccessor.UmbracoContext;
@@ -79,25 +84,26 @@ namespace Umbraco.Web
 
             // create & assign to accessor, dispose existing if any
             umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders);
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings);
         }
 
         // initializes a new instance of the UmbracoContext class
         // internal for unit tests
         // otherwise it's used by EnsureContext above
         // warn: does *not* manage setting any IUmbracoContextAccessor
-        internal UmbracoContext(
-            HttpContextBase httpContext,
+        internal UmbracoContext(HttpContextBase httpContext,
             IPublishedSnapshotService publishedSnapshotService,
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders)
+            IEnumerable<IUrlProvider> urlProviders,
+            IGlobalSettings globalSettings)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
+            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
             // this happens in the Umbraco module since the UmbracoCOntext is added to the HttpContext items.
@@ -270,7 +276,7 @@ namespace Umbraco.Web
         {
             var request = GetRequestFromContext();
             if (request?.Url != null
-                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) == false
+                && request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath, _globalSettings) == false
                 && Security.CurrentUser != null)
             {
                 var previewToken = request.GetPreviewCookieValue(); // may be null or empty

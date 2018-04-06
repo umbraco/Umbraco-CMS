@@ -1,4 +1,5 @@
 ﻿using System;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
@@ -192,11 +193,13 @@ DetermineRouteById(id):
         [TestCase(2006, false, "/x/b/e")]
         public void GetRouteByIdNoHide(int id, bool hide, string expected)
         {
-            var umbracoContext = GetUmbracoContext("/test", 0);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings.Object);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            SettingsForTests.HideTopLevelNodeFromPath = hide;
 
             var route = cache.GetRouteById(false, id);
             Assert.AreEqual(expected, route);
@@ -215,11 +218,13 @@ DetermineRouteById(id):
         [TestCase(2006, true, "/b/e")] // risky!
         public void GetRouteByIdHide(int id, bool hide, string expected)
         {
-            var umbracoContext = GetUmbracoContext("/test", 0);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings.Object);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            SettingsForTests.HideTopLevelNodeFromPath = hide;
 
             var route = cache.GetRouteById(false, id);
             Assert.AreEqual(expected, route);
@@ -228,12 +233,14 @@ DetermineRouteById(id):
         [Test]
         public void GetRouteByIdCache()
         {
-            var umbracoContext = GetUmbracoContext("/test", 0);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            SettingsForTests.HideTopLevelNodeFromPath = false;
-
+            
             var route = cache.GetRouteById(false, 1000);
             Assert.AreEqual("/a", route);
 
@@ -258,11 +265,13 @@ DetermineRouteById(id):
         [TestCase("/x", false, 2000)]
         public void GetByRouteNoHide(string route, bool hide, int expected)
         {
-            var umbracoContext = GetUmbracoContext("/test", 0);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            SettingsForTests.HideTopLevelNodeFromPath = hide;
 
             const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
             var content = cache.GetByRoute(preview, route);
@@ -288,11 +297,13 @@ DetermineRouteById(id):
         [TestCase("/b/c", true, 1002)] // (hence the 2005 collision)
         public void GetByRouteHide(string route, bool hide, int expected)
         {
-            var umbracoContext = GetUmbracoContext("/test", 0);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(hide);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            SettingsForTests.HideTopLevelNodeFromPath = hide;
 
             const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
             var content = cache.GetByRoute(preview, route);
@@ -310,12 +321,14 @@ DetermineRouteById(id):
         [Test]
         public void GetByRouteCache()
         {
-            var umbracoContext = GetUmbracoContext("/test", 0);
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings.Object);
             var cache = umbracoContext.ContentCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            SettingsForTests.HideTopLevelNodeFromPath = false;
-
+            
             var content = cache.GetByRoute(false, "/a/b/c");
             Assert.IsNotNull(content);
             Assert.AreEqual(1002, content.Id);

@@ -25,12 +25,14 @@ namespace Umbraco.Core.Services.Implement
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
         private readonly INotificationsRepository _notificationsRepository;
+        private readonly IGlobalSettings _globalSettings;
         private readonly ILogger _logger;
 
         public NotificationService(IScopeProvider provider, IUserService userService, IContentService contentService, ILogger logger,
-            INotificationsRepository notificationsRepository)
+            INotificationsRepository notificationsRepository, IGlobalSettings globalSettings)
         {
             _notificationsRepository = notificationsRepository;
+            _globalSettings = globalSettings;
             _uowProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -425,7 +427,7 @@ namespace Umbraco.Core.Services.Implement
                     "<tr><td colspan=\"2\" style=\"border-bottom: 1px solid #CCC; font-size: 2px;\">&nbsp;</td></tr>");
             }
 
-            string protocol = GlobalSettings.UseSSL ? "https" : "http";
+            string protocol = _globalSettings.UseHttps ? "https" : "http";
 
 
             string[] subjectVars = {
@@ -471,7 +473,7 @@ namespace Umbraco.Core.Services.Implement
 
             // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
             // adding the server name to make sure we don't replace external links
-            if (GlobalSettings.UseSSL && string.IsNullOrEmpty(mail.Body) == false)
+            if (_globalSettings.UseHttps && string.IsNullOrEmpty(mail.Body) == false)
             {
                 string serverName = http.Request.ServerVariables["SERVER_NAME"];
                 mail.Body = mail.Body.Replace(
@@ -482,9 +484,9 @@ namespace Umbraco.Core.Services.Implement
             return new NotificationRequest(mail, actionName, mailingUser.Name, mailingUser.Email);
         }
 
-        private static string ReplaceLinks(string text, HttpRequestBase request)
+        private string ReplaceLinks(string text, HttpRequestBase request)
         {
-            var sb = new StringBuilder(GlobalSettings.UseSSL ? "https://" : "http://");
+            var sb = new StringBuilder(_globalSettings.UseHttps ? "https://" : "http://");
             sb.Append(request.ServerVariables["SERVER_NAME"]);
             sb.Append(":");
             sb.Append(request.Url.Port);

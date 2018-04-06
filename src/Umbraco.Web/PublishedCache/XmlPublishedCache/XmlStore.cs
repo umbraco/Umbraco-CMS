@@ -43,6 +43,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
+        private readonly IGlobalSettings _globalSettings;
         private XmlStoreFilePersister _persisterTask;
         private volatile bool _released;
         private bool _withRepositoryEvents;
@@ -61,8 +62,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         /// <remarks>The default constructor will boot the cache, load data from file or database, /// wire events in order to manage changes, etc.</remarks>
         public XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
-            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
-            : this(serviceContext, scopeProvider, routesCache, contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository)
+            IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings)
+            : this(serviceContext, scopeProvider, routesCache, contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, false, false, documentRepository, mediaRepository, memberRepository, globalSettings)
         { }
 
         // internal for unit tests
@@ -70,7 +71,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         // fixme - er, we DO have a DB?
         internal XmlStore(ServiceContext serviceContext, IScopeProvider scopeProvider, RoutesCache routesCache, PublishedContentTypeCache contentTypeCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders, IPublishedSnapshotAccessor publishedSnapshotAccessor, MainDom mainDom,
-            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository)
+            bool testing, bool enableRepositoryEvents, IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings)
         {
             if (testing == false)
                 EnsureConfigurationIsValid();
@@ -83,6 +84,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
+            _globalSettings = globalSettings;
+            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(_globalSettings));
             _segmentProviders = segmentProviders;
 
             if (testing)
@@ -107,7 +110,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _xmlFileEnabled = false;
-
+            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(UmbracoConfig.For.GlobalSettings()));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -121,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _memberRepository = memberRepository;
             GetXmlDocument = getXmlDocument ?? throw new ArgumentNullException(nameof(getXmlDocument));
             _xmlFileEnabled = false;
-
+            _xmlFileName = IOHelper.MapPath(SystemFiles.GetContentCacheXml(UmbracoConfig.For.GlobalSettings()));
             // do not plug events, we may not have what it takes to handle them
         }
 
@@ -630,7 +633,7 @@ AND (umbracoNode.id=@id)";
 
         #region File
 
-        private readonly string _xmlFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
+        private readonly string _xmlFileName;
         private DateTime _lastFileRead; // last time the file was read
         private DateTime _nextFileCheck; // last time we checked whether the file was changed
 

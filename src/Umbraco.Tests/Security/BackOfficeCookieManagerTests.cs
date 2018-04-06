@@ -29,11 +29,12 @@ namespace Umbraco.Tests.Security
             var umbracoContext = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
-                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>());
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
+                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(),TestObjects.GetGlobalSettings());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
-            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbracoContext), runtime);
+            var mgr = new BackOfficeCookieManager(
+                Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbracoContext), runtime, TestObjects.GetGlobalSettings());
 
             var result = mgr.ShouldAuthenticateRequest(Mock.Of<IOwinContext>(), new Uri("http://localhost/umbraco"));
 
@@ -46,11 +47,11 @@ namespace Umbraco.Tests.Security
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService),
-                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>());
+                new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
+                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), TestObjects.GetGlobalSettings());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
-            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx), runtime);
+            var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx), runtime, TestObjects.GetGlobalSettings());
 
             var request = new Mock<OwinRequest>();
             request.Setup(owinRequest => owinRequest.Uri).Returns(new Uri("http://localhost/umbraco"));

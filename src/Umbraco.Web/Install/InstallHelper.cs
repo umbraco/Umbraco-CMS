@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
+using LightInject;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -13,61 +15,31 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Services;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
 {
-    internal class InstallHelper
+    public sealed class InstallHelper
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
         private InstallationType? _installationType;
 
-        internal InstallHelper(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, ILogger logger)
+        public InstallHelper(UmbracoContext umbracoContext,
+            DatabaseBuilder databaseBuilder,
+            ILogger logger, IGlobalSettings globalSettings)
         {
             _httpContext = umbracoContext.HttpContext;
             _logger = logger;
+            _globalSettings = globalSettings;
             _databaseBuilder = databaseBuilder;
-        }
-
-        /// <summary>
-        /// Get the installer steps
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// The step order returned here is how they will appear on the front-end if they have views assigned
-        /// </remarks>
-        public IEnumerable<InstallSetupStep> GetAllSteps()
-        {
-            return new List<InstallSetupStep>
-            {
-                // fixme - should NOT use current everywhere here - inject!
-                new NewInstallStep(_httpContext, Current.Services.UserService, _databaseBuilder),
-                new UpgradeStep(),
-                new FilePermissionsStep(),
-                new MajorVersion7UpgradeReport(_databaseBuilder, Current.RuntimeState, Current.SqlContext, Current.ScopeProvider),
-                new Version73FileCleanup(_httpContext, _logger),
-                new ConfigureMachineKey(),
-                new DatabaseConfigureStep(_databaseBuilder),
-                new DatabaseInstallStep(_databaseBuilder, Current.RuntimeState, Current.Logger),
-                new DatabaseUpgradeStep(_databaseBuilder, Current.RuntimeState, Current.Logger),
-                new StarterKitDownloadStep(Current.Services.ContentService, this, Current.UmbracoContext.Security),
-                new StarterKitInstallStep(_httpContext),
-                new StarterKitCleanupStep(),
-                new SetUmbracoVersionStep(_httpContext, _logger, this)
-            };
-        }
-
-        /// <summary>
-        /// Returns the steps that are used only for the current installation type
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<InstallSetupStep> GetStepsForCurrentInstallType()
-        {
-            return GetAllSteps().Where(x => x.InstallTypeTarget.HasFlag(GetInstallationType()));
         }
 
         public InstallationType GetInstallationType()
@@ -109,7 +81,7 @@ namespace Umbraco.Web.Install
                 // Check for current install Id
                 var installId = Guid.NewGuid();
 
-                var installCookie = _httpContext.Request.GetPreviewCookieValue();
+                var installCookie = _httpContext.Request.GetCookieValue(Constants.Web.InstallerCookieName);
                 if (string.IsNullOrEmpty(installCookie) == false)
                 {
                     if (Guid.TryParse(installCookie, out installId))
@@ -119,7 +91,7 @@ namespace Umbraco.Web.Install
                             installId = Guid.NewGuid();
                     }
                 }
-                _httpContext.Response.Cookies.Set(new HttpCookie("umb_installId", "1"));
+                _httpContext.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, "1"));
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
@@ -144,7 +116,7 @@ namespace Umbraco.Web.Install
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
+                _logger.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
             }
         }
 
@@ -175,7 +147,7 @@ namespace Umbraco.Web.Install
             get
             {
                 var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
-                if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
+                if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
                     && _databaseBuilder.IsConnectionStringConfigured(databaseSettings) == false)
                 {
                     //no version or conn string configured, must be a brand new install
@@ -211,7 +183,7 @@ namespace Umbraco.Web.Install
             }
             catch (AggregateException ex)
             {
-                Current.Logger.Error<InstallHelper>("Could not download list of available starter kits", ex);
+                _logger.Error<InstallHelper>("Could not download list of available starter kits", ex);
             }
 
             return packages;

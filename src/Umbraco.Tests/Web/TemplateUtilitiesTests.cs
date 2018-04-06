@@ -36,7 +36,8 @@ namespace Umbraco.Tests.Web
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
             var container = new Mock<IServiceContainer>();
-            container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(new TypeLoader(NullCacheProvider.Instance, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
+            container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
+                new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
             Current.Container = container.Object;
 
@@ -77,15 +78,18 @@ namespace Umbraco.Tests.Web
                     return "/my-test-url";
                 });
 
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+
             using (var umbCtx = UmbracoContext.EnsureContext(
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 //setup a quick mock of the WebRouting section
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 //pass in the custom url provider
                 new[]{ testUrlProvider.Object },
+                globalSettings,
                 true))
             {
                 var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);

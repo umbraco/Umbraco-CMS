@@ -29,14 +29,15 @@ namespace Umbraco.Web
         /// Example: normal back office login or authenticating upgrade login
         /// </param>
         /// <param name="features"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
         /// <remarks>
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings)
         {
-            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features);
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">

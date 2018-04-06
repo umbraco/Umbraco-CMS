@@ -9,17 +9,17 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal class ConfigServerAddress : IServerAddress
     {
-        public ConfigServerAddress(IServer n)
+        public ConfigServerAddress(IServer n, IGlobalSettings globalSettings)
         {
             var webServicesUrl = IOHelper.ResolveUrl(SystemDirectories.WebServices);
 
-            var protocol = GlobalSettings.UseSSL ? "https" : "http";
+            var protocol = globalSettings.UseHttps ? "https" : "http";
             if (n.ForceProtocol.IsNullOrWhiteSpace() == false)
                 protocol = n.ForceProtocol;
             var domain = n.ServerAddress;
             if (n.ForcePortnumber.IsNullOrWhiteSpace() == false)
-                domain += string.Format(":{0}", n.ForcePortnumber);
-            ServerAddress = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, webServicesUrl);
+                domain += $":{n.ForcePortnumber}";
+            ServerAddress = $"{protocol}://{domain}{webServicesUrl}/cacheRefresher.asmx";
         }
 
         public string ServerAddress { get; private set; }

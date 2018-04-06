@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Models.Identity
 {
     public class IdentityProfile : Profile
     {
-        public IdentityProfile(ILocalizedTextService textService, IEntityService entityService)
+        public IdentityProfile(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
         {
             CreateMap<IUser, BackOfficeIdentityUser>()
                 .BeforeMap((src, dest) =>
@@ -25,7 +26,7 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(dest => dest.IsApproved, opt => opt.MapFrom(src => src.IsApproved))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username))
                 .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(user => GetPasswordHash(user.RawPasswordValue)))
-                .ForMember(dest => dest.Culture, opt => opt.MapFrom(src => src.GetUserCulture(textService)))
+                .ForMember(dest => dest.Culture, opt => opt.MapFrom(src => src.GetUserCulture(textService, globalSettings)))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.StartMediaIds, opt => opt.MapFrom(src => src.StartMediaIds))
                 .ForMember(dest => dest.StartContentIds, opt => opt.MapFrom(src => src.StartContentIds))

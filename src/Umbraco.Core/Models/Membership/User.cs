@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Membership
         {
             SessionTimeout = 60;
             _userGroups = new HashSet<IReadOnlyUserGroup>();
-            _language = GlobalSettings.DefaultUILanguage;
+            _language = UmbracoConfig.For.GlobalSettings().DefaultUILanguage; //fixme inject somehow?
             _isApproved = true;
             _isLockedOut = false;
             _startContentIds = new int[] { };

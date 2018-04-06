@@ -29,7 +29,7 @@ namespace Umbraco.Web.WebServices
 
             //todo cache embed doc
             var xmlConfig = new XmlDocument();
-            xmlConfig.Load(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
+            xmlConfig.Load(GlobalSettings.FullPathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
 
             foreach (XmlNode node in xmlConfig.SelectNodes("//provider"))
             {

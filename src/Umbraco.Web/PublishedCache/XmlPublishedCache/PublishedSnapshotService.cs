@@ -2,6 +2,7 @@
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -29,6 +30,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
         private readonly ICacheProvider _requestCache;
+        private readonly IGlobalSettings _globalSettings;
 
         #region Constructors
 
@@ -41,11 +43,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
+            IGlobalSettings globalSettings,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, segmentProviders, publishedSnapshotAccessor,
                 documentRepository, mediaRepository, memberRepository,
-                logger, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
@@ -56,12 +59,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
+            IGlobalSettings globalSettings,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), publishedSnapshotAccessor,
                 documentRepository, mediaRepository, memberRepository,
-                logger, contentTypeCache, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
         private PublishedSnapshotService(ServiceContext serviceContext,
@@ -72,6 +76,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
+            IGlobalSettings globalSettings,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
@@ -82,8 +87,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
 
-            _xmlStore = new XmlStore(serviceContext, scopeProvider, _routesCache, _contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
-                documentRepository, mediaRepository, memberRepository);
+            _xmlStore = new XmlStore(serviceContext, scopeProvider, _routesCache,
+                _contentTypeCache, segmentProviders, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
+                documentRepository, mediaRepository, memberRepository, globalSettings);
 
             _domainService = serviceContext.DomainService;
             _memberService = serviceContext.MemberService;
@@ -91,6 +97,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _userService = serviceContext.UserService;
 
             _requestCache = requestCache;
+            _globalSettings = globalSettings;
         }
 
         public override void Dispose()
@@ -115,7 +122,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
             catch
             {
-                errors = new[] { SystemFiles.ContentCacheXml };
+                errors = new[] { SystemFiles.GetContentCacheXml(_globalSettings) };
                 return false;
             }
         }
@@ -134,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             var domainCache = new DomainCache(_domainService);
 
             return new PublishedShapshot(
-                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _contentTypeCache, _routesCache, previewToken),
+                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),
                 domainCache);

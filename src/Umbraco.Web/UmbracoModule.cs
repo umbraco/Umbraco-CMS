@@ -15,6 +15,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
@@ -38,6 +39,12 @@ namespace Umbraco.Web
         // modules are *not* instanciated by the container so we have to
         // get our dependencies injected manually, through properties, in
         // Init(). works for dependencies that are singletons.
+
+        [Inject]
+        public IUmbracoSettingsSection UmbracoSettings { get; set; }
+
+        [Inject]
+        public IGlobalSettings GlobalSettings { get; set; }
 
         [Inject]
         public IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
@@ -79,7 +86,7 @@ namespace Umbraco.Web
         private void BeginRequest(HttpContextBase httpContext)
         {
             // ensure application url is initialized
-            ((RuntimeState) Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
+            ((RuntimeState) Current.RuntimeState).EnsureApplicationUrl(UmbracoSettings, GlobalSettings, httpContext.Request);
 
             // do not process if client-side request
             if (httpContext.Request.Url.IsClientSideRequest())
@@ -101,9 +108,10 @@ namespace Umbraco.Web
                 UmbracoContextAccessor,
                 httpContext,
                 PublishedSnapshotService,
-                new WebSecurity(httpContext, UserService),
+                new WebSecurity(httpContext, UserService, GlobalSettings),
                 UmbracoConfig.For.UmbracoSettings(),
                 UrlProviders,
+                GlobalSettings,
                 true);
         }
 
@@ -131,7 +139,7 @@ namespace Umbraco.Web
             var umbracoContext = UmbracoContext.Current;
 
             // re-write for the default back office path
-            if (httpContext.Request.Url.IsDefaultBackOfficeRequest())
+            if (httpContext.Request.Url.IsDefaultBackOfficeRequest(GlobalSettings))
             {
                 if (EnsureRuntime(httpContext, umbracoContext.OriginalRequestUrl))
                     RewriteToBackOfficeHandler(httpContext);
@@ -397,7 +405,7 @@ namespace Umbraco.Web
         /// Rewrites to the default back office page.
         /// </summary>
         /// <param name="context"></param>
-        private static void RewriteToBackOfficeHandler(HttpContextBase context)
+        private void RewriteToBackOfficeHandler(HttpContextBase context)
         {
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
             var rewritePath = GlobalSettings.Path.TrimEnd('/') + "/Default";
@@ -423,7 +431,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
-        private static void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
+        private void RewriteToUmbracoHandler(HttpContextBase context, PublishedRequest pcr)
         {
             // NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
             // not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly

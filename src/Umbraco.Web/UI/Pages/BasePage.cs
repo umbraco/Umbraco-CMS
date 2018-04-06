@@ -75,7 +75,7 @@ namespace Umbraco.Web.UI.Pages
         {
             base.OnLoad(e);
 
-            if (Request.IsSecureConnection || GlobalSettings.UseSSL == false) return;
+            if (Request.IsSecureConnection || UmbracoConfig.For.GlobalSettings().UseHttps == false) return;
 
             var serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
             Response.Redirect($"https://{serverName}{Request.FilePath}");

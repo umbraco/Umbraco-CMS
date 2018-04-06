@@ -35,7 +35,6 @@ namespace Umbraco.Core.Runtime
             base.Compose(composition);
 
             // register from roots
-            composition.Container.RegisterFrom<ConfigurationCompositionRoot>();
             composition.Container.RegisterFrom<RepositoryCompositionRoot>();
             composition.Container.RegisterFrom<ServicesCompositionRoot>();
             composition.Container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
@@ -78,7 +77,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<IServerRegistrar>(f =>
             {
                 if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
-                    return new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings(), f.GetInstance<ILogger>());
+                    return new ConfigServerRegistrar(f.GetInstance<IUmbracoSettingsSection>(), f.GetInstance<ILogger>(), f.GetInstance<IGlobalSettings>());
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
                     return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
                 return new DatabaseServerRegistrar(
@@ -94,8 +93,8 @@ namespace Umbraco.Core.Runtime
                     factory.GetInstance<IRuntimeState>(),
                     factory.GetInstance<IScopeProvider>(),
                     factory.GetInstance<ISqlContext>(),
-                    factory.GetInstance<ILogger>(),
                     factory.GetInstance<ProfilingLogger>(),
+                    factory.GetInstance<IGlobalSettings>(),
                     true, new DatabaseServerMessengerOptions()));
 
             composition.Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()

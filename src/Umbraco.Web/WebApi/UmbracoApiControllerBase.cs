@@ -5,6 +5,7 @@ using LightInject;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
@@ -31,6 +32,12 @@ namespace Umbraco.Web.WebApi
         // don't need to implement complex constructors + need to refactor them each time we change ours.
         // this means that these properties have a setter.
         // what can go wrong?
+
+        /// <summary>
+        /// Gets or sets the Umbraco context.
+        /// </summary>
+        [Inject]
+        public virtual IGlobalSettings GlobalSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the Umbraco context.

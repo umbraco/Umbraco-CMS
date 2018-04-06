@@ -84,7 +84,10 @@ namespace Umbraco.Tests.Misc
         {
             ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
 
-            var settings = SettingsForTests.GenerateMockSettings();
+            var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
+            globalConfig.Setup(x => x.UseDirectoryUrls).Returns(directoryUrls);
+
+            var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var requestMock = Mock.Get(settings.RequestHandler);
             requestMock.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
             SettingsForTests.ConfigureSettings(settings);
@@ -93,7 +96,7 @@ namespace Umbraco.Tests.Misc
 
             var expectedUri = NewUri(expectedUrl);
             var sourceUri = NewUri(sourceUrl);
-            var resultUri = UriUtility.UriFromUmbraco(sourceUri);
+            var resultUri = UriUtility.UriFromUmbraco(sourceUri, globalConfig.Object, settings.RequestHandler);
 
             Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
         }

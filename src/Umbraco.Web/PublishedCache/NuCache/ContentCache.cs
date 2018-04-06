@@ -24,20 +24,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ICacheProvider _snapshotCache;
         private readonly ICacheProvider _elementsCache;
         private readonly DomainHelper _domainHelper;
+        private readonly IGlobalSettings _globalSettings;
 
         #region Constructor
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings)
             : base(previewDefault)
         {
             _snapshot = snapshot;
             _snapshotCache = snapshotCache;
             _elementsCache = elementsCache;
             _domainHelper = domainHelper;
+            _globalSettings = globalSettings;
         }
 
-        // fixme - inject settings
-        private static bool HideTopLevelNodeFromPath => GlobalSettings.HideTopLevelNodeFromPath;
+        private bool HideTopLevelNodeFromPath => _globalSettings.HideTopLevelNodeFromPath;
 
         #endregion
 

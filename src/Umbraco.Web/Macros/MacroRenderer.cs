@@ -650,7 +650,7 @@ namespace Umbraco.Web.Macros
                 querystring += $"&umb_{ide.Key}={HttpContext.Current.Server.UrlEncode((ide.Value ?? String.Empty).ToString())}";
 
             // create a new 'HttpWebRequest' object to the mentioned URL.
-            var useSsl = GlobalSettings.UseSSL;
+            var useSsl = UmbracoConfig.For.GlobalSettings().UseHttps;
             var protocol = useSsl ? "https" : "http";
             var currentRequest = HttpContext.Current.Request;
             var serverVars = currentRequest.ServerVariables;

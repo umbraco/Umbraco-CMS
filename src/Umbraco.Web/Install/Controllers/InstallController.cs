@@ -18,17 +18,19 @@ namespace Umbraco.Web.Install.Controllers
     [InstallAuthorize]
     public class InstallController : Controller
     {
-        private readonly DatabaseBuilder _databaseBuilder;
         private readonly UmbracoContext _umbracoContext;
+        private readonly InstallHelper _installHelper;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
 
-        public InstallController(UmbracoContext umbracoContext, DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
+        public InstallController(UmbracoContext umbracoContext, InstallHelper installHelper, IRuntimeState runtime, ILogger logger, IGlobalSettings globalSettings)
         {
             _umbracoContext = umbracoContext;
-            _databaseBuilder = databaseBuilder;
+            _installHelper = installHelper;
             _runtime = runtime;
             _logger = logger;
+            _globalSettings = globalSettings;
         }
 
         [HttpGet]
@@ -62,11 +64,10 @@ namespace Umbraco.Web.Install.Controllers
             // get the base umbraco folder
             ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            var ih = new InstallHelper(_umbracoContext, _databaseBuilder, _logger);
-            ih.InstallStatus(false, "");
+            _installHelper.InstallStatus(false, "");
 
             // always ensure full path (see NOTE in the class remarks)
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "install/views/index.cshtml");
+            return View(_globalSettings.Path.EnsureEndsWith('/') + "install/views/index.cshtml");
         }
     }
 }

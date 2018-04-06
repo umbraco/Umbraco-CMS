@@ -12,10 +12,12 @@ namespace Umbraco.Web.Editors
     public class PreviewController : Controller
     {
         private readonly UmbracoFeatures _features;
+        private readonly IGlobalSettings _globalSettings;
 
-        public PreviewController(UmbracoFeatures features)
+        public PreviewController(UmbracoFeatures features, IGlobalSettings globalSettings)
         {
             _features = features;
+            _globalSettings = globalSettings;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -36,13 +38,13 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
 
         public ActionResult Editors(string editor)
         {
             if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException(nameof(editor));
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
+            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
         }
     }
 }

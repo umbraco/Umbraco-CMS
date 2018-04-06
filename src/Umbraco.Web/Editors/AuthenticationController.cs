@@ -40,6 +40,8 @@ namespace Umbraco.Web.Editors
     [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
+
+        //fixme inject these
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
@@ -304,13 +306,13 @@ namespace Umbraco.Web.Editors
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         //Ensure the culture of the found user is used for the email!
-                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService),
+                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",
                             //Ensure the culture of the found user is used for the email!
-                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
+                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
                         message);
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
@@ -487,7 +489,7 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.UmbracoMvcArea,
+                    area = GlobalSettings.GetUmbracoMvcArea(),
                     u = userId,
                     r = code
                 });

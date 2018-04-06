@@ -58,6 +58,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Matches_Default_Index()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
             //var appCtx = new ApplicationContext(
@@ -67,9 +68,10 @@ namespace Umbraco.Tests.Web.Mvc
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings, 
                 true);
             var ctrl = new MatchesDefaultIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -82,15 +84,17 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Matches_Overriden_Index()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings, 
                 true);
             var ctrl = new MatchesOverriddenIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -103,15 +107,17 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Matches_Custom_Index()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings, 
                 true);
             var ctrl = new MatchesCustomIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -124,15 +130,17 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Matches_Async_Index_Same_Signature()
         {
+            var globalSettings = TestObjects.GetGlobalSettings();
             var attr = new RenderIndexActionSelectorAttribute();
             var req = new RequestContext();
             var umbCtx = UmbracoContext.EnsureContext(
                 Current.UmbracoContextAccessor,
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
-                new Mock<WebSecurity>(null, null).Object,
+                new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
+                globalSettings, 
                 true);
             var ctrl = new MatchesAsyncIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);

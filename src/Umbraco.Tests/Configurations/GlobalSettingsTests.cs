@@ -1,5 +1,6 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -10,26 +11,24 @@ namespace Umbraco.Tests.Configurations
     [TestFixture]
     public class GlobalSettingsTests : BaseWebTest
     {
+        private string _root;
+
         public override void SetUp()
         {
             base.SetUp();
-
-            SettingsForTests.UmbracoPath = "~/umbraco";
+            _root = SystemDirectories.Root;
         }
 
         public override void TearDown()
         {
             base.TearDown();
-
-            //ensure this is reset
-            SystemDirectories.Root = null;
-            SettingsForTests.UmbracoPath = "~/umbraco";
+            SystemDirectories.Root = _root;
         }
 
         [Test]
         public void Is_Debug_Mode()
         {
-            Assert.That(Umbraco.Core.Configuration.GlobalSettings.DebugMode, Is.EqualTo(true));
+            Assert.That(GlobalSettings.DebugMode, Is.EqualTo(true));
         }
 
         [Ignore("fixme - ignored test")]
@@ -46,9 +45,12 @@ namespace Umbraco.Tests.Configurations
         [TestCase("~/some-wacky/nestedPath", "/MyVirtualDir/NestedVDir/", "some-wacky-nestedpath")]
         public void Umbraco_Mvc_Area(string path, string rootPath, string outcome)
         {
-            SettingsForTests.UmbracoPath = path;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.Path).Returns(IOHelper.ResolveUrl(path));
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
+
             SystemDirectories.Root = rootPath;
-            Assert.AreEqual(outcome, Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea);
+            Assert.AreEqual(outcome, UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea());
         }
 
         [TestCase("/umbraco/umbraco.aspx")]
@@ -61,7 +63,8 @@ namespace Umbraco.Tests.Configurations
         [TestCase("/config/splashes/booting.aspx")]
         public void Is_Reserved_Path_Or_Url(string url)
         {
-            Assert.IsTrue(Umbraco.Core.Configuration.GlobalSettings.IsReservedPathOrUrl(url));
+            var globalSettings = TestObjects.GetGlobalSettings();
+            Assert.IsTrue(globalSettings.IsReservedPathOrUrl(url));
         }
 
         [TestCase("/umbraco_client/Tree/treeIcons.css")]
@@ -75,7 +78,8 @@ namespace Umbraco.Tests.Configurations
         [TestCase("/install.aspx")]
         public void Is_Not_Reserved_Path_Or_Url(string url)
         {
-            Assert.IsFalse(Umbraco.Core.Configuration.GlobalSettings.IsReservedPathOrUrl(url));
+            var globalSettings = TestObjects.GetGlobalSettings();
+            Assert.IsFalse(globalSettings.IsReservedPathOrUrl(url));
         }
 
 
@@ -92,8 +96,10 @@ namespace Umbraco.Tests.Configurations
         public void Is_Reserved_By_Route(string url, bool shouldMatch)
         {
             //reset the app config, we only want to test routes not the hard coded paths
-            Umbraco.Core.Configuration.GlobalSettings.ReservedPaths = "";
-            Umbraco.Core.Configuration.GlobalSettings.ReservedUrls = "";
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.ReservedPaths).Returns("");
+            globalSettingsMock.Setup(x => x.ReservedUrls).Returns("");
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
             var routes = new RouteCollection();
 
@@ -112,7 +118,7 @@ namespace Umbraco.Tests.Configurations
 
             Assert.AreEqual(
                 shouldMatch,
-                Umbraco.Core.Configuration.GlobalSettings.IsReservedPathOrUrl(url, context.HttpContext, routes));
+                globalSettingsMock.Object.IsReservedPathOrUrl(url, context.HttpContext, routes));
         }
     }
 }
