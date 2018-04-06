@@ -89,19 +89,19 @@
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
-    <script type="text/javascript">
+    <script>
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript((IEnumerable<string>)ViewBag.ExternalSignInError)
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
         }
     </script>
 
-    <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
-    <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
+    <script src="lib/rgrove-lazyload/lazyload.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
     @if (isDebug)
     {
-        <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+        <script src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
 </body>
