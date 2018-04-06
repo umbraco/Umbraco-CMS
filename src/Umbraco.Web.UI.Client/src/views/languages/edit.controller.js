@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesEditController($scope, $timeout, $location, $routeParams, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper) {
+    function LanguagesEditController($scope, $timeout, $location, $routeParams, navigationService, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper) {
 
         var vm = this;
 
@@ -65,6 +65,10 @@
                     makeBreadcrumbs();
                 });
             }
+
+            $timeout(function () {
+                navigationService.syncTree({ tree: "languages", path: "-1" });
+            });
         }
 
         function save() {
