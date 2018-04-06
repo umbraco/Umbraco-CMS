@@ -1,19 +1,10 @@
-﻿@using System.Collections
-@using System.Net.Http
-@using System.Web.Mvc.Html
-@using Umbraco.Core
+﻿@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
-@using Microsoft.Owin.Security
-@using Newtonsoft.Json
-@using Newtonsoft.Json.Linq
 @using Umbraco.Core.IO
 @using Umbraco.Web
-@using Umbraco.Web.Editors
 @using umbraco
-
 @inherits System.Web.Mvc.WebViewPage
-
 @{
     var isDebug = false;
     if (Request.RawUrl.IndexOf('?') >= 0)
@@ -32,9 +23,7 @@
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
@@ -54,10 +43,10 @@
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <div ng-hide="!authenticated" ng-cloak>
-    
+
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
-        
+
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
             <noscript>
@@ -80,7 +69,7 @@
             <umb-notifications></umb-notifications>
 
         </div>
-        
+
     </div>
 
     <umb-backdrop
@@ -102,14 +91,11 @@
 
     <script type="text/javascript">
         document.angularReady = function(app) {
-
             @Html.AngularValueExternalLoginInfoScript((IEnumerable<string>)ViewBag.ExternalSignInError)
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
         }
     </script>
 
-
-    @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
     <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
@@ -118,6 +104,5 @@
         <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
-
 </body>
 </html>
