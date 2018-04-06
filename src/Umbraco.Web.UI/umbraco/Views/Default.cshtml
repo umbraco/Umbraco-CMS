@@ -51,7 +51,6 @@
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 </head>
-<noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <div ng-hide="!authenticated" ng-cloak>
@@ -60,6 +59,12 @@
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
         
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+
+            <noscript>
+                <h3>Umbraco</h3>
+                <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
+                <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.</p>
+            </noscript>
 
             <umb-navigation></umb-navigation>
 
