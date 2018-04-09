@@ -35,6 +35,8 @@ namespace Umbraco.Web.PropertyEditors
         public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
         {
             var val = property.GetValue(languageId, segment);
+            if (val == null) return null;
+
             ImageCropperValue value;
             try
             {
