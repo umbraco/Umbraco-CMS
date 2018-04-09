@@ -379,7 +379,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
-        /// <returns></returns>        
+        /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
                 int id,
@@ -409,9 +409,13 @@ namespace Umbraco.Web.Editors
                 return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
             }
 
+            // Note that we're excluding mapping of complex properties here to ensure that getting a larger amount of
+            // children for listviews and other similar cases, will not make everything halt when it tries to deserialize a
+            // complex property such as Nested Content.
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
-            pagedResult.Items = children
-                    .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
+            pagedResult.Items = children.Select(content =>
+                Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content,
+                    opts => { opts.Items["ExcludeComplexProperties"] = true; }));
 
             return pagedResult;
         }
