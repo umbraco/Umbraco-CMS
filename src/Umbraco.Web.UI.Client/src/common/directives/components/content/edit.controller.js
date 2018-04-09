@@ -207,7 +207,7 @@
         content: $scope.content,
         action: args.action
       }).then(function (data) {
-        //success            
+        //success
         init($scope.content);
         syncTreeNode($scope.content, data.path);
 
@@ -301,7 +301,7 @@
       var dialog = {
         title: "Ready to Publish?", //TODO: localize
         view: "publish",
-        variants: $scope.editors[0].content.variants, 
+        variants: $scope.editors[0].content.variants, //set a model property for the dialog
         submitButtonLabel: "Publish",
         submit: function(model) {
           model.submitButtonState = "busy";
@@ -311,6 +311,8 @@
             overlayService.close();
           }, function(err) {
               model.submitButtonState = "error";
+              //re-map the dialog model since we've re-bound the properties
+              dialog.variants = $scope.editors[0].content.variants;
               return $q.reject(err);
           });
         },
