@@ -32,7 +32,8 @@ namespace Umbraco.Web.Models.Mapping
                 //fixme these all need to the variant values but we need to wait for the db/service changes
                 Name = source.Name ,                
                 Exists = source.HasVariation(x.Id), //TODO: This needs to be wired up with new APIs when they are ready
-                PublishedState = source.PublishedState.ToString()
+                PublishedState = source.PublishedState.ToString(),
+                //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();
 
             var langId = context.GetLanguageId();

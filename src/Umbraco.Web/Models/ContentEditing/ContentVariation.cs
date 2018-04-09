@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
@@ -10,18 +11,19 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "contentVariant", Namespace = "")]
     public class ContentVariation
     {
+        [DataMember(Name = "language", IsRequired = true)]
+        [Required]
+        public Language Language { get; set; }
+
+        [DataMember(Name = "segment")]
+        public string Segment { get; set; }
+
         /// <summary>
         /// The content name of the variant
         /// </summary>
         [DataMember(Name = "name")]
         public string Name { get; set; }
         
-        [DataMember(Name = "language")]
-        public Language Language { get; set; }
-
-        [DataMember(Name = "segment")]
-        public string Segment { get; set; }
-
         [DataMember(Name = "state")]
         public string PublishedState { get; set; }
 

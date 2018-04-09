@@ -54,13 +54,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            var deferred = $q.defer();
-
             if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage, action: args.action })) {
 
                 args.scope.busy = true;
 
-                args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
+                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope, notifications: data.notifications });
@@ -74,7 +72,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         });
 
                         args.scope.busy = false;
-                        deferred.resolve(data);
 
                     }, function (err) {
                         self.handleSaveError({
@@ -91,14 +88,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             }
                         }
                         args.scope.busy = false;
-                        deferred.reject(err);
+                        return $q.reject(err);
                     });
             }
             else {
-                deferred.reject();
+                return angularHelper.rejectedPromise();
             }
-
-            return deferred.promise;
+            
         },
         
         /** Used by the content editor and media editor to add an info tab to the tabs array (normally known as the properties tab) */
@@ -508,7 +504,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * @description
          * A function to handle what happens when we have validation issues from the server side
          *
-         * TODO: Move to formHelper, so all this is in one place
          */
         handleSaveError: function (args) {
 

@@ -197,11 +197,10 @@
 
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
-      var deferred = $q.defer();
-
+      
       $scope.page.buttonGroupState = "busy";
 
-      contentEditingHelper.contentEditorPerformSave({
+      return contentEditingHelper.contentEditorPerformSave({
         statusMessage: args.statusMessage,
         saveMethod: args.saveMethod,
         scope: $scope,
@@ -214,7 +213,6 @@
 
         $scope.page.buttonGroupState = "success";
 
-        deferred.resolve(data);
       }, function (err) {
         //error
         if (err) {
@@ -222,11 +220,8 @@
         }
 
         $scope.page.buttonGroupState = "error";
-
-        deferred.reject(err);
+        return $q.reject(err);
       });
-
-      return deferred.promise;
     }
 
     function resetLastListPageNumber(content) {
@@ -304,15 +299,19 @@
       // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
 
       var dialog = {
-        title: "Ready to Publish?",
+        title: "Ready to Publish?", //TODO: localize
         view: "publish",
+        variants: $scope.editors[0].content.variants, 
         submitButtonLabel: "Publish",
         submit: function(model) {
           model.submitButtonState = "busy";
-          console.log(model.selection);
-          // TODO: call bulk publishing method
-          performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
+            
+          //we need to return this promise so that the dialog can handle the result and wire up the validation response
+          return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
             overlayService.close();
+          }, function(err) {
+              model.submitButtonState = "error";
+              return $q.reject(err);
           });
         },
         close: function(oldModel) {

@@ -73,10 +73,15 @@
 
         function save() {
 
-            if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+            if (formHelper.submitForm({ scope: $scope })) {
                 vm.page.saveButtonState = "busy";
 
                 languageResource.save(vm.language).then(function (lang) {
+
+                    formHelper.resetForm({
+                        scope: $scope
+                    });
+
                     vm.language = lang;
                     vm.page.saveButtonState = "success";
                     notificationsService.success(localizationService.localize("speechBubbles_languageSaved"));
@@ -86,10 +91,7 @@
                 }, function (err) {
                     vm.page.saveButtonState = "error";
 
-                    contentEditingHelper.handleSaveError({
-                        redirectOnFailure: false,
-                        err: err
-                    });
+                    formHelper.handleError(err);
 
                     //show any notifications
                     if (angular.isArray(err.data.notifications)) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Core.Models;
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// The language Id for the content variation being saved
         /// </summary>
         [DataMember(Name = "languageId")]
-        public int? LanguageId { get; set; }
+        public int? LanguageId { get; set; } //TODO: Change this to ContentVariationPublish, but this will all change anyways when we can edit all variants at once
 
         /// <summary>
         /// The template alias to save
@@ -29,5 +30,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "expireDate")]
         public DateTime? ExpireDate { get; set; }
 
+        /// <summary>
+        /// Indicates that these variations should also be published 
+        /// </summary>
+        [DataMember(Name = "publishVariations")]
+        public IEnumerable<ContentVariationPublish> PublishVariations { get; set; }
     }
 }

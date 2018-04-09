@@ -324,15 +324,21 @@
                 //this is basically the same as for media but we need to explicitly add some extra properties
                 var saveModel = this.formatMediaPostData(displayModel, action);
 
-                //get the selected variant
-                var currVariant = _.find(displayModel.variants,
-                    function(v) {
-                        return v.current === true;
+                //get the selected variant and build the additional published variants
+                saveModel.publishVariations = [];
+                _.each(displayModel.variants,
+                    function (d) {
+                        //set the selected variant if this is current
+                        if (d.current === true) {
+                            saveModel.languageId = d.language.id;
+                        }
+                        if (d.publish === true) {
+                            saveModel.publishVariations.push({
+                                languageId: d.language.id,
+                                segment: d.segment
+                            });
+                        }
                     });
-                if (currVariant) {
-                    saveModel.languageId = currVariant.language.id;
-                }
-                
 
                 var propExpireDate = displayModel.removeDate;
                 var propReleaseDate = displayModel.releaseDate;

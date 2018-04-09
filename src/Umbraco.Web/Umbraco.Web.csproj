@@ -230,6 +230,7 @@
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollectionBuilder.cs" />
     <Compile Include="Models\ContentEditing\ContentVariation.cs" />
+    <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />

@@ -412,7 +412,7 @@ Opens an overlay to show a custom YSOD. </br>
 (function() {
    'use strict';
 
-   function OverlayDirective($timeout, formHelper, overlayHelper, localizationService) {
+   function OverlayDirective($timeout, formHelper, overlayHelper, localizationService, $q) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -638,14 +638,21 @@ Opens an overlay to show a custom YSOD. </br>
          scope.submitForm = function(model) {
             if(scope.model.submit) {
                  if (formHelper.submitForm({scope: scope})) {
-                    formHelper.resetForm({ scope: scope });
-
-                    if(scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
-                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
-                    } else {
-                        unregisterOverlay();
-                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
-                    }
+                    
+                     if (scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
+                        //wrap in a when since we don't know if this is a promise or not
+                         $q.when(scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton)).then(
+                             function() {
+                                 formHelper.resetForm({ scope: scope });
+                             }, angular.noop);
+                     } else {
+                         unregisterOverlay();
+                         //wrap in a when since we don't know if this is a promise or not
+                         $q.when(scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton)).then(
+                             function() {
+                                 formHelper.resetForm({ scope: scope });
+                             }, angular.noop);
+                     }
 
                  }
              }
