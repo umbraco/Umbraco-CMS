@@ -60,11 +60,15 @@
 
             <umb-app-header></umb-app-header>
 
-            <umb-navigation></umb-navigation>
+            <div class="umb-app-content">
 
-            <section id="contentwrapper">
-                <div id="contentcolumn" ng-view></div>
-            </section>
+                <umb-navigation></umb-navigation>
+
+                <section id="contentwrapper">
+                    <div id="contentcolumn" ng-view></div>
+                </section>
+                
+            </div>
 
             <umb-tour
                 ng-if="tour.show"
