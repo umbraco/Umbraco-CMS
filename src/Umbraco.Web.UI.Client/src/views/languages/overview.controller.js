@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($location, notificationsService, localizationService, languageResource) {
+    function LanguagesOverviewController($location, $timeout, navigationService, notificationsService, localizationService, languageResource) {
 
         var vm = this;
 
@@ -35,6 +35,10 @@
             languageResource.getAll().then(function(languages) {
                 vm.languages = languages;
                 vm.loading = false;
+            });
+
+            $timeout(function () {
+                navigationService.syncTree({ tree: "languages", path: "-1" });
             });
         }
 
