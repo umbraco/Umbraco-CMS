@@ -88,6 +88,11 @@
         <td>Set an alternate submit button label key for localized texts</td>
     </tr>
     <tr>
+        <td>model.submitButtonState</td>
+        <td>String</td>
+        <td>Set the state for the submit button</td>
+    </tr>
+    <tr>
         <td>model.hideSubmitButton</td>
         <td>Boolean</td>
         <td>Hides the submit button</td>
@@ -438,7 +443,7 @@ Opens an overlay to show a custom YSOD. </br>
                // this has to be done inside a timeout to ensure the destroy
                // event on other overlays is run before registering a new one
                registerOverlay();
-
+               
                setOverlayIndent();
 
             });
@@ -556,8 +561,8 @@ Opens an overlay to show a custom YSOD. </br>
             var overlayWidth = el.context.clientWidth;
 
             el.css('width', overlayWidth - indentSize);
-
-            if(scope.position === "center" || scope.position === "target") {
+            
+            if(scope.position === "center" && overlayIndex > 0 || scope.position === "target" && overlayIndex > 0) {
                var overlayTopPosition = el.context.offsetTop;
                el.css('top', overlayTopPosition + indentSize);
             }

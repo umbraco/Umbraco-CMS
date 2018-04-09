@@ -13,6 +13,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
+    $scope.overlay = {};
 
 
     $scope.removeNotification = function (index) {
@@ -111,6 +112,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         };
     }));
 
+    // events for drawer
     // manage the help dialog by subscribing to the showHelp appState
     $scope.drawer = {};
     evts.push(eventsService.on("appState.drawerState.changed", function (e, args) {
@@ -128,6 +130,12 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         }
     }));
 
+    // events for overlays
+    evts.push(eventsService.on("appState.overlay", function (name, args) {
+        $scope.overlay = args;
+    }));
+    
+    // events for tours
     evts.push(eventsService.on("appState.tour.start", function (name, args) {
         $scope.tour = args;
         $scope.tour.show = true;
@@ -141,6 +149,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.tour = null;
     }));
 
+    // events for backdrop
     evts.push(eventsService.on("appState.backdrop", function (name, args) {
         $scope.backdrop = args;
     }));

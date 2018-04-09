@@ -71,7 +71,8 @@
                     ng-if="model.submit && model.hideSubmitButton !== true"
                     type="button"
                     disabled="model.disableSubmitButton"
-                    action="submitForm(model)">
+                    action="submitForm(model)"
+                    state="model.submitButtonState">
                 </umb-button>
             </div>
 
