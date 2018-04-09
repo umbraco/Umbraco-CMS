@@ -2,9 +2,10 @@ using System.Linq;
 using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Web;
 using Umbraco.Web.UI;
 
-namespace Umbraco.Web.umbraco.presentation.umbraco.create
+namespace umbraco
 {
     public class MemberGroupTasks : LegacyDialogTask
     {
