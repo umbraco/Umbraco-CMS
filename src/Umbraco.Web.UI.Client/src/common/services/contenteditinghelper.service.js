@@ -440,7 +440,25 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             //a method to ignore built-in prop changes
             var shouldIgnore = function(propName) {
-                return _.some(["tabs", "notifications", "ModelState", "tabs", "properties"], function(i) {
+                return _.some([
+                    "tabs",
+                    "notifications",
+                    "ModelState",
+                    "tabs",
+                    "properties",
+                    "apps",
+                    "createDateFormatted",
+                    "releaseDateYear",
+                    "releaseDateMonth",
+                    "releaseDateDayNumber",
+                    "releaseDateDay",
+                    "releaseDateTime",
+                    "removeDateYear",
+                    "removeDateMonth",
+                    "removeDateDayNumber",
+                    "removeDateDay",
+                    "removeDateTime",
+                ], function (i) {
                     return i === propName;
                 });
             };

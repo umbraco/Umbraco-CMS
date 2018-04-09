@@ -557,6 +557,47 @@ namespace Umbraco.Web.Editors
             return contentItemDisplay;
         }
 
+        /// <summary>
+        /// This will check content variants other than the current one for validation errors
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="dto"></param>
+        /// <param name="display"></param>
+        /// <remarks>
+        /// When publishing a content variant, we need to ensure that:
+        /// a) the current variant passes validation rules
+        /// b) the default variant and any mandatory variants pass validation rules
+        /// </remarks>
+        private bool ValidateContentVariants(IContent content, ContentItemDto<IContent> dto, ContentItemDisplay display)
+        {
+            var variants = display.Variants.ToList();
+            if (variants.Count == 1) return true;  // no need to validate others
+
+            var validator = new ContentItemValidationHelper<IContent, ContentItemSave>();
+
+            var currVariant = display.Variants.First(x => x.IsCurrent);
+
+            var isValid = true;
+
+            //for each variant, we'll need to re-map to a display object to validate it's properties
+            foreach (var contentVariation in variants.Where(x => x.Mandatory && x.Language.Id != currVariant.Language.Id))
+            {
+                var mapped = MapToBasic(content, contentVariation.Language.Id);
+                var modelState = new ModelStateDictionary(); //new dictionary since we don't want validation results populating the current model state (at least for now)
+                var variantValid = validator.ValidatePropertyData(mapped, dto, modelState);
+                if (!variantValid)
+                {
+                    display.AddErrorNotification(
+                        Services.TextService.Localize("speechBubbles/contentVariantValidationErrorHeader"),
+                        Services.TextService.Localize("speechBubbles/contentLanguageValidationErrorText", new[]{contentVariation.Language.Name}));
+
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
             //If we've reached here it means:
@@ -623,6 +664,10 @@ namespace Umbraco.Web.Editors
 
             //return the updated model
             var display = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
+
+            //validate the mandatory variants
+            if (!ValidateContentVariants(contentItem.PersistedContent, contentItem.ContentDto, display))
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -1131,6 +1176,28 @@ namespace Umbraco.Web.Editors
                 new Dictionary<string, object> { { ContextMapper.LanguageKey, languageId } });
 
             return display;
+        }
+
+        /// <summary>
+        /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemBasic"/> and ensuring a language is present if required
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="languageId"></param>
+        /// <returns></returns>
+        private ContentItemBasic<ContentPropertyBasic, IContent> MapToBasic(IContent content, int? languageId = null)
+        {
+            //a languageId must exist in the mapping context if this content item has any property type that can be varied by language
+            //otherwise the property validation will fail since it's expecting to be get/set with a language ID. If a languageId is not explicitly
+            //sent up, then it means that the user is editing the default variant language.
+            if (!languageId.HasValue && content.HasLanguageVariantPropertyType())
+            {
+                languageId = Services.LocalizationService.GetDefaultVariantLanguage().Id;
+            }
+
+            var basic = ContextMapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content, UmbracoContext,
+                new Dictionary<string, object> { { ContextMapper.LanguageKey, languageId } });
+
+            return basic;
         }
     }
 }

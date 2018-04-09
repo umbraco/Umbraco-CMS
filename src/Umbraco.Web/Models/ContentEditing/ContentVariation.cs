@@ -36,5 +36,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "current")]
         public bool IsCurrent { get; set; }
+
+        /// <summary>
+        /// If the variant is a required variant for validation purposes
+        /// </summary>
+        [DataMember(Name = "mandatory")]
+        public bool Mandatory { get; set; }
     }
 }

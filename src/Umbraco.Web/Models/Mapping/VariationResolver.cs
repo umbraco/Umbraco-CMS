@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
             var variants = langs.Select(x => new ContentVariation
             {
                 Language = x,
+                Mandatory = x.Mandatory,
                 //fixme these all need to the variant values but we need to wait for the db/service changes
                 Name = source.Name ,                
                 Exists = source.HasVariation(x.Id), //TODO: This needs to be wired up with new APIs when they are ready
