@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// Implements <see cref="IContentService"/>.
+    /// Implements <see cref="IConsentService"/>.
     /// </summary>
     internal class ConsentService : ScopeRepositoryService, IConsentService
     {
