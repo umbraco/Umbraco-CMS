@@ -46,6 +46,7 @@
         <key alias="setPermissions">Set permissions</key>
         <key alias="unlock">Unlock</key>
         <key alias="createblueprint">Create Content Template</key>
+        <key alias="resendInvite">Resend Invitation</key>
     </area>
     <area alias="actionCategories">
         <key alias="content">Content</key>
@@ -1419,6 +1420,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
         <key alias="memberExportedSuccess">Member was exported to file</key>
         <key alias="memberExportedError">An error occurred while exporting the member</key>
+        <key alias="deleteUserSuccess">User %0% was deleted</key>
+        <key alias="resendInviteHeader">Invite user</key>
+        <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1996,6 +2000,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     </html>]]>
         </key>
         <key alias="invite">Invite</key>
+        <key alias="defaultInvitationMessage">Resending invitation...</key>
+        <key alias="deleteUser">Delete User</key>
+        <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
     </area>
 
     <area alias="validation">
