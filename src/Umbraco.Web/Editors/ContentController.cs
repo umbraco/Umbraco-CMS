@@ -306,6 +306,11 @@ namespace Umbraco.Web.Editors
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
             mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+
+            //Remove all variants except for the default since currently the default must be saved before other variants can be edited
+            //TODO: Allow for editing all variants at once ... this will be a future task
+            mapped.Variants = new[] {mapped.Variants.First(x => x.IsCurrent)};
+
             return mapped;
         }
 
