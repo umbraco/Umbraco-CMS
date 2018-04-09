@@ -11,7 +11,7 @@ Umbraco is a free open source Content Management System built on the ASP.NET pla
 
 ## Watch an introduction video
 
-[![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](https://umbraco.tv/videos/umbraco-v7/content-editor/basics/introduction/cms-explanation/)
+[![ScreenShot](https://shop.umbraco.com/images/whatisumbraco.png)](https://umbraco.tv/videos/umbraco-v7/content-editor/basics/introduction/cms-explanation/)
 
 ## Umbraco - The Friendly CMS
 
