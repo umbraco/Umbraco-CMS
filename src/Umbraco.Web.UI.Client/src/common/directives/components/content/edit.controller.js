@@ -101,7 +101,7 @@
       // set first app to active
       $scope.content.apps[0].active = true;
 
-      // create new editor for split view
+        // create new editor for split view
         if ($scope.editors.length === 0) {
             var editor = {
                 content: $scope.content
@@ -294,24 +294,28 @@
     $scope.saveAndPublish = function () {
 
       // TODO: we only want to open the bulk publish dialog if there are more than one variant to publish
-      // TODO: Add "..." to publish button label if there are more than one variant to publish
-      // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
-
+      // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
+        if ($scope.content.variants.length > 1) {
             var dialog = {
                 title: "Ready to Publish?", //TODO: localize
                 view: "publish",
-                variants: $scope.editors[0].content.variants, //set a model property for the dialog
+                variants: $scope.content.variants, //set a model property for the dialog
+                skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                 submitButtonLabel: "Publish",
                 submit: function(model) {
                     model.submitButtonState = "busy";
 
                     //we need to return this promise so that the dialog can handle the result and wire up the validation response
-          return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
+                    return performSave({
+                        saveMethod: contentResource.publish,
+                        action: "publish"
+                    }).then(function() {
                             overlayService.close();
-          }, function(err) {
+                        },
+                        function(err) {
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = $scope.editors[0].content.variants;
+                            dialog.variants = $scope.content.variants;
                             return $q.reject(err);
                         });
                 },
@@ -321,7 +325,10 @@
             };
 
             overlayService.open(dialog);
-
+        }
+        else {
+            return performSave({ saveMethod: contentResource.publish, action: "publish" });
+        }
     };
 
     $scope.save = function () {

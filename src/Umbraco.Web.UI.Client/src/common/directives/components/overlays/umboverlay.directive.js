@@ -637,7 +637,7 @@ Opens an overlay to show a custom YSOD. </br>
 
          scope.submitForm = function(model) {
             if(scope.model.submit) {
-                 if (formHelper.submitForm({scope: scope})) {
+                if (formHelper.submitForm({ scope: scope, skipValidation: scope.model.skipFormValidation})) {
                     
                      if (scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
                         //wrap in a when since we don't know if this is a promise or not
