@@ -243,7 +243,7 @@
             // load audit trail when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
                 $timeout(function(){
-                    if (args.id === -1) {
+                    if (args.alias === "info") {
                         isInfoTab = true;
                         loadAuditTrail();
                     } else {
