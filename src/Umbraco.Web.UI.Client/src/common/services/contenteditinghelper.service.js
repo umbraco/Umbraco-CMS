@@ -69,6 +69,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         });
 
                         args.scope.busy = false;
+                        return $q.when(data);
 
                     }, function (err) {
                         self.handleSaveError({

@@ -200,27 +200,28 @@
       
       $scope.page.buttonGroupState = "busy";
 
-      return contentEditingHelper.contentEditorPerformSave({
-        saveMethod: args.saveMethod,
-        scope: $scope,
-        content: $scope.content,
-        action: args.action
-      }).then(function (data) {
-        //success
-        init($scope.content);
-        syncTreeNode($scope.content, data.path);
+        return contentEditingHelper.contentEditorPerformSave({
+            saveMethod: args.saveMethod,
+            scope: $scope,
+            content: $scope.content,
+            action: args.action
+        }).then(function(data) {
+                //success
+                init($scope.content);
+                syncTreeNode($scope.content, data.path);
 
-        $scope.page.buttonGroupState = "success";
+                $scope.page.buttonGroupState = "success";
+                return $q.when(data);
+            },
+            function(err) {
+                //error
+                if (err) {
+                    editorState.set($scope.content);
+                }
 
-      }, function (err) {
-        //error
-        if (err) {
-          editorState.set($scope.content);
-        }
-
-        $scope.page.buttonGroupState = "error";
-        return $q.reject(err);
-      });
+                $scope.page.buttonGroupState = "error";
+                return $q.reject(err);
+            });
     }
 
     function resetLastListPageNumber(content) {
@@ -303,17 +304,18 @@
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                     submitButtonLabel: "Publish",
-                    submit: function (model) {
+                    submit: function(model) {
                         model.submitButtonState = "busy";
 
                         //we need to return this promise so that the dialog can handle the result and wire up the validation response
                         return performSave({
                             saveMethod: contentResource.publish,
                             action: "publish"
-                        }).then(function () {
+                        }).then(function(data) {
                                 overlayService.close();
+                                return $q.when(data);
                             },
-                            function (err) {
+                            function(err) {
                                 model.submitButtonState = "error";
                                 //re-map the dialog model since we've re-bound the properties
                                 dialog.variants = $scope.content.variants;
@@ -323,9 +325,10 @@
                                 //will need to fix validation errors on the properties
                                 if (err.data && err.data.ModelState) {
                                     var keys = _.keys(err.data.ModelState);
-                                    var foundVariantError = _.find(keys, function(k) {
-                                        return k.startsWith("publish_variant_");
-                                    });
+                                    var foundVariantError = _.find(keys,
+                                        function(k) {
+                                            return k.startsWith("publish_variant_");
+                                        });
                                     if (!foundVariantError) {
                                         //no variant errors, close the dialog
                                         overlayService.close();
@@ -335,7 +338,7 @@
                                 return $q.reject(err);
                             });
                     },
-                    close: function (oldModel) {
+                    close: function(oldModel) {
                         overlayService.close();
                     }
                 };
