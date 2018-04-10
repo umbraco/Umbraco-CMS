@@ -102,6 +102,19 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         }
     }));
 
+    // Listen for language updates
+    evts.push(eventsService.on("editors.languages.languageDeleted", function(e, args) {
+        languageResource.getAll().then(function(languages) {
+            $scope.languages = languages;
+        });
+    }));
+
+    evts.push(eventsService.on("editors.languages.languageCreated", function(e, args) {
+        languageResource.getAll().then(function(languages) {
+            $scope.languages = languages;
+        });
+    }));
+
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     evts.push(eventsService.on("app.closeDialogs", function(event) {
         if (appState.getGlobalState("stickyNavigation")) {

@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesEditController($scope, $timeout, $location, $routeParams, navigationService, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper) {
+    function LanguagesEditController($scope, $timeout, $location, $routeParams, navigationService, notificationsService, localizationService, languageResource, contentEditingHelper, formHelper, eventsService) {
 
         var vm = this;
 
@@ -80,6 +80,12 @@
                     vm.language = lang;
                     vm.page.saveButtonState = "success";
                     notificationsService.success(localizationService.localize("speechBubbles_languageSaved"));
+
+                    // emit event when language is created
+                    if($routeParams.create) {
+                        var args = { language: lang };
+                        eventsService.emit("editors.languages.languageCreated", args);
+                    }
 
                     back();
 
