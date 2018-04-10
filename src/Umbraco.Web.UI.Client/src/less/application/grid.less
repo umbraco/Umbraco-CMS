@@ -62,10 +62,6 @@ body.umb-drawer-is-visible #mainwrapper{
   margin: 0
 }
 
-#contentwrapper {
-    top: @appHeaderHeight;
-}
-
 #umb-notifications-wrapper {
     left: 80px;
 }
@@ -87,7 +83,7 @@ body.umb-drawer-is-visible #mainwrapper{
   z-index: 1100;
   float: left;
   position: absolute;
-  top: @appHeaderHeight;
+  top: 0;
 }
 
 #navigation {
@@ -98,17 +94,16 @@ body.umb-drawer-is-visible #mainwrapper{
   z-index: 100;
   background: @white;
   height: 100%;
-
 }
 
-.navigation-inner-container{
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    border-right: 1px solid @gray-9;
-    z-index: 100;
+.navigation-inner-container {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  border-right: 1px solid @gray-9;
+  z-index: 100;
 }
 
 #dialog {
@@ -124,6 +119,7 @@ body.umb-drawer-is-visible #mainwrapper{
   padding: 0px;
   z-index: 100 !important;
   overflow: auto;
+  height: 100%;
 }
 
 #tree .umb-tree {
