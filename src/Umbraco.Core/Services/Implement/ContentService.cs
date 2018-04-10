@@ -1518,11 +1518,11 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
         /// </summary>
-        public void EmptyRecycleBin()
+        public OperationResult EmptyRecycleBin()
         {
             var nodeObjectType = Constants.ObjectTypes.Document;
             var deleted = new List<IContent>();
-            var evtMsgs = EventMessagesFactory.Get(); // todo - and then?
+            var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1533,11 +1533,11 @@ namespace Umbraco.Core.Services.Implement
                 // are managed by Delete, and not here.
 
                 // no idea what those events are for, keep a simplified version
-                var recycleBinEventArgs = new RecycleBinEventArgs(nodeObjectType);
+                var recycleBinEventArgs = new RecycleBinEventArgs(nodeObjectType, evtMsgs);
                 if (scope.Events.DispatchCancelable(EmptyingRecycleBin, this, recycleBinEventArgs))
                 {
                     scope.Complete();
-                    return; // causes rollback
+                    return OperationResult.Cancel(evtMsgs);
                 }
 
                 // emptying the recycle bin means deleting whetever is in there - do it properly!
@@ -1557,6 +1557,8 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Complete();
             }
+
+            return OperationResult.Succeed(evtMsgs);
         }
 
         #endregion
@@ -2311,7 +2313,7 @@ namespace Umbraco.Core.Services.Implement
             content.WriterId = userId;
 
             foreach (var property in blueprint.Properties)
-                content.SetValue(property.Alias, property.GetValue());
+                content.SetValue(property.Alias, property.GetValue()); //fixme doesn't take into account variants
 
             return content;
         }

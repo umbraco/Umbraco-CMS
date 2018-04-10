@@ -25,8 +25,10 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Web.Models;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
+using ContentVariation = Umbraco.Core.Models.ContentVariation;
 
 namespace Umbraco.Web.Editors
 {
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
-            return foundContent.Select(x => ContextMapper.Map<IContent, ContentItemDisplay>(x, UmbracoContext));
+            return foundContent.Select(x => MapToDisplay(x));
         }
 
         /// <summary>
@@ -223,7 +225,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
+            var content = MapToDisplay(foundContent);
 
             SetupBlueprint(content, foundContent);
 
@@ -250,18 +252,20 @@ namespace Umbraco.Web.Editors
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="languageId"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(int id)
+        public ContentItemDisplay GetById(int id, int? languageId = null)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
+                return null;//irrelevant since the above throws
             }
 
-            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
+            var content = MapToDisplay(foundContent, languageId);
             return content;
         }
 
@@ -274,7 +278,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
+            var content = MapToDisplay(foundContent);
             return content;
         }
 
@@ -297,11 +301,16 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
-            var mapped = ContextMapper.Map<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
+            var mapped = MapToDisplay(emptyContent);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
             mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+
+            //Remove all variants except for the default since currently the default must be saved before other variants can be edited
+            //TODO: Allow for editing all variants at once ... this will be a future task
+            mapped.Variants = new[] {mapped.Variants.First(x => x.IsCurrent)};
+
             return mapped;
         }
 
@@ -536,7 +545,16 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            return PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            //ensure the active language is still selected
+            if (contentItem.LanguageId.HasValue)
+            {
+                foreach (var contentVariation in contentItemDisplay.Variants)
+                {
+                    contentVariation.IsCurrent = contentVariation.Language.Id == contentItem.LanguageId;
+                }
+            }
+            return contentItemDisplay;
         }
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
@@ -561,7 +579,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = ContextMapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
+                    var forDisplay = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -598,13 +616,13 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                contentItem.PersistedContent.PublishValues(); // fixme variants?
+                contentItem.PersistedContent.PublishValues(contentItem.LanguageId);
                 publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
             }
 
             //return the updated model
-            var display = ContextMapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
+            var display = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -858,7 +876,7 @@ namespace Umbraco.Web.Editors
 
             var unpublishResult = Services.ContentService.Unpublish(foundContent, Security.CurrentUser.Id);
 
-            var content = ContextMapper.Map<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
+            var content = MapToDisplay(foundContent);
 
             if (unpublishResult.Success == false)
             {
@@ -903,7 +921,10 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            base.MapPropertyValues(contentItem);
+            base.MapPropertyValues<IContent, ContentItemSave>(
+                contentItem,
+                (save, property) => property.GetValue(save.LanguageId),         //get prop val
+                (save, property, v) => property.SetValue(v, save.LanguageId));  //set prop val
         }
 
         /// <summary>
@@ -1090,5 +1111,26 @@ namespace Umbraco.Web.Editors
             return allowed;
         }
 
+        /// <summary>
+        /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring a language is present if required
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="languageId"></param>
+        /// <returns></returns>
+        private ContentItemDisplay MapToDisplay(IContent content, int? languageId = null)
+        {
+            //a languageId must exist in the mapping context if this content item has any property type that can be varied by language
+            //otherwise the property validation will fail since it's expecting to be get/set with a language ID. If a languageId is not explicitly
+            //sent up, then it means that the user is editing the default variant language.
+            if (!languageId.HasValue && content.HasLanguageVariantPropertyType())
+            {
+                languageId = Services.LocalizationService.GetDefaultVariantLanguage().Id;
+            }
+
+            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,
+                new Dictionary<string, object> { { ContextMapper.LanguageKey, languageId } });
+
+            return display;
+        }
     }
 }

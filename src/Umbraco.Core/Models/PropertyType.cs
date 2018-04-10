@@ -20,6 +20,9 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyType : EntityBase, IEquatable<PropertyType>
     {
+        //fixme this should be invariant by default but for demo purposes and until the UI is updated to support changing a property type we'll make this neutral by default
+        private const ContentVariation DefaultVaryBy = ContentVariation.CultureNeutral;
+
         private static PropertySelectors _selectors;
 
         private readonly bool _forceValueStorageType;
@@ -47,7 +50,7 @@ namespace Umbraco.Core.Models
 
             _propertyEditorAlias = dataType.EditorAlias;
             _valueStorageType = dataType.DatabaseType;
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = DefaultVaryBy;
         }
 
         /// <summary>
@@ -84,7 +87,7 @@ namespace Umbraco.Core.Models
             _valueStorageType = valueStorageType;
             _forceValueStorageType = forceValueStorageType;
             _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = DefaultVaryBy;
         }
 
         private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
@@ -392,6 +395,8 @@ namespace Umbraco.Core.Models
             throw new InvalidOperationException($"Cannot assign value \"{value}\" of type \"{value.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
         }
 
+
+        //fixme - perhaps this and other validation methods should be a service level (not a model) thing?
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>

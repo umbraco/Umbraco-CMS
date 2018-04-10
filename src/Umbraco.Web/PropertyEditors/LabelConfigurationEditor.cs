@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     {
         /// <inheritdoc />
-        public override LabelConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, LabelConfiguration configuration)
+        public override LabelConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, LabelConfiguration configuration)
         {
             var newConfiguration = new LabelConfiguration();
 

@@ -50,7 +50,7 @@ namespace Umbraco.Web.PropertyEditors
             return jobject.Property("color").Value.Value<string>();
         }
 
-        public override ColorPickerConfiguration FromConfigurationEditor(Dictionary<string, object> editorValues, ColorPickerConfiguration configuration)
+        public override ColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ColorPickerConfiguration configuration)
         {
             var output = new ColorPickerConfiguration();
 

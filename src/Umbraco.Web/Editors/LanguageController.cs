@@ -7,11 +7,12 @@ using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Editors
 {
@@ -42,23 +43,9 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IEnumerable<Language> GetAllLanguages()
         {
-            var allLanguages = Services.LocalizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
-            var langs = Mapper.Map<IEnumerable<Language>>(allLanguages).ToList();
+            var allLanguages = Services.LocalizationService.GetAllLanguages();
 
-            //if there's only one language, by default it is the default
-            if (langs.Count == 1)
-            {
-                langs[0].IsDefaultVariantLanguage = true;
-                langs[0].Mandatory = true;
-            }   
-            else if (allLanguages.All(x => !x.IsDefaultVariantLanguage))
-            {
-                //if no language has the default flag, then the defaul language is the one with the lowest id
-                langs[0].IsDefaultVariantLanguage = true;
-                langs[0].Mandatory = true;
-            }
-
-            return langs.OrderBy(x => x.Name);
+            return Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages);
         }
 
         [HttpGet]

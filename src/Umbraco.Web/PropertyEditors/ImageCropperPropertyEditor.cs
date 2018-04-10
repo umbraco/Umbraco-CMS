@@ -50,16 +50,11 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.
         /// </summary>
-        /// <param name="property">The property.</param>
-        /// <param name="ensureValue">A value indicating whether to check that the property has a non-empty value.</param>
+        /// <param name="property">The property.</param>        
         /// <returns>A value indicating whether a property is an image cropper field, and (optionaly) has a non-empty value.</returns>
-        private static bool IsCropperField(Property property, bool ensureValue)
+        private static bool IsCropperField(Property property)
         {
-            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.Aliases.ImageCropper)
-                return false;
-            if (ensureValue == false)
-                return true;
-            return property.GetValue() is string && string.IsNullOrWhiteSpace((string) property.GetValue()) == false;
+            return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper;
         }
 
         /// <summary>
@@ -89,33 +84,51 @@ namespace Umbraco.Web.PropertyEditors
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>
-        /// <param name="allPropertyData"></param>
-        internal IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
-        {
-            return allPropertyData.SelectMany(x => x.Value)
-                .Where(x => IsCropperField(x, true)).Select(x =>
-                {
-                    var jo = GetJObject((string) x.GetValue(), true);
-                    if (jo?["src"] == null) return null;
-                    var src = jo["src"].Value<string>();
-                    return string.IsNullOrWhiteSpace(src) ? null : _mediaFileSystem.GetRelativePath(src);
-                }).WhereNotNull();
-        }
-
-        /// <summary>
-        /// Ensures any files associated are removed
-        /// </summary>
         /// <param name="deletedEntities"></param>
         internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
         {
             return deletedEntities.SelectMany(x => x.Properties)
-                .Where(x => IsCropperField(x, true)).Select(x =>
-                {
-                    var jo = GetJObject((string) x.GetValue(), true);
-                    if (jo?["src"] == null) return null;
-                    var src = jo["src"].Value<string>();
-                    return string.IsNullOrWhiteSpace(src) ? null : _mediaFileSystem.GetRelativePath(src);
-                }).WhereNotNull();
+                .Where(IsCropperField)
+                .SelectMany(GetFilePathsFromPropertyValues)
+                .Distinct();
+        }
+
+        /// <summary>
+        /// Look through all propery values stored against the property and resolve any file paths stored
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        private IEnumerable<string> GetFilePathsFromPropertyValues(Property prop)
+        {
+            //parses out the src from a json string
+
+            foreach (var propertyValue in prop.Values)
+            {
+                //check if the published value contains data and return it
+                var src = GetFileSrcFromPropertyValue(propertyValue.PublishedValue, out var _);
+                if (src != null) yield return _mediaFileSystem.GetRelativePath(src);
+
+                //check if the edited value contains data and return it
+                src = GetFileSrcFromPropertyValue(propertyValue.EditedValue, out var _);
+                if (src != null) yield return _mediaFileSystem.GetRelativePath(src);
+            }
+        }
+
+        /// <summary>
+        /// Returns the "src" property from the json structure if the value is formatted correctly
+        /// </summary>
+        /// <param name="propVal"></param>
+        /// <param name="deserializedValue">The deserialized <see cref="JObject"/> value</param>
+        /// <returns></returns>
+        private string GetFileSrcFromPropertyValue(object propVal, out JObject deserializedValue)
+        {
+            deserializedValue = null;
+            if (propVal == null || !(propVal is string str)) return null;
+            if (!str.DetectIsJson()) return null;
+            deserializedValue = GetJObject(str, true);
+            if (deserializedValue?["src"] == null) return null;
+            var src = deserializedValue["src"].Value<string>();
+            return _mediaFileSystem.GetRelativePath(src);
         }
 
         /// <summary>
@@ -125,23 +138,25 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="args">The event arguments.</param>
         public void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
         {
-            // get the image cropper field properties with a value
-            var properties = args.Original.Properties.Where(x => IsCropperField(x, true));
+            // get the image cropper field properties
+            var properties = args.Original.Properties.Where(IsCropperField);
 
             // copy files
             var isUpdated = false;
             foreach (var property in properties)
             {
-                var jo = GetJObject((string) property.GetValue(), true);
-
-                var src = jo?["src"]?.Value<string>();
-                if (string.IsNullOrWhiteSpace(src)) continue;
-
-                var sourcePath = _mediaFileSystem.GetRelativePath(src);
-                var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                jo["src"] = _mediaFileSystem.GetUrl(copyPath);
-                args.Copy.SetValue(property.Alias, jo.ToString());
-                isUpdated = true;
+                //copy each of the property values (variants, segments) to the destination by using the edited value
+                foreach (var propertyValue in property.Values)
+                {
+                    var propVal = property.GetValue(propertyValue.LanguageId, propertyValue.Segment);
+                    var src = GetFileSrcFromPropertyValue(propVal, out var jo);
+                    if (src == null) continue;
+                    var sourcePath = _mediaFileSystem.GetRelativePath(src);
+                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                    jo["src"] = _mediaFileSystem.GetUrl(copyPath);
+                    args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.LanguageId, propertyValue.Segment);
+                    isUpdated = true;
+                }
             }
             // if updated, re-save the copy with the updated value
             if (isUpdated)
@@ -185,7 +200,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         private void AutoFillProperties(IContentBase model)
         {
-            var properties = model.Properties.Where(x => IsCropperField(x, false));
+            var properties = model.Properties.Where(IsCropperField);
 
             foreach (var property in properties)
             {

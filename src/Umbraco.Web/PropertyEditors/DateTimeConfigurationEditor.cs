@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfiguration>
     {
-        public override Dictionary<string, object> ToValueEditor(object configuration)
+        public override IDictionary<string, object> ToValueEditor(object configuration)
         {
             var d = base.ToValueEditor(configuration);
             d["pickTime"] = true;

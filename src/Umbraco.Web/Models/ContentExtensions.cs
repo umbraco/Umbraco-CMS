@@ -12,6 +12,30 @@ namespace Umbraco.Web.Models
     public static class ContentExtensions
     {
         /// <summary>
+        /// Returns true if the content has any property type that allows language variants
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static bool HasLanguageVariantPropertyType(this IContent content)
+        {
+            return content.PropertyTypes.Any(x => x.Variations == ContentVariation.CultureNeutral);
+        }
+
+        /// <summary>
+        /// Returns true if the content has a variation for the language/segment combination
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="langId"></param>
+        /// <param name="segment"></param>
+        /// <returns></returns>
+        public static bool HasVariation(this IContent content, int langId, string segment = null)
+        {
+            //TODO: Wire up with new APIs
+            return false;
+            //return content.Languages.FirstOrDefault(x => x == langId);
+        }
+
+        /// <summary>
         /// Gets the culture that would be selected to render a specified content,
         /// within the context of a specified current request.
         /// </summary>

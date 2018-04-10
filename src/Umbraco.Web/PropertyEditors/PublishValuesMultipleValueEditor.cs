@@ -69,12 +69,13 @@ namespace Umbraco.Web.PropertyEditors
         /// Override so that we can return a json array to the editor for multi-select values
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="propertyType"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="languageId"></param>
+        /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ToEditor(Property property, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
         {
-            var delimited = base.ToEditor(property, dataTypeService).ToString();
+            var delimited = base.ToEditor(property, dataTypeService, languageId, segment).ToString();
             return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
 

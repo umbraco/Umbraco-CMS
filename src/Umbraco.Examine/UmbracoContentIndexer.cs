@@ -347,6 +347,7 @@ namespace Umbraco.Examine
                 foreach (var property in c.Properties)
                 {
                     //only add the value if its not null or empty (we'll check for string explicitly here too)
+                    //fixme support variants with language id
                     var val = property.GetValue();
                     switch (val)
                     {

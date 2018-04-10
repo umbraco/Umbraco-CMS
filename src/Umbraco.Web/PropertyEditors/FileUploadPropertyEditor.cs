@@ -36,30 +36,12 @@ namespace Umbraco.Web.PropertyEditors
         /// Gets a value indicating whether a property is an upload field.
         /// </summary>
         /// <param name="property">The property.</param>
-        /// <param name="ensureValue">A value indicating whether to check that the property has a non-empty value.</param>
         /// <returns>A value indicating whether a property is an upload field, and (optionaly) has a non-empty value.</returns>
-        private static bool IsUploadField(Property property, bool ensureValue)
+        private static bool IsUploadField(Property property)
         {
-            if (property.PropertyType.PropertyEditorAlias != Constants.PropertyEditors.Aliases.UploadField)
-                return false;
-            if (ensureValue == false)
-                return true;
-            var stringValue = property.GetValue() as string;
-            return string.IsNullOrWhiteSpace(stringValue) == false;
+            return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
         }
-
-        /// <summary>
-        /// Ensures any files associated are removed
-        /// </summary>
-        /// <param name="allPropertyData"></param>
-        internal IEnumerable<string> ServiceEmptiedRecycleBin(Dictionary<int, IEnumerable<Property>> allPropertyData)
-        {
-            return allPropertyData.SelectMany(x => x.Value)
-                .Where (x => IsUploadField(x, true))
-                .Select(x => _mediaFileSystem.GetRelativePath((string)x.GetValue()))
-                .ToList();
-        }
-
+        
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>
@@ -67,9 +49,31 @@ namespace Umbraco.Web.PropertyEditors
         internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
         {
             return deletedEntities.SelectMany(x => x.Properties)
-                .Where(x => IsUploadField(x, true))
-                .Select(x => _mediaFileSystem.GetRelativePath((string) x.GetValue()))
-                .ToList();
+                .Where(IsUploadField)
+                .SelectMany(GetFilePathsFromPropertyValues)
+                .Distinct();
+        }
+
+        /// <summary>
+        /// Look through all propery values stored against the property and resolve any file paths stored
+        /// </summary>
+        /// <param name="prop"></param>
+        /// <returns></returns>
+        private IEnumerable<string> GetFilePathsFromPropertyValues(Property prop)
+        {
+            var propVals = prop.Values;
+            foreach (var propertyValue in propVals)
+            {
+                //check if the published value contains data and return it
+                var propVal = propertyValue.PublishedValue;
+                if (propVal != null && propVal is string str1 && !str1.IsNullOrWhiteSpace())
+                    yield return _mediaFileSystem.GetRelativePath(str1);
+
+                //check if the edited value contains data and return it
+                propVal = propertyValue.EditedValue;
+                if (propVal != null && propVal is string str2 && !str2.IsNullOrWhiteSpace())
+                    yield return _mediaFileSystem.GetRelativePath(str2);
+            }
         }
 
         /// <summary>
@@ -80,16 +84,22 @@ namespace Umbraco.Web.PropertyEditors
         internal void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
         {
             // get the upload field properties with a value
-            var properties = args.Original.Properties.Where(x => IsUploadField(x, true));
+            var properties = args.Original.Properties.Where(IsUploadField);
 
             // copy files
             var isUpdated = false;
             foreach (var property in properties)
             {
-                var sourcePath = _mediaFileSystem.GetRelativePath((string) property.GetValue());
-                var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath));
-                isUpdated = true;
+                //copy each of the property values (variants, segments) to the destination
+                foreach (var propertyValue in property.Values)
+                {
+                    var propVal = property.GetValue(propertyValue.LanguageId, propertyValue.Segment);
+                    if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace()) continue;
+                    var sourcePath = _mediaFileSystem.GetRelativePath(str);
+                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                    args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.LanguageId, propertyValue.Segment);
+                    isUpdated = true;
+                }
             }
 
             // if updated, re-save the copy with the updated value
@@ -134,7 +144,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         private void AutoFillProperties(IContentBase model)
         {
-            var properties = model.Properties.Where(x => IsUploadField(x, false));
+            var properties = model.Properties.Where(IsUploadField);
 
             foreach (var property in properties)
             {

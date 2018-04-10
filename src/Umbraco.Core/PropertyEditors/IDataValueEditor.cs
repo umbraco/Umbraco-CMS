@@ -61,7 +61,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a value for the editor.
         /// </summary>
-        object ToEditor(Property property, IDataTypeService dataTypeService);
+        object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null);
 
         // fixme - editing - document or remove these
         // why property vs propertyType? services should be injected! etc...

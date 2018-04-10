@@ -60,15 +60,17 @@ namespace Umbraco.Web.PropertyEditors
             /// Format the data for the editor
             /// </summary>
             /// <param name="property"></param>
-            /// <param name="propertyType"></param>
             /// <param name="dataTypeService"></param>
+            /// <param name="languageId"></param>
+            /// <param name="segment"></param>
             /// <returns></returns>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
             {
-                if (property.GetValue() == null)
+                var val = property.GetValue(languageId, segment);
+                if (val == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(property.GetValue().ToString(), new Dictionary<string, string>());
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(val.ToString(), new Dictionary<string, string>());
                 return parsed;
             }
 

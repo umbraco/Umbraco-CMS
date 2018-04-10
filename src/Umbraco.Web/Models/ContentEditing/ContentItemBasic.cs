@@ -24,6 +24,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "published")]
         public bool Published { get; set; }
 
+        /// <summary>
+        /// Determines if the content item is a draft
+        /// </summary>
+        [DataMember(Name = "edited")]
+        public bool Edited { get; set; }
+
         [DataMember(Name = "owner")]
         public UserProfile Owner { get; set; }
 
@@ -75,8 +81,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "properties")]
         public virtual IEnumerable<T> Properties
         {
-            get { return _properties; }
-            set { _properties = value; }
+            get => _properties;
+            set => _properties = value;
         }
 
         /// <summary>

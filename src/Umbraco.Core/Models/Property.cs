@@ -89,7 +89,7 @@ namespace Umbraco.Core.Models
         /// Gets the list of values.
         /// </summary>
         [DataMember]
-        public List<PropertyValue> Values
+        public IReadOnlyCollection<PropertyValue> Values
         {
             get => _values;
             set

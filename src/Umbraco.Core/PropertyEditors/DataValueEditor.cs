@@ -232,22 +232,24 @@ namespace Umbraco.Core.PropertyEditors
         // eg
         // [ { "value": "hello" }, { "lang": "fr-fr", "value": "bonjour" } ]
 
-        /// <summary>
-        /// A method to deserialize the string value that has been saved in the content editor
-        /// to an object to be stored in the database.
-        /// </summary>
-        /// <param name="editorValue"></param>
-        /// <param name="currentValue">
-        /// The current value that has been persisted to the database for this editor. This value may be usesful for
-        /// how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
-        /// </param>
+        ///  <summary>
+        ///  A method to deserialize the string value that has been saved in the content editor
+        ///  to an object to be stored in the database.
+        ///  </summary>
+        ///  <param name="editorValue"></param>
+        ///  <param name="currentValue">
+        ///  The current value that has been persisted to the database for this editor. This value may be usesful for
+        ///  how the value then get's deserialized again to be re-persisted. In most cases it will probably not be used.
+        ///  </param>
+        /// <param name="languageId"></param>
+        /// <param name="segment"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
-        ///
-        /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
-        /// value to the DB will fail when it tries to validate the value type.
-        /// </remarks>
+        ///  <remarks>
+        ///  By default this will attempt to automatically convert the string value to the value type supplied by ValueType.
+        /// 
+        ///  If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
+        ///  value to the DB will fail when it tries to validate the value type.
+        ///  </remarks>
         public virtual object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             //if it's json but it's empty json, then return null
@@ -269,16 +271,18 @@ namespace Umbraco.Core.PropertyEditors
         /// A method used to format the database value to a value that can be used by the editor
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="propertyType"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="languageId"></param>
+        /// <param name="segment"></param>
         /// <returns></returns>
         /// <remarks>
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(Property property, IDataTypeService dataTypeService)
+        public virtual object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
         {
-            if (property.GetValue() == null) return string.Empty;
+            var val = property.GetValue(languageId, segment);
+            if (val == null) return string.Empty;
 
             switch (ValueTypes.ToStorageType(ValueType))
             {
@@ -286,7 +290,7 @@ namespace Umbraco.Core.PropertyEditors
                 case ValueStorageType.Nvarchar:
                     //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
                     //to a real json object so we can pass the true json object directly to angular!
-                    var asString = property.GetValue().ToString();
+                    var asString = val.ToString();
                     if (asString.DetectIsJson())
                     {
                         try
@@ -304,12 +308,12 @@ namespace Umbraco.Core.PropertyEditors
                 case ValueStorageType.Decimal:
                     //Decimals need to be formatted with invariant culture (dots, not commas)
                     //Anything else falls back to ToString()
-                    var decim = property.GetValue().TryConvertTo<decimal>();
+                    var decim = val.TryConvertTo<decimal>();
                     return decim.Success
                         ? decim.Result.ToString(NumberFormatInfo.InvariantInfo)
-                        : property.GetValue().ToString();
+                        : val.ToString();
                 case ValueStorageType.Date:
-                    var date = property.GetValue().TryConvertTo<DateTime?>();
+                    var date = val.TryConvertTo<DateTime?>();
                     if (date.Success == false || date.Result == null)
                     {
                         return string.Empty;

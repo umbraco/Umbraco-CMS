@@ -17,7 +17,6 @@ namespace Umbraco.Core.Models
         private ITemplate _template;
         private bool _published;
         private PublishedState _publishedState;
-        private string _language;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
@@ -79,7 +78,6 @@ namespace Umbraco.Core.Models
         {
             public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
             public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
@@ -149,7 +147,7 @@ namespace Umbraco.Core.Models
         /// is true or false, but can also temporarily be Publishing or Unpublishing when the
         /// content item is about to be saved.</remarks>
         [DataMember]
-        internal PublishedState PublishedState
+        public PublishedState PublishedState
         {
             get => _publishedState;
             set
@@ -163,16 +161,6 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public bool Edited { get; internal set; }
 
-        /// <summary>
-        /// Language of the data contained within this Content object.
-        /// </summary>
-        [Obsolete("This is not used and will be removed from the codebase in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Language
-        {
-            get => _language;
-            set => SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector);
-        }
 
         /// <summary>
         /// The date this Content should be released and thus be published

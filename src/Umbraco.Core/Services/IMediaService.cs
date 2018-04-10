@@ -248,7 +248,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
-        void EmptyRecycleBin();
+        OperationResult EmptyRecycleBin();
 
         /// <summary>
         /// Deletes all media of specified type. All children of deleted media is moved to Recycle Bin.

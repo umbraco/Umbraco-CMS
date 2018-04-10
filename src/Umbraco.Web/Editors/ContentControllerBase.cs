@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
     {
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
         {
-            ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
+            ModelState.AddModelError("id", $"content with id: {id} was not found");
             var errorResponse = Request.CreateErrorResponse(
                 HttpStatusCode.NotFound,
                 ModelState);
@@ -66,9 +66,16 @@ namespace Umbraco.Web.Editors
         /// Maps the dto property values to the persisted model
         /// </summary>
         /// <typeparam name="TPersisted"></typeparam>
+        /// <typeparam name="TSaved"></typeparam>
         /// <param name="contentItem"></param>
-        protected virtual void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
+        /// <param name="getPropertyValue"></param>
+        /// <param name="savePropertyValue"></param>
+        protected void MapPropertyValues<TPersisted, TSaved>(
+            TSaved contentItem,
+            Func<TSaved, Property, object> getPropertyValue,
+            Action<TSaved, Property, object> savePropertyValue)
             where TPersisted : IContentBase
+            where TSaved : ContentBaseItemSave<TPersisted>
         {
             // map the property values
             foreach (var propertyDto in contentItem.ContentDto.Properties)
@@ -102,7 +109,7 @@ namespace Umbraco.Web.Editors
                 };
 
                 // let the editor convert the value that was received, deal with files, etc
-                var value = valueEditor.FromEditor(data, property.GetValue());
+                var value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
 
                 // set the value - tags are special
                 var tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
@@ -110,10 +117,11 @@ namespace Umbraco.Web.Editors
                 {
                     var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
                     if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = tagAttribute.Delimiter;
+                    //fixme how is this supposed to work with variants?
                     property.SetTagsValue(value, tagConfiguration);
                 }
                 else
-                    property.SetValue(value);
+                    savePropertyValue(contentItem, property, value);
             }
         }
 

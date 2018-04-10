@@ -112,6 +112,7 @@ namespace Umbraco.Core.Models
         private static void RemoveTags(this Property property, IEnumerable<string> tags, TagsStorageType storageType, char delimiter)
         {
             // already empty = nothing to do
+            //fixme doesn't take into account variants
             var value = property.GetValue()?.ToString();
             if (string.IsNullOrWhiteSpace(value)) return;
 
@@ -145,6 +146,7 @@ namespace Umbraco.Core.Models
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
+            //fixme doesn't take into account variants
             var value = property.GetValue()?.ToString();
             if (string.IsNullOrWhiteSpace(value)) return Enumerable.Empty<string>();
 
@@ -154,6 +156,7 @@ namespace Umbraco.Core.Models
                     return value.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
 
                 case TagsStorageType.Json:
+                    //fixme doesn't take into account variants
                     return JsonConvert.DeserializeObject<JArray>(property.GetValue().ToString()).Select(x => x.ToString().Trim());
 
                 default:
@@ -167,9 +170,7 @@ namespace Umbraco.Core.Models
         /// <param name="property">The property.</param>
         /// <param name="value">The property value.</param>
         /// <param name="tagConfiguration">The datatype configuration.</param>
-        /// <param name="tagPropertyEditorAttribute">The property editor tags configuration attribute.</param>
-        /// <remarks>
-        /// <para>The tags configuration is specified by the <paramref name="tagPropertyEditorAttribute"/> marking the property editor.</para>
+        /// <remarks>        
         /// <para>The value is either a string (delimited string) or an enumeration of strings (tag list).</para>
         /// <para>This is used both by the content repositories to initialize a property with some tag values, and by the
         /// content controllers to update a property with values received from the property editor.</para>

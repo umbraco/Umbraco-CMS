@@ -39,14 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityId"></param>
         /// <returns></returns>
         EntityPermissionCollection GetPermissionsForEntity(int entityId);
-
-        ///// <summary>
-        ///// Gets the implicit/inherited list of permissions for the content item
-        ///// </summary>
-        ///// <param name="path"></param>
-        ///// <returns></returns>
-        //IEnumerable<EntityPermission> GetPermissionsForPath(string path);
-
+        
         /// <summary>
         /// Used to add/update a permission for a content item
         /// </summary>

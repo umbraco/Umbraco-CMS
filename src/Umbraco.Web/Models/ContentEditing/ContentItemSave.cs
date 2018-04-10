@@ -12,6 +12,12 @@ namespace Umbraco.Web.Models.ContentEditing
     public class ContentItemSave : ContentBaseItemSave<IContent>
     {
         /// <summary>
+        /// The language Id for the content variation being saved
+        /// </summary>
+        [DataMember(Name = "languageId")]
+        public int? LanguageId { get; set; }
+
+        /// <summary>
         /// The template alias to save
         /// </summary>
         [DataMember(Name = "templateAlias")]

@@ -21,6 +21,7 @@ namespace Umbraco.Core.Models
             var val = media.Properties[propertyType];
             if (val == null) return string.Empty;
 
+            //fixme doesn't take into account variants
             var jsonString = val.GetValue() as string;
             if (jsonString == null) return string.Empty;
 

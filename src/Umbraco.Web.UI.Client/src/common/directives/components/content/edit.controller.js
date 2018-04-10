@@ -42,6 +42,11 @@
         }
       }
 
+        //init can be called more than once and we don't want to have multiple bound events
+      for (var e in evts) {
+          eventsService.unsubscribe(evts[e]);
+      }
+
       evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
         createButtons(args.node);
       }));
@@ -52,61 +57,6 @@
 
       // We don't get the info tab from the server from version 7.8 so we need to manually add it
       //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-      // prototype variants
-      $scope.content.variants = [
-        {
-          "cultureDisplayName": "English (United States)",
-          "culture": "en-US",
-          "current": true,
-          "segments" : [
-            {
-              "name": "Mobile"
-            },
-            {
-              "name": "Job campign"
-            }
-          ],
-          "state": "Published"
-        },
-        {
-          "cultureDisplayName": "Danish",
-          "culture": "da-DK",
-          "current": false,
-          "segments" : [
-            {
-              "name": "Mobile"
-            }
-          ],
-          "state": "Published"
-        },
-        {
-            "cultureDisplayName": "Spanish (Spain)",
-            "culture": "es-ES",
-            "current": false,
-            "state": "Published (pending changes)"
-        },
-        {
-            "cultureDisplayName": "French (France)",
-            "culture": "fr-FR",
-            "current": false,
-            "segments" : [
-              {
-                "name": "Mobile"
-              },
-              {
-                "name": "Job campign"
-              }
-            ],
-            "state": "Draft"
-        },
-        {
-            "cultureDisplayName": "German (Germany)",
-            "culture": "de-DE",
-            "current": false,
-            "state": "Draft"
-        }
-      ];
 
       // prototype content and info apps
       var contentApp = {
@@ -152,20 +102,30 @@
       $scope.content.apps[0].active = true;
 
       // create new editor for split view
-      if($scope.editors.length === 0) {
-        var editor = {};
-        editor.content = $scope.content;
-        $scope.editors.push(editor);
-      }
-
+        if ($scope.editors.length === 0) {
+            var editor = {
+                content: $scope.content
+            };
+            $scope.editors.push(editor);
+        }
+        else if ($scope.editors.length === 1) {
+            $scope.editors[0].content = $scope.content
+        }
+        else {
+            //fixme - need to fix something here if we are re-loading a content item that is in a split view
+        }
     }
 
-    function getNode() {
+      /**
+       *  This does the content loading and initializes everything, called on load and changing variants
+       * @param {any} languageId
+       */
+    function getNode(languageId) {
 
       $scope.page.loading = true;
 
       //we are editing so get the content item from the server
-      $scope.getMethod()($scope.contentId)
+      $scope.getMethod()($scope.contentId, languageId)
         .then(function (data) {
 
           $scope.content = data;
@@ -470,7 +430,11 @@
       angular.forEach(variants, function(variant) {
         variant.current = false;
       });
+
       selectedVariant.current = true;
+
+      //go get the variant
+      getNode(selectedVariant.language.id);
     }
 
     $scope.closeSplitView = function(index, editor) {
@@ -497,6 +461,7 @@
       }, 100);
     
       // fake loading of content
+      // TODO: Make this real, but how do we deal with saving since currently we only save one variant at a time?!
       $timeout(function(){
         $scope.editors[editorIndex].content = angular.copy($scope.content);
         $scope.editors[editorIndex].content.name = "What a variant";

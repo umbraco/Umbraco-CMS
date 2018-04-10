@@ -12,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
                 .Config = new Dictionary<string, object> { { "idType", "udi" } };
         }
 
-        public override Dictionary<string, object> ToValueEditor(object configuration)
+        public override IDictionary<string, object> ToValueEditor(object configuration)
         {
             // these are not configuration fields, but constants required by the value editor
             var d = base.ToValueEditor(configuration);

@@ -19,6 +19,9 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
+        //fixme this should be invariant by default but for demo purposes and until the UI is updated to support changing a property type we'll make this neutral by default
+        private const ContentVariation DefaultVaryBy = ContentVariation.CultureNeutral;
+
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private string _alias;
@@ -46,7 +49,7 @@ namespace Umbraco.Core.Models
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
 
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = DefaultVaryBy;
         }
 
         protected ContentTypeBase(IContentTypeBase parent)
@@ -67,7 +70,7 @@ namespace Umbraco.Core.Models
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
 
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = DefaultVaryBy;
         }
 
         /// <summary>

@@ -160,6 +160,19 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- get NuGet packages directory -->
   <PropertyGroup>
+    <PostBuildEvent>
+REM if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
+REM xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\x86\*.*" "$(TargetDir)x86"
+REM if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
+REM xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
+REM xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
+    <PostBuildEvent>REM     if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
+REM     xcopy /s /y "$(NugetPackages)\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\x86\*.*" "$(TargetDir)x86"
+REM     if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
+REM     xcopy /s /y "$(NugetPackages)\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>
     <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
   </PropertyGroup>
   <Target Name="BeforeBuild">
