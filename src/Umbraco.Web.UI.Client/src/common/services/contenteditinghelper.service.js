@@ -89,7 +89,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     });
             }
             else {
-                return angularHelper.rejectedPromise();
+                return $q.reject();
             }
             
         },
@@ -152,7 +152,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //publish action
                         return {
                             letter: ch,
-                            labelKey: "buttons_saveAndPublish",
+                            labelKey: args.content.variants && args.content.variants.length > 1 ? "buttons_saveAndPublishMany" : "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
