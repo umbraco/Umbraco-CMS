@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper) {
+function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
 
     //TODO: Need to think about this and an nicer way to acheive what this is doing.
     //the tree event handler i used to subscribe to the main tree click events
@@ -31,6 +31,10 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.menuDialogTitle = null;
     $scope.menuActions = [];
     $scope.menuNode = null;
+    $scope.languages = [];
+    $scope.selectedLanguage = {};
+    $scope.page = {};
+    $scope.page.languageSelectorIsOpen = false;
 
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.showNavigation = appState.getGlobalState("showNavigation");
@@ -115,7 +119,27 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //when the application is ready and the user is authorized setup the data
     evts.push(eventsService.on("app.ready", function(evt, data) {
         $scope.authenticated = true;
+        
+        // load languages
+        languageResource.getAll().then(function(languages) {
+            $scope.languages = languages;
+
+            // select the default language
+            $scope.languages.forEach(function(language) {
+                if(language.isDefault) {
+                    $scope.selectLanguage(language);
+                }
+            });
+
+        });
+
     }));
+
+    $scope.selectLanguage = function(language, languages) {
+        $scope.selectedLanguage = language;
+        // close the language selector
+        $scope.page.languageSelectorIsOpen = false;
+    };
 
     //this reacts to the options item in the tree
     //todo, migrate to nav service
@@ -155,8 +179,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         }
     };
     
-    $scope.toggleTreeLanguageSelector = function() {
-        $scope.treeLanguageSelectorIsOpen = !$scope.treeLanguageSelectorIsOpen;
+    $scope.toggleLanguageSelector = function() {
+        $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;
     };
 
     //ensure to unregister from all events!
