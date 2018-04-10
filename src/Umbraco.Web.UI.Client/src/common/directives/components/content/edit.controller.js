@@ -295,35 +295,53 @@
 
       // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
         if ($scope.content.variants.length > 1) {
-            var dialog = {
-                title: "Ready to Publish?", //TODO: localize
-                view: "publish",
-                variants: $scope.content.variants, //set a model property for the dialog
-                skipFormValidation: true, //when submitting the overlay form, skip any client side validation
-                submitButtonLabel: "Publish",
-                submit: function(model) {
-                    model.submitButtonState = "busy";
+            //before we launch the dialog we want to execute all client side validations first
+            if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
+                var dialog = {
+                    title: "Ready to Publish?", //TODO: localize
+                    view: "publish",
+                    variants: $scope.content.variants, //set a model property for the dialog
+                    skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    submitButtonLabel: "Publish",
+                    submit: function (model) {
+                        model.submitButtonState = "busy";
 
-                    //we need to return this promise so that the dialog can handle the result and wire up the validation response
-                    return performSave({
-                        saveMethod: contentResource.publish,
-                        action: "publish"
-                    }).then(function() {
-                            overlayService.close();
-                        },
-                        function(err) {
-                            model.submitButtonState = "error";
-                            //re-map the dialog model since we've re-bound the properties
-                            dialog.variants = $scope.content.variants;
-                            return $q.reject(err);
-                        });
-                },
-                close: function(oldModel) {
-                    overlayService.close();
-                }
-            };
+                        //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                        return performSave({
+                            saveMethod: contentResource.publish,
+                            action: "publish"
+                        }).then(function () {
+                                overlayService.close();
+                            },
+                            function (err) {
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
 
-            overlayService.open(dialog);
+                                //check the error list for specific variant errors, if none exist that means that only server side validation
+                                //for the current variant's properties failed, in this case we want to close the publish dialog since the user
+                                //will need to fix validation errors on the properties
+                                if (err.data && err.data.ModelState) {
+                                    var keys = _.keys(err.data.ModelState);
+                                    var foundVariantError = _.find(keys, function(k) {
+                                        return k.startsWith("publish_variant_");
+                                    });
+                                    if (!foundVariantError) {
+                                        //no variant errors, close the dialog
+                                        overlayService.close();
+                                    }
+                                }
+
+                                return $q.reject(err);
+                            });
+                    },
+                    close: function (oldModel) {
+                        overlayService.close();
+                    }
+                };
+
+                overlayService.open(dialog);
+            }
         }
         else {
             return performSave({ saveMethod: contentResource.publish, action: "publish" });
