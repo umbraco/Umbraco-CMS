@@ -40,20 +40,12 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
             else {
                 currentForm = args.formCtrl;
             }
-            //if no statusPropertyName is set we'll default to formStatus.
-            if (!args.statusPropertyName) {
-                args.statusPropertyName = "formStatus";
-            }
-            //if no statusTimeout is set, we'll  default to 2500 ms
-            if (!args.statusTimeout) {
-                args.statusTimeout = 2500;
-            }
             
             //the first thing any form must do is broadcast the formSubmitting event
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
             //then check if the form is valid
-            if (!args.skipValidation) {                
+            if (!args.skipValidation) {
                 if (currentForm.$invalid) {
                     return false;
                 }
@@ -62,16 +54,6 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
             //reset the server validations
             serverValidationManager.reset();
             
-            //check if a form status should be set on the scope
-            if (args.statusMessage) {
-                args.scope[args.statusPropertyName] = args.statusMessage;
-
-                //clear the message after the timeout
-                $timeout(function () {
-                    args.scope[args.statusPropertyName] = undefined;
-                }, args.statusTimeout);
-            }
-
             return true;
         },
         
@@ -95,14 +77,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                 throw "args.scope cannot be null";
             }
             
-            //if no statusPropertyName is set we'll default to formStatus.
-            if (!args.statusPropertyName) {
-                args.statusPropertyName = "formStatus";
-            }
-            //clear the status
-            args.scope[args.statusPropertyName] = null;
-
-            this.showNotifications(args);            
+            this.showNotifications(args);
 
             args.scope.$broadcast("formSubmitted", { scope: args.scope });
         },

@@ -60,7 +60,7 @@ function MemberGroupsEditController($scope, $routeParams, appState, navigationSe
 
     $scope.save = function () {
 
-        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (formHelper.submitForm({ scope: $scope })) {
 
             $scope.page.saveButtonState = "busy";
 

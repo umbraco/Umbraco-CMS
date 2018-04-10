@@ -119,7 +119,7 @@
 
         function save() {
 
-            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
+            if (formHelper.submitForm({ scope: $scope })) {
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {

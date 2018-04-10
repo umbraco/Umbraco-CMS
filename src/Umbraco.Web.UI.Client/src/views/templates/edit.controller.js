@@ -5,7 +5,6 @@
 
         var vm = this;
         var oldMasterTemplateAlias = null;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.loading = true;
@@ -33,7 +32,6 @@
             vm.template.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: templateResource.save,
                 scope: $scope,
                 content: vm.template,

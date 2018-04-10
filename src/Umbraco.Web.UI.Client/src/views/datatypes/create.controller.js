@@ -20,7 +20,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
             dataTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();

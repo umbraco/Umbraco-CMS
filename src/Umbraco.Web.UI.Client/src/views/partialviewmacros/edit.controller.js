@@ -4,7 +4,6 @@
     function partialViewMacrosEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper, macroResource) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.loading = true;
@@ -31,7 +30,6 @@
             vm.partialViewMacro.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.partialViewMacro,

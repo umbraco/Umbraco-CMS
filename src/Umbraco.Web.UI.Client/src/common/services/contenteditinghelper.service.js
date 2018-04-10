@@ -40,9 +40,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.content) {
                 throw "args.content is not defined";
             }
-            if (!args.statusMessage) {
-                throw "args.statusMessage is not defined";
-            }
             if (!args.saveMethod) {
                 throw "args.saveMethod is not defined";
             }
@@ -54,7 +51,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage, action: args.action })) {
+            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, action: args.action })) {
 
                 args.scope.busy = true;
 

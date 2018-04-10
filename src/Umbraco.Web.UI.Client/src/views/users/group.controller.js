@@ -4,8 +4,6 @@
     function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
-
 
         vm.page = {};        
         vm.page.rootIcon = "icon-folder";
@@ -78,7 +76,6 @@
             vm.page.saveButtonState = "busy";
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,

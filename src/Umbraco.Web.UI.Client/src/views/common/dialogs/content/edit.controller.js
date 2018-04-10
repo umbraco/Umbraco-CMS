@@ -7,7 +7,6 @@ function ContentEditDialogController($scope, editorState, $routeParams, $q, $tim
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
         contentEditingHelper.contentEditorPerformSave({
-            statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
             scope: $scope,
             content: $scope.content
@@ -74,15 +73,15 @@ function ContentEditDialogController($scope, editorState, $routeParams, $q, $tim
     }  
 
     $scope.sendToPublish = function () {
-        performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending..." });
+        performSave({ saveMethod: contentResource.sendToPublish });
     };
 
     $scope.saveAndPublish = function () {
-        performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing..." });
+        performSave({ saveMethod: contentResource.publish });
     };
 
     $scope.save = function () {
-        performSave({ saveMethod: contentResource.save, statusMessage: "Saving..." });
+        performSave({ saveMethod: contentResource.save });
     };
 
     // this method is called for all action buttons and then we proxy based on the btn definition

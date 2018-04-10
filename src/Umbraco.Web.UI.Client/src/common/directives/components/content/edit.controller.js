@@ -201,7 +201,6 @@
       $scope.page.buttonGroupState = "busy";
 
       return contentEditingHelper.contentEditorPerformSave({
-        statusMessage: args.statusMessage,
         saveMethod: args.saveMethod,
         scope: $scope,
         content: $scope.content,
@@ -260,7 +259,7 @@
 
     $scope.unPublish = function () {
 
-      if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
+      if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
 
         $scope.page.buttonGroupState = "busy";
 
@@ -289,7 +288,7 @@
     };
 
     $scope.sendToPublish = function () {
-      return performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending...", action: "sendToPublish" });
+      return performSave({ saveMethod: contentResource.sendToPublish, action: "sendToPublish" });
     };
 
     $scope.saveAndPublish = function () {
@@ -298,35 +297,35 @@
       // TODO: Add "..." to publish button label if there are more than one variant to publish
       // return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
 
-      var dialog = {
-        title: "Ready to Publish?", //TODO: localize
-        view: "publish",
-        variants: $scope.editors[0].content.variants, //set a model property for the dialog
-        submitButtonLabel: "Publish",
-        submit: function(model) {
-          model.submitButtonState = "busy";
-            
-          //we need to return this promise so that the dialog can handle the result and wire up the validation response
-          return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
-            overlayService.close();
-          }, function(err) {
-              model.submitButtonState = "error";
-              //re-map the dialog model since we've re-bound the properties
-              dialog.variants = $scope.editors[0].content.variants;
-              return $q.reject(err);
-          });
-        },
-        close: function(oldModel) {
-          overlayService.close();
-        }
-      };
+            var dialog = {
+                title: "Ready to Publish?", //TODO: localize
+                view: "publish",
+                variants: $scope.editors[0].content.variants, //set a model property for the dialog
+                submitButtonLabel: "Publish",
+                submit: function(model) {
+                    model.submitButtonState = "busy";
 
-      overlayService.open(dialog);
+                    //we need to return this promise so that the dialog can handle the result and wire up the validation response
+          return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" }).then(function(){
+                            overlayService.close();
+          }, function(err) {
+                            model.submitButtonState = "error";
+                            //re-map the dialog model since we've re-bound the properties
+                            dialog.variants = $scope.editors[0].content.variants;
+                            return $q.reject(err);
+                        });
+                },
+                close: function(oldModel) {
+                    overlayService.close();
+                }
+            };
+
+            overlayService.open(dialog);
 
     };
 
     $scope.save = function () {
-      return performSave({ saveMethod: $scope.saveMethod(), statusMessage: "Saving...", action: "save" });
+      return performSave({ saveMethod: $scope.saveMethod(), action: "save" });
     };
 
     $scope.preview = function (content) {
