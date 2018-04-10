@@ -38,8 +38,19 @@ namespace Umbraco.Web.Models.Mapping
 
             var langId = context.GetLanguageId();
 
-            //set the current variant being edited to the one found in the context or the default, whichever matches
-            variants.First(x => (langId.HasValue && langId.Value == x.Language.Id) || x.Language.IsDefaultVariantLanguage).IsCurrent = true;
+            //set the current variant being edited to the one found in the context or the default if nothing matches
+            var foundCurrent = false;
+            foreach (var variant in variants)
+            {
+                if (langId.HasValue && langId.Value == variant.Language.Id)
+                {
+                    variant.IsCurrent = true;
+                    foundCurrent = true;
+                    break;
+                }
+            }
+            if (!foundCurrent)
+                variants.First(x => x.Language.IsDefaultVariantLanguage).IsCurrent = true;
 
             return variants;
         }

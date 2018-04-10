@@ -293,7 +293,6 @@
 
     $scope.saveAndPublish = function () {
 
-      // TODO: we only want to open the bulk publish dialog if there are more than one variant to publish
       // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
         if ($scope.content.variants.length > 1) {
             var dialog = {

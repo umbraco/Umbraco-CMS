@@ -17,6 +17,7 @@
                         name="publishVariantSelector"
                         type="checkbox"
                         ng-model="variant.publish"
+                        ng-change="vm.changeSelection(variant)"
                         ng-disabled="variant.validationError"
                         style="margin-right: 8px;"
                         val-server-field="{{variant.htmlId}}"/>
