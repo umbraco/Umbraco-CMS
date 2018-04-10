@@ -1,7 +1,10 @@
 (function () {
     'use strict';
 
-    function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService) {
+    function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location,
+        appState, contentResource, entityResource, navigationService, notificationsService, angularHelper,
+        serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper,
+        keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService) {
 
         var evts = [];
 
@@ -17,6 +20,7 @@
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
+        $scope.page.languageId = $scope.languageId;
         $scope.allowOpen = true;
 
         // add all editors to an editors array to support split view 
@@ -109,7 +113,7 @@
                 $scope.editors.push(editor);
             }
             else if ($scope.editors.length === 1) {
-                $scope.editors[0].content = $scope.content
+                $scope.editors[0].content = $scope.content;
             }
             else {
                 //fixme - need to fix something here if we are re-loading a content item that is in a split view
@@ -258,10 +262,10 @@
         }
         else {
 
-            getNode();
+            //Browse content nodes based on the selected tree language variant
+            $scope.page.languageId ? getNode($scope.languageId) : getNode();
 
         }
-
 
         $scope.unPublish = function () {
 
@@ -402,8 +406,6 @@
                 $scope.page.buttonRestore = "error";
                 notificationsService.error(error.headline, error.content);
             });
-
-
         };
 
         $scope.selectVariant = function (variant, variants, form) {
@@ -527,7 +529,8 @@
                 page: "=?",
                 saveMethod: "&",
                 getMethod: "&",
-                getScaffoldMethod: "&?"
+                getScaffoldMethod: "&?",
+                languageId: "=?"
             }
         };
 

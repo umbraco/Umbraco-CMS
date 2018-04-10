@@ -8,8 +8,6 @@
  */
 function ContentEditController($scope, $routeParams, contentResource) {
 
-
-
     function scaffoldEmpty() {
         return contentResource.getScaffold($routeParams.id, $routeParams.doctype);
     }
@@ -23,6 +21,7 @@ function ContentEditController($scope, $routeParams, contentResource) {
     $scope.getScaffoldMethod = $routeParams.blueprintId ? scaffoldBlueprint : scaffoldEmpty;
     $scope.page = $routeParams.page;
     $scope.isNew = $routeParams.create;
+    $scope.languageId = $routeParams.languageId;
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Content.EditController", ContentEditController);
