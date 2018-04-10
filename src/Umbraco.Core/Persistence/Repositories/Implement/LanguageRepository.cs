@@ -89,6 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                                //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
                                // but we still need to remove them
                                "DELETE FROM cmsLanguageText WHERE languageId = @id",
+                               "DELETE FROM umbracoPropertyData WHERE languageId = @id",
                                "DELETE FROM umbracoLanguage WHERE id = @id"
                            };
             return list;
