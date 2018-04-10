@@ -13,7 +13,7 @@
             <div class="umb-dashboard__content">
 
                 <umb-tabs-content view="true">
-                    <umb-tab id="tab{{tab.id}}" ng-repeat="tab in dashboard.tabs" rel="{{tab.id}}">
+                    <umb-tab id="tab{{tab.id}}" ng-repeat="tab in dashboard.tabs" rel="{{tab.id}}" class="row-fluid">
         
                         <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
         
