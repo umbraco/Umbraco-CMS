@@ -263,7 +263,7 @@
         else {
 
             //Browse content nodes based on the selected tree language variant
-            $scope.page.languageId ? getNode($scope.languageId) : getNode();
+            $scope.page.languageId ? getNode($scope.page.languageId) : getNode();
 
         }
 
