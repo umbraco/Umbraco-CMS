@@ -74,7 +74,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             });
         });
 
-        $scope.selectLanguage = function (language, languages) {
+        $scope.selectLanguage = function (language) {
             $scope.selectedLanguage = language;
             // close the language selector
             $scope.page.languageSelectorIsOpen = false;
@@ -254,7 +254,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
                 //from the server in this method.
                 if ($scope.model.select) {
-                    $scope.model.select(args.node)
+                    $scope.model.select(args.node);
                 } else {
                     select(args.node.name, args.node.id);
                     //toggle checked state
