@@ -317,9 +317,10 @@
 
     # copy libs
     Write-Host "Copy SqlCE libraries"
-    $this.CopyFiles("$src\packages\SqlServerCE.4.0.0.1", "*.*", "$tmp\bin", `
+    $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
+    $this.CopyFiles("$nugetPackages\SqlServerCE\4.0.0.1", "*.*", "$tmp\bin", `
       { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") })
-    $this.CopyFiles("$src\packages\SqlServerCE.4.0.0.1", "*.*", "$tmp\WebApp\bin", `
+    $this.CopyFiles("$nugetPackages\SqlServerCE\4.0.0.1", "*.*", "$tmp\WebApp\bin", `
       { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") })
 
     # copy Belle
